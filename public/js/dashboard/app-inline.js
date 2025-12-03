@@ -24130,128 +24130,68 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             { id: 'emma-config', label: 'Emma', icon: 'iconoir-settings', component: EmmaConfigTab }
         ];
 
-        // État pour gérer les onglets visibles et ceux dans "Plus"
-        const [visibleTabs, setVisibleTabs] = useState(allTabs);
-        const [hiddenTabs, setHiddenTabs] = useState([]);
-        const [showPlusMenu, setShowPlusMenu] = useState(false);
+        // État pour le scroll horizontal des onglets
         const navRef = useRef(null);
+        const tabsContainerRef = useRef(null);
         const tabRefs = useRef({});
+        const [canScrollLeft, setCanScrollLeft] = useState(false);
+        const [canScrollRight, setCanScrollRight] = useState(false);
 
-        // Fonction pour calculer quels onglets peuvent s'afficher
-        const calculateVisibleTabs = useCallback(() => {
-            if (!navRef.current) return;
+        // Fonction pour vérifier si on peut scroller
+        const checkScrollButtons = useCallback(() => {
+            if (!tabsContainerRef.current) return;
+            const container = tabsContainerRef.current;
+            setCanScrollLeft(container.scrollLeft > 0);
+            setCanScrollRight(container.scrollLeft < container.scrollWidth - container.clientWidth - 1);
+        }, []);
 
-            const navWidth = navRef.current.offsetWidth;
-            const plusButtonWidth = 80; // Largeur approximative du bouton "Plus"
-            const padding = 16; // Padding horizontal
-            const gap = 4; // Gap entre les onglets
-            const availableWidth = navWidth - padding * 2 - plusButtonWidth - gap;
+        // Vérifier les boutons de scroll
+        useEffect(() => {
+            checkScrollButtons();
+            const handleResize = () => {
+                setTimeout(checkScrollButtons, 100);
+            };
+            window.addEventListener('resize', handleResize);
+            return () => window.removeEventListener('resize', handleResize);
+        }, [checkScrollButtons, allTabs]);
 
-            let currentWidth = 0;
-            const visible = [];
-            const hidden = [];
-
-            for (const tab of allTabs) {
-                // Estimer la largeur de l'onglet (min-width: 70px + padding)
-                const estimatedWidth = 70 + (tab.label.length * 4); // Approximation
-                
-                if (currentWidth + estimatedWidth <= availableWidth) {
-                    visible.push(tab);
-                    currentWidth += estimatedWidth + gap;
-                } else {
-                    hidden.push(tab);
-                }
-            }
-
-            // Toujours afficher au moins quelques onglets principaux
-            if (visible.length < 3 && allTabs.length > 3) {
-                const mainTabs = allTabs.slice(0, 3);
-                const restTabs = allTabs.slice(3);
-                setVisibleTabs(mainTabs);
-                setHiddenTabs(restTabs);
-            } else {
-                setVisibleTabs(visible);
-                setHiddenTabs(hidden);
+        // Fonction pour scroller vers un onglet
+        const scrollToTab = useCallback((tabId) => {
+            if (!tabsContainerRef.current) return;
+            const tabElement = tabRefs.current[tabId];
+            if (tabElement) {
+                const container = tabsContainerRef.current;
+                const tabRect = tabElement.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                const scrollLeft = container.scrollLeft + (tabRect.left - containerRect.left) - (containerRect.width / 2) + (tabRect.width / 2);
+                container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
             }
         }, []);
 
-        // Recalculer lors du redimensionnement
+        // Auto-scroll vers l'onglet actif
         useEffect(() => {
-            calculateVisibleTabs();
-            
-            const handleResize = () => {
-                calculateVisibleTabs();
-            };
-
-            window.addEventListener('resize', handleResize);
-            // Recalculer après un court délai pour s'assurer que le DOM est rendu
-            const timeout = setTimeout(calculateVisibleTabs, 100);
-
-            return () => {
-                window.removeEventListener('resize', handleResize);
-                clearTimeout(timeout);
-            };
-        }, [calculateVisibleTabs]);
-
-        // Recalculer quand activeTab change (pour s'assurer que l'onglet actif est visible)
-        useEffect(() => {
-            const activeTabIndex = allTabs.findIndex(t => t.id === activeTab);
-            if (activeTabIndex >= 0 && hiddenTabs.some(t => t.id === activeTab)) {
-                // Si l'onglet actif est caché, le rendre visible
-                calculateVisibleTabs();
+            if (activeTab) {
+                setTimeout(() => scrollToTab(activeTab), 100);
             }
-        }, [activeTab, calculateVisibleTabs, hiddenTabs]);
+        }, [activeTab, scrollToTab]);
 
-        // Fermer le menu "Plus" quand on clique en dehors
-        useEffect(() => {
-            const handleClickOutside = (event) => {
-                if (showPlusMenu && navRef.current && !navRef.current.contains(event.target)) {
-                    setShowPlusMenu(false);
-                }
-            };
-
-            if (showPlusMenu) {
-                document.addEventListener('mousedown', handleClickOutside);
+        // Fonctions de navigation
+        const scrollLeft = () => {
+            if (tabsContainerRef.current) {
+                tabsContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+                setTimeout(checkScrollButtons, 300);
             }
+        };
 
-            return () => {
-                document.removeEventListener('mousedown', handleClickOutside);
-            };
-        }, [showPlusMenu]);
+        const scrollRight = () => {
+            if (tabsContainerRef.current) {
+                tabsContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+                setTimeout(checkScrollButtons, 300);
+            }
+        };
 
-        // Calculer la position du menu "Plus" quand il s'ouvre
-        useEffect(() => {
-            if (!showPlusMenu) return;
-
-            const updateMenuPosition = () => {
-                const plusButton = navRef.current?.querySelector('[title="Plus d\'options"]')?.closest('div');
-                const menuEl = document.querySelector('.plus-dropdown-menu');
-                
-                if (plusButton && menuEl) {
-                    const rect = plusButton.getBoundingClientRect();
-                    menuEl.style.left = `${rect.left}px`;
-                    menuEl.style.bottom = `${window.innerHeight - rect.top + 8}px`;
-                }
-            };
-
-            // Attendre que le DOM soit mis à jour
-            setTimeout(updateMenuPosition, 0);
-            const interval = setInterval(updateMenuPosition, 100);
-            window.addEventListener('resize', updateMenuPosition);
-            window.addEventListener('scroll', updateMenuPosition);
-
-            return () => {
-                clearInterval(interval);
-                window.removeEventListener('resize', updateMenuPosition);
-                window.removeEventListener('scroll', updateMenuPosition);
-            };
-        }, [showPlusMenu]);
-
-        // Construire la liste finale des onglets à afficher
-        const tabs = [...visibleTabs];
-        if (hiddenTabs.length > 0) {
-            tabs.push({ id: 'plus', label: 'Plus', icon: 'iconoir-menu', component: window.PlusTab || (() => <div>Chargement...</div>), hiddenTabs: hiddenTabs });
-        }
+        // Utiliser tous les onglets (plus de système visible/hidden)
+        const tabs = allTabs;
 
         return (
             <div className={`min-h-screen transition-colors duration-300 ${isDarkMode
@@ -25081,90 +25021,34 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     : 'bg-white/95 border-t-2 border-gray-200'
                         } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
                 >
-                    <div className="flex items-center overflow-x-auto scrollbar-hide px-2 py-3 gap-1" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
-                        {(window.RolesPermissions && window.userPermissions 
-                            ? window.RolesPermissions.filterTabsByPermissions(tabs)
-                            : tabs
-                        ).map(tab => {
-                            // Gérer le menu "Plus" spécialement
-                            if (tab.id === 'plus' && tab.hiddenTabs) {
-                                return (
-                                    <div key="plus-menu" className="relative flex-shrink-0 z-[100]">
-                                        <button
-                                            onMouseDown={withRipple}
-                                            onClick={() => setShowPlusMenu(!showPlusMenu)}
-                                            className={`flex flex-col items-center justify-center py-2.5 px-3 min-w-[70px] btn-ripple relative transition-all duration-300 group rounded-lg ${
-                                                showPlusMenu
-                                                    ? (isDarkMode
-                                                        ? 'text-green-400 bg-gradient-to-b from-green-500/20 to-green-600/10'
-                                                        : 'text-green-600 bg-gradient-to-b from-green-50 to-green-100/50')
-                                                    : (isDarkMode
-                                                        ? 'text-gray-400 hover:text-green-300 hover:bg-gray-800/50'
-                                                        : 'text-gray-600 hover:text-green-700 hover:bg-gray-100')
-                                            }`}
-                                            title="Plus d'options"
-                                        >
-                                            <i className={`iconoir-menu text-xl relative z-10 transition-all duration-300`}></i>
-                                            <span className={`text-[10px] font-semibold text-center leading-tight transition-all duration-300 whitespace-nowrap`}>
-                                                Plus
-                                            </span>
-                                            {showPlusMenu && (
-                                                <span className={`absolute top-1 right-1 w-2 h-2 rounded-full transition-all duration-300 ${isDarkMode
-                                                    ? 'bg-green-400 shadow-[0_0_6px_rgba(34,197,94,0.8)]'
-                                                    : 'bg-green-600 shadow-[0_0_4px_rgba(22,163,74,0.6)]'
-                                                    } animate-pulse`}></span>
-                                            )}
-                                        </button>
+                    <div className="flex items-center px-2 py-3 gap-1 relative" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
+                        {/* Bouton flèche gauche */}
+                        {canScrollLeft && (
+                            <button
+                                onClick={scrollLeft}
+                                className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 ${
+                                    isDarkMode
+                                        ? 'bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-green-400'
+                                        : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-green-600'
+                                }`}
+                                title="Défiler vers la gauche"
+                            >
+                                <i className="iconoir-arrow-left text-lg"></i>
+                            </button>
+                        )}
 
-                                        {/* Dropdown menu pour les onglets cachés */}
-                                        {showPlusMenu && (
-                                            <div 
-                                                className={`plus-dropdown-menu fixed rounded-lg shadow-2xl border overflow-hidden z-[9999] min-w-[200px] max-h-[400px] overflow-y-auto ${
-                                                    isDarkMode
-                                                        ? 'bg-gray-900 border-gray-700'
-                                                        : 'bg-white border-gray-200'
-                                                }`}
-                                                style={{ maxHeight: '60vh' }}
-                                            >
-                                                {tab.hiddenTabs.map(hiddenTab => {
-                                                    const iconClass = hiddenTab.icon || getTabIcon(hiddenTab.id);
-                                                    const isActive = activeTab === hiddenTab.id;
-                                                    return (
-                                                        <button
-                                                            key={hiddenTab.id}
-                                                            onClick={() => {
-                                                                handleTabChange(hiddenTab.id);
-                                                                setShowPlusMenu(false);
-                                                            }}
-                                                            className={`w-full text-left px-4 py-3 flex items-center gap-3 transition-colors ${
-                                                                isActive
-                                                                    ? (isDarkMode
-                                                                        ? 'bg-green-500/20 text-green-400'
-                                                                        : 'bg-green-50 text-green-600')
-                                                                    : (isDarkMode
-                                                                        ? 'text-gray-300 hover:bg-gray-800'
-                                                                        : 'text-gray-700 hover:bg-gray-100')
-                                                            }`}
-                                                        >
-                                                            {iconClass ? (
-                                                                <i className={`${iconClass} text-lg`}></i>
-                                                            ) : (
-                                                                <span className="text-lg">📊</span>
-                                                            )}
-                                                            <span className="font-medium">{hiddenTab.label}</span>
-                                                            {isActive && (
-                                                                <span className={`ml-auto w-2 h-2 rounded-full ${isDarkMode ? 'bg-green-400' : 'bg-green-600'}`}></span>
-                                                            )}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            }
-                            
-                            // Rendu normal pour les autres onglets
+                        {/* Conteneur scrollable des onglets */}
+                        <div
+                            ref={tabsContainerRef}
+                            onScroll={checkScrollButtons}
+                            className="flex items-center overflow-x-auto scrollbar-hide gap-1 flex-1"
+                            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                        >
+                            {(window.RolesPermissions && window.userPermissions 
+                                ? window.RolesPermissions.filterTabsByPermissions(tabs)
+                                : tabs
+                            ).map(tab => {
+                                // Rendu normal pour tous les onglets
                             const iconClass = tab.icon || getTabIcon(tab.id);
                             const isActive = activeTab === tab.id;
                             return (
@@ -25174,7 +25058,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     onMouseDown={withRipple}
                                     onClick={() => {
                                         handleTabChange(tab.id);
-                                        setShowPlusMenu(false);
+                                        setTimeout(() => scrollToTab(tab.id), 100);
                                     }}
                                     className={`flex-shrink-0 flex flex-col items-center justify-center py-2.5 px-3 min-w-[70px] btn-ripple relative transition-all duration-300 group rounded-lg ${isActive
                                         ? (isDarkMode
@@ -25237,6 +25121,22 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </button>
                             );
                         })}
+                        </div>
+
+                        {/* Bouton flèche droite */}
+                        {canScrollRight && (
+                            <button
+                                onClick={scrollRight}
+                                className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 ${
+                                    isDarkMode
+                                        ? 'bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-green-400'
+                                        : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-green-600'
+                                }`}
+                                title="Défiler vers la droite"
+                            >
+                                <i className="iconoir-arrow-right text-lg"></i>
+                            </button>
+                        )}
                     </div>
                 </nav>
 

@@ -333,15 +333,19 @@ const NewsTicker = ({ isDarkMode = true }) => {
                         
                         <span
                             className="text-sm font-semibold"
-                            style={{ color: '#10b981', minWidth: '110px', flexShrink: 0 }}
+                            style={{ color: '#10b981', minWidth: '80px', maxWidth: '100px', flexShrink: 0 }}
                         >
                             {news[currentNewsIndex]?.source || news[currentNewsIndex]?.source_provider || news[currentNewsIndex]?.source_original || 'Source'}
                         </span>
                         <span
-                            className="text-base font-medium flex-1 truncate"
+                            className="text-base font-medium flex-1"
                             style={{ 
                                 color: '#e0e7ff',
-                                cursor: news[currentNewsIndex]?.url ? 'pointer' : 'default'
+                                cursor: news[currentNewsIndex]?.url ? 'pointer' : 'default',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                marginLeft: '8px'
                             }}
                         >
                             {news[currentNewsIndex]?.headline}
