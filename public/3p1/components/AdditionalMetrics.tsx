@@ -357,6 +357,80 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                 </div>
             </div>
 
+            {/* Ratio 3:1 (Potentiel de Rendement vs Potentiel de Baisse) */}
+            <div className="bg-white p-5 rounded-lg shadow border border-gray-200">
+                <h3 className="text-lg font-bold text-gray-800 mb-4">📊 Ratio 3:1 (Potentiel vs Risque)</h3>
+                <p className="text-xs text-gray-600 mb-4">
+                    Le ratio 3:1 mesure le potentiel de rendement par rapport au risque de baisse. 
+                    Un ratio ≥ 3:1 indique que le potentiel de hausse est au moins 3 fois supérieur au risque de baisse.
+                </p>
+                {(() => {
+                    // Calcul du risque de baisse (basé sur le prix plancher historique)
+                    const avgLowPrice = calculateAverage(validHistory.map(d => d.priceLow));
+                    const floorPrice = avgLowPrice * 0.9;
+                    const downsideRisk = assumptions.currentPrice > 0
+                        ? ((assumptions.currentPrice - floorPrice) / assumptions.currentPrice) * 100
+                        : 0;
+                    
+                    // Calcul du potentiel de hausse (basé sur le rendement total)
+                    const projectedPrice5Y = baseEPS * Math.pow(1 + assumptions.growthRateEPS / 100, 5) * assumptions.targetPE;
+                    const upsidePotential = assumptions.currentPrice > 0
+                        ? ((projectedPrice5Y - assumptions.currentPrice) / assumptions.currentPrice) * 100
+                        : 0;
+                    
+                    const ratio31 = downsideRisk > 0 ? upsidePotential / downsideRisk : 0;
+                    const isFavorable = ratio31 >= 3;
+                    
+                    return (
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                                    <div className="text-xs text-green-700 font-semibold mb-1">Potentiel de Hausse</div>
+                                    <div className="text-2xl font-bold text-green-800">{upsidePotential.toFixed(1)}%</div>
+                                    <div className="text-xs text-green-600 mt-1">
+                                        Prix projeté: {formatCurrency(projectedPrice5Y)}
+                                    </div>
+                                </div>
+                                <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                                    <div className="text-xs text-red-700 font-semibold mb-1">Risque de Baisse</div>
+                                    <div className="text-2xl font-bold text-red-800">{downsideRisk.toFixed(1)}%</div>
+                                    <div className="text-xs text-red-600 mt-1">
+                                        Prix plancher: {formatCurrency(floorPrice)}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className={`p-4 rounded-lg border-2 ${
+                                isFavorable 
+                                    ? 'bg-green-50 border-green-500' 
+                                    : 'bg-yellow-50 border-yellow-500'
+                            }`}>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <div className="text-sm font-semibold text-gray-700 mb-1">Ratio 3:1</div>
+                                        <div className="text-xs text-gray-600">
+                                            Formule: Potentiel de Hausse (%) ÷ Risque de Baisse (%)
+                                        </div>
+                                    </div>
+                                    <div className={`text-3xl font-bold ${
+                                        isFavorable ? 'text-green-700' : 'text-yellow-700'
+                                    }`}>
+                                        {ratio31.toFixed(2)}:1
+                                    </div>
+                                </div>
+                                <div className={`mt-2 text-sm font-semibold ${
+                                    isFavorable ? 'text-green-800' : 'text-yellow-800'
+                                }`}>
+                                    {isFavorable 
+                                        ? '✅ Ratio favorable (≥ 3:1) - Potentiel 3x supérieur au risque'
+                                        : '⚠️ Ratio défavorable (< 3:1) - Risque élevé par rapport au potentiel'
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })()}
+            </div>
+
             {/* Recommandation d'Achat/Vente */}
             <div className="bg-white p-5 rounded-lg shadow border border-gray-200">
                 <h3 className="text-lg font-bold text-gray-800 mb-4">🎯 Zones de Prix Recommandées</h3>

@@ -230,13 +230,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
         )}
       </div>
 
-      {/* Version History Section */}
-      <div className="border-t border-slate-800" style={{ height: '300px' }}>
-        <VersionHistory
-          ticker={currentId}
-          onLoadVersion={onLoadVersion}
-        />
-      </div>
+      {/* Version History Section - Retiré, maintenant dans RightSidebar */}
 
       {/* Research Section */}
       <div className="p-4 border-t border-slate-800 bg-slate-900">

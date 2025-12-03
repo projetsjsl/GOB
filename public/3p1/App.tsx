@@ -3,19 +3,21 @@ import { Header } from './components/Header';
 import { HistoricalTable } from './components/HistoricalTable';
 import { ValuationCharts } from './components/ValuationCharts';
 import { Sidebar } from './components/Sidebar';
+import { RightSidebar } from './components/RightSidebar';
 import { SensitivityTable } from './components/SensitivityTable';
 import { NotesEditor } from './components/NotesEditor';
 import { EvaluationDetails } from './components/EvaluationDetails';
 import { HistoricalRangesTable } from './components/HistoricalRangesTable';
 import { DataSourcesInfo } from './components/DataSourcesInfo';
 import { AdditionalMetrics } from './components/AdditionalMetrics';
+import { KPIDashboard } from './components/KPIDashboard';
 import { InfoTab } from './components/InfoTab';
 import { TickerSearch } from './components/TickerSearch';
 import { ConfirmSyncDialog } from './components/ConfirmSyncDialog';
 import { HistoricalVersionBanner } from './components/HistoricalVersionBanner';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
 import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation } from './utils/calculations';
-import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { fetchCompanyData } from './services/financeApi';
 import { saveSnapshot, hasManualEdits, loadSnapshot, listSnapshots } from './services/snapshotApi';
 import { loadAllTickersFromSupabase, mapSourceToIsWatchlist } from './services/tickersApi';
@@ -79,7 +81,8 @@ export default function App() {
     const [activeId, setActiveId] = useState<string>('ACN');
     const [isInitialized, setIsInitialized] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [currentView, setCurrentView] = useState<'analysis' | 'info'>('analysis');
+    const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
+    const [currentView, setCurrentView] = useState<'analysis' | 'info' | 'kpi'>('analysis');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [showConfirmSync, setShowConfirmSync] = useState(false);
 
@@ -1237,6 +1240,29 @@ export default function App() {
                                 >
                                     <Bars3Icon className="w-6 h-6" />
                                 </button>
+                                <button
+                                    onClick={() => setCurrentView(currentView === 'kpi' ? 'analysis' : 'kpi')}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                                        currentView === 'kpi' 
+                                            ? 'bg-blue-600 text-white' 
+                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                                    }`}
+                                    title="Basculer entre vue Analyse et vue KPI"
+                                >
+                                    <ChartBarSquareIcon className="w-5 h-5 inline mr-2" />
+                                    {currentView === 'kpi' ? 'Vue Analyse' : 'Vue KPI'}
+                                </button>
+                                <button
+                                    onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
+                                    className={`p-2 rounded-lg transition-colors ${
+                                        isRightSidebarOpen 
+                                            ? 'bg-blue-600 text-white' 
+                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                                    }`}
+                                    title="Afficher/Masquer l'historique"
+                                >
+                                    <ClockIcon className="w-6 h-6" />
+                                </button>
                                 {!isSidebarOpen && (
                                     <h1 className="text-xl font-bold text-gray-700">Analyse Financière Pro</h1>
                                 )}
@@ -1462,6 +1488,14 @@ export default function App() {
                     setShowConfirmSync(false);
                     await performSync(saveSnapshot);
                 }}
+            />
+
+            {/* RIGHT SIDEBAR - HISTORIQUE */}
+            <RightSidebar
+                ticker={activeId}
+                onLoadVersion={handleLoadSnapshot}
+                isOpen={isRightSidebarOpen}
+                onToggle={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
             />
         </div>
     );
