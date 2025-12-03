@@ -610,29 +610,67 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         </div>
       </div>
 
-      {/* Matrice à carreaux Améliorée */}
+      {/* Matrice à carreaux Améliorée avec Vues Multiples */}
       <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-xl font-bold text-gray-800">🎯 Matrice de Performance</h3>
             <p className="text-xs text-gray-500 mt-1">Cliquez sur un carreau pour sélectionner le titre</p>
           </div>
-          <div className="flex items-center gap-4 text-xs">
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded bg-green-600"></div>
-              <span className="text-gray-600">≥50%</span>
+          <div className="flex items-center gap-3">
+            {/* Sélecteur de vue */}
+            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setMatrixView('grid')}
+                className={`px-3 py-1.5 text-xs font-semibold rounded transition-all ${
+                  matrixView === 'grid' 
+                    ? 'bg-white text-blue-600 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+                title="Vue grille"
+              >
+                ⬜ Grille
+              </button>
+              <button
+                onClick={() => setMatrixView('list')}
+                className={`px-3 py-1.5 text-xs font-semibold rounded transition-all ${
+                  matrixView === 'list' 
+                    ? 'bg-white text-blue-600 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+                title="Vue liste"
+              >
+                ☰ Liste
+              </button>
+              <button
+                onClick={() => setMatrixView('compact')}
+                className={`px-3 py-1.5 text-xs font-semibold rounded transition-all ${
+                  matrixView === 'compact' 
+                    ? 'bg-white text-blue-600 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+                title="Vue compacte"
+              >
+                ▦ Compacte
+              </button>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded bg-green-300"></div>
-              <span className="text-gray-600">20-50%</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded bg-yellow-400"></div>
-              <span className="text-gray-600">0-20%</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded bg-red-600"></div>
-              <span className="text-gray-600">&lt;0%</span>
+            <div className="flex items-center gap-4 text-xs">
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded bg-green-600"></div>
+                <span className="text-gray-600">≥50%</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded bg-green-300"></div>
+                <span className="text-gray-600">20-50%</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded bg-yellow-400"></div>
+                <span className="text-gray-600">0-20%</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded bg-red-600"></div>
+                <span className="text-gray-600">&lt;0%</span>
+              </div>
             </div>
           </div>
         </div>
