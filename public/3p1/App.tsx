@@ -1304,9 +1304,15 @@ export default function App() {
                             onFetchData={handleFetchData}
                         />
 
-                        {/* CONDITIONAL RENDER: ANALYSIS VS INFO */}
+                        {/* CONDITIONAL RENDER: ANALYSIS VS INFO VS KPI */}
                         {currentView === 'info' ? (
                             <InfoTab />
+                        ) : currentView === 'kpi' ? (
+                            <KPIDashboard
+                                profiles={Object.values(library)}
+                                currentId={activeId}
+                                onSelect={setActiveId}
+                            />
                         ) : (
                             <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
 
