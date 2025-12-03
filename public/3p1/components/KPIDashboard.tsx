@@ -323,6 +323,142 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         </div>
       </div>
 
+      {/* 5 Autres Idées de Visualisation */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Idée 1: Heatmap de Secteurs */}
+        <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+          <h3 className="text-lg font-bold mb-4">🔥 Heatmap par Secteur</h3>
+          <div className="space-y-2">
+            {Array.from(new Set(filteredMetrics.map(m => m.profile.info.sector))).map(sector => {
+              const sectorMetrics = filteredMetrics.filter(m => m.profile.info.sector === sector);
+              const avgReturn = sectorMetrics.reduce((sum, m) => sum + m.totalReturnPercent, 0) / sectorMetrics.length;
+              return (
+                <div key={sector} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-sm font-medium">{sector}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-24 h-4 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full"
+                        style={{
+                          width: `${Math.min(Math.max((avgReturn + 50) / 200 * 100, 0), 100)}%`,
+                          backgroundColor: getReturnColor(avgReturn)
+                        }}
+                      />
+                    </div>
+                    <span className="text-xs font-semibold w-16 text-right">{avgReturn.toFixed(1)}%</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Idée 2: Top Performers */}
+        <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+          <h3 className="text-lg font-bold mb-4">🏆 Top Performers</h3>
+          <div className="space-y-2">
+            {filteredMetrics
+              .sort((a, b) => b.totalReturnPercent - a.totalReturnPercent)
+              .slice(0, 5)
+              .map((metric, idx) => (
+                <div key={metric.profile.id} className="flex items-center justify-between p-2 bg-gradient-to-r from-yellow-50 to-white rounded border-l-4 border-yellow-400">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-bold text-yellow-600">#{idx + 1}</span>
+                    <span className="font-semibold">{metric.profile.id}</span>
+                  </div>
+                  <span className="text-sm font-bold text-green-600">{metric.totalReturnPercent.toFixed(1)}%</span>
+                </div>
+              ))}
+          </div>
+        </div>
+
+        {/* Idée 3: Distribution des Risques */}
+        <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+          <h3 className="text-lg font-bold mb-4">⚠️ Distribution des Risques</h3>
+          <div className="space-y-2">
+            {['Faible', 'Modéré', 'Élevé'].map((level, idx) => {
+              const ranges = [[0, 20], [20, 50], [50, 100]];
+              const count = filteredMetrics.filter(m => 
+                m.downsideRisk >= ranges[idx][0] && m.downsideRisk < ranges[idx][1]
+              ).length;
+              return (
+                <div key={level} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-sm font-medium">{level}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 h-4 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-red-500"
+                        style={{ width: `${(count / filteredMetrics.length) * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-xs font-semibold w-8 text-right">{count}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Idée 4: Ratio 3:1 Distribution */}
+        <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+          <h3 className="text-lg font-bold mb-4">📊 Distribution Ratio 3:1</h3>
+          <div className="space-y-2">
+            {['< 1:1', '1:1 - 3:1', '> 3:1'].map((range, idx) => {
+              const ranges = [[0, 1], [1, 3], [3, 100]];
+              const count = filteredMetrics.filter(m => 
+                m.ratio31 >= ranges[idx][0] && m.ratio31 < ranges[idx][1]
+              ).length;
+              const color = idx === 2 ? 'green' : idx === 1 ? 'yellow' : 'red';
+              return (
+                <div key={range} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-sm font-medium">{range}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 h-4 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full bg-${color}-500`}
+                        style={{ width: `${(count / filteredMetrics.length) * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-xs font-semibold w-8 text-right">{count}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Idée 5: Timeline de Performance */}
+        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 md:col-span-2">
+          <h3 className="text-lg font-bold mb-4">📈 Timeline de Performance</h3>
+          <div className="overflow-x-auto">
+            <div className="flex gap-2 min-w-max">
+              {filteredMetrics
+                .sort((a, b) => b.totalReturnPercent - a.totalReturnPercent)
+                .map((metric) => (
+                  <div
+                    key={metric.profile.id}
+                    className="flex flex-col items-center p-2 bg-gray-50 rounded min-w-[80px] cursor-pointer hover:bg-blue-50 transition-colors"
+                    onClick={() => onSelect(metric.profile.id)}
+                  >
+                    <div className="text-xs font-bold mb-1">{metric.profile.id}</div>
+                    <div
+                      className="w-full rounded mb-1"
+                      style={{
+                        height: `${Math.max(Math.min((metric.totalReturnPercent + 50) / 200 * 100, 100), 5)}px`,
+                        backgroundColor: getReturnColor(metric.totalReturnPercent),
+                        minHeight: '20px'
+                      }}
+                    />
+                    <div className="text-xs font-semibold" style={{ color: getReturnColor(metric.totalReturnPercent) }}>
+                      {metric.totalReturnPercent.toFixed(0)}%
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Tableau détaillé */}
       <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
         <h3 className="text-lg font-bold mb-4">Tableau de Performance</h3>
