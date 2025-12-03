@@ -1512,6 +1512,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
                 )
             )
         )
+    )
     );
 };
 
