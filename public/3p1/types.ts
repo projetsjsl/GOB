@@ -73,6 +73,24 @@ export enum Recommendation {
   SELL = "VENTE"
 }
 
+export interface ValueLineCorridor {
+  lowReturn?: number; // Proj Low TTL Return
+  highReturn?: number; // Proj High TTL Return
+  lowPriceGain?: number; // Proj Price Low Gain (optionnel)
+  highPriceGain?: number; // Proj Price High Gain (optionnel)
+}
+
+export interface ValueLineInitial {
+  epsGrowth?: number; // Projected EPS Growth 3 To 5 Yr
+  cfGrowth?: number; // Cash Flow Proj 3 To 5 Year Growth Rate
+  bvGrowth?: number; // Book Value Proj 3 To 5 Year Growth Rate
+  divGrowth?: number; // Dividend Proj 3 To 5 Year Growth Rate
+  peRatio?: number; // Current P/E Ratio_1
+  pcfRatio?: number; // P/CF Ratio (optionnel)
+  pbvRatio?: number; // P/BV Ratio (optionnel)
+  yield?: number; // 3 To 5 Year Proj Dividend Yield
+}
+
 export interface AnalysisProfile {
   id: string; // usually symbol
   lastModified: number;
@@ -81,4 +99,8 @@ export interface AnalysisProfile {
   info: CompanyInfo;
   notes?: string;
   isWatchlist?: boolean; // New field to distinguish Watchlist vs Portfolio
+  // Corridor ValueLine (pour Phase 3 - Validation)
+  valuelineCorridor?: ValueLineCorridor;
+  // Métriques ValueLine initiales (pour Phase 1 - Initialisation)
+  valuelineInitial?: ValueLineInitial;
 }

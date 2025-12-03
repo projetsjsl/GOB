@@ -18,6 +18,11 @@ export interface SupabaseTicker {
   price_stability?: string;
   beta?: number; // Beta (volatilité relative au marché) - Source: API FMP
   valueline_updated_at?: string; // Date de mise à jour ValueLine
+  // Corridor ValueLine (pour Phase 3 - Validation)
+  valueline_proj_low_return?: number; // Proj Low TTL Return
+  valueline_proj_high_return?: number; // Proj High TTL Return
+  valueline_proj_low_price_gain?: number; // Proj Price Low Gain (optionnel)
+  valueline_proj_high_price_gain?: number; // Proj Price High Gain (optionnel)
   [key: string]: any; // Pour les autres champs potentiels
 }
 
