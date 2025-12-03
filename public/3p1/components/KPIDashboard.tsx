@@ -786,6 +786,103 @@ Secteur: ${metric.profile.info.sector}`}
         </div>
       )}
 
+      {/* Matrice de Corrélation */}
+      {filteredMetrics.length > 1 && (
+        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">🔗 Matrice de Corrélation entre Métriques</h3>
+          <div className="text-xs text-gray-500 mb-4">
+            Corrélations entre JPEGY, Rendement, Ratio 3:1, P/E, Yield et Croissance
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr>
+                  <th className="p-2 text-left font-bold text-gray-700 border-b border-gray-300"></th>
+                  <th className="p-2 text-center font-bold text-gray-700 border-b border-gray-300">JPEGY</th>
+                  <th className="p-2 text-center font-bold text-gray-700 border-b border-gray-300">Rendement</th>
+                  <th className="p-2 text-center font-bold text-gray-700 border-b border-gray-300">Ratio 3:1</th>
+                  <th className="p-2 text-center font-bold text-gray-700 border-b border-gray-300">P/E</th>
+                  <th className="p-2 text-center font-bold text-gray-700 border-b border-gray-300">Yield</th>
+                  <th className="p-2 text-center font-bold text-gray-700 border-b border-gray-300">Croissance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(() => {
+                  const metrics = ['jpegy', 'totalReturnPercent', 'ratio31', 'currentPE', 'currentYield', 'historicalGrowth'];
+                  const labels = ['JPEGY', 'Rendement', 'Ratio 3:1', 'P/E', 'Yield', 'Croissance'];
+                  
+                  const calculateCorrelation = (x: string, y: string): number => {
+                    const xValues = filteredMetrics.map(m => m[x as keyof typeof m] as number).filter(v => v != null && isFinite(v));
+                    const yValues = filteredMetrics.map(m => m[y as keyof typeof m] as number).filter(v => v != null && isFinite(v));
+                    
+                    if (xValues.length !== yValues.length || xValues.length < 2) return 0;
+                    
+                    const xMean = xValues.reduce((a, b) => a + b, 0) / xValues.length;
+                    const yMean = yValues.reduce((a, b) => a + b, 0) / yValues.length;
+                    
+                    let numerator = 0;
+                    let xSumSq = 0;
+                    let ySumSq = 0;
+                    
+                    for (let i = 0; i < xValues.length; i++) {
+                      const xDiff = xValues[i] - xMean;
+                      const yDiff = yValues[i] - yMean;
+                      numerator += xDiff * yDiff;
+                      xSumSq += xDiff * xDiff;
+                      ySumSq += yDiff * yDiff;
+                    }
+                    
+                    const denominator = Math.sqrt(xSumSq * ySumSq);
+                    return denominator === 0 ? 0 : numerator / denominator;
+                  };
+                  
+                  return metrics.map((metric, idx) => (
+                    <tr key={metric}>
+                      <td className="p-2 font-bold text-gray-700 border-r border-gray-300">{labels[idx]}</td>
+                      {metrics.map((otherMetric, otherIdx) => {
+                        if (idx === otherIdx) {
+                          return (
+                            <td key={otherMetric} className="p-2 text-center bg-gray-100 font-bold">
+                              1.00
+                            </td>
+                          );
+                        }
+                        const corr = calculateCorrelation(metric, otherMetric);
+                        const intensity = Math.abs(corr);
+                        const color = corr > 0 
+                          ? `rgba(34, 197, 94, ${intensity})` // Vert pour corrélation positive
+                          : `rgba(239, 68, 68, ${intensity})`; // Rouge pour corrélation négative
+                        return (
+                          <td 
+                            key={otherMetric} 
+                            className="p-2 text-center font-semibold"
+                            style={{ backgroundColor: color, color: intensity > 0.5 ? 'white' : 'black' }}
+                            title={`Corrélation: ${corr.toFixed(3)}`}
+                          >
+                            {corr.toFixed(2)}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ));
+                })()}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4 flex items-center justify-center gap-4 text-xs">
+            <div className="flex items-center gap-1">
+              <div className="w-4 h-4 bg-green-500 rounded"></div>
+              <span className="text-gray-600">Corrélation positive</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-4 h-4 bg-red-500 rounded"></div>
+              <span className="text-gray-600">Corrélation négative</span>
+            </div>
+            <div className="text-gray-500">Intensité = valeur absolue</div>
+          </div>
+        </div>
+      )}
+
       {/* Tableau détaillé Amélioré */}
       <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
         <div className="flex items-center justify-between mb-4">
