@@ -528,36 +528,61 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             Aucun titre ne correspond aux filtres sélectionnés.
           </div>
         ) : (
-          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3">
-            {filteredMetrics.map((metric) => (
-              <div
-                key={metric.profile.id}
-                onClick={() => onSelect(metric.profile.id)}
-                className={`p-3 rounded-lg cursor-pointer transition-all hover:scale-110 hover:shadow-xl border-2 ${
-                  currentId === metric.profile.id ? 'border-blue-600 ring-4 ring-blue-300 shadow-xl' : 'border-gray-200'
-                }`}
-                style={{
-                  backgroundColor: getReturnColor(metric.totalReturnPercent),
-                  opacity: currentId === metric.profile.id ? 1 : 0.85
-                }}
-                title={`${metric.profile.info.name || metric.profile.id}
+          <>
+            <div className="mb-4 flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                Mode: <span className="font-semibold">Vue normale</span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    const sorted = [...filteredMetrics].sort((a, b) => b.totalReturnPercent - a.totalReturnPercent);
+                    const top10 = sorted.slice(0, 10);
+                    // Scroll vers le premier élément
+                    setTimeout(() => {
+                      const firstEl = document.querySelector(`[data-ticker="${top10[0]?.profile.id}"]`);
+                      firstEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                  }}
+                  className="px-3 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded transition-colors"
+                >
+                  Zoom Top 10
+                </button>
+              </div>
+            </div>
+            <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3">
+              {filteredMetrics.map((metric) => (
+                <div
+                  key={metric.profile.id}
+                  data-ticker={metric.profile.id}
+                  onClick={() => onSelect(metric.profile.id)}
+                  className={`p-3 rounded-lg cursor-pointer transition-all hover:scale-110 hover:shadow-xl border-2 ${
+                    currentId === metric.profile.id ? 'border-blue-600 ring-4 ring-blue-300 shadow-xl' : 'border-gray-200'
+                  }`}
+                  style={{
+                    backgroundColor: getReturnColor(metric.totalReturnPercent),
+                    opacity: currentId === metric.profile.id ? 1 : 0.85
+                  }}
+                  title={`${metric.profile.info.name || metric.profile.id}
 Rendement: ${metric.totalReturnPercent.toFixed(1)}%
 JPEGY: ${metric.jpegy.toFixed(2)}
 Ratio 3:1: ${metric.ratio31.toFixed(2)}
 P/E: ${metric.currentPE?.toFixed(1) || 'N/A'}x
-Secteur: ${metric.profile.info.sector}`}
-              >
-                <div className="flex flex-col items-center justify-center h-full text-white">
-                  <div className="text-xs font-bold mb-1">{metric.profile.id}</div>
-                  <div className="text-[10px] font-semibold mb-1">{metric.totalReturnPercent.toFixed(0)}%</div>
-                  <div className="text-[8px] opacity-90">JPEGY: {metric.jpegy.toFixed(1)}</div>
-                  {metric.hasApprovedVersion && (
-                    <CheckCircleIcon className="w-4 h-4 mt-1 text-white" />
-                  )}
+Secteur: ${metric.profile.info.sector}
+${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
+                >
+                  <div className="flex flex-col items-center justify-center h-full text-white">
+                    <div className="text-xs font-bold mb-1">{metric.profile.id}</div>
+                    <div className="text-[10px] font-semibold mb-1">{metric.totalReturnPercent.toFixed(0)}%</div>
+                    <div className="text-[8px] opacity-90">JPEGY: {metric.jpegy.toFixed(1)}</div>
+                    {metric.hasApprovedVersion && (
+                      <CheckCircleIcon className="w-4 h-4 mt-1 text-white" />
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
 
