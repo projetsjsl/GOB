@@ -160,16 +160,76 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     });
   }, [profiles]);
 
-  // Filtrer les profils
+  // Filtrer et trier les profils
   const filteredMetrics = useMemo(() => {
-    return profileMetrics.filter(metric => {
+    const filtered = profileMetrics.filter(metric => {
       if (metric.totalReturnPercent < filters.minReturn || metric.totalReturnPercent > filters.maxReturn) return false;
       if (metric.jpegy < filters.minJPEGY || metric.jpegy > filters.maxJPEGY) return false;
       if (filters.sector && metric.profile.info.sector.toLowerCase() !== filters.sector.toLowerCase()) return false;
       if (filters.recommendation !== 'all' && metric.recommendation !== filters.recommendation) return false;
       return true;
     });
-  }, [profileMetrics, filters]);
+    
+    // Trier
+    const sorted = [...filtered].sort((a, b) => {
+      let aValue: any = a[sortConfig.key as keyof typeof a];
+      let bValue: any = b[sortConfig.key as keyof typeof b];
+      
+      // Gérer les valeurs imbriquées
+      if (sortConfig.key === 'ticker') {
+        aValue = a.profile.id;
+        bValue = b.profile.id;
+      } else if (sortConfig.key === 'sector') {
+        aValue = a.profile.info.sector;
+        bValue = b.profile.info.sector;
+      }
+      
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.direction === 'asc' 
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+      
+      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+    
+    return sorted;
+  }, [profileMetrics, filters, sortConfig]);
+  
+  const handleSort = (key: string) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'desc' ? 'asc' : 'desc'
+    }));
+  };
+  
+  const handleExport = () => {
+    const csv = [
+      ['Ticker', 'Nom', 'Secteur', 'JPEGY', 'Rendement Total', 'Ratio 3:1', 'Potentiel Hausse', 'Risque Baisse', 'P/E', 'Yield', 'Croissance', 'Recommandation'].join(','),
+      ...filteredMetrics.map(m => [
+        m.profile.id,
+        `"${m.profile.info.name}"`,
+        m.profile.info.sector,
+        m.jpegy.toFixed(2),
+        m.totalReturnPercent.toFixed(2),
+        m.ratio31.toFixed(2),
+        m.upsidePotential.toFixed(2),
+        m.downsideRisk.toFixed(2),
+        m.currentPE?.toFixed(1) || 'N/A',
+        m.currentYield?.toFixed(2) || 'N/A',
+        m.historicalGrowth?.toFixed(2) || 'N/A',
+        m.recommendation
+      ].join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `kpi-dashboard-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  };
 
   // Obtenir la couleur JPEGY
   const getJpegyColor = (jpegy: number): string => {
