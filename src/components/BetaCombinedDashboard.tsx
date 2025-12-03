@@ -11,6 +11,8 @@ import EmmaConfigTab from './tabs/EmmaConfigTab';
 import AskEmmaTab from './tabs/AskEmmaTab';
 import EmailBriefingsTab from './tabs/EmailBriefingsTab';
 import TestOnlyTab from './tabs/TestOnlyTab';
+import GroupChatTab from './tabs/GroupChatTab';
+import RobotWebTab from './tabs/RobotWebTab';
 import type { TabName, StockData, NewsArticle, SeekingAlphaData } from '../types';
 
 export const BetaCombinedDashboard: React.FC = () => {
@@ -459,6 +461,8 @@ export const BetaCombinedDashboard: React.FC = () => {
             case 'emma-config': return <EmmaConfigTab {...tabProps} />;
             case 'testonly': return <TestOnlyTab {...tabProps} />;
             case 'email-briefings': return <EmailBriefingsTab {...tabProps} />;
+            case 'group-chat': return <GroupChatTab {...tabProps} />;
+            case 'robotweb': return <RobotWebTab {...tabProps} />;
             case 'plus': return <PlusTab {...tabProps} />;
             case 'watchlist': return <DansWatchlistTab {...tabProps} />;
             case 'economic-calendar': return <EconomicCalendarTab {...tabProps} />;
@@ -490,6 +494,8 @@ export const BetaCombinedDashboard: React.FC = () => {
                         { id: 'email-briefings' as TabName, label: '📧 Briefings' },
                         { id: 'watchlist' as TabName, label: '⭐ Watchlist' },
                         { id: 'economic-calendar' as TabName, label: '📅 Calendar' },
+                        { id: 'robotweb' as TabName, label: '🤖 RobotWeb' },
+                        { id: 'group-chat' as TabName, label: '💬 ChatGPT Groupe' },
                         { id: 'ask-emma' as TabName, label: '🤖 Emma IA™' },
                         { id: 'emma-config' as TabName, label: '🛠️ Emma Config' },
                         { id: 'testonly' as TabName, label: '🧪 Test Only' },
