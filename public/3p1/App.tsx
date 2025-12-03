@@ -2,10 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Header } from './components/Header';
 import { HistoricalTable } from './components/HistoricalTable';
 import { ValuationCharts } from './components/ValuationCharts';
-// ... other imports
-
-// ... inside App component
-// <Header ... /> -> commented out in render
 import { Sidebar } from './components/Sidebar';
 import { SensitivityTable } from './components/SensitivityTable';
 import { NotesEditor } from './components/NotesEditor';
@@ -1281,7 +1277,6 @@ export default function App() {
                             onUpdateAssumption={handleUpdateAssumption}
                             onFetchData={handleFetchData}
                         />
-                        {/* <div className="p-4 bg-yellow-100 text-yellow-800">Header désactivé pour débogage</div> */}
 
                         {/* CONDITIONAL RENDER: ANALYSIS VS INFO */}
                         {currentView === 'info' ? (
