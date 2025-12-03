@@ -11,6 +11,8 @@ import EmmaConfigTab from './tabs/EmmaConfigTab';
 import AskEmmaTab from './tabs/AskEmmaTab';
 import EmailBriefingsTab from './tabs/EmailBriefingsTab';
 import TestOnlyTab from './tabs/TestOnlyTab';
+import GroupChatTab from './tabs/GroupChatTab';
+import RobotWebTab from './tabs/RobotWebTab';
 import type { TabName, StockData, NewsArticle, SeekingAlphaData } from '../types';
 
 export const BetaCombinedDashboard: React.FC = () => {
@@ -459,12 +461,29 @@ export const BetaCombinedDashboard: React.FC = () => {
             case 'emma-config': return <EmmaConfigTab {...tabProps} />;
             case 'testonly': return <TestOnlyTab {...tabProps} />;
             case 'email-briefings': return <EmailBriefingsTab {...tabProps} />;
+            case 'group-chat': return <GroupChatTab {...tabProps} />;
+            case 'robotweb': return <RobotWebTab {...tabProps} />;
             case 'plus': return <PlusTab {...tabProps} />;
             case 'watchlist': return <DansWatchlistTab {...tabProps} />;
             case 'economic-calendar': return <EconomicCalendarTab {...tabProps} />;
             default: return <StocksNewsTab {...tabProps} />;
         }
     };
+
+    const navItems: { id: TabName; label: string; icon: string; accent?: string; helper?: string }[] = [
+        { id: 'stocks-news', label: 'Stocks & News', icon: '📊', helper: 'Flux marchés + nouvelles' },
+        { id: 'intellistocks', label: 'IntelliStocks', icon: '🧠', helper: 'Signal IA actions' },
+        { id: 'email-briefings', label: 'Briefings', icon: '📧', helper: 'Résumé email' },
+        { id: 'watchlist', label: 'Watchlist', icon: '⭐', helper: 'Liste interne' },
+        { id: 'economic-calendar', label: 'Calendar', icon: '📅', helper: 'Agenda macro' },
+        { id: 'robotweb', label: 'RobotWeb', icon: '🤖', accent: 'from-cyan-500 to-emerald-500', helper: 'Automated browser' },
+        { id: 'group-chat', label: 'ChatGPT Groupe', icon: '💬', accent: 'from-emerald-400 to-lime-500', helper: 'Salon partagé' },
+        { id: 'ask-emma', label: 'Emma IA™', icon: '🤖', helper: 'Assistant' },
+        { id: 'emma-config', label: 'Emma Config', icon: '🛠️', helper: 'Réglages Emma' },
+        { id: 'testonly', label: 'Test Only', icon: '🧪', helper: 'Sandbox' },
+        { id: 'admin-jslai', label: 'Admin', icon: '⚙️', helper: 'Supervision' },
+        { id: 'plus', label: 'Plus', icon: '➕', helper: 'Onglets additionnels' }
+    ];
 
     return (
         <div className="min-h-screen bg-gray-900 text-white">
@@ -483,31 +502,42 @@ export const BetaCombinedDashboard: React.FC = () => {
 
             {/* Navigation Tabs */}
             <nav className="bg-gray-800 border-b border-gray-700 px-4">
-                <div className="flex gap-2 overflow-x-auto">
-                    {[
-                        { id: 'stocks-news' as TabName, label: '📊 Stocks & News' },
-                        { id: 'intellistocks' as TabName, label: '🧠 IntelliStocks' },
-                        { id: 'email-briefings' as TabName, label: '📧 Briefings' },
-                        { id: 'watchlist' as TabName, label: '⭐ Watchlist' },
-                        { id: 'economic-calendar' as TabName, label: '📅 Calendar' },
-                        { id: 'ask-emma' as TabName, label: '🤖 Emma IA™' },
-                        { id: 'emma-config' as TabName, label: '🛠️ Emma Config' },
-                        { id: 'testonly' as TabName, label: '🧪 Test Only' },
-                        { id: 'admin-jslai' as TabName, label: '⚙️ Admin' },
-                        { id: 'plus' as TabName, label: '➕ Plus' }
-                    ].map(tab => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`px-4 py-3 whitespace-nowrap transition-colors ${
-                                activeTab === tab.id
-                                    ? 'bg-blue-600 text-white border-b-2 border-blue-400'
-                                    : 'text-gray-400 hover:text-white hover:bg-gray-700'
-                            }`}
-                        >
-                            {tab.label}
-                        </button>
-                    ))}
+                <div className="flex gap-2 overflow-x-auto py-2">
+                    {navItems.map(tab => {
+                        const isActive = activeTab === tab.id;
+                        const accent = tab.accent || 'from-blue-500/90 to-indigo-500/80';
+
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                title={`${tab.label}${tab.helper ? ` • ${tab.helper}` : ''}`}
+                                aria-label={tab.label}
+                                className={`group relative flex items-center gap-3 rounded-xl px-4 py-3 whitespace-nowrap transition-all border ${
+                                    isActive
+                                        ? 'border-emerald-300/60 text-white shadow-lg shadow-emerald-500/20'
+                                        : 'border-gray-700 text-gray-300 hover:text-white hover:border-emerald-300/50 hover:bg-gray-700/70'
+                                }`}
+                            >
+                                <span
+                                    className={`flex h-10 w-10 items-center justify-center rounded-lg text-xl font-bold bg-gradient-to-br ${accent} ${
+                                        isActive ? 'ring-2 ring-offset-2 ring-offset-gray-900 ring-emerald-300/80' : 'opacity-90 group-hover:opacity-100'
+                                    }`}
+                                >
+                                    {tab.icon}
+                                </span>
+                                <div className="flex flex-col items-start leading-tight text-left">
+                                    <span className="text-sm font-semibold">{tab.label}</span>
+                                    {tab.helper && <span className="text-xs text-gray-400 group-hover:text-gray-200">{tab.helper}</span>}
+                                </div>
+                                {tab.id === 'group-chat' && (
+                                    <span className="absolute -right-1 -top-1 inline-flex items-center rounded-full bg-emerald-400 px-2 py-0.5 text-[10px] font-bold text-emerald-950 shadow-sm">
+                                        Live
+                                    </span>
+                                )}
+                            </button>
+                        );
+                    })}
                 </div>
             </nav>
 
