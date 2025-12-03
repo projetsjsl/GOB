@@ -19,6 +19,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     sector: '',
     recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL'
   });
+  
+  const [sortConfig, setSortConfig] = useState<{
+    key: string;
+    direction: 'asc' | 'desc';
+  }>({ key: 'totalReturnPercent', direction: 'desc' });
 
   // Calculer les métriques pour chaque profil
   const profileMetrics = useMemo(() => {
@@ -590,31 +595,75 @@ Secteur: ${metric.profile.info.sector}`}
       {/* 5 Autres Idées de Visualisation */}
       {filteredMetrics.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Idée 1: Heatmap de Secteurs */}
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-          <h3 className="text-lg font-bold mb-4">🔥 Heatmap par Secteur</h3>
-          <div className="space-y-2">
-            {Array.from(new Set(filteredMetrics.map(m => m.profile.info.sector))).map(sector => {
-              const sectorMetrics = filteredMetrics.filter(m => m.profile.info.sector === sector);
-              const avgReturn = sectorMetrics.reduce((sum, m) => sum + m.totalReturnPercent, 0) / sectorMetrics.length;
-              return (
-                <div key={sector} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                  <span className="text-sm font-medium">{sector}</span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-24 h-4 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full"
-                        style={{
-                          width: `${Math.min(Math.max((avgReturn + 50) / 200 * 100, 0), 100)}%`,
-                          backgroundColor: getReturnColor(avgReturn)
-                        }}
-                      />
+        {/* Idée 1: Heatmap de Secteurs Amélioré */}
+        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">🔥 Performance par Secteur</h3>
+          <div className="text-xs text-gray-500 mb-3">
+            Rendement moyen, JPEGY moyen et nombre de titres par secteur
+          </div>
+          <div className="space-y-3">
+            {Array.from(new Set(filteredMetrics.map(m => m.profile.info.sector)))
+              .map(sector => {
+                const sectorMetrics = filteredMetrics.filter(m => m.profile.info.sector === sector);
+                const avgReturn = sectorMetrics.reduce((sum, m) => sum + m.totalReturnPercent, 0) / sectorMetrics.length;
+                const avgJPEGY = sectorMetrics.reduce((sum, m) => sum + m.jpegy, 0) / sectorMetrics.length;
+                const avgRatio31 = sectorMetrics.reduce((sum, m) => sum + m.ratio31, 0) / sectorMetrics.length;
+                return { sector, avgReturn, avgJPEGY, avgRatio31, count: sectorMetrics.length };
+              })
+              .sort((a, b) => b.avgReturn - a.avgReturn)
+              .map(({ sector, avgReturn, avgJPEGY, avgRatio31, count }) => (
+                <div key={sector} className="p-3 bg-gradient-to-r from-gray-50 to-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-bold text-gray-800">{sector}</span>
+                    <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
+                      {count} titre(s)
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-600">Rendement moyen:</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-32 h-3 bg-gray-200 rounded-full overflow-hidden">
+                          <div
+                            className="h-full"
+                            style={{
+                              width: `${Math.min(Math.max((avgReturn + 50) / 200 * 100, 0), 100)}%`,
+                              backgroundColor: getReturnColor(avgReturn)
+                            }}
+                          />
+                        </div>
+                        <span className={`text-xs font-bold w-16 text-right ${
+                          avgReturn >= 50 ? 'text-green-600' :
+                          avgReturn >= 20 ? 'text-green-500' :
+                          avgReturn >= 0 ? 'text-yellow-600' :
+                          'text-red-600'
+                        }`}>
+                          {avgReturn.toFixed(1)}%
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-xs font-semibold w-16 text-right">{avgReturn.toFixed(1)}%</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-600">JPEGY moyen:</span>
+                      <span 
+                        className="text-xs font-semibold px-2 py-0.5 rounded text-white"
+                        style={{ backgroundColor: getJpegyColor(avgJPEGY) }}
+                      >
+                        {avgJPEGY.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-600">Ratio 3:1 moyen:</span>
+                      <span className={`text-xs font-semibold ${
+                        avgRatio31 >= 3 ? 'text-green-600' :
+                        avgRatio31 >= 1 ? 'text-yellow-600' :
+                        'text-red-600'
+                      }`}>
+                        {avgRatio31.toFixed(2)}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              );
-            })}
+              ))}
           </div>
         </div>
 
@@ -741,8 +790,17 @@ Secteur: ${metric.profile.info.sector}`}
       <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-bold text-gray-800">📋 Tableau de Performance Détaillé</h3>
-          <div className="text-xs text-gray-500">
-            {filteredMetrics.length} titre(s)
+          <div className="flex items-center gap-4">
+            <div className="text-xs text-gray-500">
+              {filteredMetrics.length} titre(s)
+            </div>
+            <button
+              onClick={handleExport}
+              className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              title="Exporter en CSV"
+            >
+              📥 Exporter CSV
+            </button>
           </div>
         </div>
         {filteredMetrics.length === 0 ? (
@@ -754,17 +812,81 @@ Secteur: ${metric.profile.info.sector}`}
             <table className="w-full text-sm">
               <thead className="bg-gradient-to-r from-slate-100 to-slate-50 sticky top-0">
                 <tr>
-                  <th className="p-3 text-left font-bold text-gray-700 border-b border-gray-300">Ticker</th>
-                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="P/E ajusté pour croissance et rendement">JPEGY</th>
-                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Rendement total projeté sur 5 ans">Rendement</th>
-                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Ratio potentiel de hausse vs risque de baisse">Ratio 3:1</th>
+                  <th 
+                    className="p-3 text-left font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors"
+                    onClick={() => handleSort('ticker')}
+                  >
+                    <div className="flex items-center gap-1">
+                      Ticker
+                      {sortConfig.key === 'ticker' && (
+                        <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </div>
+                  </th>
+                  <th 
+                    className="p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors" 
+                    title="P/E ajusté pour croissance et rendement"
+                    onClick={() => handleSort('jpegy')}
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      JPEGY
+                      {sortConfig.key === 'jpegy' && (
+                        <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </div>
+                  </th>
+                  <th 
+                    className="p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors" 
+                    title="Rendement total projeté sur 5 ans"
+                    onClick={() => handleSort('totalReturnPercent')}
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      Rendement
+                      {sortConfig.key === 'totalReturnPercent' && (
+                        <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </div>
+                  </th>
+                  <th 
+                    className="p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors" 
+                    title="Ratio potentiel de hausse vs risque de baisse"
+                    onClick={() => handleSort('ratio31')}
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      Ratio 3:1
+                      {sortConfig.key === 'ratio31' && (
+                        <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </div>
+                  </th>
                   <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Potentiel de hausse en %">Hausse</th>
                   <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Risque de baisse en %">Baisse</th>
                   <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Ratio cours/bénéfice actuel">P/E</th>
                   <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Rendement du dividende">Yield</th>
-                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Croissance historique des EPS">Croissance</th>
+                  <th 
+                    className="p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors" 
+                    title="Croissance historique des EPS"
+                    onClick={() => handleSort('historicalGrowth')}
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      Croissance
+                      {sortConfig.key === 'historicalGrowth' && (
+                        <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </div>
+                  </th>
                   <th className="p-3 text-center font-bold text-gray-700 border-b border-gray-300">Approuvé</th>
-                  <th className="p-3 text-center font-bold text-gray-700 border-b border-gray-300">Signal</th>
+                  <th 
+                    className="p-3 text-center font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors"
+                    onClick={() => handleSort('recommendation')}
+                  >
+                    <div className="flex items-center justify-center gap-1">
+                      Signal
+                      {sortConfig.key === 'recommendation' && (
+                        <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
