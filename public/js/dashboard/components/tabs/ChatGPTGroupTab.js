@@ -1062,7 +1062,6 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
                     React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 'Toutes les valeurs sont sauvegardées localement pour un relancement instantané.')
                 )
             )
-        )
         ) : (
             // ============================================
             // MODE INTÉGRÉ (Chat Intégré avec Historique)
