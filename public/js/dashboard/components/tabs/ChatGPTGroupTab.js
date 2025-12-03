@@ -541,7 +541,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
         ),
 
         // Contenu selon le mode choisi
-        (chatMode === 'shared' ? (
+        chatMode === 'shared' ? (
             // ============================================
             // MODE PARTAGÉ (ChatGPT Group Chat Partagé)
             // ============================================
@@ -1219,7 +1219,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
                                     },
                                         React.createElement('div', { className: 'flex items-center gap-2' },
                                             shouldCallLlm(newMessage) ? (
-                                                React.createElement(React.Fragment, {},
+                                                React.createElement('div', {},
                                                     React.createElement('span', { className: 'text-green-400' }, '🤖 LLM répondra'),
                                                     React.createElement('span', { className: `${themeStyles.textMuted}` }, 
                                                         llmAutoReply ? '(auto)' : 
