@@ -19,15 +19,6 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   const [comparisonMode, setComparisonMode] = useState(false);
   const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
   const [matrixView, setMatrixView] = useState<'grid' | 'list' | 'compact'>('grid');
-  
-  const [sortConfig, setSortConfig] = useState<{
-    key: string;
-    direction: 'asc' | 'desc';
-  }>({ key: 'totalReturnPercent', direction: 'desc' });
-  
-  const [comparisonMode, setComparisonMode] = useState(false);
-  const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
-  const [matrixView, setMatrixView] = useState<'grid' | 'list' | 'compact'>('grid');
 
   // Calculer les métriques pour chaque profil
   const profileMetrics = useMemo(() => {
