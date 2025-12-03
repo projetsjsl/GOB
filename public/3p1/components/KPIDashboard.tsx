@@ -821,8 +821,15 @@ Secteur: ${metric.profile.info.sector}`}
                   const labels = ['JPEGY', 'Rendement', 'Ratio 3:1', 'P/E', 'Yield', 'Croissance'];
                   
                   const calculateCorrelation = (x: string, y: string): number => {
-                    const xValues = filteredMetrics.map(m => m[x as keyof typeof m] as number).filter(v => v != null && isFinite(v));
-                    const yValues = filteredMetrics.map(m => m[y as keyof typeof m] as number).filter(v => v != null && isFinite(v));
+                    if (filteredMetrics.length < 2) return 0;
+                    const xValues = filteredMetrics.map(m => {
+                      const val = m[x as keyof typeof m];
+                      return typeof val === 'number' && isFinite(val) ? val : 0;
+                    }).filter(v => v != null && isFinite(v));
+                    const yValues = filteredMetrics.map(m => {
+                      const val = m[y as keyof typeof m];
+                      return typeof val === 'number' && isFinite(val) ? val : 0;
+                    }).filter(v => v != null && isFinite(v));
                     
                     if (xValues.length !== yValues.length || xValues.length < 2) return 0;
                     
