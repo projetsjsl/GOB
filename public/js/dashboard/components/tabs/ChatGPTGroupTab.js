@@ -91,12 +91,31 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
     // ============================================
     // ÉTATS REACT
     // ============================================
+    // Mode de chat: 'shared' (partagé ChatGPT) ou 'integrated' (intégré avec API)
+    const [chatMode, setChatMode] = useState(() => {
+        try {
+            const saved = localStorage.getItem('gob-chat-mode');
+            return saved || 'shared'; // Par défaut: mode partagé
+        } catch {
+            return 'shared';
+        }
+    });
+    
     const [settings, setSettings] = useState(defaultSettings);
     const [copied, setCopied] = useState(false);
     const [iframeError, setIframeError] = useState(null);
     const [cspBlocked, setCspBlocked] = useState(false);
     const [accessSafety, setAccessSafety] = useState('needs-token');
     const [sessionOrigin, setSessionOrigin] = useState('non configuré');
+    
+    // États pour le chat intégré
+    const [integratedRoom, setIntegratedRoom] = useState(null);
+    const [integratedMessages, setIntegratedMessages] = useState([]);
+    const [integratedParticipants, setIntegratedParticipants] = useState([]);
+    const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+    const [isSendingMessage, setIsSendingMessage] = useState(false);
+    const [newMessage, setNewMessage] = useState('');
+    const [pollingInterval, setPollingInterval] = useState(null);
     
     const hasEnvChatUrl = Boolean(envChatUrl);
     const isUsingEnvDefault = Boolean(envChatUrl) && settings.sessionUrl === envChatUrl;
@@ -193,6 +212,165 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
     const handleReset = () => setSettings(defaultSettings);
 
     // ============================================
+    // GESTION DU MODE DE CHAT
+    // ============================================
+    const handleModeChange = (mode) => {
+        setChatMode(mode);
+        try {
+            localStorage.setItem('gob-chat-mode', mode);
+        } catch (e) {
+            console.warn('Impossible de sauvegarder le mode:', e);
+        }
+        
+        // Si on passe en mode intégré et qu'on n'a pas de salon, en créer un
+        if (mode === 'integrated' && !integratedRoom) {
+            handleCreateIntegratedRoom();
+        }
+    };
+
+    // ============================================
+    // GESTION DU CHAT INTÉGRÉ
+    // ============================================
+    const handleCreateIntegratedRoom = async () => {
+        try {
+            setIsLoadingMessages(true);
+            const response = await fetch('/api/groupchat/integrated/create-room', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    roomName: settings.roomName,
+                    adminUserId: settings.userAlias || 'admin',
+                    adminDisplayName: settings.adminDisplayName,
+                    systemPrompt: settings.systemPrompt,
+                    welcomeMessage: settings.welcomeMessage,
+                    temperature: settings.temperature,
+                    maxMessages: settings.maxMessages,
+                    allowGuests: settings.allowGuests
+                })
+            });
+
+            const data = await response.json();
+            if (data.success && data.room) {
+                setIntegratedRoom(data.room);
+                // Charger les messages initiaux
+                await loadIntegratedMessages(data.room.id);
+                // Démarrer la synchronisation
+                startPolling(data.room.id);
+                // Mettre à jour la présence
+                updatePresence(data.room.id);
+            } else {
+                console.error('Erreur création salon:', data.error);
+                alert('Erreur création salon: ' + (data.error || 'Erreur inconnue'));
+            }
+        } catch (error) {
+            console.error('Erreur création salon intégré:', error);
+            alert('Erreur création salon: ' + error.message);
+        } finally {
+            setIsLoadingMessages(false);
+        }
+    };
+
+    const loadIntegratedMessages = async (roomId) => {
+        try {
+            const response = await fetch(`/api/groupchat/integrated/get-messages?roomId=${roomId}&limit=100`);
+            const data = await response.json();
+            if (data.success && data.messages) {
+                setIntegratedMessages(data.messages);
+            }
+        } catch (error) {
+            console.error('Erreur chargement messages:', error);
+        }
+    };
+
+    const loadIntegratedParticipants = async (roomId) => {
+        try {
+            const response = await fetch(`/api/groupchat/integrated/get-participants?roomId=${roomId}`);
+            const data = await response.json();
+            if (data.success && data.participants) {
+                setIntegratedParticipants(data.participants);
+            }
+        } catch (error) {
+            console.error('Erreur chargement participants:', error);
+        }
+    };
+
+    const updatePresence = async (roomId) => {
+        try {
+            await fetch('/api/groupchat/integrated/update-presence', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    roomId: roomId,
+                    userId: settings.userAlias || 'user',
+                    userDisplayName: settings.userAlias || settings.adminDisplayName,
+                    userIcon: settings.userIcon,
+                    isOnline: true
+                })
+            });
+        } catch (error) {
+            console.error('Erreur mise à jour présence:', error);
+        }
+    };
+
+    const startPolling = (roomId) => {
+        // Arrêter le polling existant
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+        }
+
+        // Polling toutes les 2 secondes pour synchronisation live
+        const interval = setInterval(async () => {
+            await loadIntegratedMessages(roomId);
+            await loadIntegratedParticipants(roomId);
+            await updatePresence(roomId);
+        }, 2000);
+
+        setPollingInterval(interval);
+    };
+
+    const handleSendIntegratedMessage = async () => {
+        if (!newMessage.trim() || !integratedRoom || isSendingMessage) return;
+
+        try {
+            setIsSendingMessage(true);
+            const response = await fetch('/api/groupchat/integrated/send-message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    roomId: integratedRoom.id,
+                    userId: settings.userAlias || 'user',
+                    userDisplayName: settings.userAlias || settings.adminDisplayName,
+                    userIcon: settings.userIcon,
+                    message: newMessage.trim()
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                setNewMessage('');
+                // Recharger les messages pour avoir la réponse de l'assistant
+                await loadIntegratedMessages(integratedRoom.id);
+            } else {
+                alert('Erreur envoi message: ' + (data.error || 'Erreur inconnue'));
+            }
+        } catch (error) {
+            console.error('Erreur envoi message:', error);
+            alert('Erreur envoi message: ' + error.message);
+        } finally {
+            setIsSendingMessage(false);
+        }
+    };
+
+    // Nettoyer le polling à la fermeture
+    useEffect(() => {
+        return () => {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+            }
+        };
+    }, [pollingInterval]);
+
+    // ============================================
     // RÈGLES D'OR DU SALON (MÉMOISÉ)
     // ============================================
     const chatGuardrails = useMemo(() => [
@@ -221,7 +399,69 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
     // RENDU DU COMPOSANT
     // ============================================
     return React.createElement('div', { className: 'space-y-6 p-6' },
-        // Header avec titre et actions
+        // Sélecteur de mode (Partagé vs Intégré)
+        React.createElement('div', { 
+            className: `p-4 rounded-xl ${themeStyles.surface} border ${themeStyles.border} shadow` 
+        },
+            React.createElement('div', { className: 'flex items-center justify-between mb-4' },
+                React.createElement('div', {},
+                    React.createElement('h3', { className: `text-lg font-semibold ${themeStyles.text} mb-1` }, 'Mode de Chat'),
+                    React.createElement('p', { className: `text-sm ${themeStyles.textSecondary}` }, 
+                        'Choisissez entre le chat de groupe partagé ChatGPT ou un chat intégré avec historique'
+                    )
+                )
+            ),
+            React.createElement('div', { className: 'grid grid-cols-2 gap-4' },
+                // Mode Partagé
+                React.createElement('button', {
+                    onClick: () => handleModeChange('shared'),
+                    className: `p-4 rounded-lg border-2 transition-all ${
+                        chatMode === 'shared'
+                            ? 'border-blue-500 bg-blue-900/20'
+                            : `${themeStyles.border} ${themeStyles.surface} hover:border-blue-400`
+                    }` 
+                },
+                    React.createElement('div', { className: 'text-center space-y-2' },
+                        React.createElement('div', { className: 'text-3xl mb-2' }, '🔗'),
+                        React.createElement('h4', { className: `font-semibold ${themeStyles.text}` }, 'Chat Partagé'),
+                        React.createElement('p', { className: `text-xs ${themeStyles.textSecondary}` }, 
+                            'Lien ChatGPT partagé (ouvre dans nouvel onglet)'
+                        ),
+                        chatMode === 'shared' && (
+                            React.createElement('span', { className: 'text-xs text-blue-400 mt-2 block' }, '✓ Actif')
+                        )
+                    )
+                ),
+                // Mode Intégré
+                React.createElement('button', {
+                    onClick: () => handleModeChange('integrated'),
+                    className: `p-4 rounded-lg border-2 transition-all ${
+                        chatMode === 'integrated'
+                            ? 'border-green-500 bg-green-900/20'
+                            : `${themeStyles.border} ${themeStyles.surface} hover:border-green-400`
+                    }` 
+                },
+                    React.createElement('div', { className: 'text-center space-y-2' },
+                        React.createElement('div', { className: 'text-3xl mb-2' }, '💬'),
+                        React.createElement('h4', { className: `font-semibold ${themeStyles.text}` }, 'Chat Intégré'),
+                        React.createElement('p', { className: `text-xs ${themeStyles.textSecondary}` }, 
+                            'Chat avec historique, contexte et visibilité live'
+                        ),
+                        chatMode === 'integrated' && (
+                            React.createElement('span', { className: 'text-xs text-green-400 mt-2 block' }, '✓ Actif')
+                        )
+                    )
+                )
+            )
+        ),
+
+        // Contenu selon le mode choisi
+        chatMode === 'shared' ? (
+            // ============================================
+            // MODE PARTAGÉ (ChatGPT Group Chat Partagé)
+            // ============================================
+            React.createElement(React.Fragment, {},
+                // Header avec titre et actions
         React.createElement('div', { 
             className: `flex items-center justify-between flex-wrap gap-3 ${themeStyles.bg} p-4 rounded-xl border ${themeStyles.border}`
         },
