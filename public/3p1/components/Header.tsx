@@ -75,14 +75,32 @@ export const Header: React.FC<HeaderProps> = ({
               alt={info.name}
               className="w-16 h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200"
               onError={(e) => {
-                // Fallback vers logo FMP générique si le logo ne charge pas
-                const fallbackUrl = `https://financialmodelingprep.com/image-stock/${info.preferredSymbol || info.symbol}.png`;
-                if (e.currentTarget.src !== fallbackUrl) {
-                  e.currentTarget.src = fallbackUrl;
-                } else {
-                  // Si le fallback échoue aussi, masquer l'image
-                  e.currentTarget.style.display = 'none';
-                }
+                // Essayer plusieurs variantes de logo
+                const symbolsToTry = [
+                  info.logoSymbol, // Symbole optimisé pour logo depuis l'API
+                  info.actualSymbol?.replace('.TO', '').replace('-', '.'), // Symbole réel utilisé
+                  info.preferredSymbol, // Symbole original demandé
+                  (info as any).symbol // Symbole alternatif
+                ].filter(Boolean);
+                
+                let triedIndex = 0;
+                const tryNextFallback = () => {
+                  if (triedIndex < symbolsToTry.length) {
+                    const fallbackUrl = `https://financialmodelingprep.com/image-stock/${symbolsToTry[triedIndex]}.png`;
+                    if (e.currentTarget.src !== fallbackUrl) {
+                      e.currentTarget.src = fallbackUrl;
+                      triedIndex++;
+                    } else {
+                      triedIndex++;
+                      tryNextFallback();
+                    }
+                  } else {
+                    // Si tous les fallbacks échouent, masquer l'image
+                    e.currentTarget.style.display = 'none';
+                  }
+                };
+                
+                tryNextFallback();
               }}
             />
           ) : (

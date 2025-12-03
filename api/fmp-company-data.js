@@ -37,15 +37,18 @@ export default async function handler(req, res) {
     // Mapping de symboles alternatifs pour les cas spéciaux
     const symbolVariants = {
         'BRK.B': ['BRK-B', 'BRK.B', 'BRKB'],
-        'BBD.B': ['BBD-B', 'BBD.B', 'BBD-B.TO'],
-        'GIB.A': ['GIB-A', 'GIB.A', 'GIB-A.TO'],
-        'ATD.B': ['ATD-B', 'ATD.B', 'ATD-B.TO'],
-        'TECK.B': ['TECK-B', 'TECK.B', 'TECK-B.TO'],
-        'RCI.B': ['RCI-B', 'RCI.B', 'RCI-B.TO'],
+        'BBD.B': ['BBD-B', 'BBD.B', 'BBD-B.TO', 'BBD.TO'],
+        'GIB.A': ['GIB-A', 'GIB.A', 'GIB-A.TO', 'GIB.TO'],
+        'ATD.B': ['ATD-B', 'ATD.B', 'ATD-B.TO', 'ATD.TO'],
+        'TECK.B': ['TECK-B', 'TECK.B', 'TECK-B.TO', 'TECK.TO'],
+        'RCI.B': ['RCI-B', 'RCI.B', 'RCI-B.TO', 'RCI.TO', 'RCI'],
         'MRU': ['MRU.TO', 'MRU'],
         'ABX': ['ABX.TO', 'ABX', 'GOLD'], // Barrick Gold peut être GOLD maintenant
         'IFC': ['IFC.TO', 'IFC'],
-        'GWO': ['GWO.TO', 'GWO']
+        'GWO': ['GWO.TO', 'GWO'],
+        'EMA': ['EMA.TO', 'EMA'],
+        'CCA': ['CCA.TO', 'CCA'],
+        'POW': ['POW.TO', 'POW']
     };
 
     // Fonction pour essayer plusieurs variantes de symboles
@@ -75,19 +78,42 @@ export default async function handler(req, res) {
 
         // 3. Si toujours échec, essayer avec .TO pour les symboles canadiens
         if (!profileResult && (cleanSymbol.includes('.B') || cleanSymbol.includes('.A'))) {
-            const tsxSymbol = cleanSymbol.replace('.', '-') + '.TO';
-            profileResult = await tryFetchProfile(tsxSymbol);
+            // Essayer avec tiret + .TO
+            const tsxSymbol1 = cleanSymbol.replace('.', '-') + '.TO';
+            profileResult = await tryFetchProfile(tsxSymbol1);
             if (profileResult) {
-                usedSymbol = tsxSymbol;
+                usedSymbol = tsxSymbol1;
+            } else {
+                // Essayer avec point + .TO
+                const tsxSymbol2 = cleanSymbol + '.TO';
+                profileResult = await tryFetchProfile(tsxSymbol2);
+                if (profileResult) {
+                    usedSymbol = tsxSymbol2;
+                }
             }
         }
 
         // 4. Si toujours échec, essayer sans le suffixe de classe
         if (!profileResult && (cleanSymbol.includes('.B') || cleanSymbol.includes('.A'))) {
             const baseSymbol = cleanSymbol.split('.')[0];
+            // Essayer base seul
             profileResult = await tryFetchProfile(baseSymbol);
             if (profileResult) {
                 usedSymbol = baseSymbol;
+            } else {
+                // Essayer base + .TO
+                profileResult = await tryFetchProfile(baseSymbol + '.TO');
+                if (profileResult) {
+                    usedSymbol = baseSymbol + '.TO';
+                }
+            }
+        }
+
+        // 5. Pour les symboles sans suffixe, essayer .TO si pas déjà fait
+        if (!profileResult && !cleanSymbol.includes('.') && !cleanSymbol.endsWith('.TO')) {
+            profileResult = await tryFetchProfile(cleanSymbol + '.TO');
+            if (profileResult) {
+                usedSymbol = cleanSymbol + '.TO';
             }
         }
 
@@ -239,10 +265,11 @@ export default async function handler(req, res) {
         };
 
         // 8. Info Object avec toutes les informations
-        // Utiliser le symbole original pour le logo, mais le symbole utilisé pour les données
+        // Générer plusieurs URLs de logo possibles pour le fallback
+        const logoBaseSymbol = usedSymbol.replace('.TO', '').replace('-', '.').replace('_', '.');
         const logoUrl = profile.image 
             ? profile.image 
-            : `https://financialmodelingprep.com/image-stock/${usedSymbol.replace('.TO', '').replace('-', '.')}.png`;
+            : `https://financialmodelingprep.com/image-stock/${logoBaseSymbol}.png`;
         
         const mappedInfo = {
             name: profile.companyName,
@@ -253,7 +280,8 @@ export default async function handler(req, res) {
             exchange: profile.exchangeShortName || profile.exchange || '',
             currency: profile.currency || 'USD',
             preferredSymbol: cleanSymbol, // Garder le symbole original demandé
-            actualSymbol: usedSymbol // Le symbole réellement utilisé par FMP
+            actualSymbol: usedSymbol, // Le symbole réellement utilisé par FMP
+            logoSymbol: logoBaseSymbol // Symbole à utiliser pour les logos (sans .TO, avec format standard)
         };
 
         return res.status(200).json({

@@ -105,6 +105,7 @@ CONTRAINTES:
                 // État pour afficher/masquer les sections
                 const [showEmmaConfig, setShowEmmaConfig] = useState(false);
                 const [showTickersManager, setShowTickersManager] = useState(false);
+                const [showRedirectsManager, setShowRedirectsManager] = useState(false);
                 
                 // États pour la gestion des tickers
                 const [tickersList, setTickersList] = useState([]);
@@ -128,6 +129,132 @@ CONTRAINTES:
                     stop_loss: '',
                     notes: ''
                 });
+
+                // États pour la gestion des redirections
+                const [redirectsList, setRedirectsList] = useState([]);
+                const [loadingRedirects, setLoadingRedirects] = useState(false);
+                const [editingRedirect, setEditingRedirect] = useState(null);
+                const [showAddRedirectForm, setShowAddRedirectForm] = useState(false);
+                const [newRedirect, setNewRedirect] = useState({
+                    source: '',
+                    destination: '',
+                    permanent: false
+                });
+
+                // Fonctions pour gérer les redirections
+                const fetchRedirects = async () => {
+                    setLoadingRedirects(true);
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/admin/redirects`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            setRedirectsList(data.redirects || []);
+                        } else {
+                            const error = await response.json();
+                            console.error('Erreur récupération redirections:', error);
+                            alert(`❌ Erreur: ${error.error || 'Impossible de récupérer les redirections'}`);
+                        }
+                    } catch (error) {
+                        console.error('Erreur fetchRedirects:', error);
+                        alert('❌ Erreur lors de la récupération des redirections');
+                    } finally {
+                        setLoadingRedirects(false);
+                    }
+                };
+
+                const handleAddRedirect = async () => {
+                    if (!newRedirect.source || !newRedirect.destination) {
+                        alert('❌ Veuillez remplir tous les champs');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/admin/redirects`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(newRedirect)
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            alert(`✅ Redirection ${data.redirect.source} → ${data.redirect.destination} ajoutée avec succès`);
+                            setNewRedirect({ source: '', destination: '', permanent: false });
+                            setShowAddRedirectForm(false);
+                            fetchRedirects();
+                        } else {
+                            const error = await response.json();
+                            alert(`❌ Erreur: ${error.error || 'Impossible d\'ajouter la redirection'}`);
+                        }
+                    } catch (error) {
+                        console.error('Erreur addRedirect:', error);
+                        alert('❌ Erreur lors de l\'ajout de la redirection');
+                    }
+                };
+
+                const handleUpdateRedirect = async (source, updateData) => {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/admin/redirects`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ source, ...updateData })
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            alert(`✅ Redirection modifiée avec succès`);
+                            setEditingRedirect(null);
+                            fetchRedirects();
+                        } else {
+                            const error = await response.json();
+                            alert(`❌ Erreur: ${error.error || 'Impossible de modifier la redirection'}`);
+                        }
+                    } catch (error) {
+                        console.error('Erreur updateRedirect:', error);
+                        alert('❌ Erreur lors de la modification de la redirection');
+                    }
+                };
+
+                const handleDeleteRedirect = async (source) => {
+                    if (!confirm(`Êtes-vous sûr de vouloir supprimer la redirection ${source} ?`)) {
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/admin/redirects`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ source })
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            alert(`✅ Redirection ${source} supprimée avec succès`);
+                            fetchRedirects();
+                        } else {
+                            const error = await response.json();
+                            alert(`❌ Erreur: ${error.error || 'Impossible de supprimer la redirection'}`);
+                        }
+                    } catch (error) {
+                        console.error('Erreur deleteRedirect:', error);
+                        alert('❌ Erreur lors de la suppression de la redirection');
+                    }
+                };
+
+                const testRedirect = (source) => {
+                    if (typeof window !== 'undefined' && window.location) {
+                        const testUrl = `${window.location.origin}${source}`;
+                        window.open(testUrl, '_blank');
+                    } else {
+                        alert(`URL de test: ${API_BASE_URL}${source}`);
+                    }
+                };
+
+                // Charger les redirections au montage
+                useEffect(() => {
+                    if (showRedirectsManager) {
+                        fetchRedirects();
+                    }
+                }, [showRedirectsManager]);
 
                 // Handlers pour sauvegarder dans localStorage
                 const handlePromptChange = (newPrompt) => {
@@ -194,7 +321,7 @@ CONTRAINTES:
                 };
 
                 // Fonctions pour gérer les tickers
-                const fetchTickers = async () => {
+                const fetchTickers = useCallback(async () => {
                     setLoadingTickers(true);
                     try {
                         const params = new URLSearchParams();
@@ -220,7 +347,7 @@ CONTRAINTES:
                     } finally {
                         setLoadingTickers(false);
                     }
-                };
+                }, [tickerFilter.source, tickerFilter.is_active, API_BASE_URL]);
 
                 const handleAddTicker = async () => {
                     try {
@@ -313,7 +440,7 @@ CONTRAINTES:
                     if (showTickersManager) {
                         fetchTickers();
                     }
-                }, [showTickersManager, tickerFilter]);
+                }, [showTickersManager, tickerFilter.source, tickerFilter.is_active, fetchTickers]);
 
                 return (
                 <div className="space-y-6">
@@ -872,6 +999,269 @@ CONTRAINTES:
                                             </div>
                                         </div>
                                     )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* 🔀 Gestion des Redirections Vercel */}
+                    <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gradient-to-br from-blue-900/20 to-gray-900 border-blue-700' : 'bg-gradient-to-br from-blue-50 to-gray-50 border-blue-200'
+                    }`}>
+                        <div className="flex justify-between items-center mb-4 cursor-pointer" onClick={() => setShowRedirectsManager(!showRedirectsManager)}>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-900'}`}>
+                                <Icon emoji="🔀" size={20} />
+                                Gestion des Redirections Vercel
+                            </h3>
+                            <button className={`px-3 py-1 text-xs rounded transition-colors ${
+                                isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
+                            }`}>
+                                {showRedirectsManager ? '▼ Masquer' : '▶ Afficher'}
+                            </button>
+                        </div>
+
+                        {showRedirectsManager && (
+                            <div className="space-y-4">
+                                {/* En-tête avec bouton d'ajout */}
+                                <div className="flex justify-between items-center">
+                                    <div className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                        {loadingRedirects ? 'Chargement...' : `${redirectsList.length} redirection(s) configurée(s)`}
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            setShowAddRedirectForm(!showAddRedirectForm);
+                                            setEditingRedirect(null);
+                                        }}
+                                        className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                                            isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                        }`}
+                                    >
+                                        {showAddRedirectForm ? '❌ Annuler' : '➕ Ajouter une redirection'}
+                                    </button>
+                                </div>
+
+                                {/* Formulaire d'ajout */}
+                                {showAddRedirectForm && (
+                                    <div className={`p-4 rounded border-2 ${isDarkMode ? 'bg-gray-900 border-blue-600' : 'bg-blue-50 border-blue-300'}`}>
+                                        <h4 className="font-semibold mb-3">Nouvelle redirection</h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                                            <div>
+                                                <label className="block mb-1">Source (chemin)</label>
+                                                <input
+                                                    type="text"
+                                                    value={newRedirect.source}
+                                                    onChange={(e) => setNewRedirect({ ...newRedirect, source: e.target.value })}
+                                                    placeholder="/exemple"
+                                                    className={`w-full p-2 rounded border ${
+                                                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                    }`}
+                                                />
+                                                <div className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                    Doit commencer par /
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="block mb-1">Destination (URL complète)</label>
+                                                <input
+                                                    type="text"
+                                                    value={newRedirect.destination}
+                                                    onChange={(e) => setNewRedirect({ ...newRedirect, destination: e.target.value })}
+                                                    placeholder="https://example.com/page"
+                                                    className={`w-full p-2 rounded border ${
+                                                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                    }`}
+                                                />
+                                            </div>
+                                            <div className="flex items-end">
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={newRedirect.permanent}
+                                                        onChange={(e) => setNewRedirect({ ...newRedirect, permanent: e.target.checked })}
+                                                        className="rounded"
+                                                    />
+                                                    <span>Redirection permanente (301)</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2 mt-3">
+                                            <button
+                                                onClick={handleAddRedirect}
+                                                className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                                                    isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                                }`}
+                                            >
+                                                ✅ Ajouter
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setShowAddRedirectForm(false);
+                                                    setNewRedirect({ source: '', destination: '', permanent: false });
+                                                }}
+                                                className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                                                    isDarkMode ? 'bg-gray-600 hover:bg-gray-700 text-white' : 'bg-gray-500 hover:bg-gray-600 text-white'
+                                                }`}
+                                            >
+                                                ❌ Annuler
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Liste des redirections */}
+                                {loadingRedirects ? (
+                                    <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        Chargement des redirections...
+                                    </div>
+                                ) : redirectsList.length === 0 ? (
+                                    <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        Aucune redirection configurée
+                                    </div>
+                                ) : (
+                                    <div className={`rounded border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                        <table className="w-full text-sm">
+                                            <thead>
+                                                <tr className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                                    <th className={`p-3 text-left font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>Source</th>
+                                                    <th className={`p-3 text-left font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>Destination</th>
+                                                    <th className={`p-3 text-center font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>Type</th>
+                                                    <th className={`p-3 text-center font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {redirectsList.map((redirect, index) => (
+                                                    <tr key={index} className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                                        <td className={`p-3 font-mono ${isDarkMode ? 'text-blue-300' : 'text-blue-700'}`}>
+                                                            {redirect.source}
+                                                        </td>
+                                                        <td className={`p-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                            <a
+                                                                href={redirect.destination}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-blue-500 hover:underline truncate block max-w-md"
+                                                            >
+                                                                {redirect.destination}
+                                                            </a>
+                                                        </td>
+                                                        <td className="p-3 text-center">
+                                                            <span className={`px-2 py-1 rounded text-xs ${
+                                                                redirect.permanent
+                                                                    ? isDarkMode ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-800'
+                                                                    : isDarkMode ? 'bg-yellow-900 text-yellow-300' : 'bg-yellow-100 text-yellow-800'
+                                                            }`}>
+                                                                {redirect.permanent ? '301 (Permanent)' : '302 (Temporaire)'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="p-3">
+                                                            <div className="flex gap-2 justify-center">
+                                                                <button
+                                                                    onClick={() => testRedirect(redirect.source)}
+                                                                    className={`px-2 py-1 rounded text-xs transition-colors ${
+                                                                        isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                                                    }`}
+                                                                    title="Tester la redirection"
+                                                                >
+                                                                    🧪 Tester
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setEditingRedirect(redirect);
+                                                                        setShowAddRedirectForm(false);
+                                                                    }}
+                                                                    className={`px-2 py-1 rounded text-xs transition-colors ${
+                                                                        isDarkMode ? 'bg-yellow-600 hover:bg-yellow-700 text-white' : 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                                                                    }`}
+                                                                    title="Modifier"
+                                                                >
+                                                                    ✏️ Modifier
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleDeleteRedirect(redirect.source)}
+                                                                    className={`px-2 py-1 rounded text-xs transition-colors ${
+                                                                        isDarkMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-500 hover:bg-red-600 text-white'
+                                                                    }`}
+                                                                    title="Supprimer"
+                                                                >
+                                                                    🗑️ Supprimer
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+
+                                {/* Formulaire d'édition (modal inline) */}
+                                {editingRedirect && (
+                                    <div className={`mt-4 p-4 rounded border-2 ${isDarkMode ? 'bg-gray-900 border-yellow-600' : 'bg-yellow-50 border-yellow-300'}`}>
+                                        <h4 className="font-semibold mb-3">Éditer la redirection {editingRedirect.source}</h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                                            <div>
+                                                <label className="block mb-1">Source (chemin)</label>
+                                                <input
+                                                    type="text"
+                                                    value={editingRedirect.source}
+                                                    onChange={(e) => setEditingRedirect({ ...editingRedirect, source: e.target.value })}
+                                                    className={`w-full p-2 rounded border ${
+                                                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                    }`}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block mb-1">Destination (URL complète)</label>
+                                                <input
+                                                    type="text"
+                                                    value={editingRedirect.destination}
+                                                    onChange={(e) => setEditingRedirect({ ...editingRedirect, destination: e.target.value })}
+                                                    className={`w-full p-2 rounded border ${
+                                                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                    }`}
+                                                />
+                                            </div>
+                                            <div className="flex items-end">
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={editingRedirect.permanent || false}
+                                                        onChange={(e) => setEditingRedirect({ ...editingRedirect, permanent: e.target.checked })}
+                                                        className="rounded"
+                                                    />
+                                                    <span>Redirection permanente (301)</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2 mt-3">
+                                            <button
+                                                onClick={() => handleUpdateRedirect(editingRedirect.source, {
+                                                    newSource: editingRedirect.source,
+                                                    destination: editingRedirect.destination,
+                                                    permanent: editingRedirect.permanent
+                                                })}
+                                                className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                                                    isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                                }`}
+                                            >
+                                                ✅ Sauvegarder
+                                            </button>
+                                            <button
+                                                onClick={() => setEditingRedirect(null)}
+                                                className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                                                    isDarkMode ? 'bg-gray-600 hover:bg-gray-700 text-white' : 'bg-gray-500 hover:bg-gray-600 text-white'
+                                                }`}
+                                            >
+                                                ❌ Annuler
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Note d'information */}
+                                <div className={`p-3 rounded text-xs ${isDarkMode ? 'bg-blue-900/30 border border-blue-700 text-blue-300' : 'bg-blue-50 border border-blue-200 text-blue-800'}`}>
+                                    <strong>ℹ️ Note:</strong> Les modifications sont sauvegardées directement dans <code className="px-1 py-0.5 rounded bg-black/10">vercel.json</code> via GitHub API. 
+                                    Le déploiement Vercel se fera automatiquement après le commit.
                                 </div>
                             </div>
                         )}

@@ -58,6 +58,9 @@
     "api/admin/tickers.js": {
       "maxDuration": 15
     },
+    "api/admin/redirects.js": {
+      "maxDuration": 30
+    },
     "api/ai-services.js": {
       "maxDuration": 120
     },

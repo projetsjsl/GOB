@@ -155,7 +155,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
                       className="w-8 h-8 rounded object-cover flex-shrink-0"
                       onError={(e) => {
                         // Fallback vers logo FMP générique si le logo ne charge pas
-                        const fallbackUrl = `https://financialmodelingprep.com/image-stock/${profile.info.preferredSymbol || profile.id}.png`;
+                        const logoSymbol = profile.info.logoSymbol || 
+                                          profile.info.actualSymbol?.replace('.TO', '').replace('-', '.') ||
+                                          profile.info.preferredSymbol || 
+                                          profile.id;
+                        const fallbackUrl = `https://financialmodelingprep.com/image-stock/${logoSymbol}.png`;
                         if (e.currentTarget.src !== fallbackUrl) {
                           e.currentTarget.src = fallbackUrl;
                         } else {
@@ -167,7 +171,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
                   ) : (
                     // Fallback si pas de logo dans les données
                     <img 
-                      src={`https://financialmodelingprep.com/image-stock/${profile.info.preferredSymbol || profile.id}.png`}
+                      src={`https://financialmodelingprep.com/image-stock/${profile.info.logoSymbol || profile.info.actualSymbol?.replace('.TO', '').replace('-', '.') || profile.info.preferredSymbol || profile.id}.png`}
                       alt={profile.info.name}
                       className="w-8 h-8 rounded object-cover flex-shrink-0"
                       onError={(e) => {
