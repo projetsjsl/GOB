@@ -733,6 +733,84 @@ useEffect(() => {
 
 ---
 
+## 🔴 Erreurs d'Intégration Iframe et CSP
+
+### Erreur #33: ChatGPT bloque les iframes via CSP (Content Security Policy)
+
+**Contexte**: ChatGPTGroupTab - Intégration iframe ChatGPT Group Chat
+
+**Symptôme**: Erreur dans la console: `Framing 'https://chatgpt.com/' violates the following Content Security Policy directive: "frame-ancestors 'self'"`
+
+**Cause racine**:
+```javascript
+// ❌ MAUVAIS: Tentative d'intégration iframe ChatGPT
+<iframe
+    src="https://chatgpt.com/gg/v/..."
+    title="Session de clavardage ChatGPT"
+/>
+```
+
+**Problème identifié**:
+- ChatGPT utilise une politique CSP stricte (`frame-ancestors 'self'`)
+- Cela signifie que ChatGPT ne peut être intégré que dans des pages de même origine (chatgpt.com)
+- Les iframes externes sont bloquées pour des raisons de sécurité
+
+**Solution appliquée**:
+```javascript
+// ✅ BON: Remplacer iframe par bouton d'ouverture
+<div className="aspect-video rounded-lg bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center">
+    <div className="text-center space-y-6">
+        <div className="text-6xl mb-4">💬</div>
+        <h3 className="text-2xl font-bold">{settings.roomName}</h3>
+        <p className="text-sm text-gray-300">
+            ChatGPT bloque l'intégration en iframe pour des raisons de sécurité.
+        </p>
+        <button
+            onClick={() => window.open(settings.sessionUrl, '_blank', 'noopener,noreferrer')}
+            className="px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-lg font-semibold"
+        >
+            🚀 Ouvrir le salon ChatGPT
+        </button>
+        <button
+            onClick={handleCopyLink}
+            className="px-6 py-3 rounded-lg border border-gray-700 text-white"
+        >
+            📋 Copier le lien
+        </button>
+    </div>
+</div>
+```
+
+**Fichier**: `public/js/dashboard/components/tabs/ChatGPTGroupTab.js`
+
+**Impact**: Moyen - Empêchait l'affichage de l'iframe (mais fonctionnalité disponible via bouton)
+
+**Leçons apprises**:
+1. ⚠️ Certains sites (ChatGPT, Google, etc.) bloquent les iframes via CSP
+2. ⚠️ `frame-ancestors 'self'` signifie que seul le même domaine peut intégrer
+3. ✅ Toujours prévoir une alternative (bouton d'ouverture) pour les iframes bloquées
+4. ✅ Détecter les erreurs CSP et afficher un message clair à l'utilisateur
+5. ✅ Utiliser `window.open()` avec `noopener,noreferrer` pour sécurité
+
+**Commentaires à ajouter**:
+```javascript
+// ============================================
+// INTÉGRATION CHATGPT - GESTION CSP
+// ============================================
+// ⚠️ PROBLÈME: ChatGPT bloque les iframes via CSP (frame-ancestors 'self')
+// ✅ SOLUTION: Remplacer iframe par bouton d'ouverture dans nouvel onglet
+// ✅ AVANTAGES: Fonctionne malgré CSP, UX claire, pas de dépendance iframe
+// ============================================
+```
+
+**Alternatives considérées**:
+1. ❌ Proxy iframe (violerait les ToS de ChatGPT)
+2. ❌ Popup window (bloquée par les bloqueurs de popup)
+3. ✅ Bouton d'ouverture dans nouvel onglet (solution retenue)
+4. ✅ Copie de lien pour partage
+
+---
+
 ## 🔴 Erreurs de Variables d'Environnement
 
 ### Erreur #30: Accès aux variables VITE_* en Babel inline
