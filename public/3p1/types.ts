@@ -39,6 +39,11 @@ export interface Assumptions {
   requiredReturn: number;
   dividendPayoutRatio: number;
   baseYear: number;
+  // Metric exclusions for evaluation
+  excludeEPS?: boolean;
+  excludeCF?: boolean;
+  excludeBV?: boolean;
+  excludeDIV?: boolean;
 }
 
 export interface CompanyInfo {

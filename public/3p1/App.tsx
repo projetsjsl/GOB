@@ -537,7 +537,7 @@ export default function App() {
         setData(updated);
     };
 
-    const handleUpdateAssumption = (key: keyof Assumptions, value: number) => {
+    const handleUpdateAssumption = (key: keyof Assumptions, value: number | boolean) => {
         setAssumptions(prev => ({ ...prev, [key]: value }));
     };
 
