@@ -6,7 +6,7 @@ import { CalculatorIcon } from '@heroicons/react/24/outline';
 interface EvaluationDetailsProps {
   data: AnnualData[];
   assumptions: Assumptions;
-  onUpdateAssumption: (key: keyof Assumptions, value: number) => void;
+  onUpdateAssumption: (key: keyof Assumptions, value: number | boolean) => void;
 }
 
 export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assumptions, onUpdateAssumption }) => {
