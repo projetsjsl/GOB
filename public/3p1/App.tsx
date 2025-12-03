@@ -1335,6 +1335,7 @@ export default function App() {
                             <InfoTab />
                         ) : currentView === 'kpi' ? (
                             <KPIDashboard
+                                key={`kpi-${Object.keys(library).length}-${Object.values(library).reduce((sum, p) => sum + p.lastModified, 0)}`}
                                 profiles={Object.values(library)}
                                 currentId={activeId}
                                 onSelect={setActiveId}
