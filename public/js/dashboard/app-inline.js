@@ -25239,7 +25239,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 )}
 
                 {/* Contenu principal */}
-                <main className={`max-w-7xl mx-auto p-6 pb-24 transition-opacity duration-500 ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                <main className={`max-w-7xl mx-auto p-6 pb-32 transition-opacity duration-500 relative z-10 ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'
                     }`} style={{ minHeight: '500px', backgroundColor: isDarkMode ? '#000' : '#fff' }}>
                     {console.log('🎯 Active Tab:', activeTab, 'Loading Screen:', showLoadingScreen)}
                     {activeTab === 'markets-economy' && <MarketsEconomyTab />}
