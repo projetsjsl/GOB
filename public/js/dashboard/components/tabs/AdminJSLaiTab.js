@@ -1640,18 +1640,77 @@ const AdminJSLaiTab = ({
                                 const config = typeof window.getAnnouncementBarsConfig === 'function' 
                                     ? window.getAnnouncementBarsConfig() 
                                     : {};
+                                
+                                // Prompts par défaut
+                                const defaultPrompts = {
+                                    'news': 'Utilise Google Search pour trouver la principale actualité financière de l\'heure. Génère un message court (max 80 caractères) pour une barre d\'annonce en haut de page. Format: "📰 [Titre accrocheur]"',
+                                    'update': 'Génère un message de mise à jour système court (max 80 caractères) pour une barre d\'annonce. Format: "🆕 [Message de mise à jour]"',
+                                    'event': 'Utilise Google Search pour trouver le prochain événement économique important (Fed, GDP, emploi, etc.). Génère un message court (max 80 caractères). Format: "📅 [Événement] - [Date/Heure]"',
+                                    'market-alert': 'Utilise Google Search pour trouver une alerte de marché importante (volatilité, crash, rally). Génère un message court (max 80 caractères). Format: "⚠️ [Alerte]"',
+                                    'promotion': 'Génère un message promotionnel court (max 80 caractères) pour services premium. Format: "🎁 [Offre]"'
+                                };
+                                
+                                const [editingBar, setEditingBar] = React.useState(null);
+                                const [barConfigs, setBarConfigs] = React.useState(() => {
+                                    const saved = { ...config };
+                                    // Initialiser avec les valeurs par défaut si manquantes
+                                    barTypes.forEach(({ key, type }) => {
+                                        if (!saved[key]) {
+                                            saved[key] = { enabled: false, type: type, section: 'top', design: 'default' };
+                                        }
+                                        const barConfig = saved[key];
+                                        if (!barConfig.prompt) {
+                                            barConfig.prompt = defaultPrompts[type] || '';
+                                        }
+                                        if (barConfig.temperature === undefined) barConfig.temperature = 0.7;
+                                        if (barConfig.maxOutputTokens === undefined) barConfig.maxOutputTokens = 150;
+                                        if (barConfig.useGoogleSearch === undefined) {
+                                            barConfig.useGoogleSearch = ['news', 'event', 'market-alert'].includes(type);
+                                        }
+                                    });
+                                    return saved;
+                                });
+                                
                                 const barTypes = [
-                                    { key: 'news-top', label: 'Actualités Financières', emoji: '📰', description: 'Actualités importantes de l\'heure' },
-                                    { key: 'update-top', label: 'Mises à Jour Système', emoji: '🆕', description: 'Nouvelles fonctionnalités et améliorations' },
-                                    { key: 'event-top', label: 'Événements Économiques', emoji: '📅', description: 'Fed, GDP, emploi, etc.' },
-                                    { key: 'market-alert-top', label: 'Alertes de Marché', emoji: '⚠️', description: 'Volatilité, crash, rally' },
-                                    { key: 'promotion-top', label: 'Promotions', emoji: '🎁', description: 'Offres sur services premium' }
+                                    { key: 'news-top', label: 'Actualités Financières', emoji: '📰', description: 'Actualités importantes de l\'heure', type: 'news' },
+                                    { key: 'update-top', label: 'Mises à Jour Système', emoji: '🆕', description: 'Nouvelles fonctionnalités et améliorations', type: 'update' },
+                                    { key: 'event-top', label: 'Événements Économiques', emoji: '📅', description: 'Fed, GDP, emploi, etc.', type: 'event' },
+                                    { key: 'market-alert-top', label: 'Alertes de Marché', emoji: '⚠️', description: 'Volatilité, crash, rally', type: 'market-alert' },
+                                    { key: 'promotion-top', label: 'Promotions', emoji: '🎁', description: 'Offres sur services premium', type: 'promotion' }
                                 ];
+                                
+                                const saveBarConfig = (key, updates) => {
+                                    const newConfig = {
+                                        ...barConfigs,
+                                        [key]: {
+                                            ...barConfigs[key],
+                                            ...updates
+                                        }
+                                    };
+                                    setBarConfigs(newConfig);
+                                    // Sauvegarder sans recharger la page
+                                    try {
+                                        localStorage.setItem('announcement-bars-config', JSON.stringify(newConfig));
+                                    } catch (e) {
+                                        console.error('Erreur sauvegarde config:', e);
+                                    }
+                                };
                                 
                                 return (
                                     <div className="space-y-3">
-                                        {barTypes.map(({ key, label, emoji, description }) => {
-                                            const barConfig = config[key] || { enabled: false, type: key.split('-')[0], section: 'top', design: 'default' };
+                                        {barTypes.map(({ key, label, emoji, description, type }) => {
+                                            const barConfig = barConfigs[key] || { 
+                                                enabled: false, 
+                                                type: type, 
+                                                section: 'top', 
+                                                design: 'default',
+                                                prompt: defaultPrompts[type] || '',
+                                                temperature: 0.7,
+                                                maxOutputTokens: 150,
+                                                useGoogleSearch: ['news', 'event', 'market-alert'].includes(type)
+                                            };
+                                            const isEditing = editingBar === key;
+                                            
                                             return (
                                                 <div key={key} className={`p-4 rounded-lg border transition-colors duration-300 ${
                                                     darkMode 
@@ -1662,7 +1721,7 @@ const AdminJSLaiTab = ({
                                                             ? 'bg-indigo-100 border-indigo-300' 
                                                             : 'bg-white border-gray-200'
                                                 }`}>
-                                                    <div className="flex items-center justify-between">
+                                                    <div className="flex items-center justify-between mb-3">
                                                         <div className="flex items-center gap-3 flex-1">
                                                             <span className="text-2xl">{emoji}</span>
                                                             <div>
@@ -1674,35 +1733,136 @@ const AdminJSLaiTab = ({
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <label className="relative inline-flex items-center cursor-pointer">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={barConfig.enabled}
-                                                                onChange={() => {
-                                                                    const newConfig = {
-                                                                        ...config,
-                                                                        [key]: {
-                                                                            ...barConfig,
-                                                                            enabled: !barConfig.enabled
-                                                                        }
-                                                                    };
-                                                                    if (typeof window.setAnnouncementBarsConfig === 'function') {
-                                                                        window.setAnnouncementBarsConfig(newConfig);
-                                                                    }
-                                                                }}
-                                                                className="sr-only peer"
-                                                            />
-                                                            <div className={`w-11 h-6 rounded-full peer transition-colors ${
-                                                                barConfig.enabled
-                                                                    ? darkMode ? 'bg-indigo-600' : 'bg-indigo-500'
-                                                                    : darkMode ? 'bg-gray-700' : 'bg-gray-300'
-                                                            }`}>
-                                                                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                                                                    barConfig.enabled ? 'translate-x-5' : 'translate-x-0.5'
-                                                                } mt-0.5`}></div>
-                                                            </div>
-                                                        </label>
+                                                        <div className="flex items-center gap-2">
+                                                            <button
+                                                                onClick={() => setEditingBar(isEditing ? null : key)}
+                                                                className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${
+                                                                    darkMode
+                                                                        ? isEditing ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                                                        : isEditing ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                                                }`}
+                                                            >
+                                                                {isEditing ? 'Fermer' : '⚙️ Config'}
+                                                            </button>
+                                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={barConfig.enabled}
+                                                                    onChange={() => {
+                                                                        saveBarConfig(key, { enabled: !barConfig.enabled });
+                                                                    }}
+                                                                    className="sr-only peer"
+                                                                />
+                                                                <div className={`w-11 h-6 rounded-full peer transition-colors ${
+                                                                    barConfig.enabled
+                                                                        ? darkMode ? 'bg-indigo-600' : 'bg-indigo-500'
+                                                                        : darkMode ? 'bg-gray-700' : 'bg-gray-300'
+                                                                }`}>
+                                                                    <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                                                                        barConfig.enabled ? 'translate-x-5' : 'translate-x-0.5'
+                                                                    } mt-0.5`}></div>
+                                                                </div>
+                                                            </label>
+                                                        </div>
                                                     </div>
+                                                    
+                                                    {/* Panneau de configuration */}
+                                                    {isEditing && (
+                                                        <div className={`mt-4 p-4 rounded-lg border space-y-4 ${
+                                                            darkMode ? 'bg-gray-800/50 border-gray-600' : 'bg-gray-50 border-gray-300'
+                                                        }`}>
+                                                            <div>
+                                                                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                                    Prompt / Instructions
+                                                                </label>
+                                                                <textarea
+                                                                    value={barConfig.prompt || ''}
+                                                                    onChange={(e) => saveBarConfig(key, { prompt: e.target.value })}
+                                                                    rows={3}
+                                                                    className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                                                                        darkMode 
+                                                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                                                    }`}
+                                                                    placeholder="Entrez le prompt pour générer le contenu..."
+                                                                />
+                                                            </div>
+                                                            
+                                                            <div className="grid grid-cols-3 gap-4">
+                                                                <div>
+                                                                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                                        Température
+                                                                    </label>
+                                                                    <input
+                                                                        type="number"
+                                                                        min="0"
+                                                                        max="2"
+                                                                        step="0.1"
+                                                                        value={barConfig.temperature || 0.7}
+                                                                        onChange={(e) => saveBarConfig(key, { temperature: parseFloat(e.target.value) })}
+                                                                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                                                                            darkMode 
+                                                                                ? 'bg-gray-700 border-gray-600 text-white' 
+                                                                                : 'bg-white border-gray-300 text-gray-900'
+                                                                        }`}
+                                                                    />
+                                                                </div>
+                                                                
+                                                                <div>
+                                                                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                                        Max Tokens
+                                                                    </label>
+                                                                    <input
+                                                                        type="number"
+                                                                        min="50"
+                                                                        max="500"
+                                                                        step="10"
+                                                                        value={barConfig.maxOutputTokens || 150}
+                                                                        onChange={(e) => saveBarConfig(key, { maxOutputTokens: parseInt(e.target.value) })}
+                                                                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                                                                            darkMode 
+                                                                                ? 'bg-gray-700 border-gray-600 text-white' 
+                                                                                : 'bg-white border-gray-300 text-gray-900'
+                                                                        }`}
+                                                                    />
+                                                                </div>
+                                                                
+                                                                <div>
+                                                                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                                        Google Search
+                                                                    </label>
+                                                                    <label className="relative inline-flex items-center cursor-pointer w-full justify-center">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={barConfig.useGoogleSearch || false}
+                                                                            onChange={(e) => saveBarConfig(key, { useGoogleSearch: e.target.checked })}
+                                                                            className="sr-only peer"
+                                                                        />
+                                                                        <div className={`w-11 h-6 rounded-full peer transition-colors ${
+                                                                            barConfig.useGoogleSearch
+                                                                                ? darkMode ? 'bg-indigo-600' : 'bg-indigo-500'
+                                                                                : darkMode ? 'bg-gray-700' : 'bg-gray-300'
+                                                                        }`}>
+                                                                            <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                                                                                barConfig.useGoogleSearch ? 'translate-x-5' : 'translate-x-0.5'
+                                                                            } mt-0.5`}></div>
+                                                                        </div>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <button
+                                                                onClick={() => setEditingBar(null)}
+                                                                className={`w-full px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                                                    darkMode
+                                                                        ? 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                                                                        : 'bg-indigo-500 hover:bg-indigo-400 text-white'
+                                                                }`}
+                                                            >
+                                                                ✓ Enregistrer
+                                                            </button>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             );
                                         })}

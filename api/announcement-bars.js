@@ -28,9 +28,9 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { type = 'news', section = 'top' } = req.method === 'POST' ? req.body : req.query;
+        const { type = 'news', section = 'top', config: customConfig = {} } = req.method === 'POST' ? req.body : req.query;
 
-        // Prompts selon le type de barre (basés sur l'article Elfsight)
+        // Prompts par défaut selon le type de barre (basés sur l'article Elfsight)
         const typePrompts = {
             'news': {
                 prompt: `Utilise Google Search pour trouver la principale actualité financière de l'heure. Génère un message court (max 80 caractères) pour une barre d'annonce en haut de page. Format: "📰 [Titre accrocheur]"`,
@@ -54,7 +54,14 @@ export default async function handler(req, res) {
             }
         };
 
-        const config = typePrompts[type] || typePrompts['news'];
+        // Utiliser la configuration personnalisée si fournie, sinon utiliser les valeurs par défaut
+        const defaultConfig = typePrompts[type] || typePrompts['news'];
+        const prompt = customConfig.prompt || defaultConfig.prompt;
+        const temperature = customConfig.temperature !== undefined ? customConfig.temperature : 0.7;
+        const maxOutputTokens = customConfig.maxOutputTokens !== undefined ? customConfig.maxOutputTokens : 150;
+        const useGoogleSearch = customConfig.useGoogleSearch !== undefined 
+            ? customConfig.useGoogleSearch 
+            : (type === 'news' || type === 'event' || type === 'market-alert');
         
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
         
@@ -65,16 +72,16 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify({
                 contents: [{
-                    parts: [{ text: config.prompt }]
+                    parts: [{ text: prompt }]
                 }],
-                tools: type === 'news' || type === 'event' || type === 'market-alert' ? [{
+                tools: useGoogleSearch ? [{
                     googleSearchRetrieval: {} // Active Google Search pour données à jour
                 }] : undefined,
                 generationConfig: {
-                    temperature: 0.7,
+                    temperature: temperature,
                     topK: 20,
                     topP: 0.8,
-                    maxOutputTokens: 150,
+                    maxOutputTokens: maxOutputTokens,
                     candidateCount: 1
                 }
             }),
@@ -87,7 +94,7 @@ export default async function handler(req, res) {
         }
 
         const data = await response.json();
-        const content = data.candidates?.[0]?.content?.parts?.[0]?.text || config.example;
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text || defaultConfig.example;
         
         // Nettoyer le contenu (enlever guillemets, espaces en trop)
         const cleanContent = content.trim().replace(/^["']|["']$/g, '');
@@ -109,4 +116,5 @@ export default async function handler(req, res) {
         });
     }
 }
+
 

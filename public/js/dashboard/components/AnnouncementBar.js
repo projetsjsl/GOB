@@ -35,12 +35,36 @@ const AnnouncementBar = ({
         const loadContent = async () => {
             try {
                 setLoading(true);
+                
+                // Récupérer la configuration personnalisée depuis localStorage
+                let customConfig = {};
+                try {
+                    const savedConfig = typeof window.getAnnouncementBarsConfig === 'function' 
+                        ? window.getAnnouncementBarsConfig() 
+                        : {};
+                    const barKey = `${type}-${section}`;
+                    if (savedConfig[barKey]) {
+                        customConfig = {
+                            prompt: savedConfig[barKey].prompt,
+                            temperature: savedConfig[barKey].temperature,
+                            maxOutputTokens: savedConfig[barKey].maxOutputTokens,
+                            useGoogleSearch: savedConfig[barKey].useGoogleSearch
+                        };
+                    }
+                } catch (e) {
+                    console.warn('Erreur récupération config personnalisée:', e);
+                }
+                
                 const response = await fetch('/api/announcement-bars', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ type, section })
+                    body: JSON.stringify({ 
+                        type, 
+                        section,
+                        ...(Object.keys(customConfig).length > 0 && { config: customConfig })
+                    })
                 });
 
                 if (response.ok) {
@@ -156,4 +180,5 @@ const AnnouncementBar = ({
 
 // Exposer globalement
 window.AnnouncementBar = AnnouncementBar;
+
 
