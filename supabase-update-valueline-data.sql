@@ -1,7 +1,7 @@
 -- ============================================================================
 -- MISE À JOUR DES MÉTRIQUES VALUELINE
 -- Généré automatiquement depuis valueline.xlsx
--- Date: 2025-12-03T19:38:24.766Z
+-- Date: 2025-12-03T21:24:01.934Z
 -- ============================================================================
 -- 
 -- Ce script met à jour les métriques ValueLine pour tous les tickers

@@ -1,6 +1,6 @@
 /**
  * Données ValueLine générées automatiquement depuis valueline.xlsx
- * Date de génération: 2025-12-03T19:38:24.767Z
+ * Date de génération: 2025-12-03T21:24:01.936Z
  * Source: ValueLine au 3 décembre 2025
  */
 
