@@ -512,10 +512,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               {comparisonMode ? '✕ Mode Comparaison' : '🔍 Mode Comparaison'}
             </button>
             <button
-              onClick={() => setFilters({ minReturn: -100, maxReturn: 500, minJPEGY: 0, maxJPEGY: 5, sector: '', recommendation: 'all' })}
+              onClick={() => setFilters(defaultFilterValues)}
               className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+              title="Réinitialiser tous les filtres pour afficher tous les titres"
             >
-              Réinitialiser
+              🔄 Réinitialiser
             </button>
             <button
               onClick={() => {
