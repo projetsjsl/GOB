@@ -61,34 +61,34 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
   return (
     <div className="bg-slate-900 text-white flex flex-col h-full border-r border-slate-800 shadow-xl w-full">
       {/* App Title */}
-      <div className="p-4 border-b border-slate-800 bg-slate-950">
-        <div className="flex items-center gap-2 text-blue-400 font-bold text-lg">
-          <ChartBarIcon className="w-6 h-6" />
+      <div className="p-3 sm:p-4 border-b border-slate-800 bg-slate-950">
+        <div className="flex items-center gap-2 text-blue-400 font-bold text-base sm:text-lg">
+          <ChartBarIcon className="w-5 h-5 sm:w-6 sm:h-6" />
           <span>FinancePro</span>
         </div>
         <p className="text-xs text-slate-500 mt-1">Gestion de Portefeuille</p>
       </div>
 
       {/* Search & Add */}
-      <div className="p-4 border-b border-slate-800/50">
+      <div className="p-2 sm:p-4 border-b border-slate-800/50">
         <div className="flex gap-2 mb-2">
           <div className="relative flex-1">
-            <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <MagnifyingGlassIcon className="w-4 h-4 absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
               type="text"
               placeholder="Filtrer..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded pl-9 pr-3 py-2 text-sm text-slate-200 focus:ring-1 focus:ring-blue-500 outline-none placeholder-slate-500 transition-all focus:border-blue-500"
+              className="w-full bg-slate-800 border border-slate-700 rounded pl-8 sm:pl-9 pr-2 sm:pr-3 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-200 focus:ring-1 focus:ring-blue-500 outline-none placeholder-slate-500 transition-all focus:border-blue-500"
             />
           </div>
           <button
             onClick={onAdd}
-            className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded flex items-center justify-center gap-2 text-sm font-bold transition-colors shadow-lg hover:shadow-blue-500/20 whitespace-nowrap"
+            className="bg-blue-600 hover:bg-blue-500 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm font-bold transition-colors shadow-lg hover:shadow-blue-500/20 whitespace-nowrap"
             title="Ajouter un Ticker"
           >
-            <PlusIcon className="w-5 h-5" />
-            <span className="hidden xl:inline">Ajouter</span>
+            <PlusIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline">Ajouter</span>
           </button>
         </div>
         {onSyncFromSupabase && (

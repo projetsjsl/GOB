@@ -65,15 +65,15 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow mb-4 border-l-4 border-blue-600 print-full-width">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-2">
-        <div className="flex items-center gap-3">
+    <div className="bg-white p-2 sm:p-4 rounded-lg shadow mb-4 border-l-4 border-blue-600 print-full-width">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 sm:mb-4 border-b pb-2">
+        <div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto">
           {/* Logo */}
           {info.logo ? (
             <img 
               src={info.logo} 
               alt={info.name}
-              className="w-16 h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200"
+              className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200"
               onError={(e) => {
                 // Essayer plusieurs variantes de logo
                 const symbolsToTry = [
@@ -116,7 +116,7 @@ export const Header: React.FC<HeaderProps> = ({
           )}
           
           <div className="relative">
-            <div className="bg-blue-100 p-2 rounded text-blue-700 font-bold text-xl min-w-[60px] text-center select-none">
+            <div className="bg-blue-100 p-1.5 sm:p-2 rounded text-blue-700 font-bold text-base sm:text-xl min-w-[50px] sm:min-w-[60px] text-center select-none">
               {info.preferredSymbol || info.symbol}
             </div>
             {/* Recommendation Status Dot */}
@@ -137,12 +137,13 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800 uppercase truncate max-w-[300px] md:max-w-[500px] flex items-center gap-2">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-base sm:text-xl md:text-2xl font-bold text-gray-800 uppercase truncate flex items-center gap-2">
               {info.name}
             </h1>
-            <div className="flex items-center gap-2 mt-1">
-              <p className="text-sm text-gray-500">GROUPE OUELLET BOLDUC - GESTIONNAIRES DE PORTEFEUILLE</p>
+            <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
+              <p className="text-xs sm:text-sm text-gray-500 hidden sm:inline">GROUPE OUELLET BOLDUC - GESTIONNAIRES DE PORTEFEUILLE</p>
+              <p className="text-xs text-gray-500 sm:hidden">GOB</p>
               {info.exchange && (
                 <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
                   {info.exchange}
@@ -161,77 +162,79 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
         </div>
-        <div className="mt-2 md:mt-0 flex items-center gap-4 text-sm shrink-0">
-          <div className="bg-gray-100 px-3 py-1 rounded">
-            <span className="font-semibold text-gray-600 block text-xs">SECTEUR</span>
-            {info.sector}
+        <div className="mt-2 md:mt-0 flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm shrink-0 w-full md:w-auto">
+          <div className="bg-gray-100 px-2 sm:px-3 py-1 rounded">
+            <span className="font-semibold text-gray-600 block text-[10px] sm:text-xs">SECTEUR</span>
+            <span className="text-xs sm:text-sm">{info.sector}</span>
           </div>
-          <div className="bg-gray-100 px-3 py-1 rounded text-center">
-            <span className="font-semibold text-gray-600 block text-xs">CÔTE SÉCURITÉ</span>
-            <span className="font-bold text-green-600">{info.securityRank}</span>
-            <span className="text-[9px] text-gray-500 block mt-0.5">ValueLine 3 déc 2025</span>
+          <div className="bg-gray-100 px-2 sm:px-3 py-1 rounded text-center">
+            <span className="font-semibold text-gray-600 block text-[10px] sm:text-xs">CÔTE SÉCURITÉ</span>
+            <span className="font-bold text-green-600 text-sm sm:text-base">{info.securityRank}</span>
+            <span className="text-[8px] sm:text-[9px] text-gray-500 block mt-0.5 hidden sm:block">ValueLine 3 déc 2025</span>
           </div>
           {info.beta !== undefined && info.beta !== null && (
-            <div className="bg-gray-100 px-3 py-1 rounded text-center">
-              <span className="font-semibold text-gray-600 block text-xs">BETA</span>
-              <span className="font-bold text-blue-600">{info.beta.toFixed(2)}</span>
+            <div className="bg-gray-100 px-2 sm:px-3 py-1 rounded text-center">
+              <span className="font-semibold text-gray-600 block text-[10px] sm:text-xs">BETA</span>
+              <span className="font-bold text-blue-600 text-sm sm:text-base">{info.beta.toFixed(2)}</span>
             </div>
           )}
-          {/* Métriques ValueLine */}
+          {/* Métriques ValueLine - Masquées sur très petit écran */}
           {info.earningsPredictability && (
-            <div className="bg-gray-100 px-3 py-1 rounded text-center">
-              <span className="font-semibold text-gray-600 block text-xs">EARNINGS PRED.</span>
-              <span className="font-bold text-purple-600">{info.earningsPredictability}</span>
-              <span className="text-[9px] text-gray-500 block mt-0.5">ValueLine 3 déc 2025</span>
+            <div className="bg-gray-100 px-2 sm:px-3 py-1 rounded text-center hidden sm:block">
+              <span className="font-semibold text-gray-600 block text-[10px] sm:text-xs">EARNINGS PRED.</span>
+              <span className="font-bold text-purple-600 text-sm sm:text-base">{info.earningsPredictability}</span>
+              <span className="text-[8px] sm:text-[9px] text-gray-500 block mt-0.5 hidden md:block">ValueLine 3 déc 2025</span>
             </div>
           )}
           {info.priceGrowthPersistence && (
-            <div className="bg-gray-100 px-3 py-1 rounded text-center">
+            <div className="bg-gray-100 px-2 sm:px-3 py-1 rounded text-center hidden md:block">
               <span className="font-semibold text-gray-600 block text-xs">PRICE GROWTH PERSISTENCE</span>
               <span className="font-bold text-pink-600">{info.priceGrowthPersistence}</span>
               <span className="text-[9px] text-gray-500 block mt-0.5">ValueLine 3 déc 2025</span>
             </div>
           )}
           {info.priceStability && (
-            <div className="bg-gray-100 px-3 py-1 rounded text-center">
+            <div className="bg-gray-100 px-2 sm:px-3 py-1 rounded text-center hidden md:block">
               <span className="font-semibold text-gray-600 block text-xs">PRICE STABILITY</span>
               <span className="font-bold text-teal-600">{info.priceStability}</span>
               <span className="text-[9px] text-gray-500 block mt-0.5">ValueLine 3 déc 2025</span>
             </div>
           )}
-          <button
-            onClick={() => window.dispatchEvent(new CustomEvent('open-save-dialog'))}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase transition-colors no-print bg-blue-600 text-white hover:bg-blue-700"
-            title="Sauvegarder une version (Snapshot)"
-          >
-            <CloudArrowDownIcon className="w-4 h-4" />
-            Sauvegarder
-          </button>
-
-          {onFetchData && (
+          <div className="flex gap-1 sm:gap-2 ml-auto md:ml-0">
             <button
-              onClick={handleSyncClick}
-              disabled={isLoading}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase transition-colors no-print ${isLoading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
-              title="Récupérer les données via API (FMP & Finnhub)"
+              onClick={() => window.dispatchEvent(new CustomEvent('open-save-dialog'))}
+              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print bg-blue-600 text-white hover:bg-blue-700"
+              title="Sauvegarder une version (Snapshot)"
             >
-              <ArrowPathIcon className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-              {isLoading ? 'Sync...' : 'Sync. Données'}
+              <CloudArrowDownIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Sauvegarder</span>
             </button>
-          )}
 
-          <button
-            onClick={handlePrint}
-            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors no-print"
-            title="Imprimer la fiche (PDF)"
-          >
-            <PrinterIcon className="w-6 h-6" />
-          </button>
+            {onFetchData && (
+              <button
+                onClick={handleSyncClick}
+                disabled={isLoading}
+                className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
+                title="Récupérer les données via API (FMP & Finnhub)"
+              >
+                <ArrowPathIcon className={`w-3 h-3 sm:w-4 sm:h-4 ${isLoading ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">{isLoading ? 'Sync...' : 'Sync. Données'}</span>
+              </button>
+            )}
+
+            <button
+              onClick={handlePrint}
+              className="p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors no-print"
+              title="Imprimer la fiche (PDF)"
+            >
+              <PrinterIcon className="w-4 h-4 sm:w-6 sm:h-6" />
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Quick Stats Inputs */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 bg-slate-50 p-3 rounded-md border border-slate-200">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-4 bg-slate-50 p-2 sm:p-3 rounded-md border border-slate-200">
         <div className="flex flex-col group relative">
           <label className="text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help" title="Prix du marché en temps réel">
             <TagIcon className="w-3 h-3" /> Prix Actuel

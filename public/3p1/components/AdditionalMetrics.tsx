@@ -109,15 +109,15 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
         <div className="space-y-6">
             {/* Indicateur JPEGY */}
             <div className="bg-white p-5 rounded-lg shadow border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
                     🎯 JPEGY (Jean-Sebastien's P/E Adjusted for Growth & Yield)
                 </h3>
                 <p className="text-sm text-gray-600 mb-4">
                     Ratio = P/E ÷ (Growth % + Yield %). Plus le ratio est bas, plus l'action est attractive.
                 </p>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {/* JPEGY (P/E Actuel) */}
-                    <div className="bg-white p-4 rounded-lg border border-purple-200">
+                    <div className="bg-white p-3 sm:p-4 rounded-lg border border-purple-200">
                         <div className="text-sm text-gray-600 mb-1">JPEGY (P/E Actuel)</div>
                         <div className="text-3xl font-bold mb-3" style={{ color: jpegyColor.color }}>
                             {jpegy > 0 ? jpegy.toFixed(2) : 'N/A'}
@@ -155,7 +155,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                     </div>
                     
                     {/* JPEGY (Forward P/E) */}
-                    <div className="bg-white p-4 rounded-lg border border-purple-200">
+                    <div className="bg-white p-3 sm:p-4 rounded-lg border border-purple-200">
                         <div className="text-sm text-gray-600 mb-1">JPEGY (Forward P/E)</div>
                         <div className="text-3xl font-bold mb-3" style={{ color: forwardJpegyColor.color }}>
                             {forwardJpegy > 0 ? forwardJpegy.toFixed(2) : 'N/A'}
@@ -223,7 +223,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
 
             {/* Ratios Actuels vs Historiques */}
             <div className="bg-white p-5 rounded-lg shadow border border-gray-200">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
                     📊 Ratios Actuels vs Historiques
                 </h3>
                 <div className="overflow-x-auto">
@@ -315,10 +315,10 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
 
             {/* Rendement Espéré (Value Line Style) */}
             <div className="card bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
                     📈 Rendement Espéré (5 ans)
                 </h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                         <div className="text-sm text-gray-600 mb-2">Appréciation du Prix</div>
                         <div className="text-2xl font-bold text-blue-600">
@@ -383,7 +383,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                     
                     return (
                         <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div className="bg-green-50 p-4 rounded-lg border border-green-200">
                                     <div className="text-xs text-green-700 font-semibold mb-1">Potentiel de Hausse</div>
                                     <div className="text-2xl font-bold text-green-800">{upsidePotential.toFixed(1)}%</div>

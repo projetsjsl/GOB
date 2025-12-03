@@ -22,6 +22,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
   const [matrixView, setMatrixView] = useState<'grid' | 'list' | 'compact'>('grid');
   const [approvedVersions, setApprovedVersions] = useState<Set<string>>(new Set());
+  const [isLoadingApprovedVersions, setIsLoadingApprovedVersions] = useState(false);
 
   // Calculer les métriques pour chaque profil
   const profileMetrics = useMemo(() => {
@@ -162,6 +163,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   // Charger les versions approuvées pour tous les profils (avec batch pour éviter trop de requêtes)
   useEffect(() => {
     const loadApprovedVersions = async () => {
+      setIsLoadingApprovedVersions(true);
       const approvedSet = new Set<string>();
       
       // Traiter par batch de 10 pour éviter de surcharger l'API
@@ -195,10 +197,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       }
       
       setApprovedVersions(approvedSet);
+      setIsLoadingApprovedVersions(false);
     };
 
     if (profiles.length > 0) {
       loadApprovedVersions();
+    } else {
+      setIsLoadingApprovedVersions(false);
     }
   }, [profiles]);
 
@@ -442,10 +447,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       {globalStats && (
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg shadow-lg border border-blue-200">
           <h3 className="text-xl font-bold text-gray-800 mb-4">📊 Statistiques Globales du Portefeuille</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
+            <div className="bg-white p-2 sm:p-3 md:p-4 rounded-lg shadow border border-gray-200">
               <div className="text-xs text-gray-500 mb-1">Rendement Moyen</div>
-              <div className="text-2xl font-bold text-blue-600">{globalStats.avgReturn.toFixed(1)}%</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">{globalStats.avgReturn.toFixed(1)}%</div>
               <div className="text-xs text-gray-400 mt-1">Médiane: {globalStats.medianReturn.toFixed(1)}%</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
@@ -568,15 +573,15 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       )}
 
       {/* Filtres Améliorés */}
-      <div className={`bg-white p-6 rounded-lg shadow-lg border-2 transition-all ${
+        <div className={`bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border-2 transition-all ${
         (filters.minReturn !== -100 || filters.maxReturn !== 500 || filters.minJPEGY !== 0 || 
          filters.maxJPEGY !== 5 || filters.sector !== '' || filters.recommendation !== 'all')
           ? 'border-blue-400 bg-blue-50' 
           : 'border-gray-200'
       }`}>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <h3 className="text-lg font-bold">🔍 Filtres de Screening</h3>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <h3 className="text-base sm:text-lg font-bold">🔍 Filtres de Screening</h3>
             {(filters.minReturn !== -100 || filters.maxReturn !== 500 || filters.minJPEGY !== 0 || 
               filters.maxJPEGY !== 5 || filters.sector !== '' || filters.recommendation !== 'all') && (
               <span className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full flex items-center gap-1">
@@ -585,10 +590,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               </span>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 w-full sm:w-auto">
             <button
               onClick={() => setComparisonMode(!comparisonMode)}
-              className={`px-3 py-1 text-xs rounded transition-colors ${
+              className={`px-2 sm:px-3 py-1 text-[10px] sm:text-xs rounded transition-colors ${
                 comparisonMode 
                   ? 'bg-purple-500 text-white' 
                   : 'bg-purple-100 hover:bg-purple-200 text-purple-700'
@@ -598,7 +603,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             </button>
             <button
               onClick={() => setFilters(defaultFilterValues)}
-              className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+              className="px-2 sm:px-3 py-1 text-[10px] sm:text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
               title="Réinitialiser tous les filtres pour afficher tous les titres"
             >
               🔄 Réinitialiser
@@ -610,7 +615,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 const maxReturn = Math.max(...top10.map(m => m.totalReturnPercent));
                 setFilters(prev => ({ ...prev, minReturn: minReturn - 5, maxReturn: maxReturn + 5 }));
               }}
-              className="px-3 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded transition-colors"
+              className="px-2 sm:px-3 py-1 text-[10px] sm:text-xs bg-gray-100 hover:bg-blue-100 hover:text-blue-600 text-gray-700 rounded transition-colors"
             >
               Top 10
             </button>
@@ -623,7 +628,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   setFilters(prev => ({ ...prev, minJPEGY: 0, maxJPEGY: maxJPEGY + 0.5 }));
                 }
               }}
-              className="px-3 py-1 text-xs bg-green-100 hover:bg-green-200 rounded transition-colors"
+              className="px-2 sm:px-3 py-1 text-[10px] sm:text-xs bg-green-100 hover:bg-green-200 rounded transition-colors"
             >
               Sous-évalués
             </button>
@@ -642,18 +647,21 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               filters.source !== 'all') && (
               <span className="ml-2 text-xs text-blue-600">({profileMetrics.length - filteredMetrics.length} masqué(s))</span>
             )}
+            {isLoadingApprovedVersions && (
+              <span className="ml-2 text-xs text-gray-400">⏳ Vérification des versions approuvées...</span>
+            )}
           </div>
         </div>
         
         {/* Filtres avec indicateurs visuels */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">Rendement Min (%)</label>
             <input
               type="number"
               value={filters.minReturn}
               onChange={(e) => setFilters({ ...filters, minReturn: parseFloat(e.target.value) || defaultFilterValues.minReturn })}
-              className={`w-full px-4 py-2.5 border-2 rounded-lg text-sm transition-all ${
+              className={`w-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 border-2 rounded-lg text-xs sm:text-sm transition-all ${
                 filters.minReturn !== defaultFilterValues.minReturn 
                   ? 'border-blue-400 bg-blue-50 focus:ring-2 focus:ring-blue-500' 
                   : 'border-gray-300 focus:border-blue-400'
@@ -666,7 +674,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               type="number"
               value={filters.maxReturn}
               onChange={(e) => setFilters({ ...filters, maxReturn: parseFloat(e.target.value) || defaultFilterValues.maxReturn })}
-              className={`w-full px-4 py-2.5 border-2 rounded-lg text-sm transition-all ${
+              className={`w-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 border-2 rounded-lg text-xs sm:text-sm transition-all ${
                 filters.maxReturn !== defaultFilterValues.maxReturn 
                   ? 'border-blue-400 bg-blue-50 focus:ring-2 focus:ring-blue-500' 
                   : 'border-gray-300 focus:border-blue-400'
@@ -680,7 +688,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               step="0.1"
               value={filters.minJPEGY}
               onChange={(e) => setFilters({ ...filters, minJPEGY: parseFloat(e.target.value) || defaultFilterValues.minJPEGY })}
-              className={`w-full px-4 py-2.5 border-2 rounded-lg text-sm transition-all ${
+              className={`w-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 border-2 rounded-lg text-xs sm:text-sm transition-all ${
                 filters.minJPEGY !== defaultFilterValues.minJPEGY 
                   ? 'border-green-400 bg-green-50 focus:ring-2 focus:ring-green-500' 
                   : 'border-gray-300 focus:border-green-400'
@@ -694,7 +702,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               step="0.1"
               value={filters.maxJPEGY}
               onChange={(e) => setFilters({ ...filters, maxJPEGY: parseFloat(e.target.value) || defaultFilterValues.maxJPEGY })}
-              className={`w-full px-4 py-2.5 border-2 rounded-lg text-sm transition-all ${
+              className={`w-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 border-2 rounded-lg text-xs sm:text-sm transition-all ${
                 filters.maxJPEGY !== defaultFilterValues.maxJPEGY 
                   ? 'border-green-400 bg-green-50 focus:ring-2 focus:ring-green-500' 
                   : 'border-gray-300 focus:border-green-400'
@@ -708,7 +716,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               value={filters.sector}
               onChange={(e) => setFilters({ ...filters, sector: e.target.value })}
               placeholder="Tous"
-              className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded text-xs sm:text-sm"
             />
           </div>
           <div>
@@ -716,7 +724,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             <select
               value={filters.recommendation}
               onChange={(e) => setFilters({ ...filters, recommendation: e.target.value as any })}
-              className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded text-xs sm:text-sm"
             >
               <option value="all">Toutes</option>
               <option value="BUY">Achat</option>
@@ -776,18 +784,18 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       </div>
 
       {/* Matrice à carreaux Améliorée avec Vues Multiples */}
-      <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+      <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-xl font-bold text-gray-800">🎯 Matrice de Performance</h3>
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">🎯 Matrice de Performance</h3>
             <p className="text-xs text-gray-500 mt-1">Cliquez sur un carreau pour sélectionner le titre</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
             {/* Sélecteur de vue */}
-            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+            <div className="flex items-center gap-0.5 sm:gap-1 bg-gray-100 rounded-lg p-0.5 sm:p-1">
               <button
                 onClick={() => setMatrixView('grid')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded transition-all ${
+                className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-semibold rounded transition-all ${
                   matrixView === 'grid' 
                     ? 'bg-white text-blue-600 shadow-sm' 
                     : 'text-gray-600 hover:text-gray-800'
@@ -798,7 +806,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               </button>
               <button
                 onClick={() => setMatrixView('list')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded transition-all ${
+                className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-semibold rounded transition-all ${
                   matrixView === 'list' 
                     ? 'bg-white text-blue-600 shadow-sm' 
                     : 'text-gray-600 hover:text-gray-800'
@@ -809,7 +817,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               </button>
               <button
                 onClick={() => setMatrixView('compact')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded transition-all ${
+                className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-semibold rounded transition-all ${
                   matrixView === 'compact' 
                     ? 'bg-white text-blue-600 shadow-sm' 
                     : 'text-gray-600 hover:text-gray-800'
@@ -819,21 +827,21 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 ▦ Compacte
               </button>
             </div>
-            <div className="flex items-center gap-4 text-xs">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 text-[10px] sm:text-xs">
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded bg-green-600"></div>
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-green-600"></div>
                 <span className="text-gray-600">≥50%</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded bg-green-300"></div>
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-green-300"></div>
                 <span className="text-gray-600">20-50%</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded bg-yellow-400"></div>
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-yellow-400"></div>
                 <span className="text-gray-600">0-20%</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded bg-red-600"></div>
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-red-600"></div>
                 <span className="text-gray-600">&lt;0%</span>
               </div>
             </div>
@@ -868,7 +876,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             </div>
             {/* Vue Grille */}
             {matrixView === 'grid' && (
-              <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-2 sm:gap-3">
                 {filteredMetrics.map((metric) => (
                   <div
                     key={metric.profile.id}
@@ -888,7 +896,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                         onSelect(metric.profile.id);
                       }
                     }}
-                    className={`p-3 rounded-lg cursor-pointer transition-all hover:scale-110 hover:shadow-xl border-2 ${
+                    className={`p-2 sm:p-2.5 md:p-3 rounded-lg cursor-pointer transition-all hover:scale-105 sm:hover:scale-110 hover:shadow-xl border-2 ${
                       currentId === metric.profile.id ? 'border-blue-600 ring-4 ring-blue-300 shadow-xl' : 
                       comparisonMode && selectedForComparison.includes(metric.profile.id)
                         ? 'border-purple-600 ring-4 ring-purple-300 shadow-xl' 
@@ -953,7 +961,7 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
                         onSelect(metric.profile.id);
                       }
                     }}
-                    className={`p-4 rounded-lg cursor-pointer transition-all hover:shadow-lg border-2 flex items-center justify-between ${
+                    className={`p-3 sm:p-4 rounded-lg cursor-pointer transition-all hover:shadow-lg border-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 ${
                       currentId === metric.profile.id ? 'border-blue-600 ring-2 ring-blue-300 bg-blue-50' : 
                       comparisonMode && selectedForComparison.includes(metric.profile.id)
                         ? 'border-purple-600 ring-2 ring-purple-300 bg-purple-50' 
@@ -1023,7 +1031,7 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
 
             {/* Vue Compacte */}
             {matrixView === 'compact' && (
-              <div className="grid grid-cols-6 md:grid-cols-10 lg:grid-cols-15 xl:grid-cols-20 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-15 gap-1.5 sm:gap-2">
                 {filteredMetrics.map((metric) => (
                   <div
                     key={metric.profile.id}
@@ -1043,7 +1051,7 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
                         onSelect(metric.profile.id);
                       }
                     }}
-                    className={`p-2 rounded cursor-pointer transition-all hover:scale-105 border ${
+                    className={`p-1.5 sm:p-2 rounded cursor-pointer transition-all hover:scale-105 border ${
                       currentId === metric.profile.id ? 'border-blue-600 ring-2 ring-blue-300' : 
                       comparisonMode && selectedForComparison.includes(metric.profile.id)
                         ? 'border-purple-600 ring-2 ring-purple-300' 
@@ -1075,9 +1083,9 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
       </div>
 
       {/* Graphique X/Y Amélioré */}
-      <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+      <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-gray-800">📊 Positionnement JPEGY vs Rendement Total</h3>
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📊 Positionnement JPEGY vs Rendement Total</h3>
           <div className="text-xs text-gray-500">
             {filteredMetrics.length} titre(s) affiché(s)
           </div>
@@ -1087,9 +1095,10 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
             Aucun titre à afficher sur le graphique.
           </div>
         ) : (
-          <div className="overflow-x-auto bg-gray-50 p-4 rounded-lg">
-            <svg width={chartWidth} height={chartHeight} className="border border-gray-300 rounded bg-white">
-              {/* Grille de fond */}
+          <div className="overflow-x-auto bg-gray-50 p-2 sm:p-4 rounded-lg">
+            <div className="min-w-[600px]">
+              <svg width={chartWidth} height={chartHeight} className="border border-gray-300 rounded bg-white w-full" viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="xMidYMid meet">
+                {/* Grille de fond */}
               {xTicks.map((tick, i) => (
                 <line
                   key={`x-grid-${i}`}
@@ -1242,15 +1251,16 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
                   </g>
                 );
               })}
-            </svg>
+              </svg>
+            </div>
           </div>
         )}
       </div>
 
       {/* Graphique de Distribution des Rendements */}
       {filteredMetrics.length > 0 && (
-        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">📊 Distribution des Rendements Totaux</h3>
+        <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">📊 Distribution des Rendements Totaux</h3>
           <div className="flex items-end justify-between gap-2 h-64 border-b border-l border-gray-300 pb-2 pl-2">
             {(() => {
               if (filteredMetrics.length === 0) return null;
@@ -1306,8 +1316,8 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
       {filteredMetrics.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Idée 1: Heatmap de Secteurs Amélioré */}
-        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">🔥 Performance par Secteur</h3>
+        <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">🔥 Performance par Secteur</h3>
           <div className="text-xs text-gray-500 mb-3">
             Rendement moyen, JPEGY moyen et nombre de titres par secteur
           </div>
@@ -1378,8 +1388,8 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
         </div>
 
         {/* Idée 2: Top Performers Amélioré */}
-        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">🏆 Top 5 Performers</h3>
+        <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">🏆 Top 5 Performers</h3>
           <div className="text-xs text-gray-500 mb-3">
             Meilleurs rendements projetés
           </div>
@@ -1400,8 +1410,8 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
         </div>
 
         {/* Idée 3: Distribution des Risques Amélioré avec Graphique */}
-        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">⚠️ Distribution des Risques de Baisse</h3>
+        <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">⚠️ Distribution des Risques de Baisse</h3>
           <div className="text-xs text-gray-500 mb-3">
             Classification par niveau de risque avec visualisation
           </div>
@@ -1474,8 +1484,8 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
         </div>
 
         {/* Idée 4: Ratio 3:1 Distribution Amélioré */}
-        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">📊 Distribution Ratio 3:1 (Potentiel vs Risque)</h3>
+        <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">📊 Distribution Ratio 3:1 (Potentiel vs Risque)</h3>
           <div className="text-xs text-gray-500 mb-3">
             Ratio hausse potentielle / risque de baisse
           </div>
@@ -1506,7 +1516,7 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
 
         {/* Idée 5: Timeline de Performance Amélioré */}
         <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 md:col-span-2">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">📈 Timeline de Performance (Triée par Rendement)</h3>
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">📈 Timeline de Performance (Triée par Rendement)</h3>
           <div className="text-xs text-gray-500 mb-3">
             Barres horizontales classées par rendement décroissant
           </div>
@@ -1542,8 +1552,8 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
 
       {/* Matrice de Corrélation */}
       {filteredMetrics.length > 1 && (
-        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">🔗 Matrice de Corrélation entre Métriques</h3>
+        <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">🔗 Matrice de Corrélation entre Métriques</h3>
           <div className="text-xs text-gray-500 mb-4">
             Corrélations entre JPEGY, Rendement, Ratio 3:1, P/E, Yield et Croissance
           </div>
@@ -1645,19 +1655,19 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
       )}
 
       {/* Tableau détaillé Amélioré */}
-      <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-gray-800">📋 Tableau de Performance Détaillé</h3>
-          <div className="flex items-center gap-4">
+      <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 mb-3 sm:mb-4">
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📋 Tableau de Performance Détaillé</h3>
+          <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
             <div className="text-xs text-gray-500">
               {filteredMetrics.length} titre(s)
             </div>
             <button
               onClick={handleExport}
-              className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-white text-xs sm:text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1 sm:gap-2 flex-1 sm:flex-none"
               title="Exporter en CSV"
             >
-              📥 Exporter CSV
+              📥 <span className="hidden sm:inline">Exporter</span> CSV
             </button>
           </div>
         </div>

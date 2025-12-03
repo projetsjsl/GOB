@@ -15,6 +15,7 @@ import { InfoTab } from './components/InfoTab';
 import { TickerSearch } from './components/TickerSearch';
 import { ConfirmSyncDialog } from './components/ConfirmSyncDialog';
 import { HistoricalVersionBanner } from './components/HistoricalVersionBanner';
+import { NotificationManager } from './components/Notification';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
 import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation } from './utils/calculations';
 import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
@@ -85,6 +86,17 @@ export default function App() {
     const [currentView, setCurrentView] = useState<'analysis' | 'info' | 'kpi'>('analysis');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [showConfirmSync, setShowConfirmSync] = useState(false);
+    const [notifications, setNotifications] = useState<Array<{ id: string; message: string; type: 'success' | 'error' | 'warning' | 'info' }>>([]);
+
+    // Helper function pour afficher des notifications
+    const showNotification = (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+        const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+        setNotifications(prev => [...prev, { id, message, type }]);
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            setNotifications(prev => prev.filter(n => n.id !== id));
+        }, 5000);
+    };
 
     // Historical Version State
     const [currentSnapshot, setCurrentSnapshot] = useState<{
@@ -433,7 +445,7 @@ export default function App() {
 
                 if (!saveResult.success) {
                     console.error('Failed to save snapshot:', saveResult.error);
-                    alert(`Erreur lors de la sauvegarde: ${saveResult.error}`);
+                    showNotification(`Erreur lors de la sauvegarde: ${saveResult.error}`, 'error');
                     // Continue anyway?
                 }
             }
@@ -545,17 +557,17 @@ export default function App() {
                 true   // Auto-fetched
             );
 
-            alert(`Données synchronisées avec succès pour ${activeId}`);
+            showNotification(`Données synchronisées avec succès pour ${activeId}`, 'success');
 
         } catch (e) {
-            alert(`Erreur lors de la récupération des données : ${(e as Error).message}`);
+            showNotification(`Erreur lors de la récupération des données : ${(e as Error).message}`, 'error');
         }
     };
 
     const handleUpdateRow = (index: number, field: keyof AnnualData, value: number) => {
         // Block updates if viewing historical version in read-only mode
         if (isReadOnly) {
-            alert('Cette version est en lecture seule. Déverrouillez-la pour la modifier.');
+            showNotification('Cette version est en lecture seule. Déverrouillez-la pour la modifier.', 'warning');
             return;
         }
 
@@ -587,7 +599,7 @@ export default function App() {
 
         if (!result.success) {
             console.error(`❌ Load failed: ${result.error}`);
-            alert(`Erreur chargement: ${result.error}`);
+            showNotification(`Erreur chargement: ${result.error}`, 'error');
             return;
         }
 
@@ -621,7 +633,7 @@ export default function App() {
             if (currentSnap) {
                 await handleLoadSnapshot(currentSnap.id);
             } else {
-                alert('Aucune version actuelle trouvée');
+                showNotification('Aucune version actuelle trouvée', 'warning');
             }
         }
 
@@ -654,7 +666,7 @@ export default function App() {
         );
 
         if (result.success) {
-            alert('✅ Version sauvegardée avec succès!');
+            showNotification('Version sauvegardée avec succès!', 'success');
             // Update current snapshot state to reflect this new version
             if (result.snapshot) {
                 setCurrentSnapshot({
@@ -665,7 +677,7 @@ export default function App() {
                 });
             }
         } else {
-            alert(`Erreur lors de la sauvegarde: ${result.error}`);
+            showNotification(`Erreur lors de la sauvegarde: ${result.error}`, 'error');
         }
     };
 
@@ -692,12 +704,12 @@ export default function App() {
         );
 
         if (result.success) {
-            alert('✅ Nouvelle version sauvegardée!');
+            showNotification('Nouvelle version sauvegardée!', 'success');
             // Reset to normal mode
             setCurrentSnapshot(null);
             setIsReadOnly(false);
         } else {
-            alert(`Erreur: ${result.error}`);
+            showNotification(`Erreur: ${result.error}`, 'error');
         }
     };
 
@@ -840,7 +852,7 @@ export default function App() {
         if (newId) {
             const upperId = newId.toUpperCase();
             if (library[upperId]) {
-                alert("Ce nom existe déjà.");
+                showNotification("Ce nom existe déjà.", 'warning');
                 return;
             }
             const source = library[id];
@@ -1042,13 +1054,13 @@ export default function App() {
         setBulkSyncProgress({ current: 0, total: 0 });
 
         // Afficher le résultat
-        const message = `✅ Synchronisation terminée\n\n` +
+        const message = `Synchronisation terminée\n\n` +
             `Réussies: ${successCount}\n` +
             `Erreurs: ${errorCount}` +
             (errors.length > 0 ? `\n\nErreurs:\n${errors.slice(0, 5).join('\n')}${errors.length > 5 ? `\n... et ${errors.length - 5} autres` : ''}` : '');
         
-        alert(message);
-        console.log(message);
+        showNotification(message, errorCount > 0 ? 'warning' : 'success');
+        console.log(`✅ ${message}`);
     };
 
     // --- SYNC FROM SUPABASE HANDLER ---
@@ -1061,7 +1073,7 @@ export default function App() {
 
             if (!result.success) {
                 setTickersLoadError(result.error || 'Erreur lors de la synchronisation');
-                alert(`❌ Erreur: ${result.error || 'Impossible de synchroniser avec Supabase'}`);
+                showNotification(`Erreur: ${result.error || 'Impossible de synchroniser avec Supabase'}`, 'error');
                 setIsLoadingTickers(false);
                 return;
             }
@@ -1197,18 +1209,18 @@ export default function App() {
 
             // Afficher un message de succès
             const message = newTickersCount > 0 
-                ? `✅ ${newTickersCount} nouveau(x) ticker(s) ajouté(s)${updatedTickersCount > 0 ? `, ${updatedTickersCount} mis à jour` : ''}`
+                ? `${newTickersCount} nouveau(x) ticker(s) ajouté(s)${updatedTickersCount > 0 ? `, ${updatedTickersCount} mis à jour` : ''}`
                 : updatedTickersCount > 0
-                ? `✅ ${updatedTickersCount} ticker(s) mis à jour`
-                : '✅ Synchronisation terminée (aucun changement)';
+                ? `${updatedTickersCount} ticker(s) mis à jour`
+                : 'Synchronisation terminée (aucun changement)';
             
-            alert(message);
-            console.log(message);
+            showNotification(message, 'success');
+            console.log(`✅ ${message}`);
 
         } catch (error: any) {
             console.error('❌ Erreur lors de la synchronisation:', error);
             setTickersLoadError(error.message || 'Erreur inconnue');
-            alert(`❌ Erreur: ${error.message || 'Impossible de synchroniser avec Supabase'}`);
+            showNotification(`Erreur: ${error.message || 'Impossible de synchroniser avec Supabase'}`, 'error');
         } finally {
             setIsLoadingTickers(false);
         }
@@ -1236,8 +1248,19 @@ export default function App() {
         <div className="flex h-screen bg-gray-100 font-sans text-slate-800 overflow-hidden">
 
             {/* SIDEBAR NAVIGATION */}
+            {/* Overlay pour mobile */}
+            {isSidebarOpen && (
+                <div 
+                    className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
             <div
-                className={`bg-slate-900 h-full transition-all duration-300 ease-in-out flex-shrink-0 overflow-hidden ${isSidebarOpen ? 'w-72' : 'w-0'} no-print`}
+                className={`bg-slate-900 h-full transition-all duration-300 ease-in-out flex-shrink-0 overflow-hidden ${
+                    isSidebarOpen 
+                        ? 'w-72 fixed md:relative z-50 md:z-auto' 
+                        : 'w-0 md:w-0'
+                } no-print`}
             >
                 <div className="w-72 h-full">
                     <Sidebar
@@ -1272,30 +1295,30 @@ export default function App() {
                     />
                 )}
 
-                <div className="flex-1 overflow-y-auto p-4 md:p-8 print-full-width">
+                <div className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-8 print-full-width">
                     <div className="max-w-7xl mx-auto">
 
                         {/* TOP BAR & NAVIGATION */}
-                        <div className="flex items-center justify-between mb-6 no-print">
-                            <div className="flex items-center gap-4">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6 no-print">
+                            <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
                                 <button
                                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                                    className="p-2 bg-white rounded-md shadow-sm border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                                    className="p-2 bg-white rounded-md shadow-sm border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors flex-shrink-0"
                                     title={isSidebarOpen ? "Fermer le menu" : "Ouvrir le menu"}
                                 >
-                                    <Bars3Icon className="w-6 h-6" />
+                                    <Bars3Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </button>
                                 <button
                                     onClick={() => setCurrentView(currentView === 'kpi' ? 'analysis' : 'kpi')}
-                                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                                    className={`px-2 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
                                         currentView === 'kpi' 
                                             ? 'bg-blue-600 text-white' 
                                             : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                                     }`}
                                     title="Basculer entre vue Analyse et vue KPI"
                                 >
-                                    <ChartBarSquareIcon className="w-5 h-5 inline mr-2" />
-                                    {currentView === 'kpi' ? 'Vue Analyse' : 'Vue KPI'}
+                                    <ChartBarSquareIcon className="w-4 h-4 sm:w-5 sm:h-5 inline sm:mr-2" />
+                                    <span className="hidden sm:inline">{currentView === 'kpi' ? 'Vue Analyse' : 'Vue KPI'}</span>
                                 </button>
                                 <button
                                     onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
@@ -1306,34 +1329,32 @@ export default function App() {
                                     }`}
                                     title="Afficher/Masquer l'historique"
                                 >
-                                    <ClockIcon className="w-6 h-6" />
+                                    <ClockIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </button>
-                                {!isSidebarOpen && (
-                                    <h1 className="text-xl font-bold text-gray-700">Analyse Financière Pro</h1>
-                                )}
+                                <h1 className="text-base sm:text-xl font-bold text-gray-700 truncate flex-1 sm:flex-none">Analyse Financière Pro</h1>
                             </div>
 
                             {/* VIEW TABS */}
-                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1 flex items-center gap-1">
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1 flex items-center gap-1 w-full sm:w-auto">
                                 <button
                                     onClick={() => setCurrentView('analysis')}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${currentView === 'analysis'
+                                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all flex-1 sm:flex-none ${currentView === 'analysis'
                                         ? 'bg-blue-50 text-blue-700 shadow-sm'
                                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                         }`}
                                 >
-                                    <ChartBarSquareIcon className="w-5 h-5" />
-                                    Analyse
+                                    <ChartBarSquareIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    <span className="hidden xs:inline">Analyse</span>
                                 </button>
                                 <button
                                     onClick={() => setCurrentView('info')}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${currentView === 'info'
+                                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all flex-1 sm:flex-none ${currentView === 'info'
                                         ? 'bg-blue-50 text-blue-700 shadow-sm'
                                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                         }`}
                                 >
-                                    <InformationCircleIcon className="w-5 h-5" />
-                                    Mode d'emploi
+                                    <InformationCircleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    <span className="hidden xs:inline">Mode d'emploi</span>
                                 </button>
                             </div>
                         </div>
@@ -1441,11 +1462,11 @@ export default function App() {
                                 </div>
 
                                 {/* RIGHT COLUMN - SUMMARY & PARAMS */}
-                                <div className="xl:col-span-1 space-y-6 no-print">
+                                <div className="xl:col-span-1 space-y-4 sm:space-y-6 no-print order-1 xl:order-2">
 
                                     {/* Summary Card */}
-                                    <div className="bg-gradient-to-br from-slate-800 to-slate-900 text-white p-6 rounded-lg shadow-lg">
-                                        <h2 className="text-xl font-bold mb-4 border-b border-slate-600 pb-2">Résumé Exécutif</h2>
+                                    <div className="bg-gradient-to-br from-slate-800 to-slate-900 text-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg">
+                                        <h2 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4 border-b border-slate-600 pb-2">Résumé Exécutif</h2>
                                         <p className="text-slate-300 text-sm mb-4 leading-relaxed">
                                             L'analyse de {info.name} suggère une position <strong className="text-white uppercase">{recommendation}</strong> au prix actuel de {formatCurrency(assumptions.currentPrice)}.
                                         </p>
@@ -1491,12 +1512,12 @@ export default function App() {
                                     </div>
 
                                     {/* Editable Company Info */}
-                                    <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-                                        <h3 className="text-sm font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
-                                            <Cog6ToothIcon className="w-4 h-4" />
+                                    <div className="bg-white p-3 sm:p-4 rounded-lg shadow border border-gray-200">
+                                        <h3 className="text-xs sm:text-sm font-bold text-gray-500 uppercase mb-2 sm:mb-3 flex items-center gap-2">
+                                            <Cog6ToothIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                                             Configuration
                                         </h3>
-                                        <div className="space-y-3 text-sm">
+                                        <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
                                             <div>
                                                 <label className="block text-xs text-gray-500 mb-1">Nom Société</label>
                                                 <input
@@ -1624,6 +1645,12 @@ export default function App() {
                 onLoadVersion={handleLoadSnapshot}
                 isOpen={isRightSidebarOpen}
                 onToggle={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
+            />
+
+            {/* NOTIFICATIONS */}
+            <NotificationManager
+                notifications={notifications}
+                onRemove={(id) => setNotifications(prev => prev.filter(n => n.id !== id))}
             />
         </div>
     );

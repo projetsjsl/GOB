@@ -62,7 +62,9 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
             // Reload list
             await loadSnapshots();
         } else {
-            alert(`Erreur: ${result.error}`);
+            setError(`Erreur: ${result.error}`);
+            // Clear error after 5 seconds
+            setTimeout(() => setError(null), 5000);
         }
     };
 

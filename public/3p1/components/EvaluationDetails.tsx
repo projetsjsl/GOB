@@ -342,9 +342,9 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
     const sector5YGrowth = sector5YearProjections[config.growthKey];
 
     return (
-      <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mt-2 mb-2 rounded-r">
-        <div className="text-xs font-semibold text-blue-800 mb-3">📊 Intervalles de Référence - {metricConfig[metric].ratioLabel}</div>
-        <div className="grid grid-cols-2 gap-4 text-xs">
+      <div className="bg-blue-50 border-l-4 border-blue-400 p-2 sm:p-3 md:p-4 mt-2 mb-2 rounded-r">
+        <div className="text-xs font-semibold text-blue-800 mb-2 sm:mb-3">📊 Intervalles de Référence - {metricConfig[metric].ratioLabel}</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4 text-xs">
           <div>
             <div className="font-semibold text-gray-700 mb-2">Ratio {config.ratioLabel}</div>
             <table className="w-full text-xs">
@@ -402,15 +402,15 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   };
 
   return (
-    <div className="bg-white p-5 rounded-lg shadow border border-gray-200 print-break-inside-avoid">
-      <h3 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+    <div className="bg-white p-3 sm:p-4 md:p-5 rounded-lg shadow border border-gray-200 print-break-inside-avoid">
+      <h3 className="text-base sm:text-lg font-bold text-gray-700 mb-3 sm:mb-4 flex items-center gap-2">
         <CalculatorIcon className="w-5 h-5 text-blue-600" />
         ÉVALUATION PERSONNELLE (Projection 5 Ans)
         <span className="text-xs font-normal text-gray-500 ml-2">(☑ = Incluse, ☐ = Exclue)</span>
       </h3>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm text-right border-collapse">
+      <div className="overflow-x-auto -mx-3 sm:mx-0">
+        <table className="w-full text-xs sm:text-sm text-right border-collapse min-w-[600px]">
           <thead className="bg-slate-100 text-gray-600 uppercase text-xs">
             <tr>
               <th className="p-2 text-left">Métrique</th>
@@ -653,19 +653,19 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
         </table>
       </div>
 
-      <div className="mt-6 flex flex-col md:flex-row justify-end gap-6 items-end">
-        <div className="text-right">
+      <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-end gap-4 sm:gap-6 items-end">
+        <div className="text-right w-full sm:w-auto">
           <div className="text-xs text-gray-500 uppercase mb-1">Prix Cible Moyen (5 ans)</div>
-          <div className="text-3xl font-bold text-gray-800 border-b-2 border-gray-800 inline-block px-2">
+          <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 border-b-2 border-gray-800 inline-block px-2">
             {formatCurrency(avgTargetPrice)}
           </div>
         </div>
 
-        <div className="bg-green-50 p-4 rounded-lg border border-green-200 text-right min-w-[200px]">
+        <div className="bg-green-50 p-3 sm:p-4 rounded-lg border border-green-200 text-right w-full sm:min-w-[200px]">
           <div className="text-xs text-green-800 uppercase font-bold mb-1" title="Incluant appréciation du prix et dividendes cumulés">
             Rendement Total Potentiel
           </div>
-          <div className="text-3xl font-black text-green-600">
+          <div className="text-xl sm:text-2xl md:text-3xl font-black text-green-600">
             {totalReturnPercent.toFixed(2)}%
           </div>
           <div className="text-[10px] text-green-700 mt-1 opacity-80">

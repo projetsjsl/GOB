@@ -2,7 +2,7 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
     <title>Analyse Financière Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -25,6 +25,30 @@
       input[type=number]::-webkit-outer-spin-button { 
         -webkit-appearance: none; 
         margin: 0; 
+      }
+      
+      /* Mobile optimizations */
+      @media (max-width: 640px) {
+        body {
+          -webkit-text-size-adjust: 100%;
+          -webkit-tap-highlight-color: transparent;
+        }
+        /* Améliorer la lisibilité sur mobile */
+        table {
+          font-size: 0.75rem;
+        }
+        /* Réduire les espacements sur mobile */
+        .space-y-6 > * + * {
+          margin-top: 1rem;
+        }
+      }
+      
+      /* Touch-friendly buttons on mobile */
+      @media (max-width: 768px) {
+        button, a {
+          min-height: 44px;
+          min-width: 44px;
+        }
       }
       
       /* Print Styles */

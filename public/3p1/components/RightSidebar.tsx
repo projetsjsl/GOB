@@ -133,7 +133,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ ticker, onLoadVersio
         className={`fixed right-0 top-0 h-full bg-slate-900 text-white shadow-2xl transition-transform duration-300 z-40 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
-        style={{ width: '400px' }}
+        style={{ width: 'min(400px, 90vw)' }}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
