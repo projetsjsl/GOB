@@ -27,6 +27,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   
   const [comparisonMode, setComparisonMode] = useState(false);
   const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
+  const [matrixView, setMatrixView] = useState<'grid' | 'list' | 'compact'>('grid');
 
   // Calculer les métriques pour chaque profil
   const profileMetrics = useMemo(() => {
@@ -480,10 +481,24 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         </div>
       )}
 
-      {/* Filtres */}
-      <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+      {/* Filtres Améliorés */}
+      <div className={`bg-white p-6 rounded-lg shadow-lg border-2 transition-all ${
+        (filters.minReturn !== -100 || filters.maxReturn !== 500 || filters.minJPEGY !== 0 || 
+         filters.maxJPEGY !== 5 || filters.sector !== '' || filters.recommendation !== 'all')
+          ? 'border-blue-400 bg-blue-50' 
+          : 'border-gray-200'
+      }`}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold">Filtres de Screening</h3>
+          <div className="flex items-center gap-3">
+            <h3 className="text-lg font-bold">🔍 Filtres de Screening</h3>
+            {(filters.minReturn !== -100 || filters.maxReturn !== 500 || filters.minJPEGY !== 0 || 
+              filters.maxJPEGY !== 5 || filters.sector !== '' || filters.recommendation !== 'all') && (
+              <span className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full flex items-center gap-1">
+                <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                Filtres actifs
+              </span>
+            )}
+          </div>
           <div className="flex gap-2">
             <button
               onClick={() => setComparisonMode(!comparisonMode)}
@@ -648,60 +663,182 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3">
-              {filteredMetrics.map((metric) => (
-                <div
-                  key={metric.profile.id}
-                  data-ticker={metric.profile.id}
-                  onClick={(e) => {
-                    if (comparisonMode) {
-                      e.stopPropagation();
-                      setSelectedForComparison(prev => {
-                        if (prev.includes(metric.profile.id)) {
-                          return prev.filter(t => t !== metric.profile.id);
-                        } else if (prev.length < 5) {
-                          return [...prev, metric.profile.id];
-                        }
-                        return prev;
-                      });
-                    } else {
-                      onSelect(metric.profile.id);
-                    }
-                  }}
-                  className={`p-3 rounded-lg cursor-pointer transition-all hover:scale-110 hover:shadow-xl border-2 ${
-                    currentId === metric.profile.id ? 'border-blue-600 ring-4 ring-blue-300 shadow-xl' : 
-                    comparisonMode && selectedForComparison.includes(metric.profile.id)
-                      ? 'border-purple-600 ring-4 ring-purple-300 shadow-xl' 
-                      : 'border-gray-200'
-                  }`}
-                  style={{
-                    backgroundColor: getReturnColor(metric.totalReturnPercent),
-                    opacity: currentId === metric.profile.id ? 1 : 0.85
-                  }}
-                  title={`${metric.profile.info.name || metric.profile.id}
+            {/* Vue Grille */}
+            {matrixView === 'grid' && (
+              <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3">
+                {filteredMetrics.map((metric) => (
+                  <div
+                    key={metric.profile.id}
+                    data-ticker={metric.profile.id}
+                    onClick={(e) => {
+                      if (comparisonMode) {
+                        e.stopPropagation();
+                        setSelectedForComparison(prev => {
+                          if (prev.includes(metric.profile.id)) {
+                            return prev.filter(t => t !== metric.profile.id);
+                          } else if (prev.length < 5) {
+                            return [...prev, metric.profile.id];
+                          }
+                          return prev;
+                        });
+                      } else {
+                        onSelect(metric.profile.id);
+                      }
+                    }}
+                    className={`p-3 rounded-lg cursor-pointer transition-all hover:scale-110 hover:shadow-xl border-2 ${
+                      currentId === metric.profile.id ? 'border-blue-600 ring-4 ring-blue-300 shadow-xl' : 
+                      comparisonMode && selectedForComparison.includes(metric.profile.id)
+                        ? 'border-purple-600 ring-4 ring-purple-300 shadow-xl' 
+                        : 'border-gray-200'
+                    }`}
+                    style={{
+                      backgroundColor: getReturnColor(metric.totalReturnPercent),
+                      opacity: currentId === metric.profile.id ? 1 : 0.85
+                    }}
+                    title={`${metric.profile.info.name || metric.profile.id}
 Rendement: ${metric.totalReturnPercent.toFixed(1)}%
 JPEGY: ${metric.jpegy.toFixed(2)}
 Ratio 3:1: ${metric.ratio31.toFixed(2)}
 P/E: ${metric.currentPE?.toFixed(1) || 'N/A'}x
 Secteur: ${metric.profile.info.sector}
 ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
-                >
-                  <div className="flex flex-col items-center justify-center h-full text-white relative">
+                  >
+                    <div className="flex flex-col items-center justify-center h-full text-white relative">
+                      {comparisonMode && selectedForComparison.includes(metric.profile.id) && (
+                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold">
+                          {selectedForComparison.indexOf(metric.profile.id) + 1}
+                        </div>
+                      )}
+                      <div className="text-xs font-bold mb-1">{metric.profile.id}</div>
+                      <div className="text-[10px] font-semibold mb-1">{metric.totalReturnPercent.toFixed(0)}%</div>
+                      <div className="text-[8px] opacity-90">JPEGY: {metric.jpegy.toFixed(1)}</div>
+                      {metric.hasApprovedVersion && (
+                        <CheckCircleIcon className="w-4 h-4 mt-1 text-white" />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Vue Liste */}
+            {matrixView === 'list' && (
+              <div className="space-y-2">
+                {filteredMetrics.map((metric) => (
+                  <div
+                    key={metric.profile.id}
+                    data-ticker={metric.profile.id}
+                    onClick={(e) => {
+                      if (comparisonMode) {
+                        e.stopPropagation();
+                        setSelectedForComparison(prev => {
+                          if (prev.includes(metric.profile.id)) {
+                            return prev.filter(t => t !== metric.profile.id);
+                          } else if (prev.length < 5) {
+                            return [...prev, metric.profile.id];
+                          }
+                          return prev;
+                        });
+                      } else {
+                        onSelect(metric.profile.id);
+                      }
+                    }}
+                    className={`p-4 rounded-lg cursor-pointer transition-all hover:shadow-lg border-2 flex items-center justify-between ${
+                      currentId === metric.profile.id ? 'border-blue-600 ring-2 ring-blue-300 bg-blue-50' : 
+                      comparisonMode && selectedForComparison.includes(metric.profile.id)
+                        ? 'border-purple-600 ring-2 ring-purple-300 bg-purple-50' 
+                        : 'border-gray-200 bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4 flex-1">
+                      <div 
+                        className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+                        style={{ backgroundColor: getReturnColor(metric.totalReturnPercent) }}
+                      >
+                        {metric.profile.id}
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-bold text-gray-800">{metric.profile.info.name || metric.profile.id}</div>
+                        <div className="text-xs text-gray-500">{metric.profile.info.sector}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-lg" style={{ color: getReturnColor(metric.totalReturnPercent) }}>
+                          {metric.totalReturnPercent.toFixed(1)}%
+                        </div>
+                        <div className="text-xs text-gray-500">Rendement</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-semibold" style={{ color: getJpegyColor(metric.jpegy) }}>
+                          {metric.jpegy.toFixed(2)}
+                        </div>
+                        <div className="text-xs text-gray-500">JPEGY</div>
+                      </div>
+                      <div className="text-right">
+                        <div className={`font-semibold ${
+                          metric.ratio31 >= 3 ? 'text-green-600' :
+                          metric.ratio31 >= 1 ? 'text-yellow-600' :
+                          'text-red-600'
+                        }`}>
+                          {metric.ratio31.toFixed(2)}
+                        </div>
+                        <div className="text-xs text-gray-500">Ratio 3:1</div>
+                      </div>
+                    </div>
                     {comparisonMode && selectedForComparison.includes(metric.profile.id) && (
-                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold">
+                      <div className="ml-4 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
                         {selectedForComparison.indexOf(metric.profile.id) + 1}
                       </div>
                     )}
-                    <div className="text-xs font-bold mb-1">{metric.profile.id}</div>
-                    <div className="text-[10px] font-semibold mb-1">{metric.totalReturnPercent.toFixed(0)}%</div>
-                    <div className="text-[8px] opacity-90">JPEGY: {metric.jpegy.toFixed(1)}</div>
                     {metric.hasApprovedVersion && (
-                      <CheckCircleIcon className="w-4 h-4 mt-1 text-white" />
+                      <CheckCircleIcon className="w-5 h-5 text-green-500 ml-2" />
                     )}
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
+
+            {/* Vue Compacte */}
+            {matrixView === 'compact' && (
+              <div className="grid grid-cols-6 md:grid-cols-10 lg:grid-cols-15 xl:grid-cols-20 gap-2">
+                {filteredMetrics.map((metric) => (
+                  <div
+                    key={metric.profile.id}
+                    data-ticker={metric.profile.id}
+                    onClick={(e) => {
+                      if (comparisonMode) {
+                        e.stopPropagation();
+                        setSelectedForComparison(prev => {
+                          if (prev.includes(metric.profile.id)) {
+                            return prev.filter(t => t !== metric.profile.id);
+                          } else if (prev.length < 5) {
+                            return [...prev, metric.profile.id];
+                          }
+                          return prev;
+                        });
+                      } else {
+                        onSelect(metric.profile.id);
+                      }
+                    }}
+                    className={`p-2 rounded cursor-pointer transition-all hover:scale-105 border ${
+                      currentId === metric.profile.id ? 'border-blue-600 ring-2 ring-blue-300' : 
+                      comparisonMode && selectedForComparison.includes(metric.profile.id)
+                        ? 'border-purple-600 ring-2 ring-purple-300' 
+                        : 'border-gray-200'
+                    }`}
+                    style={{
+                      backgroundColor: getReturnColor(metric.totalReturnPercent),
+                      opacity: currentId === metric.profile.id ? 1 : 0.8
+                    }}
+                    title={`${metric.profile.id}: ${metric.totalReturnPercent.toFixed(1)}%`}
+                  >
+                    <div className="flex flex-col items-center text-white text-[9px]">
+                      <div className="font-bold">{metric.profile.id}</div>
+                      <div className="text-[8px]">{metric.totalReturnPercent.toFixed(0)}%</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>
