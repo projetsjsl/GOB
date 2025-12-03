@@ -24219,6 +24219,34 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             };
         }, [showPlusMenu]);
 
+        // Calculer la position du menu "Plus" quand il s'ouvre
+        useEffect(() => {
+            if (!showPlusMenu) return;
+
+            const updateMenuPosition = () => {
+                const plusButton = navRef.current?.querySelector('[title="Plus d\'options"]')?.closest('div');
+                const menuEl = document.querySelector('.plus-dropdown-menu');
+                
+                if (plusButton && menuEl) {
+                    const rect = plusButton.getBoundingClientRect();
+                    menuEl.style.left = `${rect.left}px`;
+                    menuEl.style.bottom = `${window.innerHeight - rect.top + 8}px`;
+                }
+            };
+
+            // Attendre que le DOM soit mis à jour
+            setTimeout(updateMenuPosition, 0);
+            const interval = setInterval(updateMenuPosition, 100);
+            window.addEventListener('resize', updateMenuPosition);
+            window.addEventListener('scroll', updateMenuPosition);
+
+            return () => {
+                clearInterval(interval);
+                window.removeEventListener('resize', updateMenuPosition);
+                window.removeEventListener('scroll', updateMenuPosition);
+            };
+        }, [showPlusMenu]);
+
         // Construire la liste finale des onglets à afficher
         const tabs = [...visibleTabs];
         if (hiddenTabs.length > 0) {
@@ -25091,7 +25119,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         {/* Dropdown menu pour les onglets cachés */}
                                         {showPlusMenu && (
                                             <div 
-                                                className={`absolute bottom-full left-0 mb-2 rounded-lg shadow-2xl border overflow-hidden z-[100] min-w-[200px] max-h-[400px] overflow-y-auto ${
+                                                className={`plus-dropdown-menu fixed rounded-lg shadow-2xl border overflow-hidden z-[9999] min-w-[200px] max-h-[400px] overflow-y-auto ${
                                                     isDarkMode
                                                         ? 'bg-gray-900 border-gray-700'
                                                         : 'bg-white border-gray-200'
