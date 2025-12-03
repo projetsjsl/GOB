@@ -179,7 +179,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       minJPEGY: Math.max(0, Math.floor(Math.min(...jpegyValues, 0))),
       maxJPEGY: Math.ceil(Math.max(...jpegyValues, 10)) + 2, // Marge de sécurité
       sector: '',
-      recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL'
+      recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL',
+      source: 'all' as 'all' | 'portfolio' | 'watchlist'
     };
   }, [profileMetrics]);
 
@@ -205,6 +206,12 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       if (metric.jpegy < filters.minJPEGY || metric.jpegy > filters.maxJPEGY) return false;
       if (filters.sector && metric.profile.info.sector.toLowerCase() !== filters.sector.toLowerCase()) return false;
       if (filters.recommendation !== 'all' && metric.recommendation !== filters.recommendation) return false;
+      // Filtre portefeuille/watchlist
+      if (filters.source !== 'all') {
+        const isWatchlist = metric.profile.isWatchlist ?? false;
+        if (filters.source === 'watchlist' && !isWatchlist) return false;
+        if (filters.source === 'portfolio' && isWatchlist) return false;
+      }
       return true;
     });
     
@@ -586,7 +593,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               filters.minJPEGY !== defaultFilterValues.minJPEGY || 
               filters.maxJPEGY !== defaultFilterValues.maxJPEGY || 
               filters.sector !== '' || 
-              filters.recommendation !== 'all') && (
+              filters.recommendation !== 'all' ||
+              filters.source !== 'all') && (
               <span className="ml-2 text-xs text-blue-600">({profileMetrics.length - filteredMetrics.length} masqué(s))</span>
             )}
           </div>
@@ -670,6 +678,54 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               <option value="HOLD">Conserver</option>
               <option value="SELL">Vendre</option>
             </select>
+          </div>
+          <div className="relative">
+            <label className="block text-xs font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              Source
+              {filters.source !== 'all' && (
+                <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full flex items-center gap-1 ${
+                  filters.source === 'watchlist' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'
+                }`}>
+                  {filters.source === 'watchlist' ? (
+                    <>
+                      <EyeIcon className="w-3 h-3" />
+                      Watchlist
+                    </>
+                  ) : (
+                    <>
+                      <StarIcon className="w-3 h-3" />
+                      Portefeuille
+                    </>
+                  )}
+                </span>
+              )}
+            </label>
+            <div className="relative">
+              <select
+                value={filters.source}
+                onChange={(e) => setFilters({ ...filters, source: e.target.value as any })}
+                className={`w-full px-4 py-2.5 border-2 rounded-lg text-sm transition-all appearance-none ${
+                  filters.source !== 'all' 
+                    ? filters.source === 'watchlist'
+                      ? 'border-blue-400 bg-blue-50 focus:ring-2 focus:ring-blue-500' 
+                      : 'border-yellow-400 bg-yellow-50 focus:ring-2 focus:ring-yellow-500'
+                    : 'border-gray-300 focus:border-blue-400'
+                }`}
+              >
+                <option value="all">Tous (Portefeuille + Watchlist)</option>
+                <option value="portfolio">⭐ Portefeuille</option>
+                <option value="watchlist">👁️ Watchlist</option>
+              </select>
+              {filters.source !== 'all' && (
+                <button
+                  onClick={() => setFilters({ ...filters, source: 'all' })}
+                  className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 text-xs"
+                  title="Réinitialiser"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -811,7 +867,14 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
                           {selectedForComparison.indexOf(metric.profile.id) + 1}
                         </div>
                       )}
-                      <div className="text-xs font-bold mb-1">{metric.profile.id}</div>
+                      <div className="flex items-center gap-1 mb-1">
+                        <div className="text-xs font-bold">{metric.profile.id}</div>
+                        {(metric.profile.isWatchlist ?? false) ? (
+                          <EyeIcon className="w-3 h-3 text-blue-300" title="Watchlist" />
+                        ) : (
+                          <StarIcon className="w-3 h-3 text-yellow-400" title="Portefeuille" />
+                        )}
+                      </div>
                       <div className="text-[10px] font-semibold mb-1">{metric.totalReturnPercent.toFixed(0)}%</div>
                       <div className="text-[8px] opacity-90">JPEGY: {metric.jpegy.toFixed(1)}</div>
                       {metric.hasApprovedVersion && (
