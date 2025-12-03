@@ -103,13 +103,23 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
               <th className="p-2 bg-slate-50">5 Ans (Proj)</th>
               <th className="p-2">Ratio Cible</th>
               <th className="p-2 bg-green-50 text-green-900">Prix Cible</th>
-              <th className="p-2 text-center" title="Exclure de la moyenne">Exclure</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {/* BPA Row */}
             <tr className={assumptions.excludeEPS ? "opacity-50 bg-gray-100" : ""}>
-              <td className="p-3 text-left font-bold text-gray-700">BPA (EPS)</td>
+              <td className="p-3 text-left font-bold text-gray-700">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={!assumptions.excludeEPS}
+                    onChange={() => handleToggleExclusion('excludeEPS')}
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
+                    title={assumptions.excludeEPS ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"}
+                  />
+                  <span>BPA (EPS)</span>
+                </div>
+              </td>
               <td className={`p-3 font-semibold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"}`}>{baseValues.eps.toFixed(2)}</td>
               <td className={`p-3 ${assumptions.excludeEPS ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
@@ -131,20 +141,22 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                 />
               </td>
               <td className={`p-3 font-bold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"}`}>{formatCurrency(targets.eps)}</td>
-              <td className="p-3 text-center">
-                <input
-                  type="checkbox"
-                  checked={assumptions.excludeEPS || false}
-                  onChange={() => handleToggleExclusion('excludeEPS')}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
-                  title="Exclure cette métrique du calcul de la moyenne"
-                />
-              </td>
             </tr>
 
             {/* CFA Row */}
             <tr className={assumptions.excludeCF ? "opacity-50 bg-gray-100" : ""}>
-              <td className="p-3 text-left font-bold text-gray-700">CFA (Cash Flow)</td>
+              <td className="p-3 text-left font-bold text-gray-700">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={!assumptions.excludeCF}
+                    onChange={() => handleToggleExclusion('excludeCF')}
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
+                    title={assumptions.excludeCF ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"}
+                  />
+                  <span>CFA (Cash Flow)</span>
+                </div>
+              </td>
               <td className={`p-3 font-semibold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"}`}>{baseValues.cf.toFixed(2)}</td>
               <td className={`p-3 ${assumptions.excludeCF ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
@@ -166,20 +178,22 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                 />
               </td>
               <td className={`p-3 font-bold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"}`}>{formatCurrency(targets.cf)}</td>
-              <td className="p-3 text-center">
-                <input
-                  type="checkbox"
-                  checked={assumptions.excludeCF || false}
-                  onChange={() => handleToggleExclusion('excludeCF')}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
-                  title="Exclure cette métrique du calcul de la moyenne"
-                />
-              </td>
             </tr>
 
             {/* BV Row */}
             <tr className={assumptions.excludeBV ? "opacity-50 bg-gray-100" : ""}>
-              <td className="p-3 text-left font-bold text-gray-700">BV (Book Value)</td>
+              <td className="p-3 text-left font-bold text-gray-700">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={!assumptions.excludeBV}
+                    onChange={() => handleToggleExclusion('excludeBV')}
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
+                    title={assumptions.excludeBV ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"}
+                  />
+                  <span>BV (Book Value)</span>
+                </div>
+              </td>
               <td className={`p-3 font-semibold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"}`}>{baseValues.bv.toFixed(2)}</td>
               <td className={`p-3 ${assumptions.excludeBV ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
@@ -201,20 +215,22 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                 />
               </td>
               <td className={`p-3 font-bold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"}`}>{formatCurrency(targets.bv)}</td>
-              <td className="p-3 text-center">
-                <input
-                  type="checkbox"
-                  checked={assumptions.excludeBV || false}
-                  onChange={() => handleToggleExclusion('excludeBV')}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
-                  title="Exclure cette métrique du calcul de la moyenne"
-                />
-              </td>
             </tr>
 
             {/* DIV Row */}
             <tr className={assumptions.excludeDIV ? "opacity-50 bg-gray-100" : ""}>
-              <td className="p-3 text-left font-bold text-gray-700">DIV (Dividende)</td>
+              <td className="p-3 text-left font-bold text-gray-700">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={!assumptions.excludeDIV}
+                    onChange={() => handleToggleExclusion('excludeDIV')}
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
+                    title={assumptions.excludeDIV ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"}
+                  />
+                  <span>DIV (Dividende)</span>
+                </div>
+              </td>
               <td className={`p-3 font-semibold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"}`}>{baseValues.div.toFixed(2)}</td>
               <td className={`p-3 ${assumptions.excludeDIV ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
@@ -240,15 +256,6 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                 </div>
               </td>
               <td className={`p-3 font-bold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"}`}>{formatCurrency(targets.div)}</td>
-              <td className="p-3 text-center">
-                <input
-                  type="checkbox"
-                  checked={assumptions.excludeDIV || false}
-                  onChange={() => handleToggleExclusion('excludeDIV')}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
-                  title="Exclure cette métrique du calcul de la moyenne"
-                />
-              </td>
             </tr>
           </tbody>
         </table>
