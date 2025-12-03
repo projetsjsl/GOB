@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration des Rôles - GOB Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+            min-height: 100vh;
+        }
+        .component-checkbox {
+            transition: all 0.2s;
+        }
+        .component-checkbox:checked {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+    </style>
+</head>
+<body class="text-white">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2 flex items-center gap-3">
+                <i class="iconoir-settings text-green-400"></i>
+                Configuration des Rôles Utilisateur
+            </h1>
+            <p class="text-gray-400">Gérez les rôles et permissions des composants du dashboard</p>
+        </div>
+
+        <!-- Login Section (si non authentifié) -->
+        <div id="loginSection" class="max-w-md mx-auto">
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                    <i class="iconoir-lock text-yellow-400"></i>
+                    Authentification Admin
+                </h2>
+                <p class="text-gray-400 mb-6">Entrez le mot de passe admin pour accéder à la configuration</p>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Mot de passe admin</label>
+                    <input 
+                        type="password" 
+                        id="adminPassword"
+                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-green-400"
+                        placeholder="Entrez le mot de passe"
+                    />
+                </div>
+                
+                <button 
+                    id="loginBtn"
+                    onclick="verifyAdmin()"
+                    class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                >
+                    <i class="iconoir-log-in"></i> Se connecter
+                </button>
+                
+                <div id="loginError" class="mt-4 text-red-400 text-sm hidden"></div>
+            </div>
+        </div>
+
+        <!-- Main Configuration Section (si authentifié) -->
+        <div id="configSection" class="hidden">
+            <!-- Roles List -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold flex items-center gap-2">
+                        <i class="iconoir-user-group text-blue-400"></i>
+                        Rôles Disponibles
+                    </h2>
+                    <button 
+                        onclick="showCreateRoleModal()"
+                        class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+                    >
+                        <i class="iconoir-plus-circle"></i> Nouveau Rôle
+                    </button>
+                </div>
+
+                <div id="rolesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Rôles chargés dynamiquement -->
+                </div>
+            </div>
+
+            <!-- User Role Mapping -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                    <i class="iconoir-user text-purple-400"></i>
+                    Assignation des Rôles aux Utilisateurs
+                </h2>
+                <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Nom d'utilisateur</label>
+                        <input 
+                            type="text" 
+                            id="usernameInput"
+                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-green-400"
+                            placeholder="ex: daniel, gob, client"
+                        />
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Rôle</label>
+                        <select 
+                            id="roleSelect"
+                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-green-400"
+                        >
+                            <option value="">Sélectionner un rôle...</option>
+                        </select>
+                    </div>
+                    <button 
+                        onclick="assignRole()"
+                        class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                    >
+                        <i class="iconoir-check"></i> Assigner le Rôle
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour créer/modifier un rôle -->
+    <div id="roleModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-gray-700">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold" id="modalTitle">Nouveau Rôle</h3>
+                <button onclick="closeRoleModal()" class="text-gray-400 hover:text-white">
+                    <i class="iconoir-cancel text-2xl"></i>
+                </button>
+            </div>
+
+            <form id="roleForm" onsubmit="saveRole(event)">
+                <input type="hidden" id="roleIdInput" />
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nom du rôle (ID)</label>
+                        <input 
+                            type="text" 
+                            id="roleNameInput"
+                            required
+                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-green-400"
+                            placeholder="ex: analyst"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nom d'affichage</label>
+                        <input 
+                            type="text" 
+                            id="displayNameInput"
+                            required
+                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-green-400"
+                            placeholder="ex: Analyste"
+                        />
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Description</label>
+                    <textarea 
+                        id="descriptionInput"
+                        rows="2"
+                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-green-400"
+                        placeholder="Description du rôle..."
+                    ></textarea>
+                </div>
+
+                <div class="mb-6">
+                    <label class="flex items-center gap-2 mb-4">
+                        <input 
+                            type="checkbox" 
+                            id="isAdminInput"
+                            class="w-4 h-4 rounded"
+                        />
+                        <span>Rôle administrateur (accès complet)</span>
+                    </label>
+                </div>
+
+                <!-- Permissions par catégorie -->
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold mb-4">Permissions des Composants</h4>
+                    <div id="componentsList" class="space-y-4">
+                        <!-- Composants chargés dynamiquement -->
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button 
+                        type="submit"
+                        class="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                    >
+                        <i class="iconoir-save"></i> Enregistrer
+                    </button>
+                    <button 
+                        type="button"
+                        onclick="closeRoleModal()"
+                        class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                    >
+                        <i class="iconoir-cancel"></i> Annuler
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let adminPassword = '';
+        let roles = [];
+        let components = [];
+
+        // Vérifier l'authentification admin
+        async function verifyAdmin() {
+            const password = document.getElementById('adminPassword').value;
+            if (!password) {
+                showError('Veuillez entrer le mot de passe');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/roles-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'verify_admin',
+                        adminPassword: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    adminPassword = password;
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('configSection').classList.remove('hidden');
+                    components = data.components || [];
+                    loadRoles();
+                } else {
+                    showError(data.error || 'Mot de passe incorrect');
+                }
+            } catch (error) {
+                showError('Erreur de connexion: ' + error.message);
+            }
+        }
+
+        // Charger les rôles
+        async function loadRoles() {
+            try {
+                const response = await fetch('/api/roles-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'get_roles',
+                        adminPassword: adminPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    roles = data.roles || [];
+                    renderRoles();
+                    populateRoleSelect();
+                } else {
+                    showError(data.error || 'Erreur lors du chargement des rôles');
+                }
+            } catch (error) {
+                showError('Erreur de connexion: ' + error.message);
+            }
+        }
+
+        // Afficher les rôles
+        function renderRoles() {
+            const container = document.getElementById('rolesList');
+            container.innerHTML = roles.map(role => `
+                <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-green-400 transition-colors">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-xl font-bold">${role.display_name}</h3>
+                        ${role.is_admin ? '<span class="bg-red-500 text-white text-xs px-2 py-1 rounded">Admin</span>' : ''}
+                    </div>
+                    <p class="text-gray-400 text-sm mb-3">${role.description || 'Aucune description'}</p>
+                    <p class="text-gray-500 text-xs mb-3">ID: ${role.role_name}</p>
+                    <div class="flex gap-2">
+                        <button 
+                            onclick="editRole('${role.id}')"
+                            class="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-sm py-1 px-3 rounded transition-colors"
+                        >
+                            <i class="iconoir-edit"></i> Modifier
+                        </button>
+                        ${!role.is_admin ? `
+                            <button 
+                                onclick="deleteRole('${role.id}')"
+                                class="flex-1 bg-red-500 hover:bg-red-600 text-white text-sm py-1 px-3 rounded transition-colors"
+                            >
+                                <i class="iconoir-trash"></i> Supprimer
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Afficher le modal de création/modification
+        function showCreateRoleModal() {
+            document.getElementById('modalTitle').textContent = 'Nouveau Rôle';
+            document.getElementById('roleForm').reset();
+            document.getElementById('roleIdInput').value = '';
+            renderComponentsList({});
+            document.getElementById('roleModal').classList.remove('hidden');
+        }
+
+        // Éditer un rôle
+        async function editRole(roleId) {
+            try {
+                const response = await fetch('/api/roles-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'get_role',
+                        adminPassword: adminPassword,
+                        roleId: roleId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const role = data.role;
+                    document.getElementById('modalTitle').textContent = `Modifier: ${role.display_name}`;
+                    document.getElementById('roleIdInput').value = role.id;
+                    document.getElementById('roleNameInput').value = role.role_name;
+                    document.getElementById('displayNameInput').value = role.display_name;
+                    document.getElementById('descriptionInput').value = role.description || '';
+                    document.getElementById('isAdminInput').checked = role.is_admin || false;
+                    renderComponentsList(role.component_permissions || {});
+                    document.getElementById('roleModal').classList.remove('hidden');
+                } else {
+                    showError(data.error || 'Erreur lors du chargement du rôle');
+                }
+            } catch (error) {
+                showError('Erreur de connexion: ' + error.message);
+            }
+        }
+
+        // Rendre la liste des composants avec checkboxes
+        function renderComponentsList(permissions) {
+            const container = document.getElementById('componentsList');
+            const categories = {};
+
+            components.forEach(comp => {
+                if (!categories[comp.category]) {
+                    categories[comp.category] = [];
+                }
+                categories[comp.category].push(comp);
+            });
+
+            container.innerHTML = Object.keys(categories).map(category => `
+                <div class="mb-6">
+                    <h5 class="font-semibold mb-2 text-green-400">${category}</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        ${categories[category].map(comp => `
+                            <label class="flex items-center gap-2 p-2 bg-gray-700 rounded hover:bg-gray-600 cursor-pointer">
+                                <input 
+                                    type="checkbox" 
+                                    class="component-checkbox w-4 h-4 rounded"
+                                    data-component="${comp.id}"
+                                    ${permissions[comp.id] ? 'checked' : ''}
+                                />
+                                <span class="text-sm">${comp.label}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Sauvegarder un rôle
+        async function saveRole(event) {
+            event.preventDefault();
+
+            const roleId = document.getElementById('roleIdInput').value;
+            const roleName = document.getElementById('roleNameInput').value;
+            const displayName = document.getElementById('displayNameInput').value;
+            const description = document.getElementById('descriptionInput').value;
+            const isAdmin = document.getElementById('isAdminInput').checked;
+
+            // Collecter les permissions
+            const permissions = {};
+            document.querySelectorAll('.component-checkbox').forEach(checkbox => {
+                permissions[checkbox.dataset.component] = checkbox.checked;
+            });
+
+            try {
+                const action = roleId ? 'update_role' : 'create_role';
+                const response = await fetch('/api/roles-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: action,
+                        adminPassword: adminPassword,
+                        roleId: roleId || undefined,
+                        roleName: roleName,
+                        displayName: displayName,
+                        description: description,
+                        is_admin: isAdmin,
+                        componentPermissions: permissions
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    closeRoleModal();
+                    loadRoles();
+                    alert('Rôle enregistré avec succès!');
+                } else {
+                    showError(data.error || 'Erreur lors de l\'enregistrement');
+                }
+            } catch (error) {
+                showError('Erreur de connexion: ' + error.message);
+            }
+        }
+
+        // Supprimer un rôle
+        async function deleteRole(roleId) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce rôle?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/roles-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'delete_role',
+                        adminPassword: adminPassword,
+                        roleId: roleId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    loadRoles();
+                    alert('Rôle supprimé avec succès!');
+                } else {
+                    showError(data.error || 'Erreur lors de la suppression');
+                }
+            } catch (error) {
+                showError('Erreur de connexion: ' + error.message);
+            }
+        }
+
+        // Assigner un rôle à un utilisateur
+        async function assignRole() {
+            const username = document.getElementById('usernameInput').value.trim();
+            const roleId = document.getElementById('roleSelect').value;
+
+            if (!username || !roleId) {
+                showError('Veuillez remplir tous les champs');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/roles-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'assign_role',
+                        adminPassword: adminPassword,
+                        username: username,
+                        role_id: roleId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('usernameInput').value = '';
+                    document.getElementById('roleSelect').value = '';
+                    alert('Rôle assigné avec succès!');
+                } else {
+                    showError(data.error || 'Erreur lors de l\'assignation');
+                }
+            } catch (error) {
+                showError('Erreur de connexion: ' + error.message);
+            }
+        }
+
+        // Remplir le select des rôles
+        function populateRoleSelect() {
+            const select = document.getElementById('roleSelect');
+            select.innerHTML = '<option value="">Sélectionner un rôle...</option>' +
+                roles.map(role => 
+                    `<option value="${role.id}">${role.display_name} (${role.role_name})</option>`
+                ).join('');
+        }
+
+        // Fermer le modal
+        function closeRoleModal() {
+            document.getElementById('roleModal').classList.add('hidden');
+        }
+
+        // Afficher une erreur
+        function showError(message) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+            setTimeout(() => errorDiv.classList.add('hidden'), 5000);
+        }
+
+        // Permettre Enter pour se connecter
+        document.getElementById('adminPassword')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                verifyAdmin();
+            }
+        });
+    </script>
+</body>
+</html>
+

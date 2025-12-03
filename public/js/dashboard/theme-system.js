@@ -27,9 +27,9 @@ const defaultThemes = {
             warning: '#ffcc00', // yellow (alerts)
         },
         fonts: {
-            primary: '"Courier New", "Courier", "Consolas", "Monaco", "Menlo", monospace',
-            secondary: '"Courier New", "Courier", "Consolas", "Monaco", "Menlo", monospace',
-            mono: '"Courier New", "Courier", "Consolas", "Monaco", "Menlo", monospace'
+            primary: '"Courier New", "Courier", "Consolas", "Monaco", "Menlo", "SF Mono", monospace',
+            secondary: '"Courier New", "Courier", "Consolas", "Monaco", "Menlo", "SF Mono", monospace',
+            mono: '"Courier New", "Courier", "Consolas", "Monaco", "Menlo", "SF Mono", monospace'
         },
         styles: {
             headerBg: '#000000',
@@ -186,9 +186,9 @@ const customThemes = {
             warning: '#ffaa00', // orange (#FFAA00) - alertes
         },
         fonts: {
-            primary: '"Roboto", "Helvetica Neue", "Arial", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-            secondary: '"Inter", "Roboto", "Helvetica Neue", system-ui, sans-serif',
-            mono: '"Consolas", "Monaco", "Menlo", "Courier New", monospace'
+            primary: '"Roboto", "Helvetica Neue", "Helvetica", "Arial", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            secondary: '"Inter", "Roboto", "Helvetica Neue", "Helvetica", system-ui, sans-serif',
+            mono: '"SF Mono", "Consolas", "Monaco", "Menlo", "Courier New", monospace'
         },
         styles: {
             headerBg: 'linear-gradient(135deg, #141b3d 0%, #1e2749 100%)',
@@ -218,9 +218,9 @@ const customThemes = {
             warning: '#ffaa00', // orange (#FFAA00) - alertes
         },
         fonts: {
-            primary: '"Roboto", "Helvetica Neue", "Arial", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-            secondary: '"Inter", "Roboto", "Helvetica Neue", system-ui, sans-serif',
-            mono: '"Consolas", "Monaco", "Menlo", "Courier New", monospace'
+            primary: '"Roboto", "Helvetica Neue", "Helvetica", "Arial", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            secondary: '"Inter", "Roboto", "Helvetica Neue", "Helvetica", system-ui, sans-serif',
+            mono: '"SF Mono", "Consolas", "Monaco", "Menlo", "Courier New", monospace'
         },
         styles: {
             headerBg: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
@@ -251,9 +251,9 @@ const customThemes = {
             warning: '#ffcc00', // yellow (alerts)
         },
         fonts: {
-            primary: '"Courier New", "Courier", "Consolas", "Monaco", "Menlo", monospace',
-            secondary: '"Courier New", "Courier", "Consolas", "Monaco", "Menlo", monospace',
-            mono: '"Courier New", "Courier", "Consolas", "Monaco", "Menlo", monospace'
+            primary: '"Courier New", "Courier", "Consolas", "Monaco", "Menlo", "SF Mono", monospace',
+            secondary: '"Courier New", "Courier", "Consolas", "Monaco", "Menlo", "SF Mono", monospace',
+            mono: '"Courier New", "Courier", "Consolas", "Monaco", "Menlo", "SF Mono", monospace'
         },
         styles: {
             headerBg: '#000000',
@@ -284,9 +284,9 @@ const customThemes = {
             warning: '#fbbc04', // Google yellow
         },
         fonts: {
-            primary: '"Roboto", "Helvetica Neue", "Arial", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-            secondary: '"Roboto", "Helvetica Neue", "Arial", sans-serif',
-            mono: '"Consolas", "Monaco", "Menlo", "Courier New", monospace'
+            primary: '"Roboto", "Helvetica Neue", "Helvetica", "Arial", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            secondary: '"Roboto", "Helvetica Neue", "Helvetica", "Arial", sans-serif',
+            mono: '"SF Mono", "Consolas", "Monaco", "Menlo", "Courier New", monospace'
         },
         styles: {
             headerBg: '#f5f5f5', // gris clair pour header
@@ -316,9 +316,9 @@ const customThemes = {
             warning: '#ff9800', // Material orange (#FF9800)
         },
         fonts: {
-            primary: 'Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-            secondary: 'Inter, system-ui, sans-serif',
-            mono: 'SF Mono, "Courier New", monospace'
+            primary: '"Roboto", "Helvetica Neue", "Helvetica", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            secondary: '"Inter", "Roboto", system-ui, sans-serif',
+            mono: '"SF Mono", "Consolas", "Monaco", "Menlo", "Courier New", monospace'
         },
         styles: {
             headerBg: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
@@ -349,9 +349,9 @@ const customThemes = {
             warning: '#f59e0b', // amber (#F59E0B)
         },
         fonts: {
-            primary: '"Georgia", "Times New Roman", "Palatino", serif', // Style rétro années 1990
-            secondary: '"Courier New", "Courier", monospace', // Style terminal rétro
-            mono: '"Courier New", "Courier", monospace'
+            primary: '"Georgia", "Times New Roman", "Palatino", "Times", serif', // Style rétro années 1990
+            secondary: '"Courier New", "Courier", "Consolas", "Monaco", monospace', // Style terminal rétro
+            mono: '"Courier New", "Courier", "Consolas", "Monaco", monospace'
         },
         styles: {
             headerBg: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
@@ -382,9 +382,9 @@ const customThemes = {
             warning: '#ff9800', // Orange (#FF9800) - alertes
         },
         fonts: {
-            primary: '"Arial", "Helvetica Neue", "Helvetica", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-            secondary: '"Arial", "Helvetica Neue", "Helvetica", system-ui, sans-serif',
-            mono: '"Consolas", "Monaco", "Menlo", "Courier New", monospace'
+            primary: '"Arial", "Helvetica Neue", "Helvetica", "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            secondary: '"Inter", "Arial", "Helvetica Neue", "Helvetica", system-ui, sans-serif',
+            mono: '"SF Mono", "Consolas", "Monaco", "Menlo", "Courier New", monospace'
         },
         styles: {
             headerBg: 'linear-gradient(135deg, #006747 0%, #00a651 100%)', // Dégradé vert Desjardins

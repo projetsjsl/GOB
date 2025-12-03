@@ -6,10 +6,14 @@
  * - After edits, run a quick parse check locally (e.g. with @babel/parser or another linter) before deploying.
  * Keeping this block at the top as a reminder to reduce future syntax regressions.
  */
+// Log immédiat pour confirmer que le script se charge
+console.log('🚀 app-inline.js: Script en cours de chargement...');
+
 if (window.__GOB_DASHBOARD_MOUNTED) {
     console.warn('⚠️ Beta Dashboard déjà initialisé, exécution ignorée.');
 } else {
     window.__GOB_DASHBOARD_MOUNTED = true;
+    console.log('✅ app-inline.js: Initialisation du dashboard...');
 
     // Vérification que Babel fonctionne
     console.log('🔧 Babel chargé:', typeof Babel !== 'undefined');
@@ -480,7 +484,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         );
     };
 
-        const BetaCombinedDashboard = () => {
+    const BetaCombinedDashboard = () => {
         // État pour le thème actuel
         const [currentThemeId, setCurrentThemeId] = useState(() => {
             if (window.GOBThemes) {
@@ -651,6 +655,54 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         const tabSoundRef = useRef(null);
         const audioCtxRef = useRef(null);
         const tickerTapeRef = useRef(null);
+
+        // Fonction utilitaire pour obtenir les styles basés sur le thème
+        const getThemeStyles = () => {
+            return {
+                // Backgrounds
+                bg: { backgroundColor: 'var(--theme-bg)' },
+                surface: { backgroundColor: 'var(--theme-surface)' },
+                surfaceLight: { backgroundColor: 'var(--theme-surface-light)' },
+                // Text
+                text: { color: 'var(--theme-text)' },
+                textSecondary: { color: 'var(--theme-text-secondary)' },
+                // Borders
+                border: { borderColor: 'var(--theme-border)' },
+                // Buttons
+                buttonPrimary: {
+                    backgroundColor: 'var(--theme-primary)',
+                    color: 'var(--theme-text)',
+                },
+                buttonSecondary: {
+                    backgroundColor: 'var(--theme-secondary)',
+                    color: 'var(--theme-text)',
+                },
+                buttonSurface: {
+                    backgroundColor: 'var(--theme-surface-light)',
+                    color: 'var(--theme-text)',
+                },
+                // Cards
+                card: {
+                    backgroundColor: 'var(--theme-surface)',
+                    borderColor: 'var(--theme-border)',
+                    color: 'var(--theme-text)',
+                },
+            };
+        };
+
+        // Fonction pour obtenir les classes CSS basées sur le thème (alternative)
+        const getThemeClasses = (type) => {
+            // Utiliser des classes avec variables CSS via style inline
+            const baseClasses = {
+                bg: 'transition-colors duration-300',
+                surface: 'transition-colors duration-300',
+                text: 'transition-colors duration-300',
+                border: 'transition-colors duration-300',
+                button: 'transition-all duration-300',
+                card: 'transition-colors duration-300',
+            };
+            return baseClasses[type] || '';
+        };
         const stocksLoadingRef = useRef(false); // Pour éviter les chargements multiples
         const batchLoadedRef = useRef(false); // Pour suivre si le batch a déjà chargé les données
         
@@ -3373,6 +3425,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             return <span className="inline-block">{emoji}</span>;
         };
 
+        // Exposer Icon globalement pour les composants externes (AdminJSLaiTab, PlusTab, etc.)
+        window.Icon = Icon;
+
         // Volume: baisser le son général et couper le son du ripple/clic
         useEffect(() => {
             try {
@@ -3396,6 +3451,88 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             setFilteredNews(newsData);
         }, [newsData]);
 
+        // Liste exhaustive d'indices TradingView valides (accessible globalement)
+        const getAllAvailableIndices = window.getAllAvailableIndices = () => {
+            return {
+                'us': [
+                    { proName: 'SP:SPX', title: 'S&P 500', category: 'us' },
+                    { proName: 'DJ:DJI', title: 'Dow Jones', category: 'us' },
+                    { proName: 'NASDAQ:NDX', title: 'NASDAQ 100', category: 'us' },
+                    { proName: 'TVC:RUT', title: 'Russell 2000', category: 'us' },
+                    { proName: 'TVC:VIX', title: 'VIX', category: 'us' },
+                    { proName: 'NYSE:NYA', title: 'NYSE Composite', category: 'us' }
+                ],
+                'canada': [
+                    { proName: 'TSX:OSPTX', title: 'S&P/TSX Composite', category: 'canada' },
+                    { proName: 'TSX:OSPTX60', title: 'S&P/TSX 60', category: 'canada' },
+                    { proName: 'TSXV:OSPVX', title: 'TSX Venture', category: 'canada' }
+                ],
+                'europe': [
+                    { proName: 'LSE:UKX', title: 'FTSE 100', category: 'europe' },
+                    { proName: 'XETR:DAX', title: 'DAX', category: 'europe' },
+                    { proName: 'EURONEXT:FCHI', title: 'CAC 40', category: 'europe' },
+                    { proName: 'BME:IBEX', title: 'IBEX 35', category: 'europe' },
+                    { proName: 'MIL:FTSEMIB', title: 'FTSE MIB', category: 'europe' },
+                    { proName: 'EURONEXT:AEX', title: 'AEX', category: 'europe' },
+                    { proName: 'SIX:SSMI', title: 'SMI', category: 'europe' },
+                    { proName: 'EURONEXT:PSI20', title: 'PSI 20', category: 'europe' },
+                    { proName: 'XETR:MDAX', title: 'MDAX', category: 'europe' }
+                ],
+                'asia': [
+                    { proName: 'TVC:NK225', title: 'Nikkei 225', category: 'asia' },
+                    { proName: 'HKEX:HSI', title: 'Hang Seng', category: 'asia' },
+                    { proName: 'ASX:XJO', title: 'ASX 200', category: 'asia' },
+                    { proName: 'SSE:000001', title: 'SSE Composite', category: 'asia' },
+                    { proName: 'BSE:SENSEX', title: 'BSE Sensex', category: 'asia' },
+                    { proName: 'KRX:KOSPI', title: 'KOSPI', category: 'asia' },
+                    { proName: 'TVC:TWII', title: 'Taiwan Weighted', category: 'asia' }
+                ],
+                'crypto': [
+                    { proName: 'BITSTAMP:BTCUSD', title: 'Bitcoin', category: 'crypto' },
+                    { proName: 'BITSTAMP:ETHUSD', title: 'Ethereum', category: 'crypto' },
+                    { proName: 'BINANCE:BNBUSD', title: 'BNB', category: 'crypto' },
+                    { proName: 'COINBASE:SOLUSD', title: 'Solana', category: 'crypto' },
+                    { proName: 'COINBASE:ADAUSD', title: 'Cardano', category: 'crypto' }
+                ],
+                'commodities': [
+                    { proName: 'TVC:USOIL', title: 'WTI Crude Oil', category: 'commodities' },
+                    { proName: 'TVC:BRENT', title: 'Brent Crude', category: 'commodities' },
+                    { proName: 'TVC:XAUUSD', title: 'Gold', category: 'commodities' },
+                    { proName: 'TVC:XAGUSD', title: 'Silver', category: 'commodities' },
+                    { proName: 'TVC:XCUUSD', title: 'Copper', category: 'commodities' }
+                ],
+                'forex': [
+                    { proName: 'FX:EURUSD', title: 'EUR/USD', category: 'forex' },
+                    { proName: 'FX:GBPUSD', title: 'GBP/USD', category: 'forex' },
+                    { proName: 'FX:USDJPY', title: 'USD/JPY', category: 'forex' },
+                    { proName: 'FX:USDCAD', title: 'USD/CAD', category: 'forex' },
+                    { proName: 'FX:AUDUSD', title: 'AUD/USD', category: 'forex' }
+                ]
+            };
+        };
+
+        // Charger les indices sélectionnés depuis localStorage
+        const [selectedIndices, setSelectedIndices] = useState(() => {
+            try {
+                const saved = localStorage.getItem('tradingview-selected-indices');
+                if (saved) {
+                    return JSON.parse(saved);
+                }
+            } catch (e) {
+                console.warn('Erreur chargement indices:', e);
+            }
+            // Par défaut: indices US principaux + crypto
+            return [
+                'SP:SPX',
+                'DJ:DJI',
+                'NASDAQ:NDX',
+                'TVC:RUT',
+                'TSX:OSPTX',
+                'BITSTAMP:BTCUSD',
+                'BITSTAMP:ETHUSD'
+            ];
+        });
+
         // Charger le widget TradingView Ticker Tape
         useEffect(() => {
             const container = tickerTapeRef.current;
@@ -3403,94 +3540,30 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
             container.innerHTML = '';
 
+            // Obtenir tous les indices disponibles
+            const allIndices = getAllAvailableIndices();
+            const flatIndices = Object.values(allIndices).flat();
+            
+            // Filtrer les indices sélectionnés
+            const symbolsToDisplay = flatIndices.filter(idx => 
+                selectedIndices.includes(idx.proName)
+            );
+
+            // Si aucun indice sélectionné, utiliser les indices par défaut
+            const finalSymbols = symbolsToDisplay.length > 0 
+                ? symbolsToDisplay 
+                : [
+                    { proName: 'SP:SPX', title: 'S&P 500' },
+                    { proName: 'DJ:DJI', title: 'Dow Jones' },
+                    { proName: 'NASDAQ:NDX', title: 'NASDAQ 100' }
+                ];
+
             const script = document.createElement('script');
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
             script.type = 'text/javascript';
             script.async = true;
             script.textContent = JSON.stringify({
-                symbols: [
-                    // Indices US
-                    {
-                        proName: 'FOREXCOM:SPXUSD',
-                        title: 'S&P 500'
-                    },
-                    {
-                        proName: 'FOREXCOM:DJI',
-                        title: 'Dow Jones'
-                    },
-                    {
-                        proName: 'FOREXCOM:NSXUSD',
-                        title: 'NASDAQ 100'
-                    },
-                    {
-                        proName: 'TVC:RUT',
-                        title: 'Russell 2000'
-                    },
-                    // Indices Amérique du Nord
-                    {
-                        proName: 'TSX:OSPTX',
-                        title: 'TSX (Canada)'
-                    },
-                    // Indices Europe
-                    {
-                        proName: 'FOREXCOM:UKXGBP',
-                        title: 'FTSE 100 (UK)'
-                    },
-                    {
-                        proName: 'XETR:DAX',
-                        title: 'DAX (Allemagne)'
-                    },
-                    {
-                        proName: 'EURONEXT:FCHI',
-                        title: 'CAC 40 (France)'
-                    },
-                    {
-                        proName: 'BME:IBEX',
-                        title: 'IBEX 35 (Espagne)'
-                    },
-                    {
-                        proName: 'MIL:FTSEMIB',
-                        title: 'FTSE MIB (Italie)'
-                    },
-                    {
-                        proName: 'EURONEXT:AEX',
-                        title: 'AEX (Pays-Bas)'
-                    },
-                    {
-                        proName: 'SIX:SSMI',
-                        title: 'SMI (Suisse)'
-                    },
-                    // Indices Asie-Pacifique
-                    {
-                        proName: 'TVC:NK225',
-                        title: 'Nikkei 225 (Japon)'
-                    },
-                    {
-                        proName: 'HKEX:HSI',
-                        title: 'Hang Seng (Hong Kong)'
-                    },
-                    {
-                        proName: 'ASX:XJO',
-                        title: 'ASX 200 (Australie)'
-                    },
-                    {
-                        proName: 'SSE:000001',
-                        title: 'SSE Composite (Chine)'
-                    },
-                    {
-                        proName: 'BSE:SENSEX',
-                        title: 'BSE Sensex (Inde)'
-                    },
-                    // Crypto-monnaies
-                    {
-                        proName: 'BITSTAMP:BTCUSD',
-                        title: 'Bitcoin'
-                    },
-                    {
-                        proName: 'BITSTAMP:ETHUSD',
-                        title: 'Ethereum'
-                    }
-                ],
+                symbols: finalSymbols,
                 colorTheme: isDarkMode ? 'dark' : 'light',
                 locale: 'fr',
                 largeChartUrl: '',
@@ -4720,1161 +4793,19 @@ STRUCTURE JSON OBLIGATOIRE:
 
         // ============================================================================
         // COMPOSANT ADMIN-JSLAI
+        // NOTE: Le composant AdminJSLaiTab est maintenant défini dans un fichier séparé:
+        // public/js/dashboard/components/tabs/AdminJSLaiTab.js
+        // Il est chargé via <script> dans beta-combined-dashboard.html
+        // L'ancienne définition a été supprimée pour éviter les conflits.
+        // Utiliser window.AdminJSLaiTab à la place (voir ligne ~26487 pour le rendu)
         // ============================================================================
-        const AdminJSLaiTab = ({
-            emmaConnected,
-            setEmmaConnected,
-            showPromptEditor,
-            setShowPromptEditor,
-            showTemperatureEditor,
-            setShowTemperatureEditor,
-            showLengthEditor,
-            setShowLengthEditor
-        }) => (
-            <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                    <h2 className={`text-2xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>⚙️ Admin-JSLAI</h2>
-                </div>
-
-                <EmmaSmsPanel />
-
-                {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
-                <div className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
-                    }`}>
-                    <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        <Icon emoji="🔍" size={20} />
-                        Debug des Données
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                            <div className="text-blue-600 font-medium mb-2 flex items-center gap-2">
-                                <Icon emoji="📊" size={18} />
-                                Stock Data
-                            </div>
-                            <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                Tickers: {tickers.length} ({tickers.join(', ')})
-                            </div>
-                            <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                Données chargées: {Object.keys(stockData).length}
-                            </div>
-                            <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                Dernière MAJ: {lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Jamais'}
-                            </div>
-                        </div>
-                        <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                            <div className="text-emerald-600 font-medium mb-2 flex items-center gap-2">
-                                <Icon emoji="📰" size={18} />
-                                News Data
-                            </div>
-                            <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                Articles: {newsData.length}
-                            </div>
-                            <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                Premier article: {newsData[0]?.title?.substring(0, 30) || 'Aucun'}...
-                            </div>
-                        </div>
-                        <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                            <div className="text-violet-600 font-medium mb-2 flex items-center gap-2">
-                                <Icon emoji="🎯" size={18} />
-                                Seeking Alpha
-                            </div>
-                            <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                Stocks: {seekingAlphaData.stocks?.length || 0}
-                            </div>
-                            <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                Stock Data: {Object.keys(seekingAlphaStockData.stocks || {}).length}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 📦 Gestion du Cache Supabase */}
-                <div className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-br from-blue-900/20 to-gray-900 border-blue-700' : 'bg-gradient-to-br from-blue-50 to-gray-50 border-blue-200'
-                    }`}>
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-900'}`}>
-                            <Icon emoji="📦" size={20} />
-                            Gestion du Cache Supabase
-                        </h3>
-                        <button
-                            onClick={async () => {
-                                setLoadingCacheStatus(true);
-                                try {
-                                    const response = await fetch(`${API_BASE_URL}/api/supabase-daily-cache?type=status&maxAgeHours=${cacheSettings.maxAgeHours || 4}`);
-                                    if (response.ok) {
-                                        const data = await response.json();
-                                        setCacheStatus(data.status || {});
-                                    }
-                                } catch (error) {
-                                    console.error('Erreur récupération statut cache:', error);
-                                } finally {
-                                    setLoadingCacheStatus(false);
-                                }
-                            }}
-                            disabled={loadingCacheStatus}
-                            className={`px-3 py-1 text-xs rounded transition-colors ${loadingCacheStatus
-                                ? 'bg-gray-500 text-white cursor-not-allowed'
-                                : isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
-                                }`}
-                        >
-                            {loadingCacheStatus ? '⏳ Chargement...' : '🔄 Actualiser'}
-                        </button>
-                    </div>
-
-                    {/* Paramètres du Cache */}
-                    <div className={`space-y-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                            <div className="font-semibold mb-3 flex items-center gap-2">
-                                <Icon emoji="⚙️" size={16} />
-                                Paramètres du Cache
-                            </div>
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="block text-sm mb-2">
-                                        Durée du cache (heures): <span className="font-bold text-blue-600">{cacheSettings.maxAgeHours}h</span>
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="1"
-                                        max="12"
-                                        value={cacheSettings.maxAgeHours}
-                                        onChange={(e) => {
-                                            const newSettings = { ...cacheSettings, maxAgeHours: parseInt(e.target.value) };
-                                            setCacheSettings(newSettings);
-                                            localStorage.setItem('cacheSettings', JSON.stringify(newSettings));
-                                        }}
-                                        className="w-full"
-                                    />
-                                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                                        <span>1h</span>
-                                        <span>6h</span>
-                                        <span>12h</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        id="refreshOnNavigation"
-                                        checked={cacheSettings.refreshOnNavigation}
-                                        onChange={(e) => {
-                                            const newSettings = { ...cacheSettings, refreshOnNavigation: e.target.checked };
-                                            setCacheSettings(newSettings);
-                                            localStorage.setItem('cacheSettings', JSON.stringify(newSettings));
-                                        }}
-                                        className="rounded"
-                                    />
-                                    <label htmlFor="refreshOnNavigation" className="text-sm">
-                                        Rafraîchir les données tickers lors de la navigation
-                                    </label>
-                                </div>
-                                {cacheSettings.refreshOnNavigation && (
-                                    <div className="ml-6">
-                                        <label className="block text-sm mb-2">
-                                            Intervalle de rafraîchissement (minutes): <span className="font-bold text-blue-600">{cacheSettings.refreshIntervalMinutes} min</span>
-                                        </label>
-                                        <input
-                                            type="range"
-                                            min="5"
-                                            max="30"
-                                            step="5"
-                                            value={cacheSettings.refreshIntervalMinutes}
-                                            onChange={(e) => {
-                                                const newSettings = { ...cacheSettings, refreshIntervalMinutes: parseInt(e.target.value) };
-                                                setCacheSettings(newSettings);
-                                                localStorage.setItem('cacheSettings', JSON.stringify(newSettings));
-                                            }}
-                                            className="w-full"
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* État du Cache */}
-                        <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                            <div className="font-semibold mb-3 flex items-center gap-2">
-                                <Icon emoji="📊" size={16} />
-                                État du Cache
-                            </div>
-                            <div className="space-y-2 text-xs">
-                                {Object.keys(cacheStatus).length === 0 ? (
-                                    <div className={`text-center py-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                        Cliquez sur "Actualiser" pour voir l'état du cache
-                                    </div>
-                                ) : (
-                                    Object.entries(cacheStatus).map(([type, status]) => (
-                                        <div key={type} className={`p-2 rounded border ${status.expired
-                                            ? isDarkMode ? 'bg-yellow-900/30 border-yellow-800' : 'bg-yellow-50 border-yellow-200'
-                                            : isDarkMode ? 'bg-green-900/30 border-green-800' : 'bg-green-50 border-green-200'
-                                            }`}>
-                                            <div className="flex justify-between items-center">
-                                                <span className="font-semibold capitalize">{type.replace('_', ' ')}</span>
-                                                <span className={`px-2 py-1 rounded text-xs ${status.expired
-                                                    ? 'bg-yellow-500 text-white'
-                                                    : 'bg-green-500 text-white'
-                                                    }`}>
-                                                    {status.expired ? '⚠️ Expiré' : '✅ Valide'}
-                                                </span>
-                                            </div>
-                                            {status.age_hours && (
-                                                <div className="mt-1 text-gray-600">
-                                                    Âge: {parseFloat(status.age_hours).toFixed(1)}h / {status.max_age_hours || cacheSettings.maxAgeHours}h max
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex gap-2">
-                            <button
-                                onClick={async () => {
-                                    if (confirm('Vider tout le cache Supabase ? Les données seront rechargées depuis les APIs.')) {
-                                        try {
-                                            const response = await fetch(`${API_BASE_URL}/api/supabase-daily-cache`, {
-                                                method: 'DELETE'
-                                            });
-                                            if (response.ok) {
-                                                alert('Cache vidé avec succès');
-                                                setCacheStatus({});
-                                            }
-                                        } catch (error) {
-                                            alert('Erreur lors du vidage du cache');
-                                        }
-                                    }
-                                }}
-                                className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${isDarkMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-500 hover:bg-red-600 text-white'
-                                    }`}
-                            >
-                                🗑️ Vider le Cache
-                            </button>
-                            <button
-                                onClick={() => {
-                                    const defaultSettings = {
-                                        maxAgeHours: 4,
-                                        refreshOnNavigation: true,
-                                        refreshIntervalMinutes: 10
-                                    };
-                                    setCacheSettings(defaultSettings);
-                                    localStorage.setItem('cacheSettings', JSON.stringify(defaultSettings));
-                                    alert('Paramètres réinitialisés aux valeurs par défaut');
-                                }}
-                                className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-600 hover:bg-gray-700 text-white'
-                                    }`}
-                            >
-                                🔄 Réinitialiser
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 📋 Logs Système - Nouveau */}
-                <div className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
-                    }`}>
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                            <Icon emoji="📋" size={20} />
-                            Logs Système
-                        </h3>
-                        <button
-                            onClick={() => setSystemLogs([])}
-                            className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                        >
-                            Effacer logs
-                        </button>
-                    </div>
-                    <div className={`max-h-64 overflow-y-auto rounded p-3 font-mono text-xs ${isDarkMode ? 'bg-gray-800' : 'bg-white'
-                        }`}>
-                        {systemLogs.length === 0 ? (
-                            <div className={`text-center py-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                Aucun log pour le moment
-                            </div>
-                        ) : (
-                            systemLogs.map((log, index) => (
-                                <div
-                                    key={index}
-                                    className={`py-1 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'
-                                        } ${log.type === 'error' ? 'text-red-500' :
-                                            log.type === 'success' ? 'text-green-500' :
-                                                log.type === 'warning' ? 'text-yellow-500' :
-                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}
-                                >
-                                    <span className="text-gray-500">[{log.timestamp}]</span> {log.text}
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </div>
-
-                {/* 🧠 Deep Think - Analyses Profondes */}
-                <div className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-br from-purple-900/20 to-gray-900 border-purple-700' : 'bg-gradient-to-br from-purple-50 to-gray-50 border-purple-200'
-                    }`}>
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
-                            <Icon emoji="🧠" size={20} />
-                            Deep Think
-                        </h3>
-                        <span className={`px-2 py-1 text-xs rounded ${isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'}`}>
-                            AI Analysis System
-                        </span>
-                    </div>
-                    <div className={`space-y-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                            <div className="font-semibold mb-1 flex items-center gap-2">
-                                <Icon emoji="🎯" size={16} />
-                                Statut du système
-                            </div>
-                            <div className="text-xs space-y-1">
-                                <div>• Gemini API: {typeof window !== 'undefined' ? '✅ Actif' : '⚠️ Vérification...'}</div>
-                                <div>• Emma Agent: {systemLogs.filter(l => l.text.includes('Emma')).length > 0 ? '✅ Opérationnel' : '⏸️ En attente'}</div>
-                                <div>• Deep Analysis: {stockData && Object.keys(stockData).length > 0 ? '✅ Données disponibles' : '⚠️ Pas de données'}</div>
-                            </div>
-                        </div>
-                        <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                            <div className="font-semibold mb-1 flex items-center gap-2">
-                                <Icon emoji="📊" size={16} />
-                                Métriques
-                            </div>
-                            <div className="text-xs space-y-1">
-                                <div>• Analyses effectuées: {systemLogs.filter(l => l.type === 'success').length}</div>
-                                <div>• Requêtes API: {systemLogs.length}</div>
-                                <div>• Dernière analyse: {systemLogs[0]?.timestamp || 'N/A'}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* ⚠️ Violations & Diagnostics */}
-                <div className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-br from-red-900/20 to-gray-900 border-red-700' : 'bg-gradient-to-br from-red-50 to-gray-50 border-red-200'
-                    }`}>
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-red-300' : 'text-red-900'}`}>
-                            <Icon emoji="⚠️" size={20} />
-                            Violations
-                        </h3>
-                        <span className={`px-2 py-1 text-xs rounded ${systemLogs.filter(l => l.type === 'error').length > 0
-                            ? 'bg-red-500 text-white'
-                            : isDarkMode ? 'bg-green-900/50 text-green-300' : 'bg-green-200 text-green-900'
-                            }`}>
-                            {systemLogs.filter(l => l.type === 'error').length} erreur(s)
-                        </span>
-                    </div>
-                    <div className={`max-h-48 overflow-y-auto rounded p-3 font-mono text-xs ${isDarkMode ? 'bg-gray-800' : 'bg-white'
-                        }`}>
-                        {systemLogs.filter(l => l.type === 'error').length === 0 ? (
-                            <div className={`text-center py-4 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
-                                ✅ Aucune violation détectée - Système opérationnel
-                            </div>
-                        ) : (
-                            <div className="space-y-2">
-                                {systemLogs.filter(l => l.type === 'error').map((log, index) => (
-                                    <div
-                                        key={index}
-                                        className={`p-2 rounded border ${isDarkMode ? 'bg-red-900/30 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-800'
-                                            }`}
-                                    >
-                                        <div className="flex items-start gap-2">
-                                            <span className="text-red-500">⚠️</span>
-                                            <div className="flex-1">
-                                                <div className="font-semibold text-xs">[{log.timestamp}]</div>
-                                                <div className="mt-1">{log.text}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                    <div className={`mt-3 p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
-                        💡 <strong>Info:</strong> Les violations sont automatiquement trackées. Consultez les logs système ci-dessus pour plus de détails.
-                    </div>
-                </div>
-
-                {/* 🎨 Mode Professionnel / Fun */}
-                <div className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-br from-indigo-900/20 to-gray-900 border-indigo-700' : 'bg-gradient-to-br from-indigo-50 to-gray-50 border-indigo-200'
-                    }`}>
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-indigo-300' : 'text-indigo-900'}`}>
-                            <Icon emoji="🎨" size={20} />
-                            Mode d'Affichage des Icônes
-                        </h3>
-                        <div className={`px-3 py-1 rounded text-xs font-medium ${isProfessionalMode
-                            ? isDarkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-200 text-blue-900'
-                            : isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'
-                            }`}>
-                            {isProfessionalMode ? '💼 Professionnel' : '🎉 Fun'}
-                        </div>
-                    </div>
-                    <div className={`space-y-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                            <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                    <Icon emoji={isProfessionalMode ? "💼" : "🎉"} size={18} />
-                                    <span className="font-semibold">
-                                        {isProfessionalMode ? 'Mode Professionnel' : 'Mode Fun'}
-                                    </span>
-                                </div>
-                                <button
-                                    onClick={() => {
-                                        const newMode = window.ProfessionalModeSystem.toggle();
-                                        setIsProfessionalMode(newMode);
-                                    }}
-                                    className={`px-4 py-2 rounded-lg transition-all duration-300 border-2 font-semibold ${isProfessionalMode
-                                        ? 'bg-gradient-to-br from-blue-600 to-blue-700 border-blue-400 text-white hover:from-blue-700 hover:to-blue-800'
-                                        : 'bg-gradient-to-br from-purple-600 to-pink-600 border-purple-400 text-white hover:from-purple-700 hover:to-pink-700'
-                                        }`}
-                                >
-                                    {isProfessionalMode ? (
-                                        <span className="flex items-center gap-2">
-                                            <i className="iconoir-briefcase"></i>
-                                            Mode Professionnel
-                                        </span>
-                                    ) : (
-                                        <span className="flex items-center gap-2">
-                                            <span>🎉</span>
-                                            Mode Fun
-                                        </span>
-                                    )}
-                                </button>
-                            </div>
-                            <div className={`text-xs mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                {isProfessionalMode ? (
-                                    <>
-                                        <p className="mb-1">✅ Icônes professionnelles Iconoir activées</p>
-                                        <p>Les emojis sont remplacés par des icônes vectorielles modernes pour une apparence plus professionnelle.</p>
-                                    </>
-                                ) : (
-                                    <>
-                                        <p className="mb-1">✅ Mode Fun avec emojis activé</p>
-                                        <p>Les icônes sont affichées sous forme d'emojis colorés pour une expérience plus décontractée.</p>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                        <div className={`p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800/50 text-gray-400' : 'bg-gray-50 text-gray-600'}`}>
-                            💡 <strong>Astuce:</strong> Le mode sélectionné est sauvegardé automatiquement et s'applique à tous les onglets du dashboard.
-                        </div>
-                    </div>
-                </div>
-
-                {/* 🤖 Configuration Emma IA */}
-                <div className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-br from-emerald-900/20 to-gray-900 border-emerald-700' : 'bg-gradient-to-br from-emerald-50 to-gray-50 border-emerald-200'
-                    }`}>
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>
-                            <Icon emoji="🤖" size={20} />
-                            Configuration Emma IA
-                        </h3>
-                        <div className={`px-3 py-1 rounded text-xs font-medium ${emmaConnected
-                            ? isDarkMode ? 'bg-green-900/50 text-green-300' : 'bg-green-200 text-green-900'
-                            : isDarkMode ? 'bg-red-900/50 text-red-300' : 'bg-red-200 text-red-900'
-                            }`}>
-                            {emmaConnected ? '✅ Gemini Actif' : '❌ Gemini Inactif'}
-                        </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        <button
-                            onClick={() => setShowPromptEditor(!showPromptEditor)}
-                            className={`px-4 py-2 rounded transition-colors ${isDarkMode
-                                ? 'bg-purple-800 hover:bg-purple-700 text-white'
-                                : 'bg-purple-600 hover:bg-purple-700 text-white'
-                                }`}
-                        >
-                            📝 Modifier Prompt
-                        </button>
-                        <button
-                            onClick={() => setShowTemperatureEditor(!showTemperatureEditor)}
-                            className={`px-4 py-2 rounded transition-colors ${isDarkMode
-                                ? 'bg-gray-800 hover:bg-gray-700 text-white'
-                                : 'bg-gray-800 hover:bg-gray-700 text-white'
-                                }`}
-                        >
-                            🌡️ Température
-                        </button>
-                        <button
-                            onClick={() => setShowLengthEditor(!showLengthEditor)}
-                            className={`px-4 py-2 rounded transition-colors ${isDarkMode
-                                ? 'bg-green-800 hover:bg-green-700 text-white'
-                                : 'bg-green-600 hover:bg-green-700 text-white'
-                                }`}
-                        >
-                            📏 Longueur Réponse
-                        </button>
-                    </div>
-                    <div className={`mt-3 p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
-                        💡 <strong>Info:</strong> Ces paramètres affectent le comportement d'Emma IA dans l'onglet Ask Emma. Modifications appliquées immédiatement.
-                    </div>
-                </div>
-
-                {/* Section Administration des Stocks */}
-                <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
-                    ? 'bg-gray-900 border-gray-700'
-                    : 'bg-gray-50 border-gray-200'
-                    }`}>
-                    <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>
-                        <Icon emoji="📊" size={20} className="mr-2 inline-block" />
-                        Gestion des Stocks
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                        <button
-                            onClick={refreshAllStocks}
-                            disabled={loading}
-                            className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50 transition-colors"
-                        >
-                            {loading ? 'Actualisation...' : 'Actualiser Stocks'}
-                        </button>
-                        <button
-                            onClick={fetchNews}
-                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-                        >
-                            Actualiser News
-                        </button>
-                    </div>
-                </div>
-
-                {/* Section Scraping Seeking Alpha */}
-                {/* WORKFLOW EN 3 ÉTAPES CLAIRES */}
-                <div className="space-y-4">
-                    {/* ÉTAPE 1: SCRAPING BATCH */}
-                    <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${isDarkMode
-                        ? 'bg-gradient-to-r from-gray-900/40 to-gray-800/40 border-gray-500/50'
-                        : 'bg-gradient-to-r from-gray-800/40 to-gray-700/40 border-gray-400/50'
-                        }`}>
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className={`text-xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>
-                                <Icon emoji="📊" size={20} className="mr-2 inline-block" />
-                                ÉTAPE 1: SCRAPING BATCH (25 tickers)
-                            </h3>
-                            <span className={`px-4 py-2 rounded-full text-sm font-bold ${scrapingStatus === 'idle' ? 'bg-gray-500 text-white' :
-                                scrapingStatus === 'running' ? 'bg-gray-700 text-white animate-pulse' :
-                                    scrapingStatus === 'completed' ? 'bg-green-500 text-white' :
-                                        'bg-red-500 text-white'
-                                }`}>
-                                {scrapingStatus === 'idle' ? '⏸️ EN ATTENTE' :
-                                    scrapingStatus === 'running' ? '🔄 SCRAPING...' :
-                                        scrapingStatus === 'completed' ? '✅ TERMINÉ' :
-                                            '❌ ERREUR'}
-                            </span>
-                        </div>
-
-                        {/* Barre de progression */}
-                        {scrapingStatus === 'running' && (
-                            <div className="mb-4">
-                                <div className="w-full bg-gray-700 rounded-full h-4">
-                                    <div
-                                        className="bg-gradient-to-r from-gray-700 to-gray-600 h-4 rounded-full transition-all duration-300 flex items-center justify-center text-white text-xs font-bold"
-                                        style={{ width: `${scrapingProgress}%` }}
-                                    >
-                                        {scrapingProgress}%
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-black/30' : 'bg-white/60'
-                            }`}>
-                            <p className={`text-sm mb-3 font-semibold transition-colors duration-300 ${isDarkMode ? 'text-yellow-300' : 'text-yellow-800'
-                                }`}>
-                                ⚠️ IMPORTANT: Connectez-vous AVANT de lancer le scraping!
-                            </p>
-                            <ol className={`text-sm space-y-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                }`}>
-                                <li><strong>1.</strong> Cliquez "🔐 SE CONNECTER" → Login Seeking Alpha</li>
-                                <li><strong>2.</strong> Cliquez "🚀 LANCER SCRAPING BATCH" → Toutes les popups s'ouvrent</li>
-                                <li><strong>3.</strong> Pour CHAQUE popup: F12 → Console → Collez script → Entrée</li>
-                                <li><strong>4.</strong> Fermez la popup après copie</li>
-                                <li><strong>5.</strong> Les données sont auto-sauvegardées dans Supabase</li>
-                            </ol>
-                        </div>
-
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => {
-                                    addScrapingLog('🔐 Ouverture de la page de connexion Seeking Alpha...', 'info');
-                                    window.open('https://seekingalpha.com/account/login', '_blank');
-                                    addScrapingLog('✅ Connectez-vous, puis revenez ici', 'success');
-                                }}
-                                className="flex-1 px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all font-bold text-lg shadow-lg"
-                            >
-                                🔐 SE CONNECTER À SEEKING ALPHA
-                            </button>
-                            <button
-                                onClick={runSeekingAlphaScraper}
-                                disabled={scrapingStatus === 'running'}
-                                className="flex-1 px-6 py-4 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-lg hover:from-violet-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold text-lg shadow-lg"
-                            >
-                                {scrapingStatus === 'running' ? '⏳ SCRAPING EN COURS...' : '🚀 LANCER SCRAPING BATCH'}
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* ÉTAPE 2: ANALYSE PERPLEXITY */}
-                    <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${isDarkMode
-                        ? 'bg-gradient-to-r from-pink-900/40 to-rose-900/40 border-pink-500/50'
-                        : 'bg-gradient-to-r from-pink-50 to-rose-50 border-pink-400/50'
-                        }`}>
-                        <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>
-                            <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
-                            ÉTAPE 2: ANALYSE BATCH PERPLEXITY
-                        </h3>
-
-                        <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-black/30' : 'bg-white/60'
-                            }`}>
-                            <p className={`text-sm mb-3 transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                }`}>
-                                📊 Cliquez pour analyser TOUTES les données scrapées en une seule fois:
-                            </p>
-                            <ul className={`text-sm space-y-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                }`}>
-                                <li>✓ Récupère tous les raw scrapes depuis Supabase</li>
-                                <li>✓ Analyse avec Perplexity AI en batch</li>
-                                <li>✓ Formate en JSON structuré</li>
-                                <li>✓ Sauvegarde dans seeking_alpha_analysis</li>
-                                <li>✓ Affiche les résultats dans le tableau ci-dessous</li>
-                            </ul>
-                        </div>
-
-                        <button
-                            onClick={async () => {
-                                addScrapingLog('🤖 Démarrage analyse Perplexity BATCH...', 'info');
-                                try {
-                                    // Récupérer tous les raw scrapes depuis Supabase
-                                    addScrapingLog('📥 Récupération des données depuis Supabase...', 'info');
-                                    const response = await fetch('/api/seeking-alpha-scraping?type=raw&limit=100');
-                                    const data = await response.json();
-
-                                    if (data.success && data.data && data.data.length > 0) {
-                                        addScrapingLog(`✅ ${data.data.length} raw scrapes trouvés`, 'success');
-
-                                        for (const item of data.data) {
-                                            const ticker = item.ticker;
-                                            addScrapingLog(`🔄 Analyse de ${ticker} avec Perplexity...`, 'info');
-                                            await analyzeWithPerplexityAndUpdate(ticker, {
-                                                fullText: item.raw_text,
-                                                url: item.url,
-                                                content: {}
-                                            });
-                                        }
-                                        addScrapingLog('🎉 Analyse Perplexity terminée pour TOUS les tickers!', 'success');
-                                        addScrapingLog('💾 Résultats sauvegardés dans Supabase', 'success');
-                                    } else {
-                                        addScrapingLog('⚠️ Aucune donnée trouvée dans Supabase', 'warning');
-                                        addScrapingLog('💡 Effectuez d\'abord le scraping (Étape 1)', 'info');
-                                    }
-                                } catch (error) {
-                                    addScrapingLog(`❌ Erreur: ${error.message}`, 'error');
-                                }
-                            }}
-                            className="w-full px-6 py-4 bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-lg hover:from-pink-700 hover:to-rose-700 transition-all font-bold text-lg shadow-lg"
-                        >
-                            🤖 ANALYSER TOUT AVEC PERPLEXITY ({tickers.length} tickers)
-                        </button>
-                    </div>
-
-                    {/* ÉTAPE 3: RÉSULTATS */}
-                    <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${isDarkMode
-                        ? 'bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border-emerald-500/50'
-                        : 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-400/50'
-                        }`}>
-                        <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>
-                            <Icon emoji="📊" size={20} className="mr-2 inline-block" />
-                            ÉTAPE 3: RÉSULTATS & AFFICHAGE
-                        </h3>
-
-                        <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-black/30' : 'bg-white/60'
-                            }`}>
-                            <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                }`}>
-                                Toutes les analyses apparaissent dans le tableau ci-dessous. Cliquez sur "RAFRAÎCHIR" pour recharger les dernières données depuis Supabase.
-                            </p>
-                        </div>
-
-                        <button
-                            onClick={async () => {
-                                addScrapingLog('🔄 Rafraîchissement des données depuis Supabase...', 'info');
-                                await fetchSeekingAlphaData();
-                                await fetchSeekingAlphaStockData();
-                                addScrapingLog('✅ Données rafraîchies!', 'success');
-                            }}
-                            className="w-full px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all font-bold text-lg shadow-lg"
-                        >
-                            🔄 RAFRAÎCHIR LES DONNÉES DU TABLEAU
-                        </button>
-                    </div>
-                </div>
-
-                {/* Section Logs de Scraping */}
-                {scrapingLogs.length > 0 && (
-                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
-                        ? 'bg-gray-900 border-gray-700'
-                        : 'bg-gray-50 border-gray-200'
-                        }`}>
-                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📋 Logs de Scraping</h3>
-                        <div className={`max-h-64 overflow-y-auto space-y-2 ${isDarkMode ? 'bg-gray-800' : 'bg-white'
-                            } rounded-lg p-4`}>
-                            {scrapingLogs.map((log, index) => (
-                                <div key={index} className={`text-sm p-2 rounded ${log.type === 'error' ? 'bg-red-100 text-red-800' :
-                                    log.type === 'success' ? 'bg-green-100 text-green-800' :
-                                        log.type === 'warning' ? 'bg-yellow-100 text-yellow-800' :
-                                            'bg-gray-700 text-gray-200'
-                                    }`}>
-                                    <span className="font-mono text-xs opacity-70">
-                                        {new Date(log.timestamp).toLocaleTimeString()}
-                                    </span>
-                                    <span className="ml-2">{log.message}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Section État des Connexions & Diagnostic des APIs - FUSIONNÉE */}
-                <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
-                    ? 'bg-gray-900 border-gray-700'
-                    : 'bg-gray-50 border-gray-200'
-                    }`}>
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className={`text-lg font-semibold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>🔗 État des Connexions & Diagnostic des APIs</h3>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={async () => {
-                                    await checkApiStatus();
-                                    await runHealthCheck();
-                                }}
-                                disabled={healthCheckLoading}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors duration-300 ${healthCheckLoading
-                                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                    : 'bg-gray-800 text-white hover:bg-gray-700'
-                                    }`}
-                            >
-                                {healthCheckLoading ? 'Vérification...' : '🔄 Vérifier Toutes'}
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Status Global (si healthStatus disponible) */}
-                    {healthStatus && (
-                        <div className={`p-4 rounded-lg border-2 mb-4 ${healthStatus.overall_status === 'healthy'
-                            ? 'bg-green-50 border-green-200'
-                            : healthStatus.overall_status === 'degraded'
-                                ? 'bg-yellow-50 border-yellow-200'
-                                : 'bg-red-50 border-red-200'
-                            }`}>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h4 className={`font-bold text-lg ${healthStatus.overall_status === 'healthy'
-                                        ? 'text-green-800'
-                                        : healthStatus.overall_status === 'degraded'
-                                            ? 'text-yellow-800'
-                                            : 'text-red-800'
-                                        }`}>
-                                        {healthStatus.overall_status === 'healthy' ? '🟢' :
-                                            healthStatus.overall_status === 'degraded' ? '🟡' : '🔴'}
-                                        Status Global: {healthStatus.overall_status.toUpperCase()}
-                                    </h4>
-                                    <p className={`text-sm ${healthStatus.overall_status === 'healthy'
-                                        ? 'text-green-600'
-                                        : healthStatus.overall_status === 'degraded'
-                                            ? 'text-yellow-600'
-                                            : 'text-red-600'
-                                        }`}>
-                                        {healthStatus.healthy_apis}/{healthStatus.total_apis} APIs opérationnelles
-                                        ({Math.round((healthStatus.healthy_apis / healthStatus.total_apis) * 100)}%)
-                                    </p>
-                                </div>
-                                <div className="text-right">
-                                    <p className={`text-sm font-medium ${healthStatus.overall_status === 'healthy'
-                                        ? 'text-green-600'
-                                        : healthStatus.overall_status === 'degraded'
-                                            ? 'text-yellow-600'
-                                            : 'text-red-600'
-                                        }`}>
-                                        {healthStatus.response_time_ms}ms
-                                    </p>
-                                    <p className="text-xs text-gray-500">
-                                        {new Date(healthStatus.timestamp).toLocaleTimeString('fr-FR')}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Liste détaillée des connexions */}
-                    {Object.keys(apiStatus).length > 0 && (
-                        <div className="space-y-3 mb-4">
-                            <h4 className={`text-sm font-semibold mb-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                }`}>Connexions détaillées:</h4>
-                            {Object.entries(apiStatus).map(([api, status]) => (
-                                <div key={api} className={`flex items-center justify-between p-3 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
-                                    }`}>
-                                    <div className="flex-1">
-                                        <span className={`font-mono capitalize transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                            }`}>{api}</span>
-                                        {status.error && (
-                                            <div className={`text-xs mt-1 transition-colors duration-300 ${isDarkMode ? 'text-red-400' : 'text-red-600'
-                                                }`}>
-                                                {status.error}
-                                            </div>
-                                        )}
-                                        {status.source && (
-                                            <div className={`text-xs mt-1 transition-colors duration-300 ${isDarkMode ? 'text-gray-500' : 'text-gray-500'
-                                                }`}>
-                                                Source: {status.source}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className={`w-3 h-3 rounded-full ${status.status === 'success' ? 'bg-green-500' :
-                                            status.status === 'warning' ? 'bg-yellow-500' :
-                                                status.status === 'error' ? 'bg-red-500' : 'bg-gray-500'
-                                            }`}></span>
-                                        <span className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>
-                                            {status.responseTime}ms
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* Recommandations (si healthStatus disponible) */}
-                    {healthStatus && healthStatus.recommendations && healthStatus.recommendations.length > 0 && (
-                        <div className={`p-4 rounded-lg mt-4 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-700'
-                            }`}>
-                            <h4 className={`font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-blue-900'
-                                }`}>
-                                💡 Recommandations
-                            </h4>
-                            <div className="space-y-2">
-                                {healthStatus.recommendations.map((rec, index) => (
-                                    <div key={index} className={`p-3 rounded-lg ${rec.priority === 'critical' ? 'bg-red-100 border border-red-200' :
-                                        rec.priority === 'high' ? 'bg-green-100 border border-green-200' :
-                                            'bg-yellow-100 border border-yellow-200'
-                                        }`}>
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex-1">
-                                                <p className={`font-medium text-sm ${rec.priority === 'critical' ? 'text-red-800' :
-                                                    rec.priority === 'high' ? 'text-green-800' :
-                                                        'text-yellow-800'
-                                                    }`}>
-                                                    {rec.priority === 'critical' ? '🚨' :
-                                                        rec.priority === 'high' ? '⚠️' : '💡'}
-                                                    {rec.message}
-                                                </p>
-                                                <p className="text-xs text-gray-600 mt-1">
-                                                    <strong>Action:</strong> {rec.action}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {Object.keys(apiStatus).length === 0 && !healthStatus && (
-                        <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            <p>Cliquez sur "🔄 Vérifier Toutes" pour diagnostiquer les connexions</p>
-                        </div>
-                    )}
-                </div>
-
-                {/* Section Monitoring API Emma */}
-                <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
-                    ? 'bg-gray-900 border-gray-700'
-                    : 'bg-gray-50 border-gray-200'
-                    }`}>
-                    <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>
-                        <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
-                        Monitoring Emma AI
-                    </h3>
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
-                                }`}>
-                                <div className="text-purple-600 font-medium mb-2 flex items-center gap-2">
-                                    <Icon emoji="🧠" size={18} />
-                                    Emma Agent
-                                </div>
-                                <div className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                    Status: <span className="text-green-500">✅ Opérationnel</span>
-                                </div>
-                                <div className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                    Outils: 12 disponibles
-                                </div>
-                            </div>
-                            <div className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
-                                }`}>
-                                <div className="text-blue-600 font-medium mb-2">📧 Briefings</div>
-                                <div className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                    Cron: <span className="text-green-500">✅ Actif</span>
-                                </div>
-                                <div className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                    Horaires: 7h20 • 11h50 • 16h20
-                                </div>
-                            </div>
-                            <div className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
-                                }`}>
-                                <div className="text-emerald-600 font-medium mb-2">🗄️ Supabase</div>
-                                <div className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                    Tables: 4 créées
-                                </div>
-                                <div className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                    Tickers: {teamTickers.length} team + {watchlistTickers.length} watchlist
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => {
-                                    fetch('/api/emma-agent', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({
-                                            message: 'Test de connexion Emma Agent',
-                                            context: { test: true }
-                                        })
-                                    }).then(response => response.json())
-                                        .then(data => {
-                                            if (data.success) {
-                                                showMessage('✅ Emma Agent opérationnel', 'success');
-                                            } else {
-                                                showMessage('❌ Emma Agent erreur: ' + data.error, 'error');
-                                            }
-                                        }).catch(error => {
-                                            showMessage('❌ Erreur connexion Emma Agent', 'error');
-                                        });
-                                }}
-                                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
-                            >
-                                🧪 Tester Emma Agent
-                            </button>
-                            <button
-                                onClick={() => {
-                                    fetch('/api/emma-briefing?type=morning')
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            if (data.success) {
-                                                showMessage('✅ Emma Briefing opérationnel', 'success');
-                                            } else {
-                                                showMessage('❌ Emma Briefing erreur: ' + data.error, 'error');
-                                            }
-                                        }).catch(error => {
-                                            showMessage('❌ Erreur connexion Emma Briefing', 'error');
-                                        });
-                                }}
-                                className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors"
-                            >
-                                📧 Tester Briefing
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Section Gestion des Outils Emma */}
-                <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
-                    ? 'bg-gray-900 border-gray-700'
-                    : 'bg-gray-50 border-gray-200'
-                    }`}>
-                    <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🔧 Gestion des Outils Emma</h3>
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
-                                }`}>
-                                <h4 className={`font-medium mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>
-                                    <Icon emoji="📊" size={18} className="mr-2 inline-block" />
-                                    Outils Financiers
-                                </h4>
-                                <div className="space-y-1 text-sm">
-                                    <div className={`transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Polygon Stock Price</div>
-                                    <div className={`transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• FMP Fundamentals</div>
-                                    <div className={`transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Finnhub News</div>
-                                    <div className={`transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Twelve Data Technical</div>
-                                    <div className={`transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Alpha Vantage Ratios</div>
-                                </div>
-                            </div>
-                            <div className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
-                                }`}>
-                                <h4 className={`font-medium mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>🗄️ Outils Supabase</h4>
-                                <div className="space-y-1 text-sm">
-                                    <div className={`transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Watchlist Manager</div>
-                                    <div className={`transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Team Tickers</div>
-                                    <div className={`transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Economic Calendar</div>
-                                    <div className={`transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Earnings Calendar</div>
-                                    <div className={`transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Analyst Recommendations</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => {
-                                    fetch('/api/emma-agent', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({
-                                            message: 'Afficher la configuration des outils',
-                                            context: { action: 'show_tools_config' }
-                                        })
-                                    }).then(response => response.json())
-                                        .then(data => {
-                                            if (data.success) {
-                                                showMessage('✅ Configuration des outils récupérée', 'success');
-                                                console.log('Tools Config:', data.tools_config);
-                                            } else {
-                                                showMessage('❌ Erreur récupération config', 'error');
-                                            }
-                                        }).catch(error => {
-                                            showMessage('❌ Erreur connexion', 'error');
-                                        });
-                                }}
-                                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
-                            >
-                                ⚙️ Voir Configuration
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-
-                {/* Section Configuration */}
-                <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
-                    ? 'bg-gray-900 border-gray-700'
-                    : 'bg-gray-50 border-gray-200'
-                    }`}>
-                    <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>
-                        <Icon emoji="⚙️" size={20} className="mr-2 inline-block" />
-                        Configuration
-                    </h3>
-                    <div className="space-y-4">
-                        <div>
-                            <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                }`}>
-                                Token GitHub (pour les mises à jour)
-                            </label>
-                            <input
-                                type="password"
-                                value={githubToken}
-                                onChange={(e) => setGithubToken(e.target.value)}
-                                placeholder="Entrez votre token GitHub"
-                                className={`w-full px-3 py-2 rounded-lg border transition-colors duration-300 ${isDarkMode
-                                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                                    }`}
-                            />
-                        </div>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => setShowSettings(!showSettings)}
-                                className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors"
-                            >
-                                {showSettings ? 'Masquer' : 'Afficher'} les paramètres
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-
-        // Composant onglet Plus
-        const PlusTab = () => {
-            const handleLogout = () => {
-                // Nettoyer toutes les données de session
-                sessionStorage.clear();
-                localStorage.clear();
-
-                // Rediriger vers la page de login
-                window.location.href = '/login.html';
-            };
-
-            return (
-                <div className="space-y-6">
-                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
-                        ? 'bg-gray-900 border-gray-700'
-                        : 'bg-gray-50 border-gray-200'
-                        }`}>
-                        <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>
-                            <Icon emoji="⚙️" size={24} className="mr-2 inline-block" />
-                            Paramètres
-                        </h2>
-
-                        <div className="space-y-4">
-                            <div className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode
-                                ? 'bg-gray-800 border-gray-700'
-                                : 'bg-white border-gray-200'
-                                }`}>
-                                <h3 className={`text-lg font-semibold mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>
-                                    Compte
-                                </h3>
-                                <p className={`text-sm mb-4 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                    }`}>
-                                    Gérez votre compte et vos préférences
-                                </p>
-                                <button
-                                    onClick={handleLogout}
-                                    className={`w-full px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${isDarkMode
-                                        ? 'bg-red-600 hover:bg-red-700 text-white'
-                                        : 'bg-red-500 hover:bg-red-600 text-white'
-                                        } shadow-lg hover:shadow-xl transform hover:scale-105`}
-                                >
-                                    <Icon emoji="🚪" size={20} className="mr-2 inline-block" />
-                                    Se déconnecter
-                                </button>
-                            </div>
-
-                            <div className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode
-                                ? 'bg-gray-800 border-gray-700'
-                                : 'bg-white border-gray-200'
-                                }`}>
-                                <h3 className={`text-lg font-semibold mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>
-                                    Informations
-                                </h3>
-                                <div className={`text-sm space-y-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                    }`}>
-                                    <p><strong>Version:</strong> Bêta</p>
-                                    <p><strong>Propulsé par:</strong> JSL AI</p>
-                                    <p><strong>Terminal Financier</strong> - Tous droits réservés</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
+        // COMPOSANT ADMIN-JSLAI
+        // NOTE: Le composant AdminJSLaiTab est maintenant défini dans un fichier séparé:
+        // public/js/dashboard/components/tabs/AdminJSLaiTab.js
+        // Il est chargé via <script> dans beta-combined-dashboard.html
+        // L'ancienne définition JSX a été complètement supprimée pour éviter les conflits.
+        // Utiliser window.AdminJSLaiTab à la place (voir ligne ~26487 pour le rendu)
+        // ============================================================================
 
         // Composant onglet Dan's Watchlist
         const DansWatchlistTab = () => {
@@ -17233,32 +16164,82 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </button>
                             )}
                             {/* Toggle Vue */}
-                            <div className={`flex gap-1 p-1 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'
-                                }`}>
+                            <div 
+                                className="flex gap-1 p-1 rounded-lg transition-colors duration-300"
+                                style={{ backgroundColor: 'var(--theme-surface-light)' }}
+                            >
                                 <button
                                     onClick={() => setStocksViewMode('list')}
-                                    className={`px-3 py-1 rounded text-sm font-medium transition-all duration-200 ${stocksViewMode === 'list'
-                                        ? (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white')
-                                        : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
-                                        }`}
+                                    className="px-3 py-1 rounded text-sm font-medium transition-all duration-200"
+                                style={stocksViewMode === 'list' 
+                                    ? {
+                                        backgroundColor: 'var(--theme-primary)',
+                                        color: 'var(--theme-text)'
+                                    }
+                                    : {
+                                        color: 'var(--theme-text-secondary)'
+                                    }
+                                }
+                                onMouseEnter={(e) => {
+                                    if (stocksViewMode !== 'list') {
+                                        e.currentTarget.style.color = 'var(--theme-text)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (stocksViewMode !== 'list') {
+                                        e.currentTarget.style.color = 'var(--theme-text-secondary)';
+                                    }
+                                }}
                                 >
                                     📋 Liste
                                 </button>
                                 <button
                                     onClick={() => setStocksViewMode('cards')}
-                                    className={`px-3 py-1 rounded text-sm font-medium transition-all duration-200 ${stocksViewMode === 'cards'
-                                        ? (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white')
-                                        : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
-                                        }`}
+                                    className="px-3 py-1 rounded text-sm font-medium transition-all duration-200"
+                                style={stocksViewMode === 'cards' 
+                                    ? {
+                                        backgroundColor: 'var(--theme-primary)',
+                                        color: 'var(--theme-text)'
+                                    }
+                                    : {
+                                        color: 'var(--theme-text-secondary)'
+                                    }
+                                }
+                                onMouseEnter={(e) => {
+                                    if (stocksViewMode !== 'cards') {
+                                        e.currentTarget.style.color = 'var(--theme-text)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (stocksViewMode !== 'cards') {
+                                        e.currentTarget.style.color = 'var(--theme-text-secondary)';
+                                    }
+                                }}
                                 >
                                     🎴 Cartes
                                 </button>
                                 <button
                                     onClick={() => setStocksViewMode('table')}
-                                    className={`px-3 py-1 rounded text-sm font-medium transition-all duration-200 ${stocksViewMode === 'table'
-                                        ? (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white')
-                                        : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
-                                        }`}
+                                    className="px-3 py-1 rounded text-sm font-medium transition-all duration-200"
+                                style={stocksViewMode === 'table' 
+                                    ? {
+                                        backgroundColor: 'var(--theme-primary)',
+                                        color: 'var(--theme-text)'
+                                    }
+                                    : {
+                                        color: 'var(--theme-text-secondary)'
+                                    }
+                                }
+                                onMouseEnter={(e) => {
+                                    if (stocksViewMode !== 'table') {
+                                        e.currentTarget.style.color = 'var(--theme-text)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (stocksViewMode !== 'table') {
+                                        e.currentTarget.style.color = 'var(--theme-text-secondary)';
+                                    }
+                                }}
                                 >
                                     📊 Tableau
                                 </button>
@@ -17288,11 +16269,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                     {/* Section d'ajout de ticker (uniquement pour watchlist) */}
                     {tickerSource === 'watchlist' && (
-                        <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 mt-4 ${isDarkMode
-                            ? 'bg-gray-900 border-gray-700'
-                            : 'bg-gray-50 border-gray-200'
-                            }`}>
-                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        <div 
+                            className="backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 mt-4"
+                            style={{
+                                backgroundColor: 'var(--theme-surface)',
+                                borderColor: 'var(--theme-border)'
+                            }}
+                        >
+                            <h3 className="text-lg font-semibold mb-4 transition-colors duration-300" style={{ color: 'var(--theme-text)' }}>
                                 ➕ Ajouter un Ticker
                             </h3>
                             <div className="flex gap-2">
@@ -17301,20 +16285,32 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     value={newTicker}
                                     onChange={(e) => setNewTicker(e.target.value)}
                                     placeholder="Ex: AAPL, TSLA, GOOGL..."
-                                    className={`flex-1 px-3 py-2 rounded-lg border transition-colors duration-300 ${isDarkMode
-                                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                                        }`}
+                                    className="flex-1 px-3 py-2 rounded-lg border transition-colors duration-300"
+                                    style={{
+                                        backgroundColor: 'var(--theme-surface-light)',
+                                        borderColor: 'var(--theme-border)',
+                                        color: 'var(--theme-text)'
+                                    }}
                                     onKeyPress={(e) => e.key === 'Enter' && addTickerToWatchlist()}
                                 />
                                 <button
                                     onClick={addTickerToWatchlist}
-                                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                                    className="px-4 py-2 rounded transition-colors"
+                                    style={{
+                                        backgroundColor: 'var(--theme-success)',
+                                        color: 'var(--theme-text)'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.opacity = '0.9';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.opacity = '1';
+                                    }}
                                 >
                                     ➕ Ajouter
                                 </button>
                             </div>
-                            <p className={`text-sm mt-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            <p className="text-sm mt-2 transition-colors duration-300" style={{ color: 'var(--theme-text-secondary)' }}>
                                 💡 Ces tickers ne seront visibles que dans cette watchlist personnalisée
                             </p>
                         </div>
@@ -17322,18 +16318,31 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                     {/* TOP MOVERS - Vue rapide */}
                     {displayedTickers.length > 0 && (
-                        <div className={`mt-6 p-6 rounded-xl transition-colors duration-300 ${isDarkMode
-                            ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
-                            : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
-                            }`}>
+                        <div 
+                            className="mt-6 p-6 rounded-xl transition-colors duration-300 border"
+                            style={{
+                                background: `linear-gradient(135deg, var(--theme-surface) 0%, var(--theme-surface-light) 100%)`,
+                                borderColor: 'var(--theme-border)',
+                                color: 'var(--theme-text)'
+                            }}
+                        >
                             <h3 className={`text-xl font-bold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                 <LucideIcon name="Fire" className="w-6 h-6 text-orange-500" />
                                 Top Movers du Jour
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {/* Top Gainers */}
-                                <div className={`p-3 sm:p-4 rounded-lg ${isDarkMode ? 'bg-green-500/10 border border-green-500/30' : 'bg-green-50 border border-green-200'}`}>
-                                    <h4 className={`text-base sm:text-sm font-bold mb-3 sm:mb-3 flex items-center gap-3 ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>
+                                <div 
+                                    className="p-3 sm:p-4 rounded-lg border"
+                                    style={{
+                                        backgroundColor: 'rgba(var(--theme-success-rgb, 16, 185, 129), 0.1)',
+                                        borderColor: 'rgba(var(--theme-success-rgb, 16, 185, 129), 0.3)'
+                                    }}
+                                >
+                                    <h4 
+                                        className="text-base sm:text-sm font-bold mb-3 sm:mb-3 flex items-center gap-3"
+                                        style={{ color: 'var(--theme-success)' }}
+                                    >
                                         <LucideIcon name="TrendingUp" className="w-5 h-5" />
                                         {renderMarketBadge('bull')}
                                         Top Gainers
@@ -17351,8 +16360,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             .map((item, idx) => (
                                                 <div
                                                     key={item.ticker}
-                                                    className={`flex items-start justify-between p-2 sm:p-2 rounded cursor-pointer transition-all hover:scale-[1.02] ${isDarkMode ? 'hover:bg-green-500/20' : 'hover:bg-green-100'
-                                                        }`}
+                                                    className="flex items-start justify-between p-2 sm:p-2 rounded cursor-pointer transition-all hover:scale-[1.02]"
+                                    style={{
+                                        backgroundColor: 'transparent',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'rgba(var(--theme-success-rgb, 16, 185, 129), 0.2)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
                                                     onClick={() => {
                                                         setSelectedStock(item.ticker);
                                                         setActiveTab('intellistocks');
@@ -17360,8 +16377,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 >
                                                     <div className="flex-1 min-w-0 pr-2">
                                                         <div className="flex items-center gap-2 mb-1">
-                                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${isDarkMode ? 'bg-green-500/30 text-green-300' : 'bg-green-100 text-green-700'
-                                                                }`}>
+                                                            <div 
+                                                                className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                                                                style={{
+                                                                    backgroundColor: 'rgba(var(--theme-success-rgb, 16, 185, 129), 0.3)',
+                                                                    color: 'var(--theme-success)'
+                                                                }}
+                                                            >
                                                                 {idx + 1}
                                                             </div>
                                                             <img
@@ -25084,28 +24106,98 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
         // Configuration des onglets (après déclaration de TOUS les composants)
         // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
-        const tabs = [
-            { id: 'markets-economy', label: 'Marchés & Économie', icon: 'iconoir-globe', component: MarketsEconomyTab },
+        // Configuration des onglets (sans "Plus" dans la liste principale - il sera ajouté dynamiquement)
+        // Composant de fallback pour AdminJSLaiTab
+        const AdminJSLaiTabFallback = () => <div className="p-4 text-center text-gray-500">Chargement de l'onglet Admin...</div>;
+        
+        // Composant de fallback pour GroupChatTab
+        const GroupChatTabFallback = () => <div className="p-4 text-center text-gray-500">Chargement de l'onglet RobotWeb...</div>;
+
+        const allTabs = [
+            { id: 'markets-economy', label: 'Marchés', icon: 'iconoir-globe', component: MarketsEconomyTab },
             { id: 'intellistocks', label: 'JLab™', icon: 'iconoir-flask', component: JLabUnifiedTab },
-            { id: 'ask-emma', label: 'Emma IA™', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
-            { id: 'assistant-vocal', label: 'Assistant Vocal', icon: 'iconoir-microphone', component: VoiceAssistantTab },
-            { id: 'finvox', label: 'FinVox (Live)', icon: 'iconoir-voice-circle', component: FinVoxTab },
-            { id: 'emmaia', label: 'EmmAIA (Gemini)', icon: 'iconoir-brain', component: EmmAIATab },
+            { id: 'groupchat', label: 'RobotWeb', icon: 'iconoir-robot', component: (typeof window !== 'undefined' && window.GroupChatTab) ? window.GroupChatTab : GroupChatTabFallback },
+            { id: 'ask-emma', label: 'Emma', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
+            { id: 'assistant-vocal', label: 'Assistant', icon: 'iconoir-microphone', component: VoiceAssistantTab },
+            { id: 'finvox', label: 'FinVox', icon: 'iconoir-voice-circle', component: FinVoxTab },
+            { id: 'emmaia', label: 'EmmAIA', icon: 'iconoir-brain', component: EmmAIATab },
             { id: 'fastgraphs', label: 'FastGraphs', icon: 'iconoir-graph-up', component: FastGraphsTab },
-            { id: 'plus', label: 'Plus', icon: 'iconoir-menu', component: PlusTab },
-            { id: 'admin-jsla', label: 'Admin JSLAI', icon: 'iconoir-settings', component: AdminJSLaiTab },
-            { id: 'scrapping-sa', label: 'Seeking Alpha', icon: 'iconoir-search', component: ScrappingSATab },
-            { id: 'seeking-alpha', label: 'Stocks News', icon: 'iconoir-graph-up', component: SeekingAlphaTab },
-            { id: 'email-briefings', label: 'Emma En Direct', icon: 'iconoir-antenna-signal', component: EmailBriefingsTab },
-            { id: 'investing-calendar', label: 'TESTS JS', icon: 'iconoir-calendar', component: InvestingCalendarTab },
-            { id: 'emma-config', label: 'Emma Config', icon: 'iconoir-settings', component: EmmaConfigTab }
+            { id: 'admin-jsla', label: 'Admin', icon: 'iconoir-settings', component: (typeof window !== 'undefined' && window.AdminJSLaiTab) ? window.AdminJSLaiTab : AdminJSLaiTabFallback },
+            { id: 'scrapping-sa', label: 'Seeking', icon: 'iconoir-search', component: ScrappingSATab },
+            { id: 'seeking-alpha', label: 'Stocks', icon: 'iconoir-graph-up', component: SeekingAlphaTab },
+            { id: 'email-briefings', label: 'Emma', icon: 'iconoir-antenna-signal', component: EmailBriefingsTab },
+            { id: 'investing-calendar', label: 'TESTS', icon: 'iconoir-calendar', component: InvestingCalendarTab },
+            { id: 'emma-config', label: 'Emma', icon: 'iconoir-settings', component: EmmaConfigTab }
         ];
+
+        // État pour le scroll horizontal des onglets
+        const navRef = useRef(null);
+        const tabsContainerRef = useRef(null);
+        const tabRefs = useRef({});
+        const [canScrollLeft, setCanScrollLeft] = useState(false);
+        const [canScrollRight, setCanScrollRight] = useState(false);
+
+        // Fonction pour vérifier si on peut scroller
+        const checkScrollButtons = useCallback(() => {
+            if (!tabsContainerRef.current) return;
+            const container = tabsContainerRef.current;
+            setCanScrollLeft(container.scrollLeft > 0);
+            setCanScrollRight(container.scrollLeft < container.scrollWidth - container.clientWidth - 1);
+        }, []);
+
+        // Vérifier les boutons de scroll
+        useEffect(() => {
+            checkScrollButtons();
+            const handleResize = () => {
+                setTimeout(checkScrollButtons, 100);
+            };
+            window.addEventListener('resize', handleResize);
+            return () => window.removeEventListener('resize', handleResize);
+        }, [checkScrollButtons, allTabs]);
+
+        // Fonction pour scroller vers un onglet
+        const scrollToTab = useCallback((tabId) => {
+            if (!tabsContainerRef.current) return;
+            const tabElement = tabRefs.current[tabId];
+            if (tabElement) {
+                const container = tabsContainerRef.current;
+                const tabRect = tabElement.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                const scrollLeft = container.scrollLeft + (tabRect.left - containerRect.left) - (containerRect.width / 2) + (tabRect.width / 2);
+                container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+            }
+        }, []);
+
+        // Auto-scroll vers l'onglet actif
+        useEffect(() => {
+            if (activeTab) {
+                setTimeout(() => scrollToTab(activeTab), 100);
+            }
+        }, [activeTab, scrollToTab]);
+
+        // Fonctions de navigation
+        const scrollLeft = () => {
+            if (tabsContainerRef.current) {
+                tabsContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+                setTimeout(checkScrollButtons, 300);
+            }
+        };
+
+        const scrollRight = () => {
+            if (tabsContainerRef.current) {
+                tabsContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+                setTimeout(checkScrollButtons, 300);
+            }
+        };
+
+        // Utiliser tous les onglets (plus de système visible/hidden)
+        const tabs = allTabs;
 
         return (
             <div className={`min-h-screen transition-colors duration-300 ${isDarkMode
                 ? 'bg-black'
                 : 'bg-white'
-                }`}>
+                }`} style={{ minHeight: '100vh', backgroundColor: isDarkMode ? '#000000' : '#ffffff' }}>
                 {/* Professional/Fun Mode Toggle Button */}
 
                 {/* Intro Emma IA - première visite de session */}
@@ -25587,8 +24679,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         : '0.02em',
                                                     color: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                         ? '#ffcc00'
-                                                        : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                        : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'light'
                                                         ? '#1a1a1a'
+                                                        : currentThemeId === 'desjardins'
+                                                        ? '#ffffff'
                                                         : '#ffffff',
                                                     textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
                                                         ? '0 1px 3px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 212, 255, 0.2)'
@@ -25623,8 +24717,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             ? '0 1px 4px rgba(0, 212, 255, 0.4), 0 0 12px rgba(0, 212, 255, 0.3)'
                                                             : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                             ? '0 1px 4px rgba(0, 255, 0, 0.5), 0 0 12px rgba(0, 255, 0, 0.4)'
-                                                            : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                            : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'light'
                                                             ? '0 1px 2px rgba(0, 0, 0, 0.3)'
+                                                            : currentThemeId === 'desjardins'
+                                                            ? '0 1px 3px rgba(0, 0, 0, 0.5), 0 0 8px rgba(0, 166, 81, 0.3)'
                                                             : '0 1px 4px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)',
                                                         filter: 'brightness(1.1)'
                                                     }}
@@ -25682,11 +24778,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         : '"Inter", "Arial", sans-serif',
                                                     color: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                         ? '#888888'
-                                                        : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                        : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'light'
                                                         ? '#666666'
+                                                        : currentThemeId === 'desjardins'
+                                                        ? '#e5e7eb'
                                                         : '#9ca3af',
-                                                    textShadow: currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                    textShadow: currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'light'
                                                         ? '0 1px 1px rgba(255, 255, 255, 0.5)'
+                                                        : currentThemeId === 'desjardins'
+                                                        ? '0 1px 2px rgba(0, 0, 0, 0.3)'
                                                         : '0 1px 2px rgba(0, 0, 0, 0.3)',
                                                     letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0.03em' : '0.01em'
                                                 }}
@@ -25902,6 +25002,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     <div className="h-0.5 bg-gradient-to-r from-transparent via-green-500 to-transparent"></div>
                 </header>
 
+                {/* Announcement Bars - Barres d'annonces dynamiques (Gemini-powered) */}
+                {window.AnnouncementBarManager && React.createElement(window.AnnouncementBarManager, { isDarkMode: isDarkMode })}
+
                 {/* News Ticker - Bandeau d'actualités défilant */}
                 {window.NewsTicker && React.createElement(window.NewsTicker, { isDarkMode: isDarkMode })}
 
@@ -25911,19 +25014,52 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 </div>
 
                 {/* Bottom Navigation Bar - Tous les écrans */}
-                <nav className={`fixed bottom-0 left-0 right-0 backdrop-blur-md transition-all duration-300 z-40 shadow-2xl ${isDarkMode
+                <nav 
+                    ref={navRef}
+                    className={`fixed bottom-0 left-0 right-0 backdrop-blur-md transition-all duration-300 z-40 shadow-2xl ${isDarkMode
                     ? 'bg-black/95 border-t border-green-500/20'
                     : 'bg-white/95 border-t-2 border-gray-200'
-                    } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                    <div className="flex items-center overflow-x-auto scrollbar-hide px-2 py-3 gap-1" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
-                        {tabs.map(tab => {
+                        } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                >
+                    <div className="flex items-center px-2 py-3 gap-1 relative" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
+                        {/* Bouton flèche gauche */}
+                        {canScrollLeft && (
+                            <button
+                                onClick={scrollLeft}
+                                className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 ${
+                                    isDarkMode
+                                        ? 'bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-green-400'
+                                        : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-green-600'
+                                }`}
+                                title="Défiler vers la gauche"
+                            >
+                                <i className="iconoir-arrow-left text-lg"></i>
+                            </button>
+                        )}
+
+                        {/* Conteneur scrollable des onglets */}
+                        <div
+                            ref={tabsContainerRef}
+                            onScroll={checkScrollButtons}
+                            className="flex items-center overflow-x-auto scrollbar-hide gap-1 flex-1"
+                            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                        >
+                            {(window.RolesPermissions && window.userPermissions 
+                                ? window.RolesPermissions.filterTabsByPermissions(tabs)
+                                : tabs
+                            ).map(tab => {
+                                // Rendu normal pour tous les onglets
                             const iconClass = tab.icon || getTabIcon(tab.id);
                             const isActive = activeTab === tab.id;
                             return (
                                 <button
                                     key={tab.id}
+                                    ref={el => { if (el) tabRefs.current[tab.id] = el; }}
                                     onMouseDown={withRipple}
-                                    onClick={() => handleTabChange(tab.id)}
+                                    onClick={() => {
+                                        handleTabChange(tab.id);
+                                        setTimeout(() => scrollToTab(tab.id), 100);
+                                    }}
                                     className={`flex-shrink-0 flex flex-col items-center justify-center py-2.5 px-3 min-w-[70px] btn-ripple relative transition-all duration-300 group rounded-lg ${isActive
                                         ? (isDarkMode
                                             ? 'text-green-400 bg-gradient-to-b from-green-500/20 to-green-600/10'
@@ -25985,6 +25121,22 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </button>
                             );
                         })}
+                        </div>
+
+                        {/* Bouton flèche droite */}
+                        {canScrollRight && (
+                            <button
+                                onClick={scrollRight}
+                                className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 ${
+                                    isDarkMode
+                                        ? 'bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-green-400'
+                                        : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-green-600'
+                                }`}
+                                title="Défiler vers la droite"
+                            >
+                                <i className="iconoir-arrow-right text-lg"></i>
+                            </button>
+                        )}
                     </div>
                 </nav>
 
@@ -26015,12 +25167,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 )}
 
                 {/* Contenu principal */}
-                <main className={`max-w-7xl mx-auto p-6 pb-24 transition-opacity duration-500 ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                <main className={`max-w-7xl mx-auto p-6 pb-32 transition-opacity duration-500 relative z-10 ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'
                     }`} style={{ minHeight: '500px', backgroundColor: isDarkMode ? '#000' : '#fff' }}>
                     {console.log('🎯 Active Tab:', activeTab, 'Loading Screen:', showLoadingScreen)}
                     {activeTab === 'markets-economy' && <MarketsEconomyTab />}
                     {/* {activeTab === 'yield-curve' && <YieldCurveTab />} */} {/* Intégré dans Marchés & Économie */}
                     {activeTab === 'intellistocks' && <JLabUnifiedTab />}
+                    {activeTab === 'groupchat' && window.GroupChatTab && React.createElement(window.GroupChatTab, { isDarkMode: isDarkMode })}
                     {activeTab === 'ask-emma' && <AskEmmaTab
                         prefillMessage={emmaPrefillMessage}
                         setPrefillMessage={setEmmaPrefillMessage}
@@ -26036,17 +25189,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         setShowLengthEditor={setShowLengthEditor}
                     />}
                     {activeTab === 'assistant-vocal' && <VoiceAssistantTab isDarkMode={isDarkMode} />}
-                    {activeTab === 'plus' && <PlusTab />}
-                    {activeTab === 'admin-jsla' && <AdminJSLaiTab
-                        emmaConnected={emmaConnected}
-                        setEmmaConnected={setEmmaConnected}
-                        showPromptEditor={showPromptEditor}
-                        setShowPromptEditor={setShowPromptEditor}
-                        showTemperatureEditor={showTemperatureEditor}
-                        setShowTemperatureEditor={setShowTemperatureEditor}
-                        showLengthEditor={showLengthEditor}
-                        setShowLengthEditor={setShowLengthEditor}
-                    />}
+                    {activeTab === 'plus' && window.PlusTab && React.createElement(window.PlusTab, { isDarkMode: isDarkMode, isProfessionalMode: isProfessionalMode })}
+                    {activeTab === 'admin-jsla' && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, {
+                        emmaConnected: emmaConnected,
+                        setEmmaConnected: setEmmaConnected,
+                        showPromptEditor: showPromptEditor,
+                        setShowPromptEditor: setShowPromptEditor,
+                        showTemperatureEditor: showTemperatureEditor,
+                        setShowTemperatureEditor: setShowTemperatureEditor,
+                        showLengthEditor: showLengthEditor,
+                        setShowLengthEditor: setShowLengthEditor,
+                        isDarkMode: isDarkMode
+                    })}
                     {activeTab === 'dans-watchlist' && <DansWatchlistTab />}
                     {activeTab === 'scrapping-sa' && <ScrappingSATab />}
                     {activeTab === 'email-briefings' && <EmailBriefingsTab />}
@@ -26359,6 +25513,78 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
     // Fonction fallback SUPPRIMÉE - Plus de contenu demo
 
-    ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
+    // Exposer BetaCombinedDashboard globalement pour le montage
+    window.BetaCombinedDashboard = BetaCombinedDashboard;
+
+    // Montage de l'application React avec gestion d'erreurs robuste
+    const mountApp = () => {
+        try {
+            const rootElement = document.getElementById('root');
+            if (!rootElement) {
+                console.error('❌ Élément root introuvable !');
+                document.body.innerHTML = `
+                    <div style="padding: 40px; text-align: center; background: #fee; border: 2px solid #fcc; margin: 20px; border-radius: 8px;">
+                        <h2 style="color: #c00;">⚠️ Erreur Critique</h2>
+                        <p style="color: #800;">L'élément root (#root) est introuvable dans le DOM.</p>
+                        <p style="color: #800;">Vérifiez que le HTML contient bien &lt;div id="root"&gt;&lt;/div&gt;</p>
+                    </div>
+                `;
+                return;
+            }
+
+            console.log('✅ Élément root trouvé, montage de React...');
+            console.log('📊 État du root avant montage:', rootElement.innerHTML.length, 'caractères');
+            
+            // Vérifier que React et ReactDOM sont disponibles
+            if (typeof React === 'undefined') {
+                throw new Error('React n\'est pas défini');
+            }
+            if (typeof ReactDOM === 'undefined') {
+                throw new Error('ReactDOM n\'est pas défini');
+            }
+            
+            // Utiliser BetaCombinedDashboard directement (défini dans la portée du bloc)
+            // Il est aussi exposé globalement via window.BetaCombinedDashboard
+            const DashboardComponent = BetaCombinedDashboard || window.BetaCombinedDashboard;
+            
+            if (!DashboardComponent) {
+                throw new Error('BetaCombinedDashboard n\'est pas défini. Le script Babel ne s\'est peut-être pas chargé correctement.');
+            }
+
+            console.log('✅ React, ReactDOM et BetaCombinedDashboard sont disponibles');
+            try {
+                // Utiliser ReactDOM.render (compatible avec React 18 via Babel)
+                ReactDOM.render(<DashboardComponent />, rootElement);
+                console.log('✅ Application React montée avec succès !');
+            } catch (renderError) {
+                console.error('❌ Erreur lors du ReactDOM.render:', renderError);
+                console.error('Stack:', renderError.stack);
+                throw renderError;
+            }
+            
+        } catch (error) {
+            console.error('❌ ERREUR CRITIQUE lors du montage React:', error);
+            const rootElement = document.getElementById('root') || document.body;
+            rootElement.innerHTML = `
+                <div style="padding: 40px; text-align: center; background: #fee; border: 2px solid #fcc; margin: 20px; border-radius: 8px; font-family: system-ui;">
+                    <h2 style="color: #c00; margin-bottom: 20px;">⚠️ Erreur de Chargement</h2>
+                    <p style="color: #800; margin-bottom: 10px;"><strong>Erreur:</strong> ${error.message}</p>
+                    <p style="color: #800; margin-bottom: 10px;"><strong>Stack:</strong> ${error.stack || 'N/A'}</p>
+                    <p style="color: #666; margin-top: 20px;">Veuillez rafraîchir la page ou contacter le support.</p>
+                    <button onclick="window.location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #c00; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Rafraîchir la page
+                    </button>
+                </div>
+            `;
+        }
+    };
+
+    // Attendre que le DOM soit complètement chargé
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', mountApp);
+    } else {
+        // DOM déjà chargé, monter immédiatement
+        mountApp();
+    }
 }
 
