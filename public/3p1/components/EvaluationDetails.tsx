@@ -114,10 +114,11 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                     type="checkbox"
                     checked={!assumptions.excludeEPS}
                     onChange={() => handleToggleExclusion('excludeEPS')}
-                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0"
+                    style={{ accentColor: '#2563eb' }}
                     title={assumptions.excludeEPS ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"}
                   />
-                  <span>BPA (EPS)</span>
+                  <span className="select-none">BPA (EPS)</span>
                 </div>
               </td>
               <td className={`p-3 font-semibold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"}`}>{baseValues.eps.toFixed(2)}</td>
@@ -151,10 +152,11 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                     type="checkbox"
                     checked={!assumptions.excludeCF}
                     onChange={() => handleToggleExclusion('excludeCF')}
-                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0"
+                    style={{ accentColor: '#2563eb' }}
                     title={assumptions.excludeCF ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"}
                   />
-                  <span>CFA (Cash Flow)</span>
+                  <span className="select-none">CFA (Cash Flow)</span>
                 </div>
               </td>
               <td className={`p-3 font-semibold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"}`}>{baseValues.cf.toFixed(2)}</td>
@@ -188,10 +190,11 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                     type="checkbox"
                     checked={!assumptions.excludeBV}
                     onChange={() => handleToggleExclusion('excludeBV')}
-                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0"
+                    style={{ accentColor: '#2563eb' }}
                     title={assumptions.excludeBV ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"}
                   />
-                  <span>BV (Book Value)</span>
+                  <span className="select-none">BV (Book Value)</span>
                 </div>
               </td>
               <td className={`p-3 font-semibold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"}`}>{baseValues.bv.toFixed(2)}</td>
@@ -225,10 +228,11 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                     type="checkbox"
                     checked={!assumptions.excludeDIV}
                     onChange={() => handleToggleExclusion('excludeDIV')}
-                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0"
+                    style={{ accentColor: '#2563eb' }}
                     title={assumptions.excludeDIV ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"}
                   />
-                  <span>DIV (Dividende)</span>
+                  <span className="select-none">DIV (Dividende)</span>
                 </div>
               </td>
               <td className={`p-3 font-semibold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"}`}>{baseValues.div.toFixed(2)}</td>

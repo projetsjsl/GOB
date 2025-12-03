@@ -35,6 +35,43 @@
     fetch(link.href, fetchOpts);
   }
 })();
+(function polyfill2() {
+  const relList = document.createElement("link").relList;
+  if (relList && relList.supports && relList.supports("modulepreload")) {
+    return;
+  }
+  for (const link of document.querySelectorAll('link[rel="modulepreload"]')) {
+    processPreload(link);
+  }
+  new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type !== "childList") {
+        continue;
+      }
+      for (const node of mutation.addedNodes) {
+        if (node.tagName === "LINK" && node.rel === "modulepreload")
+          processPreload(node);
+      }
+    }
+  }).observe(document, { childList: true, subtree: true });
+  function getFetchOpts(link) {
+    const fetchOpts = {};
+    if (link.integrity) fetchOpts.integrity = link.integrity;
+    if (link.referrerPolicy) fetchOpts.referrerPolicy = link.referrerPolicy;
+    if (link.crossOrigin === "use-credentials")
+      fetchOpts.credentials = "include";
+    else if (link.crossOrigin === "anonymous") fetchOpts.credentials = "omit";
+    else fetchOpts.credentials = "same-origin";
+    return fetchOpts;
+  }
+  function processPreload(link) {
+    if (link.ep)
+      return;
+    link.ep = true;
+    const fetchOpts = getFetchOpts(link);
+    fetch(link.href, fetchOpts);
+  }
+})();
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function getDefaultExportFromCjs(x2) {
   return x2 && x2.__esModule && Object.prototype.hasOwnProperty.call(x2, "default") ? x2["default"] : x2;
@@ -11348,7 +11385,7 @@ var DefaultLegendContent = /* @__PURE__ */ (function(_PureComponent) {
        * @param {Object} data Data of each legend item
        * @return {String} Path element
        */
-      function renderIcon(data) {
+      (function renderIcon(data) {
         var inactiveColor = this.props.inactiveColor;
         var halfSize = SIZE / 2;
         var sixthSize = SIZE / 6;
@@ -11397,7 +11434,7 @@ var DefaultLegendContent = /* @__PURE__ */ (function(_PureComponent) {
           sizeType: "diameter",
           type: data.type
         });
-      }
+      })
     )
     /**
      * Draw items of legend
@@ -27161,7 +27198,7 @@ var CartesianAxis = /* @__PURE__ */ (function(_Component) {
        * @param {string} letterSpacing Letterspacing to consider for tick spacing
        * @return {ReactComponent} renderedTicks
        */
-      function renderTicks(ticks2, fontSize, letterSpacing) {
+      (function renderTicks(ticks2, fontSize, letterSpacing) {
         var _this2 = this;
         var _this$props6 = this.props, tickLine = _this$props6.tickLine, stroke = _this$props6.stroke, tick = _this$props6.tick, tickFormatter = _this$props6.tickFormatter, unit2 = _this$props6.unit;
         var finalTicks = getTicks(_objectSpread$6(_objectSpread$6({}, this.props), {}, {
@@ -27198,7 +27235,7 @@ var CartesianAxis = /* @__PURE__ */ (function(_Component) {
         return /* @__PURE__ */ React.createElement("g", {
           className: "recharts-cartesian-axis-ticks"
         }, items);
-      }
+      })
     )
   }, {
     key: "render",

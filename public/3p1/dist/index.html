@@ -56,5 +56,13 @@
 </head>
   <body class="bg-gray-50 text-slate-800 antialiased">
     <div id="root"></div>
+  <!-- Redirection vers la version compilée -->
+  <script>
+    // Rediriger vers la version compilée si elle existe
+    if (window.location.pathname.includes('/3p1/index.html') && !window.location.pathname.includes('/dist/')) {
+      window.location.href = window.location.pathname.replace('/3p1/index.html', '/3p1/dist/index.html');
+    }
+  </script>
+  <!-- Fallback: charger la version compilée directement -->
 </body>
 </html>
