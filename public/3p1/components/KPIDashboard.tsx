@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { AnalysisProfile } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
 import { formatCurrency, formatPercent } from '../utils/calculations';
-import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon } from '@heroicons/react/24/outline';
 
 interface KPIDashboardProps {
   profiles: AnalysisProfile[];
