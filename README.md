@@ -33,6 +33,7 @@ Dashboard financier complet avec JLab™ (ex-JStocks™) pour le Groupe Ouellet 
 - **[Plan d'implémentation](./docs/technical/COMPLETE_IMPLEMENTATION_PLAN.md)**
 - **[Résultats des tests](./docs/technical/TEST_RESULTS.md)**
 - **[Configuration APIs](./docs/api/CONFIGURATION_CLES_API.md)**
+- **⚠️ [Répertoire des Erreurs](./docs/REPERTOIRE_COMPLET_ERREURS.md)** - **CRITIQUE**: 32+ erreurs documentées avec solutions. **À consulter avant de coder**
 
 ---
 

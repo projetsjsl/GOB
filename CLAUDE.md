@@ -219,6 +219,7 @@ These run automatically on Vercel's infrastructure.
 - `docs/technical/COMPLETE_IMPLEMENTATION_PLAN.md` - Full implementation roadmap
 - `docs/api/DOCUMENTATION_APIs.md` - API documentation and usage
 - `docs/deployment/DEPLOYMENT.md` - Deployment instructions
+- `docs/REPERTOIRE_COMPLET_ERREURS.md` - **⚠️ CRITIQUE**: Répertoire complet de 32+ erreurs rencontrées, leurs solutions et leçons apprises. **TOUJOURS CONSULTER AVANT DE CODER** pour éviter les erreurs récurrentes
 - `README.md` - Project overview
 
 ## Environment Variables (Vercel)
@@ -295,6 +296,36 @@ When editing, search for specific component functions (e.g., `JLabTab`, `Economi
 - `news_cache` table: Cached news articles (reduces API calls)
 
 Setup scripts in `supabase-*.sql` files.
+
+## ⚠️ CRITICAL: Error Prevention Reference
+
+**BEFORE CODING, ALWAYS CONSULT**: `docs/REPERTOIRE_COMPLET_ERREURS.md`
+
+This document contains 32+ documented errors with root causes, solutions, and lessons learned. It covers:
+- **Order of declaration errors** (variables used before definition)
+- **Z-index and stacking context issues** (menus hidden behind elements)
+- **Reference errors** (undefined variables, missing exports)
+- **Layout and spacing problems** (minWidth, flexbox issues)
+- **Environment variable access** (VITE_* in Babel inline)
+- **Theme system errors** (order of definition critical)
+- **And 6 more categories**
+
+**Key Patterns to Avoid**:
+1. Using variables in `useState` initializers before they're defined
+2. Not exposing components globally when loaded via `<script type="text/babel">`
+3. Using `absolute` positioning with `overflow` parents (use `fixed` instead)
+4. Hardcoding colors instead of CSS theme variables
+5. Using `import.meta.env` in Babel inline (use multi-method fallback)
+
+**Checklist Before Committing**:
+- [ ] All variables defined BEFORE use in `useState` initializers
+- [ ] All components exposed globally: `window.ComponentName = ComponentName`
+- [ ] All references protected: `typeof variable !== 'undefined'`
+- [ ] Z-index hierarchy: modals (10000+) > dropdowns (9999) > content (1-100)
+- [ ] No duplicate declarations (`useState`, functions)
+- [ ] Environment variables have multiple fallback methods
+
+See `docs/REPERTOIRE_COMPLET_ERREURS.md` for complete checklist and detailed examples.
 
 ## Important Notes
 

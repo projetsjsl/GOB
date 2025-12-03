@@ -1,0 +1,90 @@
+# Cursor Rules - GOB Dashboard
+
+## ⚠️ CRITICAL: Error Prevention
+
+**BEFORE CODING, ALWAYS CONSULT**: `docs/REPERTOIRE_COMPLET_ERREURS.md`
+
+This document contains 32+ documented errors with root causes, solutions, and lessons learned.
+
+### Most Common Errors to Avoid:
+
+1. **Order of Declaration** (40% of errors)
+   - ❌ Using variables in `useState` initializers before they're defined
+   - ✅ Define all constants/variables BEFORE `useState` if used in initializer
+
+2. **Reference Errors** (35% of errors)
+   - ❌ Variables used without `typeof` checks
+   - ❌ Components not exposed globally: `window.ComponentName = ComponentName`
+   - ✅ Always protect references: `typeof variable !== 'undefined' ? variable : defaultValue`
+
+3. **Z-Index Issues** (12% of errors)
+   - ❌ Using `absolute` positioning with parent `overflow`
+   - ✅ Use `fixed` positioning + dynamic calculation for dropdowns
+
+4. **Layout Problems** (8% of errors)
+   - ❌ `minWidth` too large reducing space for flex children
+   - ✅ Use reasonable `minWidth` (80px) + `flex-1` for flexible elements
+
+5. **Environment Variables** (5% of errors)
+   - ❌ Using `import.meta.env` in Babel inline
+   - ✅ Use multi-method fallback: `window.importMetaEnv` → meta tag → API
+
+### Checklist Before Committing:
+
+- [ ] All variables defined BEFORE use in `useState` initializers
+- [ ] All components exposed globally: `window.ComponentName = ComponentName`
+- [ ] All references protected: `typeof variable !== 'undefined'`
+- [ ] Z-index hierarchy: modals (10000+) > dropdowns (9999) > content (1-100)
+- [ ] No duplicate declarations (`useState`, functions)
+- [ ] Environment variables have multiple fallback methods
+- [ ] Fixed positioning for dropdowns with `overflow` parents
+- [ ] CSS theme variables used instead of hardcoded colors
+
+## Key Files Reference
+
+- `CLAUDE.md` - Main project guide
+- `docs/REPERTOIRE_COMPLET_ERREURS.md` - **CRITICAL**: Error reference
+- `docs/INDEX.md` - Documentation index
+- `docs/api/DOCUMENTATION_APIs.md` - API documentation
+
+## Architecture Notes
+
+- Dashboard uses Babel inline (not Vite build) - `import.meta.env` not available
+- All components loaded via `<script type="text/babel">` must be exposed: `window.ComponentName = ComponentName`
+- Theme system order is critical: `customThemes` → `defaultThemes` → `allThemes`
+- Z-index hierarchy: modals (10000+) > dropdowns (9999) > content (1-100) > background (0)
+
+## Code Patterns
+
+### Safe Variable Access
+```javascript
+const value = typeof variable !== 'undefined' ? variable : defaultValue;
+```
+
+### Component Exposure
+```javascript
+const MyComponent = () => { /* ... */ };
+window.MyComponent = MyComponent; // Required for Babel inline
+```
+
+### useState with Dependencies
+```javascript
+// Define dependencies FIRST
+const barTypes = [ /* ... */ ];
+
+// Then use in useState
+const [config, setConfig] = useState(() => {
+    barTypes.forEach(/* ... */); // ✅ barTypes is defined
+});
+```
+
+### Fixed Positioning for Dropdowns
+```javascript
+// Calculate position dynamically
+const rect = buttonRef.current.getBoundingClientRect();
+menuEl.style.left = `${rect.left}px`;
+menuEl.style.bottom = `${window.innerHeight - rect.top + 8}px`;
+```
+
+See `docs/REPERTOIRE_COMPLET_ERREURS.md` for complete examples and solutions.
+
