@@ -2,6 +2,17 @@
 
 Bienvenue dans la documentation complète du projet GOB (Groupe Ouellet Bolduc) avec JLab™.
 
+## 🚨 Documentation Critique
+
+### ⚠️ Répertoire des Erreurs
+- **[REPERTOIRE_COMPLET_ERREURS.md](./REPERTOIRE_COMPLET_ERREURS.md)** - **CRITIQUE**: Répertoire complet de 32+ erreurs rencontrées, leurs solutions et leçons apprises
+  - **Quand consulter**: Avant de coder, avant chaque commit
+  - **Contenu**: Patterns d'erreurs, solutions, checklist de prévention, templates de commentaires
+  - **Impact**: Évite les erreurs récurrentes, améliore la qualité du code
+
+### 📋 Index de Documentation
+- **[INDEX.md](./INDEX.md)** - Index centralisé de toute la documentation
+
 ## 📁 Structure de la documentation
 
 ### 🚀 [Guides Utilisateur](./user-guides/)
