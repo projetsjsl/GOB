@@ -188,16 +188,35 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     return '#dc2626'; // Rouge
   };
 
-  // Calculer les dimensions du graphique
+  // Vérifier si on a des profils
+  if (profiles.length === 0) {
+    return (
+      <div className="bg-white p-8 rounded-lg shadow border border-gray-200 text-center">
+        <h3 className="text-xl font-bold text-gray-700 mb-4">Vue KPI Dashboard</h3>
+        <p className="text-gray-500 mb-4">Aucun profil disponible pour afficher les KPI.</p>
+        <p className="text-sm text-gray-400">Ajoutez des tickers dans la sidebar de gauche pour voir les métriques.</p>
+      </div>
+    );
+  }
+
+  // Calculer les dimensions du graphique (après avoir vérifié qu'on a des profils)
   const chartWidth = 900;
   const chartHeight = 700;
   const padding = 80;
   
-  // Calculer les échelles avec marges
-  const maxJPEGY = Math.max(...filteredMetrics.map(m => m.jpegy), 5);
-  const minJPEGY = Math.min(...filteredMetrics.map(m => m.jpegy), 0);
-  const maxReturn = Math.max(...filteredMetrics.map(m => m.totalReturnPercent), 200);
-  const minReturn = Math.min(...filteredMetrics.map(m => m.totalReturnPercent), -50);
+  // Calculer les échelles avec marges (seulement si on a des métriques filtrées)
+  const maxJPEGY = filteredMetrics.length > 0 
+    ? Math.max(...filteredMetrics.map(m => m.jpegy), 5)
+    : 5;
+  const minJPEGY = filteredMetrics.length > 0
+    ? Math.min(...filteredMetrics.map(m => m.jpegy), 0)
+    : 0;
+  const maxReturn = filteredMetrics.length > 0
+    ? Math.max(...filteredMetrics.map(m => m.totalReturnPercent), 200)
+    : 200;
+  const minReturn = filteredMetrics.length > 0
+    ? Math.min(...filteredMetrics.map(m => m.totalReturnPercent), -50)
+    : -50;
   
   const xScale = (jpegy: number) => {
     const range = maxJPEGY - minJPEGY || 1;
@@ -222,17 +241,6 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   for (let i = 0; i <= yTickCount; i++) {
     const value = minReturn + (maxReturn - minReturn) * (i / yTickCount);
     yTicks.push({ value, position: yScale(value) });
-  }
-
-  // Vérifier si on a des profils
-  if (profiles.length === 0) {
-    return (
-      <div className="bg-white p-8 rounded-lg shadow border border-gray-200 text-center">
-        <h3 className="text-xl font-bold text-gray-700 mb-4">Vue KPI Dashboard</h3>
-        <p className="text-gray-500 mb-4">Aucun profil disponible pour afficher les KPI.</p>
-        <p className="text-sm text-gray-400">Ajoutez des tickers dans la sidebar de gauche pour voir les métriques.</p>
-      </div>
-    );
   }
 
   return (
