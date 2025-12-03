@@ -64,8 +64,8 @@ const AdminJSLaiTab = ({
                 const [loading, setLoading] = React.useState(false);
                 const [scrapingStatus, setScrapingStatus] = React.useState('idle');
                 const [scrapingProgress, setScrapingProgress] = React.useState(0);
-                const [cacheStatus, setCacheStatus] = React.useState('idle');
-                const [setLoadingCacheStatus] = React.useState(false);
+                const [cacheStatus, setCacheStatus] = React.useState({});
+                const [loadingCacheStatus, setLoadingCacheStatus] = React.useState(false);
                 
                 // Fonctions helper pour les actions manquantes
                 const refreshAllStocks = () => {
