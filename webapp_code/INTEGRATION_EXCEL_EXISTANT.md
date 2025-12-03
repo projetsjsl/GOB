@@ -190,3 +190,4 @@ Si vous rencontrez des difficultés d'intégration :
 2. Comparer avec la structure attendue dans `docs/EXCEL_SETUP.md`
 3. Adapter le code selon vos besoins spécifiques
 
+

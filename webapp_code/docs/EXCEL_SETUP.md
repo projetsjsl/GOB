@@ -270,3 +270,4 @@ Pour actualiser automatiquement toutes les heures :
 - Vérifier que les formules dans Weighted_Performance sont correctes
 - Actualiser le graphique : Clic droit > Actualiser
 
+

@@ -13,3 +13,4 @@ Attribute VB_Name = "JsonConverter"
 ' Ce module nécessite la bibliothèque complète VBA-JSON
 ' Téléchargez-la depuis: https://github.com/VBA-tools/VBA-JSON
 
+

@@ -109,3 +109,4 @@ curl http://localhost:5000/api/sector
 - Vérifier que la référence "Microsoft XML, v6.0" est ajoutée
 - Vérifier que JsonConverter.bas est importé
 
+

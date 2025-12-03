@@ -276,3 +276,4 @@ pm2 restart sector-index-api
 - [ ] Documentation mise à jour avec l'URL du serveur
 - [ ] Tests de connexion depuis les clients Excel
 
+
