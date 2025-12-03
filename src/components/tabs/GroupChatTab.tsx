@@ -42,6 +42,7 @@ const GroupChatTab: React.FC<TabProps> = () => {
     const [copied, setCopied] = useState(false);
     const [iframeError, setIframeError] = useState<string | null>(null);
     const [accessSafety, setAccessSafety] = useState<'token' | 'needs-token'>('token');
+    const [sessionOrigin, setSessionOrigin] = useState<string>('chatgpt.com');
 
     useEffect(() => {
         try {
@@ -65,6 +66,13 @@ const GroupChatTab: React.FC<TabProps> = () => {
 
     useEffect(() => {
         setAccessSafety(settings.sessionUrl.includes('token=') ? 'token' : 'needs-token');
+        try {
+            const url = new URL(settings.sessionUrl);
+            setSessionOrigin(url.hostname);
+        } catch (error) {
+            console.warn('URL de session invalide', error);
+            setSessionOrigin('inconnue');
+        }
     }, [settings.sessionUrl]);
 
     const handleChange = <K extends keyof ChatSessionSettings>(key: K, value: ChatSessionSettings[K]) => {
@@ -146,6 +154,9 @@ const GroupChatTab: React.FC<TabProps> = () => {
                                         Ajoutez un token pour éviter toute demande de login
                                     </span>
                                 )}
+                                <span className="px-3 py-1 rounded-full bg-gray-900 text-gray-100 border border-gray-700">
+                                    Source : {sessionOrigin === 'chatgpt.com' ? 'chatgpt.com (temps réel)' : sessionOrigin}
+                                </span>
                                 {iframeError ? (
                                     <span className="text-red-300">{iframeError}</span>
                                 ) : (
