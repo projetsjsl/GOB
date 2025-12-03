@@ -556,11 +556,12 @@ Secteur: ${metric.profile.info.sector}`}
           <h3 className="text-xl font-bold text-gray-800 mb-4">📊 Distribution des Rendements Totaux</h3>
           <div className="flex items-end justify-between gap-2 h-64 border-b border-l border-gray-300 pb-2 pl-2">
             {(() => {
+              if (filteredMetrics.length === 0) return null;
               // Créer des bins pour la distribution
               const minReturn = Math.min(...filteredMetrics.map(m => m.totalReturnPercent));
               const maxReturn = Math.max(...filteredMetrics.map(m => m.totalReturnPercent));
               const binCount = 12;
-              const binSize = (maxReturn - minReturn) / binCount;
+              const binSize = (maxReturn - minReturn) / binCount || 1;
               const bins = Array(binCount).fill(0).map((_, i) => ({
                 min: minReturn + i * binSize,
                 max: minReturn + (i + 1) * binSize,
