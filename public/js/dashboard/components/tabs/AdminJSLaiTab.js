@@ -84,10 +84,18 @@ const AdminJSLaiTab = ({
                     console.log('Fetch news clicked');
                 };
                 
-                // Fonctions helper pour le scraping
+                // États pour les logs de scraping
+                const [scrapingLogs, setScrapingLogs] = React.useState([]);
+                
+                // Fonction addScrapingLog pour ajouter aux logs
                 const addScrapingLog = (message, type = 'info') => {
+                    const log = {
+                        message,
+                        type,
+                        timestamp: new Date().toISOString()
+                    };
+                    setScrapingLogs(prev => [...prev, log]);
                     console.log(`[Scraping ${type.toUpperCase()}] ${message}`);
-                    // TODO: Implémenter l'affichage des logs dans l'UI
                 };
                 
                 const runSeekingAlphaScraper = async () => {
@@ -115,20 +123,6 @@ const AdminJSLaiTab = ({
                     addScrapingLog(`🤖 Analyse de ${ticker} avec Perplexity...`, 'info');
                     // TODO: Implémenter l'analyse Perplexity
                     return { success: true };
-                };
-                
-                // États pour les logs de scraping
-                const [scrapingLogs, setScrapingLogs] = React.useState([]);
-                
-                // Fonction addScrapingLog pour ajouter aux logs
-                const addScrapingLog = (message, type = 'info') => {
-                    const log = {
-                        message,
-                        type,
-                        timestamp: new Date().toISOString()
-                    };
-                    setScrapingLogs(prev => [...prev, log]);
-                    console.log(`[Scraping ${type.toUpperCase()}] ${message}`);
                 };
                 
                 // Fonctions helper pour les données Seeking Alpha
