@@ -151,31 +151,27 @@ function parseValueLineData(excelData) {
         }
         
         // Extraire les métriques
-        // Gérer la colonne "Price Growth Persistence" qui peut contenir les deux valeurs
-        let priceGrowth = normalizedRow.price_growth;
+        // IMPORTANT: "Price Growth Persistence" est une SEULE métrique ValueLine (note numérique 5-100)
+        // Ce n'est PAS une combinaison de "Price Growth" et "Persistence"
+        // Source: ValueLine Investment Survey - mesure la croissance persistante du prix (10 dernières années)
+        let priceGrowth = normalizedRow.price_growth; // Peut être null si pas de colonne séparée
         let persistence = normalizedRow.persistence;
         
-        // Si on a "price_growth_persistence" (colonne combinée), essayer de la séparer
-        if (normalizedRow.price_growth_persistence && !priceGrowth && !persistence) {
-            const combined = String(normalizedRow.price_growth_persistence).trim();
-            // Si c'est un nombre, c'est probablement Persistence
-            // Si c'est une lettre (A++, A+, etc.), c'est probablement Price Growth
-            if (/^[A-E][\+\+]*$/.test(combined)) {
-                priceGrowth = combined;
-            } else if (/^\d+$/.test(combined)) {
-                persistence = combined;
+        // Si on a "price_growth_persistence" (colonne ValueLine unique)
+        if (normalizedRow.price_growth_persistence && !persistence) {
+            const value = String(normalizedRow.price_growth_persistence).trim();
+            // "Price Growth Persistence" est une note numérique (5-100) = Persistence
+            // Format: nombre entre 5 et 100 (par incréments de 5)
+            if (/^\d+$/.test(value)) {
+                persistence = value;
             } else {
-                // Essayer de séparer si format "A+ 85" ou similaire
-                const parts = combined.split(/\s+/);
-                if (parts.length >= 2) {
-                    priceGrowth = parts[0];
-                    persistence = parts[1];
-                } else {
-                    // Par défaut, considérer comme Persistence si c'est un nombre
-                    persistence = combined;
-                }
+                // Si format inattendu, essayer de parser
+                persistence = value;
             }
         }
+        
+        // Note: price_growth reste null car il n'existe pas de colonne séparée dans valueline.xlsx
+        // Si vous avez une source séparée pour Price Growth (format A++, A+, etc.), elle doit être ajoutée manuellement
         
         tickers[ticker] = {
             securityRank: normalizedRow.security_rank ? String(normalizedRow.security_rank).trim() : null,
