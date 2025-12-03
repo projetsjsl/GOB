@@ -962,7 +962,7 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
                 transform={`rotate(-90, 25, ${chartHeight / 2})`}
                 className="text-sm font-bold fill-gray-800"
               >
-                Rendement Total Projeté (5 ans, %)
+                Rendement Total Projeté (5 ans, %) - Ratio 3:1
               </text>
               
               {/* Légende JPEGY */}
