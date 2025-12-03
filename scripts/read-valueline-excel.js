@@ -9,11 +9,34 @@
  * Le fichier valueline.xlsx doit être à la racine du projet
  */
 
-const XLSX = require('xlsx');
-const fs = require('fs');
-const path = require('path');
+import XLSX from 'xlsx';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const EXCEL_FILE = path.join(__dirname, '..', 'valueline.xlsx');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Chercher le fichier Excel à plusieurs emplacements possibles
+const possiblePaths = [
+    path.join(__dirname, '..', 'valueline.xlsx'), // Racine
+    path.join(__dirname, '..', 'public', '3p1', 'valueline.xlsx'), // public/3p1
+    path.join(__dirname, '..', 'valueline.xlsx') // Fallback
+];
+
+let EXCEL_FILE = null;
+for (const filePath of possiblePaths) {
+    if (fs.existsSync(filePath)) {
+        EXCEL_FILE = filePath;
+        break;
+    }
+}
+
+// Si pas trouvé, utiliser le premier chemin par défaut
+if (!EXCEL_FILE) {
+    EXCEL_FILE = possiblePaths[0];
+}
+
 const OUTPUT_SQL = path.join(__dirname, '..', 'supabase-update-valueline-data.sql');
 const OUTPUT_JS = path.join(__dirname, '..', 'scripts', 'valueline-data-generated.js');
 
@@ -84,6 +107,8 @@ function normalizeColumnName(name) {
         'security_rank': 'security_rank',
         'securityrank': 'security_rank',
         'financial_strength': 'security_rank',
+        'financial_strength_rating': 'security_rank',
+        'financialstrengthrating': 'security_rank',
         'cote_securite': 'security_rank',
         'earnings_predictability': 'earnings_predictability',
         'earningspredictability': 'earnings_predictability',
@@ -91,6 +116,8 @@ function normalizeColumnName(name) {
         'price_growth': 'price_growth',
         'pricegrowth': 'price_growth',
         'growth': 'price_growth',
+        'price_growth_persistence': 'price_growth_persistence', // Colonne combinée
+        'pricegrowthpersistence': 'price_growth_persistence',
         'persistence': 'persistence',
         'price_stability': 'price_stability',
         'pricestability': 'price_stability',
@@ -124,11 +151,37 @@ function parseValueLineData(excelData) {
         }
         
         // Extraire les métriques
+        // Gérer la colonne "Price Growth Persistence" qui peut contenir les deux valeurs
+        let priceGrowth = normalizedRow.price_growth;
+        let persistence = normalizedRow.persistence;
+        
+        // Si on a "price_growth_persistence" (colonne combinée), essayer de la séparer
+        if (normalizedRow.price_growth_persistence && !priceGrowth && !persistence) {
+            const combined = String(normalizedRow.price_growth_persistence).trim();
+            // Si c'est un nombre, c'est probablement Persistence
+            // Si c'est une lettre (A++, A+, etc.), c'est probablement Price Growth
+            if (/^[A-E][\+\+]*$/.test(combined)) {
+                priceGrowth = combined;
+            } else if (/^\d+$/.test(combined)) {
+                persistence = combined;
+            } else {
+                // Essayer de séparer si format "A+ 85" ou similaire
+                const parts = combined.split(/\s+/);
+                if (parts.length >= 2) {
+                    priceGrowth = parts[0];
+                    persistence = parts[1];
+                } else {
+                    // Par défaut, considérer comme Persistence si c'est un nombre
+                    persistence = combined;
+                }
+            }
+        }
+        
         tickers[ticker] = {
             securityRank: normalizedRow.security_rank ? String(normalizedRow.security_rank).trim() : null,
             earningsPredictability: normalizedRow.earnings_predictability ? String(normalizedRow.earnings_predictability).trim() : null,
-            priceGrowth: normalizedRow.price_growth ? String(normalizedRow.price_growth).trim() : null,
-            persistence: normalizedRow.persistence ? String(normalizedRow.persistence).trim() : null,
+            priceGrowth: priceGrowth ? String(priceGrowth).trim() : null,
+            persistence: persistence ? String(persistence).trim() : null,
             priceStability: normalizedRow.price_stability ? String(normalizedRow.price_stability).trim() : null
         };
         
@@ -286,9 +339,10 @@ function main() {
     console.log('   4. Ou utiliser le script update-tickers-valueline-metrics.js avec les données générées\n');
 }
 
-if (require.main === module) {
+// Exécuter si appelé directement
+if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith('read-valueline-excel.js')) {
     main();
 }
 
-module.exports = { readExcelFile, parseValueLineData, generateSQL, generateJS };
+export { readExcelFile, parseValueLineData, generateSQL, generateJS };
 
