@@ -91,6 +91,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
       <h3 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
         <CalculatorIcon className="w-5 h-5 text-blue-600" />
         ÉVALUATION PERSONNELLE (Projection 5 Ans)
+        <span className="text-xs font-normal text-gray-500 ml-2">(☑ = Incluse, ☐ = Exclue)</span>
       </h3>
 
       <div className="overflow-x-auto">
