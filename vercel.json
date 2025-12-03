@@ -164,8 +164,13 @@
       "permanent": false
     },
     {
+      "source": "/reee",
+      "destination": "https://jslai.app/reee",
+      "permanent": false
+    },
+    {
       "source": "/REEE",
-      "destination": "https://jslai.app/rrq",
+      "destination": "https://jslai.app/reee",
       "permanent": false
     }
   ]

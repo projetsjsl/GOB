@@ -25,16 +25,10 @@ BEGIN
         ALTER TABLE tickers ADD COLUMN earnings_predictability VARCHAR(10);
     END IF;
     
-    -- Price Growth
+    -- Price Growth Persistence (UNE SEULE métrique ValueLine - note numérique 5-100)
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                   WHERE table_name = 'tickers' AND column_name = 'price_growth') THEN
-        ALTER TABLE tickers ADD COLUMN price_growth VARCHAR(10);
-    END IF;
-    
-    -- Persistence
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                   WHERE table_name = 'tickers' AND column_name = 'persistence') THEN
-        ALTER TABLE tickers ADD COLUMN persistence VARCHAR(10);
+                   WHERE table_name = 'tickers' AND column_name = 'price_growth_persistence') THEN
+        ALTER TABLE tickers ADD COLUMN price_growth_persistence VARCHAR(10);
     END IF;
     
     -- Price Stability
@@ -63,8 +57,7 @@ CREATE INDEX IF NOT EXISTS idx_tickers_beta ON tickers(beta);
 -- Commentaires sur les colonnes
 COMMENT ON COLUMN tickers.security_rank IS 'Financial Strength (Cote de sécurité) - Source: ValueLine au 3 décembre 2025';
 COMMENT ON COLUMN tickers.earnings_predictability IS 'Earnings Predictability - Source: ValueLine au 3 décembre 2025';
-COMMENT ON COLUMN tickers.price_growth IS 'Price Growth - Source: ValueLine au 3 décembre 2025';
-COMMENT ON COLUMN tickers.persistence IS 'Persistence - Source: ValueLine au 3 décembre 2025';
+COMMENT ON COLUMN tickers.price_growth_persistence IS 'Price Growth Persistence (ValueLine) - Note numérique 5-100 mesurant la croissance persistante du prix sur 10 ans. Source: ValueLine au 3 décembre 2025';
 COMMENT ON COLUMN tickers.price_stability IS 'Price Stability - Source: ValueLine au 3 décembre 2025';
 COMMENT ON COLUMN tickers.beta IS 'Beta (volatilité relative au marché) - Source: API FMP';
 COMMENT ON COLUMN tickers.valueline_updated_at IS 'Date de dernière mise à jour des métriques ValueLine';
@@ -74,8 +67,7 @@ SELECT
     '✅ Colonnes ValueLine ajoutées' as status,
     COUNT(*) FILTER (WHERE security_rank IS NOT NULL) as tickers_with_security_rank,
     COUNT(*) FILTER (WHERE earnings_predictability IS NOT NULL) as tickers_with_earnings_predictability,
-    COUNT(*) FILTER (WHERE price_growth IS NOT NULL) as tickers_with_price_growth,
-    COUNT(*) FILTER (WHERE persistence IS NOT NULL) as tickers_with_persistence,
+    COUNT(*) FILTER (WHERE price_growth_persistence IS NOT NULL) as tickers_with_price_growth_persistence,
     COUNT(*) FILTER (WHERE price_stability IS NOT NULL) as tickers_with_price_stability,
     COUNT(*) FILTER (WHERE beta IS NOT NULL) as tickers_with_beta
 FROM tickers;

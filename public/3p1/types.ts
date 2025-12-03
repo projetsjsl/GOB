@@ -62,8 +62,7 @@ export interface CompanyInfo {
   beta?: number; // Beta (volatilité relative au marché)
   // Métriques ValueLine (Source: ValueLine au 3 décembre 2025)
   earningsPredictability?: string; // Earnings Predictability
-  priceGrowth?: string; // Price Growth
-  persistence?: string; // Persistence
+  priceGrowthPersistence?: string; // Price Growth Persistence (note numérique 5-100, mesure la croissance persistante du prix sur 10 ans)
   priceStability?: string; // Price Stability
 }
 

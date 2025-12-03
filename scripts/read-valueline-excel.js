@@ -113,12 +113,9 @@ function normalizeColumnName(name) {
         'earnings_predictability': 'earnings_predictability',
         'earningspredictability': 'earnings_predictability',
         'predictability': 'earnings_predictability',
-        'price_growth': 'price_growth',
-        'pricegrowth': 'price_growth',
-        'growth': 'price_growth',
-        'price_growth_persistence': 'price_growth_persistence', // Colonne combinée
+        'price_growth_persistence': 'price_growth_persistence', // Colonne ValueLine unique (note numérique 5-100)
         'pricegrowthpersistence': 'price_growth_persistence',
-        'persistence': 'persistence',
+        'persistence': 'price_growth_persistence', // Ancien nom (compatibilité)
         'price_stability': 'price_stability',
         'pricestability': 'price_stability',
         'stability': 'price_stability'
@@ -154,30 +151,18 @@ function parseValueLineData(excelData) {
         // IMPORTANT: "Price Growth Persistence" est une SEULE métrique ValueLine (note numérique 5-100)
         // Ce n'est PAS une combinaison de "Price Growth" et "Persistence"
         // Source: ValueLine Investment Survey - mesure la croissance persistante du prix (10 dernières années)
-        let priceGrowth = normalizedRow.price_growth; // Peut être null si pas de colonne séparée
-        let persistence = normalizedRow.persistence;
+        let priceGrowthPersistence = normalizedRow.price_growth_persistence;
         
         // Si on a "price_growth_persistence" (colonne ValueLine unique)
-        if (normalizedRow.price_growth_persistence && !persistence) {
-            const value = String(normalizedRow.price_growth_persistence).trim();
-            // "Price Growth Persistence" est une note numérique (5-100) = Persistence
-            // Format: nombre entre 5 et 100 (par incréments de 5)
-            if (/^\d+$/.test(value)) {
-                persistence = value;
-            } else {
-                // Si format inattendu, essayer de parser
-                persistence = value;
-            }
+        if (!priceGrowthPersistence) {
+            // Essayer l'ancien nom "persistence" pour compatibilité
+            priceGrowthPersistence = normalizedRow.persistence;
         }
-        
-        // Note: price_growth reste null car il n'existe pas de colonne séparée dans valueline.xlsx
-        // Si vous avez une source séparée pour Price Growth (format A++, A+, etc.), elle doit être ajoutée manuellement
         
         tickers[ticker] = {
             securityRank: normalizedRow.security_rank ? String(normalizedRow.security_rank).trim() : null,
             earningsPredictability: normalizedRow.earnings_predictability ? String(normalizedRow.earnings_predictability).trim() : null,
-            priceGrowth: priceGrowth ? String(priceGrowth).trim() : null,
-            persistence: persistence ? String(persistence).trim() : null,
+            priceGrowthPersistence: priceGrowthPersistence ? String(priceGrowthPersistence).trim() : null,
             priceStability: normalizedRow.price_stability ? String(normalizedRow.price_stability).trim() : null
         };
         
@@ -210,11 +195,8 @@ function generateSQL(tickers) {
         if (metrics.earningsPredictability) {
             setParts.push(`earnings_predictability = '${metrics.earningsPredictability.replace(/'/g, "''")}'`);
         }
-        if (metrics.priceGrowth) {
-            setParts.push(`price_growth = '${metrics.priceGrowth.replace(/'/g, "''")}'`);
-        }
-        if (metrics.persistence) {
-            setParts.push(`persistence = '${metrics.persistence.replace(/'/g, "''")}'`);
+        if (metrics.priceGrowthPersistence) {
+            setParts.push(`price_growth_persistence = '${metrics.priceGrowthPersistence.replace(/'/g, "''")}'`);
         }
         if (metrics.priceStability) {
             setParts.push(`price_stability = '${metrics.priceStability.replace(/'/g, "''")}'`);
@@ -252,8 +234,7 @@ SELECT
     ticker,
     security_rank,
     earnings_predictability,
-    price_growth,
-    persistence,
+    price_growth_persistence,
     price_stability,
     valueline_updated_at
 FROM tickers
@@ -297,23 +278,20 @@ function main() {
     const metricsCount = {
         securityRank: 0,
         earningsPredictability: 0,
-        priceGrowth: 0,
-        persistence: 0,
+        priceGrowthPersistence: 0,
         priceStability: 0
     };
     
     Object.values(tickers).forEach(ticker => {
         if (ticker.securityRank) metricsCount.securityRank++;
         if (ticker.earningsPredictability) metricsCount.earningsPredictability++;
-        if (ticker.priceGrowth) metricsCount.priceGrowth++;
-        if (ticker.persistence) metricsCount.persistence++;
+        if (ticker.priceGrowthPersistence) metricsCount.priceGrowthPersistence++;
         if (ticker.priceStability) metricsCount.priceStability++;
     });
     
     console.log(`   - Financial Strength: ${metricsCount.securityRank}`);
     console.log(`   - Earnings Predictability: ${metricsCount.earningsPredictability}`);
-    console.log(`   - Price Growth: ${metricsCount.priceGrowth}`);
-    console.log(`   - Persistence: ${metricsCount.persistence}`);
+    console.log(`   - Price Growth Persistence: ${metricsCount.priceGrowthPersistence}`);
     console.log(`   - Price Stability: ${metricsCount.priceStability}\n`);
     
     // Générer le SQL

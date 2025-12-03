@@ -1,7 +1,7 @@
 -- ============================================================================
 -- MISE À JOUR DES MÉTRIQUES VALUELINE
 -- Généré automatiquement depuis valueline.xlsx
--- Date: 2025-12-03T22:07:56.863Z
+-- Date: 2025-12-03T22:18:04.547Z
 -- ============================================================================
 -- 
 -- Ce script met à jour les métriques ValueLine pour tous les tickers
@@ -14,7 +14,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -24,7 +24,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '5',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -34,7 +34,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '5',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -44,7 +44,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '55',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -54,7 +54,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '85',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -64,7 +64,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '75',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -74,7 +74,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -84,7 +84,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '15',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -94,7 +94,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '75',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -104,7 +104,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '55',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -114,7 +114,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '50',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -124,7 +124,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '90',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -134,7 +134,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '100',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -144,7 +144,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -154,7 +154,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '65',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -164,7 +164,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -174,7 +174,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '100',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -184,7 +184,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -194,7 +194,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '35',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -204,7 +204,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -214,7 +214,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '55',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -224,7 +224,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -234,7 +234,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -244,7 +244,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -254,7 +254,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '15',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -264,7 +264,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -274,7 +274,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -284,7 +284,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -294,7 +294,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '30',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -304,7 +304,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -314,7 +314,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '50',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -324,7 +324,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -334,7 +334,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -344,7 +344,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -354,7 +354,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '65',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -364,7 +364,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -374,7 +374,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '5',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -384,7 +384,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -394,7 +394,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -404,7 +404,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '40',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -414,7 +414,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '65',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -424,7 +424,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -434,7 +434,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -444,7 +444,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -454,7 +454,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '65',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -464,7 +464,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '55',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -474,7 +474,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -484,7 +484,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '15',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -494,7 +494,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -504,7 +504,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -514,7 +514,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '40',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -524,7 +524,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '25',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -534,7 +534,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -544,7 +544,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '40',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -554,7 +554,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '45',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -564,7 +564,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -574,7 +574,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -584,7 +584,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -594,7 +594,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -604,7 +604,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '20',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -614,7 +614,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '100',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -624,7 +624,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '15',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -634,7 +634,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '85',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -644,7 +644,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '5',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -654,7 +654,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '15',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -664,7 +664,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -674,7 +674,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '15',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -684,7 +684,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -694,7 +694,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -704,7 +704,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '15',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -714,7 +714,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -724,7 +724,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -734,7 +734,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -744,7 +744,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '20',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -754,7 +754,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -764,7 +764,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -774,7 +774,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -784,7 +784,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -794,7 +794,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '25',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -804,7 +804,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -814,7 +814,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '70',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -824,7 +824,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '45',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -834,7 +834,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '35',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -844,7 +844,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '55',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -854,7 +854,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '85',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -864,7 +864,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -874,7 +874,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -884,7 +884,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '60',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -894,7 +894,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '10',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -904,7 +904,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '75',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -914,7 +914,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '45',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -924,7 +924,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -934,7 +934,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -944,7 +944,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -954,7 +954,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '55',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -964,7 +964,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '15',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -974,7 +974,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '85',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -984,7 +984,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '70',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -994,7 +994,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '100',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1004,7 +1004,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1014,7 +1014,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1024,7 +1024,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '5',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1034,7 +1034,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1044,7 +1044,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1054,7 +1054,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1064,7 +1064,7 @@ UPDATE tickers
 SET 
     security_rank = 'C+',
     earnings_predictability = '35',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1074,7 +1074,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '45',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1084,7 +1084,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '55',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1094,7 +1094,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1104,7 +1104,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1114,7 +1114,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '5',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1124,7 +1124,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1134,7 +1134,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '35',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1144,7 +1144,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1154,7 +1154,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1164,7 +1164,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1174,7 +1174,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '90',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1184,7 +1184,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1194,7 +1194,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '15',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1204,7 +1204,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '10',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1214,7 +1214,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '85',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1224,7 +1224,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '45',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1234,7 +1234,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '95',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1244,7 +1244,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1254,7 +1254,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '50',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1264,7 +1264,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1274,7 +1274,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '5',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1284,7 +1284,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '30',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1294,7 +1294,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '80',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1304,7 +1304,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '5',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1314,7 +1314,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1324,7 +1324,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '50',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1334,7 +1334,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '5',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1344,7 +1344,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1354,7 +1354,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1364,7 +1364,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '90',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1374,7 +1374,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '45',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1384,7 +1384,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1394,7 +1394,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1404,7 +1404,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1414,7 +1414,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1424,7 +1424,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '30',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1434,7 +1434,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1444,7 +1444,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1454,7 +1454,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '80',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1464,7 +1464,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '35',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1474,7 +1474,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '35',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1484,7 +1484,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1494,7 +1494,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '50',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1504,7 +1504,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '45',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1514,7 +1514,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '85',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1524,7 +1524,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1534,7 +1534,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1544,7 +1544,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1554,7 +1554,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '50',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1564,7 +1564,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1574,7 +1574,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1584,7 +1584,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '65',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1594,7 +1594,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '70',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1604,7 +1604,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '45',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1614,7 +1614,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1624,7 +1624,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1634,7 +1634,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1644,7 +1644,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '70',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1654,7 +1654,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '80',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1664,7 +1664,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1674,7 +1674,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1684,7 +1684,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1694,7 +1694,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '25',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1704,7 +1704,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1714,7 +1714,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1724,7 +1724,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '30',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1734,7 +1734,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1744,7 +1744,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '55',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1754,7 +1754,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1764,7 +1764,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '5',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1774,7 +1774,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1784,7 +1784,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1794,7 +1794,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '30',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1804,7 +1804,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1814,7 +1814,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '100',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1824,7 +1824,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1834,7 +1834,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '70',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1844,7 +1844,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '35',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1854,7 +1854,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1864,7 +1864,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1874,7 +1874,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '60',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1884,7 +1884,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '65',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1894,7 +1894,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '15',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1904,7 +1904,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '60',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1914,7 +1914,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1924,7 +1924,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1934,7 +1934,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '80',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1944,7 +1944,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1954,7 +1954,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '45',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1964,7 +1964,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1974,7 +1974,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '75',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1984,7 +1984,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '70',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -1994,7 +1994,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2004,7 +2004,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2014,7 +2014,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '70',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2024,7 +2024,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '80',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2034,7 +2034,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2044,7 +2044,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '90',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2054,7 +2054,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2064,7 +2064,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '25',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2074,7 +2074,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '5',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2084,7 +2084,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '25',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2094,7 +2094,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2104,7 +2104,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2114,7 +2114,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '70',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2124,7 +2124,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '60',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2134,7 +2134,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '15',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2144,7 +2144,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2154,7 +2154,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '100',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2164,7 +2164,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2174,7 +2174,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '85',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2184,7 +2184,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2194,7 +2194,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2204,7 +2204,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '40',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2214,7 +2214,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '25',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2224,7 +2224,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '20',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2234,7 +2234,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '25',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2244,7 +2244,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2254,7 +2254,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2264,7 +2264,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '20',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2274,7 +2274,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '85',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2284,7 +2284,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2294,7 +2294,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2304,7 +2304,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '60',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2314,7 +2314,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2324,7 +2324,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2334,7 +2334,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2344,7 +2344,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '95',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2354,7 +2354,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2364,7 +2364,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2374,7 +2374,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '20',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2384,7 +2384,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '15',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2394,7 +2394,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2404,7 +2404,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '5',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2414,7 +2414,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2424,7 +2424,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2434,7 +2434,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2444,7 +2444,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '20',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2454,7 +2454,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '65',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2464,7 +2464,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2474,7 +2474,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '40',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2484,7 +2484,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '20',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2494,7 +2494,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '25',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2504,7 +2504,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '80',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2514,7 +2514,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2524,7 +2524,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2534,7 +2534,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '45',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2544,7 +2544,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '5',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2554,7 +2554,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '55',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2564,7 +2564,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2574,7 +2574,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2584,7 +2584,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '85',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2594,7 +2594,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2604,7 +2604,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2614,7 +2614,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '70',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2624,7 +2624,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '60',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2634,7 +2634,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '10',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2644,7 +2644,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '10',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2654,7 +2654,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '60',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2664,7 +2664,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2674,7 +2674,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '70',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2684,7 +2684,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2694,7 +2694,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2704,7 +2704,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '30',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2714,7 +2714,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '30',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2724,7 +2724,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2734,7 +2734,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2744,7 +2744,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2754,7 +2754,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2764,7 +2764,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '95',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2774,7 +2774,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2784,7 +2784,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '30',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2794,7 +2794,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2804,7 +2804,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2814,7 +2814,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2824,7 +2824,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '70',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2834,7 +2834,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2844,7 +2844,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '45',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2854,7 +2854,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '50',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2864,7 +2864,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '65',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2874,7 +2874,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '40',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2884,7 +2884,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '65',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2894,7 +2894,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '70',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2904,7 +2904,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '100',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2914,7 +2914,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2924,7 +2924,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2934,7 +2934,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2944,7 +2944,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '80',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2954,7 +2954,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '20',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2964,7 +2964,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2974,7 +2974,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2984,7 +2984,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -2994,7 +2994,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3004,7 +3004,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3014,7 +3014,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '20',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3024,7 +3024,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3034,7 +3034,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '50',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3044,7 +3044,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3054,7 +3054,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '75',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3064,7 +3064,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3074,7 +3074,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '65',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3084,7 +3084,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '75',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3094,7 +3094,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '45',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3104,7 +3104,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3114,7 +3114,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3124,7 +3124,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3134,7 +3134,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3144,7 +3144,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '15',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3154,7 +3154,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '60',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3164,7 +3164,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3174,7 +3174,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3184,7 +3184,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3194,7 +3194,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3204,7 +3204,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3214,7 +3214,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '35',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3224,7 +3224,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '80',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3234,7 +3234,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3244,7 +3244,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '10',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3254,7 +3254,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3264,7 +3264,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3274,7 +3274,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '60',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3284,7 +3284,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '50',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3294,7 +3294,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3304,7 +3304,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3314,7 +3314,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3324,7 +3324,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3334,7 +3334,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '45',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3344,7 +3344,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3354,7 +3354,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3364,7 +3364,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3374,7 +3374,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3384,7 +3384,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '60',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3394,7 +3394,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3404,7 +3404,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3414,7 +3414,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '15',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3424,7 +3424,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3434,7 +3434,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3444,7 +3444,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '100',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3454,7 +3454,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3464,7 +3464,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '70',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3474,7 +3474,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3484,7 +3484,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3494,7 +3494,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3504,7 +3504,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3514,7 +3514,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3524,7 +3524,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3534,7 +3534,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '5',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3544,7 +3544,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '70',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3554,7 +3554,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3564,7 +3564,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '100',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3574,7 +3574,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3584,7 +3584,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '100',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3594,7 +3594,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3604,7 +3604,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3614,7 +3614,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3624,7 +3624,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3634,7 +3634,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3644,7 +3644,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3654,7 +3654,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3664,7 +3664,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3674,7 +3674,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3684,7 +3684,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '65',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3694,7 +3694,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3704,7 +3704,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3714,7 +3714,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3724,7 +3724,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3734,7 +3734,7 @@ UPDATE tickers
 SET 
     security_rank = 'C+',
     earnings_predictability = '25',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3744,7 +3744,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '50',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3754,7 +3754,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '15',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3764,7 +3764,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3774,7 +3774,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3784,7 +3784,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '15',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3794,7 +3794,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '25',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3804,7 +3804,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3814,7 +3814,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3824,7 +3824,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '65',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3834,7 +3834,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3844,7 +3844,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3854,7 +3854,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3864,7 +3864,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '10',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3874,7 +3874,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3884,7 +3884,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '100',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3894,7 +3894,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '40',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3904,7 +3904,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '35',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3914,7 +3914,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3924,7 +3924,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3934,7 +3934,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3944,7 +3944,7 @@ UPDATE tickers
 SET 
     security_rank = 'C++',
     earnings_predictability = '50',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3954,7 +3954,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3964,7 +3964,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '25',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3974,7 +3974,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '20',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3984,7 +3984,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -3994,7 +3994,7 @@ UPDATE tickers
 SET 
     security_rank = 'C++',
     earnings_predictability = '40',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4004,7 +4004,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4014,7 +4014,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '90',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4024,7 +4024,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4034,7 +4034,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4044,7 +4044,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '30',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4054,7 +4054,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4064,7 +4064,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4074,7 +4074,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '70',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4084,7 +4084,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4094,7 +4094,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '65',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4104,7 +4104,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4114,7 +4114,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4124,7 +4124,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '50',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4134,7 +4134,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '35',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4144,7 +4144,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '45',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4154,7 +4154,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '65',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4164,7 +4164,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '65',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4174,7 +4174,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4184,7 +4184,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '25',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4194,7 +4194,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4204,7 +4204,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '10',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4214,7 +4214,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4224,7 +4224,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4234,7 +4234,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4244,7 +4244,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4254,7 +4254,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4264,7 +4264,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '90',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4274,7 +4274,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '85',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4284,7 +4284,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '95',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4294,7 +4294,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4304,7 +4304,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4314,7 +4314,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4324,7 +4324,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '35',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4334,7 +4334,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '35',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4344,7 +4344,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '60',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4354,7 +4354,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4364,7 +4364,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '15',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4374,7 +4374,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '50',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4384,7 +4384,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4394,7 +4394,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '95',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4404,7 +4404,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4414,7 +4414,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4424,7 +4424,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '70',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4434,7 +4434,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4444,7 +4444,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4454,7 +4454,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4464,7 +4464,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '25',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4474,7 +4474,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4484,7 +4484,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '20',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4494,7 +4494,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '90',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4504,7 +4504,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '45',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4514,7 +4514,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4524,7 +4524,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '35',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4534,7 +4534,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4544,7 +4544,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '15',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4554,7 +4554,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4564,7 +4564,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4574,7 +4574,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4584,7 +4584,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '85',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4594,7 +4594,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '80',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4604,7 +4604,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4614,7 +4614,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4624,7 +4624,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4634,7 +4634,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '40',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4644,7 +4644,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4654,7 +4654,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '35',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4664,7 +4664,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4674,7 +4674,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4684,7 +4684,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4694,7 +4694,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '10',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4704,7 +4704,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4714,7 +4714,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '50',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4724,7 +4724,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '20',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4734,7 +4734,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4744,7 +4744,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4754,7 +4754,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4764,7 +4764,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '75',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4774,7 +4774,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '30',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4784,7 +4784,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4794,7 +4794,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4804,7 +4804,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '15',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4814,7 +4814,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4824,7 +4824,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '90',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4834,7 +4834,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4844,7 +4844,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '90',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4854,7 +4854,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '60',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4864,7 +4864,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '75',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4874,7 +4874,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4884,7 +4884,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4894,7 +4894,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4904,7 +4904,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '15',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4914,7 +4914,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4924,7 +4924,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '30',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4934,7 +4934,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4944,7 +4944,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4954,7 +4954,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '85',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4964,7 +4964,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4974,7 +4974,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4984,7 +4984,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -4994,7 +4994,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '55',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5004,7 +5004,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '100',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5014,7 +5014,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5024,7 +5024,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '100',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5034,7 +5034,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '70',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5044,7 +5044,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5054,7 +5054,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '95',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5064,7 +5064,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5074,7 +5074,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5084,7 +5084,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5094,7 +5094,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5104,7 +5104,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5114,7 +5114,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5124,7 +5124,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5134,7 +5134,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '60',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5144,7 +5144,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5154,7 +5154,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5164,7 +5164,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5174,7 +5174,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '55',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5184,7 +5184,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5194,7 +5194,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5204,7 +5204,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '100',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5214,7 +5214,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5224,7 +5224,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '30',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5234,7 +5234,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '25',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5244,7 +5244,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5254,7 +5254,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '60',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5264,7 +5264,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '65',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5274,7 +5274,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5284,7 +5284,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5294,7 +5294,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5304,7 +5304,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5314,7 +5314,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '25',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5324,7 +5324,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5334,7 +5334,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '55',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5344,7 +5344,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '55',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5354,7 +5354,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5364,7 +5364,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '100',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5374,7 +5374,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '10',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5384,7 +5384,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5394,7 +5394,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '65',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5404,7 +5404,7 @@ UPDATE tickers
 SET 
     security_rank = 'C++',
     earnings_predictability = '65',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5414,7 +5414,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5424,7 +5424,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5434,7 +5434,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5444,7 +5444,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5454,7 +5454,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5464,7 +5464,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '80',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5474,7 +5474,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '65',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5484,7 +5484,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '35',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5494,7 +5494,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '70',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5504,7 +5504,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '50',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5514,7 +5514,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5524,7 +5524,7 @@ UPDATE tickers
 SET 
     security_rank = 'C+',
     earnings_predictability = '10',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5534,7 +5534,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5544,7 +5544,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '10',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5554,7 +5554,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '15',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5564,7 +5564,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '40',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5574,7 +5574,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5584,7 +5584,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '30',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5594,7 +5594,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '20',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5604,7 +5604,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '15',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5614,7 +5614,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '90',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5624,7 +5624,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '65',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5634,7 +5634,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5644,7 +5644,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5654,7 +5654,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '20',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5664,7 +5664,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5674,7 +5674,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '15',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5684,7 +5684,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '30',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5694,7 +5694,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '25',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5704,7 +5704,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '85',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5714,7 +5714,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5724,7 +5724,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5734,7 +5734,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5744,7 +5744,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '5',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5754,7 +5754,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '50',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5764,7 +5764,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5774,7 +5774,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '80',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5784,7 +5784,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5794,7 +5794,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '25',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5804,7 +5804,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5814,7 +5814,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '55',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5824,7 +5824,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5834,7 +5834,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '50',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5844,7 +5844,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5854,7 +5854,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5864,7 +5864,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5874,7 +5874,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5884,7 +5884,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5894,7 +5894,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '55',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5904,7 +5904,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5914,7 +5914,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '55',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5924,7 +5924,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5934,7 +5934,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5944,7 +5944,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '5',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5954,7 +5954,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5964,7 +5964,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '30',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5974,7 +5974,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '90',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5984,7 +5984,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -5994,7 +5994,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '60',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6004,7 +6004,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6014,7 +6014,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '85',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6024,7 +6024,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '20',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6034,7 +6034,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6044,7 +6044,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6054,7 +6054,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6064,7 +6064,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '70',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6074,7 +6074,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '40',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6084,7 +6084,7 @@ UPDATE tickers
 SET 
     security_rank = 'C+',
     earnings_predictability = '5',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6094,7 +6094,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6104,7 +6104,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6114,7 +6114,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '70',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6124,7 +6124,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6134,7 +6134,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6144,7 +6144,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '100',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6154,7 +6154,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6164,7 +6164,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6174,7 +6174,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '10',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6184,7 +6184,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6194,7 +6194,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '40',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6204,7 +6204,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6214,7 +6214,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '40',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6224,7 +6224,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6234,7 +6234,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6244,7 +6244,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6254,7 +6254,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6264,7 +6264,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6274,7 +6274,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '60',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6284,7 +6284,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6294,7 +6294,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6304,7 +6304,7 @@ UPDATE tickers
 SET 
     security_rank = 'C++',
     earnings_predictability = '10',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6314,7 +6314,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '100',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6324,7 +6324,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6334,7 +6334,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '95',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6344,7 +6344,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '50',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6354,7 +6354,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '45',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6364,7 +6364,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6374,7 +6374,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '20',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6384,7 +6384,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '70',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6394,7 +6394,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6404,7 +6404,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6414,7 +6414,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '60',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6424,7 +6424,7 @@ UPDATE tickers
 SET 
     security_rank = 'C+',
     earnings_predictability = '5',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6434,7 +6434,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6444,7 +6444,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6454,7 +6454,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '20',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6464,7 +6464,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '30',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6474,7 +6474,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '5',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6484,7 +6484,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6494,7 +6494,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '55',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6504,7 +6504,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6514,7 +6514,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '30',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6524,7 +6524,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6534,7 +6534,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '50',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6544,7 +6544,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '65',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6554,7 +6554,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '40',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6564,7 +6564,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '45',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6574,7 +6574,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '70',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6584,7 +6584,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '90',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6594,7 +6594,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6604,7 +6604,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '60',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6614,7 +6614,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6624,7 +6624,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '20',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6634,7 +6634,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6644,7 +6644,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '45',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6654,7 +6654,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6664,7 +6664,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6674,7 +6674,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6684,7 +6684,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6694,7 +6694,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6704,7 +6704,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6714,7 +6714,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6724,7 +6724,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6734,7 +6734,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6744,7 +6744,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6754,7 +6754,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '45',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6764,7 +6764,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6774,7 +6774,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6784,7 +6784,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '65',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6794,7 +6794,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6804,7 +6804,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6814,7 +6814,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6824,7 +6824,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6834,7 +6834,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6844,7 +6844,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6854,7 +6854,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6864,7 +6864,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '10',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6874,7 +6874,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '10',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6884,7 +6884,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '30',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6894,7 +6894,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '55',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6904,7 +6904,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6914,7 +6914,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6924,7 +6924,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6934,7 +6934,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '20',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6944,7 +6944,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '55',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6954,7 +6954,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '15',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6964,7 +6964,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6974,7 +6974,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '45',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6984,7 +6984,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -6994,7 +6994,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '20',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7004,7 +7004,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '30',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7014,7 +7014,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7024,7 +7024,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '20',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7034,7 +7034,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7044,7 +7044,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '15',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7054,7 +7054,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '100',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7064,7 +7064,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '45',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7074,7 +7074,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7084,7 +7084,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '20',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7094,7 +7094,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7104,7 +7104,7 @@ UPDATE tickers
 SET 
     security_rank = 'C+',
     earnings_predictability = '25',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7114,7 +7114,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '20',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7124,7 +7124,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7134,7 +7134,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7144,7 +7144,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '55',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7154,7 +7154,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '35',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7164,7 +7164,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '45',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7174,7 +7174,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '100',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7184,7 +7184,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '60',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7194,7 +7194,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7204,7 +7204,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7214,7 +7214,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7224,7 +7224,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '65',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7234,7 +7234,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7244,7 +7244,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '45',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7254,7 +7254,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7264,7 +7264,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7274,7 +7274,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '45',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7284,7 +7284,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '15',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7294,7 +7294,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7304,7 +7304,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7314,7 +7314,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '80',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7324,7 +7324,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '30',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7334,7 +7334,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '75',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7344,7 +7344,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '45',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7354,7 +7354,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7364,7 +7364,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '55',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7374,7 +7374,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '35',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7384,7 +7384,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '5',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7394,7 +7394,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7404,7 +7404,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7414,7 +7414,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '55',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7424,7 +7424,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '65',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7434,7 +7434,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7444,7 +7444,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7454,7 +7454,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7464,7 +7464,7 @@ UPDATE tickers
 SET 
     security_rank = 'C+',
     earnings_predictability = '50',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7474,7 +7474,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '80',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7484,7 +7484,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '20',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7494,7 +7494,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '10',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7504,7 +7504,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7514,7 +7514,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '90',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7524,7 +7524,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '75',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7534,7 +7534,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7544,7 +7544,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '5',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7554,7 +7554,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7564,7 +7564,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7574,7 +7574,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '70',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7584,7 +7584,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '20',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7594,7 +7594,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7604,7 +7604,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '35',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7614,7 +7614,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '50',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7624,7 +7624,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7634,7 +7634,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7644,7 +7644,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '45',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7654,7 +7654,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '80',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7664,7 +7664,7 @@ UPDATE tickers
 SET 
     security_rank = 'C++',
     earnings_predictability = '20',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7674,7 +7674,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '40',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7684,7 +7684,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7694,7 +7694,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '20',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7704,7 +7704,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7714,7 +7714,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '15',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7724,7 +7724,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '45',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7734,7 +7734,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7744,7 +7744,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '10',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7754,7 +7754,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7764,7 +7764,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7774,7 +7774,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7784,7 +7784,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7794,7 +7794,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7804,7 +7804,7 @@ UPDATE tickers
 SET 
     security_rank = 'C++',
     earnings_predictability = '20',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7814,7 +7814,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7824,7 +7824,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7834,7 +7834,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7844,7 +7844,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '60',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7854,7 +7854,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7864,7 +7864,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '90',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7874,7 +7874,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '10',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7884,7 +7884,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7894,7 +7894,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '80',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7904,7 +7904,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '45',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7914,7 +7914,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7924,7 +7924,7 @@ UPDATE tickers
 SET 
     security_rank = 'C+',
     earnings_predictability = '5',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7934,7 +7934,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '25',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7944,7 +7944,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7954,7 +7954,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7964,7 +7964,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '70',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7974,7 +7974,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '70',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7984,7 +7984,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '20',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -7994,7 +7994,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '35',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8004,7 +8004,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8014,7 +8014,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8024,7 +8024,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8034,7 +8034,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '55',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8044,7 +8044,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '5',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8054,7 +8054,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8064,7 +8064,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8074,7 +8074,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '45',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8084,7 +8084,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '30',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8094,7 +8094,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '60',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8104,7 +8104,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '20',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8114,7 +8114,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8124,7 +8124,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '55',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8134,7 +8134,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8144,7 +8144,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '45',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8154,7 +8154,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '50',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8164,7 +8164,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '35',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8174,7 +8174,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '30',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8184,7 +8184,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8194,7 +8194,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '50',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8204,7 +8204,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8214,7 +8214,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '65',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8224,7 +8224,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8234,7 +8234,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8244,7 +8244,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8254,7 +8254,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '45',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8264,7 +8264,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8274,7 +8274,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '70',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8284,7 +8284,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8294,7 +8294,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8304,7 +8304,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8314,7 +8314,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8324,7 +8324,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8334,7 +8334,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8344,7 +8344,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8354,7 +8354,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8364,7 +8364,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8374,7 +8374,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8384,7 +8384,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8394,7 +8394,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8404,7 +8404,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '75',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8414,7 +8414,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '70',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8424,7 +8424,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '15',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8434,7 +8434,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '100',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8444,7 +8444,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '10',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8454,7 +8454,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '40',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8464,7 +8464,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '30',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8474,7 +8474,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8484,7 +8484,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8494,7 +8494,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8504,7 +8504,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8514,7 +8514,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8524,7 +8524,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8534,7 +8534,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8544,7 +8544,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8554,7 +8554,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '35',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8564,7 +8564,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '10',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8574,7 +8574,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '60',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8584,7 +8584,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '50',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8594,7 +8594,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8604,7 +8604,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8614,7 +8614,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '55',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8624,7 +8624,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8634,7 +8634,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '25',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8644,7 +8644,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8654,7 +8654,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8664,7 +8664,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '90',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8674,7 +8674,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8684,7 +8684,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '55',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8694,7 +8694,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8704,7 +8704,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '55',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8714,7 +8714,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '55',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8724,7 +8724,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '10',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8734,7 +8734,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '45',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8744,7 +8744,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '5',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8754,7 +8754,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8764,7 +8764,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '35',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8774,7 +8774,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8784,7 +8784,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '60',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8794,7 +8794,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '65',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8804,7 +8804,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '65',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8814,7 +8814,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8824,7 +8824,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '70',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8834,7 +8834,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '60',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8844,7 +8844,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8854,7 +8854,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '15',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8864,7 +8864,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8874,7 +8874,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8884,7 +8884,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '65',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8894,7 +8894,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8904,7 +8904,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '95',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8914,7 +8914,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '65',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8924,7 +8924,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '20',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8934,7 +8934,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8944,7 +8944,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8954,7 +8954,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '35',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8964,7 +8964,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '75',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8974,7 +8974,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8984,7 +8984,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -8994,7 +8994,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9004,7 +9004,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9014,7 +9014,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '10',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9024,7 +9024,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9034,7 +9034,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '75',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9044,7 +9044,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '15',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9054,7 +9054,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9064,7 +9064,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9074,7 +9074,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9084,7 +9084,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9094,7 +9094,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '40',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9104,7 +9104,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '75',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9114,7 +9114,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '95',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9124,7 +9124,7 @@ UPDATE tickers
 SET 
     security_rank = 'C+',
     earnings_predictability = '55',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9134,7 +9134,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '5',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9144,7 +9144,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '20',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9154,7 +9154,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9164,7 +9164,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '60',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9174,7 +9174,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9184,7 +9184,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '50',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9194,7 +9194,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '75',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9204,7 +9204,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '65',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9214,7 +9214,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '80',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9224,7 +9224,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '45',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9234,7 +9234,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9244,7 +9244,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9254,7 +9254,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9264,7 +9264,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '95',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9274,7 +9274,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '70',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9284,7 +9284,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '25',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9294,7 +9294,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '85',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9304,7 +9304,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '75',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9314,7 +9314,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '35',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9324,7 +9324,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '85',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '55',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9334,7 +9334,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '95',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9344,7 +9344,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9354,7 +9354,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9364,7 +9364,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '45',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9374,7 +9374,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9384,7 +9384,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '30',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9394,7 +9394,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '5',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9404,7 +9404,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9414,7 +9414,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9424,7 +9424,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '5',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9434,7 +9434,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '15',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9444,7 +9444,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '60',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9454,7 +9454,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '5',
+    price_growth_persistence = '5',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9464,7 +9464,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '5',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9474,7 +9474,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9484,7 +9484,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9494,7 +9494,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9504,7 +9504,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '5',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9514,7 +9514,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '5',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9524,7 +9524,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '25',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9534,7 +9534,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9544,7 +9544,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9554,7 +9554,7 @@ UPDATE tickers
 SET 
     security_rank = 'C++',
     earnings_predictability = '5',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '5',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9564,7 +9564,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '95',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9574,7 +9574,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '90',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9584,7 +9584,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9594,7 +9594,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '65',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9604,7 +9604,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '45',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9614,7 +9614,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '15',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9624,7 +9624,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '5',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9634,7 +9634,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9644,7 +9644,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '40',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9654,7 +9654,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '25',
+    price_growth_persistence = '25',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9664,7 +9664,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '75',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9674,7 +9674,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '35',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9684,7 +9684,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '15',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9694,7 +9694,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '55',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9704,7 +9704,7 @@ UPDATE tickers
 SET 
     security_rank = 'B',
     earnings_predictability = '70',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '20',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9714,7 +9714,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9724,7 +9724,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '15',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9734,7 +9734,7 @@ UPDATE tickers
 SET 
     security_rank = 'C++',
     earnings_predictability = '45',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9744,7 +9744,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9754,7 +9754,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9764,7 +9764,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9774,7 +9774,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '35',
-    persistence = '10',
+    price_growth_persistence = '10',
     price_stability = '50',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9784,7 +9784,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '10',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9794,7 +9794,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '100',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9804,7 +9804,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '50',
-    persistence = '60',
+    price_growth_persistence = '60',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9814,7 +9814,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '20',
+    price_growth_persistence = '20',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9824,7 +9824,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '65',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '60',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9834,7 +9834,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '70',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9844,7 +9844,7 @@ UPDATE tickers
 SET 
     security_rank = 'A+',
     earnings_predictability = '65',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9854,7 +9854,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9864,7 +9864,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9874,7 +9874,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '65',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '45',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9884,7 +9884,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '80',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '65',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9894,7 +9894,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '75',
-    persistence = '30',
+    price_growth_persistence = '30',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9904,7 +9904,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '90',
-    persistence = '100',
+    price_growth_persistence = '100',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9914,7 +9914,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '95',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '90',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9924,7 +9924,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '80',
+    price_growth_persistence = '80',
     price_stability = '70',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9934,7 +9934,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '30',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '85',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9944,7 +9944,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '5',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '35',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9954,7 +9954,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '65',
-    persistence = '90',
+    price_growth_persistence = '90',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9964,7 +9964,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '50',
+    price_growth_persistence = '50',
     price_stability = '95',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9974,7 +9974,7 @@ UPDATE tickers
 SET 
     security_rank = 'A++',
     earnings_predictability = '5',
-    persistence = '35',
+    price_growth_persistence = '35',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9984,7 +9984,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '50',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '25',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -9994,7 +9994,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '80',
-    persistence = '95',
+    price_growth_persistence = '95',
     price_stability = '75',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -10004,7 +10004,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '15',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '10',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -10014,7 +10014,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '95',
-    persistence = '85',
+    price_growth_persistence = '85',
     price_stability = '100',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -10024,7 +10024,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '45',
+    price_growth_persistence = '45',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -10034,7 +10034,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '55',
+    price_growth_persistence = '55',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -10044,7 +10044,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '85',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -10054,7 +10054,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '60',
-    persistence = '65',
+    price_growth_persistence = '65',
     price_stability = '40',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -10064,7 +10064,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '55',
-    persistence = '40',
+    price_growth_persistence = '40',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -10074,7 +10074,7 @@ UPDATE tickers
 SET 
     security_rank = 'B+',
     earnings_predictability = '25',
-    persistence = '15',
+    price_growth_persistence = '15',
     price_stability = '30',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -10084,7 +10084,7 @@ UPDATE tickers
 SET 
     security_rank = 'B++',
     earnings_predictability = '40',
-    persistence = '75',
+    price_growth_persistence = '75',
     price_stability = '15',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -10094,7 +10094,7 @@ UPDATE tickers
 SET 
     security_rank = 'A',
     earnings_predictability = '100',
-    persistence = '70',
+    price_growth_persistence = '70',
     price_stability = '80',
     valueline_updated_at = '2025-12-03 00:00:00+00',
     updated_at = NOW()
@@ -10103,29 +10103,14 @@ WHERE ticker = 'ZTS';
 -- ============================================================================
 -- VÉRIFICATION
 -- ============================================================================
--- Note: price_growth sera NULL (normal, pas de colonne séparée dans Excel)
--- "Price Growth Persistence" est UNE SEULE métrique → va dans "persistence"
-
 SELECT 
     ticker,
     security_rank,
     earnings_predictability,
-    persistence,  -- ← Contient "Price Growth Persistence" (note numérique 5-100)
+    price_growth,
+    persistence,
     price_stability,
-    price_growth,  -- ← Sera NULL (normal, pas de données disponibles)
     valueline_updated_at
 FROM tickers
 WHERE valueline_updated_at IS NOT NULL
-ORDER BY ticker
-LIMIT 20;  -- Afficher les 20 premiers pour vérification
-
--- Statistiques de mise à jour
-SELECT 
-    COUNT(*) as total_tickers,
-    COUNT(security_rank) as avec_security_rank,
-    COUNT(earnings_predictability) as avec_earnings_predictability,
-    COUNT(persistence) as avec_persistence,  -- Devrait être ~1009
-    COUNT(price_stability) as avec_price_stability,
-    COUNT(price_growth) as avec_price_growth  -- Devrait être 0 (normal)
-FROM tickers
-WHERE valueline_updated_at IS NOT NULL;
+ORDER BY ticker;

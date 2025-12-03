@@ -200,8 +200,7 @@ export default function App() {
                                 preferredSymbol: supabaseTicker.ticker,
                                 // Métriques ValueLine (Source: ValueLine au 3 décembre 2025)
                                 earningsPredictability: supabaseTicker.earnings_predictability,
-                                priceGrowth: supabaseTicker.price_growth,
-                                persistence: supabaseTicker.persistence,
+                                priceGrowthPersistence: supabaseTicker.price_growth_persistence,
                                 priceStability: supabaseTicker.price_stability,
                                 beta: supabaseTicker.beta // Beta récupéré via API FMP
                             },
@@ -458,8 +457,7 @@ export default function App() {
                 const preservedValueLineMetrics = {
                     securityRank: existingProfile?.info?.securityRank || result.info.securityRank || 'N/A',
                     earningsPredictability: existingProfile?.info?.earningsPredictability || result.info.earningsPredictability,
-                    priceGrowth: existingProfile?.info?.priceGrowth || result.info.priceGrowth,
-                    persistence: existingProfile?.info?.persistence || result.info.persistence,
+                    priceGrowthPersistence: existingProfile?.info?.priceGrowthPersistence || result.info.priceGrowthPersistence,
                     priceStability: existingProfile?.info?.priceStability || result.info.priceStability
                 };
                 
@@ -1468,17 +1466,10 @@ export default function App() {
                                                     <div className="text-[10px] text-slate-500 mt-1">ValueLine 3 déc 2025</div>
                                                 </div>
                                             )}
-                                            {info.priceGrowth && (
+                                            {info.priceGrowthPersistence && (
                                                 <div className="bg-slate-700/50 p-3 rounded">
-                                                    <div className="text-xs text-slate-400 uppercase">Price Growth</div>
-                                                    <div className="text-2xl font-bold text-indigo-400">{info.priceGrowth}</div>
-                                                    <div className="text-[10px] text-slate-500 mt-1">ValueLine 3 déc 2025</div>
-                                                </div>
-                                            )}
-                                            {info.persistence && (
-                                                <div className="bg-slate-700/50 p-3 rounded">
-                                                    <div className="text-xs text-slate-400 uppercase">Persistence</div>
-                                                    <div className="text-2xl font-bold text-pink-400">{info.persistence}</div>
+                                                    <div className="text-xs text-slate-400 uppercase">Price Growth Persistence</div>
+                                                    <div className="text-2xl font-bold text-pink-400">{info.priceGrowthPersistence}</div>
                                                     <div className="text-[10px] text-slate-500 mt-1">ValueLine 3 déc 2025</div>
                                                 </div>
                                             )}
@@ -1559,16 +1550,6 @@ export default function App() {
                                                     type="text"
                                                     value={info.priceGrowth || ''}
                                                     onChange={(e) => handleUpdateInfo('priceGrowth', e.target.value)}
-                                                    className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
-                                                    placeholder="A++, A+, A, etc."
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-xs text-gray-500 mb-1">Persistence (ValueLine 3 déc 2025)</label>
-                                                <input
-                                                    type="text"
-                                                    value={info.persistence || ''}
-                                                    onChange={(e) => handleUpdateInfo('persistence', e.target.value)}
                                                     className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
                                                     placeholder="A++, A+, A, etc."
                                                 />

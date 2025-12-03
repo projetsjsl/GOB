@@ -185,17 +185,10 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="text-[9px] text-gray-500 block mt-0.5">ValueLine 3 déc 2025</span>
             </div>
           )}
-          {info.priceGrowth && (
+          {info.priceGrowthPersistence && (
             <div className="bg-gray-100 px-3 py-1 rounded text-center">
-              <span className="font-semibold text-gray-600 block text-xs">PRICE GROWTH</span>
-              <span className="font-bold text-indigo-600">{info.priceGrowth}</span>
-              <span className="text-[9px] text-gray-500 block mt-0.5">ValueLine 3 déc 2025</span>
-            </div>
-          )}
-          {info.persistence && (
-            <div className="bg-gray-100 px-3 py-1 rounded text-center">
-              <span className="font-semibold text-gray-600 block text-xs">PERSISTENCE</span>
-              <span className="font-bold text-pink-600">{info.persistence}</span>
+              <span className="font-semibold text-gray-600 block text-xs">PRICE GROWTH PERSISTENCE</span>
+              <span className="font-bold text-pink-600">{info.priceGrowthPersistence}</span>
               <span className="text-[9px] text-gray-500 block mt-0.5">ValueLine 3 déc 2025</span>
             </div>
           )}
