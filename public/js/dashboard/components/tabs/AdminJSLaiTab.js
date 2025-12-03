@@ -18,7 +18,7 @@ const AdminJSLaiTab = ({
                 const darkMode = isDarkMode !== undefined ? isDarkMode : true;
                 
                 // États pour la gestion des indices TradingView
-                const [adminSelectedIndices, setAdminSelectedIndices] = (typeof React !== 'undefined' && React.useState) ? React.useState(() => {
+                const [adminSelectedIndices, setAdminSelectedIndices] = React.useState(() => {
                     try {
                         const saved = localStorage.getItem('tradingview-selected-indices');
                         if (saved) {
@@ -41,6 +41,42 @@ const AdminJSLaiTab = ({
                 
                 const [showIndicesManager, setShowIndicesManager] = React.useState(false);
                 
+                // États locaux pour les variables manquantes
+                const [githubToken, setGithubToken] = React.useState(() => {
+                    try {
+                        return localStorage.getItem('github-token') || '';
+                    } catch (e) {
+                        return '';
+                    }
+                });
+                const [showSettings, setShowSettings] = React.useState(false);
+                const [loadingCacheStatus, setLoadingCacheStatus] = React.useState(false);
+                const [systemLogs] = React.useState([]);
+                const [isProfessionalMode, setIsProfessionalMode] = React.useState(() => {
+                    try {
+                        return typeof window !== 'undefined' && typeof window.ProfessionalModeSystem !== 'undefined' 
+                            ? window.ProfessionalModeSystem.isEnabled() 
+                            : false;
+                    } catch (e) {
+                        return false;
+                    }
+                });
+                const [loading, setLoading] = React.useState(false);
+                const [scrapingStatus, setScrapingStatus] = React.useState('idle');
+                const [scrapingProgress, setScrapingProgress] = React.useState(0);
+                
+                // Fonctions helper pour les actions manquantes
+                const refreshAllStocks = () => {
+                    setLoading(true);
+                    // TODO: Implémenter l'actualisation des stocks
+                    setTimeout(() => setLoading(false), 1000);
+                };
+                
+                const fetchNews = () => {
+                    // TODO: Implémenter la récupération des nouvelles
+                    console.log('Fetch news clicked');
+                };
+                
                 // Fonction helper pour obtenir tous les indices disponibles
                 const getAllIndices = () => {
                     if (typeof window !== 'undefined' && typeof window.getAllAvailableIndices === 'function') {
@@ -55,6 +91,17 @@ const AdminJSLaiTab = ({
                         ]
                     };
                 };
+                
+                // Sauvegarder githubToken dans localStorage quand il change
+                React.useEffect(() => {
+                    if (githubToken) {
+                        try {
+                            localStorage.setItem('github-token', githubToken);
+                        } catch (e) {
+                            console.warn('Erreur sauvegarde token:', e);
+                        }
+                    }
+                }, [githubToken]);
                 
                 return (
                 <div className="space-y-6">
@@ -81,13 +128,13 @@ const AdminJSLaiTab = ({
                                     Stock Data
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Tickers: {typeof tickers !== 'undefined' ? tickers.length : 0} ({typeof tickers !== 'undefined' ? tickers.join(', ') : 'N/A'})
+                                    Tickers: N/A
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Données chargées: {typeof stockData !== 'undefined' ? Object.keys(stockData).length : 0}
+                                    Données chargées: 0
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Dernière MAJ: {typeof lastUpdate !== 'undefined' && lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Jamais'}
+                                    Dernière MAJ: Jamais
                                 </div>
                             </div>
                             <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
@@ -96,7 +143,7 @@ const AdminJSLaiTab = ({
                                     News Data
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Articles: {typeof newsData !== 'undefined' ? newsData.length : 0}
+                                    Articles: 0
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Premier article: {typeof newsData !== 'undefined' && newsData[0]?.title ? newsData[0].title.substring(0, 30) : 'Aucun'}...
