@@ -338,7 +338,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       </div>
 
       {/* 5 Autres Idées de Visualisation */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {filteredMetrics.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Idée 1: Heatmap de Secteurs */}
         <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
           <h3 className="text-lg font-bold mb-4">🔥 Heatmap par Secteur</h3>
@@ -471,8 +472,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             </div>
           </div>
         </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Tableau détaillé */}
       <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
