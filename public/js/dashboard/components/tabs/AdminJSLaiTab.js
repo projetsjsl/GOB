@@ -1637,11 +1637,17 @@ const AdminJSLaiTab = ({
                                 Les barres peuvent être fermées par les utilisateurs (X) et se rafraîchissent automatiquement.
                             </p>
                             {(() => {
+                                // ============================================
+                                // ÉTAPE 1: Récupérer la configuration sauvegardée
+                                // ============================================
                                 const config = typeof window.getAnnouncementBarsConfig === 'function' 
                                     ? window.getAnnouncementBarsConfig() 
                                     : {};
                                 
-                                // Prompts par défaut
+                                // ============================================
+                                // ÉTAPE 2: Définir les prompts par défaut
+                                // ============================================
+                                // Ces prompts sont utilisés si aucun prompt personnalisé n'est configuré
                                 const defaultPrompts = {
                                     'news': 'Utilise Google Search pour trouver la principale actualité financière de l\'heure. Génère un message court (max 80 caractères) pour une barre d\'annonce en haut de page. Format: "📰 [Titre accrocheur]"',
                                     'update': 'Génère un message de mise à jour système court (max 80 caractères) pour une barre d\'annonce. Format: "🆕 [Message de mise à jour]"',
@@ -1650,27 +1656,11 @@ const AdminJSLaiTab = ({
                                     'promotion': 'Génère un message promotionnel court (max 80 caractères) pour services premium. Format: "🎁 [Offre]"'
                                 };
                                 
-                                const [editingBar, setEditingBar] = React.useState(null);
-                                const [barConfigs, setBarConfigs] = React.useState(() => {
-                                    const saved = { ...config };
-                                    // Initialiser avec les valeurs par défaut si manquantes
-                                    barTypes.forEach(({ key, type }) => {
-                                        if (!saved[key]) {
-                                            saved[key] = { enabled: false, type: type, section: 'top', design: 'default' };
-                                        }
-                                        const barConfig = saved[key];
-                                        if (!barConfig.prompt) {
-                                            barConfig.prompt = defaultPrompts[type] || '';
-                                        }
-                                        if (barConfig.temperature === undefined) barConfig.temperature = 0.7;
-                                        if (barConfig.maxOutputTokens === undefined) barConfig.maxOutputTokens = 150;
-                                        if (barConfig.useGoogleSearch === undefined) {
-                                            barConfig.useGoogleSearch = ['news', 'event', 'market-alert'].includes(type);
-                                        }
-                                    });
-                                    return saved;
-                                });
-                                
+                                // ============================================
+                                // ÉTAPE 3: Définir les types de barres
+                                // ============================================
+                                // ⚠️ IMPORTANT: Définir barTypes AVANT useState pour éviter l'erreur "Cannot read properties of undefined"
+                                // Cette erreur se produit quand on utilise une variable avant qu'elle soit déclarée
                                 const barTypes = [
                                     { key: 'news-top', label: 'Actualités Financières', emoji: '📰', description: 'Actualités importantes de l\'heure', type: 'news' },
                                     { key: 'update-top', label: 'Mises à Jour Système', emoji: '🆕', description: 'Nouvelles fonctionnalités et améliorations', type: 'update' },
@@ -1679,7 +1669,53 @@ const AdminJSLaiTab = ({
                                     { key: 'promotion-top', label: 'Promotions', emoji: '🎁', description: 'Offres sur services premium', type: 'promotion' }
                                 ];
                                 
+                                // ============================================
+                                // ÉTAPE 4: Initialiser les états React
+                                // ============================================
+                                // État pour gérer quelle barre est en cours d'édition
+                                const [editingBar, setEditingBar] = React.useState(null);
+                                
+                                // État pour stocker la configuration de toutes les barres
+                                // ⚠️ IMPORTANT: barTypes doit être défini AVANT cette ligne car on l'utilise dans l'initialisation
+                                const [barConfigs, setBarConfigs] = React.useState(() => {
+                                    // Créer une copie de la config sauvegardée pour éviter les mutations
+                                    const saved = { ...config };
+                                    
+                                    // Initialiser avec les valeurs par défaut si manquantes
+                                    // On peut maintenant utiliser barTypes car il est défini ci-dessus
+                                    barTypes.forEach(({ key, type }) => {
+                                        // Si la barre n'existe pas dans la config, la créer avec des valeurs par défaut
+                                        if (!saved[key]) {
+                                            saved[key] = { enabled: false, type: type, section: 'top', design: 'default' };
+                                        }
+                                        
+                                        const barConfig = saved[key];
+                                        
+                                        // Initialiser le prompt si manquant
+                                        if (!barConfig.prompt) {
+                                            barConfig.prompt = defaultPrompts[type] || '';
+                                        }
+                                        
+                                        // Initialiser les paramètres Gemini si manquants
+                                        if (barConfig.temperature === undefined) barConfig.temperature = 0.7;
+                                        if (barConfig.maxOutputTokens === undefined) barConfig.maxOutputTokens = 150;
+                                        
+                                        // Activer Google Search par défaut pour les types qui en ont besoin
+                                        if (barConfig.useGoogleSearch === undefined) {
+                                            barConfig.useGoogleSearch = ['news', 'event', 'market-alert'].includes(type);
+                                        }
+                                    });
+                                    
+                                    return saved;
+                                });
+                                
+                                // ============================================
+                                // ÉTAPE 5: Fonction pour sauvegarder la configuration
+                                // ============================================
+                                // Cette fonction met à jour la config d'une barre spécifique
+                                // et sauvegarde dans localStorage sans recharger la page
                                 const saveBarConfig = (key, updates) => {
+                                    // Créer une nouvelle config en fusionnant les updates
                                     const newConfig = {
                                         ...barConfigs,
                                         [key]: {
@@ -1687,8 +1723,12 @@ const AdminJSLaiTab = ({
                                             ...updates
                                         }
                                     };
+                                    
+                                    // Mettre à jour l'état React
                                     setBarConfigs(newConfig);
-                                    // Sauvegarder sans recharger la page
+                                    
+                                    // Sauvegarder dans localStorage pour persister les changements
+                                    // ⚠️ IMPORTANT: On ne recharge PAS la page ici pour une meilleure UX
                                     try {
                                         localStorage.setItem('announcement-bars-config', JSON.stringify(newConfig));
                                     } catch (e) {
