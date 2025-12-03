@@ -191,13 +191,19 @@ export default function App() {
                                 symbol: tickerSymbol,
                                 name: supabaseTicker.company_name || 'Chargement...',
                                 sector: supabaseTicker.sector || '',
-                                securityRank: 'N/A',
+                                securityRank: supabaseTicker.security_rank || 'N/A',
                                 marketCap: '-',
                                 logo: undefined,
                                 country: undefined,
                                 exchange: undefined,
-                                currency: 'USD',
-                                preferredSymbol: undefined
+                                currency: supabaseTicker.currency || 'USD',
+                                preferredSymbol: supabaseTicker.ticker,
+                                // Métriques ValueLine (Source: ValueLine au 3 décembre 2025)
+                                earningsPredictability: supabaseTicker.earnings_predictability,
+                                priceGrowth: supabaseTicker.price_growth,
+                                persistence: supabaseTicker.persistence,
+                                priceStability: supabaseTicker.price_stability,
+                                beta: supabaseTicker.beta // Beta récupéré via API FMP
                             },
                             notes: '',
                             isWatchlist
@@ -445,10 +451,25 @@ export default function App() {
                 setData(result.data);
             }
 
-            // Update Info (including logo)
+            // Update Info (including logo and beta, but preserve ValueLine metrics)
             if (result.info) {
-                setInfo(prev => ({ ...prev, ...result.info }));
-                // Also update in library to persist logo
+                // Préserver les métriques ValueLine existantes si elles ne sont pas dans result.info
+                const existingProfile = library[activeId];
+                const preservedValueLineMetrics = {
+                    securityRank: existingProfile?.info?.securityRank || result.info.securityRank || 'N/A',
+                    earningsPredictability: existingProfile?.info?.earningsPredictability || result.info.earningsPredictability,
+                    priceGrowth: existingProfile?.info?.priceGrowth || result.info.priceGrowth,
+                    persistence: existingProfile?.info?.persistence || result.info.persistence,
+                    priceStability: existingProfile?.info?.priceStability || result.info.priceStability
+                };
+                
+                const updatedInfo = {
+                    ...result.info,
+                    ...preservedValueLineMetrics // Préserver les métriques ValueLine
+                };
+                
+                setInfo(updatedInfo);
+                // Also update in library to persist logo and beta
                 setLibrary(prev => {
                     const profile = prev[activeId];
                     if (!profile) return prev;
@@ -456,7 +477,7 @@ export default function App() {
                         ...prev,
                         [activeId]: {
                             ...profile,
-                            info: { ...profile.info, ...result.info }
+                            info: { ...profile.info, ...updatedInfo }
                         }
                     };
                 });
