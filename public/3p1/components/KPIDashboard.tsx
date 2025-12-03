@@ -537,6 +537,56 @@ Secteur: ${metric.profile.info.sector}`}
         )}
       </div>
 
+      {/* Graphique de Distribution des Rendements */}
+      {filteredMetrics.length > 0 && (
+        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">📊 Distribution des Rendements Totaux</h3>
+          <div className="flex items-end justify-between gap-2 h-64 border-b border-l border-gray-300 pb-2 pl-2">
+            {(() => {
+              // Créer des bins pour la distribution
+              const minReturn = Math.min(...filteredMetrics.map(m => m.totalReturnPercent));
+              const maxReturn = Math.max(...filteredMetrics.map(m => m.totalReturnPercent));
+              const binCount = 12;
+              const binSize = (maxReturn - minReturn) / binCount;
+              const bins = Array(binCount).fill(0).map((_, i) => ({
+                min: minReturn + i * binSize,
+                max: minReturn + (i + 1) * binSize,
+                count: 0
+              }));
+              
+              filteredMetrics.forEach(metric => {
+                const binIndex = Math.min(
+                  Math.floor((metric.totalReturnPercent - minReturn) / binSize),
+                  binCount - 1
+                );
+                if (binIndex >= 0) bins[binIndex].count++;
+              });
+              
+              const maxCount = Math.max(...bins.map(b => b.count));
+              
+              return bins.map((bin, idx) => (
+                <div key={idx} className="flex-1 flex flex-col items-center group relative">
+                  <div
+                    className="w-full bg-blue-500 hover:bg-blue-600 transition-colors rounded-t cursor-pointer"
+                    style={{
+                      height: `${(bin.count / maxCount) * 240}px`,
+                      minHeight: bin.count > 0 ? '4px' : '0px'
+                    }}
+                    title={`${bin.min.toFixed(0)}% - ${bin.max.toFixed(0)}%: ${bin.count} titre(s)`}
+                  />
+                  {idx % 3 === 0 && (
+                    <span className="text-[8px] text-gray-500 mt-1">{bin.min.toFixed(0)}%</span>
+                  )}
+                </div>
+              ));
+            })()}
+          </div>
+          <div className="mt-2 text-xs text-gray-500 text-center">
+            {filteredMetrics.length} titre(s) | Range: {Math.min(...filteredMetrics.map(m => m.totalReturnPercent)).toFixed(0)}% à {Math.max(...filteredMetrics.map(m => m.totalReturnPercent)).toFixed(0)}%
+          </div>
+        </div>
+      )}
+
       {/* 5 Autres Idées de Visualisation */}
       {filteredMetrics.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -568,9 +618,12 @@ Secteur: ${metric.profile.info.sector}`}
           </div>
         </div>
 
-        {/* Idée 2: Top Performers */}
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-          <h3 className="text-lg font-bold mb-4">🏆 Top Performers</h3>
+        {/* Idée 2: Top Performers Amélioré */}
+        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">🏆 Top 5 Performers</h3>
+          <div className="text-xs text-gray-500 mb-3">
+            Meilleurs rendements projetés
+          </div>
           <div className="space-y-2">
             {filteredMetrics
               .sort((a, b) => b.totalReturnPercent - a.totalReturnPercent)
@@ -587,9 +640,12 @@ Secteur: ${metric.profile.info.sector}`}
           </div>
         </div>
 
-        {/* Idée 3: Distribution des Risques */}
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-          <h3 className="text-lg font-bold mb-4">⚠️ Distribution des Risques</h3>
+        {/* Idée 3: Distribution des Risques Amélioré */}
+        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">⚠️ Distribution des Risques de Baisse</h3>
+          <div className="text-xs text-gray-500 mb-3">
+            Classification par niveau de risque
+          </div>
           <div className="space-y-2">
             {['Faible', 'Modéré', 'Élevé'].map((level, idx) => {
               const ranges = [[0, 20], [20, 50], [50, 100]];
@@ -614,9 +670,12 @@ Secteur: ${metric.profile.info.sector}`}
           </div>
         </div>
 
-        {/* Idée 4: Ratio 3:1 Distribution */}
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-          <h3 className="text-lg font-bold mb-4">📊 Distribution Ratio 3:1</h3>
+        {/* Idée 4: Ratio 3:1 Distribution Amélioré */}
+        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">📊 Distribution Ratio 3:1 (Potentiel vs Risque)</h3>
+          <div className="text-xs text-gray-500 mb-3">
+            Ratio hausse potentielle / risque de baisse
+          </div>
           <div className="space-y-2">
             {['< 1:1', '1:1 - 3:1', '> 3:1'].map((range, idx) => {
               const ranges = [[0, 1], [1, 3], [3, 100]];
@@ -642,9 +701,12 @@ Secteur: ${metric.profile.info.sector}`}
           </div>
         </div>
 
-        {/* Idée 5: Timeline de Performance */}
-        <div className="bg-white p-4 rounded-lg shadow border border-gray-200 md:col-span-2">
-          <h3 className="text-lg font-bold mb-4">📈 Timeline de Performance</h3>
+        {/* Idée 5: Timeline de Performance Amélioré */}
+        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 md:col-span-2">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">📈 Timeline de Performance (Triée par Rendement)</h3>
+          <div className="text-xs text-gray-500 mb-3">
+            Barres horizontales classées par rendement décroissant
+          </div>
           <div className="overflow-x-auto">
             <div className="flex gap-2 min-w-max">
               {filteredMetrics
