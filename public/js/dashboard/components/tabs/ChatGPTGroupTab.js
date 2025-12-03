@@ -541,11 +541,11 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
         ),
 
         // Contenu selon le mode choisi
-        chatMode === 'shared' ? (
+        (chatMode === 'shared' ? (
             // ============================================
             // MODE PARTAGÉ (ChatGPT Group Chat Partagé)
             // ============================================
-            React.createElement(React.Fragment, { key: 'shared-mode' },
+            React.createElement('div', { key: 'shared-mode' },
                 // Header avec titre et actions
         React.createElement('div', { 
             className: `flex items-center justify-between flex-wrap gap-3 ${themeStyles.bg} p-4 rounded-xl border ${themeStyles.border}`
@@ -1066,7 +1066,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
             // ============================================
             // MODE INTÉGRÉ (Chat Intégré avec Historique)
             // ============================================
-            React.createElement(React.Fragment, { key: 'integrated-mode' },
+            React.createElement('div', { key: 'integrated-mode' },
                 // Header avec titre et actions
                 React.createElement('div', { 
                     className: `flex items-center justify-between flex-wrap gap-3 ${themeStyles.bg} p-4 rounded-xl border ${themeStyles.border}`
