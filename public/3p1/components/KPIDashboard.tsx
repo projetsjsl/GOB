@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { AnalysisProfile } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
 import { formatCurrency, formatPercent } from '../utils/calculations';
@@ -11,14 +11,33 @@ interface KPIDashboardProps {
 }
 
 export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId, onSelect }) => {
-  const [filters, setFilters] = useState({
-    minReturn: -100,
-    maxReturn: 500,
-    minJPEGY: 0,
-    maxJPEGY: 5,
-    sector: '',
-    recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL'
-  });
+  // Calculer les valeurs min/max réelles pour définir des filtres par défaut qui incluent tout
+  const defaultFilterValues = useMemo(() => {
+    if (profileMetrics.length === 0) {
+      return {
+        minReturn: -100,
+        maxReturn: 500,
+        minJPEGY: 0,
+        maxJPEGY: 10,
+        sector: '',
+        recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL'
+      };
+    }
+    
+    const returns = profileMetrics.map(m => m.totalReturnPercent);
+    const jpegyValues = profileMetrics.map(m => m.jpegy);
+    
+    return {
+      minReturn: Math.floor(Math.min(...returns, -100)) - 10, // Marge de sécurité
+      maxReturn: Math.ceil(Math.max(...returns, 500)) + 10, // Marge de sécurité
+      minJPEGY: Math.max(0, Math.floor(Math.min(...jpegyValues, 0))),
+      maxJPEGY: Math.ceil(Math.max(...jpegyValues, 10)) + 2, // Marge de sécurité
+      sector: '',
+      recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL'
+    };
+  }, [profileMetrics]);
+
+  const [filters, setFilters] = useState(defaultFilterValues);
   
   const [sortConfig, setSortConfig] = useState<{
     key: string;
@@ -31,6 +50,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
 
   // Calculer les métriques pour chaque profil
   const profileMetrics = useMemo(() => {
+    if (profiles.length === 0) return [];
     return profiles.map(profile => {
       const { recommendation, targetPrice } = calculateRecommendation(profile.data, profile.assumptions);
       
