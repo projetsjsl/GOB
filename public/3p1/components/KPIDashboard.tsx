@@ -597,8 +597,12 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             <input
               type="number"
               value={filters.minReturn}
-              onChange={(e) => setFilters({ ...filters, minReturn: parseFloat(e.target.value) || -100 })}
-              className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+              onChange={(e) => setFilters({ ...filters, minReturn: parseFloat(e.target.value) || defaultFilterValues.minReturn })}
+              className={`w-full px-4 py-2.5 border-2 rounded-lg text-sm transition-all ${
+                filters.minReturn !== defaultFilterValues.minReturn 
+                  ? 'border-blue-400 bg-blue-50 focus:ring-2 focus:ring-blue-500' 
+                  : 'border-gray-300 focus:border-blue-400'
+              }`}
             />
           </div>
           <div>
@@ -606,8 +610,12 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             <input
               type="number"
               value={filters.maxReturn}
-              onChange={(e) => setFilters({ ...filters, maxReturn: parseFloat(e.target.value) || 500 })}
-              className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+              onChange={(e) => setFilters({ ...filters, maxReturn: parseFloat(e.target.value) || defaultFilterValues.maxReturn })}
+              className={`w-full px-4 py-2.5 border-2 rounded-lg text-sm transition-all ${
+                filters.maxReturn !== defaultFilterValues.maxReturn 
+                  ? 'border-blue-400 bg-blue-50 focus:ring-2 focus:ring-blue-500' 
+                  : 'border-gray-300 focus:border-blue-400'
+              }`}
             />
           </div>
           <div>
@@ -616,8 +624,12 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               type="number"
               step="0.1"
               value={filters.minJPEGY}
-              onChange={(e) => setFilters({ ...filters, minJPEGY: parseFloat(e.target.value) || 0 })}
-              className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+              onChange={(e) => setFilters({ ...filters, minJPEGY: parseFloat(e.target.value) || defaultFilterValues.minJPEGY })}
+              className={`w-full px-4 py-2.5 border-2 rounded-lg text-sm transition-all ${
+                filters.minJPEGY !== defaultFilterValues.minJPEGY 
+                  ? 'border-green-400 bg-green-50 focus:ring-2 focus:ring-green-500' 
+                  : 'border-gray-300 focus:border-green-400'
+              }`}
             />
           </div>
           <div>
@@ -626,8 +638,12 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               type="number"
               step="0.1"
               value={filters.maxJPEGY}
-              onChange={(e) => setFilters({ ...filters, maxJPEGY: parseFloat(e.target.value) || 5 })}
-              className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+              onChange={(e) => setFilters({ ...filters, maxJPEGY: parseFloat(e.target.value) || defaultFilterValues.maxJPEGY })}
+              className={`w-full px-4 py-2.5 border-2 rounded-lg text-sm transition-all ${
+                filters.maxJPEGY !== defaultFilterValues.maxJPEGY 
+                  ? 'border-green-400 bg-green-50 focus:ring-2 focus:ring-green-500' 
+                  : 'border-gray-300 focus:border-green-400'
+              }`}
             />
           </div>
           <div>
