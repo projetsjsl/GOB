@@ -13,11 +13,18 @@ export const fetchCompanyData = async (symbol: string): Promise<{
 
   try {
     // Use backend API proxy instead of direct FMP calls
+    // L'API backend essaiera automatiquement plusieurs variantes de symboles
     const response = await fetch(`/api/fmp-company-data?symbol=${encodeURIComponent(cleanSymbol)}`);
 
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error(`Symbole '${cleanSymbol}' introuvable.`);
+        const errorData = await response.json().catch(() => ({}));
+        const triedSymbols = errorData.tried || [cleanSymbol];
+        throw new Error(
+          `Symbole '${cleanSymbol}' introuvable. ` +
+          `Variantes essayées: ${triedSymbols.join(', ')}. ` +
+          `Vérifiez que le symbole est correct ou essayez un format différent.`
+        );
       }
       throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
     }
