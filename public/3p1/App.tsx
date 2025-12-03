@@ -173,10 +173,20 @@ export default function App() {
 
                         // Créer un nouveau profil pour ce ticker
                         const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
+                        const currentYear = new Date().getFullYear();
                         const newProfile: AnalysisProfile = {
                             id: tickerSymbol,
                             lastModified: Date.now(),
-                            data: INITIAL_DATA.map(d => ({ ...d, priceHigh: 0, priceLow: 0, year: 2024 })),
+                            // Créer une seule ligne placeholder pour l'année courante
+                            data: [{
+                                year: currentYear,
+                                priceHigh: 0,
+                                priceLow: 0,
+                                cashFlowPerShare: 0,
+                                dividendPerShare: 0,
+                                bookValuePerShare: 0,
+                                earningsPerShare: 0
+                            }],
                             assumptions: { ...INITIAL_ASSUMPTIONS, currentPrice: 100, currentDividend: 0 },
                             info: {
                                 symbol: tickerSymbol,
@@ -676,10 +686,20 @@ export default function App() {
         }
 
         // Create placeholder profile
+        const currentYear = new Date().getFullYear();
         const newProfile: AnalysisProfile = {
             id: upperSymbol,
             lastModified: Date.now(),
-            data: INITIAL_DATA.map(d => ({ ...d, priceHigh: 0, priceLow: 0, year: 2024 })),
+            // Créer une seule ligne placeholder pour l'année courante
+            data: [{
+                year: currentYear,
+                priceHigh: 0,
+                priceLow: 0,
+                cashFlowPerShare: 0,
+                dividendPerShare: 0,
+                bookValuePerShare: 0,
+                earningsPerShare: 0
+            }],
             assumptions: { ...INITIAL_ASSUMPTIONS, currentPrice: 100, currentDividend: 0 },
             info: { ...INITIAL_INFO, symbol: upperSymbol, name: 'Chargement...', marketCap: '-' },
             notes: '',
@@ -1026,10 +1046,20 @@ export default function App() {
                     }
 
                     // Créer un nouveau profil
+                    const currentYear = new Date().getFullYear();
                     const newProfile: AnalysisProfile = {
                         id: tickerSymbol,
                         lastModified: Date.now(),
-                        data: INITIAL_DATA.map(d => ({ ...d, priceHigh: 0, priceLow: 0, year: 2024 })),
+                        // Créer une seule ligne placeholder pour l'année courante
+                        data: [{
+                            year: currentYear,
+                            priceHigh: 0,
+                            priceLow: 0,
+                            cashFlowPerShare: 0,
+                            dividendPerShare: 0,
+                            bookValuePerShare: 0,
+                            earningsPerShare: 0
+                        }],
                         assumptions: { ...INITIAL_ASSUMPTIONS, currentPrice: 100, currentDividend: 0 },
                         info: {
                             symbol: tickerSymbol,
