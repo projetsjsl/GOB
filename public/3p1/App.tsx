@@ -552,7 +552,7 @@ export default function App() {
         setAssumptions(prev => ({ ...prev, [key]: value }));
     };
 
-    const handleUpdateInfo = (key: keyof CompanyInfo, value: string) => {
+    const handleUpdateInfo = (key: keyof CompanyInfo, value: string | number) => {
         setInfo(prev => ({ ...prev, [key]: value }));
     };
 
@@ -1434,9 +1434,47 @@ export default function App() {
                                             Le titre se négocie à <strong className="text-white">{formatPercent(Math.abs(1 - (assumptions.currentPrice / targetPrice)) * 100)} {assumptions.currentPrice < targetPrice ? 'sous' : 'au-dessus de'}</strong> l'objectif de prix EPS de {formatCurrency(targetPrice)}.
                                         </p>
 
-                                        <div className="bg-slate-700/50 p-3 rounded mt-6">
-                                            <div className="text-xs text-slate-400 uppercase">Score de Sécurité</div>
-                                            <div className="text-2xl font-bold text-green-400">{info.securityRank}</div>
+                                        <div className="space-y-3 mt-6">
+                                            <div className="bg-slate-700/50 p-3 rounded">
+                                                <div className="text-xs text-slate-400 uppercase">Financial Strength</div>
+                                                <div className="text-2xl font-bold text-green-400">{info.securityRank}</div>
+                                                <div className="text-[10px] text-slate-500 mt-1">ValueLine 3 déc 2025</div>
+                                            </div>
+                                            {info.earningsPredictability && (
+                                                <div className="bg-slate-700/50 p-3 rounded">
+                                                    <div className="text-xs text-slate-400 uppercase">Earnings Predictability</div>
+                                                    <div className="text-2xl font-bold text-purple-400">{info.earningsPredictability}</div>
+                                                    <div className="text-[10px] text-slate-500 mt-1">ValueLine 3 déc 2025</div>
+                                                </div>
+                                            )}
+                                            {info.priceGrowth && (
+                                                <div className="bg-slate-700/50 p-3 rounded">
+                                                    <div className="text-xs text-slate-400 uppercase">Price Growth</div>
+                                                    <div className="text-2xl font-bold text-indigo-400">{info.priceGrowth}</div>
+                                                    <div className="text-[10px] text-slate-500 mt-1">ValueLine 3 déc 2025</div>
+                                                </div>
+                                            )}
+                                            {info.persistence && (
+                                                <div className="bg-slate-700/50 p-3 rounded">
+                                                    <div className="text-xs text-slate-400 uppercase">Persistence</div>
+                                                    <div className="text-2xl font-bold text-pink-400">{info.persistence}</div>
+                                                    <div className="text-[10px] text-slate-500 mt-1">ValueLine 3 déc 2025</div>
+                                                </div>
+                                            )}
+                                            {info.priceStability && (
+                                                <div className="bg-slate-700/50 p-3 rounded">
+                                                    <div className="text-xs text-slate-400 uppercase">Price Stability</div>
+                                                    <div className="text-2xl font-bold text-teal-400">{info.priceStability}</div>
+                                                    <div className="text-[10px] text-slate-500 mt-1">ValueLine 3 déc 2025</div>
+                                                </div>
+                                            )}
+                                            {info.beta !== undefined && info.beta !== null && (
+                                                <div className="bg-slate-700/50 p-3 rounded">
+                                                    <div className="text-xs text-slate-400 uppercase">Beta</div>
+                                                    <div className="text-2xl font-bold text-blue-400">{info.beta.toFixed(2)}</div>
+                                                    <div className="text-[10px] text-slate-500 mt-1">Source: API FMP</div>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 

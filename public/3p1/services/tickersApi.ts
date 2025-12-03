@@ -10,6 +10,14 @@ export interface SupabaseTicker {
   source: 'team' | 'watchlist' | 'both' | 'manual';
   is_active: boolean;
   priority?: number;
+  // Métriques ValueLine (Source: ValueLine au 3 décembre 2025)
+  security_rank?: string; // Financial Strength (Cote de sécurité)
+  earnings_predictability?: string;
+  price_growth?: string;
+  persistence?: string;
+  price_stability?: string;
+  beta?: number; // Beta (volatilité relative au marché) - Source: API FMP
+  valueline_updated_at?: string; // Date de mise à jour ValueLine
   [key: string]: any; // Pour les autres champs potentiels
 }
 
