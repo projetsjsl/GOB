@@ -146,7 +146,7 @@ const AdminJSLaiTab = ({
                                     Articles: 0
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Premier article: {typeof newsData !== 'undefined' && newsData[0]?.title ? newsData[0].title.substring(0, 30) : 'Aucun'}...
+                                    Premier article: Aucun
                                 </div>
                             </div>
                             <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
@@ -155,10 +155,10 @@ const AdminJSLaiTab = ({
                                     Seeking Alpha
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Stocks: {typeof seekingAlphaData !== 'undefined' && seekingAlphaData.stocks ? seekingAlphaData.stocks.length : 0}
+                                    Stocks: 0
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Stock Data: {typeof seekingAlphaStockData !== 'undefined' && seekingAlphaStockData.stocks ? Object.keys(seekingAlphaStockData.stocks).length : 0}
+                                    Stock Data: 0
                                 </div>
                             </div>
                         </div>
@@ -423,7 +423,7 @@ const AdminJSLaiTab = ({
                                 <div className="text-xs space-y-1">
                                     <div>• Gemini API: {typeof window !== 'undefined' ? '✅ Actif' : '⚠️ Vérification...'}</div>
                                     <div>• Emma Agent: {systemLogs.filter(l => l.text.includes('Emma')).length > 0 ? '✅ Opérationnel' : '⏸️ En attente'}</div>
-                                    <div>• Deep Analysis: {stockData && Object.keys(stockData).length > 0 ? '✅ Données disponibles' : '⚠️ Pas de données'}</div>
+                                    <div>• Deep Analysis: ⚠️ Pas de données</div>
                                 </div>
                             </div>
                             <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
