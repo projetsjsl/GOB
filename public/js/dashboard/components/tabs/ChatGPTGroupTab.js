@@ -370,9 +370,10 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
                                 React.createElement('div', { 
                                     className: `mt-6 px-4 py-2 rounded-lg ${themeStyles.surface} border ${themeStyles.border} text-xs ${themeStyles.textMuted}` 
                                 },
-                                    React.createElement('p', {}, 'ℹ️ '),
-                                    React.createElement('p', {}, 'ChatGPT utilise une politique de sécurité (CSP) qui bloque les iframes.'),
-                                    React.createElement('p', {}, 'C\'est une mesure de sécurité normale pour protéger les utilisateurs.')
+                                    React.createElement('p', { className: 'mb-2' }, 'ℹ️ Information'),
+                                    React.createElement('p', { className: 'mb-1' }, 'ChatGPT bloque les iframes via CSP (Content Security Policy).'),
+                                    React.createElement('p', { className: 'mb-2' }, 'Les chats de groupe partagés n\'ont pas d\'API officielle.'),
+                                    React.createElement('p', {}, '💡 Alternative: Utiliser l\'API OpenAI pour créer un chat intégré (voir documentation).')
                                 )
                             )
                         ) : (
