@@ -25061,7 +25061,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             // Gérer le menu "Plus" spécialement
                             if (tab.id === 'plus' && tab.hiddenTabs) {
                                 return (
-                                    <div key="plus-menu" className="relative flex-shrink-0">
+                                    <div key="plus-menu" className="relative flex-shrink-0 z-[100]">
                                         <button
                                             onMouseDown={withRipple}
                                             onClick={() => setShowPlusMenu(!showPlusMenu)}
@@ -25091,7 +25091,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         {/* Dropdown menu pour les onglets cachés */}
                                         {showPlusMenu && (
                                             <div 
-                                                className={`absolute bottom-full left-0 mb-2 rounded-lg shadow-2xl border overflow-hidden z-50 min-w-[200px] max-h-[400px] overflow-y-auto ${
+                                                className={`absolute bottom-full left-0 mb-2 rounded-lg shadow-2xl border overflow-hidden z-[100] min-w-[200px] max-h-[400px] overflow-y-auto ${
                                                     isDarkMode
                                                         ? 'bg-gray-900 border-gray-700'
                                                         : 'bg-white border-gray-200'
