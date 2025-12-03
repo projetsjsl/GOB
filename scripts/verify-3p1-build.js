@@ -18,7 +18,11 @@ const CHECK_STRINGS = [
   { pattern: 'EvaluationDetails', required: true, description: 'Composant EvaluationDetails' },
   { pattern: 'checkbox', required: true, description: 'Inputs checkbox' },
   { pattern: 'exclude', required: false, description: 'Fonctionnalité exclusion (peut être minifiée)' },
-  { pattern: 'toggle', required: false, description: 'Fonction toggle (peut être minifiée)' }
+  { pattern: 'toggle', required: false, description: 'Fonction toggle (peut être minifiée)' },
+  { pattern: 'Intervalles de Référence', required: true, description: 'Table HistoricalRangesTable' },
+  { pattern: 'JPEGY', required: true, description: 'Métrique JPEGY' },
+  { pattern: 'Ratios Actuels vs Historiques', required: true, description: 'Section Ratios Actuels' },
+  { pattern: 'Zones de Prix', required: true, description: 'Section Zones de Prix Recommandées' }
 ];
 
 async function verifyBuild() {
