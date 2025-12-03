@@ -57,6 +57,8 @@ export interface CompanyInfo {
   exchange?: string; // Bourse (ex: NASDAQ, NYSE, TSX, etc.)
   currency?: string; // Devise (ex: USD, CAD, EUR, etc.)
   preferredSymbol?: string; // Symbole préféré (TSX pour Canada, ADR pour Europe/Asie)
+  actualSymbol?: string; // Symbole réellement utilisé par FMP
+  logoSymbol?: string; // Symbole optimisé pour les logos
 }
 
 export enum Recommendation {
