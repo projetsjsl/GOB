@@ -303,11 +303,132 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     yTicks.push({ value, position: yScale(value) });
   }
 
+  // Calculer les statistiques globales
+  const globalStats = useMemo(() => {
+    if (filteredMetrics.length === 0) return null;
+    
+    const returns = filteredMetrics.map(m => m.totalReturnPercent);
+    const jpegyValues = filteredMetrics.map(m => m.jpegy);
+    const ratios = filteredMetrics.map(m => m.ratio31);
+    
+    const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
+    const median = (arr: number[]) => {
+      const sorted = [...arr].sort((a, b) => a - b);
+      const mid = Math.floor(sorted.length / 2);
+      return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+    };
+    const stdDev = (arr: number[], mean: number) => {
+      const variance = arr.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / arr.length;
+      return Math.sqrt(variance);
+    };
+    
+    const avgReturn = avg(returns);
+    const medianReturn = median(returns);
+    const stdReturn = stdDev(returns, avgReturn);
+    
+    const avgJPEGY = avg(jpegyValues);
+    const medianJPEGY = median(jpegyValues);
+    
+    const avgRatio = avg(ratios);
+    const medianRatio = median(ratios);
+    
+    return {
+      avgReturn,
+      medianReturn,
+      stdReturn,
+      minReturn: Math.min(...returns),
+      maxReturn: Math.max(...returns),
+      avgJPEGY,
+      medianJPEGY,
+      avgRatio,
+      medianRatio,
+      count: filteredMetrics.length
+    };
+  }, [filteredMetrics]);
+
   return (
     <div className="space-y-6">
+      {/* Statistiques Globales */}
+      {globalStats && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg shadow-lg border border-blue-200">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">📊 Statistiques Globales du Portefeuille</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <div className="text-xs text-gray-500 mb-1">Rendement Moyen</div>
+              <div className="text-2xl font-bold text-blue-600">{globalStats.avgReturn.toFixed(1)}%</div>
+              <div className="text-xs text-gray-400 mt-1">Médiane: {globalStats.medianReturn.toFixed(1)}%</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <div className="text-xs text-gray-500 mb-1">Écart-Type</div>
+              <div className="text-2xl font-bold text-purple-600">{globalStats.stdReturn.toFixed(1)}%</div>
+              <div className="text-xs text-gray-400 mt-1">Volatilité</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <div className="text-xs text-gray-500 mb-1">Rendement Min</div>
+              <div className="text-2xl font-bold text-red-600">{globalStats.minReturn.toFixed(1)}%</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <div className="text-xs text-gray-500 mb-1">Rendement Max</div>
+              <div className="text-2xl font-bold text-green-600">{globalStats.maxReturn.toFixed(1)}%</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <div className="text-xs text-gray-500 mb-1">JPEGY Moyen</div>
+              <div className="text-2xl font-bold" style={{ color: getJpegyColor(globalStats.avgJPEGY) }}>
+                {globalStats.avgJPEGY.toFixed(2)}
+              </div>
+              <div className="text-xs text-gray-400 mt-1">Médiane: {globalStats.medianJPEGY.toFixed(2)}</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <div className="text-xs text-gray-500 mb-1">Ratio 3:1 Moyen</div>
+              <div className={`text-2xl font-bold ${
+                globalStats.avgRatio >= 3 ? 'text-green-600' :
+                globalStats.avgRatio >= 1 ? 'text-yellow-600' :
+                'text-red-600'
+              }`}>
+                {globalStats.avgRatio.toFixed(2)}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Filtres */}
       <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-        <h3 className="text-lg font-bold mb-4">Filtres de Screening</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold">Filtres de Screening</h3>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setFilters({ minReturn: -100, maxReturn: 500, minJPEGY: 0, maxJPEGY: 5, sector: '', recommendation: 'all' })}
+              className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+            >
+              Réinitialiser
+            </button>
+            <button
+              onClick={() => {
+                const top10 = [...filteredMetrics].sort((a, b) => b.totalReturnPercent - a.totalReturnPercent).slice(0, 10);
+                const minReturn = Math.min(...top10.map(m => m.totalReturnPercent));
+                const maxReturn = Math.max(...top10.map(m => m.totalReturnPercent));
+                setFilters(prev => ({ ...prev, minReturn: minReturn - 5, maxReturn: maxReturn + 5 }));
+              }}
+              className="px-3 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded transition-colors"
+            >
+              Top 10
+            </button>
+            <button
+              onClick={() => {
+                const undervalued = filteredMetrics.filter(m => m.jpegy <= 1.5);
+                if (undervalued.length > 0) {
+                  const minJPEGY = Math.min(...undervalued.map(m => m.jpegy));
+                  const maxJPEGY = Math.max(...undervalued.map(m => m.jpegy));
+                  setFilters(prev => ({ ...prev, minJPEGY: 0, maxJPEGY: maxJPEGY + 0.5 }));
+                }
+              }}
+              className="px-3 py-1 text-xs bg-green-100 hover:bg-green-200 rounded transition-colors"
+            >
+              Sous-évalués
+            </button>
+          </div>
+        </div>
         <div className="mb-2 text-xs text-gray-500">
           {filteredMetrics.length} titre(s) affiché(s) sur {profileMetrics.length} total
         </div>
@@ -379,7 +500,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       {/* Matrice à carreaux Améliorée */}
       <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-gray-800">🎯 Matrice de Performance</h3>
+          <div>
+            <h3 className="text-xl font-bold text-gray-800">🎯 Matrice de Performance</h3>
+            <p className="text-xs text-gray-500 mt-1">Cliquez sur un carreau pour sélectionner le titre</p>
+          </div>
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1">
               <div className="w-3 h-3 rounded bg-green-600"></div>
