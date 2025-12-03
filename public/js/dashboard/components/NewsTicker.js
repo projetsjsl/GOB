@@ -11,8 +11,10 @@ const NewsTicker = ({ isDarkMode = true }) => {
     const [newsType, setNewsType] = useState('all');
     const [showTypeSelector, setShowTypeSelector] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
     const tickerRef = useRef(null);
     const animationRef = useRef(null);
+    const intervalRef = useRef(null);
 
     // Écouter si le modal ThemeSelector est ouvert
     useEffect(() => {
@@ -53,38 +55,30 @@ const NewsTicker = ({ isDarkMode = true }) => {
         return () => clearInterval(interval);
     }, [newsType]);
 
-    // Animation du défilement
+    // Animation séquentielle comme un compteur de kilomètres (pause, prochaine, pause, prochaine)
     useEffect(() => {
-        if (!isVisible || news.length === 0 || !tickerRef.current) return;
-
-        const ticker = tickerRef.current;
-        const content = ticker.querySelector('.news-ticker-content');
-        if (!content) return;
-
-        let position = 0;
-        const speed = 0.5; // pixels per frame
-        const gap = 100; // gap between news items
-
-        const animate = () => {
-            if (content.scrollWidth > ticker.offsetWidth) {
-                position -= speed;
-                
-                // Reset position when all content has scrolled
-                if (Math.abs(position) >= content.scrollWidth + gap) {
-                    position = ticker.offsetWidth;
-                }
-                
-                content.style.transform = `translateX(${position}px)`;
+        if (!isVisible || news.length === 0) {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
             }
-            
-            animationRef.current = requestAnimationFrame(animate);
-        };
+            return;
+        }
 
-        animationRef.current = requestAnimationFrame(animate);
+        // Réinitialiser l'index quand les nouvelles changent
+        setCurrentNewsIndex(0);
+
+        // Changer de nouvelle toutes les 5 secondes (pause de 5s)
+        intervalRef.current = setInterval(() => {
+            setCurrentNewsIndex((prevIndex) => {
+                return (prevIndex + 1) % news.length;
+            });
+        }, 5000); // 5 secondes de pause entre chaque nouvelle
 
         return () => {
-            if (animationRef.current) {
-                cancelAnimationFrame(animationRef.current);
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
             }
         };
     }, [news, isVisible]);
@@ -204,18 +198,31 @@ const NewsTicker = ({ isDarkMode = true }) => {
     if (isModalOpen) return null;
 
     return (
-        <div
-            className="relative w-full border-b overflow-hidden"
-            style={{
-                backgroundColor: '#0a0e27', // Couleur fixe sombre pour contraste
-                borderTop: '3px solid #10b981', // Bordure supérieure verte visible et fixe
-                borderBottom: '2px solid #10b981', // Bordure inférieure verte visible et fixe
-                height: '52px', // Hauteur augmentée pour plus de visibilité
-                zIndex: 5,
-                position: 'relative',
-                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.2)' // Ombre verte subtile
-            }}
-        >
+        <>
+            <style>{`
+                @keyframes fadeInSlide {
+                    from {
+                        opacity: 0;
+                        transform: translateX(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateX(0);
+                    }
+                }
+            `}</style>
+            <div
+                className="relative w-full border-b overflow-hidden"
+                style={{
+                    backgroundColor: '#0a0e27', // Couleur fixe sombre pour contraste
+                    borderTop: '3px solid #10b981', // Bordure supérieure verte visible et fixe
+                    borderBottom: '2px solid #10b981', // Bordure inférieure verte visible et fixe
+                    height: '52px', // Hauteur augmentée pour plus de visibilité
+                    zIndex: 5,
+                    position: 'relative',
+                    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.2)' // Ombre verte subtile
+                }}
+            >
             {/* Left icon + Type selector */}
             <div
                 className="absolute left-4 top-0 bottom-0 flex items-center gap-2 z-20"
@@ -285,147 +292,86 @@ const NewsTicker = ({ isDarkMode = true }) => {
                 )}
             </div>
 
-            {/* Scrolling news content */}
+            {/* News content - Affichage séquentiel comme un compteur de kilomètres */}
             <div
                 ref={tickerRef}
-                className="absolute left-48 right-20 top-0 bottom-0 overflow-hidden"
+                className="absolute left-48 right-20 top-0 bottom-0 overflow-hidden flex items-center"
             >
-                <div
-                    className="news-ticker-content flex items-center h-full whitespace-nowrap"
-                    style={{
-                        willChange: 'transform'
-                    }}
-                >
-                    {isLoading ? (
-                        <div
-                            className="flex items-center gap-2 px-4"
-                            style={{ color: '#10b981' }}
+                {isLoading ? (
+                    <div
+                        className="flex items-center gap-2 px-4"
+                        style={{ color: '#10b981' }}
+                    >
+                        <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-sm font-medium" style={{ color: '#10b981' }}>Chargement des actualités...</span>
+                    </div>
+                ) : news.length > 0 ? (
+                    <div 
+                        key={currentNewsIndex}
+                        className="flex items-center gap-2 px-4 cursor-pointer hover:opacity-80 transition-all duration-500 ease-in-out w-full"
+                        style={{
+                            animation: 'fadeInSlide 0.5s ease-in-out',
+                            opacity: 1
+                        }}
+                        onClick={() => {
+                            const currentItem = news[currentNewsIndex];
+                            if (currentItem && currentItem.url) {
+                                window.open(currentItem.url, '_blank', 'noopener,noreferrer');
+                            }
+                        }}
+                        title={news[currentNewsIndex]?.url ? `${news[currentNewsIndex].source} - ${news[currentNewsIndex].type} - Cliquer pour ouvrir l'article` : `${news[currentNewsIndex]?.source} - ${news[currentNewsIndex]?.type}`}
+                    >
+                        {/* Type icon */}
+                        <span className="text-base flex-shrink-0" title={`Type: ${news[currentNewsIndex]?.type || 'other'}`}>
+                            {getTypeIcon(news[currentNewsIndex]?.type || 'other')}
+                        </span>
+                        
+                        {/* Source icon */}
+                        <span className="text-sm flex-shrink-0" title={`Source: ${news[currentNewsIndex]?.source}`}>
+                            {getSourceIcon(news[currentNewsIndex]?.source)}
+                        </span>
+                        
+                        <span
+                            className="text-sm font-semibold"
+                            style={{ color: '#10b981', minWidth: '110px', flexShrink: 0 }}
                         >
-                            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-sm font-medium" style={{ color: '#10b981' }}>Chargement des actualités...</span>
+                            {news[currentNewsIndex]?.source || news[currentNewsIndex]?.source_provider || news[currentNewsIndex]?.source_original || 'Source'}
+                        </span>
+                        <span
+                            className="text-base font-medium flex-1 truncate"
+                            style={{ 
+                                color: '#e0e7ff',
+                                cursor: news[currentNewsIndex]?.url ? 'pointer' : 'default'
+                            }}
+                        >
+                            {news[currentNewsIndex]?.headline}
+                        </span>
+                        {news[currentNewsIndex]?.url && (
+                            <svg 
+                                viewBox="0 0 24 24" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                strokeWidth="2" 
+                                className="w-3 h-3 flex-shrink-0"
+                                style={{ color: isDarkMode ? 'rgba(156, 163, 175, 0.6)' : 'rgba(107, 114, 128, 0.6)' }}
+                            >
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                        )}
+                        {/* Indicateur de progression (comme un compteur) */}
+                        <div className="flex items-center gap-1 ml-2 flex-shrink-0">
+                            <span className="text-xs" style={{ color: '#10b981' }}>
+                                {currentNewsIndex + 1}/{news.length}
+                            </span>
                         </div>
-                    ) : (
-                        news.map((item, index) => (
-                            <React.Fragment key={index}>
-                                <div 
-                                    className="flex items-center gap-2 px-4 cursor-pointer hover:opacity-80 transition-opacity"
-                                    onClick={() => {
-                                        if (item.url) {
-                                            window.open(item.url, '_blank', 'noopener,noreferrer');
-                                        }
-                                    }}
-                                    title={item.url ? `${item.source} - ${item.type} - Cliquer pour ouvrir l'article` : `${item.source} - ${item.type}`}
-                                >
-                                    {/* Type icon */}
-                                    <span className="text-base flex-shrink-0" title={`Type: ${item.type || 'other'}`}>
-                                        {getTypeIcon(item.type || 'other')}
-                                    </span>
-                                    
-                                    {/* Source icon */}
-                                    <span className="text-sm flex-shrink-0" title={`Source: ${item.source}`}>
-                                        {getSourceIcon(item.source)}
-                                    </span>
-                                    
-                                    <span
-                                        className="text-sm font-semibold"
-                                        style={{ color: '#10b981', minWidth: '110px', flexShrink: 0 }}
-                                    >
-                                        {item.source || item.source_provider || item.source_original || 'Source'}
-                                    </span>
-                                    <span
-                                        className="text-base font-medium"
-                                        style={{ 
-                                            color: '#e0e7ff',
-                                            cursor: item.url ? 'pointer' : 'default'
-                                        }}
-                                    >
-                                        {item.headline}
-                                    </span>
-                                    {item.url && (
-                                        <svg 
-                                            viewBox="0 0 24 24" 
-                                            fill="none" 
-                                            stroke="currentColor" 
-                                            strokeWidth="2" 
-                                            className="w-3 h-3 flex-shrink-0"
-                                            style={{ color: isDarkMode ? 'rgba(156, 163, 175, 0.6)' : 'rgba(107, 114, 128, 0.6)' }}
-                                        >
-                                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                            <polyline points="15 3 21 3 21 9"></polyline>
-                                            <line x1="10" y1="14" x2="21" y2="3"></line>
-                                        </svg>
-                                    )}
-                                </div>
-                                <div
-                                    className="w-8 h-px mx-4"
-                                    style={{ backgroundColor: isDarkMode ? 'rgba(156, 163, 175, 0.3)' : 'rgba(107, 114, 128, 0.3)' }}
-                                ></div>
-                            </React.Fragment>
-                        ))
-                    )}
-                    {/* Duplicate for seamless loop */}
-                    {!isLoading && news.length > 0 && (
-                        <>
-                            {news.map((item, index) => (
-                                <React.Fragment key={`dup-${index}`}>
-                                    <div 
-                                        className="flex items-center gap-2 px-4 cursor-pointer hover:opacity-80 transition-opacity"
-                                        onClick={() => {
-                                            if (item.url) {
-                                                window.open(item.url, '_blank', 'noopener,noreferrer');
-                                            }
-                                        }}
-                                        title={item.url ? `${item.source} - ${item.type} - Cliquer pour ouvrir l'article` : `${item.source} - ${item.type}`}
-                                    >
-                                        {/* Type icon */}
-                                        <span className="text-base flex-shrink-0" title={`Type: ${item.type || 'other'}`}>
-                                            {getTypeIcon(item.type || 'other')}
-                                        </span>
-                                        
-                                        {/* Source icon */}
-                                        <span className="text-sm flex-shrink-0" title={`Source: ${item.source}`}>
-                                            {getSourceIcon(item.source)}
-                                        </span>
-                                        
-                                        <span
-                                            className="text-sm font-semibold"
-                                            style={{ color: '#10b981', minWidth: '110px', flexShrink: 0 }}
-                                        >
-                                            {item.source || item.source_provider || item.source_original || 'Source'}
-                                        </span>
-                                        <span
-                                            className="text-base font-medium"
-                                            style={{ 
-                                                color: '#e0e7ff',
-                                                cursor: item.url ? 'pointer' : 'default'
-                                            }}
-                                        >
-                                            {item.headline}
-                                        </span>
-                                        {item.url && (
-                                            <svg 
-                                                viewBox="0 0 24 24" 
-                                                fill="none" 
-                                                stroke="currentColor" 
-                                                strokeWidth="2" 
-                                                className="w-3 h-3 flex-shrink-0"
-                                                style={{ color: isDarkMode ? 'rgba(156, 163, 175, 0.6)' : 'rgba(107, 114, 128, 0.6)' }}
-                                            >
-                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                                <polyline points="15 3 21 3 21 9"></polyline>
-                                                <line x1="10" y1="14" x2="21" y2="3"></line>
-                                            </svg>
-                                        )}
-                                    </div>
-                                    <div
-                                        className="w-8 h-px mx-4"
-                                        style={{ backgroundColor: isDarkMode ? 'rgba(156, 163, 175, 0.3)' : 'rgba(107, 114, 128, 0.3)' }}
-                                    ></div>
-                                </React.Fragment>
-                            ))}
-                        </>
-                    )}
-                </div>
+                    </div>
+                ) : (
+                    <div className="px-4 text-sm" style={{ color: '#10b981' }}>
+                        Aucune actualité disponible
+                    </div>
+                )}
             </div>
 
             {/* Close button */}
@@ -448,6 +394,7 @@ const NewsTicker = ({ isDarkMode = true }) => {
                 </svg>
             </button>
         </div>
+        </>
     );
 };
 
