@@ -392,11 +392,106 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         </div>
       )}
 
+      {/* Mode Comparaison */}
+      {comparisonMode && selectedForComparison.length > 0 && (
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg border-2 border-purple-300">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+              🔍 Mode Comparaison ({selectedForComparison.length} titre(s))
+            </h3>
+            <button
+              onClick={() => {
+                setComparisonMode(false);
+                setSelectedForComparison([]);
+              }}
+              className="px-4 py-2 bg-red-500 text-white text-sm font-semibold rounded-lg hover:bg-red-600 transition-colors"
+            >
+              Fermer
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {selectedForComparison.map(ticker => {
+              const metric = filteredMetrics.find(m => m.profile.id === ticker);
+              if (!metric) return null;
+              return (
+                <div key={ticker} className="bg-white p-4 rounded-lg shadow border border-gray-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-bold text-lg">{metric.profile.id}</h4>
+                    <button
+                      onClick={() => setSelectedForComparison(prev => prev.filter(t => t !== ticker))}
+                      className="text-red-500 hover:text-red-700 text-sm"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Rendement:</span>
+                      <span className="font-bold text-green-600">{metric.totalReturnPercent.toFixed(1)}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">JPEGY:</span>
+                      <span className="font-bold" style={{ color: getJpegyColor(metric.jpegy) }}>
+                        {metric.jpegy.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Ratio 3:1:</span>
+                      <span className={`font-bold ${
+                        metric.ratio31 >= 3 ? 'text-green-600' :
+                        metric.ratio31 >= 1 ? 'text-yellow-600' :
+                        'text-red-600'
+                      }`}>
+                        {metric.ratio31.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">P/E:</span>
+                      <span className="font-bold">{metric.currentPE?.toFixed(1) || 'N/A'}x</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Yield:</span>
+                      <span className="font-bold">{metric.currentYield?.toFixed(2) || 'N/A'}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Signal:</span>
+                      <span className={`font-bold ${
+                        metric.recommendation === 'ACHAT' ? 'text-green-600' :
+                        metric.recommendation === 'VENTE' ? 'text-red-600' :
+                        'text-yellow-600'
+                      }`}>
+                        {metric.recommendation}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => onSelect(ticker)}
+                      className="w-full mt-3 px-3 py-2 bg-blue-500 text-white text-xs font-semibold rounded hover:bg-blue-600 transition-colors"
+                    >
+                      Voir détails →
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Filtres */}
       <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold">Filtres de Screening</h3>
           <div className="flex gap-2">
+            <button
+              onClick={() => setComparisonMode(!comparisonMode)}
+              className={`px-3 py-1 text-xs rounded transition-colors ${
+                comparisonMode 
+                  ? 'bg-purple-500 text-white' 
+                  : 'bg-purple-100 hover:bg-purple-200 text-purple-700'
+              }`}
+            >
+              {comparisonMode ? '✕ Mode Comparaison' : '🔍 Mode Comparaison'}
+            </button>
             <button
               onClick={() => setFilters({ minReturn: -100, maxReturn: 500, minJPEGY: 0, maxJPEGY: 5, sector: '', recommendation: 'all' })}
               className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
@@ -555,9 +650,26 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 <div
                   key={metric.profile.id}
                   data-ticker={metric.profile.id}
-                  onClick={() => onSelect(metric.profile.id)}
+                  onClick={(e) => {
+                    if (comparisonMode) {
+                      e.stopPropagation();
+                      setSelectedForComparison(prev => {
+                        if (prev.includes(metric.profile.id)) {
+                          return prev.filter(t => t !== metric.profile.id);
+                        } else if (prev.length < 5) {
+                          return [...prev, metric.profile.id];
+                        }
+                        return prev;
+                      });
+                    } else {
+                      onSelect(metric.profile.id);
+                    }
+                  }}
                   className={`p-3 rounded-lg cursor-pointer transition-all hover:scale-110 hover:shadow-xl border-2 ${
-                    currentId === metric.profile.id ? 'border-blue-600 ring-4 ring-blue-300 shadow-xl' : 'border-gray-200'
+                    currentId === metric.profile.id ? 'border-blue-600 ring-4 ring-blue-300 shadow-xl' : 
+                    comparisonMode && selectedForComparison.includes(metric.profile.id)
+                      ? 'border-purple-600 ring-4 ring-purple-300 shadow-xl' 
+                      : 'border-gray-200'
                   }`}
                   style={{
                     backgroundColor: getReturnColor(metric.totalReturnPercent),
@@ -571,7 +683,12 @@ P/E: ${metric.currentPE?.toFixed(1) || 'N/A'}x
 Secteur: ${metric.profile.info.sector}
 ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
                 >
-                  <div className="flex flex-col items-center justify-center h-full text-white">
+                  <div className="flex flex-col items-center justify-center h-full text-white relative">
+                    {comparisonMode && selectedForComparison.includes(metric.profile.id) && (
+                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold">
+                        {selectedForComparison.indexOf(metric.profile.id) + 1}
+                      </div>
+                    )}
                     <div className="text-xs font-bold mb-1">{metric.profile.id}</div>
                     <div className="text-[10px] font-semibold mb-1">{metric.totalReturnPercent.toFixed(0)}%</div>
                     <div className="text-[8px] opacity-90">JPEGY: {metric.jpegy.toFixed(1)}</div>
