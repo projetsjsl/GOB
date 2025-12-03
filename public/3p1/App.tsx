@@ -779,6 +779,20 @@ export default function App() {
 
             setData(result.data);
             setInfo(prev => ({ ...prev, ...result.info }));
+            
+            // Update library with new info (including logo)
+            setLibrary(prev => {
+                const profile = prev[upperSymbol];
+                if (!profile) return prev;
+                return {
+                    ...prev,
+                    [upperSymbol]: {
+                        ...profile,
+                        data: result.data,
+                        info: { ...profile.info, ...result.info }
+                    }
+                };
+            });
         } catch (e) {
             console.error('Auto-fetch failed:', e);
             // Profile already created, user can manually sync later
