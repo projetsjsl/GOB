@@ -34,19 +34,75 @@ export default async function handler(req, res) {
     const cleanSymbol = symbol.toUpperCase();
     const FMP_BASE = 'https://financialmodelingprep.com/api/v3';
 
-    try {
-        // 1. Fetch Company Profile
-        const profileRes = await fetch(`${FMP_BASE}/profile/${cleanSymbol}?apikey=${FMP_KEY}`);
-        if (!profileRes.ok) throw new Error(`FMP Profile error: ${profileRes.statusText}`);
+    // Mapping de symboles alternatifs pour les cas spéciaux
+    const symbolVariants = {
+        'BRK.B': ['BRK-B', 'BRK.B', 'BRKB'],
+        'BBD.B': ['BBD-B', 'BBD.B', 'BBD-B.TO'],
+        'GIB.A': ['GIB-A', 'GIB.A', 'GIB-A.TO'],
+        'ATD.B': ['ATD-B', 'ATD.B', 'ATD-B.TO'],
+        'TECK.B': ['TECK-B', 'TECK.B', 'TECK-B.TO'],
+        'RCI.B': ['RCI-B', 'RCI.B', 'RCI-B.TO'],
+        'MRU': ['MRU.TO', 'MRU'],
+        'ABX': ['ABX.TO', 'ABX', 'GOLD'], // Barrick Gold peut être GOLD maintenant
+        'IFC': ['IFC.TO', 'IFC'],
+        'GWO': ['GWO.TO', 'GWO']
+    };
+
+    // Fonction pour essayer plusieurs variantes de symboles
+    const tryFetchProfile = async (symbolToTry) => {
+        const profileRes = await fetch(`${FMP_BASE}/profile/${symbolToTry}?apikey=${FMP_KEY}`);
+        if (!profileRes.ok) return null;
         const profileData = await profileRes.json();
+        if (!profileData || profileData.length === 0) return null;
+        return { profile: profileData[0], usedSymbol: symbolToTry };
+    };
 
-        if (!profileData || profileData.length === 0) {
-            return res.status(404).json({ error: `Symbol '${cleanSymbol}' not found` });
+    try {
+        // 1. Essayer d'abord le symbole original
+        let profileResult = await tryFetchProfile(cleanSymbol);
+        let usedSymbol = cleanSymbol;
+
+        // 2. Si échec et qu'on a des variantes, les essayer
+        if (!profileResult && symbolVariants[cleanSymbol]) {
+            for (const variant of symbolVariants[cleanSymbol]) {
+                profileResult = await tryFetchProfile(variant);
+                if (profileResult) {
+                    usedSymbol = variant;
+                    break;
+                }
+            }
         }
-        const profile = profileData[0];
 
-        // 2. Fetch Key Metrics (Annual)
-        const metricsRes = await fetch(`${FMP_BASE}/key-metrics/${cleanSymbol}?period=annual&limit=20&apikey=${FMP_KEY}`);
+        // 3. Si toujours échec, essayer avec .TO pour les symboles canadiens
+        if (!profileResult && (cleanSymbol.includes('.B') || cleanSymbol.includes('.A'))) {
+            const tsxSymbol = cleanSymbol.replace('.', '-') + '.TO';
+            profileResult = await tryFetchProfile(tsxSymbol);
+            if (profileResult) {
+                usedSymbol = tsxSymbol;
+            }
+        }
+
+        // 4. Si toujours échec, essayer sans le suffixe de classe
+        if (!profileResult && (cleanSymbol.includes('.B') || cleanSymbol.includes('.A'))) {
+            const baseSymbol = cleanSymbol.split('.')[0];
+            profileResult = await tryFetchProfile(baseSymbol);
+            if (profileResult) {
+                usedSymbol = baseSymbol;
+            }
+        }
+
+        if (!profileResult) {
+            return res.status(404).json({ 
+                error: `Symbol '${cleanSymbol}' not found`,
+                tried: [cleanSymbol, ...(symbolVariants[cleanSymbol] || [])]
+            });
+        }
+
+        const profile = profileResult.profile;
+        usedSymbol = profileResult.usedSymbol;
+
+        // 2. Fetch Key Metrics (Annual) - utiliser le symbole qui a fonctionné
+        const metricsRes = await fetch(`${FMP_BASE}/key-metrics/${usedSymbol}?period=annual&limit=20&apikey=${FMP_KEY}`);
         if (!metricsRes.ok) throw new Error(`FMP Metrics error: ${metricsRes.statusText}`);
         let metricsData = await metricsRes.json();
 
@@ -65,7 +121,7 @@ export default async function handler(req, res) {
         metricsData = Object.values(uniqueMetrics);
 
         // 2a. Fetch Dividend History (separate endpoint since key-metrics doesn't include it)
-        const dividendRes = await fetch(`${FMP_BASE}/historical-price-full/stock_dividend/${cleanSymbol}?apikey=${FMP_KEY}`);
+        const dividendRes = await fetch(`${FMP_BASE}/historical-price-full/stock_dividend/${usedSymbol}?apikey=${FMP_KEY}`);
         let dividendsByFiscalYear = {};
 
         if (dividendRes.ok) {
@@ -90,14 +146,14 @@ export default async function handler(req, res) {
                     dividendsByFiscalYear[fiscalYear] += div.dividend || div.adjDividend || 0;
                 });
 
-                console.log(`✅ Dividends aggregated for ${cleanSymbol}:`, dividendsByFiscalYear);
+                console.log(`✅ Dividends aggregated for ${usedSymbol} (original: ${cleanSymbol}):`, dividendsByFiscalYear);
             }
         } else {
             console.warn(`⚠️ No dividend data available for ${cleanSymbol}`);
         }
 
         // 3. Fetch Historical Prices for High/Low
-        const priceRes = await fetch(`${FMP_BASE}/historical-price-full/${cleanSymbol}?serietype=line&timeseries=1825&apikey=${FMP_KEY}`);
+        const priceRes = await fetch(`${FMP_BASE}/historical-price-full/${usedSymbol}?serietype=line&timeseries=1825&apikey=${FMP_KEY}`);
         if (!priceRes.ok) throw new Error(`FMP Price error: ${priceRes.statusText}`);
         const priceData = await priceRes.json();
 
@@ -105,7 +161,9 @@ export default async function handler(req, res) {
         let currentPrice = profile.price || 0;
         if (FINNHUB_KEY) {
             try {
-                const quoteRes = await fetch(`https://finnhub.io/api/v1/quote?symbol=${cleanSymbol}&token=${FINNHUB_KEY}`);
+                // Pour Finnhub, utiliser le symbole original ou nettoyer le format
+                const finnhubSymbol = cleanSymbol.replace('.', '-');
+                const quoteRes = await fetch(`https://finnhub.io/api/v1/quote?symbol=${finnhubSymbol}&token=${FINNHUB_KEY}`);
                 if (quoteRes.ok) {
                     const quoteData = await quoteRes.json();
                     if (quoteData.c) currentPrice = quoteData.c;
@@ -181,9 +239,10 @@ export default async function handler(req, res) {
         };
 
         // 8. Info Object avec toutes les informations
+        // Utiliser le symbole original pour le logo, mais le symbole utilisé pour les données
         const logoUrl = profile.image 
             ? profile.image 
-            : `https://financialmodelingprep.com/image-stock/${cleanSymbol}.png`;
+            : `https://financialmodelingprep.com/image-stock/${usedSymbol.replace('.TO', '').replace('-', '.')}.png`;
         
         const mappedInfo = {
             name: profile.companyName,
@@ -193,7 +252,8 @@ export default async function handler(req, res) {
             country: profile.country || '',
             exchange: profile.exchangeShortName || profile.exchange || '',
             currency: profile.currency || 'USD',
-            preferredSymbol: getPreferredSymbol(profile)
+            preferredSymbol: cleanSymbol, // Garder le symbole original demandé
+            actualSymbol: usedSymbol // Le symbole réellement utilisé par FMP
         };
 
         return res.status(200).json({
