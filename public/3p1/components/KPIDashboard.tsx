@@ -1656,6 +1656,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           </div>
           <div className="space-y-2">
             {filteredMetrics
+              .filter(m => !m.hasInvalidData) // Exclure les données invalides du Top 5
               .sort((a, b) => b.totalReturnPercent - a.totalReturnPercent)
               .slice(0, 5)
               .map((metric, idx) => (
@@ -1664,7 +1665,9 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     <span className="text-lg font-bold text-yellow-600">#{idx + 1}</span>
                     <span className="font-semibold">{metric.profile.id}</span>
                   </div>
-                  <span className="text-sm font-bold text-green-600">{metric.totalReturnPercent.toFixed(1)}%</span>
+                  <span className={`text-sm font-bold ${metric.hasInvalidData ? 'text-gray-400' : 'text-green-600'}`}>
+                    {metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(1)}%`}
+                  </span>
                 </div>
               ))}
           </div>
@@ -1800,8 +1803,8 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         minHeight: '20px'
                       }}
                     />
-                    <div className="text-xs font-semibold" style={{ color: getReturnColor(metric.totalReturnPercent) }}>
-                      {metric.totalReturnPercent.toFixed(0)}%
+                    <div className={`text-xs font-semibold ${metric.hasInvalidData ? 'text-gray-400' : ''}`} style={metric.hasInvalidData ? {} : { color: getReturnColor(metric.totalReturnPercent) }}>
+                      {metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`}
                     </div>
                   </div>
                 ))}
@@ -2053,8 +2056,8 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       </span>
                     )}
                   </td>
-                  <td className="p-2 text-right font-semibold" style={{ color: getReturnColor(metric.totalReturnPercent) }}>
-                    {metric.totalReturnPercent.toFixed(1)}%
+                  <td className="p-2 text-right font-semibold" style={{ color: metric.hasInvalidData ? '#9ca3af' : getReturnColor(metric.totalReturnPercent) }}>
+                    {metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(1)}%`}
                   </td>
                   <td className="p-2 text-right">{metric.ratio31.toFixed(2)}</td>
                   <td className="p-2 text-right text-green-600">{metric.upsidePotential.toFixed(1)}%</td>
