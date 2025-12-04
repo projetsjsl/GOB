@@ -28,10 +28,25 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
     const forwardPE = forwardEPS > 0 ? assumptions.currentPrice / forwardEPS : 0;
 
     // Calcul JPEGY (Jean-Sebastien's Price to Earning adjusted for Growth and Yield)
+    // MÊME LOGIQUE QUE KPIDashboard pour cohérence
     // JPEGY = P/E / (Growth % + Yield %)
-    const growthPlusYield = assumptions.growthRateEPS + currentYield;
-    const jpegy = growthPlusYield > 0 ? currentPE / growthPlusYield : 0;
-    const forwardJpegy = growthPlusYield > 0 ? forwardPE / growthPlusYield : 0;
+    const hasValidEPS = baseEPS > 0.01 && isFinite(baseEPS);
+    const safeBasePE = hasValidEPS && assumptions.currentPrice > 0 && currentPE > 0 && currentPE <= 1000 ? currentPE : 0;
+    const safeBaseYield = Math.max(0, Math.min(currentYield, 50)); // Limiter yield à 0-50%
+    const growthPlusYield = (assumptions.growthRateEPS || 0) + safeBaseYield;
+    
+    // JPEGY: valider que growthPlusYield > 0.01 ET que basePE est valide
+    // Limiter JPEGY à un maximum raisonnable (100)
+    let jpegy = 0;
+    if (growthPlusYield > 0.01 && safeBasePE > 0 && hasValidEPS) {
+      const rawJPEGY = safeBasePE / growthPlusYield;
+      jpegy = isFinite(rawJPEGY) && rawJPEGY >= 0 && rawJPEGY <= 100 ? rawJPEGY : 0;
+    }
+    
+    // Forward JPEGY avec même validation
+    const forwardJpegy = growthPlusYield > 0.01 && forwardPE > 0 && forwardPE <= 1000 && hasValidEPS
+      ? (isFinite(forwardPE / growthPlusYield) ? Math.min(Math.max(0, forwardPE / growthPlusYield), 100) : 0)
+      : 0;
 
     // Ratios historiques moyens
     const avgPE = calculateAverage(

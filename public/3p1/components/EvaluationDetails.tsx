@@ -39,62 +39,106 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   };
 
   // Determine base values from selected base year
-  // Robust fallback: 1. Match Base Year & Valid EPS -> 2. Any Valid EPS -> 3. Last Data
-  const baseYearData = data.find(d => d.year === assumptions.baseYear && d.earningsPerShare > 0)
-    || [...data].reverse().find(d => d.earningsPerShare > 0)
-    || data[data.length - 1];
+  // MÊME LOGIQUE QUE KPIDashboard pour cohérence
+  const baseYearData = data.find(d => d.year === assumptions.baseYear) || data[data.length - 1];
+  const baseEPS = Math.max(baseYearData?.earningsPerShare || 0, 0);
 
   const baseValues = {
-    eps: baseYearData?.earningsPerShare || 0,
-    cf: baseYearData?.cashFlowPerShare || 0,
-    bv: baseYearData?.bookValuePerShare || 0,
-    div: assumptions.currentDividend || 0
+    eps: Math.max(baseEPS, 0),
+    cf: Math.max(baseYearData?.cashFlowPerShare || 0, 0),
+    bv: Math.max(baseYearData?.bookValuePerShare || 0, 0),
+    div: Math.max(assumptions.currentDividend || 0, 0)
   };
 
-  // Projections (5 Years)
+  // Projections (5 Years) - MÊME VALIDATION QUE KPIDashboard
+  const projectFutureValueSafe = (current: number, rate: number, years: number): number => {
+    // Valider les entrées
+    if (current <= 0 || !isFinite(current) || !isFinite(rate)) return 0;
+    // Limiter le taux de croissance à un maximum raisonnable (50% par an)
+    const safeRate = Math.max(-50, Math.min(rate, 50));
+    return current * Math.pow(1 + safeRate / 100, years);
+  };
+
+  // Valider et limiter les taux de croissance (MÊME QUE KPIDashboard)
+  const safeGrowthEPS = Math.max(-50, Math.min(assumptions.growthRateEPS || 0, 50));
+  const safeGrowthCF = Math.max(-50, Math.min(assumptions.growthRateCF || 0, 50));
+  const safeGrowthBV = Math.max(-50, Math.min(assumptions.growthRateBV || 0, 50));
+  const safeGrowthDiv = Math.max(-50, Math.min(assumptions.growthRateDiv || 0, 50));
+
   const futureValues = {
-    eps: projectFutureValue(baseValues.eps, assumptions.growthRateEPS, 5),
-    cf: projectFutureValue(baseValues.cf, assumptions.growthRateCF, 5),
-    bv: projectFutureValue(baseValues.bv, assumptions.growthRateBV, 5),
-    div: projectFutureValue(baseValues.div, assumptions.growthRateDiv, 5)
+    eps: projectFutureValueSafe(baseValues.eps, safeGrowthEPS, 5),
+    cf: projectFutureValueSafe(baseValues.cf, safeGrowthCF, 5),
+    bv: projectFutureValueSafe(baseValues.bv, safeGrowthBV, 5),
+    div: projectFutureValueSafe(baseValues.div, safeGrowthDiv, 5)
   };
 
-  // Target Prices
+  // Valider et limiter les ratios cibles (MÊME QUE KPIDashboard)
+  const safeTargetPE = Math.max(1, Math.min(assumptions.targetPE || 0, 100));
+  const safeTargetPCF = Math.max(1, Math.min(assumptions.targetPCF || 0, 100));
+  const safeTargetPBV = Math.max(0.5, Math.min(assumptions.targetPBV || 0, 50));
+  const safeTargetYield = Math.max(0.1, Math.min(assumptions.targetYield || 0, 20));
+
+  // Target Prices - MÊME VALIDATION QUE KPIDashboard
   const targets = {
-    eps: futureValues.eps * assumptions.targetPE,
-    cf: futureValues.cf * assumptions.targetPCF,
-    bv: futureValues.bv * assumptions.targetPBV,
-    // Dividend Model: Target Price = Projected Dividend / Target Yield
-    // Using format 1.8% -> 0.018
-    div: assumptions.targetYield > 0 ? futureValues.div / (assumptions.targetYield / 100) : 0
+    eps: futureValues.eps > 0 && safeTargetPE > 0 && safeTargetPE <= 100 ? futureValues.eps * safeTargetPE : 0,
+    cf: futureValues.cf > 0 && safeTargetPCF > 0 && safeTargetPCF <= 100 ? futureValues.cf * safeTargetPCF : 0,
+    bv: futureValues.bv > 0 && safeTargetPBV > 0 && safeTargetPBV <= 50 ? futureValues.bv * safeTargetPBV : 0,
+    div: futureValues.div > 0 && safeTargetYield > 0 && safeTargetYield <= 20 ? futureValues.div / (safeTargetYield / 100) : 0
   };
 
-  // Average Target Price (excluding disabled metrics)
+  // Average Target Price (excluding disabled metrics) - MÊME VALIDATION QUE KPIDashboard
+  const currentPrice = Math.max(assumptions.currentPrice || 0, 0.01);
+  const maxReasonableTarget = currentPrice * 50;
+  const minReasonableTarget = currentPrice * 0.1; // Minimum 10% du prix actuel
+  
   const validTargets = [
-    !assumptions.excludeEPS && targets.eps > 0 ? targets.eps : null,
-    !assumptions.excludeCF && targets.cf > 0 ? targets.cf : null,
-    !assumptions.excludeBV && targets.bv > 0 ? targets.bv : null,
-    !assumptions.excludeDIV && targets.div > 0 ? targets.div : null
-  ].filter((t): t is number => t !== null && t > 0);
+    !assumptions.excludeEPS && targets.eps > 0 && targets.eps >= minReasonableTarget && targets.eps <= maxReasonableTarget && isFinite(targets.eps) ? targets.eps : null,
+    !assumptions.excludeCF && targets.cf > 0 && targets.cf >= minReasonableTarget && targets.cf <= maxReasonableTarget && isFinite(targets.cf) ? targets.cf : null,
+    !assumptions.excludeBV && targets.bv > 0 && targets.bv >= minReasonableTarget && targets.bv <= maxReasonableTarget && isFinite(targets.bv) ? targets.bv : null,
+    !assumptions.excludeDIV && targets.div > 0 && targets.div >= minReasonableTarget && targets.div <= maxReasonableTarget && isFinite(targets.div) ? targets.div : null
+  ].filter((t): t is number => t !== null && t > 0 && isFinite(t));
   
   const avgTargetPrice = validTargets.length > 0
     ? validTargets.reduce((a, b) => a + b, 0) / validTargets.length
     : 0;
 
-  // Dividend Accumulation (Approximate sum of 5 years of growing dividends)
-  // D1 = D0(1+g), D2=D0(1+g)^2...
+  // Dividend Accumulation - MÊME VALIDATION QUE KPIDashboard
   let totalDividends = 0;
-  let currentD = baseValues.div;
+  let currentD = Math.max(0, baseValues.div);
+  // Limiter les dividendes totaux à 10x le prix actuel (au-delà c'est aberrant)
+  const maxReasonableDividends = currentPrice * 10;
   for (let i = 0; i < 5; i++) {
-    currentD = currentD * (1 + assumptions.growthRateDiv / 100);
-    totalDividends += currentD;
+    currentD = currentD * (1 + safeGrowthDiv / 100);
+    if (isFinite(currentD) && currentD >= 0 && totalDividends + currentD <= maxReasonableDividends) {
+      totalDividends += currentD;
+    } else {
+      break; // Arrêter si on dépasse les limites
+    }
   }
+  // Limiter totalDividends au maximum raisonnable
+  totalDividends = Math.min(totalDividends, maxReasonableDividends);
 
-  // Total Return Calculation
-  // Formula: ((Target Price + Accumulated Dividends) - Current Price) / Current Price
-  const totalReturnPercent = assumptions.currentPrice > 0
-    ? ((avgTargetPrice + totalDividends - assumptions.currentPrice) / assumptions.currentPrice) * 100
-    : 0;
+  // Total Return Calculation - MÊME VALIDATION QUE KPIDashboard
+  let totalReturnPercent = -100; // Par défaut si pas de données valides
+  if (currentPrice > 0 && avgTargetPrice > 0 && isFinite(avgTargetPrice) && isFinite(totalDividends) && validTargets.length > 0) {
+    const rawReturn = ((avgTargetPrice + totalDividends - currentPrice) / currentPrice) * 100;
+    // VALIDATION STRICTE: Vérifier que le calcul est raisonnable
+    if (isFinite(rawReturn) && rawReturn >= -100 && rawReturn <= 1000) {
+      // Vérifier que avgTargetPrice n'est pas aberrant (max 100x le prix actuel)
+      if (avgTargetPrice <= currentPrice * 100 && avgTargetPrice >= currentPrice * 0.1) {
+        totalReturnPercent = rawReturn;
+      } else {
+        // Prix cible aberrant, marquer comme invalide
+        totalReturnPercent = -100;
+      }
+    } else {
+      // Calcul aberrant, marquer comme invalide
+      totalReturnPercent = -100;
+    }
+  } else if (validTargets.length === 0) {
+    // Si aucune métrique valide, retourner -100% pour indiquer données manquantes
+    totalReturnPercent = -100;
+  }
 
   // Annualized Return (CAGR)
   // End Value = Target + Dividends ? Or just Target and treat dividends as yield?
