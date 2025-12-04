@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon, ClockIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
-import { listSnapshots, loadSnapshot } from '../services/snapshotApi';
+import { ChevronLeftIcon, ChevronRightIcon, ClockIcon, CheckCircleIcon, XCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { listSnapshots, loadSnapshot, deleteSnapshot } from '../services/snapshotApi';
 
 interface RightSidebarProps {
   ticker: string;
@@ -28,6 +28,7 @@ interface SnapshotWithActions {
 export const RightSidebar: React.FC<RightSidebarProps> = ({ ticker, onLoadVersion, isOpen, onToggle }) => {
   const [snapshots, setSnapshots] = useState<SnapshotWithActions[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen && ticker) {
@@ -111,6 +112,40 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ ticker, onLoadVersio
     });
   };
 
+  const handleDelete = async (snapshotId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Empêcher le clic de charger la version
+    
+    const snapshot = snapshots.find(s => s.id === snapshotId);
+    if (!snapshot) return;
+
+    // Avertissement spécial si c'est la version actuelle
+    if (snapshot.isCurrent) {
+      if (!confirm(`⚠️ ATTENTION : Vous êtes sur le point de supprimer la VERSION ACTUELLE (v${snapshot.version}).\n\nCette action est irréversible. Voulez-vous vraiment continuer ?`)) {
+        return;
+      }
+    } else {
+      if (!confirm(`Supprimer la version v${snapshot.version} du ${formatDate(snapshot.date)} ?\n\nCette action est irréversible.`)) {
+        return;
+      }
+    }
+
+    setDeletingId(snapshotId);
+    try {
+      const result = await deleteSnapshot(snapshotId);
+      if (result.success) {
+        // Recharger la liste des snapshots
+        await loadSnapshots();
+      } else {
+        alert(`Erreur lors de la suppression : ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error deleting snapshot:', error);
+      alert('Erreur lors de la suppression du snapshot');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <>
       {/* Toggle Button */}
@@ -165,11 +200,11 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ ticker, onLoadVersio
               snapshots.map((snapshot) => (
                 <div
                   key={snapshot.id}
-                  className="bg-slate-800 rounded-lg p-4 border border-slate-700 hover:border-blue-500 transition-colors cursor-pointer"
+                  className="bg-slate-800 rounded-lg p-4 border border-slate-700 hover:border-blue-500 transition-colors cursor-pointer relative group"
                   onClick={() => onLoadVersion(snapshot.id)}
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <div>
+                    <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-blue-400">v{snapshot.version}</span>
                         {snapshot.isCurrent && (
@@ -181,6 +216,22 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ ticker, onLoadVersio
                       </div>
                       <div className="text-xs text-slate-400 mt-1">{formatDate(snapshot.date)}</div>
                     </div>
+                    {/* Bouton de suppression */}
+                    <button
+                      onClick={(e) => handleDelete(snapshot.id, e)}
+                      disabled={deletingId === snapshot.id}
+                      className={`ml-2 p-1.5 rounded hover:bg-red-600/20 text-slate-400 hover:text-red-400 transition-colors ${
+                        deletingId === snapshot.id ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                      title="Supprimer cette version"
+                      aria-label="Supprimer"
+                    >
+                      {deletingId === snapshot.id ? (
+                        <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <TrashIcon className="w-4 h-4" />
+                      )}
+                    </button>
                   </div>
 
                   {snapshot.notes && (
