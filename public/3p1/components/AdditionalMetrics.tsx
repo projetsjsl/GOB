@@ -36,17 +36,23 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
     const growthPlusYield = (assumptions.growthRateEPS || 0) + safeBaseYield;
     
     // JPEGY: valider que growthPlusYield > 0.01 ET que basePE est valide
-    // Limiter JPEGY à un maximum raisonnable (100)
-    let jpegy = 0;
+    // Retourner null si impossible à calculer (au lieu de 0)
+    let jpegy: number | null = null;
     if (growthPlusYield > 0.01 && safeBasePE > 0 && hasValidEPS) {
       const rawJPEGY = safeBasePE / growthPlusYield;
-      jpegy = isFinite(rawJPEGY) && rawJPEGY >= 0 && rawJPEGY <= 100 ? rawJPEGY : 0;
+      if (isFinite(rawJPEGY) && rawJPEGY >= 0 && rawJPEGY <= 100) {
+        jpegy = rawJPEGY;
+      }
     }
     
     // Forward JPEGY avec même validation
-    const forwardJpegy = growthPlusYield > 0.01 && forwardPE > 0 && forwardPE <= 1000 && hasValidEPS
-      ? (isFinite(forwardPE / growthPlusYield) ? Math.min(Math.max(0, forwardPE / growthPlusYield), 100) : 0)
-      : 0;
+    let forwardJpegy: number | null = null;
+    if (growthPlusYield > 0.01 && forwardPE > 0 && forwardPE <= 1000 && hasValidEPS) {
+      const rawForwardJPEGY = forwardPE / growthPlusYield;
+      if (isFinite(rawForwardJPEGY) && rawForwardJPEGY >= 0 && rawForwardJPEGY <= 100) {
+        forwardJpegy = rawForwardJPEGY;
+      }
+    }
 
     // Ratios historiques moyens
     const avgPE = calculateAverage(
@@ -88,8 +94,8 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
 
     // Helper function pour obtenir la couleur et la position du JPEGY
     // Zones: 0-0.5 (11.1%), 0.5-1.5 (55.6%), 1.5-1.75 (5.6%), 1.75-2.0 (5.6%), 2.0+ (22.2%)
-    const getJpegyColor = (value: number): { color: string; bgColor: string; position: number } => {
-        if (value <= 0) {
+    const getJpegyColor = (value: number | null): { color: string; bgColor: string; position: number } => {
+        if (value === null || value <= 0) {
             return { color: '#6b7280', bgColor: '#f3f4f6', position: 0 };
         }
         if (value <= 0.5) {
@@ -134,8 +140,13 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                     {/* JPEGY (P/E Actuel) */}
                     <div className="bg-white p-3 sm:p-4 rounded-lg border border-purple-200">
                         <div className="text-sm text-gray-600 mb-1">JPEGY (P/E Actuel)</div>
-                        <div className="text-3xl font-bold mb-3" style={{ color: jpegyColor.color }}>
-                            {jpegy > 0 ? jpegy.toFixed(2) : 'N/A'}
+                        <div className="text-3xl font-bold mb-3 flex items-center gap-2" style={{ color: jpegy !== null ? jpegyColor.color : '#6b7280' }}>
+                            {jpegy !== null ? jpegy.toFixed(2) : (
+                                <>
+                                    <span>N/A</span>
+                                    <span className="text-lg" title="JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%">⚠️</span>
+                                </>
+                            )}
                         </div>
                         
                         {/* Zone de couleur avec indicateur */}
@@ -149,7 +160,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                                 <div className="bg-red-600" style={{ width: '22.1%' }}></div>
                             </div>
                             {/* Indicateur de position */}
-                            {jpegy > 0 && (
+                            {jpegy !== null && jpegy > 0 && (
                                 <div
                                     className="absolute top-0 bottom-0 w-1 bg-black z-10 transition-all duration-300"
                                     style={{ left: `${jpegyColor.position}%` }}
@@ -165,15 +176,24 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                             P/E: {currentPE > 0 ? currentPE.toFixed(2) : 'N/A'}x
                         </div>
                         <div className="text-xs text-gray-500">
-                            (Growth: {assumptions.growthRateEPS.toFixed(1)}% + Yield: {currentYield.toFixed(2)}% = {growthPlusYield.toFixed(2)}%)
+                            {jpegy !== null ? (
+                                <>Growth: {assumptions.growthRateEPS.toFixed(1)}% + Yield: {currentYield.toFixed(2)}% = {growthPlusYield.toFixed(2)}%</>
+                            ) : (
+                                <span className="text-orange-600">⚠️ JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%</span>
+                            )}
                         </div>
                     </div>
                     
                     {/* JPEGY (Forward P/E) */}
                     <div className="bg-white p-3 sm:p-4 rounded-lg border border-purple-200">
                         <div className="text-sm text-gray-600 mb-1">JPEGY (Forward P/E)</div>
-                        <div className="text-3xl font-bold mb-3" style={{ color: forwardJpegyColor.color }}>
-                            {forwardJpegy > 0 ? forwardJpegy.toFixed(2) : 'N/A'}
+                        <div className="text-3xl font-bold mb-3 flex items-center gap-2" style={{ color: forwardJpegy !== null ? forwardJpegyColor.color : '#6b7280' }}>
+                            {forwardJpegy !== null ? forwardJpegy.toFixed(2) : (
+                                <>
+                                    <span>N/A</span>
+                                    <span className="text-lg" title="Forward JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%">⚠️</span>
+                                </>
+                            )}
                         </div>
                         
                         {/* Zone de couleur avec indicateur */}
@@ -187,7 +207,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                                 <div className="bg-red-600" style={{ width: '22.1%' }}></div>
                             </div>
                             {/* Indicateur de position */}
-                            {forwardJpegy > 0 && (
+                            {forwardJpegy !== null && forwardJpegy > 0 && (
                                 <div
                                     className="absolute top-0 bottom-0 w-1 bg-black z-10 transition-all duration-300"
                                     style={{ left: `${forwardJpegyColor.position}%` }}
@@ -203,7 +223,11 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                             Forward P/E: {forwardPE > 0 ? forwardPE.toFixed(2) : 'N/A'}x
                         </div>
                         <div className="text-xs text-gray-500">
-                            (Growth: {assumptions.growthRateEPS.toFixed(1)}% + Yield: {currentYield.toFixed(2)}% = {growthPlusYield.toFixed(2)}%)
+                            {forwardJpegy !== null ? (
+                                <>Growth: {assumptions.growthRateEPS.toFixed(1)}% + Yield: {currentYield.toFixed(2)}% = {growthPlusYield.toFixed(2)}%</>
+                            ) : (
+                                <span className="text-orange-600">⚠️ Forward JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%</span>
+                            )}
                         </div>
                     </div>
                 </div>

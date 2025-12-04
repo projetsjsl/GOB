@@ -37,7 +37,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         return {
           profile,
           recommendation,
-          jpegy: 0,
+          jpegy: null,
           totalReturnPercent: -100,
           ratio31: 0,
           downsideRisk: 0,
@@ -73,11 +73,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       const growthPlusYield = (profile.assumptions.growthRateEPS || 0) + safeBaseYield;
       
       // JPEGY: valider que growthPlusYield > 0.01 ET que basePE est valide
-      // Limiter JPEGY à un maximum raisonnable (100)
-      let jpegy = 0;
+      // Retourner null si impossible à calculer (au lieu de 0)
+      let jpegy: number | null = null;
       if (growthPlusYield > 0.01 && safeBasePE > 0 && hasValidEPS) {
         const rawJPEGY = safeBasePE / growthPlusYield;
-        jpegy = isFinite(rawJPEGY) && rawJPEGY >= 0 && rawJPEGY <= 100 ? rawJPEGY : 0;
+        if (isFinite(rawJPEGY) && rawJPEGY >= 0 && rawJPEGY <= 100) {
+          jpegy = rawJPEGY;
+        }
       }
 
       // Calcul rendement total potentiel
@@ -268,8 +270,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
           const excludedText = excludedMetrics.length > 0 ? ` (${excludedMetrics.join(', ')} exclus)` : '';
           invalidReason.push(`Aucun ratio cible valide${excludedText} - Vérifiez les ratios cibles (P/E, P/CF, P/BV, Yield) et les données historiques`);
         }
-        if (jpegy === 0 && growthPlusYield <= 0.01) {
-          invalidReason.push(`Croissance EPS (${profile.assumptions.growthRateEPS?.toFixed(2) || 0}%) + Yield (${baseYield.toFixed(2) || 0}%) trop faible (≤0.01%) - Ajustez la croissance ou le dividende`);
+        if (jpegy === null) {
+          invalidReason.push(`JPEGY non calculable: Croissance EPS (${profile.assumptions.growthRateEPS?.toFixed(2) || 0}%) + Yield (${baseYield.toFixed(2) || 0}%) trop faible (≤0.01%) ou EPS invalide - Ajustez la croissance, le dividende ou synchronisez les données`);
         }
         if (totalReturnPercent <= -99.9) {
           invalidReason.push('Rendement impossible à calculer - Vérifiez le prix actuel et les ratios cibles');
@@ -362,13 +364,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     }
     
     const returns = profileMetrics.map(m => m.totalReturnPercent);
-    const jpegyValues = profileMetrics.map(m => m.jpegy);
+    const jpegyValues = profileMetrics.map(m => m.jpegy).filter((j): j is number => j !== null);
     
     return {
       minReturn: Math.floor(Math.min(...returns, -100)) - 10, // Marge de sécurité
       maxReturn: Math.ceil(Math.max(...returns, 500)) + 10, // Marge de sécurité
-      minJPEGY: Math.max(0, Math.floor(Math.min(...jpegyValues, 0))),
-      maxJPEGY: Math.ceil(Math.max(...jpegyValues, 10)) + 2, // Marge de sécurité
+      minJPEGY: jpegyValues.length > 0 ? Math.max(0, Math.floor(Math.min(...jpegyValues, 0))) : 0,
+      maxJPEGY: jpegyValues.length > 0 ? Math.ceil(Math.max(...jpegyValues, 10)) + 2 : 10, // Marge de sécurité
       sector: '',
       recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL',
       source: 'all' as 'all' | 'portfolio' | 'watchlist'
@@ -394,7 +396,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   const filteredMetrics = useMemo(() => {
     const filtered = profileMetrics.filter(metric => {
       if (metric.totalReturnPercent < filters.minReturn || metric.totalReturnPercent > filters.maxReturn) return false;
-      if (metric.jpegy < filters.minJPEGY || metric.jpegy > filters.maxJPEGY) return false;
+      // Filtrer JPEGY seulement si la valeur est calculable (non null)
+      if (metric.jpegy !== null && (metric.jpegy < filters.minJPEGY || metric.jpegy > filters.maxJPEGY)) return false;
       if (filters.sector && metric.profile.info.sector.toLowerCase() !== filters.sector.toLowerCase()) return false;
       if (filters.recommendation !== 'all' && metric.recommendation !== filters.recommendation) return false;
       // Filtre portefeuille/watchlist
@@ -448,7 +451,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         m.profile.id,
         `"${m.profile.info.name}"`,
         m.profile.info.sector,
-        m.jpegy.toFixed(2),
+        m.jpegy !== null ? m.jpegy.toFixed(2) : 'N/A',
         m.totalReturnPercent.toFixed(2),
         m.ratio31.toFixed(2),
         m.upsidePotential.toFixed(2),
@@ -467,8 +470,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     link.click();
   };
 
-  // Obtenir la couleur JPEGY
-  const getJpegyColor = (jpegy: number): string => {
+  // Obtenir la couleur JPEGY (retourne null si JPEGY est null)
+  const getJpegyColor = (jpegy: number | null): string | null => {
+    if (jpegy === null) return null; // Pas de couleur si N/A
     if (jpegy <= 0.5) return '#86efac'; // Vert pâle
     if (jpegy <= 1.5) return '#16a34a'; // Vert foncé
     if (jpegy <= 1.75) return '#eab308'; // Jaune
@@ -500,19 +504,19 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   const chartHeight = 700;
   const padding = 80;
   
-  // Calculer les échelles avec marges (seulement si on a des métriques filtrées VALIDES)
+  // Calculer les échelles avec marges (seulement si on a des métriques filtrées VALIDES avec JPEGY calculable)
   const validMetricsForChart = filteredMetrics.filter(m => 
     !m.hasInvalidData && 
     m.totalReturnPercent >= -100 && m.totalReturnPercent <= 1000 &&
-    m.jpegy >= 0 && m.jpegy <= 100 &&
+    m.jpegy !== null && m.jpegy >= 0 && m.jpegy <= 100 &&
     isFinite(m.totalReturnPercent) && isFinite(m.jpegy)
   );
   
   const maxJPEGY = validMetricsForChart.length > 0 
-    ? Math.max(...validMetricsForChart.map(m => m.jpegy), 5)
+    ? Math.max(...validMetricsForChart.map(m => m.jpegy!), 5)
     : 5;
   const minJPEGY = validMetricsForChart.length > 0
-    ? Math.min(...validMetricsForChart.map(m => m.jpegy), 0)
+    ? Math.min(...validMetricsForChart.map(m => m.jpegy!), 0)
     : 0;
   const maxReturn = validMetricsForChart.length > 0
     ? Math.max(...validMetricsForChart.map(m => m.totalReturnPercent), 200)
@@ -551,16 +555,18 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     if (filteredMetrics.length === 0) return null;
     
     const returns = filteredMetrics.map(m => m.totalReturnPercent);
-    const jpegyValues = filteredMetrics.map(m => m.jpegy);
+    const jpegyValues = filteredMetrics.map(m => m.jpegy).filter((j): j is number => j !== null); // Exclure les null
     const ratios = filteredMetrics.map(m => m.ratio31);
     
-    const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
+    const avg = (arr: number[]) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
     const median = (arr: number[]) => {
+      if (arr.length === 0) return 0;
       const sorted = [...arr].sort((a, b) => a - b);
       const mid = Math.floor(sorted.length / 2);
       return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
     };
     const stdDev = (arr: number[], mean: number) => {
+      if (arr.length === 0) return 0;
       const variance = arr.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / arr.length;
       return Math.sqrt(variance);
     };
@@ -569,8 +575,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     const medianReturn = median(returns);
     const stdReturn = stdDev(returns, avgReturn);
     
-    const avgJPEGY = avg(jpegyValues);
-    const medianJPEGY = median(jpegyValues);
+    const avgJPEGY = jpegyValues.length > 0 ? avg(jpegyValues) : null;
+    const medianJPEGY = jpegyValues.length > 0 ? median(jpegyValues) : null;
     
     const avgRatio = avg(ratios);
     const medianRatio = median(ratios);
@@ -616,10 +622,21 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
               <div className="text-xs text-gray-500 mb-1">JPEGY Moyen</div>
-              <div className="text-2xl font-bold" style={{ color: getJpegyColor(globalStats.avgJPEGY) }}>
-                {globalStats.avgJPEGY.toFixed(2)}
-              </div>
-              <div className="text-xs text-gray-400 mt-1">Médiane: {globalStats.medianJPEGY.toFixed(2)}</div>
+              {globalStats.avgJPEGY !== null ? (
+                <>
+                  <div className="text-2xl font-bold" style={{ color: getJpegyColor(globalStats.avgJPEGY) || '#9ca3af' }}>
+                    {globalStats.avgJPEGY.toFixed(2)}
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1">Médiane: {globalStats.medianJPEGY !== null ? globalStats.medianJPEGY.toFixed(2) : 'N/A'}</div>
+                </>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold text-gray-400 flex items-center gap-2">
+                    N/A <ExclamationTriangleIcon className="w-5 h-5 text-orange-500" title="JPEGY non calculable pour tous les titres" />
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1">Aucun JPEGY calculable</div>
+                </>
+              )}
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
               <div className="text-xs text-gray-500 mb-1">Ratio 3:1 Moyen</div>
@@ -674,9 +691,15 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">JPEGY:</span>
-                      <span className="font-bold" style={{ color: getJpegyColor(metric.jpegy) }}>
-                        {metric.jpegy.toFixed(2)}
-                      </span>
+                      {metric.jpegy !== null ? (
+                        <span className="font-bold" style={{ color: getJpegyColor(metric.jpegy) || '#9ca3af' }}>
+                          {metric.jpegy.toFixed(2)}
+                        </span>
+                      ) : (
+                        <span className="font-bold text-gray-400 flex items-center gap-1">
+                          N/A <ExclamationTriangleIcon className="w-4 h-4 text-orange-500" title="JPEGY non calculable" />
+                        </span>
+                      )}
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Ratio 3:1:</span>
@@ -769,10 +792,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             </button>
             <button
               onClick={() => {
-                const undervalued = filteredMetrics.filter(m => m.jpegy <= 1.5);
+                const undervalued = filteredMetrics.filter(m => m.jpegy !== null && m.jpegy <= 1.5);
                 if (undervalued.length > 0) {
-                  const minJPEGY = Math.min(...undervalued.map(m => m.jpegy));
-                  const maxJPEGY = Math.max(...undervalued.map(m => m.jpegy));
+                  const validJPEGYs = undervalued.map(m => m.jpegy!).filter((j): j is number => j !== null);
+                  const minJPEGY = Math.min(...validJPEGYs);
+                  const maxJPEGY = Math.max(...validJPEGYs);
                   setFilters(prev => ({ ...prev, minJPEGY: 0, maxJPEGY: maxJPEGY + 0.5 }));
                 }
               }}
@@ -1099,7 +1123,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     }}
                     title={`${metric.profile.info.name || metric.profile.id}
 Rendement: ${metric.hasInvalidData ? 'N/A (données invalides)' : `${metric.totalReturnPercent.toFixed(1)}%`}
-JPEGY: ${metric.hasInvalidData ? 'N/A (données invalides)' : metric.jpegy.toFixed(2)}
+JPEGY: ${metric.jpegy !== null ? metric.jpegy.toFixed(2) : 'N/A (non calculable)'}
 Ratio 3:1: ${metric.hasInvalidData ? 'N/A' : metric.ratio31.toFixed(2)}
 P/E: ${metric.currentPE?.toFixed(1) || 'N/A'}x
 Secteur: ${metric.profile.info.sector}
@@ -1128,8 +1152,9 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       <div className={`text-[10px] font-semibold mb-1 ${metric.hasInvalidData ? 'opacity-50' : ''}`}>
                         {metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`}
                       </div>
-                      <div className={`text-[8px] opacity-90 ${metric.hasInvalidData ? 'opacity-50' : ''}`}>
-                        JPEGY: {metric.hasInvalidData ? 'N/A' : metric.jpegy.toFixed(1)}
+                      <div className={`text-[8px] opacity-90 ${metric.hasInvalidData || metric.jpegy === null ? 'opacity-50' : ''}`}>
+                        JPEGY: {metric.jpegy !== null ? metric.jpegy.toFixed(1) : 'N/A'}
+                        {metric.jpegy === null && <span className="ml-1 text-red-400">⚠️</span>}
                       </div>
                       {metric.hasApprovedVersion && !metric.hasInvalidData && (
                         <CheckCircleIcon className="w-4 h-4 mt-1 text-white" />
@@ -1206,8 +1231,9 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         <div className="text-xs text-gray-500">Rendement</div>
                       </div>
                       <div className="text-right">
-                        <div className={`font-semibold ${metric.hasInvalidData ? 'text-gray-400' : ''}`} style={metric.hasInvalidData ? {} : { color: getJpegyColor(metric.jpegy) }}>
-                          {metric.hasInvalidData ? 'N/A' : metric.jpegy.toFixed(2)}
+                        <div className={`font-semibold flex items-center justify-end gap-1 ${metric.jpegy === null ? 'text-gray-400' : ''}`} style={metric.jpegy !== null && getJpegyColor(metric.jpegy) ? { color: getJpegyColor(metric.jpegy)! } : {}}>
+                          {metric.jpegy !== null ? metric.jpegy.toFixed(2) : 'N/A'}
+                          {metric.jpegy === null && <ExclamationTriangleIcon className="w-3 h-3 text-orange-500" title="JPEGY non calculable" />}
                         </div>
                         <div className="text-xs text-gray-500">JPEGY</div>
                       </div>
@@ -1441,7 +1467,9 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                 .filter(metric => !metric.hasInvalidData) // Exclure complètement les données invalides
                 .map((metric) => {
                   // Validation supplémentaire: exclure les valeurs aberrantes même si hasInvalidData est false
-                  if (metric.totalReturnPercent > 1000 || metric.totalReturnPercent < -100 || 
+                  // Exclure les points avec JPEGY null ou valeurs aberrantes
+                  if (metric.jpegy === null || 
+                      metric.totalReturnPercent > 1000 || metric.totalReturnPercent < -100 || 
                       metric.jpegy > 100 || metric.jpegy < 0 || 
                       !isFinite(metric.totalReturnPercent) || !isFinite(metric.jpegy)) {
                     return null; // Ne pas afficher ce point
@@ -1449,13 +1477,14 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                   
                   const x = xScale(metric.jpegy);
                   const y = yScale(metric.totalReturnPercent);
+                  const jpegyColor = getJpegyColor(metric.jpegy);
                   return (
                     <g key={metric.profile.id}>
                       <circle
                         cx={x}
                         cy={y}
                         r={currentId === metric.profile.id ? 8 : 6}
-                        fill={getJpegyColor(metric.jpegy)}
+                        fill={jpegyColor || '#9ca3af'}
                         stroke={currentId === metric.profile.id ? '#2563eb' : '#fff'}
                         strokeWidth={currentId === metric.profile.id ? 2 : 1}
                         className="cursor-pointer hover:r-8"
@@ -1551,7 +1580,8 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
               .map(sector => {
                 const sectorMetrics = filteredMetrics.filter(m => m.profile.info.sector === sector);
                 const avgReturn = sectorMetrics.reduce((sum, m) => sum + m.totalReturnPercent, 0) / sectorMetrics.length;
-                const avgJPEGY = sectorMetrics.reduce((sum, m) => sum + m.jpegy, 0) / sectorMetrics.length;
+                const validJPEGY = sectorMetrics.filter(m => m.jpegy !== null).map(m => m.jpegy!);
+                const avgJPEGY = validJPEGY.length > 0 ? validJPEGY.reduce((sum, j) => sum + j, 0) / validJPEGY.length : null;
                 const avgRatio31 = sectorMetrics.reduce((sum, m) => sum + m.ratio31, 0) / sectorMetrics.length;
                 return { sector, avgReturn, avgJPEGY, avgRatio31, count: sectorMetrics.length };
               })
@@ -1589,12 +1619,18 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-600">JPEGY moyen:</span>
-                      <span 
-                        className="text-xs font-semibold px-2 py-0.5 rounded text-white"
-                        style={{ backgroundColor: getJpegyColor(avgJPEGY) }}
-                      >
-                        {avgJPEGY.toFixed(2)}
-                      </span>
+                      {avgJPEGY !== null ? (
+                        <span 
+                          className="text-xs font-semibold px-2 py-0.5 rounded text-white"
+                          style={{ backgroundColor: getJpegyColor(avgJPEGY) || '#9ca3af' }}
+                        >
+                          {avgJPEGY.toFixed(2)}
+                        </span>
+                      ) : (
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-gray-400 text-white flex items-center gap-1">
+                          N/A <ExclamationTriangleIcon className="w-3 h-3" />
+                        </span>
+                      )}
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-600">Ratio 3:1 moyen:</span>
@@ -2002,11 +2038,20 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     </div>
                   </td>
                   <td className="p-2 text-right">
-                    <span
-                      className="inline-block w-4 h-4 rounded-full mr-2"
-                      style={{ backgroundColor: getJpegyColor(metric.jpegy) }}
-                    />
-                    {metric.jpegy.toFixed(2)}
+                    {metric.jpegy !== null ? (
+                      <>
+                        <span
+                          className="inline-block w-4 h-4 rounded-full mr-2"
+                          style={{ backgroundColor: getJpegyColor(metric.jpegy) || '#9ca3af' }}
+                        />
+                        {metric.jpegy.toFixed(2)}
+                      </>
+                    ) : (
+                      <span className="text-gray-400 flex items-center justify-end gap-1">
+                        <ExclamationTriangleIcon className="w-4 h-4 text-orange-500" title="JPEGY non calculable" />
+                        N/A
+                      </span>
+                    )}
                   </td>
                   <td className="p-2 text-right font-semibold" style={{ color: getReturnColor(metric.totalReturnPercent) }}>
                     {metric.totalReturnPercent.toFixed(1)}%
