@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collecteur - Formulaire d'Onboarding</title>
+    <style>
+        :root {
+            --primary: #208C8E;
+            --primary-light: #32B8C6;
+            --accent-warm: #E67F61;
+            --success: #15804D;
+            --warning: #A84F2F;
+            --danger: #C0152F;
+            --bg-light: #FFFBF5;
+            --bg-surface: #FFF5F0;
+            --text-dark: #1F2121;
+            --text-secondary: #626C71;
+            --border: #5E5240;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html, body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #FFEEE7 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+        }
+
+        .header-user {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid white;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 40px;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(32, 140, 142, 0.2);
+            z-index: 0;
+        }
+
+        .progress-line.active {
+            background: var(--primary);
+            width: 50%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-step {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            text-align: center;
+        }
+
+        .step-circle {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 10px;
+            background: white;
+            border: 3px solid rgba(32, 140, 142, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .step-circle.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 8px 16px rgba(32, 140, 142, 0.3);
+            transform: scale(1.1);
+        }
+
+        .step-circle.completed {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .step-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .step-label.active {
+            color: var(--primary);
+        }
+
+        /* Form Container */
+        .form-wrapper {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .step-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        /* Form Groups */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 2px solid rgba(94, 82, 64, 0.2);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(32, 140, 142, 0.1);
+            background: white;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .required::after {
+            content: '*';
+            color: var(--danger);
+            margin-left: 3px;
+        }
+
+        /* Navigation Buttons */
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            background: rgba(94, 82, 64, 0.1);
+            color: var(--text-dark);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(94, 82, 64, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(32, 140, 142, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Récapitulatif */
+        .summary-section {
+            margin-bottom: 25px;
+        }
+
+        .summary-section h3 {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-item {
+            background: var(--bg-light);
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .summary-item-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .summary-item-value {
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* Actions finales */
+        .final-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .action-card {
+            background: var(--bg-light);
+            border: 2px solid rgba(32, 140, 142, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 16px rgba(32, 140, 142, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .action-card h4 {
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .action-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .action-card button {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .action-card button:hover {
+            background: var(--primary-light);
+        }
+
+        /* Success Message */
+        .success-message {
+            background: rgba(21, 128, 77, 0.1);
+            color: var(--success);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 3px solid var(--success);
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        /* Auto-save indicator */
+        .autosave-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: none;
+            z-index: 1000;
+        }
+
+        .autosave-indicator.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .form-wrapper {
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-step {
+                flex-basis: auto;
+            }
+
+            .step-circle {
+                width: 60px;
+                height: 60px;
+                font-size: 1.2rem;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+        }
+
+        /* Emma IA Chatbot Styles */
+        .emma-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .emma-toggle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(32, 140, 142, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .emma-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .emma-toggle.active {
+            background: linear-gradient(135deg, var(--accent-warm) 0%, var(--warning) 100%);
+        }
+
+        .emma-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 380px;
+            height: 600px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .emma-window.active {
+            display: flex;
+        }
+
+        .emma-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .emma-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .emma-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: var(--bg-light);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .emma-message {
+            display: flex;
+            gap: 8px;
+        }
+
+        .emma-message.user {
+            justify-content: flex-end;
+        }
+
+        .emma-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .emma-avatar.user {
+            background: var(--accent-warm);
+        }
+
+        .emma-bubble {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .emma-bubble.user {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+
+        .emma-bubble.emma {
+            background: white;
+            border: 1px solid rgba(32, 140, 142, 0.2);
+            color: var(--text-dark);
+        }
+
+        .emma-input-area {
+            padding: 12px;
+            border-top: 1px solid rgba(32, 140, 142, 0.1);
+            display: flex;
+            gap: 8px;
+            background: white;
+        }
+
+        .emma-input-area input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid rgba(94, 82, 64, 0.2);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .emma-send {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .emma-typing {
+            display: flex;
+            gap: 4px;
+        }
+
+        .emma-typing span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            animation: typing 1.4s infinite;
+        }
+
+        .emma-typing span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .emma-typing span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0.3; }
+            30% { opacity: 1; }
+        }
+
+        @media (max-width: 480px) {
+            .emma-window {
+                width: calc(100vw - 40px);
+                height: calc(100vh - 100px);
+                max-height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>📊 Collecteur Financier</h1>
+                <p style="margin-top: 5px; opacity: 0.9;">Onboarding Client - Collecte de Données</p>
+            </div>
+            <div class="header-user">
+                <span id="userName">User</span>
+                <button class="btn-logout" onclick="logout()">Déconnexion</button>
+            </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-container">
+            <div class="progress-steps">
+                <div class="progress-line active" id="progressLine"></div>
+                <div class="progress-step">
+                    <div class="step-circle active" id="circle1">1</div>
+                    <div class="step-label active">Identité</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-circle" id="circle2">2</div>
+                    <div class="step-label">Situation</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-circle" id="circle3">3</div>
+                    <div class="step-label">Finances</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success message -->
+        <div class="success-message" id="successMessage">
+            ✅ Données sauvegardées automatiquement
+        </div>
+
+        <!-- Form -->
+        <form id="collectionForm">
+            <div class="form-wrapper">
+                <!-- ÉTAPE 1: Identité -->
+                <div class="step-content active" id="step1">
+                    <h2 class="step-title">👤 Étape 1: Identité du Client</h2>
+                    <p class="step-description">Collectez les informations d'identité essentielles du client</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="firstName" class="required">Prénom</label>
+                            <input type="text" id="firstName" name="firstName" placeholder="Ex: Jean" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName" class="required">Nom</label>
+                            <input type="text" id="lastName" name="lastName" placeholder="Ex: Dupont" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="required">Email</label>
+                            <input type="email" id="email" name="email" placeholder="jean.dupont@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone" class="required">Téléphone</label>
+                            <input type="tel" id="phone" name="phone" placeholder="+1 (555) 123-4567" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="address" class="required">Adresse</label>
+                            <input type="text" id="address" name="address" placeholder="123 Rue Principal, Ville" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="city">Ville</label>
+                            <input type="text" id="city" name="city" placeholder="Ex: Montréal">
+                        </div>
+                        <div class="form-group">
+                            <label for="province">Province</label>
+                            <input type="text" id="province" name="province" placeholder="Ex: QC">
+                        </div>
+                        <div class="form-group">
+                            <label for="postalCode">Code Postal</label>
+                            <input type="text" id="postalCode" name="postalCode" placeholder="Ex: H1H 1H1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ÉTAPE 2: Situation -->
+                <div class="step-content" id="step2">
+                    <h2 class="step-title">👨‍👩‍👧 Étape 2: Situation Personnelle et Professionnel</h2>
+                    <p class="step-description">Informations civiles et emploi</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="civilStatus" class="required">État Civil</label>
+                            <select id="civilStatus" name="civilStatus" required>
+                                <option value="">Sélectionnez...</option>
+                                <option value="celibataire">Célibataire</option>
+                                <option value="marie">Marié(e)</option>
+                                <option value="divorce">Divorcé(e)</option>
+                                <option value="veuf">Veuf/Veuve</option>
+                                <option value="union-libre">Union libre</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="birthdate" class="required">Date de Naissance</label>
+                            <input type="date" id="birthdate" name="birthdate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nas">NAS (Numéro d'Assurance Sociale)</label>
+                            <input type="text" id="nas" name="nas" placeholder="XXX-XXX-XXX">
+                        </div>
+                        <div class="form-group">
+                            <label for="childrenCount">Nombre d'Enfants à Charge</label>
+                            <input type="number" id="childrenCount" name="childrenCount" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="employer" class="required">Employeur</label>
+                            <input type="text" id="employer" name="employer" placeholder="Ex: Acme Corporation" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="jobTitle" class="required">Titre de Poste</label>
+                            <input type="text" id="jobTitle" name="jobTitle" placeholder="Ex: Gestionnaire de Projet" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="spouseName">Nom du Conjoint</label>
+                            <input type="text" id="spouseName" name="spouseName" placeholder="(Optionnel)">
+                        </div>
+                        <div class="form-group">
+                            <label for="spouseEmployer">Employeur du Conjoint</label>
+                            <input type="text" id="spouseEmployer" name="spouseEmployer" placeholder="(Optionnel)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ÉTAPE 3: Finances -->
+                <div class="step-content" id="step3">
+                    <h2 class="step-title">💰 Étape 3: Situation Financière</h2>
+                    <p class="step-description">Informations sur les revenus, actifs et placements</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="annualIncome" class="required">Revenu Annuel ($)</label>
+                            <input type="number" id="annualIncome" name="annualIncome" placeholder="0" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="spouseIncome">Revenu Conjoint ($)</label>
+                            <input type="number" id="spouseIncome" name="spouseIncome" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="realEstateValue">Valeur Immobilière ($)</label>
+                            <input type="number" id="realEstateValue" name="realEstateValue" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="liquidAssets">Actifs Liquides ($)</label>
+                            <input type="number" id="liquidAssets" name="liquidAssets" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="investmentHorizon" class="required">Horizon de Placement</label>
+                            <select id="investmentHorizon" name="investmentHorizon" required>
+                                <option value="">Sélectionnez...</option>
+                                <option value="court">Court terme (moins de 3 ans)</option>
+                                <option value="moyen">Moyen terme (3-5 ans)</option>
+                                <option value="long">Long terme (6-10 ans)</option>
+                                <option value="tres-long">Très long terme (10+ ans)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="riskTolerance" class="required">Tolérance au Risque</label>
+                            <select id="riskTolerance" name="riskTolerance" required>
+                                <option value="">Sélectionnez...</option>
+                                <option value="faible">Faible (préservation du capital)</option>
+                                <option value="moderee">Modérée (équilibre)</option>
+                                <option value="elevee">Élevée (croissance)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="reereNumber">Numéro REER</label>
+                            <input type="text" id="reereNumber" name="reereNumber" placeholder="(Optionnel)">
+                        </div>
+                        <div class="form-group">
+                            <label for="accountantName">Comptable (Nom)</label>
+                            <input type="text" id="accountantName" name="accountantName" placeholder="(Optionnel)">
+                        </div>
+                        <div class="form-group">
+                            <label for="accountantPhone">Comptable (Téléphone)</label>
+                            <input type="tel" id="accountantPhone" name="accountantPhone" placeholder="(Optionnel)">
+                        </div>
+                        <div class="form-group">
+                            <label for="notes">Notes Additionnelles</label>
+                            <textarea id="notes" name="notes" placeholder="Informations supplémentaires..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ÉTAPE 4: Récapitulatif -->
+                <div class="step-content" id="summary">
+                    <h2 class="step-title">✅ Récapitulatif et Finalisation</h2>
+                    <p class="step-description">Vérifiez les informations avant export</p>
+                    
+                    <div id="summaryContent"></div>
+                    
+                    <div class="final-actions">
+                        <div class="action-card">
+                            <h4>📊 Exporter Excel</h4>
+                            <p>Télécharger au format Excel</p>
+                            <button type="button" onclick="exportToExcel()">Excel</button>
+                        </div>
+                        <div class="action-card">
+                            <h4>📄 Exporter PDF</h4>
+                            <p>Générer un PDF signable</p>
+                            <button type="button" onclick="exportToPDF()">PDF</button>
+                        </div>
+                        <div class="action-card">
+                            <h4>💾 Nouveau Dossier</h4>
+                            <p>Créer un nouveau client</p>
+                            <button type="button" onclick="newClient()">Nouveau</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="form-navigation" id="navigation">
+                    <button type="button" class="btn btn-secondary" id="prevBtn" onclick="previousStep()" style="display:none;">← Précédent</button>
+                    <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextStep()">Suivant →</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Auto-save indicator -->
+    <div class="autosave-indicator" id="autosaveIndicator">💾 Sauvegardé</div>
+
+    <!-- Emma IA Chatbot -->
+    <div class="emma-container">
+        <button class="emma-toggle" id="emmaToggle" title="Emma IA Assistant">💬</button>
+        <div class="emma-window" id="emmaWindow">
+            <div class="emma-header">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">Emma IA <span style="width: 10px; height: 10px; background: var(--success); border-radius: 50%; display: inline-block; margin-left: 6px;"></span></h3>
+                    <p style="margin: 0; font-size: 0.8rem; opacity: 0.9;">Assistant Intelligent</p>
+                </div>
+                <button class="emma-close" id="emmaClose">✕</button>
+            </div>
+            <div class="emma-messages" id="emmaMessages"></div>
+            <div class="emma-input-area">
+                <input type="text" id="emmaInput" placeholder="Posez une question à Emma..." autocomplete="off">
+                <button class="emma-send" id="emmaSend">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app-logic.js"></script>
+    <script src="emma-ai.js"></script>
+</body>
+</html>

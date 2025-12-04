@@ -1,0 +1,28 @@
+{
+  "name": "collecteur-financier",
+  "version": "1.0.0",
+  "description": "Application Web de Collecte de Données d'Onboarding Client en Finance",
+  "main": "public/index.html",
+  "scripts": {
+    "start": "npx http-server public -p 8000 -o public/index.html",
+    "serve": "npx http-server public -p 8000",
+    "python": "python -m http.server 8000",
+    "dev": "npx live-server public"
+  },
+  "keywords": [
+    "finance",
+    "onboarding",
+    "client",
+    "collecte",
+    "données",
+    "formulaire"
+  ],
+  "author": "Votre Entreprise",
+  "license": "UNLICENSED",
+  "dependencies": {},
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "votre-repo-git"
+  }
+}

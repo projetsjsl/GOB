@@ -180,6 +180,11 @@
       "source": "/eval",
       "destination": "https://jslai.app/evaluation",
       "permanent": false
+    },
+    {
+      "source": "/nouveauclient",
+      "destination": "/nouveauclient/index.html",
+      "permanent": false
     }
   ]
 }

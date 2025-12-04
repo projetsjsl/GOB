@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Collecteur Financier</title>
+    <style>
+        :root {
+            --primary: #208C8E;
+            --primary-light: #32B8C6;
+            --accent-warm: #E67F61;
+            --success: #15804D;
+            --warning: #A84F2F;
+            --danger: #C0152F;
+            --bg-light: #FFFBF5;
+            --bg-surface: #FFF5F0;
+            --text-dark: #1F2121;
+            --text-secondary: #626C71;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html, body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #FFEEE7 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 30px 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .menu-item {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.3);
+            border-left: 3px solid white;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+        }
+
+        .btn-logout-admin {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid white;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout-admin:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 30px;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        /* Tables */
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, rgba(32, 140, 142, 0.1) 0%, rgba(50, 184, 198, 0.1) 100%);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        td {
+            padding: 12px 15px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        tr:hover {
+            background: rgba(32, 140, 142, 0.02);
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background: var(--accent-warm);
+            color: white;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            opacity: 0.9;
+        }
+
+        .btn-delete:hover {
+            opacity: 0.9;
+        }
+
+        /* Forms */
+        .form-container {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px;
+            border: 2px solid rgba(94, 82, 64, 0.2);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(32, 140, 142, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(32, 140, 142, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(94, 82, 64, 0.1);
+            color: var(--text-dark);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(94, 82, 64, 0.2);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-top: 3px solid var(--primary);
+        }
+
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .card-stat {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(32, 140, 142, 0.2);
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            color: var(--primary);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: rgba(21, 128, 77, 0.1);
+            color: var(--success);
+            border-left: 3px solid var(--success);
+        }
+
+        .alert-error {
+            background: rgba(192, 21, 47, 0.1);
+            color: var(--danger);
+            border-left: 3px solid var(--danger);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+                padding: 20px 15px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Emma IA Chatbot Styles */
+        .emma-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000;
+        }
+
+        .emma-toggle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(32, 140, 142, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .emma-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .emma-toggle.active {
+            background: linear-gradient(135deg, var(--accent-warm) 0%, var(--warning) 100%);
+        }
+
+        .emma-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 380px;
+            height: 600px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .emma-window.active {
+            display: flex;
+        }
+
+        .emma-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .emma-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .emma-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: var(--bg-light);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .emma-message {
+            display: flex;
+            gap: 8px;
+        }
+
+        .emma-message.user {
+            justify-content: flex-end;
+        }
+
+        .emma-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .emma-avatar.user {
+            background: var(--accent-warm);
+        }
+
+        .emma-bubble {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .emma-bubble.user {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+
+        .emma-bubble.emma {
+            background: white;
+            border: 1px solid rgba(32, 140, 142, 0.2);
+            color: var(--text-dark);
+        }
+
+        .emma-input-area {
+            padding: 12px;
+            border-top: 1px solid rgba(32, 140, 142, 0.1);
+            display: flex;
+            gap: 8px;
+            background: white;
+        }
+
+        .emma-input-area input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid rgba(94, 82, 64, 0.2);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .emma-send {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .emma-typing {
+            display: flex;
+            gap: 4px;
+        }
+
+        .emma-typing span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            animation: typing 1.4s infinite;
+        }
+
+        .emma-typing span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .emma-typing span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0.3; }
+            30% { opacity: 1; }
+        }
+
+        @media (max-width: 480px) {
+            .emma-window {
+                width: calc(100vw - 40px);
+                height: calc(100vh - 100px);
+                max-height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>⚙️ Admin</h2>
+            <div class="menu-item active" onclick="switchSection('dashboard')">📊 Dashboard</div>
+            <div class="menu-item" onclick="switchSection('users')">👥 Gestion Utilisateurs</div>
+            <div class="menu-item" onclick="switchSection('fields')">📝 Paramétrer Champs</div>
+            <div class="menu-item" onclick="switchSection('templates')">📋 Templates Export</div>
+            <div class="menu-item" onclick="switchSection('clients')">📁 Dossiers Clients</div>
+            <div class="menu-item" onclick="switchSection('import-export')">📤 Import/Export</div>
+            <div class="sidebar-footer">
+                <button class="btn-logout-admin" onclick="logoutAdmin()">Déconnexion</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard -->
+            <div id="dashboard" class="content-section active">
+                <div class="section-header">
+                    <h1>📊 Dashboard Admin</h1>
+                    <p>Vue d'ensemble du système de collecte</p>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>Utilisateurs</h3>
+                        <div class="card-stat" id="userCount">2</div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Comptes actifs</p>
+                    </div>
+                    <div class="card">
+                        <h3>Dossiers</h3>
+                        <div class="card-stat" id="clientCount">0</div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Clients collectés</p>
+                    </div>
+                    <div class="card">
+                        <h3>Champs</h3>
+                        <div class="card-stat" id="fieldCount">0</div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Paramètres</p>
+                    </div>
+                </div>
+
+                <div class="form-container">
+                    <h3>ℹ️ Informations Système</h3>
+                    <table style="margin-top: 15px;">
+                        <tr>
+                            <td style="font-weight: 600; width: 200px;">Version App:</td>
+                            <td>1.0.0 Beta</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 600;">Stockage Local:</td>
+                            <td id="storageInfo">Calculé...</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 600;">Dernière Mise à Jour:</td>
+                            <td id="lastUpdate">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 600;">Navigateur:</td>
+                            <td id="browserInfo">Chargement...</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Gestion Utilisateurs -->
+            <div id="users" class="content-section">
+                <div class="section-header">
+                    <h1>👥 Gestion Utilisateurs</h1>
+                    <p>Créer et gérer les comptes utilisateurs</p>
+                </div>
+
+                <div id="alertUsers" class="alert"></div>
+
+                <div class="form-container">
+                    <h3>Ajouter Nouvel Utilisateur</h3>
+                    <form id="userForm" onsubmit="addUser(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nom Complet</label>
+                                <input type="text" id="newUserName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Nom d'Utilisateur</label>
+                                <input type="text" id="newUsername" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Mot de Passe</label>
+                                <input type="password" id="newPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Rôle</label>
+                                <select id="newRole">
+                                    <option value="user">Adjointe</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Ajouter Utilisateur</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Utilisateur</th>
+                                <th>Rôle</th>
+                                <th>Créé</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersList">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Paramétrer Champs -->
+            <div id="fields" class="content-section">
+                <div class="section-header">
+                    <h1>📝 Paramétrer les Champs</h1>
+                    <p>Configurer les champs collectés dans le formulaire</p>
+                </div>
+
+                <div id="alertFields" class="alert"></div>
+
+                <div class="form-container">
+                    <h3>Sections du Formulaire</h3>
+                    <div id="fieldsList"></div>
+                </div>
+            </div>
+
+            <!-- Templates -->
+            <div id="templates" class="content-section">
+                <div class="section-header">
+                    <h1>📋 Configuration Templates Export</h1>
+                    <p>Paramétrer les exports Excel et PDF</p>
+                </div>
+
+                <div class="form-container">
+                    <h3>Configuration Excel</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nom du Fichier (Template)</label>
+                            <input type="text" id="excelTemplate" value="client_" placeholder="client_">
+                        </div>
+                        <div class="form-group">
+                            <label>Inclure Colonnes</label>
+                            <textarea id="excelColumns">firstName,lastName,email,phone,annualIncome</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-container">
+                    <h3>Configuration PDF</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Titre du Formulaire</label>
+                            <input type="text" id="pdfTitle" value="Formulaire de Collecte de Données">
+                        </div>
+                        <div class="form-group">
+                            <label>Inclure Signature</label>
+                            <select id="pdfSignature">
+                                <option value="true">Oui</option>
+                                <option value="false">Non</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Template Sections (une par ligne)</label>
+                            <textarea id="pdfSections">Identité
+Situation Personnelle
+Situation Financière</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-container">
+                    <div class="form-actions">
+                        <button class="btn btn-primary" onclick="saveTemplates()">Sauvegarder Configuration</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clients -->
+            <div id="clients" class="content-section">
+                <div class="section-header">
+                    <h1>📁 Dossiers Clients</h1>
+                    <p>Voir et gérer tous les dossiers collectés</p>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Revenu Annuel</th>
+                                <th>Créé</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientsList">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Import/Export -->
+            <div id="import-export" class="content-section">
+                <div class="section-header">
+                    <h1>📤 Import / Export Global</h1>
+                    <p>Sauvegarder et importer les configurations et données</p>
+                </div>
+
+                <div class="form-container">
+                    <h3>Exporter Tout</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">Télécharger un fichier ZIP avec toutes les données et configurations</p>
+                    <button class="btn btn-primary" onclick="exportAll()">📥 Exporter ZIP</button>
+                </div>
+
+                <div class="form-container">
+                    <h3>Importer Configuration</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Charger Fichier JSON</label>
+                            <input type="file" id="importFile" accept=".json">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" onclick="importConfig()">📤 Importer</button>
+                    </div>
+                </div>
+
+                <div class="form-container">
+                    <h3>Sauvegarde Auto Excel</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">Un fichier Excel est créé automatiquement à chaque nouveau client</p>
+                    <button class="btn btn-secondary" onclick="testAutoSave()">🧪 Tester Auto-Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emma IA Chatbot -->
+    <div class="emma-container">
+        <button class="emma-toggle" id="emmaToggle" title="Emma IA Assistant">💬</button>
+        <div class="emma-window" id="emmaWindow">
+            <div class="emma-header">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">Emma IA <span style="width: 10px; height: 10px; background: var(--success); border-radius: 50%; display: inline-block; margin-left: 6px;"></span></h3>
+                    <p style="margin: 0; font-size: 0.8rem; opacity: 0.9;">Assistant Intelligent</p>
+                </div>
+                <button class="emma-close" id="emmaClose">✕</button>
+            </div>
+            <div class="emma-messages" id="emmaMessages"></div>
+            <div class="emma-input-area">
+                <input type="text" id="emmaInput" placeholder="Posez une question à Emma..." autocomplete="off">
+                <button class="emma-send" id="emmaSend">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-logic.js"></script>
+    <script src="emma-ai.js"></script>
+</body>
+</html>
