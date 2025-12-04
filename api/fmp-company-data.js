@@ -53,11 +53,57 @@ export default async function handler(req, res) {
 
     // Fonction pour essayer plusieurs variantes de symboles
     const tryFetchProfile = async (symbolToTry) => {
-        const profileRes = await fetch(`${FMP_BASE}/profile/${symbolToTry}?apikey=${FMP_KEY}`);
-        if (!profileRes.ok) return null;
-        const profileData = await profileRes.json();
-        if (!profileData || profileData.length === 0) return null;
-        return { profile: profileData[0], usedSymbol: symbolToTry };
+        try {
+            const profileRes = await fetch(`${FMP_BASE}/profile/${symbolToTry}?apikey=${FMP_KEY}`);
+            
+            // Vérifier le statut HTTP
+            if (!profileRes.ok) {
+                const errorText = await profileRes.text();
+                console.warn(`⚠️ FMP Profile HTTP error for ${symbolToTry}: ${profileRes.status} - ${errorText.substring(0, 200)}`);
+                
+                // Si c'est une erreur d'API key invalide, on veut le savoir
+                if (profileRes.status === 401 || profileRes.status === 403) {
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        if (errorJson['Error Message'] && errorJson['Error Message'].includes('Invalid API KEY')) {
+                            console.error(`❌ FMP API KEY INVALIDE - Vérifiez FMP_API_KEY dans Vercel`);
+                        }
+                    } catch (e) {
+                        // Ignore parse error
+                    }
+                }
+                return null;
+            }
+            
+            const profileData = await profileRes.json();
+            
+            // Vérifier si c'est un objet d'erreur FMP
+            if (profileData && typeof profileData === 'object' && !Array.isArray(profileData)) {
+                if (profileData['Error Message']) {
+                    console.warn(`⚠️ FMP Error for ${symbolToTry}: ${profileData['Error Message']}`);
+                    return null;
+                }
+            }
+            
+            // Vérifier si c'est un tableau vide ou invalide
+            if (!profileData || !Array.isArray(profileData) || profileData.length === 0) {
+                console.warn(`⚠️ FMP Profile returned empty/invalid data for ${symbolToTry}`);
+                return null;
+            }
+            
+            // Vérifier que le profil a des données valides
+            const profile = profileData[0];
+            if (!profile || !profile.symbol) {
+                console.warn(`⚠️ FMP Profile data invalid for ${symbolToTry}`);
+                return null;
+            }
+            
+            console.log(`✅ FMP Profile found for ${symbolToTry} (actual symbol: ${profile.symbol})`);
+            return { profile, usedSymbol: symbolToTry };
+        } catch (error) {
+            console.error(`❌ Error fetching FMP profile for ${symbolToTry}:`, error.message);
+            return null;
+        }
     };
 
     try {
@@ -118,9 +164,28 @@ export default async function handler(req, res) {
         }
 
         if (!profileResult) {
+            const triedSymbols = [cleanSymbol, ...(symbolVariants[cleanSymbol] || [])];
+            console.error(`❌ Symbol '${cleanSymbol}' not found after trying: ${triedSymbols.join(', ')}`);
+            
+            // Vérifier si c'est un problème de clé API
+            const testRes = await fetch(`${FMP_BASE}/profile/AAPL?apikey=${FMP_KEY}`);
+            if (!testRes.ok) {
+                const testError = await testRes.text();
+                if (testError.includes('Invalid API KEY') || testError.includes('API key')) {
+                    console.error(`❌ FMP API KEY semble invalide - Vérifiez FMP_API_KEY dans Vercel`);
+                    return res.status(500).json({
+                        error: 'FMP API key invalid or not configured',
+                        message: 'La clé API FMP semble invalide. Vérifiez FMP_API_KEY dans les variables d\'environnement Vercel.',
+                        tried: triedSymbols,
+                        diagnostic: 'Test avec AAPL a également échoué'
+                    });
+                }
+            }
+            
             return res.status(404).json({ 
                 error: `Symbol '${cleanSymbol}' not found`,
-                tried: [cleanSymbol, ...(symbolVariants[cleanSymbol] || [])]
+                tried: triedSymbols,
+                message: `Aucune donnée trouvée pour ${cleanSymbol} après avoir essayé ${triedSymbols.length} variante(s). Vérifiez que le symbole est correct.`
             });
         }
 
@@ -129,8 +194,30 @@ export default async function handler(req, res) {
 
         // 2. Fetch Key Metrics (Annual) - utiliser le symbole qui a fonctionné
         const metricsRes = await fetch(`${FMP_BASE}/key-metrics/${usedSymbol}?period=annual&limit=20&apikey=${FMP_KEY}`);
-        if (!metricsRes.ok) throw new Error(`FMP Metrics error: ${metricsRes.statusText}`);
+        if (!metricsRes.ok) {
+            const errorText = await metricsRes.text();
+            console.error(`❌ FMP Key Metrics error for ${usedSymbol}: ${metricsRes.status} - ${errorText.substring(0, 200)}`);
+            throw new Error(`FMP Metrics error: ${metricsRes.status} ${metricsRes.statusText}`);
+        }
         let metricsData = await metricsRes.json();
+        
+        // Vérifier si c'est un objet d'erreur
+        if (metricsData && typeof metricsData === 'object' && !Array.isArray(metricsData)) {
+            if (metricsData['Error Message']) {
+                console.error(`❌ FMP Key Metrics Error: ${metricsData['Error Message']}`);
+                throw new Error(`FMP Key Metrics error: ${metricsData['Error Message']}`);
+            }
+        }
+        
+        // Vérifier que c'est un tableau valide
+        if (!Array.isArray(metricsData)) {
+            console.error(`❌ FMP Key Metrics returned invalid data type for ${usedSymbol}`);
+            throw new Error(`FMP Key Metrics returned invalid data`);
+        }
+        
+        if (metricsData.length === 0) {
+            console.warn(`⚠️ FMP Key Metrics returned empty array for ${usedSymbol} - continuing with empty data`);
+        }
 
         // Deduplicate metrics by year (keep the one with the latest date if duplicates exist)
         const uniqueMetrics = {};
@@ -180,8 +267,24 @@ export default async function handler(req, res) {
 
         // 3. Fetch Historical Prices for High/Low
         const priceRes = await fetch(`${FMP_BASE}/historical-price-full/${usedSymbol}?serietype=line&timeseries=1825&apikey=${FMP_KEY}`);
-        if (!priceRes.ok) throw new Error(`FMP Price error: ${priceRes.statusText}`);
+        if (!priceRes.ok) {
+            const errorText = await priceRes.text();
+            console.error(`❌ FMP Historical Price error for ${usedSymbol}: ${priceRes.status} - ${errorText.substring(0, 200)}`);
+            throw new Error(`FMP Price error: ${priceRes.status} ${priceRes.statusText}`);
+        }
         const priceData = await priceRes.json();
+        
+        // Vérifier si c'est un objet d'erreur
+        if (priceData && typeof priceData === 'object' && !Array.isArray(priceData) && priceData['Error Message']) {
+            console.error(`❌ FMP Historical Price Error: ${priceData['Error Message']}`);
+            throw new Error(`FMP Historical Price error: ${priceData['Error Message']}`);
+        }
+        
+        // Vérifier que les données historiques existent
+        if (!priceData || !priceData.historical || !Array.isArray(priceData.historical)) {
+            console.warn(`⚠️ FMP Historical Price returned invalid data for ${usedSymbol} - continuing with empty price history`);
+            priceData.historical = [];
+        }
 
         // 4. Fetch Realtime Quote (Finnhub if available)
         let currentPrice = profile.price || 0;
