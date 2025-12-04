@@ -152,10 +152,7 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/finnhub", "destination": "/api/marketdata" },
-    { "source": "/reee", "destination": "/reee.html" },
-    { "source": "/REEE", "destination": "/reee.html" },
-    { "source": "/eval", "destination": "/eval.html" }
+    { "source": "/api/finnhub", "destination": "/api/marketdata" }
   ],
   "redirects": [
     {
