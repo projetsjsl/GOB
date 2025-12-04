@@ -4,90 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>REEE - JSL AI</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        html, body {
-            height: 100%;
-            overflow: hidden;
-        }
-        iframe {
-            width: 100%;
-            height: 100vh;
-            border: none;
-            display: block;
-        }
-        .fallback {
-            display: none;
-            padding: 2rem;
-            text-align: center;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-        .fallback.show {
-            display: block;
-        }
-        .fallback a {
-            color: #667eea;
-            text-decoration: underline;
-        }
-    </style>
+    <script>
+        // Rediriger immédiatement vers le proxy serveur
+        window.location.href = '/api/jslai-proxy?path=reee';
+    </script>
 </head>
 <body>
-    <!-- Iframe pour afficher le contenu sans changer l'URL dans la barre d'adresse -->
-    <iframe 
-        id="contentFrame"
-        src="https://jslai.app/reee" 
-        title="REEE - JSL AI"
-        allow="fullscreen"
-        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation-by-user-activation"
-    ></iframe>
-    
-    <!-- Fallback si l'iframe est bloquée -->
-    <div class="fallback" id="fallback">
-        <h1>Contenu non disponible en iframe</h1>
-        <p>Le contenu ne peut pas être affiché directement pour des raisons de sécurité.</p>
-        <p><a href="https://jslai.app/reee" target="_blank">Ouvrir dans un nouvel onglet</a></p>
-    </div>
-
-    <script>
-        // Détecter si l'iframe est bloquée (CSP ou autre)
-        const iframe = document.getElementById('contentFrame');
-        const fallback = document.getElementById('fallback');
-        
-        // Vérifier après un délai si l'iframe a chargé
-        setTimeout(() => {
-            try {
-                // Essayer d'accéder au contenu de l'iframe (sera bloqué si CSP)
-                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                // Si on arrive ici, l'iframe fonctionne
-            } catch (e) {
-                // L'iframe est bloquée, afficher le fallback
-                iframe.style.display = 'none';
-                fallback.classList.add('show');
-            }
-        }, 2000);
-
-        // Écouter les erreurs de chargement de l'iframe
-        iframe.addEventListener('error', () => {
-            iframe.style.display = 'none';
-            fallback.classList.add('show');
-        });
-
-        // Si l'iframe ne charge pas après 5 secondes, afficher le fallback
-        let loaded = false;
-        iframe.addEventListener('load', () => {
-            loaded = true;
-        });
-
-        setTimeout(() => {
-            if (!loaded) {
-                iframe.style.display = 'none';
-                fallback.classList.add('show');
-            }
-        }, 5000);
-    </script>
+    <p>Redirection en cours...</p>
+    <p>Si la redirection ne fonctionne pas, <a href="/api/jslai-proxy?path=reee">cliquez ici</a>.</p>
 </body>
 </html>
