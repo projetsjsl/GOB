@@ -87,6 +87,8 @@ export default function App() {
     const [currentView, setCurrentView] = useState<'analysis' | 'info' | 'kpi'>('analysis');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [showConfirmSync, setShowConfirmSync] = useState(false);
+    const [showRestoreDialog, setShowRestoreDialog] = useState(false);
+    const [latestSnapshotDate, setLatestSnapshotDate] = useState<string | undefined>(undefined);
     const [notifications, setNotifications] = useState<Array<{ id: string; message: string; type: 'success' | 'error' | 'warning' | 'info' }>>([]);
 
     // Helper function pour afficher des notifications
@@ -648,6 +650,125 @@ export default function App() {
             return;
         }
         setIsReadOnly(false);
+    };
+
+    // --- RESTORE DATA HANDLERS ---
+    const handleOpenRestoreDialog = async () => {
+        // Charger la date de la dernière sauvegarde
+        const result = await listSnapshots(activeId, 1);
+        if (result.success && result.snapshots && result.snapshots.length > 0) {
+            const latest = result.snapshots[0]; // Le plus récent est le premier
+            setLatestSnapshotDate(latest.snapshot_date);
+        }
+        setShowRestoreDialog(true);
+    };
+
+    const handleRestoreFromSnapshot = async () => {
+        try {
+            const result = await listSnapshots(activeId, 50);
+
+            if (result.success && result.snapshots && result.snapshots.length > 0) {
+                // Trouver le snapshot actuel (is_current) ou le plus récent
+                const currentSnap = result.snapshots.find(s => s.is_current) || result.snapshots[0];
+                
+                if (currentSnap) {
+                    await handleLoadSnapshot(currentSnap.id);
+                    showNotification('Données restaurées depuis la dernière sauvegarde', 'success');
+                } else {
+                    showNotification('Aucune sauvegarde trouvée', 'warning');
+                }
+            } else {
+                showNotification('Aucune sauvegarde disponible', 'warning');
+            }
+        } catch (error: any) {
+            console.error('Erreur lors de la restauration:', error);
+            showNotification(`Erreur: ${error.message}`, 'error');
+        }
+    };
+
+    const handleRecalculateFromFMP = async () => {
+        try {
+            showNotification(`Recalcul des données depuis FMP pour ${activeId}...`, 'info');
+            
+            // Récupérer les données FMP (comme lors d'un nouvel ajout)
+            const result = await fetchCompanyData(activeId);
+            
+            // VALIDATION STRICTE
+            if (!result.data || result.data.length === 0) {
+                throw new Error(`Aucune donnée FMP retournée pour ${activeId}`);
+            }
+            
+            if (!result.currentPrice || result.currentPrice <= 0) {
+                throw new Error(`Prix actuel invalide (${result.currentPrice}) pour ${activeId}`);
+            }
+            
+            const hasValidData = result.data.some(d => 
+                d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
+            );
+            
+            if (!hasValidData) {
+                throw new Error(`Aucune donnée financière valide pour ${activeId}`);
+            }
+
+            // Auto-fill assumptions avec la fonction centralisée (comme lors d'un nouvel ajout)
+            const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                result.data,
+                result.currentPrice,
+                assumptions // Préserver les exclusions existantes
+            );
+
+            // Mettre à jour les données et métriques
+            setData(result.data);
+            setAssumptions(prev => ({
+                ...prev,
+                ...autoFilledAssumptions
+            }));
+            setInfo(prev => ({
+                ...prev,
+                ...result.info,
+                // Préserver les métriques ValueLine
+                securityRank: prev.securityRank || result.info.securityRank || 'N/A',
+                earningsPredictability: prev.earningsPredictability || result.info.earningsPredictability,
+                priceGrowthPersistence: prev.priceGrowthPersistence || result.info.priceGrowthPersistence,
+                priceStability: prev.priceStability || result.info.priceStability
+            }));
+
+            // Mettre à jour dans la library
+            setLibrary(prev => {
+                const profile = prev[activeId];
+                if (!profile) return prev;
+                return {
+                    ...prev,
+                    [activeId]: {
+                        ...profile,
+                        data: result.data,
+                        assumptions: {
+                            ...profile.assumptions,
+                            ...autoFilledAssumptions
+                        },
+                        info: {
+                            ...profile.info,
+                            ...result.info,
+                            securityRank: profile.info.securityRank || result.info.securityRank || 'N/A',
+                            earningsPredictability: profile.info.earningsPredictability || result.info.earningsPredictability,
+                            priceGrowthPersistence: profile.info.priceGrowthPersistence || result.info.priceGrowthPersistence,
+                            priceStability: profile.info.priceStability || result.info.priceStability
+                        },
+                        lastModified: Date.now()
+                    }
+                };
+            });
+
+            // Reset historical state
+            setCurrentSnapshot(null);
+            setIsReadOnly(false);
+
+            showNotification(`✅ Données recalculées depuis FMP avec succès pour ${activeId}`, 'success');
+            console.log(`✅ ${activeId}: Données recalculées depuis FMP`);
+        } catch (error: any) {
+            console.error(`❌ ${activeId}: Erreur lors du recalcul FMP:`, error);
+            showNotification(`❌ Erreur: ${error.message}`, 'error');
+        }
     };
 
     const handleManualSave = async () => {
@@ -1629,6 +1750,15 @@ export default function App() {
                     setShowConfirmSync(false);
                     await performSync(saveSnapshot);
                 }}
+            />
+
+            {/* Restore Data Dialog */}
+            <RestoreDataDialog
+                isOpen={showRestoreDialog}
+                onClose={() => setShowRestoreDialog(false)}
+                onRestoreFromSnapshot={handleRestoreFromSnapshot}
+                onRecalculateFromFMP={handleRecalculateFromFMP}
+                latestSnapshotDate={latestSnapshotDate}
             />
 
             {/* RIGHT SIDEBAR - HISTORIQUE */}
