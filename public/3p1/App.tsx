@@ -961,10 +961,15 @@ export default function App() {
                         // Trier par année
                         mergedData.sort((a, b) => a.year - b.year);
 
-                        // 4. Mettre à jour le profil
-                        // - Garder les assumptions telles quelles (ne pas les modifier)
-                        // - Mettre à jour seulement currentPrice dans assumptions
-                        // - Mettre à jour les infos de l'entreprise
+                        // 4. Recalculer les métriques avec la fonction centralisée (bonnes pratiques cohérentes)
+                        // ⚠️ IMPORTANT : On préserve les exclusions (excludeEPS, excludeCF, etc.) mais on recalcule tout le reste
+                        const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                            mergedData, // Utiliser les données mergées (avec préservation des données manuelles)
+                            result.currentPrice,
+                            profile.assumptions // Préserver les valeurs existantes (excludeEPS, excludeCF, etc.)
+                        );
+
+                        // 5. Mettre à jour le profil avec les nouvelles métriques calculées
                         setLibrary(prev => {
                             const updated = {
                                 ...prev,
@@ -978,8 +983,8 @@ export default function App() {
                                         name: result.info.name || profile.info.name
                                     },
                                     assumptions: {
-                                        ...profile.assumptions, // Garder toutes les hypothèses (orange)
-                                        currentPrice: result.currentPrice // Mettre à jour seulement le prix actuel
+                                        ...profile.assumptions, // Préserver les exclusions et autres flags
+                                        ...autoFilledAssumptions // Recalculer toutes les métriques selon les bonnes pratiques
                                     },
                                     lastModified: Date.now()
                                 }
@@ -994,13 +999,13 @@ export default function App() {
                             return updated;
                         });
 
-                        // 5. Sauvegarder le snapshot après sync
+                        // 6. Sauvegarder le snapshot après sync avec les nouvelles métriques
                         await saveSnapshot(
                             tickerSymbol,
                             mergedData,
                             {
                                 ...profile.assumptions,
-                                currentPrice: result.currentPrice
+                                ...autoFilledAssumptions // Inclure les métriques recalculées
                             },
                             {
                                 ...profile.info,
