@@ -17,7 +17,7 @@ import { ConfirmSyncDialog } from './components/ConfirmSyncDialog';
 import { HistoricalVersionBanner } from './components/HistoricalVersionBanner';
 import { NotificationManager } from './components/Notification';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
-import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation } from './utils/calculations';
+import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation, autoFillAssumptionsFromFMPData } from './utils/calculations';
 import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { fetchCompanyData } from './services/financeApi';
 import { saveSnapshot, hasManualEdits, loadSnapshot, listSnapshots } from './services/snapshotApi';
@@ -247,34 +247,13 @@ export default function App() {
                                     
                                     // ✅ TOUTES LES VALIDATIONS PASSÉES - Créer le profil avec les données réelles
                                     const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
-                                    const currentYear = new Date().getFullYear();
                                     
-                                    // Auto-fill assumptions basées sur les données historiques
-                                    const validHistory = result.data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
-                                    const lastValidData = [...result.data].reverse().find(d => d.earningsPerShare > 0) || result.data[result.data.length - 1];
-                                    const lastData = result.data[result.data.length - 1];
-                                    const firstData = result.data[0];
-                                    const yearsDiff = lastValidData.year - firstData.year;
-                                    
-                                    const histGrowthEPS = calculateCAGR(firstData.earningsPerShare, lastValidData.earningsPerShare, yearsDiff);
-                                    const histGrowthSales = calculateCAGR(firstData.cashFlowPerShare, lastValidData.cashFlowPerShare, yearsDiff);
-                                    const histGrowthBV = calculateCAGR(firstData.bookValuePerShare, lastValidData.bookValuePerShare, yearsDiff);
-                                    const histGrowthDiv = calculateCAGR(firstData.dividendPerShare, lastValidData.dividendPerShare, yearsDiff);
-                                    
-                                    const peRatios = validHistory
-                                        .map(d => (d.priceHigh / d.earningsPerShare + d.priceLow / d.earningsPerShare) / 2)
-                                        .filter(v => isFinite(v) && v > 0);
-                                    const avgPE = peRatios.length > 0 ? calculateAverage(peRatios) : 15;
-                                    
-                                    const pcfRatios = validHistory
-                                        .map(d => (d.priceHigh / d.cashFlowPerShare + d.priceLow / d.cashFlowPerShare) / 2)
-                                        .filter(v => isFinite(v) && v > 0);
-                                    const avgPCF = pcfRatios.length > 0 ? calculateAverage(pcfRatios) : 10;
-                                    
-                                    const yieldValues = validHistory
-                                        .map(d => (d.dividendPerShare / d.priceHigh) * 100)
-                                        .filter(v => isFinite(v) && v >= 0);
-                                    const avgYield = yieldValues.length > 0 ? calculateAverage(yieldValues) : 2.0;
+                                    // Auto-fill assumptions basées sur les données historiques FMP (fonction centralisée)
+                                    const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                                        result.data,
+                                        result.currentPrice,
+                                        INITIAL_ASSUMPTIONS
+                                    );
                                     
                                     const newProfile: AnalysisProfile = {
                                         id: symbol,
@@ -282,17 +261,7 @@ export default function App() {
                                         data: result.data,
                                         assumptions: {
                                             ...INITIAL_ASSUMPTIONS,
-                                            currentPrice: result.currentPrice,
-                                            currentDividend: lastData.dividendPerShare,
-                                            baseYear: lastValidData.year,
-                                            growthRateEPS: Math.min(Math.max(histGrowthEPS, 0), 20),
-                                            growthRateSales: Math.min(Math.max(histGrowthSales, 0), 20),
-                                            growthRateCF: Math.min(Math.max(histGrowthSales, 0), 20),
-                                            growthRateBV: Math.min(Math.max(histGrowthBV, 0), 20),
-                                            growthRateDiv: Math.min(Math.max(histGrowthDiv, 0), 20),
-                                            targetPE: parseFloat(avgPE.toFixed(1)),
-                                            targetPCF: parseFloat(avgPCF.toFixed(1)),
-                                            targetYield: parseFloat(avgYield.toFixed(2))
+                                            ...autoFilledAssumptions
                                         },
                                         info: {
                                             ...result.info,
@@ -530,56 +499,24 @@ export default function App() {
                 });
             }
 
-            // Auto-fill assumptions based on historical data
-            const validHistory = result.data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
-
-            // Find last year with valid EPS to use as Base Year
-            const lastValidData = [...result.data].reverse().find(d => d.earningsPerShare > 0) || result.data[result.data.length - 1];
-            const lastData = result.data[result.data.length - 1];
-            const firstData = result.data[0];
-            const yearsDiff = lastValidData.year - firstData.year;
-
-            // Calculate historical CAGRs (using last VALID data)
-            const histGrowthEPS = calculateCAGR(firstData.earningsPerShare, lastValidData.earningsPerShare, yearsDiff);
-            const histGrowthSales = calculateCAGR(firstData.cashFlowPerShare, lastValidData.cashFlowPerShare, yearsDiff);
-            const histGrowthBV = calculateCAGR(firstData.bookValuePerShare, lastValidData.bookValuePerShare, yearsDiff);
-            const histGrowthDiv = calculateCAGR(firstData.dividendPerShare, lastValidData.dividendPerShare, yearsDiff);
-
-            // Calculate Average Ratios (filter out invalid values)
-            const peRatios = validHistory
-                .map(d => (d.priceHigh / d.earningsPerShare + d.priceLow / d.earningsPerShare) / 2)
-                .filter(v => isFinite(v) && v > 0);
-            const avgPE = peRatios.length > 0 ? calculateAverage(peRatios) : 15;
-
-            const pcfRatios = validHistory
-                .map(d => (d.priceHigh / d.cashFlowPerShare + d.priceLow / d.cashFlowPerShare) / 2)
-                .filter(v => isFinite(v) && v > 0);
-            const avgPCF = pcfRatios.length > 0 ? calculateAverage(pcfRatios) : 10;
-
-            const yieldValues = validHistory
-                .map(d => (d.dividendPerShare / d.priceHigh) * 100)
-                .filter(v => isFinite(v) && v >= 0);
-            const avgYield = yieldValues.length > 0 ? calculateAverage(yieldValues) : 2.0;
+            // Auto-fill assumptions basées sur les données historiques FMP (fonction centralisée)
+            // ⚠️ IMPORTANT : On préserve les hypothèses existantes (orange) sauf currentPrice
+            const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                result.data,
+                result.currentPrice,
+                assumptions // Préserver les valeurs existantes (excludeEPS, excludeCF, etc.)
+            );
 
             setAssumptions(prev => ({
                 ...prev,
-                currentPrice: result.currentPrice,
-                currentDividend: lastData.dividendPerShare,
-                baseYear: lastValidData.year,
-                growthRateEPS: Math.min(Math.max(histGrowthEPS, 0), 20),
-                growthRateSales: Math.min(Math.max(histGrowthSales, 0), 20),
-                growthRateCF: Math.min(Math.max(histGrowthSales, 0), 20),
-                growthRateBV: Math.min(Math.max(histGrowthBV, 0), 20),
-                growthRateDiv: Math.min(Math.max(histGrowthDiv, 0), 20),
-                targetPE: parseFloat(avgPE.toFixed(1)),
-                targetPCF: parseFloat(avgPCF.toFixed(1)),
-                targetYield: parseFloat(avgYield.toFixed(2))
+                ...autoFilledAssumptions // Mettre à jour avec les nouvelles valeurs calculées
             }));
 
             console.log('✅ Auto-filled assumptions in performSync:', {
-                growthEPS: histGrowthEPS,
-                targetPE: avgPE,
-                targetPCF: avgPCF
+                growthEPS: autoFilledAssumptions.growthRateEPS,
+                targetPE: autoFilledAssumptions.targetPE,
+                targetPCF: autoFilledAssumptions.targetPCF,
+                targetPBV: autoFilledAssumptions.targetPBV
             });
 
             // Auto-save snapshot after successful sync
@@ -815,32 +752,12 @@ export default function App() {
             }
 
             // ✅ TOUTES LES VALIDATIONS PASSÉES - Créer le profil avec les données réelles
-            // Auto-fill assumptions based on historical data
-            const validHistory = result.data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
-            const lastValidData = [...result.data].reverse().find(d => d.earningsPerShare > 0) || result.data[result.data.length - 1];
-            const lastData = result.data[result.data.length - 1];
-            const firstData = result.data[0];
-            const yearsDiff = lastValidData.year - firstData.year;
-
-            const histGrowthEPS = calculateCAGR(firstData.earningsPerShare, lastValidData.earningsPerShare, yearsDiff);
-            const histGrowthSales = calculateCAGR(firstData.cashFlowPerShare, lastValidData.cashFlowPerShare, yearsDiff);
-            const histGrowthBV = calculateCAGR(firstData.bookValuePerShare, lastValidData.bookValuePerShare, yearsDiff);
-            const histGrowthDiv = calculateCAGR(firstData.dividendPerShare, lastValidData.dividendPerShare, yearsDiff);
-
-            const peRatios = validHistory
-                .map(d => (d.priceHigh / d.earningsPerShare + d.priceLow / d.earningsPerShare) / 2)
-                .filter(v => isFinite(v) && v > 0);
-            const avgPE = peRatios.length > 0 ? calculateAverage(peRatios) : 15;
-
-            const pcfRatios = validHistory
-                .map(d => (d.priceHigh / d.cashFlowPerShare + d.priceLow / d.cashFlowPerShare) / 2)
-                .filter(v => isFinite(v) && v > 0);
-            const avgPCF = pcfRatios.length > 0 ? calculateAverage(pcfRatios) : 10;
-
-            const yieldValues = validHistory
-                .map(d => (d.dividendPerShare / d.priceHigh) * 100)
-                .filter(v => isFinite(v) && v >= 0);
-            const avgYield = yieldValues.length > 0 ? calculateAverage(yieldValues) : 2.0;
+            // Auto-fill assumptions basées sur les données historiques FMP (fonction centralisée)
+            const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                result.data,
+                result.currentPrice,
+                INITIAL_ASSUMPTIONS
+            );
 
             const newProfile: AnalysisProfile = {
                 id: upperSymbol,
@@ -848,17 +765,7 @@ export default function App() {
                 data: result.data,
                 assumptions: {
                     ...INITIAL_ASSUMPTIONS,
-                    currentPrice: result.currentPrice,
-                    currentDividend: lastData.dividendPerShare,
-                    baseYear: lastValidData.year,
-                    growthRateEPS: Math.min(Math.max(histGrowthEPS, 0), 20),
-                    growthRateSales: Math.min(Math.max(histGrowthSales, 0), 20),
-                    growthRateCF: Math.min(Math.max(histGrowthSales, 0), 20),
-                    growthRateBV: Math.min(Math.max(histGrowthBV, 0), 20),
-                    growthRateDiv: Math.min(Math.max(histGrowthDiv, 0), 20),
-                    targetPE: parseFloat(avgPE.toFixed(1)),
-                    targetPCF: parseFloat(avgPCF.toFixed(1)),
-                    targetYield: parseFloat(avgYield.toFixed(2))
+                    ...autoFilledAssumptions
                 },
                 info: result.info,
                 notes: '',
@@ -1228,31 +1135,13 @@ export default function App() {
                                 
                                 // ✅ TOUTES LES VALIDATIONS PASSÉES - Créer le profil avec les données réelles
                                 const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
-                                const validHistory = result.data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
-                                const lastValidData = [...result.data].reverse().find(d => d.earningsPerShare > 0) || result.data[result.data.length - 1];
-                                const lastData = result.data[result.data.length - 1];
-                                const firstData = result.data[0];
-                                const yearsDiff = lastValidData.year - firstData.year;
                                 
-                                const histGrowthEPS = calculateCAGR(firstData.earningsPerShare, lastValidData.earningsPerShare, yearsDiff);
-                                const histGrowthSales = calculateCAGR(firstData.cashFlowPerShare, lastValidData.cashFlowPerShare, yearsDiff);
-                                const histGrowthBV = calculateCAGR(firstData.bookValuePerShare, lastValidData.bookValuePerShare, yearsDiff);
-                                const histGrowthDiv = calculateCAGR(firstData.dividendPerShare, lastValidData.dividendPerShare, yearsDiff);
-                                
-                                const peRatios = validHistory
-                                    .map(d => (d.priceHigh / d.earningsPerShare + d.priceLow / d.earningsPerShare) / 2)
-                                    .filter(v => isFinite(v) && v > 0);
-                                const avgPE = peRatios.length > 0 ? calculateAverage(peRatios) : 15;
-                                
-                                const pcfRatios = validHistory
-                                    .map(d => (d.priceHigh / d.cashFlowPerShare + d.priceLow / d.cashFlowPerShare) / 2)
-                                    .filter(v => isFinite(v) && v > 0);
-                                const avgPCF = pcfRatios.length > 0 ? calculateAverage(pcfRatios) : 10;
-                                
-                                const yieldValues = validHistory
-                                    .map(d => (d.dividendPerShare / d.priceHigh) * 100)
-                                    .filter(v => isFinite(v) && v >= 0);
-                                const avgYield = yieldValues.length > 0 ? calculateAverage(yieldValues) : 2.0;
+                                // Auto-fill assumptions basées sur les données historiques FMP (fonction centralisée)
+                                const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                                    result.data,
+                                    result.currentPrice,
+                                    INITIAL_ASSUMPTIONS
+                                );
                                 
                                 const newProfile: AnalysisProfile = {
                                     id: symbol,
@@ -1260,17 +1149,7 @@ export default function App() {
                                     data: result.data,
                                     assumptions: {
                                         ...INITIAL_ASSUMPTIONS,
-                                        currentPrice: result.currentPrice,
-                                        currentDividend: lastData.dividendPerShare,
-                                        baseYear: lastValidData.year,
-                                        growthRateEPS: Math.min(Math.max(histGrowthEPS, 0), 20),
-                                        growthRateSales: Math.min(Math.max(histGrowthSales, 0), 20),
-                                        growthRateCF: Math.min(Math.max(histGrowthSales, 0), 20),
-                                        growthRateBV: Math.min(Math.max(histGrowthBV, 0), 20),
-                                        growthRateDiv: Math.min(Math.max(histGrowthDiv, 0), 20),
-                                        targetPE: parseFloat(avgPE.toFixed(1)),
-                                        targetPCF: parseFloat(avgPCF.toFixed(1)),
-                                        targetYield: parseFloat(avgYield.toFixed(2))
+                                        ...autoFilledAssumptions
                                     },
                                     info: {
                                         ...result.info,
