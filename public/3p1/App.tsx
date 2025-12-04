@@ -182,45 +182,9 @@ export default function App() {
                             return;
                         }
 
-                        // Créer un nouveau profil pour ce ticker
-                        const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
-                        const currentYear = new Date().getFullYear();
-                        const newProfile: AnalysisProfile = {
-                            id: tickerSymbol,
-                            lastModified: Date.now(),
-                            // Créer une seule ligne placeholder pour l'année courante
-                            data: [{
-                                year: currentYear,
-                                priceHigh: 0,
-                                priceLow: 0,
-                                cashFlowPerShare: 0,
-                                dividendPerShare: 0,
-                                bookValuePerShare: 0,
-                                earningsPerShare: 0
-                            }],
-                            assumptions: { ...INITIAL_ASSUMPTIONS, currentPrice: 100, currentDividend: 0 },
-                            info: {
-                                symbol: tickerSymbol,
-                                name: supabaseTicker.company_name || 'Chargement...',
-                                sector: supabaseTicker.sector || '',
-                                securityRank: supabaseTicker.security_rank || 'N/A',
-                                marketCap: '-',
-                                logo: undefined,
-                                country: undefined,
-                                exchange: undefined,
-                                currency: supabaseTicker.currency || 'USD',
-                                preferredSymbol: supabaseTicker.ticker,
-                                // Métriques ValueLine (Source: ValueLine au 3 décembre 2025)
-                                earningsPredictability: supabaseTicker.earnings_predictability,
-                                priceGrowthPersistence: supabaseTicker.price_growth_persistence,
-                                priceStability: supabaseTicker.price_stability,
-                                beta: supabaseTicker.beta // Beta récupéré via API FMP
-                            },
-                            notes: '',
-                            isWatchlist
-                        };
-
-                        updated[tickerSymbol] = newProfile;
+                        // ⚠️ RIGUEUR 100% : Ne pas créer de profil placeholder ici
+                        // Le profil sera créé uniquement si FMP réussit (voir code après)
+                        // On marque juste le ticker comme "à charger"
                         newTickersCount++;
                     });
 
@@ -238,7 +202,8 @@ export default function App() {
                     return updated;
                 });
 
-                // Charger les données FMP en arrière-plan pour les nouveaux tickers (batch avec délai)
+                // ⚠️ RIGUEUR 100% : Ne créer des profils QUE si FMP réussit
+                // Charger les données FMP AVANT de créer les profils (batch avec délai)
                 if (newTickers.length > 0) {
                     // Charger par batch de 5 avec délai de 500ms entre chaque batch
                     const batchSize = 5;
@@ -259,51 +224,112 @@ export default function App() {
                                 try {
                                     const result = await fetchCompanyData(symbol);
                                     
-                                    // Mettre à jour le profil avec les données réelles
+                                    // VALIDATION STRICTE : Vérifier que les données sont valides
+                                    if (!result.data || result.data.length === 0) {
+                                        console.error(`❌ ${symbol}: Aucune donnée FMP retournée - profil NON créé`);
+                                        return;
+                                    }
+                                    
+                                    if (!result.currentPrice || result.currentPrice <= 0) {
+                                        console.error(`❌ ${symbol}: Prix actuel invalide (${result.currentPrice}) - profil NON créé`);
+                                        return;
+                                    }
+                                    
+                                    // Vérifier qu'on a au moins une année avec des données valides
+                                    const hasValidData = result.data.some(d => 
+                                        d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
+                                    );
+                                    
+                                    if (!hasValidData) {
+                                        console.error(`❌ ${symbol}: Aucune donnée financière valide - profil NON créé`);
+                                        return;
+                                    }
+                                    
+                                    // ✅ TOUTES LES VALIDATIONS PASSÉES - Créer le profil avec les données réelles
+                                    const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
+                                    const currentYear = new Date().getFullYear();
+                                    
+                                    // Auto-fill assumptions basées sur les données historiques
+                                    const validHistory = result.data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
+                                    const lastValidData = [...result.data].reverse().find(d => d.earningsPerShare > 0) || result.data[result.data.length - 1];
+                                    const lastData = result.data[result.data.length - 1];
+                                    const firstData = result.data[0];
+                                    const yearsDiff = lastValidData.year - firstData.year;
+                                    
+                                    const histGrowthEPS = calculateCAGR(firstData.earningsPerShare, lastValidData.earningsPerShare, yearsDiff);
+                                    const histGrowthSales = calculateCAGR(firstData.cashFlowPerShare, lastValidData.cashFlowPerShare, yearsDiff);
+                                    const histGrowthBV = calculateCAGR(firstData.bookValuePerShare, lastValidData.bookValuePerShare, yearsDiff);
+                                    const histGrowthDiv = calculateCAGR(firstData.dividendPerShare, lastValidData.dividendPerShare, yearsDiff);
+                                    
+                                    const peRatios = validHistory
+                                        .map(d => (d.priceHigh / d.earningsPerShare + d.priceLow / d.earningsPerShare) / 2)
+                                        .filter(v => isFinite(v) && v > 0);
+                                    const avgPE = peRatios.length > 0 ? calculateAverage(peRatios) : 15;
+                                    
+                                    const pcfRatios = validHistory
+                                        .map(d => (d.priceHigh / d.cashFlowPerShare + d.priceLow / d.cashFlowPerShare) / 2)
+                                        .filter(v => isFinite(v) && v > 0);
+                                    const avgPCF = pcfRatios.length > 0 ? calculateAverage(pcfRatios) : 10;
+                                    
+                                    const yieldValues = validHistory
+                                        .map(d => (d.dividendPerShare / d.priceHigh) * 100)
+                                        .filter(v => isFinite(v) && v >= 0);
+                                    const avgYield = yieldValues.length > 0 ? calculateAverage(yieldValues) : 2.0;
+                                    
+                                    const newProfile: AnalysisProfile = {
+                                        id: symbol,
+                                        lastModified: Date.now(),
+                                        data: result.data,
+                                        assumptions: {
+                                            ...INITIAL_ASSUMPTIONS,
+                                            currentPrice: result.currentPrice,
+                                            currentDividend: lastData.dividendPerShare,
+                                            baseYear: lastValidData.year,
+                                            growthRateEPS: Math.min(Math.max(histGrowthEPS, 0), 20),
+                                            growthRateSales: Math.min(Math.max(histGrowthSales, 0), 20),
+                                            growthRateCF: Math.min(Math.max(histGrowthSales, 0), 20),
+                                            growthRateBV: Math.min(Math.max(histGrowthBV, 0), 20),
+                                            growthRateDiv: Math.min(Math.max(histGrowthDiv, 0), 20),
+                                            targetPE: parseFloat(avgPE.toFixed(1)),
+                                            targetPCF: parseFloat(avgPCF.toFixed(1)),
+                                            targetYield: parseFloat(avgYield.toFixed(2))
+                                        },
+                                        info: {
+                                            ...result.info,
+                                            symbol: symbol,
+                                            name: result.info.name || supabaseTicker.company_name || symbol,
+                                            sector: result.info.sector || supabaseTicker.sector || '',
+                                            securityRank: supabaseTicker.security_rank || 'N/A',
+                                            earningsPredictability: supabaseTicker.earnings_predictability,
+                                            priceGrowthPersistence: supabaseTicker.price_growth_persistence,
+                                            priceStability: supabaseTicker.price_stability,
+                                            beta: result.info.beta || supabaseTicker.beta,
+                                            preferredSymbol: supabaseTicker.ticker
+                                        },
+                                        notes: '',
+                                        isWatchlist
+                                    };
+                                    
+                                    // Créer le profil UNIQUEMENT avec des données valides
                                     setLibrary(prev => {
-                                        const profile = prev[symbol];
-                                        if (!profile) return prev;
-
-                                        // Préserver les métriques ValueLine de Supabase (elles ne viennent pas de FMP)
-                                        const preservedValueLineMetrics = {
-                                            securityRank: profile.info.securityRank,
-                                            earningsPredictability: profile.info.earningsPredictability,
-                                            priceGrowthPersistence: profile.info.priceGrowthPersistence,
-                                            priceStability: profile.info.priceStability,
-                                            beta: profile.info.beta // Beta peut venir de FMP ou Supabase
-                                        };
-
                                         const updated = {
                                             ...prev,
-                                            [symbol]: {
-                                                ...profile,
-                                                data: result.data,
-                                                info: {
-                                                    ...profile.info,
-                                                    ...result.info,
-                                                    // S'assurer que le nom de FMP remplace toujours celui de Supabase
-                                                    name: result.info.name || profile.info.name,
-                                                    // Préserver les métriques ValueLine (elles ne viennent pas de FMP)
-                                                    ...preservedValueLineMetrics
-                                                },
-                                                assumptions: {
-                                                    ...profile.assumptions,
-                                                    currentPrice: result.currentPrice
-                                                }
-                                            }
+                                            [symbol]: newProfile
                                         };
-
+                                        
                                         try {
                                             localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
                                         } catch (e) {
                                             console.warn('Failed to save to LocalStorage:', e);
                                         }
-
+                                        
                                         return updated;
                                     });
+                                    
+                                    console.log(`✅ ${symbol}: Profil créé avec données FMP valides`);
                                 } catch (error) {
-                                    console.warn(`⚠️ Impossible de charger les données pour ${symbol}:`, error);
-                                    // On continue avec les données par défaut
+                                    console.error(`❌ ${symbol}: Erreur FMP - profil NON créé:`, error);
+                                    // ⚠️ RIGUEUR 100% : Ne pas créer de profil si FMP échoue
                                 }
                             })
                         );
@@ -764,49 +790,43 @@ export default function App() {
             return;
         }
 
-        // Create placeholder profile
-        const currentYear = new Date().getFullYear();
-        const newProfile: AnalysisProfile = {
-            id: upperSymbol,
-            lastModified: Date.now(),
-            // Créer une seule ligne placeholder pour l'année courante
-            data: [{
-                year: currentYear,
-                priceHigh: 0,
-                priceLow: 0,
-                cashFlowPerShare: 0,
-                dividendPerShare: 0,
-                bookValuePerShare: 0,
-                earningsPerShare: 0
-            }],
-            assumptions: { ...INITIAL_ASSUMPTIONS, currentPrice: 100, currentDividend: 0 },
-            info: { ...INITIAL_INFO, symbol: upperSymbol, name: 'Chargement...', marketCap: '-' },
-            notes: '',
-            isWatchlist: false
-        };
-        setLibrary(prev => ({ ...prev, [upperSymbol]: newProfile }));
-        setActiveId(upperSymbol);
-
-        // Auto-fetch data
+        // ⚠️ RIGUEUR 100% : Ne pas créer de profil placeholder
+        // Charger les données FMP AVANT de créer le profil
         try {
+            showNotification(`Chargement des données pour ${upperSymbol}...`, 'info');
             const result = await fetchCompanyData(upperSymbol);
+            
+            // VALIDATION STRICTE : Vérifier que les données sont valides
+            if (!result.data || result.data.length === 0) {
+                throw new Error(`Aucune donnée FMP retournée pour ${upperSymbol}`);
+            }
+            
+            if (!result.currentPrice || result.currentPrice <= 0) {
+                throw new Error(`Prix actuel invalide (${result.currentPrice}) pour ${upperSymbol}`);
+            }
+            
+            // Vérifier qu'on a au moins une année avec des données valides
+            const hasValidData = result.data.some(d => 
+                d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
+            );
+            
+            if (!hasValidData) {
+                throw new Error(`Aucune donnée financière valide pour ${upperSymbol}`);
+            }
 
+            // ✅ TOUTES LES VALIDATIONS PASSÉES - Créer le profil avec les données réelles
             // Auto-fill assumptions based on historical data
             const validHistory = result.data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
-
-            // Find last year with valid EPS
             const lastValidData = [...result.data].reverse().find(d => d.earningsPerShare > 0) || result.data[result.data.length - 1];
             const lastData = result.data[result.data.length - 1];
             const firstData = result.data[0];
             const yearsDiff = lastValidData.year - firstData.year;
 
-            // Calculate historical CAGRs
             const histGrowthEPS = calculateCAGR(firstData.earningsPerShare, lastValidData.earningsPerShare, yearsDiff);
             const histGrowthSales = calculateCAGR(firstData.cashFlowPerShare, lastValidData.cashFlowPerShare, yearsDiff);
             const histGrowthBV = calculateCAGR(firstData.bookValuePerShare, lastValidData.bookValuePerShare, yearsDiff);
             const histGrowthDiv = calculateCAGR(firstData.dividendPerShare, lastValidData.dividendPerShare, yearsDiff);
 
-            // Calculate Average Ratios (filter out invalid values)
             const peRatios = validHistory
                 .map(d => (d.priceHigh / d.earningsPerShare + d.priceLow / d.earningsPerShare) / 2)
                 .filter(v => isFinite(v) && v > 0);
@@ -822,48 +842,58 @@ export default function App() {
                 .filter(v => isFinite(v) && v >= 0);
             const avgYield = yieldValues.length > 0 ? calculateAverage(yieldValues) : 2.0;
 
-            setAssumptions(prev => ({
-                ...prev,
-                currentPrice: result.currentPrice,
-                currentDividend: lastData.dividendPerShare,
-                baseYear: lastValidData.year, // Use valid data year
-                growthRateEPS: Math.min(Math.max(histGrowthEPS, 0), 20),
-                growthRateSales: Math.min(Math.max(histGrowthSales, 0), 20),
-                growthRateCF: Math.min(Math.max(histGrowthSales, 0), 20),
-                growthRateBV: Math.min(Math.max(histGrowthBV, 0), 20),
-                growthRateDiv: Math.min(Math.max(histGrowthDiv, 0), 20),
-                targetPE: parseFloat(avgPE.toFixed(1)),
-                targetPCF: parseFloat(avgPCF.toFixed(1)),
-                targetYield: parseFloat(avgYield.toFixed(2))
-            }));
-
-            console.log('✅ Auto-filled assumptions:', {
-                growthEPS: histGrowthEPS,
-                targetPE: avgPE
-            });
-
-            // Notify user of auto-fill
-            // setTimeout(() => alert(`Hypothèses mises à jour basées sur l'historique :\nCroissance BPA: ${histGrowthEPS.toFixed(1)}%\nP/E Cible: ${avgPE.toFixed(1)}x`), 500);
-
-            setData(result.data);
-            setInfo(prev => ({ ...prev, ...result.info }));
+            const newProfile: AnalysisProfile = {
+                id: upperSymbol,
+                lastModified: Date.now(),
+                data: result.data,
+                assumptions: {
+                    ...INITIAL_ASSUMPTIONS,
+                    currentPrice: result.currentPrice,
+                    currentDividend: lastData.dividendPerShare,
+                    baseYear: lastValidData.year,
+                    growthRateEPS: Math.min(Math.max(histGrowthEPS, 0), 20),
+                    growthRateSales: Math.min(Math.max(histGrowthSales, 0), 20),
+                    growthRateCF: Math.min(Math.max(histGrowthSales, 0), 20),
+                    growthRateBV: Math.min(Math.max(histGrowthBV, 0), 20),
+                    growthRateDiv: Math.min(Math.max(histGrowthDiv, 0), 20),
+                    targetPE: parseFloat(avgPE.toFixed(1)),
+                    targetPCF: parseFloat(avgPCF.toFixed(1)),
+                    targetYield: parseFloat(avgYield.toFixed(2))
+                },
+                info: result.info,
+                notes: '',
+                isWatchlist: false
+            };
             
-            // Update library with new info (including logo)
+            // Créer le profil UNIQUEMENT avec des données valides
             setLibrary(prev => {
-                const profile = prev[upperSymbol];
-                if (!profile) return prev;
-                return {
+                const updated = {
                     ...prev,
-                    [upperSymbol]: {
-                        ...profile,
-                        data: result.data,
-                        info: { ...profile.info, ...result.info }
-                    }
+                    [upperSymbol]: newProfile
                 };
+                
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                } catch (e) {
+                    console.warn('Failed to save to LocalStorage:', e);
+                }
+                
+                return updated;
             });
+            
+            setActiveId(upperSymbol);
+            setData(result.data);
+            setAssumptions(newProfile.assumptions);
+            setInfo(result.info);
+            setNotes('');
+            
+            showNotification(`✅ ${upperSymbol} chargé avec succès`, 'success');
+            console.log(`✅ ${upperSymbol}: Profil créé avec données FMP valides`);
         } catch (e) {
-            console.error('Auto-fetch failed:', e);
-            // Profile already created, user can manually sync later
+            const error = e as Error;
+            console.error(`❌ ${upperSymbol}: Erreur FMP - profil NON créé:`, error);
+            showNotification(`❌ Impossible de charger ${upperSymbol}: ${error.message}`, 'error');
+            // ⚠️ RIGUEUR 100% : Ne pas créer de profil si FMP échoue
         }
     };
 
@@ -1138,39 +1168,9 @@ export default function App() {
                         return;
                     }
 
-                    // Créer un nouveau profil
-                    const currentYear = new Date().getFullYear();
-                    const newProfile: AnalysisProfile = {
-                        id: tickerSymbol,
-                        lastModified: Date.now(),
-                        // Créer une seule ligne placeholder pour l'année courante
-                        data: [{
-                            year: currentYear,
-                            priceHigh: 0,
-                            priceLow: 0,
-                            cashFlowPerShare: 0,
-                            dividendPerShare: 0,
-                            bookValuePerShare: 0,
-                            earningsPerShare: 0
-                        }],
-                        assumptions: { ...INITIAL_ASSUMPTIONS, currentPrice: 100, currentDividend: 0 },
-                        info: {
-                            symbol: tickerSymbol,
-                            name: supabaseTicker.company_name || 'Chargement...',
-                            sector: supabaseTicker.sector || '',
-                            securityRank: 'N/A',
-                            marketCap: '-',
-                            logo: undefined,
-                            country: undefined,
-                            exchange: undefined,
-                            currency: 'USD',
-                            preferredSymbol: undefined
-                        },
-                        notes: '',
-                        isWatchlist: shouldBeWatchlist
-                    };
-
-                    updated[tickerSymbol] = newProfile;
+                    // ⚠️ RIGUEUR 100% : Ne pas créer de profil placeholder ici
+                    // Le profil sera créé uniquement si FMP réussit (voir code après)
+                    // On marque juste le ticker comme "à charger"
                     newTickersCount++;
                 });
 
@@ -1206,38 +1206,107 @@ export default function App() {
                             try {
                                 const result = await fetchCompanyData(symbol);
                                 
+                                // VALIDATION STRICTE : Vérifier que les données sont valides
+                                if (!result.data || result.data.length === 0) {
+                                    console.error(`❌ ${symbol}: Aucune donnée FMP retournée - profil NON créé`);
+                                    return;
+                                }
+                                
+                                if (!result.currentPrice || result.currentPrice <= 0) {
+                                    console.error(`❌ ${symbol}: Prix actuel invalide (${result.currentPrice}) - profil NON créé`);
+                                    return;
+                                }
+                                
+                                const hasValidData = result.data.some(d => 
+                                    d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
+                                );
+                                
+                                if (!hasValidData) {
+                                    console.error(`❌ ${symbol}: Aucune donnée financière valide - profil NON créé`);
+                                    return;
+                                }
+                                
+                                // ✅ TOUTES LES VALIDATIONS PASSÉES - Créer le profil avec les données réelles
+                                const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
+                                const validHistory = result.data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
+                                const lastValidData = [...result.data].reverse().find(d => d.earningsPerShare > 0) || result.data[result.data.length - 1];
+                                const lastData = result.data[result.data.length - 1];
+                                const firstData = result.data[0];
+                                const yearsDiff = lastValidData.year - firstData.year;
+                                
+                                const histGrowthEPS = calculateCAGR(firstData.earningsPerShare, lastValidData.earningsPerShare, yearsDiff);
+                                const histGrowthSales = calculateCAGR(firstData.cashFlowPerShare, lastValidData.cashFlowPerShare, yearsDiff);
+                                const histGrowthBV = calculateCAGR(firstData.bookValuePerShare, lastValidData.bookValuePerShare, yearsDiff);
+                                const histGrowthDiv = calculateCAGR(firstData.dividendPerShare, lastValidData.dividendPerShare, yearsDiff);
+                                
+                                const peRatios = validHistory
+                                    .map(d => (d.priceHigh / d.earningsPerShare + d.priceLow / d.earningsPerShare) / 2)
+                                    .filter(v => isFinite(v) && v > 0);
+                                const avgPE = peRatios.length > 0 ? calculateAverage(peRatios) : 15;
+                                
+                                const pcfRatios = validHistory
+                                    .map(d => (d.priceHigh / d.cashFlowPerShare + d.priceLow / d.cashFlowPerShare) / 2)
+                                    .filter(v => isFinite(v) && v > 0);
+                                const avgPCF = pcfRatios.length > 0 ? calculateAverage(pcfRatios) : 10;
+                                
+                                const yieldValues = validHistory
+                                    .map(d => (d.dividendPerShare / d.priceHigh) * 100)
+                                    .filter(v => isFinite(v) && v >= 0);
+                                const avgYield = yieldValues.length > 0 ? calculateAverage(yieldValues) : 2.0;
+                                
+                                const newProfile: AnalysisProfile = {
+                                    id: symbol,
+                                    lastModified: Date.now(),
+                                    data: result.data,
+                                    assumptions: {
+                                        ...INITIAL_ASSUMPTIONS,
+                                        currentPrice: result.currentPrice,
+                                        currentDividend: lastData.dividendPerShare,
+                                        baseYear: lastValidData.year,
+                                        growthRateEPS: Math.min(Math.max(histGrowthEPS, 0), 20),
+                                        growthRateSales: Math.min(Math.max(histGrowthSales, 0), 20),
+                                        growthRateCF: Math.min(Math.max(histGrowthSales, 0), 20),
+                                        growthRateBV: Math.min(Math.max(histGrowthBV, 0), 20),
+                                        growthRateDiv: Math.min(Math.max(histGrowthDiv, 0), 20),
+                                        targetPE: parseFloat(avgPE.toFixed(1)),
+                                        targetPCF: parseFloat(avgPCF.toFixed(1)),
+                                        targetYield: parseFloat(avgYield.toFixed(2))
+                                    },
+                                    info: {
+                                        ...result.info,
+                                        symbol: symbol,
+                                        name: result.info.name || supabaseTicker.company_name || symbol,
+                                        sector: result.info.sector || supabaseTicker.sector || '',
+                                        securityRank: supabaseTicker.security_rank || 'N/A',
+                                        earningsPredictability: supabaseTicker.earnings_predictability,
+                                        priceGrowthPersistence: supabaseTicker.price_growth_persistence,
+                                        priceStability: supabaseTicker.price_stability,
+                                        beta: result.info.beta || supabaseTicker.beta,
+                                        preferredSymbol: supabaseTicker.ticker
+                                    },
+                                    notes: '',
+                                    isWatchlist: shouldBeWatchlist
+                                };
+                                
                                 setLibrary(prev => {
-                                    const profile = prev[symbol];
-                                    if (!profile) return prev;
-
                                     const updated = {
                                         ...prev,
-                                        [symbol]: {
-                                            ...profile,
-                                            data: result.data,
-                                            info: {
-                                                ...profile.info,
-                                                ...result.info,
-                                                // S'assurer que le nom de FMP remplace toujours celui de Supabase
-                                                name: result.info.name || profile.info.name
-                                            },
-                                            assumptions: {
-                                                ...profile.assumptions,
-                                                currentPrice: result.currentPrice
-                                            }
-                                        }
+                                        [symbol]: newProfile
                                     };
-
+                                    
                                     try {
                                         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
                                     } catch (e) {
                                         console.warn('Failed to save to LocalStorage:', e);
                                     }
-
+                                    
                                     return updated;
                                 });
+                                
+                                console.log(`✅ ${symbol}: Profil créé avec données FMP valides`);
                             } catch (error) {
-                                console.warn(`⚠️ Impossible de charger les données pour ${symbol}:`, error);
+                                console.error(`❌ ${symbol}: Erreur FMP - profil NON créé:`, error);
+                                // ⚠️ RIGUEUR 100% : Ne pas créer de profil si FMP échoue
                             }
                         })
                     );
