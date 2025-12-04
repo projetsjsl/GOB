@@ -560,7 +560,33 @@ export default function App() {
             showNotification(`Données synchronisées avec succès pour ${activeId}`, 'success');
 
         } catch (e) {
-            showNotification(`Erreur lors de la récupération des données : ${(e as Error).message}`, 'error');
+            const error = e as Error;
+            let errorMessage = error.message;
+            
+            // Améliorer les messages d'erreur pour l'utilisateur
+            if (errorMessage.includes('not found') || errorMessage.includes('introuvable')) {
+                errorMessage = `Symbole '${activeId}' introuvable dans FMP.\n\n` +
+                    `Causes possibles:\n` +
+                    `• Le symbole n'existe pas ou est mal orthographié\n` +
+                    `• Le symbole nécessite un format différent (ex: BRK-B au lieu de BRK.B)\n` +
+                    `• La clé API FMP n'est pas configurée ou invalide\n` +
+                    `• Le ticker n'est pas disponible dans FMP (essayez un autre fournisseur)\n\n` +
+                    `Vérifiez les logs de la console pour plus de détails.`;
+            } else if (errorMessage.includes('API key') || errorMessage.includes('Invalid API')) {
+                errorMessage = `Erreur de clé API FMP.\n\n` +
+                    `La clé API FMP semble invalide ou non configurée.\n` +
+                    `Vérifiez FMP_API_KEY dans les variables d'environnement Vercel.`;
+            } else if (errorMessage.includes('empty') || errorMessage.includes('vide')) {
+                errorMessage = `Aucune donnée retournée pour '${activeId}'.\n\n` +
+                    `FMP a retourné un tableau vide. Cela peut signifier:\n` +
+                    `• Le ticker existe mais n'a pas de données historiques disponibles\n` +
+                    `• Le ticker nécessite un abonnement FMP premium\n` +
+                    `• Le symbole doit être formaté différemment\n\n` +
+                    `Vérifiez les logs de la console pour plus de détails.`;
+            }
+            
+            console.error('❌ Erreur synchronisation:', error);
+            showNotification(`Erreur lors de la récupération des données : ${errorMessage}`, 'error');
         }
     };
 
