@@ -3,7 +3,7 @@ import { StarIcon, EyeIcon } from '@heroicons/react/24/solid';
 import { AnalysisProfile } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
 import { formatCurrency, formatPercent } from '../utils/calculations';
-import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { listSnapshots } from '../services/snapshotApi';
 
 interface KPIDashboardProps {
@@ -30,115 +30,253 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     return profiles.map(profile => {
       const { recommendation, targetPrice } = calculateRecommendation(profile.data, profile.assumptions);
       
-      // Calcul JPEGY
+      // VALIDATION: Vérifier que currentPrice est valide
+      const currentPrice = Math.max(profile.assumptions.currentPrice || 0, 0.01); // Minimum 0.01 pour éviter division par zéro
+      if (currentPrice <= 0 || !isFinite(currentPrice)) {
+        // Retourner des valeurs par défaut si prix invalide
+        return {
+          profile,
+          recommendation,
+          jpegy: 0,
+          totalReturnPercent: -100,
+          ratio31: 0,
+          downsideRisk: 0,
+          upsidePotential: -100,
+          hasApprovedVersion: false,
+          targetPrice: 0,
+          currentPE: 0,
+          currentPCF: 0,
+          currentPBV: 0,
+          currentYield: 0,
+          historicalGrowth: 0,
+          volatility: 0
+        };
+      }
+      
+      // Calcul JPEGY avec validation stricte
       const baseYearData = profile.data.find(d => d.year === profile.assumptions.baseYear) || profile.data[profile.data.length - 1];
-      const baseEPS = baseYearData?.earningsPerShare || 0;
-      const basePE = baseEPS > 0 ? profile.assumptions.currentPrice / baseEPS : 0;
-      const baseYield = (profile.assumptions.currentDividend / profile.assumptions.currentPrice) * 100;
-      const growthPlusYield = profile.assumptions.growthRateEPS + baseYield;
-      const jpegy = growthPlusYield > 0 ? basePE / growthPlusYield : 0;
+      const baseEPS = Math.max(baseYearData?.earningsPerShare || 0, 0);
+      
+      // VALIDATION: Vérifier que baseEPS est valide (pas juste 0 par défaut)
+      const hasValidEPS = baseEPS > 0.01 && isFinite(baseEPS);
+      
+      const basePE = hasValidEPS && currentPrice > 0 ? currentPrice / baseEPS : 0;
+      // Limiter P/E à un maximum raisonnable (1000x)
+      const safeBasePE = basePE > 0 && basePE <= 1000 ? basePE : 0;
+      
+      const baseYield = currentPrice > 0 && profile.assumptions.currentDividend >= 0 
+        ? (profile.assumptions.currentDividend / currentPrice) * 100 
+        : 0;
+      // Limiter yield à 0-50% (au-delà c'est suspect)
+      const safeBaseYield = Math.max(0, Math.min(baseYield, 50));
+      
+      const growthPlusYield = (profile.assumptions.growthRateEPS || 0) + safeBaseYield;
+      
+      // JPEGY: valider que growthPlusYield > 0.01 ET que basePE est valide
+      // Limiter JPEGY à un maximum raisonnable (100)
+      let jpegy = 0;
+      if (growthPlusYield > 0.01 && safeBasePE > 0 && hasValidEPS) {
+        const rawJPEGY = safeBasePE / growthPlusYield;
+        jpegy = isFinite(rawJPEGY) && rawJPEGY >= 0 && rawJPEGY <= 100 ? rawJPEGY : 0;
+      }
 
       // Calcul rendement total potentiel
       const baseValues = {
-        eps: baseEPS,
-        cf: baseYearData?.cashFlowPerShare || 0,
-        bv: baseYearData?.bookValuePerShare || 0,
-        div: profile.assumptions.currentDividend || 0
+        eps: Math.max(baseEPS, 0),
+        cf: Math.max(baseYearData?.cashFlowPerShare || 0, 0),
+        bv: Math.max(baseYearData?.bookValuePerShare || 0, 0),
+        div: Math.max(profile.assumptions.currentDividend || 0, 0)
       };
 
       const projectFutureValue = (current: number, rate: number, years: number): number => {
-        return current * Math.pow(1 + rate / 100, years);
+        // Valider les entrées
+        if (current <= 0 || !isFinite(current) || !isFinite(rate)) return 0;
+        // Limiter le taux de croissance à un maximum raisonnable (50% par an)
+        const safeRate = Math.max(-50, Math.min(rate, 50));
+        return current * Math.pow(1 + safeRate / 100, years);
       };
+
+      // Valider et limiter les taux de croissance
+      const safeGrowthEPS = Math.max(-50, Math.min(profile.assumptions.growthRateEPS || 0, 50));
+      const safeGrowthCF = Math.max(-50, Math.min(profile.assumptions.growthRateCF || 0, 50));
+      const safeGrowthBV = Math.max(-50, Math.min(profile.assumptions.growthRateBV || 0, 50));
+      const safeGrowthDiv = Math.max(-50, Math.min(profile.assumptions.growthRateDiv || 0, 50));
 
       const futureValues = {
-        eps: projectFutureValue(baseValues.eps, profile.assumptions.growthRateEPS, 5),
-        cf: projectFutureValue(baseValues.cf, profile.assumptions.growthRateCF, 5),
-        bv: projectFutureValue(baseValues.bv, profile.assumptions.growthRateBV, 5),
-        div: projectFutureValue(baseValues.div, profile.assumptions.growthRateDiv, 5)
+        eps: projectFutureValue(baseValues.eps, safeGrowthEPS, 5),
+        cf: projectFutureValue(baseValues.cf, safeGrowthCF, 5),
+        bv: projectFutureValue(baseValues.bv, safeGrowthBV, 5),
+        div: projectFutureValue(baseValues.div, safeGrowthDiv, 5)
       };
+
+      // Valider et limiter les ratios cibles (éviter des ratios extrêmes)
+      const safeTargetPE = Math.max(1, Math.min(profile.assumptions.targetPE || 0, 100));
+      const safeTargetPCF = Math.max(1, Math.min(profile.assumptions.targetPCF || 0, 100));
+      const safeTargetPBV = Math.max(0.5, Math.min(profile.assumptions.targetPBV || 0, 50));
+      const safeTargetYield = Math.max(0.1, Math.min(profile.assumptions.targetYield || 0, 20));
 
       const targets = {
-        eps: futureValues.eps * profile.assumptions.targetPE,
-        cf: futureValues.cf * profile.assumptions.targetPCF,
-        bv: futureValues.bv * profile.assumptions.targetPBV,
-        div: profile.assumptions.targetYield > 0 ? futureValues.div / (profile.assumptions.targetYield / 100) : 0
+        eps: futureValues.eps > 0 && safeTargetPE > 0 && safeTargetPE <= 100 ? futureValues.eps * safeTargetPE : 0,
+        cf: futureValues.cf > 0 && safeTargetPCF > 0 && safeTargetPCF <= 100 ? futureValues.cf * safeTargetPCF : 0,
+        bv: futureValues.bv > 0 && safeTargetPBV > 0 && safeTargetPBV <= 50 ? futureValues.bv * safeTargetPBV : 0,
+        div: futureValues.div > 0 && safeTargetYield > 0 && safeTargetYield <= 20 ? futureValues.div / (safeTargetYield / 100) : 0
       };
 
+      // Valider que les targets sont raisonnables (max 50x le prix actuel pour éviter les valeurs aberrantes)
+      const maxReasonableTarget = currentPrice * 50;
+      const minReasonableTarget = currentPrice * 0.1; // Minimum 10% du prix actuel
       const validTargets = [
-        !profile.assumptions.excludeEPS && targets.eps > 0 ? targets.eps : null,
-        !profile.assumptions.excludeCF && targets.cf > 0 ? targets.cf : null,
-        !profile.assumptions.excludeBV && targets.bv > 0 ? targets.bv : null,
-        !profile.assumptions.excludeDIV && targets.div > 0 ? targets.div : null
-      ].filter((t): t is number => t !== null && t > 0);
+        !profile.assumptions.excludeEPS && targets.eps > 0 && targets.eps >= minReasonableTarget && targets.eps <= maxReasonableTarget && isFinite(targets.eps) ? targets.eps : null,
+        !profile.assumptions.excludeCF && targets.cf > 0 && targets.cf >= minReasonableTarget && targets.cf <= maxReasonableTarget && isFinite(targets.cf) ? targets.cf : null,
+        !profile.assumptions.excludeBV && targets.bv > 0 && targets.bv >= minReasonableTarget && targets.bv <= maxReasonableTarget && isFinite(targets.bv) ? targets.bv : null,
+        !profile.assumptions.excludeDIV && targets.div > 0 && targets.div >= minReasonableTarget && targets.div <= maxReasonableTarget && isFinite(targets.div) ? targets.div : null
+      ].filter((t): t is number => t !== null && t > 0 && isFinite(t));
 
       const avgTargetPrice = validTargets.length > 0
         ? validTargets.reduce((a, b) => a + b, 0) / validTargets.length
         : 0;
 
+      // Calculer les dividendes totaux avec validation stricte
       let totalDividends = 0;
-      let currentD = baseValues.div;
+      let currentD = Math.max(0, baseValues.div);
+      // Limiter les dividendes totaux à 10x le prix actuel (au-delà c'est aberrant)
+      const maxReasonableDividends = currentPrice * 10;
       for (let i = 0; i < 5; i++) {
-        currentD = currentD * (1 + profile.assumptions.growthRateDiv / 100);
-        totalDividends += currentD;
+        currentD = currentD * (1 + safeGrowthDiv / 100);
+        if (isFinite(currentD) && currentD >= 0 && totalDividends + currentD <= maxReasonableDividends) {
+          totalDividends += currentD;
+        } else {
+          break; // Arrêter si on dépasse les limites
+        }
+      }
+      // Limiter totalDividends au maximum raisonnable
+      totalDividends = Math.min(totalDividends, maxReasonableDividends);
+
+      // Calculer le rendement total avec validation et limites STRICTES
+      let totalReturnPercent = -100; // Par défaut si pas de données valides
+      if (currentPrice > 0 && avgTargetPrice > 0 && isFinite(avgTargetPrice) && isFinite(totalDividends) && validTargets.length > 0) {
+        const rawReturn = ((avgTargetPrice + totalDividends - currentPrice) / currentPrice) * 100;
+        // VALIDATION STRICTE: Vérifier que le calcul est raisonnable
+        if (isFinite(rawReturn) && rawReturn >= -100 && rawReturn <= 1000) {
+          // Vérifier que avgTargetPrice n'est pas aberrant (max 100x le prix actuel)
+          if (avgTargetPrice <= currentPrice * 100 && avgTargetPrice >= currentPrice * 0.1) {
+            totalReturnPercent = rawReturn;
+          } else {
+            // Prix cible aberrant, marquer comme invalide
+            totalReturnPercent = -100;
+          }
+        } else {
+          // Calcul aberrant, marquer comme invalide
+          totalReturnPercent = -100;
+        }
+      } else if (validTargets.length === 0) {
+        // Si aucune métrique valide, retourner -100% pour indiquer données manquantes
+        totalReturnPercent = -100;
       }
 
-      const totalReturnPercent = profile.assumptions.currentPrice > 0
-        ? ((avgTargetPrice + totalDividends - profile.assumptions.currentPrice) / profile.assumptions.currentPrice) * 100
-        : 0;
-
       // Calcul ratio 3:1 (potentiel de rendement vs potentiel de baisse)
-      const validHistory = profile.data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
+      const validHistory = profile.data.filter(d => d.priceHigh > 0 && d.priceLow > 0 && isFinite(d.priceHigh) && isFinite(d.priceLow));
       const avgLowPrice = validHistory.length > 0
         ? validHistory.reduce((sum, d) => sum + d.priceLow, 0) / validHistory.length
-        : profile.assumptions.currentPrice * 0.7;
+        : currentPrice * 0.7;
       
-      const downsideRisk = profile.assumptions.currentPrice > 0
-        ? ((profile.assumptions.currentPrice - avgLowPrice * 0.9) / profile.assumptions.currentPrice) * 100
+      // Valider avgLowPrice
+      const safeAvgLowPrice = isFinite(avgLowPrice) && avgLowPrice > 0 ? avgLowPrice : currentPrice * 0.7;
+      
+      const downsideRisk = currentPrice > 0 && safeAvgLowPrice > 0
+        ? Math.max(0, Math.min(100, ((currentPrice - safeAvgLowPrice * 0.9) / currentPrice) * 100))
         : 0;
       
-      const upsidePotential = totalReturnPercent;
-      const ratio31 = downsideRisk > 0 ? upsidePotential / downsideRisk : 0;
+      const upsidePotential = Math.max(-100, Math.min(1000, totalReturnPercent));
+      const ratio31 = downsideRisk > 0.1 ? Math.max(0, Math.min(100, upsidePotential / downsideRisk)) : 0;
 
       // Vérifier si version approuvée (vérifié via useEffect)
       const hasApprovedVersion = approvedVersions.has(profile.id);
       
-      // Calculer des métriques supplémentaires
-      const currentPE = basePE; // Réutiliser le P/E calculé plus haut
-      const currentPCF = baseYearData?.cashFlowPerShare > 0 
-        ? profile.assumptions.currentPrice / baseYearData.cashFlowPerShare 
+      // Calculer des métriques supplémentaires avec validation
+      const currentPE = isFinite(basePE) && basePE >= 0 ? Math.min(basePE, 1000) : 0; // Limiter P/E à 1000x max
+      const currentPCF = baseYearData?.cashFlowPerShare > 0 && isFinite(baseYearData.cashFlowPerShare)
+        ? Math.min(currentPrice / baseYearData.cashFlowPerShare, 1000)
         : 0;
-      const currentPBV = baseYearData?.bookValuePerShare > 0
-        ? profile.assumptions.currentPrice / baseYearData.bookValuePerShare
+      const currentPBV = baseYearData?.bookValuePerShare > 0 && isFinite(baseYearData.bookValuePerShare)
+        ? Math.min(currentPrice / baseYearData.bookValuePerShare, 100)
         : 0;
-      const currentYield = baseYield; // Réutiliser le yield calculé plus haut
+      const currentYield = Math.max(0, Math.min(100, baseYield)); // Limiter yield à 0-100%
       
-      // Calculer la croissance moyenne historique
-      const validData = profile.data.filter(d => d.earningsPerShare > 0);
+      // Calculer la croissance moyenne historique avec validation
+      const validData = profile.data.filter(d => d.earningsPerShare > 0 && isFinite(d.earningsPerShare));
       let historicalGrowth = 0;
       if (validData.length >= 2) {
         const firstEPS = validData[0].earningsPerShare;
         const lastEPS = validData[validData.length - 1].earningsPerShare;
         const years = validData[validData.length - 1].year - validData[0].year;
-        if (years > 0 && firstEPS > 0) {
-          historicalGrowth = (Math.pow(lastEPS / firstEPS, 1 / years) - 1) * 100;
+        if (years > 0 && firstEPS > 0 && lastEPS > 0 && isFinite(firstEPS) && isFinite(lastEPS)) {
+          const rawGrowth = (Math.pow(lastEPS / firstEPS, 1 / years) - 1) * 100;
+          // Limiter la croissance historique à -50% à +100% par an
+          historicalGrowth = Math.max(-50, Math.min(100, rawGrowth));
         }
       }
       
-      // Calculer la volatilité (écart-type des rendements historiques)
+      // Calculer la volatilité (écart-type des rendements historiques) avec validation
       const priceChanges = [];
       for (let i = 1; i < validHistory.length; i++) {
-        if (validHistory[i].priceHigh > 0 && validHistory[i-1].priceHigh > 0) {
+        if (validHistory[i].priceHigh > 0 && validHistory[i-1].priceHigh > 0 
+            && isFinite(validHistory[i].priceHigh) && isFinite(validHistory[i-1].priceHigh)) {
           const change = ((validHistory[i].priceHigh - validHistory[i-1].priceHigh) / validHistory[i-1].priceHigh) * 100;
-          priceChanges.push(change);
+          if (isFinite(change)) {
+            priceChanges.push(change);
+          }
         }
       }
       const avgChange = priceChanges.length > 0 
         ? priceChanges.reduce((a, b) => a + b, 0) / priceChanges.length 
         : 0;
-      const variance = priceChanges.length > 0
-        ? priceChanges.reduce((sum, change) => sum + Math.pow(change - avgChange, 2), 0) / priceChanges.length
+      const variance = priceChanges.length > 0 && isFinite(avgChange)
+        ? priceChanges.reduce((sum, change) => {
+            const diff = change - avgChange;
+            return sum + (isFinite(diff) ? Math.pow(diff, 2) : 0);
+          }, 0) / priceChanges.length
         : 0;
-      const volatility = Math.sqrt(variance);
+      const volatility = isFinite(variance) && variance >= 0 ? Math.min(Math.sqrt(variance), 200) : 0; // Limiter à 200%
+
+      // Détecter si les données sont suspectes ou invalides et identifier la cause
+      const invalidReason: string[] = [];
+      
+      // Vérifier si c'est un profil "vide" (pas encore synchronisé depuis l'API)
+      const hasEmptyData = profile.data.length === 1 && 
+        profile.data[0].earningsPerShare === 0 && 
+        profile.data[0].cashFlowPerShare === 0 &&
+        profile.data[0].bookValuePerShare === 0 &&
+        (profile.assumptions.currentPrice === 100 || profile.assumptions.currentPrice === 0) &&
+        profile.assumptions.currentDividend === 0;
+      
+      if (hasEmptyData) {
+        invalidReason.push('⚠️ DONNÉES NON SYNCHRONISÉES - Cliquez sur "Synchroniser" dans l\'onglet Analysis pour charger les données réelles');
+      } else {
+        if (currentPrice <= 0 || !isFinite(currentPrice)) {
+          invalidReason.push('Prix actuel invalide ou manquant');
+        }
+        if (baseEPS === 0 && baseYearData) {
+          invalidReason.push('EPS de base = 0 (données historiques manquantes ou nulles)');
+        }
+        if (validTargets.length === 0) {
+          const excludedMetrics = [];
+          if (profile.assumptions.excludeEPS) excludedMetrics.push('EPS');
+          if (profile.assumptions.excludeCF) excludedMetrics.push('CF');
+          if (profile.assumptions.excludeBV) excludedMetrics.push('BV');
+          if (profile.assumptions.excludeDIV) excludedMetrics.push('DIV');
+          const excludedText = excludedMetrics.length > 0 ? ` (${excludedMetrics.join(', ')} exclus)` : '';
+          invalidReason.push(`Aucun ratio cible valide${excludedText} - Vérifiez les ratios cibles (P/E, P/CF, P/BV, Yield) et les données historiques`);
+        }
+        if (jpegy === 0 && growthPlusYield <= 0.01) {
+          invalidReason.push(`Croissance EPS (${profile.assumptions.growthRateEPS?.toFixed(2) || 0}%) + Yield (${baseYield.toFixed(2) || 0}%) trop faible (≤0.01%) - Ajustez la croissance ou le dividende`);
+        }
+        if (totalReturnPercent <= -99.9) {
+          invalidReason.push('Rendement impossible à calculer - Vérifiez le prix actuel et les ratios cibles');
+        }
+      }
+      
+      const hasInvalidData = invalidReason.length > 0;
 
       return {
         profile,
@@ -155,7 +293,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         currentPBV,
         currentYield,
         historicalGrowth,
-        volatility
+        volatility,
+        hasInvalidData, // Nouveau flag pour indiquer données invalides
+        invalidReason: hasInvalidData ? invalidReason.join('; ') : undefined, // Raison de l'invalidité pour debug
+        isNotSynchronized: hasEmptyData // Flag spécial pour profils non synchronisés
       };
     });
   }, [profiles, approvedVersions]);
@@ -359,18 +500,25 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   const chartHeight = 700;
   const padding = 80;
   
-  // Calculer les échelles avec marges (seulement si on a des métriques filtrées)
-  const maxJPEGY = filteredMetrics.length > 0 
-    ? Math.max(...filteredMetrics.map(m => m.jpegy), 5)
+  // Calculer les échelles avec marges (seulement si on a des métriques filtrées VALIDES)
+  const validMetricsForChart = filteredMetrics.filter(m => 
+    !m.hasInvalidData && 
+    m.totalReturnPercent >= -100 && m.totalReturnPercent <= 1000 &&
+    m.jpegy >= 0 && m.jpegy <= 100 &&
+    isFinite(m.totalReturnPercent) && isFinite(m.jpegy)
+  );
+  
+  const maxJPEGY = validMetricsForChart.length > 0 
+    ? Math.max(...validMetricsForChart.map(m => m.jpegy), 5)
     : 5;
-  const minJPEGY = filteredMetrics.length > 0
-    ? Math.min(...filteredMetrics.map(m => m.jpegy), 0)
+  const minJPEGY = validMetricsForChart.length > 0
+    ? Math.min(...validMetricsForChart.map(m => m.jpegy), 0)
     : 0;
-  const maxReturn = filteredMetrics.length > 0
-    ? Math.max(...filteredMetrics.map(m => m.totalReturnPercent), 200)
+  const maxReturn = validMetricsForChart.length > 0
+    ? Math.max(...validMetricsForChart.map(m => m.totalReturnPercent), 200)
     : 200;
-  const minReturn = filteredMetrics.length > 0
-    ? Math.min(...filteredMetrics.map(m => m.totalReturnPercent), -50)
+  const minReturn = validMetricsForChart.length > 0
+    ? Math.min(...validMetricsForChart.map(m => m.totalReturnPercent), -50)
     : -50;
   
   const xScale = (jpegy: number) => {
@@ -853,6 +1001,49 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
           </div>
         ) : (
           <>
+            {/* Avertissement pour les données invalides */}
+            {filteredMetrics.some(m => m.hasInvalidData) && (
+              <div className={`mb-4 p-3 border-l-4 rounded-r ${
+                filteredMetrics.some(m => m.isNotSynchronized) 
+                  ? 'bg-blue-50 border-blue-400' 
+                  : 'bg-yellow-50 border-yellow-400'
+              }`}>
+                <div className="flex items-start gap-2">
+                  <ExclamationTriangleIcon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+                    filteredMetrics.some(m => m.isNotSynchronized) 
+                      ? 'text-blue-600' 
+                      : 'text-yellow-600'
+                  }`} />
+                  <div className={`flex-1 text-xs sm:text-sm ${
+                    filteredMetrics.some(m => m.isNotSynchronized) 
+                      ? 'text-blue-800' 
+                      : 'text-yellow-800'
+                  }`}>
+                    <strong>
+                      {filteredMetrics.some(m => m.isNotSynchronized) 
+                        ? '⚠️ Action requise:' 
+                        : 'Attention:'}
+                    </strong> {filteredMetrics.filter(m => m.hasInvalidData).length} titre(s) ont des données invalides ou manquantes. 
+                    {filteredMetrics.some(m => m.isNotSynchronized) && (
+                      <span className="font-semibold block mt-1">
+                        La plupart nécessitent une synchronisation depuis l'API. Allez dans l'onglet "Analysis" et cliquez sur "Synchroniser" pour chaque ticker.
+                      </span>
+                    )}
+                    Ces tickers sont marqués avec <ExclamationTriangleIcon className="w-4 h-4 inline text-red-500" /> et affichent "N/A".
+                    <details className="mt-2">
+                      <summary className="cursor-pointer font-semibold hover:opacity-80">Voir les détails par ticker</summary>
+                      <ul className="mt-2 space-y-1 ml-4 list-disc">
+                        {filteredMetrics.filter(m => m.hasInvalidData).map(metric => (
+                          <li key={metric.profile.id} className="text-xs">
+                            <strong>{metric.profile.id}:</strong> {metric.invalidReason || 'Données invalides'}
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="mb-4 flex items-center justify-between">
               <div className="text-sm text-gray-600">
                 Mode: <span className="font-semibold">Vue normale</span>
@@ -907,30 +1098,40 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                       opacity: currentId === metric.profile.id ? 1 : 0.85
                     }}
                     title={`${metric.profile.info.name || metric.profile.id}
-Rendement: ${metric.totalReturnPercent.toFixed(1)}%
-JPEGY: ${metric.jpegy.toFixed(2)}
-Ratio 3:1: ${metric.ratio31.toFixed(2)}
+Rendement: ${metric.hasInvalidData ? 'N/A (données invalides)' : `${metric.totalReturnPercent.toFixed(1)}%`}
+JPEGY: ${metric.hasInvalidData ? 'N/A (données invalides)' : metric.jpegy.toFixed(2)}
+Ratio 3:1: ${metric.hasInvalidData ? 'N/A' : metric.ratio31.toFixed(2)}
 P/E: ${metric.currentPE?.toFixed(1) || 'N/A'}x
 Secteur: ${metric.profile.info.sector}
-${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
+${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}
+${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                   >
                     <div className="flex flex-col items-center justify-center h-full text-white relative">
                       {comparisonMode && selectedForComparison.includes(metric.profile.id) && (
-                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold">
+                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold z-10">
                           {selectedForComparison.indexOf(metric.profile.id) + 1}
                         </div>
                       )}
+                      {metric.hasInvalidData && (
+                        <div className="absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center z-10" title="Données invalides ou manquantes">
+                          <ExclamationTriangleIcon className="w-3 h-3 text-white" />
+                        </div>
+                      )}
                       <div className="flex items-center gap-1 mb-1">
-                        <div className="text-xs font-bold">{metric.profile.id}</div>
+                        <div className={`text-xs font-bold ${metric.hasInvalidData ? 'line-through opacity-70' : ''}`}>{metric.profile.id}</div>
                         {(metric.profile.isWatchlist ?? false) ? (
                           <EyeIcon className="w-3 h-3 text-blue-300" title="Watchlist" />
                         ) : (
                           <StarIcon className="w-3 h-3 text-yellow-400" title="Portefeuille" />
                         )}
                       </div>
-                      <div className="text-[10px] font-semibold mb-1">{metric.totalReturnPercent.toFixed(0)}%</div>
-                      <div className="text-[8px] opacity-90">JPEGY: {metric.jpegy.toFixed(1)}</div>
-                      {metric.hasApprovedVersion && (
+                      <div className={`text-[10px] font-semibold mb-1 ${metric.hasInvalidData ? 'opacity-50' : ''}`}>
+                        {metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`}
+                      </div>
+                      <div className={`text-[8px] opacity-90 ${metric.hasInvalidData ? 'opacity-50' : ''}`}>
+                        JPEGY: {metric.hasInvalidData ? 'N/A' : metric.jpegy.toFixed(1)}
+                      </div>
+                      {metric.hasApprovedVersion && !metric.hasInvalidData && (
                         <CheckCircleIcon className="w-4 h-4 mt-1 text-white" />
                       )}
                     </div>
@@ -971,7 +1172,7 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
                     <div className="flex items-center gap-4 flex-1">
                       <div 
                         className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-sm relative"
-                        style={{ backgroundColor: getReturnColor(metric.totalReturnPercent) }}
+                        style={{ backgroundColor: metric.hasInvalidData ? '#fee2e2' : getReturnColor(metric.totalReturnPercent) }}
                       >
                         {metric.profile.id}
                         <div className="absolute -top-1 -right-1">
@@ -981,10 +1182,15 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
                             <StarIcon className="w-4 h-4 text-yellow-400" title="Portefeuille" />
                           )}
                         </div>
+                        {metric.hasInvalidData && (
+                          <div className="absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center z-10" title="Données invalides">
+                            <ExclamationTriangleIcon className="w-3 h-3 text-white" />
+                          </div>
+                        )}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <div className="font-bold text-gray-800">{metric.profile.info.name || metric.profile.id}</div>
+                          <div className={`font-bold text-gray-800 ${metric.hasInvalidData ? 'line-through opacity-70' : ''}`}>{metric.profile.info.name || metric.profile.id}</div>
                           {(metric.profile.isWatchlist ?? false) ? (
                             <EyeIcon className="w-4 h-4 text-blue-500" title="Watchlist" />
                           ) : (
@@ -994,24 +1200,25 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
                         <div className="text-xs text-gray-500">{metric.profile.info.sector}</div>
                       </div>
                       <div className="text-right">
-                        <div className="font-bold text-lg" style={{ color: getReturnColor(metric.totalReturnPercent) }}>
-                          {metric.totalReturnPercent.toFixed(1)}%
+                        <div className={`font-bold text-lg ${metric.hasInvalidData ? 'text-gray-400' : ''}`} style={metric.hasInvalidData ? {} : { color: getReturnColor(metric.totalReturnPercent) }}>
+                          {metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(1)}%`}
                         </div>
                         <div className="text-xs text-gray-500">Rendement</div>
                       </div>
                       <div className="text-right">
-                        <div className="font-semibold" style={{ color: getJpegyColor(metric.jpegy) }}>
-                          {metric.jpegy.toFixed(2)}
+                        <div className={`font-semibold ${metric.hasInvalidData ? 'text-gray-400' : ''}`} style={metric.hasInvalidData ? {} : { color: getJpegyColor(metric.jpegy) }}>
+                          {metric.hasInvalidData ? 'N/A' : metric.jpegy.toFixed(2)}
                         </div>
                         <div className="text-xs text-gray-500">JPEGY</div>
                       </div>
                       <div className="text-right">
                         <div className={`font-semibold ${
+                          metric.hasInvalidData ? 'text-gray-400' :
                           metric.ratio31 >= 3 ? 'text-green-600' :
                           metric.ratio31 >= 1 ? 'text-yellow-600' :
                           'text-red-600'
                         }`}>
-                          {metric.ratio31.toFixed(2)}
+                          {metric.hasInvalidData ? 'N/A' : metric.ratio31.toFixed(2)}
                         </div>
                         <div className="text-xs text-gray-500">Ratio 3:1</div>
                       </div>
@@ -1021,7 +1228,9 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
                         {selectedForComparison.indexOf(metric.profile.id) + 1}
                       </div>
                     )}
-                    {metric.hasApprovedVersion && (
+                    {metric.hasInvalidData ? (
+                      <ExclamationTriangleIcon className="w-5 h-5 text-red-500 ml-2" title="Données invalides" />
+                    ) : metric.hasApprovedVersion && (
                       <CheckCircleIcon className="w-5 h-5 text-green-500 ml-2" />
                     )}
                   </div>
@@ -1055,24 +1264,29 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
                       currentId === metric.profile.id ? 'border-blue-600 ring-2 ring-blue-300' : 
                       comparisonMode && selectedForComparison.includes(metric.profile.id)
                         ? 'border-purple-600 ring-2 ring-purple-300' 
+                        : metric.hasInvalidData
+                        ? 'border-red-300 border-dashed'
                         : 'border-gray-200'
                     }`}
                     style={{
-                      backgroundColor: getReturnColor(metric.totalReturnPercent),
-                      opacity: currentId === metric.profile.id ? 1 : 0.8
+                      backgroundColor: metric.hasInvalidData ? '#fee2e2' : getReturnColor(metric.totalReturnPercent),
+                      opacity: currentId === metric.profile.id ? 1 : (metric.hasInvalidData ? 0.6 : 0.8)
                     }}
-                    title={`${metric.profile.id}: ${metric.totalReturnPercent.toFixed(1)}%`}
+                    title={`${metric.profile.id}: ${metric.hasInvalidData ? 'Données invalides' : `${metric.totalReturnPercent.toFixed(1)}%`}`}
                   >
-                    <div className="flex flex-col items-center text-white text-[9px] relative">
+                    <div className={`flex flex-col items-center ${metric.hasInvalidData ? 'text-gray-600' : 'text-white'} text-[9px] relative`}>
+                      {metric.hasInvalidData && (
+                        <ExclamationTriangleIcon className="w-3 h-3 text-red-500 absolute -top-1 -left-1" />
+                      )}
                       <div className="flex items-center gap-0.5">
-                        <div className="font-bold">{metric.profile.id}</div>
+                        <div className={`font-bold ${metric.hasInvalidData ? 'line-through' : ''}`}>{metric.profile.id}</div>
                         {(metric.profile.isWatchlist ?? false) ? (
                           <EyeIcon className="w-2.5 h-2.5 text-blue-300" title="Watchlist" />
                         ) : (
                           <StarIcon className="w-2.5 h-2.5 text-yellow-400" title="Portefeuille" />
                         )}
                       </div>
-                      <div className="text-[8px]">{metric.totalReturnPercent.toFixed(0)}%</div>
+                      <div className="text-[8px]">{metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`}</div>
                     </div>
                   </div>
                 ))}
@@ -1222,35 +1436,46 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
                 ))}
               </g>
 
-              {/* Points */}
-              {filteredMetrics.map((metric) => {
-                const x = xScale(metric.jpegy);
-                const y = yScale(metric.totalReturnPercent);
-                return (
-                  <g key={metric.profile.id}>
-                    <circle
-                      cx={x}
-                      cy={y}
-                      r={currentId === metric.profile.id ? 8 : 6}
-                      fill={getJpegyColor(metric.jpegy)}
-                      stroke={currentId === metric.profile.id ? '#2563eb' : '#fff'}
-                      strokeWidth={currentId === metric.profile.id ? 2 : 1}
-                      className="cursor-pointer hover:r-8"
-                      onClick={() => onSelect(metric.profile.id)}
-                    />
-                    {currentId === metric.profile.id && (
-                      <text
-                        x={x}
-                        y={y - 15}
-                        textAnchor="middle"
-                        className="text-xs font-bold fill-blue-600"
-                      >
-                        {metric.profile.id}
-                      </text>
-                    )}
-                  </g>
-                );
-              })}
+              {/* Points - EXCLURE les données invalides du graphique */}
+              {filteredMetrics
+                .filter(metric => !metric.hasInvalidData) // Exclure complètement les données invalides
+                .map((metric) => {
+                  // Validation supplémentaire: exclure les valeurs aberrantes même si hasInvalidData est false
+                  if (metric.totalReturnPercent > 1000 || metric.totalReturnPercent < -100 || 
+                      metric.jpegy > 100 || metric.jpegy < 0 || 
+                      !isFinite(metric.totalReturnPercent) || !isFinite(metric.jpegy)) {
+                    return null; // Ne pas afficher ce point
+                  }
+                  
+                  const x = xScale(metric.jpegy);
+                  const y = yScale(metric.totalReturnPercent);
+                  return (
+                    <g key={metric.profile.id}>
+                      <circle
+                        cx={x}
+                        cy={y}
+                        r={currentId === metric.profile.id ? 8 : 6}
+                        fill={getJpegyColor(metric.jpegy)}
+                        stroke={currentId === metric.profile.id ? '#2563eb' : '#fff'}
+                        strokeWidth={currentId === metric.profile.id ? 2 : 1}
+                        className="cursor-pointer hover:r-8"
+                        onClick={() => onSelect(metric.profile.id)}
+                      />
+                      {currentId === metric.profile.id && (
+                        <text
+                          x={x}
+                          y={y - 15}
+                          textAnchor="middle"
+                          className="text-xs font-bold fill-blue-600"
+                        >
+                          {metric.profile.id}
+                        </text>
+                      )}
+                    </g>
+                  );
+                })
+                .filter(Boolean) // Retirer les null
+              }
               </svg>
             </div>
           </div>
