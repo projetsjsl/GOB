@@ -264,6 +264,15 @@ export default function App() {
                                         const profile = prev[symbol];
                                         if (!profile) return prev;
 
+                                        // Préserver les métriques ValueLine de Supabase (elles ne viennent pas de FMP)
+                                        const preservedValueLineMetrics = {
+                                            securityRank: profile.info.securityRank,
+                                            earningsPredictability: profile.info.earningsPredictability,
+                                            priceGrowthPersistence: profile.info.priceGrowthPersistence,
+                                            priceStability: profile.info.priceStability,
+                                            beta: profile.info.beta // Beta peut venir de FMP ou Supabase
+                                        };
+
                                         const updated = {
                                             ...prev,
                                             [symbol]: {
@@ -273,7 +282,9 @@ export default function App() {
                                                     ...profile.info,
                                                     ...result.info,
                                                     // S'assurer que le nom de FMP remplace toujours celui de Supabase
-                                                    name: result.info.name || profile.info.name
+                                                    name: result.info.name || profile.info.name,
+                                                    // Préserver les métriques ValueLine (elles ne viennent pas de FMP)
+                                                    ...preservedValueLineMetrics
                                                 },
                                                 assumptions: {
                                                     ...profile.assumptions,
