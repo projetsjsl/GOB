@@ -103,38 +103,54 @@ export default async function handler(req, res) {
       return `/api/jslai-proxy?path=${encodeURIComponent(fullPath)}`;
     };
 
-    // Réécrire les balises <link> (CSS)
+    // Fonction pour réécrire les ressources vers notre proxy de ressources
+    const rewriteResource = (url) => {
+      const absoluteUrl = rewriteUrl(url);
+      // Si c'est une URL jslai.app, utiliser notre proxy de ressources
+      if (absoluteUrl.startsWith('https://jslai.app/')) {
+        return `/api/jslai-proxy-resource?url=${encodeURIComponent(absoluteUrl)}`;
+      }
+      return absoluteUrl;
+    };
+
+    // Réécrire les balises <link> (CSS) - utiliser le proxy de ressources
     html = html.replace(/<link([^>]*href=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
-      const newUrl = rewriteUrl(url);
+      const newUrl = rewriteResource(url);
       return `<link${before}${newUrl}${after}>`;
     });
 
-    // Réécrire les balises <script> (JavaScript)
+    // Réécrire les balises <script> (JavaScript) - utiliser le proxy de ressources
     html = html.replace(/<script([^>]*src=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
-      const newUrl = rewriteUrl(url);
+      const newUrl = rewriteResource(url);
       return `<script${before}${newUrl}${after}>`;
     });
 
-    // Réécrire les balises <img> (Images)
+    // Réécrire les balises <img> (Images) - utiliser le proxy de ressources
     html = html.replace(/<img([^>]*src=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
-      const newUrl = rewriteUrl(url);
+      const newUrl = rewriteResource(url);
       return `<img${before}${newUrl}${after}>`;
     });
 
-    // Réécrire les attributs srcset
+    // Réécrire les attributs srcset - utiliser le proxy de ressources
     html = html.replace(/srcset=["']([^"']+)["']/gi, (match, srcset) => {
       const newSrcset = srcset.split(',').map(item => {
         const parts = item.trim().split(/\s+/);
         const url = parts[0];
         const descriptor = parts[1] || '';
-        return `${rewriteUrl(url)} ${descriptor}`.trim();
+        return `${rewriteResource(url)} ${descriptor}`.trim();
       }).join(', ');
       return `srcset="${newSrcset}"`;
     });
 
-    // Réécrire les attributs data-src, data-srcset, etc.
-    html = html.replace(/(data-(?:src|srcset|href)=["'])([^"']+)(["'])/gi, (match, attr, url, quote) => {
-      const newUrl = rewriteUrl(url);
+    // Réécrire les attributs data-src, data-srcset, etc. - utiliser le proxy de ressources pour les images
+    html = html.replace(/(data-(?:src|srcset)=["'])([^"']+)(["'])/gi, (match, attr, url, quote) => {
+      const newUrl = rewriteResource(url);
+      return `${attr}${newUrl}${quote}`;
+    });
+    
+    // Pour data-href, utiliser rewriteLink (pour les liens)
+    html = html.replace(/(data-href=["'])([^"']+)(["'])/gi, (match, attr, url, quote) => {
+      const newUrl = rewriteLink(url);
       return `${attr}${newUrl}${quote}`;
     });
 
@@ -144,34 +160,34 @@ export default async function handler(req, res) {
       return `<a${before}${newUrl}${after}>`;
     });
 
-    // Réécrire les URLs dans les styles inline (url(...))
+    // Réécrire les URLs dans les styles inline (url(...)) - utiliser le proxy de ressources
     html = html.replace(/url\(["']?([^"')]+)["']?\)/gi, (match, url) => {
-      const newUrl = rewriteUrl(url);
+      const newUrl = rewriteResource(url);
       return `url(${newUrl})`;
     });
 
-    // Réécrire les URLs dans les attributs style
+    // Réécrire les URLs dans les attributs style - utiliser le proxy de ressources
     html = html.replace(/style=["']([^"']*url\([^)]+\)[^"']*)["']/gi, (match, styleContent) => {
       const newStyle = styleContent.replace(/url\(["']?([^"')]+)["']?\)/gi, (urlMatch, url) => {
-        return `url(${rewriteUrl(url)})`;
+        return `url(${rewriteResource(url)})`;
       });
       return `style="${newStyle}"`;
     });
 
-    // Réécrire les balises <source> (pour les images responsives)
+    // Réécrire les balises <source> (pour les images responsives) - utiliser le proxy de ressources
     html = html.replace(/<source([^>]*srcset=["'])([^"']+)(["'][^>]*)>/gi, (match, before, srcset, after) => {
       const newSrcset = srcset.split(',').map(item => {
         const parts = item.trim().split(/\s+/);
         const url = parts[0];
         const descriptor = parts[1] || '';
-        return `${rewriteUrl(url)} ${descriptor}`.trim();
+        return `${rewriteResource(url)} ${descriptor}`.trim();
       }).join(', ');
       return `<source${before}${newSrcset}${after}>`;
     });
 
-    // Réécrire les balises <source> avec src
+    // Réécrire les balises <source> avec src - utiliser le proxy de ressources
     html = html.replace(/<source([^>]*src=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
-      const newUrl = rewriteUrl(url);
+      const newUrl = rewriteResource(url);
       return `<source${before}${newUrl}${after}>`;
     });
 
