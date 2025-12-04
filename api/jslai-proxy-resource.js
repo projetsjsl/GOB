@@ -47,16 +47,26 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     // Si c'est du JavaScript, on peut le modifier pour corriger les chemins
-    if (contentType.includes('javascript') || contentType.includes('application/javascript')) {
+    if (contentType.includes('javascript') || contentType.includes('application/javascript') || decodedUrl.endsWith('.js')) {
       let content = await response.text();
       
-      // Réécrire les chemins relatifs dans le JS
+      // Réécrire les chemins relatifs dans le JS vers jslai.app
       content = content.replace(/["']\/([^"']+)["']/g, (match, path) => {
-        if (!path.startsWith('http') && !path.startsWith('//')) {
+        if (!path.startsWith('http') && !path.startsWith('//') && !path.startsWith('#')) {
           return `"https://jslai.app/${path}"`;
         }
         return match;
       });
+      
+      // S'assurer que les fonctions sont exposées globalement si elles sont dans un module
+      // Ajouter à la fin du script pour exposer les fonctions globales
+      if (!content.includes('window.startEvaluation') && content.includes('startEvaluation')) {
+        content += '\n\n// Exposer startEvaluation globalement si elle existe\nif (typeof startEvaluation !== "undefined" && typeof window !== "undefined") {\n  window.startEvaluation = startEvaluation;\n}';
+      }
+      
+      if (!content.includes('window.ShowGuide') && content.includes('ShowGuide')) {
+        content += '\n\n// Exposer ShowGuide globalement si elle existe\nif (typeof ShowGuide !== "undefined" && typeof window !== "undefined") {\n  window.ShowGuide = ShowGuide;\n}';
+      }
       
       return res.status(200).send(content);
     }
