@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import './src/index.css';
 import App from './App';
 
 // Try to find the specific container for the dashboard integration first,

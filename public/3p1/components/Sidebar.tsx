@@ -163,9 +163,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
                         if (e.currentTarget.src !== fallbackUrl) {
                           e.currentTarget.src = fallbackUrl;
                         } else {
-                          // Si le fallback échoue aussi, masquer l'image
+                          // Si le fallback échoue aussi, masquer l'image silencieusement (pas d'erreur 404)
                           e.currentTarget.style.display = 'none';
+                          e.currentTarget.onerror = null; // Empêcher les erreurs répétées
                         }
+                      }}
+                      onLoad={(e) => {
+                        e.currentTarget.onerror = null;
                       }}
                     />
                   ) : (
@@ -175,7 +179,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
                       alt={profile.info.name}
                       className="w-8 h-8 rounded object-cover flex-shrink-0"
                       onError={(e) => {
+                        // Masquer silencieusement sans générer d'erreur 404
                         e.currentTarget.style.display = 'none';
+                        e.currentTarget.onerror = null; // Empêcher les erreurs répétées
+                      }}
+                      onLoad={(e) => {
+                        e.currentTarget.onerror = null;
                       }}
                     />
                   )}

@@ -41,7 +41,10 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
           setSectorDataFromAPI(result.data);
         } else {
           // API n'a pas retourné de données, on utilisera les valeurs par défaut
-          console.warn(`⚠️ Aucune donnée sectorielle disponible pour "${sectorKey}", utilisation des valeurs par défaut`);
+          // Ne pas afficher de warning en production pour éviter le bruit dans la console
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`⚠️ Aucune donnée sectorielle disponible pour "${sectorKey}", utilisation des valeurs par défaut`);
+          }
         }
       } catch (error: any) {
         console.error('❌ Erreur chargement données sectorielles:', error);

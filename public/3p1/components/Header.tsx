@@ -95,12 +95,17 @@ export const Header: React.FC<HeaderProps> = ({
                       tryNextFallback();
                     }
                   } else {
-                    // Si tous les fallbacks échouent, masquer l'image
+                    // Si tous les fallbacks échouent, masquer l'image silencieusement (pas d'erreur 404)
                     e.currentTarget.style.display = 'none';
+                    e.currentTarget.onerror = null; // Empêcher les erreurs répétées
                   }
                 };
                 
                 tryNextFallback();
+              }}
+              onLoad={(e) => {
+                // Si le logo charge avec succès, réinitialiser onError pour éviter les erreurs futures
+                e.currentTarget.onerror = null;
               }}
             />
           ) : (
@@ -110,7 +115,12 @@ export const Header: React.FC<HeaderProps> = ({
               alt={info.name}
               className="w-16 h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200"
               onError={(e) => {
+                // Masquer silencieusement sans générer d'erreur 404
                 e.currentTarget.style.display = 'none';
+                e.currentTarget.onerror = null; // Empêcher les erreurs répétées
+              }}
+              onLoad={(e) => {
+                e.currentTarget.onerror = null;
               }}
             />
           )}

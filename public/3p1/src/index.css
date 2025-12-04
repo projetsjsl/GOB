@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar for cleaner look in complex tables */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  body {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Améliorer la lisibilité sur mobile */
+  table {
+    font-size: 0.75rem;
+  }
+  /* Réduire les espacements sur mobile */
+  .space-y-6 > * + * {
+    margin-top: 1rem;
+  }
+}
+
+/* Touch-friendly buttons on mobile */
+@media (max-width: 768px) {
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  body { background: white; color: black; }
+  .no-print { display: none !important; }
+  .print-full-width { width: 100% !important; max-width: none !important; }
+  .print-break-inside-avoid { break-inside: avoid; }
+  /* Hide scrollbars in print */
+  ::-webkit-scrollbar { display: none; }
+  /* Force graphics colors */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
