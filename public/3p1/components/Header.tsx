@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CompanyInfo, Assumptions, Recommendation } from '../types';
-import { ArrowTrendingUpIcon, BanknotesIcon, TagIcon, CalendarDaysIcon, PrinterIcon, CloudArrowDownIcon, EyeIcon, StarIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { ArrowTrendingUpIcon, BanknotesIcon, TagIcon, CalendarDaysIcon, PrinterIcon, CloudArrowDownIcon, EyeIcon, StarIcon, ArrowPathIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { formatPercent } from '../utils/calculations';
 
 interface HeaderProps {
@@ -12,6 +12,7 @@ interface HeaderProps {
   onUpdateInfo: (key: keyof CompanyInfo, value: string) => void;
   onUpdateAssumption: (key: keyof Assumptions, value: number) => void;
   onFetchData?: () => Promise<void>;
+  onRestoreData?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -22,7 +23,8 @@ export const Header: React.FC<HeaderProps> = ({
   isWatchlist,
   onUpdateInfo,
   onUpdateAssumption,
-  onFetchData
+  onFetchData,
+  onRestoreData
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -229,6 +231,18 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <ArrowPathIcon className={`w-3 h-3 sm:w-4 sm:h-4 ${isLoading ? 'animate-spin' : ''}`} />
                 <span className="hidden sm:inline">{isLoading ? 'Sync...' : 'Sync. Données'}</span>
+              </button>
+            )}
+
+            {onRestoreData && (
+              <button
+                onClick={onRestoreData}
+                disabled={isLoading}
+                className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-purple-50 text-purple-600 hover:bg-purple-100'}`}
+                title="Restaurer les données (depuis snapshot ou FMP)"
+              >
+                <ArrowDownTrayIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Restaurer</span>
               </button>
             )}
 

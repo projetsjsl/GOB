@@ -21,6 +21,7 @@ import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrenc
 import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { fetchCompanyData } from './services/financeApi';
 import { saveSnapshot, hasManualEdits, loadSnapshot, listSnapshots } from './services/snapshotApi';
+import { RestoreDataDialog } from './components/RestoreDataDialog';
 import { loadAllTickersFromSupabase, mapSourceToIsWatchlist } from './services/tickersApi';
 
 // Données initiales par défaut (placeholder uniquement - les données réelles sont toujours récupérées depuis l'API FMP)
@@ -1349,16 +1350,17 @@ export default function App() {
                             </div>
                         </div>
 
-                        <Header
-                            info={info}
-                            assumptions={assumptions}
-                            availableYears={availableYears}
-                            recommendation={recommendation}
-                            isWatchlist={isWatchlist}
-                            onUpdateInfo={handleUpdateInfo}
-                            onUpdateAssumption={handleUpdateAssumption}
-                            onFetchData={handleFetchData}
-                        />
+                                <Header
+                                    info={info}
+                                    assumptions={assumptions}
+                                    availableYears={availableYears}
+                                    recommendation={recommendation}
+                                    isWatchlist={isWatchlist}
+                                    onUpdateInfo={handleUpdateInfo}
+                                    onUpdateAssumption={handleUpdateAssumption}
+                                    onFetchData={handleFetchData}
+                                    onRestoreData={handleOpenRestoreDialog}
+                                />
 
                         {/* CONDITIONAL RENDER: ANALYSIS VS INFO VS KPI */}
                         {currentView === 'info' ? (
