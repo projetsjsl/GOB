@@ -466,9 +466,46 @@ export default function App() {
             setPastData(prev => [...prev, data]);
             setFutureData([]);
 
-            // Update Data
+            // Update Data avec merge intelligent : préserver les données manuelles
             if (result.data.length > 0) {
-                setData(result.data);
+                // Merge intelligent : préserver les données manuelles (comme dans handleBulkSyncAllTickers)
+                const newDataByYear = new Map(result.data.map(row => [row.year, row]));
+                
+                const mergedData = data.map((existingRow) => {
+                    const newRow = newDataByYear.get(existingRow.year);
+                    
+                    // Si pas de nouvelle donnée pour cette année, garder l'existant
+                    if (!newRow) {
+                        return existingRow;
+                    }
+
+                    // Si la donnée existante est manuelle (autoFetched: false ou undefined), la garder
+                    if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
+                        return existingRow; // Préserver la donnée manuelle
+                    }
+
+                    // Sinon, utiliser la nouvelle donnée avec autoFetched: true
+                    return {
+                        ...newRow,
+                        autoFetched: true
+                    };
+                });
+
+                // Ajouter les nouvelles années qui n'existent pas dans les données existantes
+                result.data.forEach(newRow => {
+                    const exists = mergedData.some(row => row.year === newRow.year);
+                    if (!exists) {
+                        mergedData.push({
+                            ...newRow,
+                            autoFetched: true
+                        });
+                    }
+                });
+
+                // Trier par année
+                mergedData.sort((a, b) => a.year - b.year);
+                
+                setData(mergedData);
             }
 
             // Update Info (including logo and beta, but preserve ValueLine metrics)
@@ -504,8 +541,10 @@ export default function App() {
 
             // Auto-fill assumptions basées sur les données historiques FMP (fonction centralisée)
             // ⚠️ IMPORTANT : On préserve les hypothèses existantes (orange) sauf currentPrice
+            // Utiliser les données mergées (avec préservation des données manuelles) pour le calcul
+            const mergedDataForCalc = data.length > 0 ? data : result.data;
             const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-                result.data,
+                mergedDataForCalc, // Utiliser les données mergées au lieu de result.data
                 result.currentPrice,
                 assumptions // Préserver les valeurs existantes (excludeEPS, excludeCF, etc.)
             );
@@ -524,10 +563,14 @@ export default function App() {
 
             // Auto-save snapshot after successful sync
             console.log('💾 Auto-saving snapshot after API sync...');
+            const finalData = data.length > 0 ? data : result.data; // Utiliser les données mergées
             await saveSnapshot(
                 activeId,
-                result.data,
-                assumptions,
+                finalData,
+                {
+                    ...assumptions,
+                    ...autoFilledAssumptions // Inclure les métriques recalculées
+                },
                 info,
                 `API sync - ${new Date().toLocaleString()}`,
                 true,  // Mark as current
@@ -710,15 +753,55 @@ export default function App() {
                 throw new Error(`Aucune donnée financière valide pour ${activeId}`);
             }
 
+            // Merge intelligent : préserver les données manuelles (comme dans handleBulkSyncAllTickers)
+            const existingProfile = library[activeId];
+            const existingData = existingProfile?.data || data;
+            const newDataByYear = new Map(result.data.map(row => [row.year, row]));
+            
+            const mergedData = existingData.map((existingRow) => {
+                const newRow = newDataByYear.get(existingRow.year);
+                
+                // Si pas de nouvelle donnée pour cette année, garder l'existant
+                if (!newRow) {
+                    return existingRow;
+                }
+
+                // Si la donnée existante est manuelle (autoFetched: false ou undefined), la garder
+                if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
+                    return existingRow; // Préserver la donnée manuelle
+                }
+
+                // Sinon, utiliser la nouvelle donnée avec autoFetched: true
+                return {
+                    ...newRow,
+                    autoFetched: true
+                };
+            });
+
+            // Ajouter les nouvelles années qui n'existent pas dans les données existantes
+            result.data.forEach(newRow => {
+                const exists = mergedData.some(row => row.year === newRow.year);
+                if (!exists) {
+                    mergedData.push({
+                        ...newRow,
+                        autoFetched: true
+                    });
+                }
+            });
+
+            // Trier par année
+            mergedData.sort((a, b) => a.year - b.year);
+
             // Auto-fill assumptions avec la fonction centralisée (comme lors d'un nouvel ajout)
+            // Utiliser les données mergées pour le calcul
             const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-                result.data,
+                mergedData, // Utiliser les données mergées au lieu de result.data
                 result.currentPrice,
                 assumptions // Préserver les exclusions existantes
             );
 
             // Mettre à jour les données et métriques
-            setData(result.data);
+            setData(mergedData);
             setAssumptions(prev => ({
                 ...prev,
                 ...autoFilledAssumptions
@@ -741,7 +824,7 @@ export default function App() {
                     ...prev,
                     [activeId]: {
                         ...profile,
-                        data: result.data,
+                        data: mergedData, // Utiliser les données mergées au lieu de result.data
                         assumptions: {
                             ...profile.assumptions,
                             ...autoFilledAssumptions
