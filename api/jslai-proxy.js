@@ -2,6 +2,7 @@
  * Proxy serveur pour jslai.app
  * Récupère le contenu HTML et le sert depuis gobapps.com
  * Contourne le firewall en gardant l'URL gobapps.com dans la barre d'adresse
+ * Réécrit toutes les URLs pour que les ressources se chargent correctement
  */
 
 export default async function handler(req, res) {
@@ -14,15 +15,18 @@ export default async function handler(req, res) {
   try {
     // Construire l'URL cible
     const targetUrl = `https://jslai.app/${path}`;
+    const baseUrl = 'https://jslai.app';
     
     console.log(`📡 JSL AI Proxy: ${targetUrl}`);
 
     // Récupérer le contenu HTML
     const response = await fetch(targetUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Referer': 'https://jslai.app/',
       }
     });
 
@@ -43,35 +47,143 @@ export default async function handler(req, res) {
 
     let html = await response.text();
 
-    // Réécrire les URLs pour que les ressources se chargent depuis jslai.app
-    // mais les liens internes pointent vers notre proxy
-    html = html.replace(/href="\/([^"]+)"/g, (match, linkPath) => {
-      // Si c'est un lien interne, le faire pointer vers notre proxy
-      if (!linkPath.startsWith('http') && !linkPath.startsWith('#')) {
-        return `href="/api/jslai-proxy?path=${encodeURIComponent(linkPath)}"`;
+    // Fonction pour réécrire une URL relative en URL absolue vers jslai.app
+    const rewriteUrl = (url) => {
+      if (!url || url.trim() === '') return url;
+      
+      // Si c'est déjà une URL absolue, la garder
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
       }
-      return match;
+      
+      // Si c'est un hash ou un protocole spécial, le garder
+      if (url.startsWith('#') || url.startsWith('javascript:') || url.startsWith('data:')) {
+        return url;
+      }
+      
+      // Si c'est un chemin relatif (commence par /), le transformer en URL absolue
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`;
+      }
+      
+      // Si c'est un chemin relatif sans slash, le transformer en URL absolue avec le chemin de base
+      const pathDir = path.includes('/') ? path.substring(0, path.lastIndexOf('/')) : '';
+      const basePath = pathDir ? `/${pathDir}` : '';
+      return `${baseUrl}${basePath}/${url}`.replace(/\/+/g, '/');
+    };
+
+    // Fonction pour réécrire les liens internes vers notre proxy
+    const rewriteLink = (url) => {
+      if (!url || url.trim() === '') return url;
+      
+      // Si c'est une URL externe, la garder
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        // Si c'est jslai.app, le transformer en lien proxy
+        if (url.startsWith('https://jslai.app/')) {
+          const linkPath = url.replace('https://jslai.app/', '');
+          return `/api/jslai-proxy?path=${encodeURIComponent(linkPath)}`;
+        }
+        return url;
+      }
+      
+      // Si c'est un hash ou un protocole spécial, le garder
+      if (url.startsWith('#') || url.startsWith('javascript:') || url.startsWith('data:')) {
+        return url;
+      }
+      
+      // Si c'est un chemin relatif, le transformer en lien proxy
+      if (url.startsWith('/')) {
+        const linkPath = url.substring(1);
+        return `/api/jslai-proxy?path=${encodeURIComponent(linkPath)}`;
+      }
+      
+      // Chemin relatif sans slash - calculer le chemin complet
+      const pathDir = path.includes('/') ? path.substring(0, path.lastIndexOf('/')) : '';
+      const fullPath = pathDir ? `${pathDir}/${url}` : url;
+      return `/api/jslai-proxy?path=${encodeURIComponent(fullPath)}`;
+    };
+
+    // Réécrire les balises <link> (CSS)
+    html = html.replace(/<link([^>]*href=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
+      const newUrl = rewriteUrl(url);
+      return `<link${before}${newUrl}${after}>`;
     });
 
-    // Réécrire les src pour pointer vers jslai.app
-    html = html.replace(/src="\/([^"]+)"/g, (match, srcPath) => {
-      if (!srcPath.startsWith('http')) {
-        return `src="https://jslai.app/${srcPath}"`;
-      }
-      return match;
+    // Réécrire les balises <script> (JavaScript)
+    html = html.replace(/<script([^>]*src=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
+      const newUrl = rewriteUrl(url);
+      return `<script${before}${newUrl}${after}>`;
     });
 
-    // Réécrire les URLs dans les CSS (url(...))
-    html = html.replace(/url\(["']?\/([^"')]+)["']?\)/g, (match, urlPath) => {
-      if (!urlPath.startsWith('http')) {
-        return `url(https://jslai.app/${urlPath})`;
-      }
-      return match;
+    // Réécrire les balises <img> (Images)
+    html = html.replace(/<img([^>]*src=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
+      const newUrl = rewriteUrl(url);
+      return `<img${before}${newUrl}${after}>`;
     });
+
+    // Réécrire les attributs srcset
+    html = html.replace(/srcset=["']([^"']+)["']/gi, (match, srcset) => {
+      const newSrcset = srcset.split(',').map(item => {
+        const parts = item.trim().split(/\s+/);
+        const url = parts[0];
+        const descriptor = parts[1] || '';
+        return `${rewriteUrl(url)} ${descriptor}`.trim();
+      }).join(', ');
+      return `srcset="${newSrcset}"`;
+    });
+
+    // Réécrire les attributs data-src, data-srcset, etc.
+    html = html.replace(/(data-(?:src|srcset|href)=["'])([^"']+)(["'])/gi, (match, attr, url, quote) => {
+      const newUrl = rewriteUrl(url);
+      return `${attr}${newUrl}${quote}`;
+    });
+
+    // Réécrire les balises <a> (Liens)
+    html = html.replace(/<a([^>]*href=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
+      const newUrl = rewriteLink(url);
+      return `<a${before}${newUrl}${after}>`;
+    });
+
+    // Réécrire les URLs dans les styles inline (url(...))
+    html = html.replace(/url\(["']?([^"')]+)["']?\)/gi, (match, url) => {
+      const newUrl = rewriteUrl(url);
+      return `url(${newUrl})`;
+    });
+
+    // Réécrire les URLs dans les attributs style
+    html = html.replace(/style=["']([^"']*url\([^)]+\)[^"']*)["']/gi, (match, styleContent) => {
+      const newStyle = styleContent.replace(/url\(["']?([^"')]+)["']?\)/gi, (urlMatch, url) => {
+        return `url(${rewriteUrl(url)})`;
+      });
+      return `style="${newStyle}"`;
+    });
+
+    // Réécrire les balises <source> (pour les images responsives)
+    html = html.replace(/<source([^>]*srcset=["'])([^"']+)(["'][^>]*)>/gi, (match, before, srcset, after) => {
+      const newSrcset = srcset.split(',').map(item => {
+        const parts = item.trim().split(/\s+/);
+        const url = parts[0];
+        const descriptor = parts[1] || '';
+        return `${rewriteUrl(url)} ${descriptor}`.trim();
+      }).join(', ');
+      return `<source${before}${newSrcset}${after}>`;
+    });
+
+    // Réécrire les balises <source> avec src
+    html = html.replace(/<source([^>]*src=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
+      const newUrl = rewriteUrl(url);
+      return `<source${before}${newUrl}${after}>`;
+    });
+
+    // Ajouter une balise <base> pour gérer les chemins relatifs
+    if (!html.includes('<base')) {
+      html = html.replace(/<head([^>]*)>/i, `<head$1><base href="${baseUrl}/${path.endsWith('/') ? path : path + '/'}">`);
+    }
 
     // Définir le Content-Type
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'public, max-age=300'); // Cache 5 minutes
+    res.setHeader('X-Proxy-Source', 'jslai.app');
 
     return res.status(200).send(html);
 
@@ -90,4 +202,3 @@ export default async function handler(req, res) {
     `);
   }
 }
-
