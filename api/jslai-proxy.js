@@ -264,7 +264,22 @@ export default async function handler(req, res) {
               for (let key in window) {
                 if (key.toLowerCase().includes('startevaluation') || key.toLowerCase().includes('evaluation')) {
                   console.log('Found similar function:', key);
+                  // Essayer de l'exposer
+                  if (typeof window[key] === 'function') {
+                    window.startEvaluation = window[key];
+                    console.log('✅ Exposed startEvaluation from:', key);
+                  }
                 }
+              }
+              
+              // Chercher dans le scope global (pas seulement window)
+              try {
+                if (typeof startEvaluation === 'function') {
+                  window.startEvaluation = startEvaluation;
+                  console.log('✅ Exposed startEvaluation from global scope');
+                }
+              } catch(e) {
+                console.log('startEvaluation not in global scope');
               }
             }
             
@@ -277,10 +292,32 @@ export default async function handler(req, res) {
               for (let key in window) {
                 if (key.toLowerCase().includes('showguide') || key.toLowerCase().includes('guide')) {
                   console.log('Found similar function:', key);
+                  // Essayer de l'exposer
+                  if (typeof window[key] === 'function') {
+                    window.ShowGuide = window[key];
+                    console.log('✅ Exposed ShowGuide from:', key);
+                  }
                 }
               }
+              
+              // Chercher dans le scope global
+              try {
+                if (typeof ShowGuide === 'function') {
+                  window.ShowGuide = ShowGuide;
+                  console.log('✅ Exposed ShowGuide from global scope');
+                }
+              } catch(e) {
+                console.log('ShowGuide not in global scope');
+              }
             }
-          }, 2000);
+            
+            // Vérifier tous les scripts chargés
+            const scripts = document.querySelectorAll('script[src]');
+            console.log(`📜 Total scripts: ${scripts.length}`);
+            scripts.forEach((script, index) => {
+              console.log(`  ${index + 1}. ${script.src} - ${script.complete ? '✅ Loaded' : '⏳ Loading'}`);
+            });
+          }, 3000); // Augmenter le délai à 3 secondes
         });
       })();
     </script>
