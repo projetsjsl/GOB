@@ -172,6 +172,11 @@
       "source": "/REEE",
       "destination": "https://jslai.app/reee",
       "permanent": false
+    },
+    {
+      "source": "/eval",
+      "destination": "https://jslai.app/evaluation",
+      "permanent": false
     }
   ]
 }
