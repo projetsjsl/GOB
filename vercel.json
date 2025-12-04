@@ -116,9 +116,6 @@
       "api/fastgraphs-login.js": {
         "maxDuration": 300
       },
-      "api/finviz-news.js": {
-        "maxDuration": 30
-      },
       "api/roles-config.js": {
         "maxDuration": 10
       },
@@ -155,27 +152,15 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/finnhub", "destination": "/api/marketdata" }
+    { "source": "/api/finnhub", "destination": "/api/marketdata" },
+    { "source": "/reee", "destination": "/reee.html" },
+    { "source": "/REEE", "destination": "/reee.html" },
+    { "source": "/eval", "destination": "/eval.html" }
   ],
   "redirects": [
     {
       "source": "/test",
       "destination": "/test-simple.html",
-      "permanent": false
-    },
-    {
-      "source": "/reee",
-      "destination": "https://jslai.app/reee",
-      "permanent": false
-    },
-    {
-      "source": "/REEE",
-      "destination": "https://jslai.app/reee",
-      "permanent": false
-    },
-    {
-      "source": "/eval",
-      "destination": "https://jslai.app/evaluation",
       "permanent": false
     }
   ]
