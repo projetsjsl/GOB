@@ -119,11 +119,14 @@ export default async function handler(req, res) {
       return `<link${before}${newUrl}${after}>`;
     });
 
-    // Réécrire les balises <script> (JavaScript) - utiliser le proxy de ressources
+    // Réécrire les balises <script> avec src (JavaScript externe) - utiliser le proxy de ressources
+    // IMPORTANT: Ne pas toucher aux scripts inline (sans src)
     html = html.replace(/<script([^>]*src=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
       const newUrl = rewriteResource(url);
       return `<script${before}${newUrl}${after}>`;
     });
+    
+    // Les scripts inline (sans src) sont préservés automatiquement car ils ne matchent pas le pattern ci-dessus
 
     // Réécrire les balises <img> (Images) - utiliser le proxy de ressources
     html = html.replace(/<img([^>]*src=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
@@ -194,6 +197,102 @@ export default async function handler(req, res) {
     // Ajouter une balise <base> pour gérer les chemins relatifs
     if (!html.includes('<base')) {
       html = html.replace(/<head([^>]*)>/i, `<head$1><base href="${baseUrl}/${path.endsWith('/') ? path : path + '/'}">`);
+    }
+
+    // Injecter un script pour s'assurer que tous les scripts sont chargés avant d'exposer les fonctions
+    // Ce script attend que tous les scripts soient chargés et expose les fonctions globalement
+    const scriptInjection = `
+    <script>
+      // Attendre que tous les scripts soient chargés
+      (function() {
+        // Fonction pour vérifier si tous les scripts sont chargés
+        function allScriptsLoaded() {
+          const scripts = document.querySelectorAll('script[src]');
+          let loaded = 0;
+          let total = scripts.length;
+          
+          if (total === 0) return true;
+          
+          return new Promise((resolve) => {
+            scripts.forEach((script) => {
+              if (script.complete || script.readyState === 'complete') {
+                loaded++;
+              } else {
+                script.addEventListener('load', () => {
+                  loaded++;
+                  if (loaded === total) resolve(true);
+                });
+                script.addEventListener('error', () => {
+                  loaded++;
+                  if (loaded === total) resolve(true);
+                });
+              }
+            });
+            
+            if (loaded === total) resolve(true);
+            
+            // Timeout après 10 secondes
+            setTimeout(() => resolve(true), 10000);
+          });
+        }
+        
+        // Attendre le chargement complet
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', () => {
+            allScriptsLoaded().then(() => {
+              console.log('✅ All scripts loaded');
+              // Déclencher un événement personnalisé pour indiquer que tout est prêt
+              window.dispatchEvent(new Event('allScriptsLoaded'));
+            });
+          });
+        } else {
+          allScriptsLoaded().then(() => {
+            console.log('✅ All scripts loaded');
+            window.dispatchEvent(new Event('allScriptsLoaded'));
+          });
+        }
+        
+        // Exposer les fonctions globales si elles existent
+        window.addEventListener('load', () => {
+          setTimeout(() => {
+            // Vérifier et exposer startEvaluation si elle existe
+            if (typeof window.startEvaluation === 'function') {
+              console.log('✅ startEvaluation is available');
+            } else {
+              console.warn('⚠️ startEvaluation not found, trying to find it...');
+              // Chercher dans window
+              for (let key in window) {
+                if (key.toLowerCase().includes('startevaluation') || key.toLowerCase().includes('evaluation')) {
+                  console.log('Found similar function:', key);
+                }
+              }
+            }
+            
+            // Vérifier et exposer ShowGuide si elle existe
+            if (typeof window.ShowGuide === 'function') {
+              console.log('✅ ShowGuide is available');
+            } else {
+              console.warn('⚠️ ShowGuide not found, trying to find it...');
+              // Chercher dans window
+              for (let key in window) {
+                if (key.toLowerCase().includes('showguide') || key.toLowerCase().includes('guide')) {
+                  console.log('Found similar function:', key);
+                }
+              }
+            }
+          }, 2000);
+        });
+      })();
+    </script>
+    `;
+
+    // Injecter le script avant la fermeture de </body> ou avant </head>
+    if (html.includes('</body>')) {
+      html = html.replace('</body>', `${scriptInjection}</body>`);
+    } else if (html.includes('</html>')) {
+      html = html.replace('</html>', `${scriptInjection}</html>`);
+    } else {
+      html += scriptInjection;
     }
 
     // Définir le Content-Type
