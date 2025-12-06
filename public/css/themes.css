@@ -323,6 +323,9 @@ header h1::after {
 .theme-bloomberg-nostalgie .bg-black,
 
 .theme-bloomberg-nostalgie .bg-black,
+.theme-light .bg-black {
+    background-color: #ffffff !important; /* Blanc pour thèmes light */
+}
 
 /* Boutons avec thème */
 .theme-default button,

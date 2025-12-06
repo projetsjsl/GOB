@@ -67,11 +67,16 @@ const TerminalEmmaIATab = ({ isDarkMode }) => {
                 id="terminal-emma-ia-iframe"
                 src="/terminal-emma-ia.html"
                 className="w-full h-full border-0"
-                style={{ minHeight: 'calc(100vh - 140px)' }}
+                style={{ 
+                    minHeight: 'calc(100vh - 140px)',
+                    isolation: 'isolate',
+                    backgroundColor: '#0a0e27'
+                }}
                 onLoad={handleIframeLoad}
                 onError={handleIframeError}
                 title="Terminal Emma IA - Dashboard Marché & KPIs"
                 allow="fullscreen"
+                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
             />
         </div>
     );

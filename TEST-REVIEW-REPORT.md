@@ -274,3 +274,4 @@ node scripts/test-all-tabs-comprehensive-v2.js
 **Dernière mise à jour des tests:** 2025-11-28
 
 
+
