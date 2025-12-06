@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Header } from './components/Header';
 import { HistoricalTable } from './components/HistoricalTable';
 import { ValuationCharts } from './components/ValuationCharts';
@@ -1901,8 +1901,7 @@ export default function App() {
                             <InfoTab />
                         ) : currentView === 'kpi' ? (
                             <KPIDashboard
-                                key={`kpi-${Object.keys(library).length}-${Object.values(library).reduce((sum, p) => sum + p.lastModified, 0)}`}
-                                profiles={Object.values(library)}
+                                profiles={useMemo(() => Object.values(library), [library])}
                                 currentId={activeId}
                                 onSelect={setActiveId}
                             />

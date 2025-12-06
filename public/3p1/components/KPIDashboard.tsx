@@ -336,9 +336,25 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     });
   }, [profiles, approvedVersions]);
 
-  // Charger les versions approuvées pour tous les profils (avec batch pour éviter trop de requêtes)
+  // Charger les versions approuvées pour tous les profils (avec cache et optimisation)
+  const approvedVersionsCacheRef = React.useRef<{ profileIds: string[]; approvedSet: Set<string>; timestamp: number } | null>(null);
+  const APPROVED_VERSIONS_CACHE_TTL = 300000; // Cache valide pendant 5 minutes
+  
   useEffect(() => {
     const loadApprovedVersions = async () => {
+      // Vérifier le cache
+      const now = Date.now();
+      const currentProfileIds = profiles.map(p => p.id).sort().join(',');
+      
+      if (approvedVersionsCacheRef.current && 
+          approvedVersionsCacheRef.current.profileIds === currentProfileIds &&
+          (now - approvedVersionsCacheRef.current.timestamp) < APPROVED_VERSIONS_CACHE_TTL) {
+        // Utiliser le cache
+        setApprovedVersions(approvedVersionsCacheRef.current.approvedSet);
+        setIsLoadingApprovedVersions(false);
+        return;
+      }
+      
       setIsLoadingApprovedVersions(true);
       const approvedSet = new Set<string>();
       
@@ -372,6 +388,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         }
       }
       
+      // Mettre à jour le cache
+      approvedVersionsCacheRef.current = {
+        profileIds: currentProfileIds,
+        approvedSet: new Set(approvedSet),
+        timestamp: now
+      };
+      
       setApprovedVersions(approvedSet);
       setIsLoadingApprovedVersions(false);
     };
@@ -380,6 +403,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       loadApprovedVersions();
     } else {
       setIsLoadingApprovedVersions(false);
+      setApprovedVersions(new Set());
     }
   }, [profiles]);
 
