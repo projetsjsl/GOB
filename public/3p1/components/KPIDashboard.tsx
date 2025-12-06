@@ -10,9 +10,11 @@ interface KPIDashboardProps {
   profiles: AnalysisProfile[];
   currentId: string;
   onSelect: (id: string) => void;
+  onBulkSync?: () => void; // Optionnel : fonction pour synchroniser tous les tickers
+  isBulkSyncing?: boolean; // Optionnel : état de la synchronisation
 }
 
-export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId, onSelect }) => {
+export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId, onSelect, onBulkSync, isBulkSyncing = false }) => {
   const [sortConfig, setSortConfig] = useState<{
     key: string;
     direction: 'asc' | 'desc';
@@ -408,6 +410,62 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       setApprovedVersions(new Set());
     }
   }, [profiles]);
+
+  // Gérer les event listeners wheel pour le graphique JPEGY (non-passif pour permettre preventDefault)
+  useEffect(() => {
+    const svg = svgJPEGYRef.current;
+    if (!svg) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = svg.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      const delta = e.deltaY > 0 ? 0.9 : 1.1;
+      setZoomJPEGY(prevZoom => {
+        const newZoom = Math.max(0.5, Math.min(prevZoom * delta, 5));
+        const zoomFactor = newZoom / prevZoom;
+        setPanJPEGY(prev => ({
+          x: mouseX - (mouseX - prev.x) * zoomFactor,
+          y: mouseY - (mouseY - prev.y) * zoomFactor
+        }));
+        return newZoom;
+      });
+    };
+
+    svg.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      svg.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
+
+  // Gérer les event listeners wheel pour le graphique Ratio 3:1 (non-passif pour permettre preventDefault)
+  useEffect(() => {
+    const svg = svgRatio31Ref.current;
+    if (!svg) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = svg.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      const delta = e.deltaY > 0 ? 0.9 : 1.1;
+      setZoomRatio31(prevZoom => {
+        const newZoom = Math.max(0.5, Math.min(prevZoom * delta, 5));
+        const zoomFactor = newZoom / prevZoom;
+        setPanRatio31(prev => ({
+          x: mouseX - (mouseX - prev.x) * zoomFactor,
+          y: mouseY - (mouseY - prev.y) * zoomFactor
+        }));
+        return newZoom;
+      });
+    };
+
+    svg.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      svg.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
 
   // Calculer les valeurs min/max réelles pour définir des filtres par défaut qui incluent tout
   const defaultFilterValues = useMemo(() => {
