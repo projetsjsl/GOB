@@ -39,7 +39,7 @@ export default async function handler(req, res) {
 async function handleGet(req, res, supabaseUrl, supabaseKey) {
     // Récupérer depuis la table unifiée tickers avec source='team' ou 'both'
     const response = await fetch(
-        `${supabaseUrl}/rest/v1/tickers?select=*&is_active=eq.true&or=(source.eq.team,source.eq.both)&order=priority.desc,ticker.asc`,
+        `${supabaseUrl}/rest/v1/tickers?select=*&is_active=eq.true&or=(category.eq.team,category.eq.both)&order=priority.desc,ticker.asc`,
         {
             headers: {
                 'apikey': supabaseKey,
@@ -95,12 +95,15 @@ async function handlePost(req, res, supabaseUrl, supabaseKey) {
         if (existing.length > 0) {
             // Si existe déjà, mettre à jour le source si nécessaire
             const existingTicker = existing[0];
-            let newSource = 'team';
+            let newCategory = 'team';
+            let newCategories = ['team'];
             
-            if (existingTicker.source === 'watchlist') {
-                newSource = 'both';
-            } else if (existingTicker.source === 'both') {
-                newSource = 'both';
+            if (existingTicker.category === 'watchlist' || (existingTicker.categories && existingTicker.categories.includes('watchlist'))) {
+                newCategory = 'both';
+                newCategories = ['team', 'watchlist'];
+            } else if (existingTicker.category === 'both' || (existingTicker.categories && existingTicker.categories.includes('team') && existingTicker.categories.includes('watchlist'))) {
+                newCategory = 'both';
+                newCategories = ['team', 'watchlist'];
             }
 
             const updateResponse = await fetch(
@@ -114,7 +117,8 @@ async function handlePost(req, res, supabaseUrl, supabaseKey) {
                         'Prefer': 'return=representation'
                     },
                     body: JSON.stringify({
-                        source: newSource,
+                        category: newCategory,
+                        categories: newCategories,
                         priority: parseInt(priority),
                         notes: notes || existingTicker.notes,
                         company_name: company_name || existingTicker.company_name,
@@ -146,7 +150,8 @@ async function handlePost(req, res, supabaseUrl, supabaseKey) {
         },
         body: JSON.stringify({
             ticker: tickerUpper,
-            source: 'team',
+            category: 'team',
+            categories: ['team'],
             priority: parseInt(priority),
             notes: notes,
             company_name: company_name,
@@ -204,8 +209,8 @@ async function handleDelete(req, res, supabaseUrl, supabaseKey) {
 
     const existingTicker = existing[0];
 
-    // Si source est 'both', mettre à jour vers 'watchlist' au lieu de supprimer
-    if (existingTicker.source === 'both') {
+    // Si category est 'both', mettre à jour vers 'watchlist' au lieu de supprimer
+    if (existingTicker.category === 'both' || (existingTicker.categories && existingTicker.categories.includes('team') && existingTicker.categories.includes('watchlist'))) {
         const updateResponse = await fetch(
             `${supabaseUrl}/rest/v1/tickers?ticker=eq.${tickerUpper}`,
             {
@@ -217,7 +222,8 @@ async function handleDelete(req, res, supabaseUrl, supabaseKey) {
                     'Prefer': 'return=representation'
                 },
                 body: JSON.stringify({
-                    source: 'watchlist',
+                    category: 'watchlist',
+                    categories: ['watchlist'],
                     updated_at: new Date().toISOString()
                 })
             }

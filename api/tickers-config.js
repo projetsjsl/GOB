@@ -28,7 +28,7 @@ export default async function handler(req, res) {
         if (supabaseUrl && supabaseKey) {
             try {
                 const teamResponse = await fetch(
-                    `${supabaseUrl}/rest/v1/tickers?select=ticker&is_active=eq.true&or=(source.eq.team,source.eq.both)&order=priority.desc,ticker.asc`,
+                    `${supabaseUrl}/rest/v1/tickers?select=ticker&is_active=eq.true&or=(category.eq.team,category.eq.both)&order=priority.desc,ticker.asc`,
                     {
                         headers: {
                             'apikey': supabaseKey,
@@ -51,7 +51,7 @@ export default async function handler(req, res) {
             // Fetch watchlist tickers from unified tickers table
             try {
                 const watchlistResponse = await fetch(
-                    `${supabaseUrl}/rest/v1/tickers?select=ticker&is_active=eq.true&or=(source.eq.watchlist,source.eq.both)&order=ticker.asc`,
+                    `${supabaseUrl}/rest/v1/tickers?select=ticker&is_active=eq.true&or=(category.eq.watchlist,category.eq.both)&order=ticker.asc`,
                     {
                         headers: {
                             'apikey': supabaseKey,

@@ -29,8 +29,8 @@ export default async function handler(req, res) {
 
         if (!list || list === 'team') {
             // Récupérer les tickers d'équipe depuis la table unifiée `tickers` avec source='team' ou 'both'
-            const teamResponse = await fetch(
-                `${supabaseUrl}/rest/v1/tickers?select=ticker&is_active=eq.true&or=(source.eq.team,source.eq.both)&order=priority.desc,ticker.asc`,
+                const teamResponse = await fetch(
+                    `${supabaseUrl}/rest/v1/tickers?select=ticker&is_active=eq.true&or=(category.eq.team,category.eq.both)&order=priority.desc,ticker.asc`,
                 {
                     headers: {
                         'apikey': supabaseKey,
@@ -62,8 +62,8 @@ export default async function handler(req, res) {
         if (!list || list === 'watchlist') {
             // Récupérer les tickers de watchlist depuis la table unifiée `tickers` avec source='watchlist' ou 'both'
             // Note: user_id est NULL pour les watchlists globales, ou spécifique pour les watchlists utilisateur
-            const watchlistResponse = await fetch(
-                `${supabaseUrl}/rest/v1/tickers?select=ticker&is_active=eq.true&or=(source.eq.watchlist,source.eq.both)&order=ticker.asc`,
+                const watchlistResponse = await fetch(
+                    `${supabaseUrl}/rest/v1/tickers?select=ticker&is_active=eq.true&or=(category.eq.watchlist,category.eq.both)&order=ticker.asc`,
                 {
                     headers: {
                         'apikey': supabaseKey,

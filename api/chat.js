@@ -322,21 +322,22 @@ export default async function handler(req, res) {
         );
 
         // Charger watchlist et team_tickers depuis la table unifiée tickers
+        // Utilise maintenant la colonne 'category' au lieu de 'source'
         const [watchlistResult, teamTickersResult] = await Promise.all([
-          // Watchlist: source='watchlist' ou 'both'
+          // Watchlist: category='watchlist' ou 'both' OU 'watchlist' IN categories
           // Note: On charge les watchlists globales (user_id IS NULL) ET les watchlists utilisateur
           supabase
             .from('tickers')
             .select('ticker')
             .eq('is_active', true)
-            .or('source.eq.watchlist,source.eq.both')
+            .or('category.eq.watchlist,category.eq.both')
             .order('ticker', { ascending: true }),
-          // Team tickers: source='team' ou 'both'
+          // Team tickers: category='team' ou 'both' OU 'team' IN categories
           supabase
             .from('tickers')
             .select('ticker')
             .eq('is_active', true)
-            .or('source.eq.team,source.eq.both')
+            .or('category.eq.team,category.eq.both')
             .order('priority', { ascending: false })
         ]);
 

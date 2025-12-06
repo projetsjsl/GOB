@@ -62,18 +62,19 @@ async function getTickersFromSupabase() {
     );
 
     // Charger team_tickers et watchlist (comme /api/chat)
+    // Utilise maintenant la colonne 'category' au lieu de 'source'
     const [teamTickersResult, watchlistResult] = await Promise.all([
       supabase
         .from('tickers')
         .select('ticker')
         .eq('is_active', true)
-        .or('source.eq.team,source.eq.both')
+        .or('category.eq.team,category.eq.both')
         .order('priority', { ascending: false }),
       supabase
         .from('tickers')
         .select('ticker')
         .eq('is_active', true)
-        .or('source.eq.watchlist,source.eq.both')
+        .or('category.eq.watchlist,category.eq.both')
         .order('ticker', { ascending: true })
     ]);
 

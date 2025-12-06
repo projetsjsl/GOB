@@ -69,16 +69,17 @@ async function handleGet(req, res, supabase) {
   } = req.query;
 
   // Optimisation egress : sélectionner seulement les colonnes nécessaires
+  // Utilise maintenant 'category' au lieu de 'source'
   let query = supabase
     .from('tickers')
-    .select('id, ticker, company_name, sector, industry, country, exchange, currency, market_cap, source, priority, is_active, user_id, target_price, stop_loss, notes, security_rank, earnings_predictability, price_growth_persistence, price_stability, beta, valueline_updated_at, valueline_proj_low_return, valueline_proj_high_return, created_at, updated_at', { count: 'exact' });
+    .select('id, ticker, company_name, sector, industry, country, exchange, currency, market_cap, category, categories, priority, is_active, user_id, target_price, stop_loss, notes, security_rank, earnings_predictability, price_growth_persistence, price_stability, beta, valueline_updated_at, valueline_proj_low_return, valueline_proj_high_return, created_at, updated_at', { count: 'exact' });
 
-  // Filtres
+  // Filtres (utilise 'category' au lieu de 'source')
   if (source) {
     if (source === 'both') {
-      query = query.or('source.eq.team,source.eq.both');
+      query = query.or('category.eq.team,category.eq.both');
     } else {
-      query = query.eq('source', source);
+      query = query.eq('category', source);
     }
   }
 
@@ -125,7 +126,8 @@ async function handlePost(req, res, supabase) {
     exchange,
     currency = 'USD',
     market_cap,
-    source = 'manual',
+    category = 'manual',
+    categories = ['manual'],
     priority = 1,
     is_active = true,
     user_id,

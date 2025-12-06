@@ -62,7 +62,7 @@ export default async function handler(req, res) {
         .from('tickers')
         .select('*')
         .eq('is_active', true) // Only active tickers
-        .or('source.eq.team,source.eq.both') // Team tickers only
+        .or('category.eq.team,category.eq.both') // Team tickers only
         .order('priority', { ascending: false })
         .order('ticker', { ascending: true });
 
@@ -145,7 +145,7 @@ export default async function handler(req, res) {
         .from('tickers')
         .update({ is_active: active })
         .eq('ticker', ticker)
-        .or('source.eq.team,source.eq.both') // Only update team tickers
+        .or('category.eq.team,category.eq.both') // Only update team tickers
         .select();
 
       if (error) {
@@ -185,7 +185,7 @@ export default async function handler(req, res) {
         .from('tickers')
         .select('source')
         .eq('ticker', ticker)
-        .or('source.eq.team,source.eq.both')
+        .or('category.eq.team,category.eq.both')
         .single();
 
       if (checkError || !existingTicker) {
@@ -196,10 +196,10 @@ export default async function handler(req, res) {
       }
 
       // If source is 'both', update to 'watchlist' instead of deleting
-      if (existingTicker.source === 'both') {
+      if (existingTicker.category === 'both') {
         const { error: updateError } = await supabase
           .from('tickers')
-          .update({ source: 'watchlist' })
+          .update({ category: 'watchlist', categories: ['watchlist'] })
           .eq('ticker', ticker);
 
         if (updateError) {
