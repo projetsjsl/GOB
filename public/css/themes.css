@@ -257,9 +257,6 @@ header h1::after {
 .theme-seeking-alpha,
 .theme-bloomberg-mobile,
 .theme-bloomberg-nostalgie,
-.theme-desjardins {
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
 
 /* Header avec thème */
 .theme-default header,
@@ -273,10 +270,6 @@ header h1::after {
 .theme-seeking-alpha header,
 .theme-bloomberg-mobile header,
 .theme-bloomberg-nostalgie header,
-.theme-desjardins header {
-    background: var(--theme-header-bg) !important;
-    border-color: var(--theme-border) !important;
-}
 
 /* Cards avec thème */
 .theme-default .bg-gray-900,
@@ -290,12 +283,6 @@ header h1::after {
 .theme-seeking-alpha .bg-gray-900,
 .theme-bloomberg-mobile .bg-gray-900,
 .theme-bloomberg-nostalgie .bg-gray-900,
-.theme-desjardins .bg-gray-900 {
-    background-color: var(--theme-surface) !important;
-    border: var(--theme-card-border) !important;
-    border-radius: var(--theme-border-radius) !important;
-    box-shadow: var(--theme-shadow) !important;
-}
 
 /* Texte avec thème */
 .theme-default .text-white,
@@ -309,9 +296,6 @@ header h1::after {
 .theme-seeking-alpha .text-white,
 .theme-bloomberg-mobile .text-white,
 .theme-bloomberg-nostalgie .text-white,
-.theme-desjardins .text-white {
-    color: var(--theme-text) !important;
-}
 
 .theme-default .text-gray-400,
 .theme-terminal .text-gray-400,
@@ -324,9 +308,6 @@ header h1::after {
 .theme-seeking-alpha .text-gray-400,
 .theme-bloomberg-mobile .text-gray-400,
 .theme-bloomberg-nostalgie .text-gray-400,
-.theme-desjardins .text-gray-400 {
-    color: var(--theme-text-secondary) !important;
-}
 
 /* Background principal */
 .theme-default .bg-black,
@@ -340,15 +321,8 @@ header h1::after {
 .theme-seeking-alpha .bg-black,
 .theme-bloomberg-mobile .bg-black,
 .theme-bloomberg-nostalgie .bg-black,
-.theme-desjardins .bg-black {
-    background-color: var(--theme-bg) !important;
-}
 
 .theme-bloomberg-nostalgie .bg-black,
-.theme-desjardins .bg-black,
-.theme-light .bg-black {
-    background-color: #ffffff !important; /* Blanc pour thèmes light */
-}
 
 /* Boutons avec thème */
 .theme-default button,
@@ -362,9 +336,6 @@ header h1::after {
 .theme-seeking-alpha button,
 .theme-bloomberg-mobile button,
 .theme-bloomberg-nostalgie button,
-.theme-desjardins button {
-    font-family: var(--theme-font-primary) !important;
-}
 
 /* Thème spécifique: Bloomberg Terminal - Style terminal classique */
 .theme-bloomberg-terminal {
@@ -573,10 +544,6 @@ header h1::after {
 .theme-seeking-alpha nav,
 .theme-bloomberg-mobile nav,
 .theme-bloomberg-nostalgie nav,
-.theme-desjardins nav {
-    background-color: var(--theme-surface) !important;
-    border-color: var(--theme-border) !important;
-}
 
 /* Thème spécifique: Terminal (identique à Bloomberg Terminal) */
 .theme-terminal {
@@ -609,79 +576,19 @@ header h1::after {
     background-color: #ffffff !important;
 }
 
-/* Thème spécifique: Desjardins - Vert et blanc professionnel */
-.theme-desjardins {
-    background-color: #ffffff !important;
-    color: #1a1a1a !important;
-}
+/* Thème supprimé */
 
-.theme-desjardins header {
-    border-bottom: 2px solid #00a651 !important;
-    background: linear-gradient(135deg, #006747 0%, #00a651 100%) !important;
-    color: #ffffff !important;
-}
 
-.theme-desjardins .bg-gray-900,
-.theme-desjardins .bg-gray-800 {
-    background-color: #ffffff !important;
-    border: 1px solid #d0d0d0 !important;
-    box-shadow: 0 2px 8px rgba(0, 103, 71, 0.1) !important;
-}
 
-.theme-desjardins .text-white {
-    color: #1a1a1a !important; /* Noir au lieu de blanc sur fond blanc */
-}
 
-.theme-desjardins .text-gray-400 {
-    color: #666666 !important;
-}
 
-.theme-desjardins .text-green-500,
-.theme-desjardins .text-green-400,
-.theme-desjardins .text-green-600 {
-    color: #00a651 !important; /* Vert Desjardins pour gains */
-}
 
-.theme-desjardins .text-red-500,
-.theme-desjardins .text-red-400,
-.theme-desjardins .text-red-600 {
-    color: #d32f2f !important; /* Rouge pour pertes */
-}
 
-.theme-desjardins button.bg-blue-600,
-.theme-desjardins .bg-blue-600,
-.theme-desjardins .bg-green-500 {
-    background-color: #006747 !important; /* Vert Desjardins foncé pour CTA */
-    color: #ffffff !important;
-    border: 1px solid #006747 !important;
-}
 
-.theme-desjardins button:hover {
-    background-color: #00a651 !important; /* Vert plus clair au hover */
-    box-shadow: 0 4px 12px rgba(0, 103, 71, 0.2) !important;
-}
 
-.theme-desjardins nav {
-    background-color: #f5f5f5 !important;
-    border-top: 2px solid #00a651 !important;
-}
 
-.theme-desjardins table {
-    border: 1px solid #d0d0d0 !important;
-    border-collapse: collapse !important;
-}
 
-.theme-desjardins table th {
-    background-color: #f5f5f5 !important;
-    color: #1a1a1a !important;
-    border: 1px solid #d0d0d0 !important;
-}
 
-.theme-desjardins table td {
-    border: 1px solid #e8e8e8 !important;
-    color: #1a1a1a !important;
-    background-color: #ffffff !important;
-}
 
 /* Thème spécifique: MarketQ Noir - Version ultra sombre */
 .theme-marketq-dark {
