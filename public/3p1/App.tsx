@@ -188,14 +188,25 @@ export default function App() {
                                 updated[tickerSymbol] = {
                                     ...updated[tickerSymbol],
                                     isWatchlist: shouldBeWatchlist,
-                                    // Mettre à jour les métriques ValueLine depuis Supabase (préserver celles existantes si Supabase n'a pas de valeur)
+                                    // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
+                                    // Toujours utiliser Supabase si disponible, sinon garder valeur existante
                                     info: {
                                         ...updated[tickerSymbol].info,
-                                        securityRank: supabaseTicker.security_rank || updated[tickerSymbol].info.securityRank || 'N/A',
-                                        earningsPredictability: supabaseTicker.earnings_predictability || updated[tickerSymbol].info.earningsPredictability,
-                                        priceGrowthPersistence: supabaseTicker.price_growth_persistence || updated[tickerSymbol].info.priceGrowthPersistence,
-                                        priceStability: supabaseTicker.price_stability || updated[tickerSymbol].info.priceStability,
-                                        beta: supabaseTicker.beta || updated[tickerSymbol].info.beta
+                                        securityRank: supabaseTicker.security_rank !== null && supabaseTicker.security_rank !== undefined 
+                                            ? supabaseTicker.security_rank 
+                                            : (updated[tickerSymbol].info.securityRank || 'N/A'),
+                                        earningsPredictability: supabaseTicker.earnings_predictability !== null && supabaseTicker.earnings_predictability !== undefined
+                                            ? supabaseTicker.earnings_predictability
+                                            : updated[tickerSymbol].info.earningsPredictability,
+                                        priceGrowthPersistence: supabaseTicker.price_growth_persistence !== null && supabaseTicker.price_growth_persistence !== undefined
+                                            ? supabaseTicker.price_growth_persistence
+                                            : updated[tickerSymbol].info.priceGrowthPersistence,
+                                        priceStability: supabaseTicker.price_stability !== null && supabaseTicker.price_stability !== undefined
+                                            ? supabaseTicker.price_stability
+                                            : updated[tickerSymbol].info.priceStability,
+                                        beta: supabaseTicker.beta !== null && supabaseTicker.beta !== undefined
+                                            ? supabaseTicker.beta
+                                            : updated[tickerSymbol].info.beta
                                     }
                                 };
                                 
@@ -532,14 +543,42 @@ export default function App() {
 
             // Update Info (including logo and beta, but preserve ValueLine metrics)
             if (result.info) {
-                // Préserver les métriques ValueLine existantes si elles ne sont pas dans result.info
+                // ⚠️ MULTI-UTILISATEUR : Recharger les métriques ValueLine depuis Supabase lors de la synchronisation FMP
+                // Pour garantir que tous les utilisateurs voient les mêmes valeurs
                 const existingProfile = library[activeId];
-                const preservedValueLineMetrics = {
+                let preservedValueLineMetrics = {
                     securityRank: existingProfile?.info?.securityRank || result.info.securityRank || 'N/A',
                     earningsPredictability: existingProfile?.info?.earningsPredictability || result.info.earningsPredictability,
                     priceGrowthPersistence: existingProfile?.info?.priceGrowthPersistence || result.info.priceGrowthPersistence,
                     priceStability: existingProfile?.info?.priceStability || result.info.priceStability
                 };
+                
+                // Recharger depuis Supabase pour garantir la cohérence multi-utilisateurs
+                try {
+                    const supabaseResult = await loadAllTickersFromSupabase();
+                    if (supabaseResult.success) {
+                        const supabaseTicker = supabaseResult.tickers.find(t => t.ticker.toUpperCase() === activeId);
+                        if (supabaseTicker) {
+                            preservedValueLineMetrics = {
+                                securityRank: supabaseTicker.security_rank !== null && supabaseTicker.security_rank !== undefined
+                                    ? supabaseTicker.security_rank
+                                    : (preservedValueLineMetrics.securityRank || 'N/A'),
+                                earningsPredictability: supabaseTicker.earnings_predictability !== null && supabaseTicker.earnings_predictability !== undefined
+                                    ? supabaseTicker.earnings_predictability
+                                    : preservedValueLineMetrics.earningsPredictability,
+                                priceGrowthPersistence: supabaseTicker.price_growth_persistence !== null && supabaseTicker.price_growth_persistence !== undefined
+                                    ? supabaseTicker.price_growth_persistence
+                                    : preservedValueLineMetrics.priceGrowthPersistence,
+                                priceStability: supabaseTicker.price_stability !== null && supabaseTicker.price_stability !== undefined
+                                    ? supabaseTicker.price_stability
+                                    : preservedValueLineMetrics.priceStability
+                            };
+                        }
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Impossible de recharger les métriques ValueLine depuis Supabase lors de la sync FMP:', error);
+                    // Continuer avec les valeurs existantes en cas d'erreur
+                }
                 
                 const updatedInfo = {
                     ...result.info,
@@ -677,6 +716,20 @@ export default function App() {
     };
 
     const handleUpdateInfo = (key: keyof CompanyInfo, value: string | number) => {
+        // ⚠️ MULTI-UTILISATEUR : Empêcher la modification des métriques ValueLine
+        // Ces métriques viennent de Supabase et doivent rester synchronisées pour tous les utilisateurs
+        const valueLineFields: (keyof CompanyInfo)[] = ['securityRank', 'earningsPredictability', 'priceGrowthPersistence', 'priceStability'];
+        
+        if (valueLineFields.includes(key)) {
+            showNotification(
+                '⚠️ Les métriques ValueLine ne peuvent pas être modifiées localement.\n' +
+                'Elles sont synchronisées depuis Supabase pour tous les utilisateurs.\n' +
+                'Pour modifier ces valeurs, utilisez l\'interface d\'administration Supabase.',
+                'warning'
+            );
+            return; // Ne pas permettre la modification
+        }
+        
         setInfo(prev => ({ ...prev, [key]: value }));
     };
 
@@ -995,14 +1048,25 @@ export default function App() {
                 if (supabaseResult.success) {
                     const supabaseTicker = supabaseResult.tickers.find(t => t.ticker.toUpperCase() === upperSymbol);
                     if (supabaseTicker) {
-                        // Mettre à jour les métriques ValueLine depuis Supabase
+                        // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
+                        // Toujours utiliser Supabase si disponible, sinon garder valeur existante
                         const updatedInfo = {
                             ...existingProfile.info,
-                            securityRank: supabaseTicker.security_rank || existingProfile.info.securityRank || 'N/A',
-                            earningsPredictability: supabaseTicker.earnings_predictability || existingProfile.info.earningsPredictability,
-                            priceGrowthPersistence: supabaseTicker.price_growth_persistence || existingProfile.info.priceGrowthPersistence,
-                            priceStability: supabaseTicker.price_stability || existingProfile.info.priceStability,
-                            beta: supabaseTicker.beta || existingProfile.info.beta
+                            securityRank: supabaseTicker.security_rank !== null && supabaseTicker.security_rank !== undefined
+                                ? supabaseTicker.security_rank
+                                : (existingProfile.info.securityRank || 'N/A'),
+                            earningsPredictability: supabaseTicker.earnings_predictability !== null && supabaseTicker.earnings_predictability !== undefined
+                                ? supabaseTicker.earnings_predictability
+                                : existingProfile.info.earningsPredictability,
+                            priceGrowthPersistence: supabaseTicker.price_growth_persistence !== null && supabaseTicker.price_growth_persistence !== undefined
+                                ? supabaseTicker.price_growth_persistence
+                                : existingProfile.info.priceGrowthPersistence,
+                            priceStability: supabaseTicker.price_stability !== null && supabaseTicker.price_stability !== undefined
+                                ? supabaseTicker.price_stability
+                                : existingProfile.info.priceStability,
+                            beta: supabaseTicker.beta !== null && supabaseTicker.beta !== undefined
+                                ? supabaseTicker.beta
+                                : existingProfile.info.beta
                         };
                         
                         // Mettre à jour dans la library si les métriques ont changé
@@ -1405,14 +1469,25 @@ export default function App() {
                             updated[tickerSymbol] = {
                                 ...updated[tickerSymbol],
                                 isWatchlist: shouldBeWatchlist,
-                                // Mettre à jour les métriques ValueLine depuis Supabase
+                                // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
+                                // Toujours utiliser Supabase si disponible, sinon garder valeur existante
                                 info: {
                                     ...updated[tickerSymbol].info,
-                                    securityRank: supabaseTicker.security_rank || updated[tickerSymbol].info.securityRank || 'N/A',
-                                    earningsPredictability: supabaseTicker.earnings_predictability || updated[tickerSymbol].info.earningsPredictability,
-                                    priceGrowthPersistence: supabaseTicker.price_growth_persistence || updated[tickerSymbol].info.priceGrowthPersistence,
-                                    priceStability: supabaseTicker.price_stability || updated[tickerSymbol].info.priceStability,
-                                    beta: supabaseTicker.beta || updated[tickerSymbol].info.beta
+                                    securityRank: supabaseTicker.security_rank !== null && supabaseTicker.security_rank !== undefined
+                                        ? supabaseTicker.security_rank
+                                        : (updated[tickerSymbol].info.securityRank || 'N/A'),
+                                    earningsPredictability: supabaseTicker.earnings_predictability !== null && supabaseTicker.earnings_predictability !== undefined
+                                        ? supabaseTicker.earnings_predictability
+                                        : updated[tickerSymbol].info.earningsPredictability,
+                                    priceGrowthPersistence: supabaseTicker.price_growth_persistence !== null && supabaseTicker.price_growth_persistence !== undefined
+                                        ? supabaseTicker.price_growth_persistence
+                                        : updated[tickerSymbol].info.priceGrowthPersistence,
+                                    priceStability: supabaseTicker.price_stability !== null && supabaseTicker.price_stability !== undefined
+                                        ? supabaseTicker.price_stability
+                                        : updated[tickerSymbol].info.priceStability,
+                                    beta: supabaseTicker.beta !== null && supabaseTicker.beta !== undefined
+                                        ? supabaseTicker.beta
+                                        : updated[tickerSymbol].info.beta
                                 }
                             };
                             updatedTickersCount++;
@@ -1882,43 +1957,59 @@ export default function App() {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs text-gray-500 mb-1">Financial Strength (ValueLine 3 déc 2025)</label>
+                                                <label className="block text-xs text-gray-500 mb-1 flex items-center gap-1">
+                                                    Financial Strength (ValueLine 3 déc 2025)
+                                                    <span className="text-[10px] text-blue-600" title="Synchronisé depuis Supabase - Lecture seule">🔒</span>
+                                                </label>
                                                 <input
                                                     type="text"
                                                     value={info.securityRank}
-                                                    onChange={(e) => handleUpdateInfo('securityRank', e.target.value)}
-                                                    className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
+                                                    readOnly
+                                                    className="w-full border border-gray-300 rounded px-2 py-1 bg-gray-50 text-gray-700 cursor-not-allowed"
                                                     placeholder="A+, A, B+, etc."
+                                                    title="Cette métrique est synchronisée depuis Supabase et ne peut pas être modifiée localement"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs text-gray-500 mb-1">Earnings Predictability (ValueLine 3 déc 2025)</label>
+                                                <label className="block text-xs text-gray-500 mb-1 flex items-center gap-1">
+                                                    Earnings Predictability (ValueLine 3 déc 2025)
+                                                    <span className="text-[10px] text-blue-600" title="Synchronisé depuis Supabase - Lecture seule">🔒</span>
+                                                </label>
                                                 <input
                                                     type="text"
                                                     value={info.earningsPredictability || ''}
-                                                    onChange={(e) => handleUpdateInfo('earningsPredictability', e.target.value)}
-                                                    className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
+                                                    readOnly
+                                                    className="w-full border border-gray-300 rounded px-2 py-1 bg-gray-50 text-gray-700 cursor-not-allowed"
                                                     placeholder="100, 95, 90, etc."
+                                                    title="Cette métrique est synchronisée depuis Supabase et ne peut pas être modifiée localement"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs text-gray-500 mb-1">Price Growth Persistence (ValueLine 3 déc 2025)</label>
+                                                <label className="block text-xs text-gray-500 mb-1 flex items-center gap-1">
+                                                    Price Growth Persistence (ValueLine 3 déc 2025)
+                                                    <span className="text-[10px] text-blue-600" title="Synchronisé depuis Supabase - Lecture seule">🔒</span>
+                                                </label>
                                                 <input
                                                     type="text"
                                                     value={info.priceGrowthPersistence || ''}
-                                                    onChange={(e) => handleUpdateInfo('priceGrowthPersistence', e.target.value)}
-                                                    className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
+                                                    readOnly
+                                                    className="w-full border border-gray-300 rounded px-2 py-1 bg-gray-50 text-gray-700 cursor-not-allowed"
                                                     placeholder="95, 90, 85, etc."
+                                                    title="Cette métrique est synchronisée depuis Supabase et ne peut pas être modifiée localement"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs text-gray-500 mb-1">Price Stability (ValueLine 3 déc 2025)</label>
+                                                <label className="block text-xs text-gray-500 mb-1 flex items-center gap-1">
+                                                    Price Stability (ValueLine 3 déc 2025)
+                                                    <span className="text-[10px] text-blue-600" title="Synchronisé depuis Supabase - Lecture seule">🔒</span>
+                                                </label>
                                                 <input
                                                     type="text"
                                                     value={info.priceStability || ''}
-                                                    onChange={(e) => handleUpdateInfo('priceStability', e.target.value)}
-                                                    className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
+                                                    readOnly
+                                                    className="w-full border border-gray-300 rounded px-2 py-1 bg-gray-50 text-gray-700 cursor-not-allowed"
                                                     placeholder="100, 95, 90, etc."
+                                                    title="Cette métrique est synchronisée depuis Supabase et ne peut pas être modifiée localement"
                                                 />
                                             </div>
                                             {info.beta !== undefined && info.beta !== null && (
