@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { StarIcon, EyeIcon } from '@heroicons/react/24/solid';
 import { AnalysisProfile } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
@@ -29,12 +29,14 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   const [panJPEGY, setPanJPEGY] = useState({ x: 0, y: 0 });
   const [isPanningJPEGY, setIsPanningJPEGY] = useState(false);
   const [panStartJPEGY, setPanStartJPEGY] = useState({ x: 0, y: 0 });
+  const svgJPEGYRef = useRef<SVGSVGElement>(null);
   
   // États pour zoom et pan - Graphique Ratio 3:1
   const [zoomRatio31, setZoomRatio31] = useState(1);
   const [panRatio31, setPanRatio31] = useState({ x: 0, y: 0 });
   const [isPanningRatio31, setIsPanningRatio31] = useState(false);
   const [panStartRatio31, setPanStartRatio31] = useState({ x: 0, y: 0 });
+  const svgRatio31Ref = useRef<SVGSVGElement>(null);
   
   // États pour gérer la visibilité des sections (collapse/expand)
   const [sectionsVisibility, setSectionsVisibility] = useState<Record<string, boolean>>({
@@ -1566,25 +1568,12 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           <div className="overflow-x-auto bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg">
             <div className="min-w-[600px] sm:min-w-[700px] md:min-w-[800px]">
               <svg 
+                ref={svgJPEGYRef}
                 width={chartWidth} 
                 height={chartHeight} 
                 className="border border-gray-300 rounded bg-white w-full max-w-full cursor-move" 
                 viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
                 preserveAspectRatio="xMidYMid meet"
-                onWheel={(e) => {
-                  e.preventDefault();
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const mouseX = e.clientX - rect.left;
-                  const mouseY = e.clientY - rect.top;
-                  const delta = e.deltaY > 0 ? 0.9 : 1.1;
-                  const newZoom = Math.max(0.5, Math.min(zoomJPEGY * delta, 5));
-                  const zoomFactor = newZoom / zoomJPEGY;
-                  setPanJPEGY(prev => ({
-                    x: mouseX - (mouseX - prev.x) * zoomFactor,
-                    y: mouseY - (mouseY - prev.y) * zoomFactor
-                  }));
-                  setZoomJPEGY(newZoom);
-                }}
                 onMouseDown={(e) => {
                   if (e.button === 0 && !e.target || (e.target as Element).tagName !== 'circle') { // Clic gauche seulement, pas sur un point
                     setIsPanningJPEGY(true);
@@ -1915,25 +1904,12 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                 
                 return (
                   <svg 
+                    ref={svgRatio31Ref}
                     width={chartWidth} 
                     height={chartHeight} 
                     className="border border-gray-300 rounded bg-white w-full max-w-full cursor-move" 
                     viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
                     preserveAspectRatio="xMidYMid meet"
-                    onWheel={(e) => {
-                      e.preventDefault();
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const mouseX = e.clientX - rect.left;
-                      const mouseY = e.clientY - rect.top;
-                      const delta = e.deltaY > 0 ? 0.9 : 1.1;
-                      const newZoom = Math.max(0.5, Math.min(zoomRatio31 * delta, 5));
-                      const zoomFactor = newZoom / zoomRatio31;
-                      setPanRatio31(prev => ({
-                        x: mouseX - (mouseX - prev.x) * zoomFactor,
-                        y: mouseY - (mouseY - prev.y) * zoomFactor
-                      }));
-                      setZoomRatio31(newZoom);
-                    }}
                     onMouseDown={(e) => {
                       if (e.button === 0 && !e.target || (e.target as Element).tagName !== 'circle') { // Clic gauche seulement, pas sur un point
                         setIsPanningRatio31(true);
