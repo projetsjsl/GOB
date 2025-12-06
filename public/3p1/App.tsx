@@ -377,8 +377,17 @@ export default function App() {
             // Clear Undo/Redo stacks on switch
             setPastData([]);
             setFutureData([]);
+        } else {
+            // ⚠️ Profil non trouvé dans la library - données placeholder affichées
+            // Afficher un avertissement si ce n'est pas le profil initial (ACN)
+            if (activeId !== 'ACN') {
+                showNotification(
+                    `⚠️ Le ticker ${activeId} n'est pas dans votre portefeuille. Cliquez sur "Sync. Données" pour charger les données depuis l'API ou ajoutez-le depuis la sidebar.`,
+                    'warning'
+                );
+            }
         }
-    }, [activeId, isInitialized]);
+    }, [activeId, isInitialized, library]);
 
     // Save to Library when Active State Changes
     useEffect(() => {
@@ -1808,6 +1817,7 @@ export default function App() {
                                     onUpdateAssumption={handleUpdateAssumption}
                                     onFetchData={handleFetchData}
                                     onRestoreData={handleOpenRestoreDialog}
+                                    showSyncButton={currentView === 'analysis'}
                                 />
 
                         {/* CONDITIONAL RENDER: ANALYSIS VS INFO VS KPI */}

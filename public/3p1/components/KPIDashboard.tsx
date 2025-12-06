@@ -1017,7 +1017,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             </select>
           </div>
           <div className="relative">
-            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 mb-1.5 sm:mb-2 flex items-center gap-1.5 sm:gap-2 cursor-help" title="Filtre par Source\n\nFiltre les tickers selon leur source:\n\n• ⭐ Portefeuille: Titres détenus actuellement\n• 👁️ Watchlist: Titres surveillés (non détenus)\n• Tous: Affiche les deux sources\n\nLe badge coloré indique le filtre actif.">
+            <label className="flex text-[10px] sm:text-xs font-semibold text-gray-700 mb-1.5 sm:mb-2 items-center gap-1.5 sm:gap-2 cursor-help" title="Filtre par Source\n\nFiltre les tickers selon leur source:\n\n• ⭐ Portefeuille: Titres détenus actuellement\n• 👁️ Watchlist: Titres surveillés (non détenus)\n• Tous: Affiche les deux sources\n\nLe badge coloré indique le filtre actif.">
               <span className="truncate">Source</span>
               {filters.source !== 'all' && (
                 <span className={`px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-bold rounded-full flex items-center gap-0.5 sm:gap-1 flex-shrink-0 ${

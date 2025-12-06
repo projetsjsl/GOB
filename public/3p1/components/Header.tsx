@@ -13,6 +13,7 @@ interface HeaderProps {
   onUpdateAssumption: (key: keyof Assumptions, value: number) => void;
   onFetchData?: () => Promise<void>;
   onRestoreData?: () => void;
+  showSyncButton?: boolean; // Nouveau prop pour contrôler la visibilité du bouton
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -24,7 +25,8 @@ export const Header: React.FC<HeaderProps> = ({
   onUpdateInfo,
   onUpdateAssumption,
   onFetchData,
-  onRestoreData
+  onRestoreData,
+  showSyncButton = true // Par défaut, afficher le bouton
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -224,7 +226,7 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="hidden sm:inline">Sauvegarder</span>
             </button>
 
-            {onFetchData && (
+            {onFetchData && showSyncButton && (
               <button
                 onClick={handleSyncClick}
                 disabled={isLoading}
@@ -232,7 +234,7 @@ export const Header: React.FC<HeaderProps> = ({
                 title="Synchroniser les données (Sync. Données)\n\nRécupère les dernières données depuis l'API FMP:\n• Met à jour les données auto-fetchées (autoFetched: true)\n• Préserve les modifications manuelles (autoFetched: false)\n• Ajoute les nouvelles années disponibles\n• Recalcule les hypothèses (préserve les exclusions)\n• Préserve les métriques ValueLine\n\n⚠️ Ne synchronise que le ticker actuellement sélectionné."
               >
                 <ArrowPathIcon className={`w-3 h-3 sm:w-4 sm:h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                <span className="hidden sm:inline">{isLoading ? 'Sync...' : 'Sync. Données'}</span>
+                <span className="hidden xs:inline">{isLoading ? 'Sync...' : 'Sync. Données'}</span>
               </button>
             )}
 
