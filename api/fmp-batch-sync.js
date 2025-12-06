@@ -1,16 +1,21 @@
 /**
- * Job Batch pour synchroniser les données FMP vers ticker_market_cache
+ * Job Batch pour synchroniser UNIQUEMENT LES PRIX FMP vers ticker_price_cache
+ * 
+ * ⚠️ IMPORTANT : Ce job synchronise UNIQUEMENT les PRIX (pas les ratios/métriques)
+ * Les données fondamentales (ratios, métriques) sont récupérées à la demande dans 3p1
  * 
  * Ce job :
  * 1. Récupère tous les tickers actifs depuis Supabase (1 requête)
- * 2. Appelle FMP en batch pour tous les tickers (quelques requêtes max)
- * 3. Upsert massif dans ticker_market_cache (1 requête)
+ * 2. Appelle FMP quotes en batch (PRIX UNIQUEMENT - pas de ratios)
+ * 3. Upsert massif dans ticker_price_cache (1 requête)
  * 
- * Fréquence recommandée : Toutes les 5-15 minutes
+ * Fréquence : UNIQUEMENT quand nécessaire (beta-dashboard ouvert, 3p1 prix)
+ * - Option 1 : Cron toutes les 5-15 min (si beta-dashboard toujours ouvert)
+ * - Option 2 : Appel manuel depuis le frontend quand nécessaire
  * 
  * Usage:
- * - Cron Vercel : */5 * * * * (toutes les 5 min)
- * - Appel manuel : POST /api/fmp-batch-sync
+ * - Appel manuel : POST /api/fmp-batch-sync (recommandé - à la demande)
+ * - Cron optionnel : */15 * * * * (toutes les 15 min si nécessaire)
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -49,7 +54,8 @@ async function getAllActiveTickers() {
 }
 
 /**
- * Appelle FMP pour récupérer les quotes (prix, volume, etc.)
+ * Appelle FMP pour récupérer UNIQUEMENT les quotes (prix, volume, etc.)
+ * ⚠️ PAS de ratios/métriques - seulement les prix pour réduire l'egress
  * FMP accepte jusqu'à 100 symboles par requête
  */
 async function fetchFMPQuotes(symbols) {
@@ -224,12 +230,13 @@ async function syncAllTickers() {
 
     const executionTime = Date.now() - startTime;
 
-    console.log(`✅ Synchronisation terminée: ${combinedData.length} tickers en ${executionTime}ms`);
+    console.log(`✅ Synchronisation PRIX terminée: ${priceData.length} tickers en ${executionTime}ms`);
 
     return {
       success: true,
-      tickersProcessed: combinedData.length,
+      tickersProcessed: priceData.length,
       executionTimeMs: executionTime,
+      dataType: 'prices_only', // Indique que seuls les prix ont été synchronisés
       timestamp: new Date().toISOString()
     };
 

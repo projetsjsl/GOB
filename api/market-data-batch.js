@@ -1,9 +1,10 @@
 /**
- * API Endpoint pour récupérer les données de marché depuis ticker_market_cache
+ * API Endpoint pour récupérer UNIQUEMENT LES PRIX depuis ticker_price_cache
  * 
  * GET /api/market-data-batch?tickers=AAPL,MSFT,GOOGL
  * 
- * Retourne les données depuis le cache (si fraîches) ou fetch FMP si expiré
+ * ⚠️ IMPORTANT : Retourne UNIQUEMENT les prix (pas les ratios/métriques)
+ * Les ratios sont récupérés à la demande dans 3p1 via /api/fmp-company-data
  * 
  * Optimisation : 1 requête pour N tickers au lieu de N requêtes individuelles
  */
@@ -20,14 +21,14 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 /**
- * Récupère les données depuis ticker_market_cache
+ * Récupère UNIQUEMENT LES PRIX depuis ticker_price_cache
  */
-async function getCachedMarketData(tickers) {
+async function getCachedPriceData(tickers) {
   const tickersUpper = tickers.map(t => t.toUpperCase());
   
   const { data, error } = await supabase
-    .from('ticker_market_cache')
-    .select('ticker, current_price, change_percent, change_amount, volume, market_cap, pe_ratio, pcf_ratio, pbv_ratio, dividend_yield, updated_at, expires_at')
+    .from('ticker_price_cache')
+    .select('ticker, current_price, change_percent, change_amount, volume, market_cap, updated_at, expires_at')
     .in('ticker', tickersUpper);
 
   if (error) {
@@ -86,8 +87,8 @@ export default async function handler(req, res) {
       });
     }
 
-    // Récupérer depuis le cache
-    const cachedData = await getCachedMarketData(tickerList);
+    // Récupérer UNIQUEMENT LES PRIX depuis le cache
+    const cachedData = await getCachedPriceData(tickerList);
 
     // Identifier les données fraîches, stale et manquantes
     const { fresh, stale } = filterFreshData(cachedData);
@@ -104,10 +105,7 @@ export default async function handler(req, res) {
         changeAmount: d.change_amount,
         volume: d.volume,
         marketCap: d.market_cap,
-        peRatio: d.pe_ratio,
-        pcfRatio: d.pcf_ratio,
-        pbvRatio: d.pbv_ratio,
-        dividendYield: d.dividend_yield,
+        // ⚠️ PAS de ratios ici - récupérés à la demande dans 3p1
         updatedAt: d.updated_at,
         isFresh: new Date(d.expires_at) > new Date()
       })),
