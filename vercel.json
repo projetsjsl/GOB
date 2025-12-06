@@ -138,10 +138,10 @@
       ]
     }
   ],
-  "rewrites": [
-    { "source": "/api/finnhub", "destination": "/api/marketdata" }
-  ],
-  "redirects": [
+      "rewrites": [
+        { "source": "/api/finnhub", "destination": "/api/marketdata" }
+      ],
+      "redirects": [
     {
       "source": "/test",
       "destination": "/test-simple.html",

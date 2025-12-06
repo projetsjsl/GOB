@@ -98,9 +98,10 @@ class FormulaParser {
  * Charge une définition de KPI avec ses variables
  */
 async function loadKPIDefinition(kpiCode) {
+  // Optimisation egress : sélectionner seulement les colonnes nécessaires
   const { data: kpi, error: kpiError } = await supabase
     .from('kpi_definitions')
-    .select('*')
+    .select('id, name, code, expression, description, category, is_active, is_public, version')
     .eq('code', kpiCode)
     .eq('is_active', true)
     .single();
@@ -109,9 +110,10 @@ async function loadKPIDefinition(kpiCode) {
     throw new Error(`KPI ${kpiCode} non trouvé ou inactif`);
   }
 
+  // Optimisation egress : sélectionner seulement les colonnes nécessaires
   const { data: variables, error: varsError } = await supabase
     .from('kpi_variables')
-    .select('*')
+    .select('kpi_id, variable_name, metric_code, default_value, order_index')
     .eq('kpi_id', kpi.id)
     .order('order_index', { ascending: true });
 

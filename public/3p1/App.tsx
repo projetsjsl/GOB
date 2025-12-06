@@ -304,33 +304,44 @@ export default function App() {
                 });
 
                 // ⚠️ RIGUEUR 100% : Ne créer des profils QUE si FMP réussit
-                // Charger les données FMP AVANT de créer les profils (batch avec délai)
+                // OPTIMISATION EGRESS : Utiliser le cache d'abord, puis FMP si nécessaire
                 if (newTickers.length > 0) {
-                    // Charger par batch de 5 avec délai de 500ms entre chaque batch
-                    const batchSize = 5;
-                    const delayBetweenBatches = 500;
+                    // Filtrer les fonds mutuels AVANT tout appel API
+                    const validTickers = newTickers.filter(t => {
+                        const symbol = t.ticker.toUpperCase();
+                        if (isMutualFund(symbol, t.company_name)) {
+                            console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - profil NON créé (exclu automatiquement)`);
+                            return false;
+                        }
+                        return true;
+                    });
 
-                    for (let i = 0; i < newTickers.length; i += batchSize) {
-                        const batch = newTickers.slice(i, i + batchSize);
+                    if (validTickers.length === 0) {
+                        console.log('✅ Aucun ticker valide après filtrage des fonds mutuels');
+                        return;
+                    }
+
+                    // OPTIMISATION : Charger par batch de 20 (au lieu de 5) pour réduire les requêtes
+                    const batchSize = 20;
+                    const delayBetweenBatches = 1000; // 1 seconde entre batches
+
+                    for (let i = 0; i < validTickers.length; i += batchSize) {
+                        const batch = validTickers.slice(i, i + batchSize);
                         
                         // Attendre avant de charger le batch suivant
                         if (i > 0) {
                             await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
                         }
 
-                                // Charger les données FMP pour ce batch en parallèle
-                                await Promise.allSettled(
-                                    batch.map(async (supabaseTicker) => {
-                                        const symbol = supabaseTicker.ticker.toUpperCase();
-                                        
-                                        // FILTRER LES FONDS MUTUELS : Détecter et exclure avant même d'appeler l'API
-                                        if (isMutualFund(symbol, supabaseTicker.company_name)) {
-                                            console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - profil NON créé (exclu automatiquement)`);
-                                            return;
-                                        }
-                                        
-                                        try {
-                                            const result = await fetchCompanyData(symbol);
+                        // Charger les données FMP pour ce batch en parallèle
+                        await Promise.allSettled(
+                            batch.map(async (supabaseTicker) => {
+                                const symbol = supabaseTicker.ticker.toUpperCase();
+                                
+                                try {
+                                    // OPTIMISATION : Essayer d'abord le cache, puis FMP si nécessaire
+                                    // Pour l'instant, on garde fetchCompanyData mais on pourrait optimiser plus tard
+                                    const result = await fetchCompanyData(symbol);
                                             
                                             // VALIDATION STRICTE : Vérifier que les données sont valides
                                             if (!result.data || result.data.length === 0) {

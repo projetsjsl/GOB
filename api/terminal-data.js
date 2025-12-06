@@ -32,9 +32,10 @@ async function getInstruments(filters = {}) {
     search
   } = filters;
 
+  // Optimisation egress : sélectionner seulement les colonnes nécessaires
   let query = supabase
     .from('instruments')
-    .select('*')
+    .select('id, symbol, name, exchange, country, currency, sector, industry, market_cap, is_active, created_at, updated_at')
     .eq('is_active', true)
     .order('symbol', { ascending: true })
     .range(offset, offset + limit - 1);
@@ -177,9 +178,10 @@ async function getWatchlists(userId) {
 async function getMarketIndices() {
   const today = new Date().toISOString().split('T')[0];
   
+  // Optimisation egress : sélectionner seulement les colonnes nécessaires
   const { data, error } = await supabase
     .from('market_indices')
-    .select('*')
+    .select('symbol, name, value, change, change_percent, as_of')
     .eq('as_of', today)
     .order('symbol', { ascending: true });
 
@@ -197,9 +199,10 @@ async function getPriceHistory(symbol, days = 252) {
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);
 
+  // Optimisation egress : sélectionner seulement les colonnes nécessaires pour les graphiques
   const { data, error } = await supabase
     .from('price_history')
-    .select('*')
+    .select('date, open, high, low, close, volume')
     .eq('symbol', symbol)
     .gte('date', startDate.toISOString().split('T')[0])
     .order('date', { ascending: true });
@@ -215,9 +218,10 @@ async function getPriceHistory(symbol, days = 252) {
  * Récupère les métriques pour un symbole
  */
 async function getSymbolMetrics(symbol, metricCodes = null) {
+  // Optimisation egress : sélectionner seulement les colonnes nécessaires
   let query = supabase
     .from('metrics')
-    .select('*')
+    .select('symbol, metric_code, value, as_of, unit')
     .eq('symbol', symbol)
     .order('as_of', { ascending: false })
     .order('metric_code', { ascending: true });

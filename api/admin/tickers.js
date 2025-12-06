@@ -68,9 +68,10 @@ async function handleGet(req, res, supabase) {
     order_direction = 'desc'
   } = req.query;
 
+  // Optimisation egress : sélectionner seulement les colonnes nécessaires
   let query = supabase
     .from('tickers')
-    .select('*', { count: 'exact' });
+    .select('id, ticker, company_name, sector, industry, country, exchange, currency, market_cap, source, priority, is_active, user_id, target_price, stop_loss, notes, security_rank, earnings_predictability, price_growth_persistence, price_stability, beta, valueline_updated_at, valueline_proj_low_return, valueline_proj_high_return, created_at, updated_at', { count: 'exact' });
 
   // Filtres
   if (source) {
