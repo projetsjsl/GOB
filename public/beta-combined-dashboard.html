@@ -177,13 +177,23 @@
             }
         })();
 
-        // Gestionnaire d'erreur global pour éviter que les erreurs de scripts externes cassent l'application
+        // OPTIMISATION: Gestionnaire d'erreur global amélioré pour éviter que les erreurs de scripts externes cassent l'application
         window.addEventListener('error', function (event) {
             // Ignorer les erreurs de scripts externes (extensions, etc.)
             if (event.filename && (event.filename.includes('share-modal') || event.filename.includes('extension'))) {
                 console.warn('⚠️ Erreur ignorée depuis un script externe:', event.filename);
                 event.preventDefault();
                 return true;
+            }
+            // OPTIMISATION: Logger les erreurs dashboard pour debugging
+            if (event.filename && event.filename.includes('dashboard')) {
+                console.error('❌ Erreur dashboard:', {
+                    message: event.message,
+                    filename: event.filename,
+                    lineno: event.lineno,
+                    colno: event.colno,
+                    error: event.error
+                });
             }
         }, true);
 

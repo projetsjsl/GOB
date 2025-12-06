@@ -140,7 +140,8 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
     // Fonction generateMockDataForType SUPPRIMÉE - Plus de données simulées
 
-    const { useState, useEffect, useRef, useCallback } = React;
+    // OPTIMISATION: Ajouter useMemo pour mémorisation
+    const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
     // Composant d'icônes SVG inline (remplace Lucide) - Défini globalement
     // Iconoir Icon Component (remplace LucideIcon)
@@ -531,7 +532,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         }, []);
         
         // États principaux
-        const [activeTab, setActiveTab] = useState('intellistocks'); // Onglet par défaut: JLab™ (contient Titres & Nouvelles et Finance Pro)
+        // OPTIMISATION: Charger activeTab depuis localStorage pour persistance
+        const [activeTab, setActiveTab] = useState(() => {
+            const saved = localStorage.getItem('gob-dashboard-activeTab');
+            return saved || 'intellistocks'; // Onglet par défaut: JLab™ (contient Titres & Nouvelles et Finance Pro)
+        });
         const [tickers, setTickers] = useState([]);
         const [teamTickers, setTeamTickers] = useState([]);
         const [watchlistTickers, setWatchlistTickers] = useState([]);
@@ -575,6 +580,13 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         });
         const [cacheStatus, setCacheStatus] = useState({});
         const [loadingCacheStatus, setLoadingCacheStatus] = useState(false);
+
+        // OPTIMISATION: Sauvegarder activeTab dans localStorage à chaque changement
+        useEffect(() => {
+            if (activeTab) {
+                localStorage.setItem('gob-dashboard-activeTab', activeTab);
+            }
+        }, [activeTab]);
 
         // Exposer setActiveTab globalement pour les tests et l'intégration
         useEffect(() => {
