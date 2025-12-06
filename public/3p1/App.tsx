@@ -173,15 +173,36 @@ export default function App() {
                     result.tickers.forEach(supabaseTicker => {
                         const tickerSymbol = supabaseTicker.ticker.toUpperCase();
                         
-                        // Ne pas écraser si le profil existe déjà
+                        // Si le profil existe déjà, mettre à jour les métriques ValueLine depuis Supabase
                         if (updated[tickerSymbol]) {
                             // Mettre à jour isWatchlist si nécessaire (basé sur source Supabase)
                             const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
-                            if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist) {
+                            
+                            // Mettre à jour les métriques ValueLine depuis Supabase (si elles existent)
+                            const hasValueLineUpdates = supabaseTicker.security_rank || 
+                                                       supabaseTicker.earnings_predictability || 
+                                                       supabaseTicker.price_growth_persistence || 
+                                                       supabaseTicker.price_stability;
+                            
+                            if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist || hasValueLineUpdates) {
                                 updated[tickerSymbol] = {
                                     ...updated[tickerSymbol],
-                                    isWatchlist: shouldBeWatchlist
+                                    isWatchlist: shouldBeWatchlist,
+                                    // Mettre à jour les métriques ValueLine depuis Supabase (préserver celles existantes si Supabase n'a pas de valeur)
+                                    info: {
+                                        ...updated[tickerSymbol].info,
+                                        securityRank: supabaseTicker.security_rank || updated[tickerSymbol].info.securityRank || 'N/A',
+                                        earningsPredictability: supabaseTicker.earnings_predictability || updated[tickerSymbol].info.earningsPredictability,
+                                        priceGrowthPersistence: supabaseTicker.price_growth_persistence || updated[tickerSymbol].info.priceGrowthPersistence,
+                                        priceStability: supabaseTicker.price_stability || updated[tickerSymbol].info.priceStability,
+                                        beta: supabaseTicker.beta || updated[tickerSymbol].info.beta
+                                    }
                                 };
+                                
+                                // Si c'est le profil actif, mettre à jour aussi le state local
+                                if (tickerSymbol === activeId) {
+                                    setInfo(updated[tickerSymbol].info);
+                                }
                             }
                             return;
                         }
@@ -967,10 +988,51 @@ export default function App() {
         if (library[upperSymbol]) {
             // Load existing profile data
             const existingProfile = library[upperSymbol];
+            
+            // Vérifier et mettre à jour les métriques ValueLine depuis Supabase si disponibles
+            try {
+                const supabaseResult = await loadAllTickersFromSupabase();
+                if (supabaseResult.success) {
+                    const supabaseTicker = supabaseResult.tickers.find(t => t.ticker.toUpperCase() === upperSymbol);
+                    if (supabaseTicker) {
+                        // Mettre à jour les métriques ValueLine depuis Supabase
+                        const updatedInfo = {
+                            ...existingProfile.info,
+                            securityRank: supabaseTicker.security_rank || existingProfile.info.securityRank || 'N/A',
+                            earningsPredictability: supabaseTicker.earnings_predictability || existingProfile.info.earningsPredictability,
+                            priceGrowthPersistence: supabaseTicker.price_growth_persistence || existingProfile.info.priceGrowthPersistence,
+                            priceStability: supabaseTicker.price_stability || existingProfile.info.priceStability,
+                            beta: supabaseTicker.beta || existingProfile.info.beta
+                        };
+                        
+                        // Mettre à jour dans la library si les métriques ont changé
+                        if (JSON.stringify(existingProfile.info) !== JSON.stringify(updatedInfo)) {
+                            setLibrary(prev => ({
+                                ...prev,
+                                [upperSymbol]: {
+                                    ...existingProfile,
+                                    info: updatedInfo
+                                }
+                            }));
+                            setInfo(updatedInfo);
+                            console.log(`✅ Métriques ValueLine mises à jour depuis Supabase pour ${upperSymbol}`);
+                        } else {
+                            setInfo(existingProfile.info);
+                        }
+                    } else {
+                        setInfo(existingProfile.info);
+                    }
+                } else {
+                    setInfo(existingProfile.info);
+                }
+            } catch (error) {
+                console.warn(`⚠️ Impossible de charger les métriques ValueLine depuis Supabase pour ${upperSymbol}:`, error);
+                setInfo(existingProfile.info);
+            }
+            
             setActiveId(upperSymbol);
             setData(existingProfile.data);
             setAssumptions(existingProfile.assumptions);
-            setInfo(existingProfile.info);
             setNotes(existingProfile.notes);
             console.log(`✅ Loaded existing profile for ${upperSymbol}`);
             return;
@@ -1332,13 +1394,33 @@ export default function App() {
                     const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
                     
                     if (updated[tickerSymbol]) {
-                        // Mettre à jour isWatchlist si nécessaire
-                        if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist) {
+                        // Mettre à jour isWatchlist et métriques ValueLine si nécessaire
+                        const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
+                        const hasValueLineUpdates = supabaseTicker.security_rank || 
+                                                   supabaseTicker.earnings_predictability || 
+                                                   supabaseTicker.price_growth_persistence || 
+                                                   supabaseTicker.price_stability;
+                        
+                        if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist || hasValueLineUpdates) {
                             updated[tickerSymbol] = {
                                 ...updated[tickerSymbol],
-                                isWatchlist: shouldBeWatchlist
+                                isWatchlist: shouldBeWatchlist,
+                                // Mettre à jour les métriques ValueLine depuis Supabase
+                                info: {
+                                    ...updated[tickerSymbol].info,
+                                    securityRank: supabaseTicker.security_rank || updated[tickerSymbol].info.securityRank || 'N/A',
+                                    earningsPredictability: supabaseTicker.earnings_predictability || updated[tickerSymbol].info.earningsPredictability,
+                                    priceGrowthPersistence: supabaseTicker.price_growth_persistence || updated[tickerSymbol].info.priceGrowthPersistence,
+                                    priceStability: supabaseTicker.price_stability || updated[tickerSymbol].info.priceStability,
+                                    beta: supabaseTicker.beta || updated[tickerSymbol].info.beta
+                                }
                             };
                             updatedTickersCount++;
+                            
+                            // Si c'est le profil actif, mettre à jour aussi le state local
+                            if (tickerSymbol === activeId) {
+                                setInfo(updated[tickerSymbol].info);
+                            }
                         }
                         return;
                     }
@@ -1820,13 +1902,13 @@ export default function App() {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs text-gray-500 mb-1">Price Growth (ValueLine 3 déc 2025)</label>
+                                                <label className="block text-xs text-gray-500 mb-1">Price Growth Persistence (ValueLine 3 déc 2025)</label>
                                                 <input
                                                     type="text"
-                                                    value={info.priceGrowth || ''}
-                                                    onChange={(e) => handleUpdateInfo('priceGrowth', e.target.value)}
+                                                    value={info.priceGrowthPersistence || ''}
+                                                    onChange={(e) => handleUpdateInfo('priceGrowthPersistence', e.target.value)}
                                                     className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
-                                                    placeholder="A++, A+, A, etc."
+                                                    placeholder="95, 90, 85, etc."
                                                 />
                                             </div>
                                             <div>
