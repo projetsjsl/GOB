@@ -106,12 +106,14 @@ export function handleLogoError(
       // Empêcher l'erreur 404 en définissant onerror avant de changer src
       img.onerror = null;
       img.src = nextUrl;
-      // Réinstaller le handler après un court délai
-      setTimeout(() => {
-        if (img.onerror === null) {
-          img.onerror = (e) => handleLogoError(e as any, options, onFinalError);
-        }
-      }, 100);
+      // Réinstaller le handler après le prochain frame (optimisé)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (img.onerror === null) {
+            img.onerror = (e) => handleLogoError(e as any, options, onFinalError);
+          }
+        });
+      });
       return;
     }
   }

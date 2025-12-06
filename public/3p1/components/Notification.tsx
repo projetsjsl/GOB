@@ -22,7 +22,12 @@ export const Notification: React.FC<NotificationProps> = ({
     if (duration > 0) {
       const timer = setTimeout(() => {
         setIsVisible(false);
-        setTimeout(() => onClose?.(), 300); // Wait for animation
+        // Utiliser requestAnimationFrame au lieu de setTimeout pour l'animation
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            onClose?.();
+          });
+        });
       }, duration);
       return () => clearTimeout(timer);
     }
@@ -30,7 +35,12 @@ export const Notification: React.FC<NotificationProps> = ({
 
   const handleClose = () => {
     setIsVisible(false);
-    setTimeout(() => onClose?.(), 300);
+    // Utiliser requestAnimationFrame au lieu de setTimeout pour l'animation
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        onClose?.();
+      });
+    });
   };
 
   const icons = {

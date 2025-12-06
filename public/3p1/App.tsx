@@ -389,11 +389,12 @@ export default function App() {
         }
     }, [activeId, isInitialized, library]);
 
-    // Save to Library when Active State Changes
+    // Save to Library when Active State Changes (optimisé avec requestIdleCallback)
     useEffect(() => {
         if (!isInitialized) return;
 
-        const timer = setTimeout(() => {
+        // Utiliser requestIdleCallback si disponible, sinon setTimeout avec délai plus court
+        const saveToStorage = () => {
             setLibrary(prev => {
                 const updated = {
                     ...prev,
@@ -407,14 +408,30 @@ export default function App() {
                         isWatchlist
                     }
                 };
-                try {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-                } catch (e) {
-                    console.warn('Failed to save to LocalStorage:', e);
+                // Sauvegarder de manière asynchrone pour ne pas bloquer le thread principal
+                if (typeof requestIdleCallback !== 'undefined') {
+                    requestIdleCallback(() => {
+                        try {
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                        } catch (e) {
+                            console.warn('Failed to save to LocalStorage:', e);
+                        }
+                    }, { timeout: 1000 });
+                } else {
+                    // Fallback pour navigateurs sans requestIdleCallback
+                    setTimeout(() => {
+                        try {
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                        } catch (e) {
+                            console.warn('Failed to save to LocalStorage:', e);
+                        }
+                    }, 0);
                 }
                 return updated;
             });
-        }, 500);
+        };
+
+        const timer = setTimeout(saveToStorage, 300); // Réduit de 500ms à 300ms
 
         return () => clearTimeout(timer);
     }, [data, assumptions, info, notes, isWatchlist, activeId, isInitialized]);

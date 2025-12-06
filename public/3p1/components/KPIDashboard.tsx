@@ -1218,11 +1218,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   onClick={() => {
                     const sorted = [...filteredMetrics].sort((a, b) => b.totalReturnPercent - a.totalReturnPercent);
                     const top10 = sorted.slice(0, 10);
-                    // Scroll vers le premier élément
-                    setTimeout(() => {
-                      const firstEl = document.querySelector(`[data-ticker="${top10[0]?.profile.id}"]`);
-                      firstEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 100);
+                    // Scroll vers le premier élément (optimisé avec requestAnimationFrame)
+                    requestAnimationFrame(() => {
+                      requestAnimationFrame(() => {
+                        const firstEl = document.querySelector(`[data-ticker="${top10[0]?.profile.id}"]`);
+                        firstEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      });
+                    });
                   }}
                   className="px-3 py-1 text-xs bg-gray-100 hover:bg-blue-100 hover:text-blue-600 text-gray-700 rounded transition-colors"
                   title="Zoom Top 10\n\nFait défiler automatiquement vers les 10 meilleurs tickers (par rendement total projeté).\n\nUtile pour se concentrer rapidement sur les meilleures opportunités."

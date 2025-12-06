@@ -27,7 +27,10 @@ export const Tooltip: React.FC<TooltipProps> = ({
     }
     timeoutRef.current = setTimeout(() => {
       setIsVisible(true);
-      updatePosition();
+      // Utiliser requestAnimationFrame pour mettre à jour la position de manière optimale
+      requestAnimationFrame(() => {
+        updatePosition();
+      });
     }, delay);
   };
 
@@ -87,12 +90,31 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   useEffect(() => {
     if (isVisible) {
-      updatePosition();
-      window.addEventListener('scroll', updatePosition);
-      window.addEventListener('resize', updatePosition);
+      // Utiliser requestAnimationFrame pour la mise à jour initiale
+      requestAnimationFrame(() => {
+        updatePosition();
+      });
+      
+      // Debounce les événements scroll et resize pour éviter trop de calculs
+      let rafId: number | null = null;
+      const debouncedUpdate = () => {
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+        }
+        rafId = requestAnimationFrame(() => {
+          updatePosition();
+        });
+      };
+      
+      window.addEventListener('scroll', debouncedUpdate, { passive: true });
+      window.addEventListener('resize', debouncedUpdate, { passive: true });
+      
       return () => {
-        window.removeEventListener('scroll', updatePosition);
-        window.removeEventListener('resize', updatePosition);
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+        }
+        window.removeEventListener('scroll', debouncedUpdate);
+        window.removeEventListener('resize', debouncedUpdate);
       };
     }
   }, [isVisible]);
