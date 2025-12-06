@@ -1019,7 +1019,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                     // Mettre à jour le message de bienvenue si c'est le premier message
                     if (emmaMessages.length === 1 && emmaMessages[0].type === 'emma') {
-                        const welcomeMessage = 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**Comment puis-je vous assister aujourd\'hui ?**';
+                        const welcomeMessage = 'Bonjour ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**Comment puis-je vous assister aujourd\'hui ?**';
 
                         setEmmaMessages([{
                             type: 'emma',
@@ -2538,7 +2538,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
                                             <h4 className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Mission</h4>
-                                            <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Accompagner une équipe de gestionnaires de portefeuille québécois avec une expertise de niveau CFA, rigueur et esprit critique.</p>
+                                            <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Accompagner une équipe avec une expertise de niveau CFA, rigueur et esprit critique.</p>
                                             <h4 className={`font-semibold mt-4 mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Compétences clés</h4>
                                             <ul className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'} list-disc pl-5 space-y-1`}>
                                                 <li>Analyse fondamentale (actions, obligations, dérivés)</li>
