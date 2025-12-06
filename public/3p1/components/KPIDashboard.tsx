@@ -1,4 +1,5 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { StarIcon, EyeIcon } from '@heroicons/react/24/solid';
 import { AnalysisProfile } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
@@ -24,6 +25,23 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   }>({ key: 'totalReturnPercent', direction: 'desc' });
   const [showSyncDialog, setShowSyncDialog] = useState(false);
   const [showGuideDialog, setShowGuideDialog] = useState(false);
+
+  // Raccourcis clavier
+  useKeyboardShortcuts({
+    onSyncAll: onBulkSync,
+    onSyncNA: () => {
+      if (filters.showOnlyNA && onSyncNA && filteredMetrics.length > 0) {
+        const naTickers = filteredMetrics.map(m => m.profile.id);
+        onSyncNA(naTickers);
+      }
+    },
+    onToggleNAFilter: () => {
+      setFilters(prev => ({ ...prev, showOnlyNA: !prev.showOnlyNA }));
+    },
+    onExport: handleExport,
+    onOpenSyncDialog: () => setShowSyncDialog(true),
+    enabled: true
+  });
   
   const [comparisonMode, setComparisonMode] = useState(false);
   const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
@@ -577,16 +595,16 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     return sorted;
   }, [profileMetrics, filters, sortConfig]);
   
-  const handleSort = (key: string) => {
+  const handleSort = useCallback((key: string) => {
     setSortConfig(prev => ({
       key,
       direction: prev.key === key && prev.direction === 'desc' ? 'asc' : 'desc'
     }));
-  };
+  }, []);
   
-  const handleExport = () => {
+  const handleExport = useCallback(() => {
     const csv = [
-      ['Ticker', 'Nom', 'Secteur', 'JPEGY', 'Rendement Total', 'Ratio 3:1', 'Potentiel Hausse', 'Risque Baisse', 'P/E', 'Yield', 'Croissance', 'Recommandation'].join(','),
+      ['Ticker', 'Nom', 'Secteur', 'JPEGY', 'Rendement Total', 'Ratio 3:1', 'Potentiel Hausse', 'Risque Baisse', 'P/E', 'Yield', 'Croissance', 'Recommandation', 'Prix Actuel', 'Prix Cible', 'Prix Achat', 'Prix Vente', 'P/CF', 'P/BV', 'Volatilité'].join(','),
       ...filteredMetrics.map(m => [
         m.profile.id,
         `"${m.profile.info.name}"`,
@@ -599,7 +617,14 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         m.currentPE?.toFixed(1) || 'N/A',
         m.currentYield?.toFixed(2) || 'N/A',
         m.historicalGrowth?.toFixed(2) || 'N/A',
-        m.recommendation
+        m.recommendation,
+        m.profile.assumptions.currentPrice?.toFixed(2) || 'N/A',
+        m.targetPrice?.toFixed(2) || 'N/A',
+        m.profile.assumptions.currentPrice ? (m.profile.assumptions.currentPrice * 0.9).toFixed(2) : 'N/A',
+        m.profile.assumptions.currentPrice ? (m.profile.assumptions.currentPrice * 1.1).toFixed(2) : 'N/A',
+        m.currentPCF?.toFixed(1) || 'N/A',
+        m.currentPBV?.toFixed(2) || 'N/A',
+        m.volatility?.toFixed(2) || 'N/A'
       ].join(','))
     ].join('\n');
     
@@ -608,7 +633,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     link.href = URL.createObjectURL(blob);
     link.download = `kpi-dashboard-${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
-  };
+  }, [filteredMetrics]);
 
   // Obtenir la couleur JPEGY (retourne null si JPEGY est null)
   const getJpegyColor = (jpegy: number | null): string | null => {
@@ -1317,7 +1342,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               </div>
             )}
             <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
-              <div className="text-sm text-gray-600 flex items-center gap-3">
+              <div className="text-sm text-gray-600 flex items-center gap-3 flex-wrap">
                 <span>Mode: <span className="font-semibold">{filters.showOnlyNA ? 'Tickers avec N/A uniquement' : 'Vue normale'}</span></span>
                 {filters.showOnlyNA && (
                   <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
@@ -1332,6 +1357,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   <BookOpenIcon className="w-3 h-3" />
                   Guide
                 </button>
+                <span className="text-xs text-gray-400 hidden sm:inline" title="Raccourcis clavier disponibles">
+                  ⌨️ Ctrl+Shift+F: Filtre N/A | Ctrl+Shift+E: Export | Ctrl+Shift+D: Sync critères
+                </span>
               </div>
               <div className="flex gap-2 flex-wrap">
                 <button
@@ -1344,8 +1372,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                       : 'bg-gray-100 hover:bg-orange-100 hover:text-orange-600 text-gray-700'
                   }`}
                   title={filters.showOnlyNA 
-                    ? "Afficher tous les tickers\n\nDésactive le filtre N/A pour voir tous les tickers." 
-                    : "Afficher uniquement les N/A\n\nFiltre pour ne voir que les tickers avec des données invalides (N/A).\n\nUtile pour identifier rapidement les tickers nécessitant une synchronisation."}
+                    ? "Afficher tous les tickers\n\nDésactive le filtre N/A pour voir tous les tickers.\n\nRaccourci: Ctrl+Shift+F" 
+                    : "Afficher uniquement les N/A\n\nFiltre pour ne voir que les tickers avec des données invalides (N/A).\n\nUtile pour identifier rapidement les tickers nécessitant une synchronisation.\n\nRaccourci: Ctrl+Shift+F"}
+                  aria-label={filters.showOnlyNA ? "Afficher tous les tickers" : "Afficher uniquement les tickers avec N/A"}
+                  aria-pressed={filters.showOnlyNA}
+                  tabIndex={0}
                 >
                   {filters.showOnlyNA ? 'Afficher Tous' : 'Afficher N/A'}
                 </button>

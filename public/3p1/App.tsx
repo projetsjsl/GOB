@@ -1579,10 +1579,12 @@ export default function App() {
                         );
 
                         successCount++;
+                        setSyncStats({ successCount, errorCount });
                         console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
 
                     } catch (error: any) {
                         errorCount++;
+                        setSyncStats({ successCount, errorCount });
                         const errorMsg = `${tickerSymbol}: ${error.message || 'Erreur inconnue'}`;
                         errors.push(errorMsg);
                         console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
@@ -1758,10 +1760,12 @@ export default function App() {
                         );
 
                         successCount++;
+                        setSyncStats({ successCount, errorCount });
                         console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
 
                     } catch (error: any) {
                         errorCount++;
+                        setSyncStats({ successCount, errorCount });
                         const errorMsg = `${tickerSymbol}: ${error.message || 'Erreur inconnue'}`;
                         errors.push(errorMsg);
                         console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
