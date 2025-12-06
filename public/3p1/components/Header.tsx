@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CompanyInfo, Assumptions, Recommendation } from '../types';
 import { ArrowTrendingUpIcon, BanknotesIcon, TagIcon, CalendarDaysIcon, PrinterIcon, CloudArrowDownIcon, EyeIcon, StarIcon, ArrowPathIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { formatPercent } from '../utils/calculations';
+import { createLogoErrorHandler, createLogoLoadHandler } from '../utils/logoUtils';
 
 interface HeaderProps {
   info: CompanyInfo;
@@ -73,63 +74,19 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 sm:mb-4 border-b pb-2">
         <div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto">
           {/* Logo */}
-          {info.logo ? (
-            <img 
-              src={info.logo} 
-              alt={info.name}
-              className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200 cursor-help"
-              title={`Logo de ${info.name}\n\nSource: FMP API (image-stock)\n\nLe logo est chargé automatiquement depuis l'API Financial Modeling Prep.`}
-              onError={(e) => {
-                // Essayer plusieurs variantes de logo
-                const symbolsToTry = [
-                  info.logoSymbol, // Symbole optimisé pour logo depuis l'API
-                  info.actualSymbol?.replace('.TO', '').replace('-', '.'), // Symbole réel utilisé
-                  info.preferredSymbol, // Symbole original demandé
-                  (info as any).symbol // Symbole alternatif
-                ].filter(Boolean);
-                
-                let triedIndex = 0;
-                const tryNextFallback = () => {
-                  if (triedIndex < symbolsToTry.length) {
-                    const fallbackUrl = `https://financialmodelingprep.com/image-stock/${symbolsToTry[triedIndex]}.png`;
-                    if (e.currentTarget.src !== fallbackUrl) {
-                      e.currentTarget.src = fallbackUrl;
-                      triedIndex++;
-                    } else {
-                      triedIndex++;
-                      tryNextFallback();
-                    }
-                  } else {
-                    // Si tous les fallbacks échouent, masquer l'image silencieusement (pas d'erreur 404)
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.onerror = null; // Empêcher les erreurs répétées
-                  }
-                };
-                
-                tryNextFallback();
-              }}
-              onLoad={(e) => {
-                // Si le logo charge avec succès, réinitialiser onError pour éviter les erreurs futures
-                e.currentTarget.onerror = null;
-              }}
-            />
-          ) : (
-            // Fallback si pas de logo dans les données
-            <img 
-              src={`https://financialmodelingprep.com/image-stock/${info.preferredSymbol || info.symbol}.png`}
-              alt={info.name}
-              className="w-16 h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200 cursor-help"
-              title={`Logo de ${info.name}\n\nSource: FMP API (image-stock)\n\nLe logo est chargé automatiquement depuis l'API Financial Modeling Prep.`}
-              onError={(e) => {
-                // Masquer silencieusement sans générer d'erreur 404
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.onerror = null; // Empêcher les erreurs répétées
-              }}
-              onLoad={(e) => {
-                e.currentTarget.onerror = null;
-              }}
-            />
-          )}
+          <img 
+            src={info.logo || `https://financialmodelingprep.com/image-stock/${info.preferredSymbol || info.symbol}.png`}
+            alt={info.name}
+            className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200 cursor-help"
+            title={`Logo de ${info.name}\n\nSource: FMP API (image-stock)\n\nLe logo est chargé automatiquement depuis l'API Financial Modeling Prep.`}
+            onError={createLogoErrorHandler({
+              logoSymbol: info.logoSymbol,
+              actualSymbol: info.actualSymbol,
+              preferredSymbol: info.preferredSymbol,
+              symbol: info.symbol
+            })}
+            onLoad={createLogoLoadHandler()}
+          />
           
           <div className="relative">
             <div className="bg-blue-100 p-1.5 sm:p-2 rounded text-blue-700 font-bold text-base sm:text-xl min-w-[50px] sm:min-w-[60px] text-center select-none cursor-help" title={`Symbole: ${info.preferredSymbol || info.symbol}\n\nSymbole boursier utilisé pour identifier l'entreprise.\n\nSymbole préféré: ${info.preferredSymbol || 'N/A'}\nSymbole réel: ${info.actualSymbol || info.symbol}\nSymbole original: ${info.symbol}`}>

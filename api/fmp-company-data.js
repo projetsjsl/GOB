@@ -440,7 +440,9 @@ export default async function handler(req, res) {
 
         // 8. Info Object avec toutes les informations
         // Générer plusieurs URLs de logo possibles pour le fallback
+        // FMP Premium: Essayer d'abord l'URL standard, puis les variantes
         const logoBaseSymbol = usedSymbol.replace('.TO', '').replace('-', '.').replace('_', '.');
+        // Utiliser l'image du profil si disponible, sinon construire l'URL
         const logoUrl = profile.image 
             ? profile.image 
             : `https://financialmodelingprep.com/image-stock/${logoBaseSymbol}.png`;
