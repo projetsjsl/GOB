@@ -1968,13 +1968,14 @@ export default function App() {
                         {currentView === 'info' ? (
                             <InfoTab />
                         ) : currentView === 'kpi' ? (
-                        <KPIDashboard
-                            profiles={Object.values(library)}
-                            currentId={activeId}
-                            onSelect={setActiveId}
-                            onBulkSync={handleBulkSyncAllTickers}
-                            isBulkSyncing={isBulkSyncing}
-                        />
+                            <KPIDashboard
+                                profiles={Object.values(library)}
+                                currentId={activeId}
+                                onSelect={setActiveId}
+                                onBulkSync={handleBulkSyncAllTickers}
+                                onSyncNA={handleSyncSpecificTickers}
+                                isBulkSyncing={isBulkSyncing}
+                            />
                         ) : (
                             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
 

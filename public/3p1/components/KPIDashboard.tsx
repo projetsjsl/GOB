@@ -11,10 +11,11 @@ interface KPIDashboardProps {
   currentId: string;
   onSelect: (id: string) => void;
   onBulkSync?: () => void; // Optionnel : fonction pour synchroniser tous les tickers
+  onSyncNA?: (tickers: string[]) => void; // Optionnel : fonction pour synchroniser uniquement les N/A
   isBulkSyncing?: boolean; // Optionnel : état de la synchronisation
 }
 
-export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId, onSelect, onBulkSync, isBulkSyncing = false }) => {
+export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isBulkSyncing = false }) => {
   const [sortConfig, setSortConfig] = useState<{
     key: string;
     direction: 'asc' | 'desc';
@@ -512,6 +513,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   // Filtrer et trier les profils
   const filteredMetrics = useMemo(() => {
     const filtered = profileMetrics.filter(metric => {
+      // Filtre N/A en premier (priorité)
+      if (filters.showOnlyNA && !metric.hasInvalidData && metric.jpegy !== null) {
+        return false;
+      }
+      
       if (metric.totalReturnPercent < filters.minReturn || metric.totalReturnPercent > filters.maxReturn) return false;
       // Filtrer JPEGY seulement si la valeur est calculable (non null)
       if (metric.jpegy !== null && (metric.jpegy < filters.minJPEGY || metric.jpegy > filters.maxJPEGY)) return false;
@@ -1305,11 +1311,47 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 </div>
               </div>
             )}
-            <div className="mb-4 flex items-center justify-between">
-              <div className="text-sm text-gray-600">
-                Mode: <span className="font-semibold">Vue normale</span>
+            <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
+              <div className="text-sm text-gray-600 flex items-center gap-3">
+                <span>Mode: <span className="font-semibold">{filters.showOnlyNA ? 'Tickers avec N/A uniquement' : 'Vue normale'}</span></span>
+                {filters.showOnlyNA && (
+                  <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
+                    {filteredMetrics.length} ticker(s) avec N/A
+                  </span>
+                )}
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
+                <button
+                  onClick={() => {
+                    setFilters(prev => ({ ...prev, showOnlyNA: !prev.showOnlyNA }));
+                  }}
+                  className={`px-3 py-1 text-xs rounded transition-colors ${
+                    filters.showOnlyNA
+                      ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                      : 'bg-gray-100 hover:bg-orange-100 hover:text-orange-600 text-gray-700'
+                  }`}
+                  title={filters.showOnlyNA 
+                    ? "Afficher tous les tickers\n\nDésactive le filtre N/A pour voir tous les tickers." 
+                    : "Afficher uniquement les N/A\n\nFiltre pour ne voir que les tickers avec des données invalides (N/A).\n\nUtile pour identifier rapidement les tickers nécessitant une synchronisation."}
+                >
+                  {filters.showOnlyNA ? 'Afficher Tous' : 'Afficher N/A'}
+                </button>
+                {filters.showOnlyNA && onSyncNA && filteredMetrics.length > 0 && (
+                  <button
+                    onClick={() => {
+                      const naTickers = filteredMetrics.map(m => m.profile.id);
+                      if (confirm(`Synchroniser ${naTickers.length} ticker(s) avec N/A ?\n\nTickers: ${naTickers.slice(0, 10).join(', ')}${naTickers.length > 10 ? `\n... et ${naTickers.length - 10} autres` : ''}`)) {
+                        onSyncNA(naTickers);
+                      }
+                    }}
+                    disabled={isBulkSyncing}
+                    className="px-3 py-1 text-xs bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded transition-colors flex items-center gap-1"
+                    title={`Synchroniser uniquement les ${filteredMetrics.length} ticker(s) avec N/A\n\nSynchronise uniquement les tickers affichés (ceux avec N/A).\n\nPlus rapide que de synchroniser tous les tickers.`}
+                  >
+                    <ArrowPathIcon className={`w-3 h-3 ${isBulkSyncing ? 'animate-spin' : ''}`} />
+                    Sync N/A ({filteredMetrics.length})
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     const sorted = [...filteredMetrics].sort((a, b) => b.totalReturnPercent - a.totalReturnPercent);
