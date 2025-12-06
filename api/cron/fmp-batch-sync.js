@@ -1,7 +1,10 @@
 /**
- * Cron Job Vercel pour synchroniser les données FMP vers ticker_market_cache
+ * Cron Job Vercel pour synchroniser UNIQUEMENT LES PRIX FMP vers ticker_price_cache
  * 
- * Ce cron s'exécute automatiquement toutes les 5 minutes
+ * ⚠️ IMPORTANT : Ce cron synchronise UNIQUEMENT les PRIX (pas les ratios/métriques)
+ * Les données fondamentales (ratios, métriques) sont récupérées à la demande dans 3p1
+ * 
+ * Fréquence : Toutes les 15 minutes (optionnel - recommandé: à la demande)
  * Configuration dans vercel.json
  * 
  * Note: Vercel Pro permet des crons toutes les minutes
@@ -127,8 +130,9 @@ async function syncAllTickers() {
 
     return {
       success: true,
-      tickersProcessed: combinedData.length,
+      tickersProcessed: priceData.length,
       executionTimeMs: executionTime,
+      dataType: 'prices_only',
       timestamp: new Date().toISOString()
     };
 
