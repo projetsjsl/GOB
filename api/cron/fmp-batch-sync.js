@@ -166,17 +166,22 @@ async function syncAllTickers() {
       return { success: true, message: 'Aucun ticker actif', tickersProcessed: 0 };
     }
 
+    // Appeler FMP UNIQUEMENT pour les quotes (prix) - PAS de ratios
     const quotes = await fetchFMPQuotes(tickers);
     console.log(`✅ ${quotes.length} quotes récupérées`);
 
-    const ratios = await fetchFMPRatios(tickers);
-    console.log(`✅ ${ratios.length} ratios récupérés`);
+    // Formater les données (PRIX UNIQUEMENT)
+    const priceData = quotes.map(quote => ({
+      symbol: quote.symbol?.toUpperCase(),
+      price: quote.price || 0,
+      change: quote.change || 0,
+      changePercent: quote.changesPercentage || 0,
+      volume: quote.volume || 0,
+      marketCap: quote.marketCap || 0
+    }));
 
-    const combinedData = combineQuoteAndRatios(quotes, ratios);
-    console.log(`✅ ${combinedData.length} données combinées`);
-
-    const { data, error } = await supabase.rpc('upsert_ticker_market_cache_batch', {
-      p_data: combinedData
+    const { data, error } = await supabase.rpc('upsert_ticker_price_cache_batch', {
+      p_data: priceData
     });
 
     if (error) {
@@ -184,7 +189,7 @@ async function syncAllTickers() {
     }
 
     const executionTime = Date.now() - startTime;
-    console.log(`✅ [CRON] Synchronisation terminée: ${combinedData.length} tickers en ${executionTime}ms`);
+    console.log(`✅ [CRON] Synchronisation PRIX terminée: ${priceData.length} tickers en ${executionTime}ms`);
 
     return {
       success: true,

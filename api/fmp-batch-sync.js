@@ -106,83 +106,10 @@ async function fetchFMPQuotes(symbols) {
 }
 
 /**
- * Récupère les ratios FMP (P/E, P/CF, P/BV, Yield)
- * FMP accepte jusqu'à 100 symboles par requête
+ * ⚠️ SUPPRIMÉ : fetchFMPRatios et combineQuoteAndRatios
+ * On synchronise UNIQUEMENT les prix, pas les ratios/métriques
+ * Les ratios sont récupérés à la demande dans 3p1 quand nécessaire
  */
-async function fetchFMPRatios(symbols) {
-  const batchSize = 100;
-  const batches = [];
-  
-  for (let i = 0; i < symbols.length; i += batchSize) {
-    batches.push(symbols.slice(i, i + batchSize));
-  }
-
-  const allRatios = [];
-
-  for (const batch of batches) {
-    const symbolsStr = batch.join(',');
-    const url = `${FMP_BASE_URL}/ratios-ttm/${symbolsStr}?apikey=${FMP_API_KEY}`;
-    
-    try {
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        console.error(`❌ FMP Ratios Error: ${response.status}`);
-        continue;
-      }
-
-      const ratios = await response.json();
-      
-      if (Array.isArray(ratios)) {
-        allRatios.push(...ratios);
-      } else if (ratios && ratios.symbol) {
-        allRatios.push(ratios);
-      }
-
-      if (batches.length > 1) {
-        await new Promise(resolve => setTimeout(resolve, 3000));
-      }
-    } catch (error) {
-      console.error(`❌ Erreur fetch FMP ratios:`, error);
-      continue;
-    }
-  }
-
-  return allRatios;
-}
-
-/**
- * Combine quotes et ratios en un format unifié pour le cache
- */
-function combineQuoteAndRatios(quotes, ratios) {
-  const ratiosMap = new Map();
-  ratios.forEach(r => {
-    if (r.symbol) {
-      ratiosMap.set(r.symbol.toUpperCase(), r);
-    }
-  });
-
-  return quotes.map(quote => {
-    const symbol = quote.symbol?.toUpperCase();
-    const ratio = ratiosMap.get(symbol) || {};
-
-    return {
-      symbol: symbol,
-      price: quote.price || 0,
-      change: quote.change || 0,
-      changePercent: quote.changesPercentage || 0,
-      volume: quote.volume || 0,
-      marketCap: quote.marketCap || 0,
-      pe: ratio.peRatioTTM || null,
-      pcf: ratio.priceToCashFlowRatioTTM || null,
-      pbv: ratio.priceToBookRatioTTM || null,
-      dividendYield: ratio.dividendYieldTTM || null,
-      eps: quote.eps || null,
-      revenue: null, // Pas dans quote, nécessiterait key-metrics
-      netIncome: null // Pas dans quote, nécessiterait key-metrics
-    };
-  });
-}
 
 /**
  * Synchronise tous les tickers actifs depuis FMP vers ticker_market_cache
@@ -206,22 +133,25 @@ async function syncAllTickers() {
     }
 
     // 2. Appeler FMP en batch (quelques requêtes max)
-    console.log('📡 Appel FMP pour quotes...');
+    // 2. Appeler FMP UNIQUEMENT pour les quotes (prix) - PAS de ratios
+    console.log('📡 Appel FMP pour quotes (PRIX UNIQUEMENT)...');
     const quotes = await fetchFMPQuotes(tickers);
     console.log(`✅ ${quotes.length} quotes récupérées`);
 
-    console.log('📡 Appel FMP pour ratios...');
-    const ratios = await fetchFMPRatios(tickers);
-    console.log(`✅ ${ratios.length} ratios récupérés`);
+    // 3. Formater les données (PRIX UNIQUEMENT - pas de ratios)
+    const priceData = quotes.map(quote => ({
+      symbol: quote.symbol?.toUpperCase(),
+      price: quote.price || 0,
+      change: quote.change || 0,
+      changePercent: quote.changesPercentage || 0,
+      volume: quote.volume || 0,
+      marketCap: quote.marketCap || 0
+    }));
 
-    // 3. Combiner quotes et ratios
-    const combinedData = combineQuoteAndRatios(quotes, ratios);
-    console.log(`✅ ${combinedData.length} données combinées`);
-
-    // 4. Upsert massif dans ticker_market_cache (1 requête)
-    console.log('💾 Upsert dans ticker_market_cache...');
-    const { data, error } = await supabase.rpc('upsert_ticker_market_cache_batch', {
-      p_data: combinedData
+    // 4. Upsert massif dans ticker_price_cache (1 requête) - PRIX UNIQUEMENT
+    console.log('💾 Upsert dans ticker_price_cache (PRIX UNIQUEMENT)...');
+    const { data, error } = await supabase.rpc('upsert_ticker_price_cache_batch', {
+      p_data: priceData
     });
 
     if (error) {
