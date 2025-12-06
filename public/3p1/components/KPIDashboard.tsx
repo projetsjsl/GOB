@@ -585,6 +585,57 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     }));
   }, []);
 
+  // Définir handleExport APRÈS filteredMetrics pour éviter l'erreur d'initialisation
+  const handleExport = useCallback(() => {
+    const csv = [
+      ['Ticker', 'Nom', 'Secteur', 'JPEGY', 'Rendement Total', 'Ratio 3:1', 'Potentiel Hausse', 'Risque Baisse', 'P/E', 'Yield', 'Croissance', 'Recommandation', 'Prix Actuel', 'Prix Cible', 'Prix Achat', 'Prix Vente', 'P/CF', 'P/BV', 'Volatilité'].join(','),
+      ...filteredMetrics.map(m => [
+        m.profile.id,
+        `"${m.profile.info.name}"`,
+        m.profile.info.sector,
+        m.jpegy !== null ? m.jpegy.toFixed(2) : 'N/A',
+        m.totalReturnPercent.toFixed(2),
+        m.ratio31.toFixed(2),
+        m.upsidePotential.toFixed(2),
+        m.downsideRisk.toFixed(2),
+        m.currentPE?.toFixed(1) || 'N/A',
+        m.currentYield?.toFixed(2) || 'N/A',
+        m.historicalGrowth?.toFixed(2) || 'N/A',
+        m.recommendation,
+        m.profile.assumptions.currentPrice?.toFixed(2) || 'N/A',
+        m.targetPrice?.toFixed(2) || 'N/A',
+        m.profile.assumptions.currentPrice ? (m.profile.assumptions.currentPrice * 0.9).toFixed(2) : 'N/A',
+        m.profile.assumptions.currentPrice ? (m.profile.assumptions.currentPrice * 1.1).toFixed(2) : 'N/A',
+        m.currentPCF?.toFixed(1) || 'N/A',
+        m.currentPBV?.toFixed(2) || 'N/A',
+        m.volatility?.toFixed(2) || 'N/A'
+      ].join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `kpi-dashboard-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  }, [filteredMetrics]);
+
+  // Raccourcis clavier (défini APRÈS handleExport)
+  useKeyboardShortcuts({
+    onSyncAll: onBulkSync,
+    onSyncNA: () => {
+      if (filters.showOnlyNA && onSyncNA && filteredMetrics.length > 0) {
+        const naTickers = filteredMetrics.map(m => m.profile.id);
+        onSyncNA(naTickers);
+      }
+    },
+    onToggleNAFilter: () => {
+      setFilters(prev => ({ ...prev, showOnlyNA: !prev.showOnlyNA }));
+    },
+    onExport: handleExport,
+    onOpenSyncDialog: () => setShowSyncDialog(true),
+    enabled: true
+  });
+
   // Obtenir la couleur JPEGY (retourne null si JPEGY est null)
   const getJpegyColor = (jpegy: number | null): string | null => {
     if (jpegy === null) return null; // Pas de couleur si N/A
