@@ -617,8 +617,8 @@ if (typeof window !== 'undefined') {
         window.testResultsUltraComplete = results;
         console.log('\n✅ Tests terminés! Résultats disponibles dans window.testResultsUltraComplete');
     });
-} else {
-    // Node.js
-    module.exports = { runAllTestSeries, allTabs };
 }
+
+// Export pour Node.js (ES Module)
+export { runAllTestSeries, allTabs };
 
