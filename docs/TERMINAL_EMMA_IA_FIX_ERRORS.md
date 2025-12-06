@@ -48,7 +48,28 @@ WHERE table_name = 'watchlists'
 
 Si c'est `bigint` ou `integer`, le schéma corrigé s'adaptera automatiquement.
 
-## Erreur 2: Table kpi_definitions n'existe pas
+## Erreur 2: Multiple default values pour watchlist_instruments
+
+### Problème
+```
+ERROR: 42601: multiple default values specified for column "id" of table "watchlist_instruments"
+```
+
+### Cause
+`BIGSERIAL` et `SERIAL` incluent déjà automatiquement un `DEFAULT nextval()`. Il ne faut pas spécifier `DEFAULT` explicitement.
+
+### Solution
+Le schéma `supabase-terminal-emma-ia-schema-ADAPTED.sql` a été corrigé. Utilisez la version mise à jour qui ne spécifie pas `DEFAULT` pour les colonnes `BIGSERIAL`/`SERIAL`.
+
+**Version corrigée :**
+```sql
+CREATE TABLE watchlist_instruments (
+    id BIGSERIAL PRIMARY KEY,  -- Pas de DEFAULT explicite
+    ...
+)
+```
+
+## Erreur 3: Table kpi_definitions n'existe pas
 
 ### Problème
 ```

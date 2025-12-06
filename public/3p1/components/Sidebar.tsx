@@ -148,19 +148,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
                   {/* Recommendation Dot */}
                   <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getRecommendationColor(recommendation)} cursor-help`} title={`Signal: ${recommendation}\n\nBasé sur:\n• Prix actuel vs Limite d'achat/vente\n• Calculé automatiquement selon vos hypothèses\n\nVert = ACHAT\nJaune = CONSERVER\nRouge = VENTE`}></div>
 
-                  {/* Logo */}
+                  {/* Logo - Masqué immédiatement si erreur pour éviter 404 */}
                   <img 
                     src={profile.info.logo || `https://financialmodelingprep.com/image-stock/${profile.info.logoSymbol || profile.info.actualSymbol?.replace('.TO', '').replace('-', '.') || profile.info.preferredSymbol || profile.id}.png`}
                     alt={profile.info.name}
                     className="w-8 h-8 rounded object-cover flex-shrink-0 cursor-help"
                     title={`Logo de ${profile.info.name}\n\nSource: FMP API (image-stock)`}
-                    onError={createLogoErrorHandler({
-                      logoSymbol: profile.info.logoSymbol,
-                      actualSymbol: profile.info.actualSymbol,
-                      preferredSymbol: profile.info.preferredSymbol,
-                      symbol: profile.id
-                    })}
+                    onError={(e) => {
+                      // Masquer immédiatement pour éviter les erreurs 404 répétées
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                    }}
                     onLoad={createLogoLoadHandler()}
+                    loading="lazy"
                   />
 
                   <div className="flex flex-col min-w-0 flex-1">

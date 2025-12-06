@@ -3,7 +3,7 @@
 -- ============================================
 -- Ce script crée des KPI prédéfinis pour le Terminal Emma IA
 -- 
--- IMPORTANT: Exécutez d'abord supabase-terminal-emma-ia-schema-FIXED.sql
+-- IMPORTANT: Exécutez d'abord supabase-terminal-emma-ia-schema-ADAPTED.sql
 -- pour créer les tables nécessaires.
 
 -- Vérifier que la table existe
@@ -13,7 +13,7 @@ BEGIN
         SELECT 1 FROM information_schema.tables 
         WHERE table_schema = 'public' AND table_name = 'kpi_definitions'
     ) THEN
-        RAISE EXCEPTION 'La table kpi_definitions n''existe pas. Exécutez d''abord supabase-terminal-emma-ia-schema-FIXED.sql';
+        RAISE EXCEPTION 'La table kpi_definitions n''existe pas. Exécutez d''abord supabase-terminal-emma-ia-schema-ADAPTED.sql';
     END IF;
 END $$;
 
@@ -45,7 +45,7 @@ SELECT
     0.3,
     1
 FROM kpi_definitions WHERE code = 'QUALITY_SCORE_V1'
-ON CONFLICT DO NOTHING;
+ON CONFLICT (kpi_id, variable_name) DO NOTHING;
 
 INSERT INTO kpi_variables (kpi_id, variable_name, metric_code, weight, order_index)
 SELECT 
@@ -55,7 +55,7 @@ SELECT
     0.3,
     2
 FROM kpi_definitions WHERE code = 'QUALITY_SCORE_V1'
-ON CONFLICT DO NOTHING;
+ON CONFLICT (kpi_id, variable_name) DO NOTHING;
 
 INSERT INTO kpi_variables (kpi_id, variable_name, metric_code, weight, order_index)
 SELECT 
@@ -65,7 +65,7 @@ SELECT
     0.4,
     3
 FROM kpi_definitions WHERE code = 'QUALITY_SCORE_V1'
-ON CONFLICT DO NOTHING;
+ON CONFLICT (kpi_id, variable_name) DO NOTHING;
 
 -- ============================================
 -- 2. Value Score V1

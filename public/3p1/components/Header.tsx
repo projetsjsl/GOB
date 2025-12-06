@@ -73,19 +73,20 @@ export const Header: React.FC<HeaderProps> = ({
     <div className="bg-white p-2 sm:p-4 rounded-lg shadow mb-4 border-l-4 border-blue-600 print-full-width">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 sm:mb-4 border-b pb-2">
         <div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto">
-          {/* Logo */}
+          {/* Logo - Masqué par défaut si pas de logo, affiché seulement si chargé avec succès */}
           <img 
             src={info.logo || `https://financialmodelingprep.com/image-stock/${info.preferredSymbol || info.symbol}.png`}
             alt={info.name}
             className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200 cursor-help"
             title={`Logo de ${info.name}\n\nSource: FMP API (image-stock)\n\nLe logo est chargé automatiquement depuis l'API Financial Modeling Prep.`}
-            onError={createLogoErrorHandler({
-              logoSymbol: info.logoSymbol,
-              actualSymbol: info.actualSymbol,
-              preferredSymbol: info.preferredSymbol,
-              symbol: info.symbol
-            })}
+            onError={(e) => {
+              // Masquer immédiatement pour éviter les erreurs 404 répétées
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            }}
             onLoad={createLogoLoadHandler()}
+            loading="lazy"
           />
           
           <div className="relative">

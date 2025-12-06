@@ -68,8 +68,12 @@ export function generateLogoUrls(options: LogoFallbackOptions): string[] {
   return [...new Set(variants)];
 }
 
+// Cache pour stocker les URLs qui ont échoué (évite de réessayer)
+const failedLogoUrls = new Set<string>();
+
 /**
  * Gère l'erreur de chargement d'un logo avec fallback automatique
+ * Version optimisée : masque immédiatement après 1-2 tentatives pour éviter les 404 répétés
  */
 export function handleLogoError(
   e: React.SyntheticEvent<HTMLImageElement, Event>,
@@ -78,6 +82,17 @@ export function handleLogoError(
 ) {
   const img = e.currentTarget;
   const currentSrc = img.src;
+  
+  // Si cette URL a déjà échoué, masquer immédiatement
+  if (failedLogoUrls.has(currentSrc)) {
+    img.style.display = 'none';
+    img.onerror = null;
+    img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    return;
+  }
+  
+  // Marquer cette URL comme ayant échoué
+  failedLogoUrls.add(currentSrc);
   
   // Générer toutes les variantes possibles
   const urlsToTry = generateLogoUrls(options);
@@ -95,14 +110,18 @@ export function handleLogoError(
     currentIndex = 0;
   }
   
-  // Essayer la prochaine URL
+  // Essayer maximum 2 URLs avant d'abandonner (pour éviter trop de 404)
+  const maxAttempts = 2;
   const nextIndex = currentIndex + 1;
-  if (nextIndex < urlsToTry.length) {
+  
+  if (nextIndex < urlsToTry.length && (nextIndex - currentIndex) <= maxAttempts) {
     const nextUrl = urlsToTry[nextIndex];
     const nextFileName = nextUrl.split('/').pop() || '';
     
-    // Vérifier qu'on n'a pas déjà essayé cette URL
-    if (nextFileName !== currentFileName && !currentSrc.includes(nextFileName)) {
+    // Vérifier qu'on n'a pas déjà essayé cette URL et qu'elle n'a pas déjà échoué
+    if (nextFileName !== currentFileName && 
+        !currentSrc.includes(nextFileName) && 
+        !failedLogoUrls.has(nextUrl)) {
       // Empêcher l'erreur 404 en définissant onerror avant de changer src
       img.onerror = null;
       img.src = nextUrl;
@@ -118,7 +137,7 @@ export function handleLogoError(
     }
   }
   
-  // Si toutes les URLs ont été essayées, masquer l'image silencieusement
+  // Si toutes les URLs ont été essayées ou si on a atteint la limite, masquer immédiatement
   // et empêcher les erreurs répétées
   img.style.display = 'none';
   img.onerror = null;
