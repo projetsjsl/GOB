@@ -193,7 +193,8 @@ export default async function handler(req, res) {
         usedSymbol = profileResult.usedSymbol;
 
         // 2. Fetch Key Metrics (Annual) - utiliser le symbole qui a fonctionné
-        const metricsRes = await fetch(`${FMP_BASE}/key-metrics/${usedSymbol}?period=annual&limit=20&apikey=${FMP_KEY}`);
+        // Premium: Augmenter limit à 30 pour avoir 20+ ans d'historique
+        const metricsRes = await fetch(`${FMP_BASE}/key-metrics/${usedSymbol}?period=annual&limit=30&apikey=${FMP_KEY}`);
         if (!metricsRes.ok) {
             const errorText = await metricsRes.text();
             console.error(`❌ FMP Key Metrics error for ${usedSymbol}: ${metricsRes.status} - ${errorText.substring(0, 200)}`);
@@ -266,7 +267,8 @@ export default async function handler(req, res) {
         }
 
         // 3. Fetch Historical Prices for High/Low
-        const priceRes = await fetch(`${FMP_BASE}/historical-price-full/${usedSymbol}?serietype=line&timeseries=1825&apikey=${FMP_KEY}`);
+        // Premium: Augmenter timeseries à 7300 jours (~20 ans) au lieu de 1825 (5 ans)
+        const priceRes = await fetch(`${FMP_BASE}/historical-price-full/${usedSymbol}?serietype=line&timeseries=7300&apikey=${FMP_KEY}`);
         if (!priceRes.ok) {
             const errorText = await priceRes.text();
             console.error(`❌ FMP Historical Price error for ${usedSymbol}: ${priceRes.status} - ${errorText.substring(0, 200)}`);
@@ -437,7 +439,7 @@ export default async function handler(req, res) {
         };
 
         return res.status(200).json({
-            data: annualData.slice(-6), // Keep last 6 years
+            data: annualData.slice(-15), // Premium: Keep last 15 years (au lieu de 6) pour analyses long terme
             info: mappedInfo,
             currentPrice: parseFloat(currentPrice.toFixed(2))
         });
