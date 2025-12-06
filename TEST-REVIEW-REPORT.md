@@ -273,3 +273,4 @@ node scripts/test-all-tabs-comprehensive-v2.js
 **Rapport généré le:** 2025-12-06  
 **Dernière mise à jour des tests:** 2025-11-28
 
+

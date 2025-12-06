@@ -119,3 +119,4 @@ L'erreur React #310 indique qu'un hook React est utilisé de manière incorrecte
 
 Les erreurs 404 pour les images et les messages VTSAX sont des comportements attendus et non-bloquants.
 
+
