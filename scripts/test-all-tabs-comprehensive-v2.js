@@ -83,12 +83,25 @@ const allTabs = [
 async function testMethod1_ButtonClick(tab) {
     return new Promise((resolve) => {
         const startTime = performance.now();
-        const button = Array.from(document.querySelectorAll('nav button, [role="tab"] button')).find(btn => {
-            const text = (btn.textContent || btn.innerText || '').trim();
-            return text.includes(tab.name.replace('™', '')) || 
-                   text.includes(tab.name) ||
-                   btn.getAttribute('aria-label')?.includes(tab.name);
-        });
+        // Amélioration: Chercher par data-testid d'abord, puis aria-label, puis texte
+        let button = document.querySelector(`[data-testid="tab-${tab.id}"]`);
+        
+        if (!button) {
+            button = Array.from(document.querySelectorAll('nav button, [role="tab"] button, [role="tab"]')).find(btn => {
+                const text = (btn.textContent || btn.innerText || '').trim();
+                const ariaLabel = btn.getAttribute('aria-label') || '';
+                const dataTestId = btn.getAttribute('data-testid') || '';
+                const title = btn.getAttribute('title') || '';
+                
+                return dataTestId === `tab-${tab.id}` ||
+                       text.includes(tab.name.replace('™', '')) || 
+                       text.includes(tab.name) ||
+                       ariaLabel.includes(tab.name) ||
+                       ariaLabel.includes(tab.id) ||
+                       title.includes(tab.name) ||
+                       title.includes(tab.id);
+            });
+        }
         
         if (button) {
             button.click();
@@ -182,10 +195,25 @@ async function testMethod2_SetActiveTab(tab) {
 async function testMethod3_CustomEvent(tab) {
     return new Promise((resolve) => {
         const startTime = performance.now();
-        const button = Array.from(document.querySelectorAll('nav button, [role="tab"] button')).find(btn => {
-            const text = (btn.textContent || btn.innerText || '').trim();
-            return text.includes(tab.name.replace('™', '')) || text.includes(tab.name);
-        });
+        // Amélioration: Chercher par data-testid d'abord, puis aria-label, puis texte
+        let button = document.querySelector(`[data-testid="tab-${tab.id}"]`);
+        
+        if (!button) {
+            button = Array.from(document.querySelectorAll('nav button, [role="tab"] button, [role="tab"]')).find(btn => {
+                const text = (btn.textContent || btn.innerText || '').trim();
+                const ariaLabel = btn.getAttribute('aria-label') || '';
+                const dataTestId = btn.getAttribute('data-testid') || '';
+                const title = btn.getAttribute('title') || '';
+                
+                return dataTestId === `tab-${tab.id}` ||
+                       text.includes(tab.name.replace('™', '')) || 
+                       text.includes(tab.name) ||
+                       ariaLabel.includes(tab.name) ||
+                       ariaLabel.includes(tab.id) ||
+                       title.includes(tab.name) ||
+                       title.includes(tab.id);
+            });
+        }
         
         if (button) {
             try {

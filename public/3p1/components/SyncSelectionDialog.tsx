@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { XMarkIcon, StarIcon, EyeIcon, ArrowPathIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { AnalysisProfile } from '../types';
+import { calculateRecommendation } from '../utils/calculations';
 
 interface SyncSelectionDialogProps {
   isOpen: boolean;
@@ -15,7 +16,8 @@ type SyncFilter =
   | 'portfolio'      // Étoiles (isWatchlist: false)
   | 'watchlist'     // Œil (isWatchlist: true)
   | 'na'            // Tickers avec N/A
-  | 'sector';       // Par secteur
+  | 'sector'        // Par secteur
+  | 'recommendation'; // Par recommandation
 
 export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
   isOpen,
@@ -26,9 +28,11 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
 }) => {
   const [selectedFilter, setSelectedFilter] = useState<SyncFilter>('all');
   const [selectedSector, setSelectedSector] = useState<string>('');
+  const [selectedRecommendation, setSelectedRecommendation] = useState<string>('');
   const [showSectorSelector, setShowSectorSelector] = useState(false);
+  const [showRecommendationSelector, setShowRecommendationSelector] = useState(false);
 
-  // Calculer les métriques pour détecter les N/A
+  // Calculer les métriques pour détecter les N/A et recommandations
   const profileMetrics = useMemo(() => {
     return profiles.map(profile => {
       const currentPrice = Math.max(profile.assumptions?.currentPrice || 0, 0.01);
@@ -53,10 +57,14 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
 
       const hasInvalidData = currentPrice <= 0 || !isFinite(currentPrice) || jpegy === null;
 
+      // Calculer la recommandation
+      const { recommendation } = calculateRecommendation(profile.data, profile.assumptions);
+
       return {
         profile,
         hasInvalidData,
-        jpegy
+        jpegy,
+        recommendation
       };
     });
   }, [profiles]);
@@ -71,6 +79,17 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
     });
     return Array.from(sectorSet).sort();
   }, [profiles]);
+
+  // Extraire les recommandations uniques
+  const recommendations = useMemo(() => {
+    const recSet = new Set<string>();
+    profileMetrics.forEach(m => {
+      if (m.recommendation) {
+        recSet.add(m.recommendation);
+      }
+    });
+    return Array.from(recSet).sort();
+  }, [profileMetrics]);
 
   // Filtrer les tickers selon les critères
   const filteredTickers = useMemo(() => {
@@ -91,6 +110,11 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
           filtered = filtered.filter(m => m.profile.info.sector === selectedSector);
         }
         break;
+      case 'recommendation':
+        if (selectedRecommendation) {
+          filtered = filtered.filter(m => m.recommendation === selectedRecommendation);
+        }
+        break;
       case 'all':
       default:
         // Pas de filtre
@@ -98,7 +122,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
     }
 
     return filtered.map(m => m.profile.id);
-  }, [selectedFilter, selectedSector, profileMetrics]);
+  }, [selectedFilter, selectedSector, selectedRecommendation, profileMetrics]);
 
   const handleConfirm = () => {
     if (filteredTickers.length === 0) {
@@ -129,6 +153,10 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
         return profileMetrics.filter(m => m.profile.isWatchlist).length;
       case 'na':
         return profileMetrics.filter(m => m.hasInvalidData || m.jpegy === null).length;
+      case 'recommendation':
+        return selectedRecommendation 
+          ? profileMetrics.filter(m => m.recommendation === selectedRecommendation).length
+          : 0;
       case 'all':
       default:
         return profiles.length;
@@ -263,6 +291,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                 onChange={() => {
                   setSelectedFilter('sector');
                   setShowSectorSelector(true);
+                  setShowRecommendationSelector(false);
                 }}
                 className="w-4 h-4 text-blue-600"
               />
@@ -289,6 +318,54 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                       {sector} ({profileMetrics.filter(m => m.profile.info.sector === sector).length} tickers)
                     </option>
                   ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* Par recommandation */}
+          <div>
+            <label className="flex items-center gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+              style={{ borderColor: selectedFilter === 'recommendation' ? '#2563eb' : '#e5e7eb' }}>
+              <input
+                type="radio"
+                name="syncFilter"
+                value="recommendation"
+                checked={selectedFilter === 'recommendation'}
+                onChange={() => {
+                  setSelectedFilter('recommendation');
+                  setShowRecommendationSelector(true);
+                  setShowSectorSelector(false);
+                }}
+                className="w-4 h-4 text-blue-600"
+              />
+              <div className="flex-1">
+                <div className="font-semibold text-gray-900">Par recommandation</div>
+                <div className="text-xs text-gray-500">
+                  {selectedRecommendation 
+                    ? `${profileMetrics.filter(m => m.recommendation === selectedRecommendation).length} ticker(s) avec "${selectedRecommendation}"`
+                    : 'Sélectionnez une recommandation'}
+                </div>
+              </div>
+            </label>
+            
+            {selectedFilter === 'recommendation' && (
+              <div className="mt-2 ml-7">
+                <select
+                  value={selectedRecommendation}
+                  onChange={(e) => setSelectedRecommendation(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">-- Sélectionnez une recommandation --</option>
+                  {recommendations.map(rec => {
+                    const count = profileMetrics.filter(m => m.recommendation === rec).length;
+                    const emoji = rec === 'ACHAT' ? '🟢' : rec === 'CONSERVER' ? '🟡' : rec === 'VENTE' ? '🔴' : '⚪';
+                    return (
+                      <option key={rec} value={rec}>
+                        {emoji} {rec} ({count} tickers)
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
             )}

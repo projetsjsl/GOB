@@ -17,6 +17,7 @@ import { TickerSearch } from './components/TickerSearch';
 import { ConfirmSyncDialog } from './components/ConfirmSyncDialog';
 import { HistoricalVersionBanner } from './components/HistoricalVersionBanner';
 import { NotificationManager } from './components/Notification';
+import { SyncProgressBar } from './components/SyncProgressBar';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
 import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation, autoFillAssumptionsFromFMPData, isMutualFund } from './utils/calculations';
 import { detectOutlierMetrics } from './utils/outlierDetection';
@@ -1417,6 +1418,7 @@ export default function App() {
     // --- BULK SYNC ALL TICKERS HANDLER ---
     const [isBulkSyncing, setIsBulkSyncing] = useState(false);
     const [bulkSyncProgress, setBulkSyncProgress] = useState({ current: 0, total: 0 });
+    const [syncStats, setSyncStats] = useState({ successCount: 0, errorCount: 0 });
 
     const handleBulkSyncAllTickers = async () => {
         if (!confirm(`Synchroniser tous les ${Object.keys(library).length} tickers ?\n\nChaque version sera sauvegardée avant la synchronisation.\nLes données manuelles et hypothèses (orange) seront préservées.`)) {
@@ -1426,6 +1428,7 @@ export default function App() {
         setIsBulkSyncing(true);
         const allTickers = Object.keys(library);
         setBulkSyncProgress({ current: 0, total: allTickers.length });
+        setSyncStats({ successCount: 0, errorCount: 0 });
 
         let successCount = 0;
         let errorCount = 0;
@@ -1614,6 +1617,7 @@ export default function App() {
 
         setIsBulkSyncing(true);
         setBulkSyncProgress({ current: 0, total: tickersToSync.length });
+        setSyncStats({ successCount: 0, errorCount: 0 });
 
         let successCount = 0;
         let errorCount = 0;

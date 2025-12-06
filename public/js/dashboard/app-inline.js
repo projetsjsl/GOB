@@ -576,6 +576,30 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         const [cacheStatus, setCacheStatus] = useState({});
         const [loadingCacheStatus, setLoadingCacheStatus] = useState(false);
 
+        // Exposer setActiveTab globalement pour les tests et l'intégration
+        useEffect(() => {
+            if (typeof window !== 'undefined') {
+                // Exposer via window.BetaCombinedDashboardData
+                window.BetaCombinedDashboardData = window.BetaCombinedDashboardData || {};
+                window.BetaCombinedDashboardData.setActiveTab = (tabId) => {
+                    setActiveTab(tabId);
+                };
+                
+                // Exposer via window.BetaCombinedDashboard
+                window.BetaCombinedDashboard = window.BetaCombinedDashboard || {};
+                window.BetaCombinedDashboard.setActiveTab = (tabId) => {
+                    setActiveTab(tabId);
+                };
+                
+                // Alias direct pour compatibilité
+                window.setActiveTab = (tabId) => {
+                    setActiveTab(tabId);
+                };
+                
+                console.log('✅ setActiveTab exposé globalement pour les tests');
+            }
+        }, []);
+
 
         // États pour  l'interface Seeking Alpha
         const [githubToken, setGithubToken] = useState('');
@@ -25065,6 +25089,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         handleTabChange(tab.id);
                                         setTimeout(() => scrollToTab(tab.id), 100);
                                     }}
+                                    data-testid={`tab-${tab.id}`}
+                                    aria-label={tab.label || tab.name || `Onglet ${tab.id}`}
+                                    role="tab"
+                                    aria-selected={isActive}
                                     className={`flex-shrink-0 flex flex-col items-center justify-center py-2.5 px-3 min-w-[70px] btn-ripple relative transition-all duration-300 group rounded-lg ${isActive
                                         ? (isDarkMode
                                             ? 'text-green-400 bg-gradient-to-b from-green-500/20 to-green-600/10'
