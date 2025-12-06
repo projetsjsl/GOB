@@ -61,6 +61,9 @@
     "api/3p1-sync-na.js": {
       "maxDuration": 60
     },
+    "api/finance-snapshots.js": {
+      "maxDuration": 30
+    },
     "api/finviz-news.js": {
       "maxDuration": 15
     },
