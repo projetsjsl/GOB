@@ -1901,7 +1901,7 @@ export default function App() {
                             <InfoTab />
                         ) : currentView === 'kpi' ? (
                             <KPIDashboard
-                                profiles={useMemo(() => Object.values(library), [library])}
+                                profiles={Object.values(library)}
                                 currentId={activeId}
                                 onSelect={setActiveId}
                             />
