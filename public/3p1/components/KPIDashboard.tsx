@@ -25,6 +25,14 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   }>({ key: 'totalReturnPercent', direction: 'desc' });
   const [showSyncDialog, setShowSyncDialog] = useState(false);
   const [showGuideDialog, setShowGuideDialog] = useState(false);
+  const [isAnalyzingNA, setIsAnalyzingNA] = useState(false);
+  const [naAnalysisResult, setNaAnalysisResult] = useState<{
+    total: number;
+    na: number;
+    valid: number;
+    errors: number;
+    naTickers: string[];
+  } | null>(null);
   
   const [comparisonMode, setComparisonMode] = useState(false);
   const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
@@ -1396,6 +1404,67 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     <ArrowPathIcon className={`w-3 h-3 ${isBulkSyncing ? 'animate-spin' : ''}`} />
                     Sync N/A ({filteredMetrics.length})
                   </button>
+                )}
+                <button
+                  onClick={async () => {
+                    setIsAnalyzingNA(true);
+                    setNaAnalysisResult(null);
+                    try {
+                      const response = await fetch('/api/3p1-sync-na?action=analyze&limit=200');
+                      if (!response.ok) {
+                        throw new Error(`Erreur API: ${response.status}`);
+                      }
+                      const result = await response.json();
+                      if (result.success) {
+                        setNaAnalysisResult({
+                          total: result.totalTickers || 0,
+                          na: result.naTickers?.length || 0,
+                          valid: result.validTickers || 0,
+                          errors: result.errorTickers || 0,
+                          naTickers: result.naTickers || []
+                        });
+                        
+                        // Si des tickers N/A sont trouvés, proposer de les synchroniser
+                        if (result.naTickers && result.naTickers.length > 0 && onSyncNA) {
+                          const shouldSync = confirm(
+                            `Analyse terminée:\n\n` +
+                            `✅ Tickers valides: ${result.validTickers}\n` +
+                            `⚠️ Tickers avec N/A: ${result.naTickers.length}\n` +
+                            `❌ Erreurs: ${result.errorTickers}\n\n` +
+                            `Voulez-vous synchroniser automatiquement les ${result.naTickers.length} tickers avec N/A ?`
+                          );
+                          
+                          if (shouldSync) {
+                            onSyncNA(result.naTickers);
+                          }
+                        } else if (result.naTickers && result.naTickers.length === 0) {
+                          alert(`✅ Excellent! Aucun ticker avec N/A trouvé.\n\nTous les ${result.validTickers} tickers ont des données valides.`);
+                        }
+                      } else {
+                        alert(`Erreur: ${result.error || 'Erreur inconnue'}`);
+                      }
+                    } catch (error: any) {
+                      console.error('Erreur analyse N/A:', error);
+                      alert(`Erreur lors de l'analyse: ${error.message}`);
+                    } finally {
+                      setIsAnalyzingNA(false);
+                    }
+                  }}
+                  disabled={isBulkSyncing || isAnalyzingNA}
+                  className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded transition-colors flex items-center gap-1"
+                  title="Analyser et synchroniser automatiquement les tickers avec N/A depuis le backend\n\nCet outil:\n1. Analyse tous les tickers depuis Supabase\n2. Identifie ceux avec des valeurs N/A\n3. Propose de les synchroniser automatiquement"
+                >
+                  <ArrowPathIcon className={`w-3 h-3 ${isAnalyzingNA ? 'animate-spin' : ''}`} />
+                  {isAnalyzingNA ? 'Analyse...' : 'Auto-Sync N/A'}
+                </button>
+                {naAnalysisResult && (
+                  <div className="px-3 py-1 text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded border border-blue-200 dark:border-blue-800">
+                    {naAnalysisResult.na > 0 ? (
+                      <span>⚠️ {naAnalysisResult.na} N/A trouvés</span>
+                    ) : (
+                      <span>✅ Tous valides</span>
+                    )}
+                  </div>
                 )}
                 <button
                   onClick={() => {

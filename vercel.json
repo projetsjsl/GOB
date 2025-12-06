@@ -58,6 +58,9 @@
     "api/fmp-stock-screener.js": {
       "maxDuration": 30
     },
+    "api/3p1-sync-na.js": {
+      "maxDuration": 60
+    },
     "api/finviz-news.js": {
       "maxDuration": 15
     },
