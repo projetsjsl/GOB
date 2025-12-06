@@ -569,7 +569,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                         if (!hasHistory) {
                             // Aucun historique sauvegardé - ajouter welcome message
-                            const welcomeMessage = 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**Comment puis-je vous assister aujourd\'hui ?**';
+                            const welcomeMessage = 'Bonjour ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**Comment puis-je vous assister aujourd\'hui ?**';
 
                             setEmmaMessages([{
                                 type: 'emma',
@@ -1963,7 +1963,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         </div>
                                         <div className="flex-1 p-4 rounded-lg bg-gray-50 shadow-sm">
                                             <p className="text-sm leading-relaxed mb-3 text-gray-800">
-                                                Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Experte financière IA de JSLAI. Je peux vous aider avec l'analyse et l'évaluation financière.
+                                                Bonjour ! Je suis Emma, Experte financière IA de JSLAI. Je peux vous aider avec l'analyse et l'évaluation financière.
                                                 {useFunctionCalling ? ' Je peux également récupérer des données en temps réel via les APIs financières.' : ' Je vous fournis des analyses basées sur mes connaissances.'}
                                                 Quel est votre défi financier ?
                                             </p>

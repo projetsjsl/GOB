@@ -150,7 +150,7 @@ const ThemeSelector = ({ isDarkMode = true }) => {
         const colors = theme.colors || {};
         const isSelected = currentTheme === theme.id;
         // Détecter les thèmes light
-        const isLightTheme = ['seeking-alpha', 'bloomberg-nostalgie', 'desjardins', 'light'].includes(theme.id) || 
+        const isLightTheme = ['seeking-alpha', 'bloomberg-nostalgie', 'light'].includes(theme.id) || 
                             (colors.background && colors.background.toLowerCase() === '#ffffff');
         const previewBg = colors.background || (isLightTheme ? '#ffffff' : '#000000');
         const previewText = colors.text || (isLightTheme ? '#202124' : '#ffffff');

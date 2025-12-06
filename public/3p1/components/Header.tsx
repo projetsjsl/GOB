@@ -116,7 +116,6 @@ export const Header: React.FC<HeaderProps> = ({
               {info.name}
             </h1>
             <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
-              <p className="text-xs sm:text-sm text-gray-500 hidden sm:inline">GROUPE OUELLET BOLDUC - GESTIONNAIRES DE PORTEFEUILLE</p>
               <p className="text-xs text-gray-500 sm:hidden">GOB</p>
               {info.exchange && (
                 <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded cursor-help" title={`Bourse: ${info.exchange}\n\nBourse où l'action est cotée.\n\nSource: FMP API (company-profile)`}>

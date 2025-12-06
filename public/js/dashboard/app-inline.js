@@ -512,9 +512,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 setCurrentThemeId(themeId);
                 
                 // Déterminer isDarkMode en fonction du thème
-                // Thèmes light: seeking-alpha, bloomberg-nostalgie, desjardins, light
+                // Thèmes light: seeking-alpha, bloomberg-nostalgie, light
                 // Thèmes dark: default, marketq, marketq-dark, bloomberg-terminal, bloomberg-mobile, darkmode, terminal, ia
-                const lightThemes = ['seeking-alpha', 'bloomberg-nostalgie', 'desjardins', 'light'];
+                const lightThemes = ['seeking-alpha', 'bloomberg-nostalgie', 'light'];
                 const isLight = lightThemes.includes(themeId);
                 setIsDarkMode(!isLight);
                 
@@ -626,7 +626,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 // Vérifier d'abord le thème GOB
                 if (window.GOBThemes) {
                     const currentThemeId = window.GOBThemes.getCurrentTheme();
-                    const lightThemes = ['seeking-alpha', 'bloomberg-nostalgie', 'desjardins', 'light'];
+                    const lightThemes = ['seeking-alpha', 'bloomberg-nostalgie', 'light'];
                     if (lightThemes.includes(currentThemeId)) {
                         return false; // Light theme
                     }
@@ -12372,7 +12372,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                     if (!hasHistory) {
                         // Aucun historique sauvegardé - ajouter welcome message
-                        const welcomeMessage = 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**Comment puis-je vous assister aujourd\'hui ?**';
+                        const welcomeMessage = 'Bonjour ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**Comment puis-je vous assister aujourd\'hui ?**';
 
                         setEmmaMessages([{
                             type: 'emma',
@@ -14194,7 +14194,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         </div>
                                         <div className="flex-1 p-4 rounded-lg bg-gray-50 shadow-sm">
                                             <p className="text-sm leading-relaxed mb-3 text-gray-800">
-                                                Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Experte financière IA de JSLAI. Je peux vous aider avec l'analyse et l'évaluation financière.
+                                                Bonjour ! Je suis Emma, Experte financière IA de JSLAI. Je peux vous aider avec l'analyse et l'évaluation financière.
                                                 {useFunctionCalling ? ' Je peux également récupérer des données en temps réel via les APIs financières.' : ' Je vous fournis des analyses basées sur mes connaissances.'}
                                                 Quel est votre défi financier ?
                                             </p>
@@ -15328,7 +15328,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <h4 className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Mission</h4>
-                                        <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Accompagner une équipe de gestionnaires de portefeuille québécois avec une expertise de niveau CFA, rigueur et esprit critique.</p>
+                                        <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Accompagner une équipe avec une expertise de niveau CFA, rigueur et esprit critique.</p>
                                         <h4 className={`font-semibold mt-4 mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Compétences clés</h4>
                                         <ul className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'} list-disc pl-5 space-y-1`}>
                                             <li>Analyse fondamentale (actions, obligations, dérivés)</li>
@@ -24320,7 +24320,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 0 2px 8px rgba(255, 107, 53, 0.1),
                                 inset 0 1px 0 rgba(255, 107, 53, 0.05)
                             `
-                            : currentThemeId === 'desjardins'
+                            : false
                             ? `
                                 0 8px 32px rgba(0, 103, 71, 0.15),
                                 0 2px 8px rgba(0, 103, 71, 0.1),
@@ -24356,7 +24356,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 ? 0.08
                                 : currentThemeId === 'seeking-alpha'
                                 ? 0.04
-                                : currentThemeId === 'desjardins'
+                                : false
                                 ? 0.03
                                 : 0.06,
                             backgroundImage: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
@@ -24365,7 +24365,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 ? 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0), radial-gradient(circle at 10px 10px, currentColor 0.5px, transparent 0), radial-gradient(circle at 18px 18px, currentColor 0.3px, transparent 0)'
                                 : currentThemeId === 'seeking-alpha'
                                 ? 'repeating-linear-gradient(45deg, transparent, transparent 4px, currentColor 0.5px, currentColor 1px)'
-                                : currentThemeId === 'desjardins'
+                                : false
                                 ? 'repeating-linear-gradient(0deg, transparent, transparent 8px, currentColor 0.5px, currentColor 1px), repeating-linear-gradient(90deg, transparent, transparent 8px, currentColor 0.5px, currentColor 1px)'
                                 : currentThemeId === 'bloomberg-nostalgie'
                                 ? 'repeating-linear-gradient(45deg, transparent, transparent 2px, currentColor 1px, currentColor 2px), repeating-linear-gradient(-45deg, transparent, transparent 2px, currentColor 1px, currentColor 2px)'
@@ -24376,7 +24376,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 ? '16px 16px, 24px 24px, 32px 32px'
                                 : currentThemeId === 'seeking-alpha'
                                 ? '12px 12px'
-                                : currentThemeId === 'desjardins'
+                                : false
                                 ? '16px 16px, 16px 16px'
                                 : '8px 8px, 12px 12px',
                             animation: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
@@ -24408,7 +24408,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     linear-gradient(135deg, rgba(255, 107, 53, 0.12) 0%, transparent 40%),
                                     radial-gradient(ellipse at 30% 50%, rgba(255, 107, 53, 0.08) 0%, transparent 50%)
                                 `
-                                : currentThemeId === 'desjardins'
+                                : false
                                 ? `
                                     linear-gradient(135deg, rgba(0, 103, 71, 0.12) 0%, rgba(0, 166, 81, 0.08) 50%, transparent 100%),
                                     radial-gradient(ellipse at 50% 0%, rgba(0, 166, 81, 0.1) 0%, transparent 50%)
@@ -24441,7 +24441,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 ? 'linear-gradient(135deg, transparent 0%, rgba(255, 204, 0, 0.15) 50%, transparent 100%)'
                                 : currentThemeId === 'seeking-alpha'
                                 ? 'linear-gradient(135deg, transparent 0%, rgba(255, 107, 53, 0.18) 50%, transparent 100%)'
-                                : currentThemeId === 'desjardins'
+                                : false
                                 ? 'linear-gradient(135deg, transparent 0%, rgba(0, 166, 81, 0.15) 50%, transparent 100%)'
                                 : `linear-gradient(135deg, transparent 0%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15) 50%, transparent 100%)`,
                             animation: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
@@ -24461,7 +24461,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 ? 'radial-gradient(circle, rgba(255, 204, 0, 0.4) 0%, transparent 70%)'
                                 : currentThemeId === 'seeking-alpha'
                                 ? 'radial-gradient(circle, rgba(255, 107, 53, 0.4) 0%, transparent 70%)'
-                                : currentThemeId === 'desjardins'
+                                : false
                                 ? 'radial-gradient(circle, rgba(0, 166, 81, 0.4) 0%, transparent 70%)'
                                 : `radial-gradient(circle, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4) 0%, transparent 70%)`,
                             filter: 'blur(25px)',
@@ -24478,7 +24478,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 ? 'radial-gradient(circle, rgba(255, 204, 0, 0.3) 0%, transparent 70%)'
                                 : currentThemeId === 'seeking-alpha'
                                 ? 'radial-gradient(circle, rgba(26, 115, 232, 0.3) 0%, transparent 70%)'
-                                : currentThemeId === 'desjardins'
+                                : false
                                 ? 'radial-gradient(circle, rgba(0, 103, 71, 0.3) 0%, transparent 70%)'
                                 : `radial-gradient(circle, rgba(var(--theme-accent-rgb, 139, 92, 246), 0.3) 0%, transparent 70%)`,
                             filter: 'blur(25px)',
@@ -24544,7 +24544,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     rgba(255, 107, 53, 0.15) 100%
                                                 )
                                             `
-                                            : currentThemeId === 'desjardins'
+                                            : false
                                             ? `
                                                 linear-gradient(135deg, 
                                                     rgba(0, 103, 71, 0.15) 0%, 
@@ -24559,14 +24559,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15) 100%
                                                 )
                                             `,
-                                        backgroundSize: (currentThemeId === 'marketq' || currentThemeId === 'marketq-dark' || currentThemeId === 'seeking-alpha' || currentThemeId === 'desjardins') ? '200% 200%' : '100% 100%',
+                                        backgroundSize: (currentThemeId === 'marketq' || currentThemeId === 'marketq-dark' || currentThemeId === 'seeking-alpha') ? '200% 200%' : '100% 100%',
                                         border: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                             ? '2px solid rgba(255, 204, 0, 0.5)'
                                             : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
                                             ? '2px solid rgba(0, 212, 255, 0.5)'
                                             : currentThemeId === 'seeking-alpha'
                                             ? '2px solid rgba(255, 107, 53, 0.4)'
-                                            : currentThemeId === 'desjardins'
+                                            : false
                                             ? '2px solid rgba(0, 166, 81, 0.4)'
                                             : `2px solid rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`,
                                         boxShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
@@ -24589,7 +24589,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 inset 0 2px 4px rgba(255, 255, 255, 0.1),
                                                 0 0 40px rgba(255, 107, 53, 0.15)
                                             `
-                                            : currentThemeId === 'desjardins'
+                                            : false
                                             ? `
                                                 0 12px 24px -4px rgba(0, 103, 71, 0.2),
                                                 0 4px 12px -2px rgba(0, 166, 81, 0.15),
@@ -24604,7 +24604,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 0 0 40px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15)
                                             `,
                                         borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.75rem',
-                                        animation: (currentThemeId === 'marketq' || currentThemeId === 'marketq-dark' || currentThemeId === 'seeking-alpha' || currentThemeId === 'desjardins') ? 'gradient-shift 5s ease infinite' : 'none'
+                                        animation: (currentThemeId === 'marketq' || currentThemeId === 'marketq-dark' || currentThemeId === 'seeking-alpha') ? 'gradient-shift 5s ease infinite' : 'none'
                                     }}
                                 >
                                     {/* Multi-layer shine personnalisé */}
@@ -24617,7 +24617,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 ? 'linear-gradient(135deg, rgba(255, 204, 0, 0.25) 0%, transparent 50%)'
                                                 : currentThemeId === 'seeking-alpha'
                                                 ? 'linear-gradient(135deg, rgba(255, 107, 53, 0.25) 0%, transparent 50%, rgba(255, 107, 53, 0.15) 100%)'
-                                                : currentThemeId === 'desjardins'
+                                                : false
                                                 ? 'linear-gradient(135deg, rgba(0, 166, 81, 0.25) 0%, transparent 50%, rgba(0, 166, 81, 0.15) 100%)'
                                                 : `linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%, rgba(255, 255, 255, 0.1) 100%)`,
                                             borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.75rem',
@@ -24648,7 +24648,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 ? 'radial-gradient(circle, rgba(255, 204, 0, 0.4) 0%, transparent 70%)'
                                                 : currentThemeId === 'seeking-alpha'
                                                 ? 'radial-gradient(circle, rgba(255, 107, 53, 0.4) 0%, transparent 70%)'
-                                                : currentThemeId === 'desjardins'
+                                                : false
                                                 ? 'radial-gradient(circle, rgba(0, 166, 81, 0.4) 0%, transparent 70%)'
                                                 : `radial-gradient(circle, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4) 0%, transparent 70%)`,
                                             filter: 'blur(8px)',
@@ -24666,7 +24666,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 ? 'radial-gradient(ellipse, rgba(255, 204, 0, 0.6) 0%, transparent 70%)'
                                                 : currentThemeId === 'seeking-alpha'
                                                 ? 'radial-gradient(ellipse, rgba(255, 107, 53, 0.6) 0%, transparent 70%)'
-                                                : currentThemeId === 'desjardins'
+                                                : false
                                                 ? 'radial-gradient(ellipse, rgba(0, 166, 81, 0.6) 0%, transparent 70%)'
                                                 : `radial-gradient(ellipse, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.6) 0%, transparent 70%)`
                                         }}
@@ -24695,7 +24695,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         ? '"Roboto", "Helvetica Neue", "Arial", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
                                                         : currentThemeId === 'seeking-alpha'
                                                         ? '"Roboto", "Helvetica Neue", "Arial", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-                                                        : currentThemeId === 'desjardins'
+                                                        : false
                                                         ? '"Arial", "Helvetica Neue", "Helvetica", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
                                                         : currentThemeId === 'ia'
                                                         ? '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif'
@@ -24710,14 +24710,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         ? '#ffcc00'
                                                         : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'light'
                                                         ? '#1a1a1a'
-                                                        : currentThemeId === 'desjardins'
+                                                        : false
                                                         ? '#ffffff'
                                                         : '#ffffff',
                                                     textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
                                                         ? '0 1px 3px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 212, 255, 0.2)'
                                                         : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                         ? '0 1px 3px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 204, 0, 0.3)'
-                                                        : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                        : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'light'
                                                         ? '0 1px 2px rgba(255, 255, 255, 0.8)'
                                                         : '0 1px 3px rgba(0, 0, 0, 0.5)'
                                                 }}
@@ -24733,7 +24733,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             ? '#00ff00'
                                                             : currentThemeId === 'seeking-alpha'
                                                             ? '#ff6b35'
-                                                            : currentThemeId === 'desjardins'
+                                                            : false
                                                             ? '#00a651'
                                                             : currentThemeId === 'bloomberg-nostalgie'
                                                             ? '#8b5cf6'
@@ -24748,7 +24748,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             ? '0 1px 4px rgba(0, 255, 0, 0.5), 0 0 12px rgba(0, 255, 0, 0.4)'
                                                             : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'light'
                                                             ? '0 1px 2px rgba(0, 0, 0, 0.3)'
-                                                            : currentThemeId === 'desjardins'
+                                                            : false
                                                             ? '0 1px 3px rgba(0, 0, 0, 0.5), 0 0 8px rgba(0, 166, 81, 0.3)'
                                                             : '0 1px 4px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)',
                                                         filter: 'brightness(1.1)'
@@ -24765,7 +24765,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             ? 'rgba(255, 204, 0, 0.2)'
                                                             : currentThemeId === 'seeking-alpha'
                                                             ? 'rgba(255, 107, 53, 0.2)'
-                                                            : currentThemeId === 'desjardins'
+                                                            : false
                                                             ? 'rgba(0, 166, 81, 0.2)'
                                                             : `rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2)`,
                                                         color: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
@@ -24774,7 +24774,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             ? '#ffcc00'
                                                             : currentThemeId === 'seeking-alpha'
                                                             ? '#ff6b35'
-                                                            : currentThemeId === 'desjardins'
+                                                            : false
                                                             ? '#00a651'
                                                             : 'var(--theme-primary, #10b981)',
                                                         border: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
@@ -24783,7 +24783,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             ? '1px solid rgba(255, 204, 0, 0.4)'
                                                             : currentThemeId === 'seeking-alpha'
                                                             ? '1px solid rgba(255, 107, 53, 0.3)'
-                                                            : currentThemeId === 'desjardins'
+                                                            : false
                                                             ? '1px solid rgba(0, 166, 81, 0.3)'
                                                             : `1px solid rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)`,
                                                         textTransform: 'uppercase',
@@ -24802,19 +24802,19 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         ? '"Roboto", "Helvetica Neue", sans-serif'
                                                         : currentThemeId === 'seeking-alpha'
                                                         ? '"Open Sans", "Arial", sans-serif'
-                                                        : currentThemeId === 'desjardins'
+                                                        : false
                                                         ? '"Montserrat", "Arial", sans-serif'
                                                         : '"Inter", "Arial", sans-serif',
                                                     color: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                         ? '#888888'
                                                         : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'light'
                                                         ? '#666666'
-                                                        : currentThemeId === 'desjardins'
+                                                        : false
                                                         ? '#e5e7eb'
                                                         : '#9ca3af',
                                                     textShadow: currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'light'
                                                         ? '0 1px 1px rgba(255, 255, 255, 0.5)'
-                                                        : currentThemeId === 'desjardins'
+                                                        : false
                                                         ? '0 1px 2px rgba(0, 0, 0, 0.3)'
                                                         : '0 1px 2px rgba(0, 0, 0, 0.3)',
                                                     letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0.03em' : '0.01em'
@@ -24828,7 +24828,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             ? '#00ff00'
                                                             : currentThemeId === 'seeking-alpha'
                                                             ? '#ff6b35'
-                                                            : currentThemeId === 'desjardins'
+                                                            : false
                                                             ? '#00a651'
                                                             : currentThemeId === 'bloomberg-nostalgie'
                                                             ? '#8b5cf6'
@@ -24840,7 +24840,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             ? `0 0 6px rgba(0, 212, 255, 0.4)`
                                                             : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                             ? `0 0 6px rgba(0, 255, 0, 0.4)`
-                                                            : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                            : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'light'
                                                             ? `0 1px 2px rgba(0, 0, 0, 0.2)`
                                                             : `0 0 6px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)`
                                                     }}
@@ -24953,7 +24953,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         ? '"Roboto", "Helvetica Neue", "Arial", sans-serif'
                                                         : currentThemeId === 'seeking-alpha'
                                                         ? '"Roboto", "Helvetica Neue", "Arial", sans-serif'
-                                                        : currentThemeId === 'desjardins'
+                                                        : false
                                                         ? '"Arial", "Helvetica Neue", "Helvetica", sans-serif'
                                                         : '"Inter", "Roboto", sans-serif',
                                             textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
