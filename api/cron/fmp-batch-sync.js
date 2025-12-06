@@ -82,77 +82,11 @@ async function fetchFMPQuotes(symbols) {
   return allQuotes;
 }
 
-async function fetchFMPRatios(symbols) {
-  const batchSize = 100;
-  const batches = [];
-  
-  for (let i = 0; i < symbols.length; i += batchSize) {
-    batches.push(symbols.slice(i, i + batchSize));
-  }
-
-  const allRatios = [];
-
-  for (const batch of batches) {
-    const symbolsStr = batch.join(',');
-    const url = `${FMP_BASE_URL}/ratios-ttm/${symbolsStr}?apikey=${FMP_API_KEY}`;
-    
-    try {
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        console.error(`❌ FMP Ratios Error: ${response.status}`);
-        continue;
-      }
-
-      const ratios = await response.json();
-      
-      if (Array.isArray(ratios)) {
-        allRatios.push(...ratios);
-      } else if (ratios && ratios.symbol) {
-        allRatios.push(ratios);
-      }
-
-      if (batches.length > 1) {
-        await new Promise(resolve => setTimeout(resolve, 3000));
-      }
-    } catch (error) {
-      console.error(`❌ Erreur fetch FMP ratios:`, error);
-      continue;
-    }
-  }
-
-  return allRatios;
-}
-
-function combineQuoteAndRatios(quotes, ratios) {
-  const ratiosMap = new Map();
-  ratios.forEach(r => {
-    if (r.symbol) {
-      ratiosMap.set(r.symbol.toUpperCase(), r);
-    }
-  });
-
-  return quotes.map(quote => {
-    const symbol = quote.symbol?.toUpperCase();
-    const ratio = ratiosMap.get(symbol) || {};
-
-    return {
-      symbol: symbol,
-      price: quote.price || 0,
-      change: quote.change || 0,
-      changePercent: quote.changesPercentage || 0,
-      volume: quote.volume || 0,
-      marketCap: quote.marketCap || 0,
-      pe: ratio.peRatioTTM || null,
-      pcf: ratio.priceToCashFlowRatioTTM || null,
-      pbv: ratio.priceToBookRatioTTM || null,
-      dividendYield: ratio.dividendYieldTTM || null,
-      eps: quote.eps || null,
-      revenue: null,
-      netIncome: null
-    };
-  });
-}
+/**
+ * ⚠️ SUPPRIMÉ : fetchFMPRatios et combineQuoteAndRatios
+ * On synchronise UNIQUEMENT les prix, pas les ratios/métriques
+ * Les ratios sont récupérés à la demande dans 3p1 quand nécessaire
+ */
 
 async function syncAllTickers() {
   const startTime = Date.now();
