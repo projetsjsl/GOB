@@ -18,6 +18,7 @@ import { HistoricalVersionBanner } from './components/HistoricalVersionBanner';
 import { NotificationManager } from './components/Notification';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
 import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation, autoFillAssumptionsFromFMPData } from './utils/calculations';
+import { detectOutlierMetrics } from './utils/outlierDetection';
 import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { fetchCompanyData } from './services/financeApi';
 import { saveSnapshot, hasManualEdits, loadSnapshot, listSnapshots } from './services/snapshotApi';
@@ -561,16 +562,41 @@ export default function App() {
                 targetPBV: autoFilledAssumptions.targetPBV
             });
 
+            // Détecter et exclure automatiquement les métriques avec prix cibles aberrants
+            const finalData = data.length > 0 ? data : result.data; // Utiliser les données mergées
+            const finalAssumptions = {
+                ...assumptions,
+                ...autoFilledAssumptions // Inclure les métriques recalculées
+            };
+            
+            const outlierDetection = detectOutlierMetrics(finalData, finalAssumptions);
+            
+            if (outlierDetection.detectedOutliers.length > 0) {
+                console.log(`⚠️ Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(', ')}`);
+                showNotification(
+                    `Métriques exclues automatiquement (prix cibles aberrants): ${outlierDetection.detectedOutliers.join(', ')}`,
+                    'warning'
+                );
+            }
+
+            // Appliquer les exclusions détectées
+            const assumptionsWithOutlierExclusions = {
+                ...finalAssumptions,
+                excludeEPS: outlierDetection.excludeEPS,
+                excludeCF: outlierDetection.excludeCF,
+                excludeBV: outlierDetection.excludeBV,
+                excludeDIV: outlierDetection.excludeDIV
+            };
+
+            // Mettre à jour les assumptions dans le state
+            setAssumptions(assumptionsWithOutlierExclusions);
+
             // Auto-save snapshot after successful sync
             console.log('💾 Auto-saving snapshot after API sync...');
-            const finalData = data.length > 0 ? data : result.data; // Utiliser les données mergées
             await saveSnapshot(
                 activeId,
                 finalData,
-                {
-                    ...assumptions,
-                    ...autoFilledAssumptions // Inclure les métriques recalculées
-                },
+                assumptionsWithOutlierExclusions, // Inclure les exclusions automatiques
                 info,
                 `API sync - ${new Date().toLocaleString()}`,
                 true,  // Mark as current
@@ -800,12 +826,33 @@ export default function App() {
                 assumptions // Préserver les exclusions existantes
             );
 
+            // Détecter et exclure automatiquement les métriques avec prix cibles aberrants
+            const tempAssumptions = {
+                ...assumptions,
+                ...autoFilledAssumptions
+            };
+            const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
+            
+            if (outlierDetection.detectedOutliers.length > 0) {
+                console.log(`⚠️ Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(', ')}`);
+                showNotification(
+                    `Métriques exclues automatiquement (prix cibles aberrants): ${outlierDetection.detectedOutliers.join(', ')}`,
+                    'warning'
+                );
+            }
+
+            // Appliquer les exclusions détectées
+            const finalAssumptions = {
+                ...tempAssumptions,
+                excludeEPS: outlierDetection.excludeEPS,
+                excludeCF: outlierDetection.excludeCF,
+                excludeBV: outlierDetection.excludeBV,
+                excludeDIV: outlierDetection.excludeDIV
+            };
+
             // Mettre à jour les données et métriques
             setData(mergedData);
-            setAssumptions(prev => ({
-                ...prev,
-                ...autoFilledAssumptions
-            }));
+            setAssumptions(finalAssumptions);
             setInfo(prev => ({
                 ...prev,
                 ...result.info,
@@ -825,10 +872,7 @@ export default function App() {
                     [activeId]: {
                         ...profile,
                         data: mergedData, // Utiliser les données mergées au lieu de result.data
-                        assumptions: {
-                            ...profile.assumptions,
-                            ...autoFilledAssumptions
-                        },
+                        assumptions: finalAssumptions, // Inclure les exclusions automatiques
                         info: {
                             ...profile.info,
                             ...result.info,
@@ -1174,7 +1218,27 @@ export default function App() {
                             profile.assumptions // Préserver les valeurs existantes (excludeEPS, excludeCF, etc.)
                         );
 
-                        // 5. Mettre à jour le profil avec les nouvelles métriques calculées
+                        // 5. Détecter et exclure automatiquement les métriques avec prix cibles aberrants
+                        const tempAssumptions = {
+                            ...profile.assumptions,
+                            ...autoFilledAssumptions
+                        };
+                        const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
+                        
+                        if (outlierDetection.detectedOutliers.length > 0) {
+                            console.log(`⚠️ ${tickerSymbol}: Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(', ')}`);
+                        }
+
+                        // Appliquer les exclusions détectées
+                        const finalAssumptions = {
+                            ...tempAssumptions,
+                            excludeEPS: outlierDetection.excludeEPS,
+                            excludeCF: outlierDetection.excludeCF,
+                            excludeBV: outlierDetection.excludeBV,
+                            excludeDIV: outlierDetection.excludeDIV
+                        };
+
+                        // 6. Mettre à jour le profil avec les nouvelles métriques calculées et exclusions automatiques
                         setLibrary(prev => {
                             const updated = {
                                 ...prev,
@@ -1187,10 +1251,7 @@ export default function App() {
                                         // S'assurer que le nom de FMP remplace toujours celui de Supabase
                                         name: result.info.name || profile.info.name
                                     },
-                                    assumptions: {
-                                        ...profile.assumptions, // Préserver les exclusions et autres flags
-                                        ...autoFilledAssumptions // Recalculer toutes les métriques selon les bonnes pratiques
-                                    },
+                                    assumptions: finalAssumptions, // Inclure les exclusions automatiques
                                     lastModified: Date.now()
                                 }
                             };
@@ -1204,14 +1265,11 @@ export default function App() {
                             return updated;
                         });
 
-                        // 6. Sauvegarder le snapshot après sync avec les nouvelles métriques
+                        // 7. Sauvegarder le snapshot après sync avec les nouvelles métriques et exclusions automatiques
                         await saveSnapshot(
                             tickerSymbol,
                             mergedData,
-                            {
-                                ...profile.assumptions,
-                                ...autoFilledAssumptions // Inclure les métriques recalculées
-                            },
+                            finalAssumptions, // Inclure les exclusions automatiques
                             {
                                 ...profile.info,
                                 ...result.info
