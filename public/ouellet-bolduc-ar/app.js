@@ -1,7 +1,6 @@
 // Basic config for the AR experience and QR sharing
 const AR_USDZ_URL = "https://modelviewer.dev/shared-assets/models/Astronaut.usdz";
-// URL finale servie en prod (utilisée pour le QR quand on est en file://)
-const SHARE_FALLBACK_URL = "https://jslai.app/ouellet-bolduc-ar/";
+const SHARE_FALLBACK_URL = "https://example.com/ouellet-bolduc-ar";
 
 function resolveShareUrl() {
   const { protocol, href } = window.location;

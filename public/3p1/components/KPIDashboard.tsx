@@ -1274,9 +1274,21 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                         : 'Attention:'}
                     </strong> {filteredMetrics.filter(m => m.hasInvalidData).length} titre(s) ont des données invalides ou manquantes. 
                     {filteredMetrics.some(m => m.isNotSynchronized) && (
-                      <span className="font-semibold block mt-1">
-                        La plupart nécessitent une synchronisation depuis l'API. Allez dans l'onglet "Analysis" et cliquez sur "Synchroniser" pour chaque ticker.
-                      </span>
+                      <div className="font-semibold block mt-1 space-y-2">
+                        <p>La plupart nécessitent une synchronisation depuis l'API.</p>
+                        {onBulkSync ? (
+                          <button
+                            onClick={onBulkSync}
+                            disabled={isBulkSyncing}
+                            className="mt-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors"
+                          >
+                            <ArrowPathIcon className={`w-4 h-4 ${isBulkSyncing ? 'animate-spin' : ''}`} />
+                            {isBulkSyncing ? 'Synchronisation en cours...' : 'Synchroniser Tous les Tickers'}
+                          </button>
+                        ) : (
+                          <p className="text-xs">Allez dans l'onglet "Analysis" et cliquez sur "Synchroniser" pour chaque ticker, ou utilisez "Sync Tous les Tickers" dans la sidebar.</p>
+                        )}
+                      </div>
                     )}
                     Ces tickers sont marqués avec <ExclamationTriangleIcon className="w-4 h-4 inline text-red-500" /> et affichent "N/A".
                     <details className="mt-2">
