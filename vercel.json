@@ -67,6 +67,15 @@
     "api/fmp.js": {
       "maxDuration": 10
     },
+    "api/fmp-company-data.js": {
+      "maxDuration": 30
+    },
+    "api/fmp-search.js": {
+      "maxDuration": 15
+    },
+    "api/fmp-stock-screener.js": {
+      "maxDuration": 30
+    },
     "api/finviz-news.js": {
       "maxDuration": 15
     },
@@ -144,6 +153,17 @@
         "maxDuration": 30
       },
       "api/jslai-proxy-resource.js": {
+        "maxDuration": 30
+      },
+      "api/fmp-sync.js": {
+        "maxDuration": 300,
+        "memory": 1024
+      },
+      "api/kpi-engine.js": {
+        "maxDuration": 60,
+        "memory": 512
+      },
+      "api/terminal-data.js": {
         "maxDuration": 30
       }
   },

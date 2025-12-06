@@ -1,6 +1,14 @@
 /**
- * API Proxy pour la recherche FMP
- * Permet au frontend 3p1 d'accéder à l'API FMP sans exposer la clé
+ * API Proxy pour rechercher des symboles FMP
+ * Utilise FMP Premium Search endpoint pour résoudre automatiquement les variantes de symboles
+ * 
+ * Premium Features:
+ * - Recherche intelligente de symboles
+ * - Résolution automatique des variantes (BRK.B, BRK-B, BRKB, etc.)
+ * - Support multi-bourses (TSX, TSXV, NASDAQ, NYSE, etc.)
+ * - Suggestions de symboles similaires
+ * 
+ * Date: 6 décembre 2025
  */
 
 export default async function handler(req, res) {
@@ -17,7 +25,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { query, limit = 10 } = req.query;
+    const { query } = req.query;
 
     if (!query || query.trim().length === 0) {
         return res.status(400).json({ error: 'Query parameter required' });
@@ -30,29 +38,85 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'API key not configured' });
     }
 
+    const FMP_BASE = 'https://financialmodelingprep.com/api/v3';
+
     try {
-        const url = `https://financialmodelingprep.com/api/v3/search?query=${encodeURIComponent(query)}&limit=${limit}&apikey=${FMP_KEY}`;
+        // Endpoint FMP Search
+        const searchRes = await fetch(`${FMP_BASE}/search?query=${encodeURIComponent(query)}&apikey=${FMP_KEY}&limit=20`);
 
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error(`FMP API returned ${response.status}`);
+        if (!searchRes.ok) {
+            const errorText = await searchRes.text();
+            console.error(`❌ FMP Search error: ${searchRes.status} - ${errorText.substring(0, 200)}`);
+            return res.status(searchRes.status).json({
+                error: 'FMP Search failed',
+                message: errorText.substring(0, 200)
+            });
         }
 
-        const data = await response.json();
+        let searchData = await searchRes.json();
 
-        // Filter for stocks only (exclude indices, crypto, etc)
-        const filtered = data.filter(item =>
-            item.exchangeShortName &&
-            ['NASDAQ', 'NYSE', 'AMEX', 'TSX', 'LSE', 'EURONEXT'].includes(item.exchangeShortName)
-        );
+        // FMP Search peut retourner directement un tableau OU un objet avec 'results'
+        // Normaliser la réponse
+        if (Array.isArray(searchData)) {
+            // C'est déjà un tableau, utiliser directement
+        } else if (searchData && typeof searchData === 'object') {
+            // Vérifier si c'est un objet d'erreur
+            if (searchData['Error Message']) {
+                console.error(`❌ FMP Search Error: ${searchData['Error Message']}`);
+                return res.status(400).json({
+                    error: 'FMP Search error',
+                    message: searchData['Error Message']
+                });
+            }
+            // Sinon, essayer d'extraire 'results' ou convertir en tableau
+            if (Array.isArray(searchData.results)) {
+                searchData = searchData.results;
+            } else {
+                searchData = [];
+            }
+        } else {
+            searchData = [];
+        }
 
-        return res.status(200).json(filtered);
+        // Filtrer et formater les résultats
+        const formattedResults = searchData
+            .filter(result => result.symbol && result.name) // Filtrer les résultats invalides
+            .map(result => ({
+                symbol: result.symbol,
+                name: result.name,
+                exchange: result.exchangeShortName || result.exchange || '',
+                currency: result.currency || 'USD',
+                country: result.country || '',
+                type: result.type || 'stock', // stock, etf, mutual fund, etc.
+                // Score de pertinence (si disponible)
+                score: result.score || null
+            }))
+            .sort((a, b) => {
+                // Prioriser les résultats exacts
+                const aExact = a.symbol.toUpperCase() === query.toUpperCase();
+                const bExact = b.symbol.toUpperCase() === query.toUpperCase();
+                if (aExact && !bExact) return -1;
+                if (!aExact && bExact) return 1;
+                
+                // Ensuite par score (si disponible)
+                if (a.score && b.score) return b.score - a.score;
+                
+                // Sinon par ordre alphabétique
+                return a.symbol.localeCompare(b.symbol);
+            });
+
+        console.log(`✅ FMP Search found ${formattedResults.length} results for "${query}"`);
+
+        return res.status(200).json({
+            query: query,
+            results: formattedResults,
+            count: formattedResults.length
+        });
 
     } catch (error) {
         console.error('FMP Search error:', error);
         return res.status(500).json({
-            error: 'Search failed',
+            error: 'Failed to search symbols',
             message: error.message
         });
     }

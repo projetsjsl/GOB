@@ -1,6 +1,13 @@
 /**
  * API Proxy pour récupérer les données complètes d'une compagnie
- * Utilise FMP pour: profile, key-metrics, prix historiques
+ * Utilise FMP Premium pour: profile, key-metrics, prix historiques
+ * 
+ * Premium Features:
+ * - Historique étendu: 20 ans (7300 jours) au lieu de 5 ans
+ * - Key Metrics: 30 années au lieu de 20
+ * - Annual Data: 15 dernières années au lieu de 6
+ * 
+ * Date: 6 décembre 2025
  */
 
 export default async function handler(req, res) {
@@ -34,7 +41,7 @@ export default async function handler(req, res) {
     const cleanSymbol = symbol.toUpperCase();
     const FMP_BASE = 'https://financialmodelingprep.com/api/v3';
 
-    // Mapping de symboles alternatifs pour les cas spéciaux
+    // Mapping de symboles alternatifs pour les cas spéciaux (fallback si Search échoue)
     const symbolVariants = {
         'BRK.B': ['BRK-B', 'BRK.B', 'BRKB'],
         'BBD.B': ['BBD-B', 'BBD.B', 'BBD-B.TO', 'BBD.TO'],
@@ -49,6 +56,29 @@ export default async function handler(req, res) {
         'EMA': ['EMA.TO', 'EMA'],
         'CCA': ['CCA.TO', 'CCA'],
         'POW': ['POW.TO', 'POW']
+    };
+
+    // Fonction pour utiliser FMP Search Premium pour résoudre automatiquement les symboles
+    const searchSymbol = async (symbolToSearch) => {
+        try {
+            // Utiliser l'endpoint Search Premium si disponible
+            const searchRes = await fetch(`${FMP_BASE}/search?query=${encodeURIComponent(symbolToSearch)}&apikey=${FMP_KEY}&limit=10`);
+            if (searchRes.ok) {
+                const searchData = await searchRes.json();
+                if (Array.isArray(searchData) && searchData.length > 0) {
+                    // Trouver le meilleur match (exact ou le premier résultat)
+                    const exactMatch = searchData.find(r => r.symbol.toUpperCase() === symbolToSearch.toUpperCase());
+                    const bestMatch = exactMatch || searchData[0];
+                    if (bestMatch && bestMatch.symbol) {
+                        console.log(`✅ FMP Search found "${bestMatch.symbol}" for query "${symbolToSearch}"`);
+                        return bestMatch.symbol;
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn(`⚠️ FMP Search failed for ${symbolToSearch}, using fallback:`, error.message);
+        }
+        return null;
     };
 
     // Fonction pour essayer plusieurs variantes de symboles
@@ -107,9 +137,13 @@ export default async function handler(req, res) {
     };
 
     try {
-        // 1. Essayer d'abord le symbole original
-        let profileResult = await tryFetchProfile(cleanSymbol);
-        let usedSymbol = cleanSymbol;
+        // 0. Premium: Utiliser FMP Search pour résoudre automatiquement le symbole
+        let resolvedSymbol = await searchSymbol(cleanSymbol);
+        let searchSymbolToTry = resolvedSymbol || cleanSymbol;
+
+        // 1. Essayer d'abord le symbole résolu par Search (ou original)
+        let profileResult = await tryFetchProfile(searchSymbolToTry);
+        let usedSymbol = searchSymbolToTry;
 
         // 2. Si échec et qu'on a des variantes, les essayer
         if (!profileResult && symbolVariants[cleanSymbol]) {
