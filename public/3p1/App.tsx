@@ -119,22 +119,51 @@ export default function App() {
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
-                    setLibrary(parsed);
-                    if (Object.keys(parsed).length > 0) {
-                        setActiveId(Object.keys(parsed)[0]);
+                    
+                    // NETTOYER LES FONDS MUTUELS : Supprimer automatiquement les fonds mutuels existants
+                    const cleaned: Record<string, AnalysisProfile> = {};
+                    const removedMutualFunds: string[] = [];
+                    
+                    for (const [symbol, profile] of Object.entries(parsed)) {
+                        const companyName = (profile as AnalysisProfile)?.info?.name || '';
+                        if (isMutualFund(symbol, companyName)) {
+                            removedMutualFunds.push(symbol);
+                            console.warn(`⚠️ ${symbol}: Fonds mutuel détecté dans la library - suppression automatique`);
+                        } else {
+                            cleaned[symbol] = profile as AnalysisProfile;
+                        }
+                    }
+                    
+                    if (removedMutualFunds.length > 0) {
+                        console.log(`🧹 ${removedMutualFunds.length} fonds mutuel(s) supprimé(s) automatiquement: ${removedMutualFunds.join(', ')}`);
+                        // Sauvegarder la library nettoyée
+                        try {
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(cleaned));
+                        } catch (e) {
+                            console.warn('Failed to save cleaned library:', e);
+                        }
+                    }
+                    
+                    if (Object.keys(cleaned).length > 0) {
+                        setLibrary(cleaned);
+                        setActiveId(Object.keys(cleaned)[0]);
                     } else {
                         setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
+                        setActiveId(DEFAULT_PROFILE.id);
                     }
                 } catch (e) {
                     console.error("Failed to parse profiles from localStorage", e);
                     setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
+                    setActiveId(DEFAULT_PROFILE.id);
                 }
             } else {
                 setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
+                setActiveId(DEFAULT_PROFILE.id);
             }
         } catch (e) {
             console.warn("LocalStorage access failed", e);
             setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
+            setActiveId(DEFAULT_PROFILE.id);
         }
         setIsInitialized(true);
     }, []);
@@ -190,7 +219,16 @@ export default function App() {
                     const existingSymbols = new Set(Object.keys(prev));
                     newTickers = result.tickers.filter(t => {
                         const symbol = t.ticker.toUpperCase();
-                        return !existingSymbols.has(symbol);
+                        // Exclure si déjà dans library
+                        if (existingSymbols.has(symbol)) {
+                            return false;
+                        }
+                        // Exclure les fonds mutuels
+                        if (isMutualFund(symbol, t.company_name)) {
+                            console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - exclu du chargement automatique`);
+                            return false;
+                        }
+                        return true;
                     });
 
                     const updated = { ...prev };
@@ -1648,9 +1686,19 @@ export default function App() {
             });
 
             // Charger les données FMP pour les nouveaux tickers en arrière-plan
+            // Exclure les fonds mutuels
             const newTickers = result.tickers.filter(t => {
                 const symbol = t.ticker.toUpperCase();
-                return !library[symbol];
+                // Exclure si déjà dans library
+                if (library[symbol]) {
+                    return false;
+                }
+                // Exclure les fonds mutuels
+                if (isMutualFund(symbol, t.company_name)) {
+                    console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - exclu de la synchronisation`);
+                    return false;
+                }
+                return true;
             });
 
             if (newTickers.length > 0) {
