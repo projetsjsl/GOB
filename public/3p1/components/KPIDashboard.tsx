@@ -3,7 +3,7 @@ import { StarIcon, EyeIcon } from '@heroicons/react/24/solid';
 import { AnalysisProfile } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
 import { formatCurrency, formatPercent } from '../utils/calculations';
-import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon, ExclamationCircleIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon, ExclamationCircleIcon, ChevronDownIcon, ChevronUpIcon, MagnifyingGlassPlusIcon, MagnifyingGlassMinusIcon, ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
 import { listSnapshots } from '../services/snapshotApi';
 
 interface KPIDashboardProps {
@@ -23,6 +23,18 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   const [matrixView, setMatrixView] = useState<'grid' | 'list' | 'compact'>('grid');
   const [approvedVersions, setApprovedVersions] = useState<Set<string>>(new Set());
   const [isLoadingApprovedVersions, setIsLoadingApprovedVersions] = useState(false);
+  
+  // États pour zoom et pan - Graphique JPEGY
+  const [zoomJPEGY, setZoomJPEGY] = useState(1);
+  const [panJPEGY, setPanJPEGY] = useState({ x: 0, y: 0 });
+  const [isPanningJPEGY, setIsPanningJPEGY] = useState(false);
+  const [panStartJPEGY, setPanStartJPEGY] = useState({ x: 0, y: 0 });
+  
+  // États pour zoom et pan - Graphique Ratio 3:1
+  const [zoomRatio31, setZoomRatio31] = useState(1);
+  const [panRatio31, setPanRatio31] = useState({ x: 0, y: 0 });
+  const [isPanningRatio31, setIsPanningRatio31] = useState(false);
+  const [panStartRatio31, setPanStartRatio31] = useState({ x: 0, y: 0 });
   
   // États pour gérer la visibilité des sections (collapse/expand)
   const [sectionsVisibility, setSectionsVisibility] = useState<Record<string, boolean>>({
@@ -1479,8 +1491,43 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
               )}
             </button>
           </div>
-          <div className="text-xs text-gray-500">
-            {filteredMetrics.length} titre(s) affiché(s)
+          <div className="flex items-center gap-2">
+            <div className="text-xs text-gray-500">
+              {filteredMetrics.length} titre(s) affiché(s)
+            </div>
+            {/* Contrôles de zoom et pan */}
+            <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1 bg-white">
+              <button
+                onClick={() => {
+                  setZoomJPEGY(prev => Math.min(prev * 1.2, 5));
+                  setPanJPEGY({ x: 0, y: 0 });
+                }}
+                className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
+                title="Zoomer (x1.2)"
+              >
+                <MagnifyingGlassPlusIcon className="w-4 h-4 text-gray-600" />
+              </button>
+              <button
+                onClick={() => {
+                  setZoomJPEGY(prev => Math.max(prev / 1.2, 0.5));
+                  setPanJPEGY({ x: 0, y: 0 });
+                }}
+                className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
+                title="Dézoomer (÷1.2)"
+              >
+                <MagnifyingGlassMinusIcon className="w-4 h-4 text-gray-600" />
+              </button>
+              <button
+                onClick={() => {
+                  setZoomJPEGY(1);
+                  setPanJPEGY({ x: 0, y: 0 });
+                }}
+                className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
+                title="Réinitialiser la vue"
+              >
+                <ArrowsPointingOutIcon className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
           </div>
         </div>
         {sectionsVisibility.scatterPlot && (
@@ -1492,7 +1539,47 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
         ) : (
           <div className="overflow-x-auto bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg">
             <div className="min-w-[600px] sm:min-w-[700px] md:min-w-[800px]">
-              <svg width={chartWidth} height={chartHeight} className="border border-gray-300 rounded bg-white w-full max-w-full" viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="xMidYMid meet">
+              <svg 
+                width={chartWidth} 
+                height={chartHeight} 
+                className="border border-gray-300 rounded bg-white w-full max-w-full cursor-move" 
+                viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
+                preserveAspectRatio="xMidYMid meet"
+                onWheel={(e) => {
+                  e.preventDefault();
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const mouseX = e.clientX - rect.left;
+                  const mouseY = e.clientY - rect.top;
+                  const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                  const newZoom = Math.max(0.5, Math.min(zoomJPEGY * delta, 5));
+                  const zoomFactor = newZoom / zoomJPEGY;
+                  setPanJPEGY(prev => ({
+                    x: mouseX - (mouseX - prev.x) * zoomFactor,
+                    y: mouseY - (mouseY - prev.y) * zoomFactor
+                  }));
+                  setZoomJPEGY(newZoom);
+                }}
+                onMouseDown={(e) => {
+                  if (e.button === 0 && !e.target || (e.target as Element).tagName !== 'circle') { // Clic gauche seulement, pas sur un point
+                    setIsPanningJPEGY(true);
+                    setPanStartJPEGY({ 
+                      x: e.clientX - panJPEGY.x, 
+                      y: e.clientY - panJPEGY.y 
+                    });
+                  }
+                }}
+                onMouseMove={(e) => {
+                  if (isPanningJPEGY) {
+                    setPanJPEGY({
+                      x: e.clientX - panStartJPEGY.x,
+                      y: e.clientY - panStartJPEGY.y
+                    });
+                  }
+                }}
+                onMouseUp={() => setIsPanningJPEGY(false)}
+                onMouseLeave={() => setIsPanningJPEGY(false)}
+              >
+                <g transform={`translate(${panJPEGY.x}, ${panJPEGY.y}) scale(${zoomJPEGY})`}>
                 {/* Grille de fond */}
               {xTicks.map((tick, i) => (
                 <line
@@ -1672,6 +1759,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                 })
                 .filter(Boolean) // Retirer les null
               }
+                </g>
               </svg>
             </div>
             {/* Note explicative JPEGY sous le graphique */}
@@ -1706,8 +1794,41 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
               )}
             </button>
           </div>
-          <div className="text-xs text-gray-500">
-            {filteredMetrics.length} titre(s) affiché(s)
+          <div className="flex items-center gap-2">
+            <div className="text-xs text-gray-500">
+              {filteredMetrics.length} titre(s) affiché(s)
+            </div>
+            {/* Contrôles de zoom et pan */}
+            <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1 bg-white">
+              <button
+                onClick={() => {
+                  setZoomRatio31(prev => Math.min(prev * 1.2, 5));
+                }}
+                className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
+                title="Zoomer (x1.2)\n\nUtilisez aussi la molette de la souris pour zoomer vers le point de la souris."
+              >
+                <MagnifyingGlassPlusIcon className="w-4 h-4 text-gray-600" />
+              </button>
+              <button
+                onClick={() => {
+                  setZoomRatio31(prev => Math.max(prev / 1.2, 0.5));
+                }}
+                className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
+                title="Dézoomer (÷1.2)\n\nUtilisez aussi la molette de la souris pour dézoomer."
+              >
+                <MagnifyingGlassMinusIcon className="w-4 h-4 text-gray-600" />
+              </button>
+              <button
+                onClick={() => {
+                  setZoomRatio31(1);
+                  setPanRatio31({ x: 0, y: 0 });
+                }}
+                className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
+                title="Réinitialiser la vue"
+              >
+                <ArrowsPointingOutIcon className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
           </div>
         </div>
         {sectionsVisibility.scatterPlotRatio31 && (
@@ -1767,7 +1888,47 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                 }
                 
                 return (
-                  <svg width={chartWidth} height={chartHeight} className="border border-gray-300 rounded bg-white w-full max-w-full" viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="xMidYMid meet">
+                  <svg 
+                    width={chartWidth} 
+                    height={chartHeight} 
+                    className="border border-gray-300 rounded bg-white w-full max-w-full cursor-move" 
+                    viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
+                    preserveAspectRatio="xMidYMid meet"
+                    onWheel={(e) => {
+                      e.preventDefault();
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const mouseX = e.clientX - rect.left;
+                      const mouseY = e.clientY - rect.top;
+                      const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                      const newZoom = Math.max(0.5, Math.min(zoomRatio31 * delta, 5));
+                      const zoomFactor = newZoom / zoomRatio31;
+                      setPanRatio31(prev => ({
+                        x: mouseX - (mouseX - prev.x) * zoomFactor,
+                        y: mouseY - (mouseY - prev.y) * zoomFactor
+                      }));
+                      setZoomRatio31(newZoom);
+                    }}
+                    onMouseDown={(e) => {
+                      if (e.button === 0 && !e.target || (e.target as Element).tagName !== 'circle') { // Clic gauche seulement, pas sur un point
+                        setIsPanningRatio31(true);
+                        setPanStartRatio31({ 
+                          x: e.clientX - panRatio31.x, 
+                          y: e.clientY - panRatio31.y 
+                        });
+                      }
+                    }}
+                    onMouseMove={(e) => {
+                      if (isPanningRatio31) {
+                        setPanRatio31({
+                          x: e.clientX - panStartRatio31.x,
+                          y: e.clientY - panStartRatio31.y
+                        });
+                      }
+                    }}
+                    onMouseUp={() => setIsPanningRatio31(false)}
+                    onMouseLeave={() => setIsPanningRatio31(false)}
+                  >
+                    <g transform={`translate(${panRatio31.x}, ${panRatio31.y}) scale(${zoomRatio31})`}>
                     {/* Grille de fond */}
                     {xTicksRatio31.map((tick, i) => (
                       <line
@@ -1957,6 +2118,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       })
                       .filter(Boolean) // Retirer les null
                     }
+                    </g>
                   </svg>
                 );
               })()}
