@@ -13,18 +13,24 @@
             box-sizing: border-box;
         }
 
-        html, body {
+        html {
             width: 100%;
             height: 100%;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
             background: #0a0e27 !important;
             color: #e0e0e0 !important;
             overflow-x: hidden;
-            /* Isolation complète des styles du parent */
-            all: initial;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            /* Isolation visuelle pour éviter les conflits avec le dashboard parent */
+            isolation: isolate;
         }
 
         .terminal-container {
