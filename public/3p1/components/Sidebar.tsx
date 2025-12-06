@@ -14,6 +14,7 @@ import {
 import { AnalysisProfile, Recommendation } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
 import { VersionHistory } from './VersionHistory';
+import { createLogoLoadHandler } from '../utils/logoUtils';
 
 interface SidebarProps {
   profiles: AnalysisProfile[];

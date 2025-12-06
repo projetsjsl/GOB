@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ouellet-Bolduc - Démo AR interactive</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+</head>
+<body>
+  <header class="nav">
+    <div class="brand">
+      <div class="badge">AR</div>
+      <div>
+        <div class="brand-line">Équipe Ouellet-Bolduc</div>
+        <div class="brand-sub">Desjardins | VMD</div>
+      </div>
+    </div>
+    <nav>
+      <a href="#hero" data-scroll>Accueil</a>
+      <a href="#ar-demo" data-scroll>Démo AR</a>
+      <a href="#team" data-scroll>Équipe</a>
+      <a href="#partage" data-scroll>Partage</a>
+    </nav>
+    <div class="cta-actions">
+      <a class="ghost" href="https://www.desjardins.com/qc/fr/nous-trouver/equipes-vmd/ouellet-bolduc.html" target="_blank" rel="noopener">Page officielle</a>
+      <a class="primary" id="cta-demo-top" href="#ar-demo" data-scroll>Tester maintenant</a>
+    </div>
+  </header>
+
+  <main>
+    <section id="hero" class="hero">
+      <div class="hero-text">
+        <p class="kicker">Démo immersive</p>
+        <h1>Présentez l’équipe Ouellet-Bolduc en réalité augmentée</h1>
+        <p class="lead">
+          Lancez la démo AR sur iPhone, faites tourner le modèle 3D en direct, puis partagez instantanément via QR code pour engager votre auditoire.
+        </p>
+        <div class="hero-cta">
+          <a class="primary large" id="demo-ar-btn" href="#ar-demo" data-scroll>Démo AR immédiate</a>
+          <a class="ghost large" href="#partage" data-scroll>Partager avec le QR</a>
+        </div>
+        <div class="chips">
+          <span>AR Quick Look (iPhone)</span>
+          <span>Viewer 3D interactif</span>
+          <span>Navigation fluide</span>
+          <span>QR prêt à projeter</span>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="glow"></div>
+        <div class="stat-card">
+          <p class="label">Démo prête</p>
+          <p class="value">90s</p>
+          <p class="hint">pour convaincre</p>
+        </div>
+        <div class="stat-card">
+          <p class="label">Partages</p>
+          <p class="value">Scan & go</p>
+          <p class="hint">QR code intégré</p>
+        </div>
+        <div class="stat-card highlight">
+          <p class="label">Focus</p>
+          <p class="value">Équipe</p>
+          <p class="hint">Ouellet-Bolduc</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="ar-demo" class="ar-section">
+      <div class="section-head">
+        <div>
+          <p class="kicker">Interaction</p>
+          <h2>Viewer 3D + bouton “Démo AR”</h2>
+          <p class="lead">Touchez pour faire pivoter. Sur iPhone, appuyez sur “Démo AR” pour ouvrir directement en réalité augmentée.</p>
+        </div>
+        <div class="actions">
+          <a id="ar-launch" class="primary" rel="ar" data-ar-url target="_blank">Démo AR (iPhone)</a>
+          <button id="share-native" class="ghost">Partager sur mobile</button>
+        </div>
+      </div>
+      <div class="ar-grid">
+        <div class="viewer-card">
+          <model-viewer
+            id="ar-viewer"
+            src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
+            ios-src="https://modelviewer.dev/shared-assets/models/Astronaut.usdz"
+            ar
+            ar-modes="webxr scene-viewer quick-look"
+            camera-controls
+            auto-rotate
+            shadow-intensity="0.8"
+            exposure="1.1"
+            environment-image="https://modelviewer.dev/shared-assets/environments/studio_small.hdr"
+            poster="https://modelviewer.dev/shared-assets/models/Astronaut.webp"
+            alt="Modèle 3D pour la présentation Ouellet-Bolduc"
+          ></model-viewer>
+          <div class="viewer-hint">Pincez pour zoomer, touchez pour orienter</div>
+        </div>
+        <div class="checklist">
+          <div class="card">
+            <p class="label">Mode présentation</p>
+            <p>Préparez votre allocution: déclenchez l’AR, puis retournez au viewer 3D pour commenter.</p>
+          </div>
+          <div class="card">
+            <p class="label">Mobile first</p>
+            <p>Optimisé pour iPhone: bouton Quick Look, instructions courtes, CTA surélevés.</p>
+          </div>
+          <div class="card">
+            <p class="label">Lien officiel</p>
+            <p>Synchronisé avec la page Desjardins pour rester aligné sur les contenus clés.</p>
+            <a class="text-link" href="https://www.desjardins.com/qc/fr/nous-trouver/equipes-vmd/ouellet-bolduc.html" target="_blank" rel="noopener">Consulter la page</a>
+          </div>
+        </div>
+      </div>
+      <div class="ios-note" id="ios-note">iPhone: si Safari vous demande l’autorisation, acceptez pour lancer Quick Look.</div>
+    </section>
+
+    <section id="team" class="team">
+      <div class="section-head">
+        <div>
+          <p class="kicker">L’équipe</p>
+          <h2>Visages, rôles et points forts</h2>
+          <p class="lead">Mettez en avant les personnes derrière l’expertise Ouellet-Bolduc.</p>
+        </div>
+      </div>
+      <div class="team-grid">
+        <article class="person">
+          <div class="avatar">OB</div>
+          <h3>Équipe Ouellet-Bolduc</h3>
+          <p class="role">Conseillers en gestion de patrimoine</p>
+          <p class="bio">Approche humaine, rigueur financière, proximité client.</p>
+        </article>
+        <article class="person">
+          <div class="avatar">JG</div>
+          <h3>Julie G.</h3>
+          <p class="role">Planification & expérience client</p>
+          <p class="bio">Structure les rencontres, anticipe les questions clés.</p>
+        </article>
+        <article class="person">
+          <div class="avatar">MB</div>
+          <h3>Marc B.</h3>
+          <p class="role">Stratégies d’investissement</p>
+          <p class="bio">Démontre les scénarios avec supports visuels et AR.</p>
+        </article>
+        <article class="person">
+          <div class="avatar">AA</div>
+          <h3>Support</h3>
+          <p class="role">Service et suivi</p>
+          <p class="bio">Assure la continuité après la présentation.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="partage" class="share">
+      <div class="section-head">
+        <div>
+          <p class="kicker">Partage instantané</p>
+          <h2>QR code prêt pour l’écran géant</h2>
+          <p class="lead">Affichez le QR à l’écran ou envoyez le lien. Le bouton “Démo AR” reste accessible depuis l’URL scannée.</p>
+        </div>
+        <div class="actions">
+          <button id="copy-link" class="ghost">Copier le lien</button>
+        </div>
+      </div>
+      <div class="share-grid">
+        <div class="qr-card">
+          <img id="qr-image" alt="QR code pour la démo AR">
+          <div class="qr-meta">
+            <p class="label">Scannez pour ouvrir</p>
+            <p id="share-url" class="mono" aria-live="polite"></p>
+          </div>
+        </div>
+        <div class="share-steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div>
+              <p class="label">Projeté</p>
+              <p>Affichez le QR sur grand écran pendant la conférence.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div>
+              <p class="label">Scanné</p>
+              <p>Les invités ouvrent la page, tapent “Démo AR” et placent le modèle dans l’espace.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div>
+              <p class="label">Engagé</p>
+              <p>Ils explorent le modèle 3D et retrouvent les infos clés de l’équipe.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div>
+      <p class="label">Contact rapide</p>
+      <p>Prêt pour la prise de parole. Démo AR, QR code et navigation optimisée en une seule page.</p>
+    </div>
+    <div class="footer-actions">
+      <a class="primary" href="#ar-demo" data-scroll>Relancer la démo</a>
+      <a class="ghost" href="https://www.desjardins.com/qc/fr/nous-trouver/equipes-vmd/ouellet-bolduc.html" target="_blank" rel="noopener">Page Desjardins</a>
+    </div>
+  </footer>
+
+  <div class="floating-cta">
+    <button id="floating-demo" class="primary">Démo AR iPhone</button>
+    <button id="floating-qr" class="ghost">Afficher le QR</button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
