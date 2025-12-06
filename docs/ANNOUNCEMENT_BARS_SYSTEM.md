@@ -156,3 +156,6 @@ window.location.reload();
 - Google Search Retrieval: https://ai.google.dev/gemini-api/docs/google-search-retrieval
 
 
+
+
+

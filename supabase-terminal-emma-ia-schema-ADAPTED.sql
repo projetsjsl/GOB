@@ -172,8 +172,7 @@ CREATE TABLE IF NOT EXISTS kpi_variables (
     transform JSONB,
     weight NUMERIC DEFAULT 1.0,
     order_index INTEGER,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(kpi_id, variable_name)
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_kpi_variables_kpi_id ON kpi_variables(kpi_id);
@@ -219,7 +218,6 @@ DO $$
 DECLARE
     watchlists_exists BOOLEAN;
     watchlists_id_type TEXT;
-    watchlists_user_id_type TEXT;
 BEGIN
     SELECT EXISTS (
         SELECT 1 FROM information_schema.tables 
@@ -246,13 +244,7 @@ BEGIN
           AND table_name = 'watchlists' 
           AND column_name = 'id';
 
-        SELECT data_type INTO watchlists_user_id_type
-        FROM information_schema.columns
-        WHERE table_schema = 'public' 
-          AND table_name = 'watchlists' 
-          AND column_name = 'user_id';
-
-        RAISE NOTICE 'ℹ️ Table watchlists existe avec id de type % et user_id de type %', watchlists_id_type, watchlists_user_id_type;
+        RAISE NOTICE 'ℹ️ Table watchlists existe avec id de type %', watchlists_id_type;
     END IF;
 END $$;
 
@@ -277,10 +269,9 @@ BEGIN
 
     IF NOT watchlist_instruments_exists THEN
         IF watchlists_id_type = 'bigint' OR watchlists_id_type = 'integer' THEN
-            -- BIGSERIAL/SERIAL inclut déjà DEFAULT, ne pas le spécifier deux fois
             EXECUTE format('
                 CREATE TABLE watchlist_instruments (
-                    id %s PRIMARY KEY,
+                    id %s PRIMARY KEY DEFAULT nextval(''watchlist_instruments_id_seq''::regclass),
                     watchlist_id %s NOT NULL REFERENCES watchlists(id) ON DELETE CASCADE,
                     symbol TEXT NOT NULL,
                     position INTEGER DEFAULT 0,
@@ -441,137 +432,41 @@ DROP POLICY IF EXISTS "KPI values are viewable by everyone" ON kpi_values;
 CREATE POLICY "KPI values are viewable by everyone" ON kpi_values
     FOR SELECT USING (true);
 
--- Politiques RLS pour watchlists (adapter selon le type de user_id et colonnes existantes)
-DO $$
-DECLARE
-    user_id_type TEXT;
-    has_is_public BOOLEAN;
-    policy_condition TEXT;
-BEGIN
-    -- Détecter le type de user_id
-    SELECT data_type INTO user_id_type
-    FROM information_schema.columns
-    WHERE table_schema = 'public' 
-      AND table_name = 'watchlists' 
-      AND column_name = 'user_id';
+DROP POLICY IF EXISTS "Users can view their own watchlists" ON watchlists;
+CREATE POLICY "Users can view their own watchlists" ON watchlists
+    FOR SELECT USING (auth.uid() = user_id OR is_public = true);
 
-    -- Vérifier si is_public existe
-    SELECT EXISTS (
-        SELECT 1 FROM information_schema.columns
-        WHERE table_schema = 'public' 
-          AND table_name = 'watchlists' 
-          AND column_name = 'is_public'
-    ) INTO has_is_public;
+DROP POLICY IF EXISTS "Users can insert their own watchlists" ON watchlists;
+CREATE POLICY "Users can insert their own watchlists" ON watchlists
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
 
-    -- Construire la condition selon le type de user_id
-    IF user_id_type = 'text' OR user_id_type = 'character varying' THEN
-        IF has_is_public THEN
-            policy_condition := 'auth.uid()::text = user_id OR is_public = true';
-        ELSE
-            policy_condition := 'auth.uid()::text = user_id';
-        END IF;
-    ELSE
-        IF has_is_public THEN
-            policy_condition := 'auth.uid() = user_id OR is_public = true';
-        ELSE
-            policy_condition := 'auth.uid() = user_id';
-        END IF;
-    END IF;
+DROP POLICY IF EXISTS "Users can update their own watchlists" ON watchlists;
+CREATE POLICY "Users can update their own watchlists" ON watchlists
+    FOR UPDATE USING (auth.uid() = user_id);
 
-    -- Créer les politiques avec la condition adaptée
-    DROP POLICY IF EXISTS "Users can view their own watchlists" ON watchlists;
-    EXECUTE format('CREATE POLICY "Users can view their own watchlists" ON watchlists FOR SELECT USING (%s)', policy_condition);
+DROP POLICY IF EXISTS "Users can delete their own watchlists" ON watchlists;
+CREATE POLICY "Users can delete their own watchlists" ON watchlists
+    FOR DELETE USING (auth.uid() = user_id);
 
-    IF user_id_type = 'text' OR user_id_type = 'character varying' THEN
-        DROP POLICY IF EXISTS "Users can insert their own watchlists" ON watchlists;
-        CREATE POLICY "Users can insert their own watchlists" ON watchlists
-            FOR INSERT WITH CHECK (auth.uid()::text = user_id);
+DROP POLICY IF EXISTS "Users can view instruments in their watchlists" ON watchlist_instruments;
+CREATE POLICY "Users can view instruments in their watchlists" ON watchlist_instruments
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM watchlists
+            WHERE watchlists.id = watchlist_instruments.watchlist_id
+            AND (watchlists.user_id = auth.uid() OR watchlists.is_public = true)
+        )
+    );
 
-        DROP POLICY IF EXISTS "Users can update their own watchlists" ON watchlists;
-        CREATE POLICY "Users can update their own watchlists" ON watchlists
-            FOR UPDATE USING (auth.uid()::text = user_id);
-
-        DROP POLICY IF EXISTS "Users can delete their own watchlists" ON watchlists;
-        CREATE POLICY "Users can delete their own watchlists" ON watchlists
-            FOR DELETE USING (auth.uid()::text = user_id);
-    ELSE
-        DROP POLICY IF EXISTS "Users can insert their own watchlists" ON watchlists;
-        CREATE POLICY "Users can insert their own watchlists" ON watchlists
-            FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-        DROP POLICY IF EXISTS "Users can update their own watchlists" ON watchlists;
-        CREATE POLICY "Users can update their own watchlists" ON watchlists
-            FOR UPDATE USING (auth.uid() = user_id);
-
-        DROP POLICY IF EXISTS "Users can delete their own watchlists" ON watchlists;
-        CREATE POLICY "Users can delete their own watchlists" ON watchlists
-            FOR DELETE USING (auth.uid() = user_id);
-    END IF;
-END $$;
-
--- Politiques RLS pour watchlist_instruments (adapter selon le type de user_id et colonnes existantes)
-DO $$
-DECLARE
-    user_id_type TEXT;
-    has_is_public BOOLEAN;
-    view_condition TEXT;
-BEGIN
-    -- Détecter le type de user_id
-    SELECT data_type INTO user_id_type
-    FROM information_schema.columns
-    WHERE table_schema = 'public' 
-      AND table_name = 'watchlists' 
-      AND column_name = 'user_id';
-
-    -- Vérifier si is_public existe
-    SELECT EXISTS (
-        SELECT 1 FROM information_schema.columns
-        WHERE table_schema = 'public' 
-          AND table_name = 'watchlists' 
-          AND column_name = 'is_public'
-    ) INTO has_is_public;
-
-    -- Construire la condition pour la vue
-    IF user_id_type = 'text' OR user_id_type = 'character varying' THEN
-        IF has_is_public THEN
-            view_condition := 'watchlists.user_id = auth.uid()::text OR watchlists.is_public = true';
-        ELSE
-            view_condition := 'watchlists.user_id = auth.uid()::text';
-        END IF;
-    ELSE
-        IF has_is_public THEN
-            view_condition := 'watchlists.user_id = auth.uid() OR watchlists.is_public = true';
-        ELSE
-            view_condition := 'watchlists.user_id = auth.uid()';
-        END IF;
-    END IF;
-
-    -- Créer les politiques
-    DROP POLICY IF EXISTS "Users can view instruments in their watchlists" ON watchlist_instruments;
-    EXECUTE format('CREATE POLICY "Users can view instruments in their watchlists" ON watchlist_instruments FOR SELECT USING (EXISTS (SELECT 1 FROM watchlists WHERE watchlists.id = watchlist_instruments.watchlist_id AND (%s)))', view_condition);
-
-    IF user_id_type = 'text' OR user_id_type = 'character varying' THEN
-        DROP POLICY IF EXISTS "Users can manage instruments in their watchlists" ON watchlist_instruments;
-        CREATE POLICY "Users can manage instruments in their watchlists" ON watchlist_instruments
-            FOR ALL USING (
-                EXISTS (
-                    SELECT 1 FROM watchlists
-                    WHERE watchlists.id = watchlist_instruments.watchlist_id
-                    AND watchlists.user_id = auth.uid()::text
-                )
-            );
-    ELSE
-        DROP POLICY IF EXISTS "Users can manage instruments in their watchlists" ON watchlist_instruments;
-        CREATE POLICY "Users can manage instruments in their watchlists" ON watchlist_instruments
-            FOR ALL USING (
-                EXISTS (
-                    SELECT 1 FROM watchlists
-                    WHERE watchlists.id = watchlist_instruments.watchlist_id
-                    AND watchlists.user_id = auth.uid()
-                )
-            );
-    END IF;
-END $$;
+DROP POLICY IF EXISTS "Users can manage instruments in their watchlists" ON watchlist_instruments;
+CREATE POLICY "Users can manage instruments in their watchlists" ON watchlist_instruments
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM watchlists
+            WHERE watchlists.id = watchlist_instruments.watchlist_id
+            AND watchlists.user_id = auth.uid()
+        )
+    );
 
 DROP POLICY IF EXISTS "Market data is viewable by everyone" ON market_indices;
 CREATE POLICY "Market data is viewable by everyone" ON market_indices
@@ -627,47 +522,21 @@ LEFT JOIN LATERAL (
     ORDER BY metric_code, as_of DESC
 ) m ON true;
 
--- Vue: watchlists avec instruments (adaptée aux colonnes existantes)
-DO $$
-DECLARE
-    has_name BOOLEAN;
-    has_description BOOLEAN;
-    view_sql TEXT;
-BEGIN
-    -- Vérifier quelles colonnes existent
-    SELECT EXISTS (
-        SELECT 1 FROM information_schema.columns
-        WHERE table_schema = 'public' 
-          AND table_name = 'watchlists' 
-          AND column_name = 'name'
-    ) INTO has_name;
-
-    SELECT EXISTS (
-        SELECT 1 FROM information_schema.columns
-        WHERE table_schema = 'public' 
-          AND table_name = 'watchlists' 
-          AND column_name = 'description'
-    ) INTO has_description;
-
-    -- Construire la vue selon les colonnes disponibles
-    view_sql := 'CREATE OR REPLACE VIEW watchlists_with_instruments AS SELECT w.id as watchlist_id, w.user_id';
-
-    IF has_name THEN
-        view_sql := view_sql || ', w.name as watchlist_name';
-    ELSE
-        view_sql := view_sql || ', CAST(NULL AS TEXT) as watchlist_name';
-    END IF;
-
-    IF has_description THEN
-        view_sql := view_sql || ', w.description';
-    ELSE
-        view_sql := view_sql || ', CAST(NULL AS TEXT) as description';
-    END IF;
-
-    view_sql := view_sql || ', wi.symbol, wi.position, i.name as instrument_name, i.sector, i.industry FROM watchlists w JOIN watchlist_instruments wi ON w.id = wi.watchlist_id JOIN instruments i ON wi.symbol = i.symbol ORDER BY w.id, wi.position';
-
-    EXECUTE view_sql;
-END $$;
+CREATE OR REPLACE VIEW watchlists_with_instruments AS
+SELECT 
+    w.id as watchlist_id,
+    w.user_id,
+    w.name as watchlist_name,
+    w.description,
+    wi.symbol,
+    wi.position,
+    i.name as instrument_name,
+    i.sector,
+    i.industry
+FROM watchlists w
+JOIN watchlist_instruments wi ON w.id = wi.watchlist_id
+JOIN instruments i ON wi.symbol = i.symbol
+ORDER BY w.id, wi.position;
 
 -- ============================================
 -- VÉRIFICATION FINALE

@@ -142,3 +142,6 @@ checkExistingTickers()
         process.exit(1);
     });
 
+
+
+

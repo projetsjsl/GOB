@@ -229,3 +229,6 @@ Tous les scripts fonctionnent ensemble pour :
 3. Forcer les mises à jour
 4. Ajouter les boutons de contrôle
 
+
+
+

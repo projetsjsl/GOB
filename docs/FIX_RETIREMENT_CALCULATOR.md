@@ -143,3 +143,6 @@ Si les problèmes persistent après avoir inclus ces fichiers :
 3. Vérifiez que les chemins des fichiers sont corrects
 4. Essayez de forcer une correction manuelle avec `window.fixRetirementCalculator()`
 
+
+
+

@@ -271,3 +271,6 @@ Pour actualiser automatiquement toutes les heures :
 - Actualiser le graphique : Clic droit > Actualiser
 
 
+
+
+

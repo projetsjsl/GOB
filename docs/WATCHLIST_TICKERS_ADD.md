@@ -112,3 +112,6 @@ ORDER BY source;
 - WestJet (WJA) est marqué comme `is_active=false` car elle est delistée
 - Tous les tickers sont ajoutés avec `priority=1` par défaut
 
+
+
+

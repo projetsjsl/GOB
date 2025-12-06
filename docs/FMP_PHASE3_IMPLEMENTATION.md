@@ -274,3 +274,6 @@ curl "https://gobapps.com/api/fmp-company-data?symbol=TECK.B"
 **Dernière mise à jour:** 6 décembre 2025  
 **Statut:** ✅ Implémentée et prête pour tests
 
+
+
+

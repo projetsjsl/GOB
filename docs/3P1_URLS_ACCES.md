@@ -109,3 +109,6 @@ public/3p1/
 - [ ] Console du navigateur vérifiée (pas d'erreurs)
 - [ ] APIs accessibles (vérifier Network tab)
 
+
+
+

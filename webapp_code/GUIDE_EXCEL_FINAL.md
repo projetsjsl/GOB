@@ -193,3 +193,6 @@ Votre classeur Excel est maintenant connecté à l'API Vercel et peut récupére
 **Rappel :** Les données sont mises en cache pendant 60 secondes pour respecter les limites de l'API Alpha Vantage. Vous pouvez mettre à jour toutes les minutes sans problème.
 
 
+
+
+

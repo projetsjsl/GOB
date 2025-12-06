@@ -175,3 +175,6 @@ setInterval(() => {
 - Utilisez-le seulement si nécessaire
 - Désactivez-le quand vous n'en avez plus besoin
 
+
+
+

@@ -142,11 +142,27 @@ export default function App() {
     // --- LOAD TICKERS FROM SUPABASE ON INITIALIZATION ---
     const [isLoadingTickers, setIsLoadingTickers] = useState(false);
     const [tickersLoadError, setTickersLoadError] = useState<string | null>(null);
+    const hasLoadedTickersRef = useRef(false); // Flag pour éviter les chargements multiples
+    const activeIdRef = useRef(activeId); // Ref pour accéder à activeId sans dépendance
+    const supabaseTickersCacheRef = useRef<{ data: any[]; timestamp: number } | null>(null); // Cache pour éviter les appels répétés
+    const SUPABASE_CACHE_TTL = 60000; // Cache valide pendant 60 secondes
+    const isLoadingProfileRef = useRef(false); // Flag pour éviter les sauvegardes pendant le chargement d'un profil
+
+    // Mettre à jour la ref quand activeId change
+    useEffect(() => {
+        activeIdRef.current = activeId;
+    }, [activeId]);
 
     useEffect(() => {
         if (!isInitialized) return;
+        
+        // Éviter les chargements multiples
+        if (hasLoadedTickersRef.current) {
+            return;
+        }
 
         const loadTickersFromSupabase = async () => {
+            hasLoadedTickersRef.current = true; // Marquer comme chargé
             setIsLoadingTickers(true);
             setTickersLoadError(null);
 
@@ -156,18 +172,27 @@ export default function App() {
                 if (!result.success) {
                     setTickersLoadError(result.error || 'Erreur lors du chargement des tickers');
                     setIsLoadingTickers(false);
+                    hasLoadedTickersRef.current = false; // Réessayer au prochain render
                     return;
                 }
 
-                // Identifier les nouveaux tickers avant la mise à jour
-                const existingSymbols = new Set(Object.keys(library));
-                const newTickers = result.tickers.filter(t => {
-                    const symbol = t.ticker.toUpperCase();
-                    return !existingSymbols.has(symbol);
-                });
+                // Mettre à jour le cache pour handleSelectTicker
+                supabaseTickersCacheRef.current = {
+                    data: result.tickers,
+                    timestamp: Date.now()
+                };
+
+                // Identifier les nouveaux tickers AVANT la mise à jour (utiliser setLibrary avec fonction)
+                let newTickers: typeof result.tickers = [];
 
                 // Merge intelligent : ne pas écraser les profils existants
                 setLibrary(prev => {
+                    const existingSymbols = new Set(Object.keys(prev));
+                    newTickers = result.tickers.filter(t => {
+                        const symbol = t.ticker.toUpperCase();
+                        return !existingSymbols.has(symbol);
+                    });
+
                     const updated = { ...prev };
                     let newTickersCount = 0;
 
@@ -212,7 +237,7 @@ export default function App() {
                                 };
                                 
                                 // Si c'est le profil actif, mettre à jour aussi le state local
-                                if (tickerSymbol === activeId) {
+                                if (tickerSymbol === activeIdRef.current) {
                                     setInfo(updated[tickerSymbol].info);
                                 }
                             }
@@ -346,13 +371,14 @@ export default function App() {
             } catch (error: any) {
                 console.error('❌ Erreur lors du chargement des tickers:', error);
                 setTickersLoadError(error.message || 'Erreur inconnue');
+                hasLoadedTickersRef.current = false; // Réessayer au prochain render
             } finally {
                 setIsLoadingTickers(false);
             }
         };
 
         loadTickersFromSupabase();
-    }, [isInitialized]); // Seulement après l'initialisation
+    }, [isInitialized]); // Seulement après l'initialisation - pas de dépendance à library pour éviter la boucle
 
     // --- ACTIVE SESSION STATE ---
     const [data, setData] = useState<AnnualData[]>(INITIAL_DATA);
@@ -366,6 +392,9 @@ export default function App() {
         if (!isInitialized) return;
         const profile = library[activeId];
         if (profile) {
+            // Marquer comme en cours de chargement pour éviter les sauvegardes inutiles
+            isLoadingProfileRef.current = true;
+            
             setData(profile.data);
             setAssumptions({
                 ...INITIAL_ASSUMPTIONS, // ensure new fields are populated for old profiles
@@ -377,6 +406,13 @@ export default function App() {
             // Clear Undo/Redo stacks on switch
             setPastData([]);
             setFutureData([]);
+            
+            // Réinitialiser le flag après un court délai pour permettre les sauvegardes futures
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    isLoadingProfileRef.current = false;
+                });
+            });
         } else {
             // ⚠️ Profil non trouvé dans la library - données placeholder affichées
             // Afficher un avertissement si ce n'est pas le profil initial (ACN)
@@ -392,6 +428,11 @@ export default function App() {
     // Save to Library when Active State Changes (optimisé avec requestIdleCallback)
     useEffect(() => {
         if (!isInitialized) return;
+        
+        // Ne pas sauvegarder si on est en train de charger un profil
+        if (isLoadingProfileRef.current) {
+            return;
+        }
 
         // Utiliser requestIdleCallback si disponible, sinon setTimeout avec délai plus court
         const saveToStorage = () => {
@@ -1080,10 +1121,28 @@ export default function App() {
             const existingProfile = library[upperSymbol];
             
             // Vérifier et mettre à jour les métriques ValueLine depuis Supabase si disponibles
+            // Utiliser le cache pour éviter les appels répétés
             try {
-                const supabaseResult = await loadAllTickersFromSupabase();
-                if (supabaseResult.success) {
-                    const supabaseTicker = supabaseResult.tickers.find(t => t.ticker.toUpperCase() === upperSymbol);
+                let supabaseTickers: any[] = [];
+                const now = Date.now();
+                
+                // Vérifier si le cache est valide
+                if (supabaseTickersCacheRef.current && (now - supabaseTickersCacheRef.current.timestamp) < SUPABASE_CACHE_TTL) {
+                    supabaseTickers = supabaseTickersCacheRef.current.data;
+                } else {
+                    // Charger depuis Supabase et mettre à jour le cache
+                    const supabaseResult = await loadAllTickersFromSupabase();
+                    if (supabaseResult.success) {
+                        supabaseTickers = supabaseResult.tickers;
+                        supabaseTickersCacheRef.current = {
+                            data: supabaseTickers,
+                            timestamp: now
+                        };
+                    }
+                }
+                
+                if (supabaseTickers.length > 0) {
+                    const supabaseTicker = supabaseTickers.find(t => t.ticker.toUpperCase() === upperSymbol);
                     if (supabaseTicker) {
                         // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
                         // Toujours utiliser Supabase si disponible, sinon garder valeur existante

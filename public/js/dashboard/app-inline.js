@@ -24125,6 +24125,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             { id: 'assistant-vocal', label: 'Assistant', icon: 'iconoir-microphone', component: VoiceAssistantTab },
             { id: 'finvox', label: 'FinVox', icon: 'iconoir-voice-circle', component: FinVoxTab },
             { id: 'emmaia', label: 'EmmAIA', icon: 'iconoir-brain', component: EmmAIATab },
+            { id: 'terminal-emma-ia', label: 'Terminal Emma IA', icon: 'iconoir-terminal', component: (typeof window !== 'undefined' && window.TerminalEmmaIATab) ? window.TerminalEmmaIATab : () => <div className="p-4 text-center text-gray-500">Chargement du Terminal Emma IA...</div> },
             { id: 'fastgraphs', label: 'FastGraphs', icon: 'iconoir-graph-up', component: FastGraphsTab },
             { id: 'admin-jsla', label: 'Admin', icon: 'iconoir-settings', component: (typeof window !== 'undefined' && window.AdminJSLaiTab) ? window.AdminJSLaiTab : AdminJSLaiTabFallback },
             { id: 'scrapping-sa', label: 'Seeking', icon: 'iconoir-search', component: ScrappingSATab },
@@ -25214,6 +25215,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {activeTab === 'investing-calendar' && <InvestingCalendarTab />}
                     {activeTab === 'finvox' && <FinVoxTab />}
                     {activeTab === 'emmaia' && <EmmAIATab isDarkMode={isDarkMode} />}
+                    {activeTab === 'terminal-emma-ia' && window.TerminalEmmaIATab && React.createElement(window.TerminalEmmaIATab, { isDarkMode: isDarkMode })}
                     {activeTab === 'fastgraphs' && <FastGraphsTab isDarkMode={isDarkMode} />}
                     {activeTab === 'emma-config' && <EmmaConfigTab />}
                 </main>

@@ -303,3 +303,6 @@
     console.log('💡 Utilisez window.triggerRetirementCalculations() ou window.proceedRetirement()');
 })();
 
+
+
+

@@ -191,3 +191,6 @@ Si vous rencontrez des difficultés d'intégration :
 3. Adapter le code selon vos besoins spécifiques
 
 
+
+
+
