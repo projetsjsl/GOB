@@ -163,6 +163,11 @@
       "source": "/nouveauclient",
       "destination": "/nouveauclient/index.html",
       "permanent": false
+    },
+    {
+      "source": "/ar",
+      "destination": "/ouellet-bolduc-ar/index.html",
+      "permanent": false
     }
   ]
 }
