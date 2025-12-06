@@ -51,56 +51,65 @@ export const isMutualFund = (symbol: string, companyName?: string): boolean => {
   const symbolUpper = symbol.toUpperCase().trim();
   const nameUpper = (companyName || '').toUpperCase();
   
-  // Patterns de symboles de fonds mutuels communs
-  // Les fonds mutuels finissent souvent par: X, XX, IX, AX, CX, SX, etc.
-  const mutualFundSuffixes = ['X', 'XX', 'IX', 'AX', 'CX', 'SX', 'MX', 'FX'];
+  // Liste exhaustive d'actions légitimes qui finissent par X ou IX (pour éviter les faux positifs)
+  const knownStocksEndingInX = [
+    'CGNX', 'EQIX', 'GATX', 'HOLX', 'LRCX', 'NBIX', 'NFLX', 'OTEX', 'PAYX', 
+    'IDXX', 'VRTX', 'TXN', 'XOM', 'XEL', 'XPO', 'XRAY', 'XYL', 'XEC', 'XENE',
+    'AMZN', 'CMNX', 'CNX', 'DEX', 'FLEX', 'HEX', 'JXN', 'KEX', 'LEX', 'MEX',
+    'NEX', 'PEX', 'QEX', 'REX', 'SEX', 'TEX', 'UEX', 'VEX', 'WEX', 'YEX', 'ZEX'
+  ];
   
-  // Vérifier les suffixes (mais pas pour les actions normales comme X, TXN, etc.)
-  // On vérifie seulement si le symbole fait 4-6 caractères et finit par ces suffixes
-  if (symbolUpper.length >= 4 && symbolUpper.length <= 6) {
-    for (const suffix of mutualFundSuffixes) {
-      if (symbolUpper.endsWith(suffix) && symbolUpper.length > suffix.length) {
-        // Exceptions: certaines actions normales finissent par X (ex: X, TXN, XOM, etc.)
-        // On vérifie si c'est une action connue
-        const knownStocks = ['X', 'TXN', 'XOM', 'XEL', 'XPO', 'XRAY', 'XYL', 'XEC', 'XENE'];
-        if (!knownStocks.includes(symbolUpper)) {
-          return true;
-        }
-      }
-    }
+  // Si c'est une action connue, ce n'est PAS un fonds mutuel
+  if (knownStocksEndingInX.includes(symbolUpper)) {
+    return false;
   }
   
-  // Vérifier le nom de la compagnie pour des indicateurs de fonds mutuel
+  // Vérifier le nom de la compagnie pour des indicateurs de fonds mutuel (MÉTHODE PRINCIPALE)
   if (nameUpper.includes('MUTUAL FUND') || 
       nameUpper.includes('FUND TRUST') ||
       nameUpper.includes('INVESTMENT FUND') ||
       nameUpper.includes('INDEX FUND') ||
-      (nameUpper.includes('FUND') && nameUpper.includes('SERIES'))) {
+      nameUpper.includes('ETF') ||
+      (nameUpper.includes('FUND') && nameUpper.includes('SERIES')) ||
+      nameUpper.includes('VANGUARD') ||
+      nameUpper.includes('FIDELITY FUNDS') ||
+      nameUpper.includes('T. ROWE PRICE')) {
     return true;
   }
   
-  // Patterns spécifiques connus (ex: VTSAX, VFIAX, etc. - fonds Vanguard)
-  const vanguardPattern = /^V[A-Z]{3,4}X$/;
+  // Patterns spécifiques connus de fonds mutuels (Vanguard, Fidelity, etc.)
+  // VTSAX, VFIAX, VTSIX, etc. - fonds Vanguard avec pattern V + 3-4 lettres + X/IX
+  const vanguardPattern = /^V[A-Z]{3,4}[IX]$/;
   if (vanguardPattern.test(symbolUpper)) {
     return true;
   }
   
-  // Autres patterns de fonds mutuels (ex: FIDELITY, T. ROWE PRICE, etc.)
-  const fundPatterns = [
-    /^[A-Z]{4,5}X$/,  // 4-5 lettres + X (ex: AMAXX, FIDXX)
-    /^[A-Z]{3,4}IX$/, // 3-4 lettres + IX (ex: VTSIX)
-  ];
-  
-  for (const pattern of fundPatterns) {
-    if (pattern.test(symbolUpper)) {
-      // Vérifier que ce n'est pas une action connue
-      const knownStocks = ['TXN', 'XOM', 'XEL', 'XPO', 'XRAY', 'XYL'];
-      if (!knownStocks.some(stock => symbolUpper.startsWith(stock))) {
-        return true;
-      }
-    }
+  // Fonds Fidelity : FIDXX, FDRXX, etc.
+  const fidelityPattern = /^FD[A-Z]{2,3}X$/;
+  if (fidelityPattern.test(symbolUpper)) {
+    return true;
   }
   
+  // Fonds avec suffixe XX (double X) - très commun pour les fonds mutuels
+  if (symbolUpper.endsWith('XX') && symbolUpper.length >= 5) {
+    return true;
+  }
+  
+  // Fonds avec suffixe FX (Foreign Exchange funds)
+  if (symbolUpper.endsWith('FX') && symbolUpper.length >= 4) {
+    return true;
+  }
+  
+  // Ne PAS détecter comme fonds mutuel si :
+  // - Le symbole contient un point (ex: XOM.MX = bourse mexicaine)
+  // - Le symbole est trop court (< 4 caractères)
+  // - Le symbole est trop long (> 6 caractères, sauf patterns spécifiques)
+  if (symbolUpper.includes('.') || symbolUpper.length < 4) {
+    return false;
+  }
+  
+  // Par défaut, ne pas considérer comme fonds mutuel
+  // (mieux vaut un faux négatif qu'un faux positif)
   return false;
 };
 
