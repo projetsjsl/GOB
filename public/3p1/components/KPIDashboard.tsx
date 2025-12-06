@@ -5,6 +5,7 @@ import { calculateRecommendation } from '../utils/calculations';
 import { formatCurrency, formatPercent } from '../utils/calculations';
 import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon, ExclamationCircleIcon, ChevronDownIcon, ChevronUpIcon, MagnifyingGlassPlusIcon, MagnifyingGlassMinusIcon, ArrowsPointingOutIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { listSnapshots } from '../services/snapshotApi';
+import { SyncSelectionDialog } from './SyncSelectionDialog';
 
 interface KPIDashboardProps {
   profiles: AnalysisProfile[];
@@ -20,6 +21,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     key: string;
     direction: 'asc' | 'desc';
   }>({ key: 'totalReturnPercent', direction: 'desc' });
+  const [showSyncDialog, setShowSyncDialog] = useState(false);
   
   const [comparisonMode, setComparisonMode] = useState(false);
   const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
@@ -2923,6 +2925,20 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           </>
         )}
       </div>
+
+      {/* Dialog de sélection de synchronisation */}
+      <SyncSelectionDialog
+        isOpen={showSyncDialog}
+        profiles={profiles}
+        onClose={() => setShowSyncDialog(false)}
+        onConfirm={(tickers) => {
+          setShowSyncDialog(false);
+          if (onSyncNA) {
+            onSyncNA(tickers);
+          }
+        }}
+        isSyncing={isBulkSyncing}
+      />
     </div>
   );
 };
