@@ -21,7 +21,7 @@ import { SyncProgressBar } from './components/SyncProgressBar';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
 import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation, autoFillAssumptionsFromFMPData, isMutualFund } from './utils/calculations';
 import { detectOutlierMetrics } from './utils/outlierDetection';
-import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon, ClockIcon, PresentationChartBarIcon } from '@heroicons/react/24/outline';
 import { fetchCompanyData } from './services/financeApi';
 import { saveSnapshot, hasManualEdits, loadSnapshot, listSnapshots } from './services/snapshotApi';
 import { RestoreDataDialog } from './components/RestoreDataDialog';
@@ -2087,18 +2087,6 @@ export default function App() {
                                     <Bars3Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </button>
                                 <button
-                                    onClick={() => setCurrentView(currentView === 'kpi' ? 'analysis' : 'kpi')}
-                                    className={`px-2 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
-                                        currentView === 'kpi' 
-                                            ? 'bg-blue-600 text-white' 
-                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                                    }`}
-                                    title="Basculer entre vue Analyse et vue KPI"
-                                >
-                                    <ChartBarSquareIcon className="w-4 h-4 sm:w-5 sm:h-5 inline sm:mr-2" />
-                                    <span className="hidden sm:inline">{currentView === 'kpi' ? 'Vue Analyse' : 'Vue KPI'}</span>
-                                </button>
-                                <button
                                     onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
                                     className={`p-2 rounded-lg transition-colors ${
                                         isRightSidebarOpen 
@@ -2123,6 +2111,16 @@ export default function App() {
                                 >
                                     <ChartBarSquareIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                                     <span className="hidden xs:inline">Analyse</span>
+                                </button>
+                                <button
+                                    onClick={() => setCurrentView('kpi')}
+                                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all flex-1 sm:flex-none ${currentView === 'kpi'
+                                        ? 'bg-blue-50 text-blue-700 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    <PresentationChartBarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    <span className="hidden xs:inline">KPI</span>
                                 </button>
                                 <button
                                     onClick={() => setCurrentView('info')}
