@@ -31,7 +31,14 @@ const TerminalEmmaIATab = ({ isDarkMode }) => {
     };
 
     return (
-        <div className="h-full w-full relative" style={{ minHeight: 'calc(100vh - 140px)' }}>
+        <div 
+            className="h-full w-full relative" 
+            style={{ 
+                minHeight: 'calc(100vh - 140px)',
+                backgroundColor: '#0a0e27',
+                isolation: 'isolate'
+            }}
+        >
             {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50 z-10">
                     <div className="text-center">
@@ -70,7 +77,11 @@ const TerminalEmmaIATab = ({ isDarkMode }) => {
                 style={{ 
                     minHeight: 'calc(100vh - 140px)',
                     isolation: 'isolate',
-                    backgroundColor: '#0a0e27'
+                    backgroundColor: '#0a0e27',
+                    display: 'block',
+                    border: 'none',
+                    margin: 0,
+                    padding: 0
                 }}
                 onLoad={handleIframeLoad}
                 onError={handleIframeError}
