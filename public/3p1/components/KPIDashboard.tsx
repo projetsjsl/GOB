@@ -3,9 +3,10 @@ import { StarIcon, EyeIcon } from '@heroicons/react/24/solid';
 import { AnalysisProfile } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
 import { formatCurrency, formatPercent } from '../utils/calculations';
-import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon, ExclamationCircleIcon, ChevronDownIcon, ChevronUpIcon, MagnifyingGlassPlusIcon, MagnifyingGlassMinusIcon, ArrowsPointingOutIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon, ExclamationCircleIcon, ChevronDownIcon, ChevronUpIcon, MagnifyingGlassPlusIcon, MagnifyingGlassMinusIcon, ArrowsPointingOutIcon, ArrowPathIcon, BookOpenIcon } from '@heroicons/react/24/outline';
 import { listSnapshots } from '../services/snapshotApi';
 import { SyncSelectionDialog } from './SyncSelectionDialog';
+import { GuideDialog } from './GuideDialog';
 
 interface KPIDashboardProps {
   profiles: AnalysisProfile[];
@@ -22,6 +23,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     direction: 'asc' | 'desc';
   }>({ key: 'totalReturnPercent', direction: 'desc' });
   const [showSyncDialog, setShowSyncDialog] = useState(false);
+  const [showGuideDialog, setShowGuideDialog] = useState(false);
   
   const [comparisonMode, setComparisonMode] = useState(false);
   const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
@@ -1322,6 +1324,14 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     {filteredMetrics.length} ticker(s) avec N/A
                   </span>
                 )}
+                <button
+                  onClick={() => setShowGuideDialog(true)}
+                  className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center gap-1 transition-colors"
+                  title="Ouvrir le guide complet pour réduire les N/A"
+                >
+                  <BookOpenIcon className="w-3 h-3" />
+                  Guide
+                </button>
               </div>
               <div className="flex gap-2 flex-wrap">
                 <button
@@ -2938,6 +2948,12 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           }
         }}
         isSyncing={isBulkSyncing}
+      />
+
+      {/* Dialog du guide */}
+      <GuideDialog
+        isOpen={showGuideDialog}
+        onClose={() => setShowGuideDialog(false)}
       />
     </div>
   );
