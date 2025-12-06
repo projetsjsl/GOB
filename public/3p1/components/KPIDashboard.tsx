@@ -502,7 +502,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     maxJPEGY: 10,
     sector: '',
     recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL',
-    source: 'all' as 'all' | 'portfolio' | 'watchlist' // Nouveau filtre pour portefeuille/watchlist
+    source: 'all' as 'all' | 'portfolio' | 'watchlist', // Nouveau filtre pour portefeuille/watchlist
+    showOnlyNA: false // Nouveau filtre pour afficher uniquement les N/A
   }));
 
   // Mettre à jour les filtres quand defaultFilterValues change (nouveaux profils chargés)

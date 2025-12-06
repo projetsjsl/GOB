@@ -1601,6 +1601,184 @@ export default function App() {
         console.log(`✅ ${message}`);
     };
 
+    // Synchroniser uniquement une liste spécifique de tickers (ex: ceux avec N/A)
+    const handleSyncSpecificTickers = async (tickersToSync: string[]) => {
+        if (tickersToSync.length === 0) {
+            showNotification('Aucun ticker à synchroniser', 'warning');
+            return;
+        }
+
+        if (!confirm(`Synchroniser ${tickersToSync.length} ticker(s) avec N/A ?\n\nTickers: ${tickersToSync.slice(0, 10).join(', ')}${tickersToSync.length > 10 ? `\n... et ${tickersToSync.length - 10} autres` : ''}\n\nChaque version sera sauvegardée avant la synchronisation.\nLes données manuelles et hypothèses (orange) seront préservées.`)) {
+            return;
+        }
+
+        setIsBulkSyncing(true);
+        setBulkSyncProgress({ current: 0, total: tickersToSync.length });
+
+        let successCount = 0;
+        let errorCount = 0;
+        const errors: string[] = [];
+
+        // Traiter par batch pour éviter de surcharger
+        const batchSize = 3;
+        const delayBetweenBatches = 1000;
+
+        for (let i = 0; i < tickersToSync.length; i += batchSize) {
+            const batch = tickersToSync.slice(i, i + batchSize);
+
+            // Attendre entre les batches
+            if (i > 0) {
+                await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
+            }
+
+            // Traiter le batch en parallèle (même logique que handleBulkSyncAllTickers)
+            await Promise.allSettled(
+                batch.map(async (tickerSymbol) => {
+                    try {
+                        setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
+
+                        const profile = library[tickerSymbol];
+                        if (!profile) {
+                            console.warn(`⚠️ ${tickerSymbol}: Profil non trouvé`);
+                            return;
+                        }
+
+                        // 1. Sauvegarder un snapshot avant la sync
+                        console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
+                        await saveSnapshot(
+                            tickerSymbol,
+                            profile.data,
+                            profile.assumptions,
+                            profile.info,
+                            `Avant synchronisation (N/A) - ${new Date().toLocaleString()}`,
+                            false,
+                            false
+                        );
+
+                        // 2. Charger les nouvelles données FMP
+                        console.log(`🔄 Synchronisation ${tickerSymbol}...`);
+                        const result = await fetchCompanyData(tickerSymbol);
+
+                        // 3. Merge intelligent : préserver les données manuelles
+                        const newDataByYear = new Map(result.data.map(row => [row.year, row]));
+                        
+                        const mergedData = profile.data.map((existingRow) => {
+                            const newRow = newDataByYear.get(existingRow.year);
+                            if (!newRow) return existingRow;
+                            if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
+                                return existingRow;
+                            }
+                            return {
+                                ...newRow,
+                                autoFetched: true
+                            };
+                        });
+
+                        // Ajouter les nouvelles années
+                        result.data.forEach(newRow => {
+                            const exists = mergedData.some(row => row.year === newRow.year);
+                            if (!exists) {
+                                mergedData.push({
+                                    ...newRow,
+                                    autoFetched: true
+                                });
+                            }
+                        });
+
+                        mergedData.sort((a, b) => a.year - b.year);
+
+                        // 4. Recalculer les métriques
+                        const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                            mergedData,
+                            result.currentPrice,
+                            profile.assumptions
+                        );
+
+                        // 5. Détecter les outliers
+                        const tempAssumptions = {
+                            ...profile.assumptions,
+                            ...autoFilledAssumptions
+                        };
+                        const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
+                        
+                        if (outlierDetection.detectedOutliers.length > 0) {
+                            console.log(`⚠️ ${tickerSymbol}: Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(', ')}`);
+                        }
+
+                        const finalAssumptions = {
+                            ...tempAssumptions,
+                            excludeEPS: outlierDetection.excludeEPS,
+                            excludeCF: outlierDetection.excludeCF,
+                            excludeBV: outlierDetection.excludeBV,
+                            excludeDIV: outlierDetection.excludeDIV
+                        };
+
+                        // 6. Mettre à jour le profil
+                        setLibrary(prev => {
+                            const updated = {
+                                ...prev,
+                                [tickerSymbol]: {
+                                    ...profile,
+                                    data: mergedData,
+                                    info: {
+                                        ...profile.info,
+                                        ...result.info,
+                                        name: result.info.name || profile.info.name
+                                    },
+                                    assumptions: finalAssumptions,
+                                    lastModified: Date.now()
+                                }
+                            };
+
+                            try {
+                                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                            } catch (e) {
+                                console.warn('Failed to save to LocalStorage:', e);
+                            }
+
+                            return updated;
+                        });
+
+                        // 7. Sauvegarder le snapshot après sync
+                        await saveSnapshot(
+                            tickerSymbol,
+                            mergedData,
+                            finalAssumptions,
+                            {
+                                ...profile.info,
+                                ...result.info
+                            },
+                            `Synchronisation (N/A) - ${new Date().toLocaleString()}`,
+                            true,
+                            true
+                        );
+
+                        successCount++;
+                        console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
+
+                    } catch (error: any) {
+                        errorCount++;
+                        const errorMsg = `${tickerSymbol}: ${error.message || 'Erreur inconnue'}`;
+                        errors.push(errorMsg);
+                        console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
+                    }
+                })
+            );
+        }
+
+        setIsBulkSyncing(false);
+        setBulkSyncProgress({ current: 0, total: 0 });
+
+        // Afficher le résultat
+        const message = `Synchronisation terminée\n\n` +
+            `Réussies: ${successCount}\n` +
+            `Erreurs: ${errorCount}` +
+            (errors.length > 0 ? `\n\nErreurs:\n${errors.slice(0, 5).join('\n')}${errors.length > 5 ? `\n... et ${errors.length - 5} autres` : ''}` : '');
+        
+        alert(message);
+        showNotification(`Synchronisation terminée: ${successCount} réussies, ${errorCount} erreurs`, successCount > 0 ? 'success' : 'error');
+    };
+
     // --- SYNC FROM SUPABASE HANDLER ---
     const handleSyncFromSupabase = async () => {
         setIsLoadingTickers(true);
