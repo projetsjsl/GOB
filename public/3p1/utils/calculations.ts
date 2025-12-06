@@ -39,6 +39,71 @@ export const formatCurrency = (val: number) =>
 export const formatPercent = (val: number) => 
   new Intl.NumberFormat('fr-CA', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 2 }).format(val / 100);
 
+/**
+ * Détecte si un ticker est probablement un fonds mutuel
+ * Basé sur des patterns communs de symboles de fonds mutuels
+ * 
+ * @param symbol - Le symbole du ticker à vérifier
+ * @param companyName - Le nom de la compagnie (optionnel, pour validation supplémentaire)
+ * @returns true si le ticker semble être un fonds mutuel
+ */
+export const isMutualFund = (symbol: string, companyName?: string): boolean => {
+  const symbolUpper = symbol.toUpperCase().trim();
+  const nameUpper = (companyName || '').toUpperCase();
+  
+  // Patterns de symboles de fonds mutuels communs
+  // Les fonds mutuels finissent souvent par: X, XX, IX, AX, CX, SX, etc.
+  const mutualFundSuffixes = ['X', 'XX', 'IX', 'AX', 'CX', 'SX', 'MX', 'FX'];
+  
+  // Vérifier les suffixes (mais pas pour les actions normales comme X, TXN, etc.)
+  // On vérifie seulement si le symbole fait 4-6 caractères et finit par ces suffixes
+  if (symbolUpper.length >= 4 && symbolUpper.length <= 6) {
+    for (const suffix of mutualFundSuffixes) {
+      if (symbolUpper.endsWith(suffix) && symbolUpper.length > suffix.length) {
+        // Exceptions: certaines actions normales finissent par X (ex: X, TXN, XOM, etc.)
+        // On vérifie si c'est une action connue
+        const knownStocks = ['X', 'TXN', 'XOM', 'XEL', 'XPO', 'XRAY', 'XYL', 'XEC', 'XENE'];
+        if (!knownStocks.includes(symbolUpper)) {
+          return true;
+        }
+      }
+    }
+  }
+  
+  // Vérifier le nom de la compagnie pour des indicateurs de fonds mutuel
+  if (nameUpper.includes('MUTUAL FUND') || 
+      nameUpper.includes('FUND TRUST') ||
+      nameUpper.includes('INVESTMENT FUND') ||
+      nameUpper.includes('INDEX FUND') ||
+      (nameUpper.includes('FUND') && nameUpper.includes('SERIES'))) {
+    return true;
+  }
+  
+  // Patterns spécifiques connus (ex: VTSAX, VFIAX, etc. - fonds Vanguard)
+  const vanguardPattern = /^V[A-Z]{3,4}X$/;
+  if (vanguardPattern.test(symbolUpper)) {
+    return true;
+  }
+  
+  // Autres patterns de fonds mutuels (ex: FIDELITY, T. ROWE PRICE, etc.)
+  const fundPatterns = [
+    /^[A-Z]{4,5}X$/,  // 4-5 lettres + X (ex: AMAXX, FIDXX)
+    /^[A-Z]{3,4}IX$/, // 3-4 lettres + IX (ex: VTSIX)
+  ];
+  
+  for (const pattern of fundPatterns) {
+    if (pattern.test(symbolUpper)) {
+      // Vérifier que ce n'est pas une action connue
+      const knownStocks = ['TXN', 'XOM', 'XEL', 'XPO', 'XRAY', 'XYL'];
+      if (!knownStocks.some(stock => symbolUpper.startsWith(stock))) {
+        return true;
+      }
+    }
+  }
+  
+  return false;
+};
+
 // New Helper to centralize Recommendation Logic
 export const calculateRecommendation = (
   data: AnnualData[], 

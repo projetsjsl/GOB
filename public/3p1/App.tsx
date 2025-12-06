@@ -18,7 +18,7 @@ import { ConfirmSyncDialog } from './components/ConfirmSyncDialog';
 import { HistoricalVersionBanner } from './components/HistoricalVersionBanner';
 import { NotificationManager } from './components/Notification';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
-import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation, autoFillAssumptionsFromFMPData } from './utils/calculations';
+import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation, autoFillAssumptionsFromFMPData, isMutualFund } from './utils/calculations';
 import { detectOutlierMetrics } from './utils/outlierDetection';
 import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { fetchCompanyData } from './services/financeApi';
@@ -279,33 +279,45 @@ export default function App() {
                             await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
                         }
 
-                        // Charger les données FMP pour ce batch en parallèle
-                        await Promise.allSettled(
-                            batch.map(async (supabaseTicker) => {
-                                const symbol = supabaseTicker.ticker.toUpperCase();
-                                try {
-                                    const result = await fetchCompanyData(symbol);
-                                    
-                                    // VALIDATION STRICTE : Vérifier que les données sont valides
-                                    if (!result.data || result.data.length === 0) {
-                                        console.error(`❌ ${symbol}: Aucune donnée FMP retournée - profil NON créé`);
-                                        return;
-                                    }
-                                    
-                                    if (!result.currentPrice || result.currentPrice <= 0) {
-                                        console.error(`❌ ${symbol}: Prix actuel invalide (${result.currentPrice}) - profil NON créé`);
-                                        return;
-                                    }
-                                    
-                                    // Vérifier qu'on a au moins une année avec des données valides
-                                    const hasValidData = result.data.some(d => 
-                                        d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
-                                    );
-                                    
-                                    if (!hasValidData) {
-                                        console.error(`❌ ${symbol}: Aucune donnée financière valide - profil NON créé`);
-                                        return;
-                                    }
+                                // Charger les données FMP pour ce batch en parallèle
+                                await Promise.allSettled(
+                                    batch.map(async (supabaseTicker) => {
+                                        const symbol = supabaseTicker.ticker.toUpperCase();
+                                        
+                                        // FILTRER LES FONDS MUTUELS : Détecter et exclure avant même d'appeler l'API
+                                        if (isMutualFund(symbol, supabaseTicker.company_name)) {
+                                            console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - profil NON créé (exclu automatiquement)`);
+                                            return;
+                                        }
+                                        
+                                        try {
+                                            const result = await fetchCompanyData(symbol);
+                                            
+                                            // VALIDATION STRICTE : Vérifier que les données sont valides
+                                            if (!result.data || result.data.length === 0) {
+                                                console.error(`❌ ${symbol}: Aucune donnée FMP retournée - profil NON créé`);
+                                                return;
+                                            }
+                                            
+                                            if (!result.currentPrice || result.currentPrice <= 0) {
+                                                console.error(`❌ ${symbol}: Prix actuel invalide (${result.currentPrice}) - profil NON créé`);
+                                                return;
+                                            }
+                                            
+                                            // Vérifier qu'on a au moins une année avec des données valides
+                                            const hasValidData = result.data.some(d => 
+                                                d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
+                                            );
+                                            
+                                            if (!hasValidData) {
+                                                // Vérifier si c'est un fonds mutuel (même si le pattern n'a pas matché)
+                                                if (isMutualFund(symbol, result.info.name)) {
+                                                    console.warn(`⚠️ ${symbol}: Fonds mutuel détecté (pas de données financières) - profil NON créé`);
+                                                } else {
+                                                    console.error(`❌ ${symbol}: Aucune donnée financière valide - profil NON créé`);
+                                                }
+                                                return;
+                                            }
                                     
                                     // ✅ TOUTES LES VALIDATIONS PASSÉES - Créer le profil avec les données réelles
                                     const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
@@ -928,6 +940,10 @@ export default function App() {
             );
             
             if (!hasValidData) {
+                // Vérifier si c'est un fonds mutuel
+                if (isMutualFund(activeId, result.info.name)) {
+                    throw new Error(`${activeId} est un fonds mutuel et ne peut pas être analysé avec les ratios d'entreprise`);
+                }
                 throw new Error(`Aucune donnée financière valide pour ${activeId}`);
             }
 
@@ -1219,6 +1235,10 @@ export default function App() {
             );
             
             if (!hasValidData) {
+                // Vérifier si c'est un fonds mutuel
+                if (isMutualFund(upperSymbol, result.info.name)) {
+                    throw new Error(`${upperSymbol} est un fonds mutuel et ne peut pas être analysé avec les ratios d'entreprise`);
+                }
                 throw new Error(`Aucune donnée financière valide pour ${upperSymbol}`);
             }
 
