@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Emma IA - GOB Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        .terminal-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Header */
+        .terminal-header {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1429 100%);
+            border-bottom: 2px solid #2d3561;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .terminal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4f9cf9 0%, #6b7ae8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .universe-select, .kpi-select {
+            background: #1a1f3a;
+            border: 1px solid #2d3561;
+            color: #e0e0e0;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .universe-select:hover, .kpi-select:hover {
+            border-color: #4f9cf9;
+            background: #252b4a;
+        }
+
+        /* Main Content */
+        .terminal-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr;
+            gap: 1rem;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        /* Market Dashboard Section */
+        .market-dashboard {
+            grid-column: 1 / -1;
+            background: #13182b;
+            border: 1px solid #2d3561;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #4f9cf9;
+        }
+
+        .indices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .index-card {
+            background: #1a1f3a;
+            border: 1px solid #2d3561;
+            border-radius: 6px;
+            padding: 1rem;
+            transition: all 0.2s;
+        }
+
+        .index-card:hover {
+            border-color: #4f9cf9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 156, 249, 0.2);
+        }
+
+        .index-name {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            margin-bottom: 0.5rem;
+        }
+
+        .index-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .index-change {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .index-change.positive {
+            color: #10b981;
+        }
+
+        .index-change.negative {
+            color: #ef4444;
+        }
+
+        /* Screener Section */
+        .screener-section {
+            background: #13182b;
+            border: 1px solid #2d3561;
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .screener-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-input {
+            background: #1a1f3a;
+            border: 1px solid #2d3561;
+            color: #e0e0e0;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #4f9cf9;
+        }
+
+        .screener-table {
+            flex: 1;
+            overflow: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #1a1f3a;
+            color: #4f9cf9;
+            padding: 0.75rem;
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #2d3561;
+            font-size: 0.9rem;
+        }
+
+        tr:hover {
+            background: #1a1f3a;
+        }
+
+        .symbol-link {
+            color: #4f9cf9;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .symbol-link:hover {
+            text-decoration: underline;
+        }
+
+        .kpi-value {
+            font-weight: 600;
+        }
+
+        .kpi-value.positive {
+            color: #10b981;
+        }
+
+        .kpi-value.negative {
+            color: #ef4444;
+        }
+
+        /* Watchlist Section */
+        .watchlist-section {
+            background: #13182b;
+            border: 1px solid #2d3561;
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .watchlist-list {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .watchlist-item {
+            background: #1a1f3a;
+            border: 1px solid #2d3561;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .watchlist-item:hover {
+            border-color: #4f9cf9;
+            transform: translateX(4px);
+        }
+
+        /* Loading & Error States */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #9ca3af;
+        }
+
+        .error {
+            background: #7f1d1d;
+            border: 1px solid #991b1b;
+            color: #fca5a5;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .terminal-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #13182b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2d3561;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4f9cf9;
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal-container">
+        <!-- Header -->
+        <div class="terminal-header">
+            <div class="terminal-title">📊 Terminal Emma IA</div>
+            <div class="header-controls">
+                <select id="universeSelect" class="universe-select">
+                    <option value="sp500">S&P 500</option>
+                    <option value="tsx">TSX</option>
+                    <option value="all">Tous</option>
+                </select>
+                <select id="kpiSelect" class="kpi-select">
+                    <option value="">Sélectionner un KPI</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="terminal-content">
+            <!-- Market Dashboard -->
+            <div class="market-dashboard">
+                <div class="section-title">📈 Dashboard Marché</div>
+                <div id="indicesContainer" class="indices-grid">
+                    <div class="loading">Chargement des indices...</div>
+                </div>
+            </div>
+
+            <!-- Screener -->
+            <div class="screener-section">
+                <div class="section-title">🔍 Screener & Analyse</div>
+                <div class="screener-controls">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="filter-input" 
+                        placeholder="Rechercher un symbole..."
+                    >
+                    <select id="sectorFilter" class="filter-input">
+                        <option value="">Tous les secteurs</option>
+                    </select>
+                </div>
+                <div id="screenerTable" class="screener-table">
+                    <div class="loading">Chargement des instruments...</div>
+                </div>
+            </div>
+
+            <!-- Watchlist -->
+            <div class="watchlist-section">
+                <div class="section-title">⭐ Watchlists</div>
+                <div id="watchlistContainer" class="watchlist-list">
+                    <div class="loading">Chargement des watchlists...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = window.location.origin;
+        let currentUniverse = 'sp500';
+        let currentKPI = null;
+        let instrumentsData = [];
+        let kpiValues = {};
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadMarketIndices();
+            await loadSectors();
+            await loadKPIDefinitions();
+            await loadInstruments();
+            await loadWatchlists();
+
+            // Event listeners
+            document.getElementById('universeSelect').addEventListener('change', (e) => {
+                currentUniverse = e.target.value;
+                loadInstruments();
+            });
+
+            document.getElementById('kpiSelect').addEventListener('change', (e) => {
+                currentKPI = e.target.value || null;
+                if (currentKPI) {
+                    loadKPIValues();
+                }
+            });
+
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                filterInstruments(e.target.value);
+            });
+
+            document.getElementById('sectorFilter').addEventListener('change', (e) => {
+                filterInstruments(document.getElementById('searchInput').value, e.target.value);
+            });
+        });
+
+        // Charger les indices de marché
+        async function loadMarketIndices() {
+            try {
+                const response = await fetch(`${API_BASE}/api/terminal-data?action=market-indices`);
+                const data = await response.json();
+
+                const container = document.getElementById('indicesContainer');
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="error">Aucun indice disponible</div>';
+                    return;
+                }
+
+                container.innerHTML = data.map(index => `
+                    <div class="index-card">
+                        <div class="index-name">${index.name}</div>
+                        <div class="index-value">${formatNumber(index.current_value)}</div>
+                        <div class="index-change ${index.daily_change_pct >= 0 ? 'positive' : 'negative'}">
+                            ${index.daily_change >= 0 ? '+' : ''}${formatNumber(index.daily_change)} 
+                            (${index.daily_change_pct >= 0 ? '+' : ''}${formatNumber(index.daily_change_pct)}%)
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erreur chargement indices:', error);
+                document.getElementById('indicesContainer').innerHTML = 
+                    '<div class="error">Erreur chargement des indices</div>';
+            }
+        }
+
+        // Charger les secteurs
+        async function loadSectors() {
+            try {
+                const response = await fetch(`${API_BASE}/api/terminal-data?action=sectors`);
+                const data = await response.json();
+
+                const select = document.getElementById('sectorFilter');
+                select.innerHTML = '<option value="">Tous les secteurs</option>' +
+                    data.map(sector => `<option value="${sector}">${sector}</option>`).join('');
+            } catch (error) {
+                console.error('Erreur chargement secteurs:', error);
+            }
+        }
+
+        // Charger les définitions de KPI
+        async function loadKPIDefinitions() {
+            try {
+                // Pour l'instant, on utilise des KPI hardcodés
+                // Dans une vraie implémentation, on appellerait l'API
+                const kpiSelect = document.getElementById('kpiSelect');
+                kpiSelect.innerHTML = `
+                    <option value="">Sélectionner un KPI</option>
+                    <option value="QUALITY_SCORE_V1">Quality Score</option>
+                    <option value="VALUE_SCORE_V1">Value Score</option>
+                    <option value="MOMENTUM_SCORE_V1">Momentum Score</option>
+                `;
+            } catch (error) {
+                console.error('Erreur chargement KPI:', error);
+            }
+        }
+
+        // Charger les instruments
+        async function loadInstruments() {
+            try {
+                const filters = {
+                    country: currentUniverse === 'sp500' ? 'US' : currentUniverse === 'tsx' ? 'CA' : null,
+                    limit: 100
+                };
+
+                const response = await fetch(`${API_BASE}/api/terminal-data?action=instruments&${new URLSearchParams(filters)}`);
+                const result = await response.json();
+
+                instrumentsData = result.data || [];
+                renderScreenerTable(instrumentsData);
+            } catch (error) {
+                console.error('Erreur chargement instruments:', error);
+                document.getElementById('screenerTable').innerHTML = 
+                    '<div class="error">Erreur chargement des instruments</div>';
+            }
+        }
+
+        // Charger les valeurs de KPI
+        async function loadKPIValues() {
+            if (!currentKPI || instrumentsData.length === 0) return;
+
+            try {
+                const symbols = instrumentsData.map(i => i.symbol);
+                const response = await fetch(`${API_BASE}/api/terminal-data?action=kpi-values&kpi_code=${currentKPI}&symbols=${symbols.join(',')}`);
+                kpiValues = await response.json();
+
+                renderScreenerTable(instrumentsData);
+            } catch (error) {
+                console.error('Erreur chargement KPI values:', error);
+            }
+        }
+
+        // Rendre le tableau screener
+        function renderScreenerTable(instruments) {
+            const container = document.getElementById('screenerTable');
+            
+            if (instruments.length === 0) {
+                container.innerHTML = '<div class="loading">Aucun instrument trouvé</div>';
+                return;
+            }
+
+            const table = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Symbole</th>
+                            <th>Nom</th>
+                            <th>Secteur</th>
+                            <th>Prix</th>
+                            <th>Var. J</th>
+                            ${currentKPI ? `<th>${currentKPI}</th>` : ''}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${instruments.map(instrument => {
+                            const price = instrument.metrics?.PRICE || 'N/A';
+                            const change = instrument.metrics?.DAILY_CHANGE_PCT || 0;
+                            const kpiValue = kpiValues[instrument.symbol]?.value;
+
+                            return `
+                                <tr>
+                                    <td>
+                                        <a href="#" class="symbol-link" onclick="openSymbolDetail('${instrument.symbol}'); return false;">
+                                            ${instrument.symbol}
+                                        </a>
+                                    </td>
+                                    <td>${instrument.name || 'N/A'}</td>
+                                    <td>${instrument.sector || 'N/A'}</td>
+                                    <td>${formatNumber(price)}</td>
+                                    <td class="${change >= 0 ? 'kpi-value positive' : 'kpi-value negative'}">
+                                        ${change >= 0 ? '+' : ''}${formatNumber(change)}%
+                                    </td>
+                                    ${currentKPI ? `
+                                        <td class="kpi-value">
+                                            ${kpiValue !== undefined ? formatNumber(kpiValue) : 'N/A'}
+                                        </td>
+                                    ` : ''}
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = table;
+        }
+
+        // Filtrer les instruments
+        function filterInstruments(search = '', sector = '') {
+            let filtered = [...instrumentsData];
+
+            if (search) {
+                const searchLower = search.toLowerCase();
+                filtered = filtered.filter(i => 
+                    i.symbol.toLowerCase().includes(searchLower) ||
+                    (i.name && i.name.toLowerCase().includes(searchLower))
+                );
+            }
+
+            if (sector) {
+                filtered = filtered.filter(i => i.sector === sector);
+            }
+
+            renderScreenerTable(filtered);
+        }
+
+        // Charger les watchlists
+        async function loadWatchlists() {
+            try {
+                // Pour l'instant, on affiche un message
+                // Dans une vraie implémentation, on récupérerait l'user_id depuis l'auth
+                const container = document.getElementById('watchlistContainer');
+                container.innerHTML = `
+                    <div class="loading">
+                        Connectez-vous pour voir vos watchlists
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Erreur chargement watchlists:', error);
+            }
+        }
+
+        // Ouvrir le détail d'un symbole
+        function openSymbolDetail(symbol) {
+            // Ouvrir dans une nouvelle fenêtre ou un modal
+            window.open(`/titre/${symbol}`, '_blank');
+        }
+
+        // Utilitaires
+        function formatNumber(value) {
+            if (value === null || value === undefined || value === 'N/A') return 'N/A';
+            if (typeof value === 'string') return value;
+            
+            if (Math.abs(value) >= 1e9) {
+                return (value / 1e9).toFixed(2) + 'B';
+            } else if (Math.abs(value) >= 1e6) {
+                return (value / 1e6).toFixed(2) + 'M';
+            } else if (Math.abs(value) >= 1e3) {
+                return (value / 1e3).toFixed(2) + 'K';
+            } else {
+                return value.toFixed(2);
+            }
+        }
+
+        // Rafraîchir les données toutes les 5 minutes
+        setInterval(() => {
+            loadMarketIndices();
+            if (instrumentsData.length > 0) {
+                loadInstruments();
+            }
+        }, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
+
