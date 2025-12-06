@@ -126,6 +126,17 @@
     },
     "api/terminal-data.js": {
       "maxDuration": 30
+    },
+    "api/fmp-batch-sync.js": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "api/cron/fmp-batch-sync.js": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "api/market-data-batch.js": {
+      "maxDuration": 30
     }
   },
   "headers": [
@@ -140,6 +151,12 @@
   ],
       "rewrites": [
         { "source": "/api/finnhub", "destination": "/api/marketdata" }
+      ],
+      "crons": [
+        {
+          "path": "/api/cron/fmp-batch-sync",
+          "schedule": "*/5 * * * *"
+        }
       ],
       "redirects": [
     {
