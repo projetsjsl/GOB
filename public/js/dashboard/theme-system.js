@@ -360,39 +360,6 @@ const customThemes = {
             borderRadius: '0.25rem', // Légèrement arrondi (style années 1990)
             shadow: '0 2px 8px rgba(139, 92, 246, 0.15)', // Ombre violette subtile
         }
-    },
-    desjardins: {
-        name: 'Desjardins',
-        id: 'desjardins',
-        colors: {
-            primary: '#006747', // Vert Desjardins foncé (#006747) - couleur principale
-            secondary: '#00a651', // Vert Desjardins plus clair (#00A651) - accents
-            background: '#ffffff', // Blanc (#FFFFFF) - fond principal
-            surface: '#f5f5f5', // Gris très clair (#F5F5F5) - cards, panels
-            surfaceLight: '#ffffff', // Blanc (#FFFFFF) - hover states
-            surfaceDark: '#e8e8e8', // Gris clair (#E8E8E8) - borders, separators
-            text: '#1a1a1a', // Noir/gris foncé (#1A1A1A) - texte principal
-            textSecondary: '#666666', // Gris moyen (#666666) - texte secondaire
-            textGreen: '#00a651', // Vert Desjardins (#00A651) - gains
-            textRed: '#d32f2f', // Rouge (#D32F2F) - pertes
-            border: '#d0d0d0', // Gris clair (#D0D0D0) - bordures
-            accent: '#006747', // Vert Desjardins foncé (highlights, CTA)
-            success: '#00a651', // Vert Desjardins (#00A651) - success
-            danger: '#d32f2f', // Rouge (#D32F2F) - danger
-            warning: '#ff9800', // Orange (#FF9800) - alertes
-        },
-        fonts: {
-            primary: '"Arial", "Helvetica Neue", "Helvetica", "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-            secondary: '"Inter", "Arial", "Helvetica Neue", "Helvetica", system-ui, sans-serif',
-            mono: '"SF Mono", "Consolas", "Monaco", "Menlo", "Courier New", monospace'
-        },
-        styles: {
-            headerBg: 'linear-gradient(135deg, #006747 0%, #00a651 100%)', // Dégradé vert Desjardins
-            cardBg: '#ffffff',
-            cardBorder: '1px solid #d0d0d0',
-            borderRadius: '0.5rem', // Arrondi modéré
-            shadow: '0 2px 8px rgba(0, 103, 71, 0.1)', // Ombre verte subtile
-        }
     }
 };
 
