@@ -4,9 +4,6 @@
   "outputDirectory": "dist",
   "installCommand": "npm install --legacy-peer-deps",
   "functions": {
-    "api/marketdata.js": {
-      "maxDuration": 10
-    },
     "api/marketdata/batch.js": {
       "maxDuration": 30
     },
@@ -25,20 +22,11 @@
     "api/briefing.js": {
       "maxDuration": 60
     },
-    "api/briefing-test.js": {
-      "maxDuration": 10
-    },
-    "api/briefing-simple.js": {
-      "maxDuration": 10
-    },
     "api/emma-n8n.js": {
       "maxDuration": 60
     },
     "api/supabase-watchlist.js": {
       "maxDuration": 15
-    },
-    "api/config/tickers.js": {
-      "maxDuration": 10
     },
     "api/calendar-economic.js": {
       "maxDuration": 15,
@@ -52,9 +40,6 @@
       "maxDuration": 15,
       "memory": 1024
     },
-    "api/admin/emma-config.js": {
-      "maxDuration": 10
-    },
     "api/admin/tickers.js": {
       "maxDuration": 15
     },
@@ -63,9 +48,6 @@
     },
     "api/ai-services.js": {
       "maxDuration": 120
-    },
-    "api/fmp.js": {
-      "maxDuration": 10
     },
     "api/fmp-company-data.js": {
       "maxDuration": 30
@@ -107,65 +89,41 @@
     "api/treasury-rates.js": {
       "maxDuration": 30
     },
-        "api/briefing-prompts.js": {
-          "maxDuration": 10
-        },
-        "api/theme-colors.js": {
-          "maxDuration": 10
-        },
-        "api/email-recipients.js": {
-          "maxDuration": 10
-        },
-    "api/briefing-schedule.js": {
-      "maxDuration": 10
+    "api/fastgraphs-login.js": {
+      "maxDuration": 300
     },
-    "api/auth.js": {
-      "maxDuration": 10
+    "api/groupchat/simulate.js": {
+      "maxDuration": 60
     },
-      "api/fastgraphs-login.js": {
-        "maxDuration": 300
-      },
-      "api/roles-config.js": {
-        "maxDuration": 10
-      },
-      "api/groupchat/simulate.js": {
-        "maxDuration": 60
-      },
-      "api/groupchat/config.js": {
-        "maxDuration": 10
-      },
-      "api/groupchat/workflows.js": {
-        "maxDuration": 10
-      },
-      "api/groupchat/admin.js": {
-        "maxDuration": 30
-      },
-      "api/groupchat/test.js": {
-        "maxDuration": 30
-      },
-      "api/sector.js": {
-        "maxDuration": 15
-      },
-      "api/sector-index.js": {
-        "maxDuration": 15
-      },
-      "api/jslai-proxy.js": {
-        "maxDuration": 30
-      },
-      "api/jslai-proxy-resource.js": {
-        "maxDuration": 30
-      },
-      "api/fmp-sync.js": {
-        "maxDuration": 300,
-        "memory": 1024
-      },
-      "api/kpi-engine.js": {
-        "maxDuration": 60,
-        "memory": 512
-      },
-      "api/terminal-data.js": {
-        "maxDuration": 30
-      }
+    "api/groupchat/admin.js": {
+      "maxDuration": 30
+    },
+    "api/groupchat/test.js": {
+      "maxDuration": 30
+    },
+    "api/sector.js": {
+      "maxDuration": 15
+    },
+    "api/sector-index.js": {
+      "maxDuration": 15
+    },
+    "api/jslai-proxy.js": {
+      "maxDuration": 30
+    },
+    "api/jslai-proxy-resource.js": {
+      "maxDuration": 30
+    },
+    "api/fmp-sync.js": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "api/kpi-engine.js": {
+      "maxDuration": 60,
+      "memory": 512
+    },
+    "api/terminal-data.js": {
+      "maxDuration": 30
+    }
   },
   "headers": [
     {
