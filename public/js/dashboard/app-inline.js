@@ -1024,8 +1024,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         };
 
 
+        // OPTIMISATION: useCallback pour éviter re-création de fonction
         // Fonction pour gérer le changement d'onglet avec animations d'intro
-        const handleTabChange = (tabId) => {
+        const handleTabChange = useCallback((tabId) => {
             setActiveTab(tabId);
 
             // Afficher intro Emma IA si c'est la première visite de cette page load
@@ -1034,6 +1035,10 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 setTimeout(() => setShowEmmaIntro(false), 3000);
                 setTabsVisitedThisSession(prev => ({ ...prev, 'emma': true }));
             }
+            
+            // OPTIMISATION: Scroll smooth vers le haut lors du changement d'onglet
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, []);
 
             // Afficher intro Dan's Watchlist si c'est la première visite de cette page load
             if (tabId === 'dans-watchlist' && !tabsVisitedThisSession['dan']) {
