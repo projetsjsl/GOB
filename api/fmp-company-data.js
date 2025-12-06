@@ -338,14 +338,38 @@ export default async function handler(req, res) {
             };
         }).sort((a, b) => a.year - b.year);
 
-        // 6a. Fetch Beta from Key Metrics (most recent)
+        // 6a. Fetch Beta, ROE, ROA from Key Metrics (most recent)
         let beta = null;
+        let roe = null;
+        let roa = null;
         if (metricsData && metricsData.length > 0) {
             // Beta est généralement dans les key-metrics les plus récents
             // Essayer aussi dans le profile
             beta = profile.beta || (metricsData[0]?.beta) || null;
             if (beta !== null) {
                 beta = parseFloat(beta);
+            }
+            
+            // ROE (Return on Equity) - généralement en pourcentage dans FMP
+            roe = metricsData[0]?.roe || metricsData[0]?.returnOnEquity || null;
+            if (roe !== null && roe !== undefined) {
+                roe = parseFloat(roe);
+                // Si ROE est déjà en pourcentage (0-100), le garder tel quel
+                // Si ROE est en décimal (0-1), le convertir en pourcentage
+                if (Math.abs(roe) <= 1 && roe !== 0) {
+                    roe = roe * 100;
+                }
+            }
+            
+            // ROA (Return on Assets) - généralement en pourcentage dans FMP
+            roa = metricsData[0]?.roa || metricsData[0]?.returnOnAssets || null;
+            if (roa !== null && roa !== undefined) {
+                roa = parseFloat(roa);
+                // Si ROA est déjà en pourcentage (0-100), le garder tel quel
+                // Si ROA est en décimal (0-1), le convertir en pourcentage
+                if (Math.abs(roa) <= 1 && roa !== 0) {
+                    roa = roa * 100;
+                }
             }
         }
 
@@ -407,7 +431,9 @@ export default async function handler(req, res) {
             preferredSymbol: cleanSymbol, // Garder le symbole original demandé
             actualSymbol: usedSymbol, // Le symbole réellement utilisé par FMP
             logoSymbol: logoBaseSymbol, // Symbole à utiliser pour les logos (sans .TO, avec format standard)
-            beta: beta // Ajouter le beta récupéré
+            beta: beta, // Ajouter le beta récupéré
+            roe: roe, // Return on Equity (en pourcentage)
+            roa: roa // Return on Assets (en pourcentage)
         };
 
         return res.status(200).json({

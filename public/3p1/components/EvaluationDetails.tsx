@@ -454,7 +454,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
       </h3>
 
       <div className="overflow-x-auto -mx-3 sm:mx-0">
-        <table className="w-full text-xs sm:text-sm text-right border-collapse min-w-[600px]">
+        <table className="w-full text-xs sm:text-sm text-right border-collapse min-w-[650px] md:min-w-[700px]">
           <thead className="bg-slate-100 text-gray-600 uppercase text-xs">
             <tr>
               <th className="p-2 text-left">Métrique</th>
@@ -476,13 +476,17 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                     onChange={() => handleToggleExclusion('excludeEPS')}
                     className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0"
                     style={{ accentColor: '#2563eb' }}
-                    title={assumptions.excludeEPS ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"}
+                    title={assumptions.excludeEPS 
+                      ? "Inclure BPA (EPS) dans le calcul\n\n✅ Cliquez pour inclure cette métrique dans le prix cible moyen.\n\nLa métrique sera:\n• Incluse dans le calcul du prix cible moyen\n• Affichée normalement (non grisée)\n• Les champs seront éditables"
+                      : "Exclure BPA (EPS) du calcul\n\n❌ Cliquez pour exclure cette métrique du prix cible moyen.\n\nLa métrique sera:\n• Exclue du calcul du prix cible moyen\n• Affichée en gris (opacité 50%)\n• Les champs seront désactivés\n\nUtile si:\n• Le prix cible est aberrant\n• Les données sont incomplètes\n• La métrique n'est pas pertinente pour ce type d'entreprise"}
                   />
                   <span className="select-none">BPA (EPS)</span>
                   <button
                     onClick={() => toggleMetric('eps')}
                     className="ml-2 p-1 hover:bg-gray-200 rounded transition-colors"
-                    title={expandedMetrics.eps ? "Masquer les intervalles de référence" : "Afficher les intervalles de référence"}
+                    title={expandedMetrics.eps 
+                      ? "Masquer les intervalles de référence historiques\n\nCliquez pour masquer les tableaux de comparaison:\n• Ratios historiques (Titre vs Secteur)\n• Croissance historique (Titre vs Secteur)\n• Projections 5 ans (Titre vs Secteur)"
+                      : "Afficher les intervalles de référence historiques\n\nCliquez pour afficher les tableaux de comparaison:\n• Ratios historiques (Titre vs Secteur)\n• Croissance historique (Titre vs Secteur)\n• Projections 5 ans (Titre vs Secteur)\n\nUtile pour valider vos hypothèses par rapport à l'historique et au secteur."}
                   >
                     {expandedMetrics.eps ? (
                       <ChevronUpIcon className="w-4 h-4 text-gray-600" />
@@ -492,7 +496,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   </button>
                 </div>
               </td>
-              <td className={`p-3 font-semibold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"}`}>{baseValues.eps.toFixed(2)}</td>
+              <td className={`p-3 font-semibold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`BPA (EPS) Actuel: ${baseValues.eps.toFixed(2)} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.eps.toFixed(2)}</td>
               <td className={`p-3 ${assumptions.excludeEPS ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -500,9 +504,10 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   onChange={(e) => handleInput(e, 'growthRateEPS')} 
                   disabled={assumptions.excludeEPS}
                   className={`w-16 text-right border-b outline-none focus:border-orange-500 bg-transparent font-medium ${assumptions.excludeEPS ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-orange-300 text-orange-700"}`}
+                  title={`Taux de croissance BPA (EPS)\n\nTaux de croissance annuel composé pour projeter le BPA sur 5 ans.\n\nPlage recommandée: 0% à 20%\nLimite système: -50% à +50%\n\nAuto-rempli avec le CAGR historique.\n\nFormule projection: BPA × (1 + Taux/100)⁵`}
                 />
               </td>
-              <td className={`p-3 font-medium ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"}`}>{futureValues.eps.toFixed(2)}</td>
+              <td className={`p-3 font-medium ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`} title={`BPA (EPS) Projeté (5 ans): ${futureValues.eps.toFixed(2)} $\n\nCalculé avec:\nBPA Actuel (${baseValues.eps.toFixed(2)}) × (1 + ${assumptions.growthRateEPS}%)⁵\n\n= ${futureValues.eps.toFixed(2)} $\n\nValeur projetée utilisée pour calculer le prix cible.`}>{futureValues.eps.toFixed(2)}</td>
               <td className={`p-3 ${assumptions.excludeEPS ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -510,9 +515,10 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   onChange={(e) => handleInput(e, 'targetPE')} 
                   disabled={assumptions.excludeEPS}
                   className={`w-16 text-right border-b outline-none focus:border-orange-500 bg-transparent font-medium ${assumptions.excludeEPS ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-orange-300 text-orange-700"}`}
+                  title={`P/E Cible (Ratio Prix/Bénéfice)\n\nRatio P/E attendu dans 5 ans.\n\nPlage recommandée: 1x à 100x\nLimite système: 1x à 100x\n\nAuto-rempli avec la moyenne historique.\n\nPrix Cible = BPA Projeté × P/E Cible`}
                 />
               </td>
-              <td className={`p-3 font-bold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"}`}>{formatCurrency(targets.eps)}</td>
+              <td className={`p-3 font-bold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`} title={`Prix Cible BPA (EPS): ${formatCurrency(targets.eps)}\n\nCalculé avec:\nBPA Projeté (${futureValues.eps.toFixed(2)}) × P/E Cible (${assumptions.targetPE}x)\n\n= ${formatCurrency(targets.eps)}\n\n${assumptions.excludeEPS ? '❌ Exclu du prix cible moyen' : '✅ Inclus dans le prix cible moyen'}`}>{formatCurrency(targets.eps)}</td>
             </tr>
             {expandedMetrics.eps && (
               <tr>
@@ -548,7 +554,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   </button>
                 </div>
               </td>
-              <td className={`p-3 font-semibold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"}`}>{baseValues.cf.toFixed(2)}</td>
+              <td className={`p-3 font-semibold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`CFA (Cash Flow) Actuel: ${baseValues.cf.toFixed(2)} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.cf.toFixed(2)}</td>
               <td className={`p-3 ${assumptions.excludeCF ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -556,9 +562,10 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   onChange={(e) => handleInput(e, 'growthRateCF')} 
                   disabled={assumptions.excludeCF}
                   className={`w-16 text-right border-b outline-none focus:border-orange-500 bg-transparent font-medium ${assumptions.excludeCF ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-orange-300 text-orange-700"}`}
+                  title={`Taux de croissance CFA (Cash Flow)\n\nTaux de croissance annuel composé pour projeter le Cash Flow sur 5 ans.\n\nPlage recommandée: 0% à 20%\nLimite système: -50% à +50%\n\nAuto-rempli avec le CAGR historique.\n\nFormule projection: CF × (1 + Taux/100)⁵`}
                 />
               </td>
-              <td className={`p-3 font-medium ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"}`}>{futureValues.cf.toFixed(2)}</td>
+              <td className={`p-3 font-medium ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`} title={`CFA (Cash Flow) Projeté (5 ans): ${futureValues.cf.toFixed(2)} $\n\nCalculé avec:\nCF Actuel (${baseValues.cf.toFixed(2)}) × (1 + ${assumptions.growthRateCF}%)⁵\n\n= ${futureValues.cf.toFixed(2)} $\n\nValeur projetée utilisée pour calculer le prix cible.`}>{futureValues.cf.toFixed(2)}</td>
               <td className={`p-3 ${assumptions.excludeCF ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -566,9 +573,10 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   onChange={(e) => handleInput(e, 'targetPCF')} 
                   disabled={assumptions.excludeCF}
                   className={`w-16 text-right border-b outline-none focus:border-orange-500 bg-transparent font-medium ${assumptions.excludeCF ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-orange-300 text-orange-700"}`}
+                  title={`P/CF Cible (Ratio Prix/Cash Flow)\n\nRatio P/CF attendu dans 5 ans.\n\nPlage recommandée: 1x à 100x\nLimite système: 1x à 100x\n\nAuto-rempli avec la moyenne historique.\n\nPrix Cible = CF Projeté × P/CF Cible`}
                 />
               </td>
-              <td className={`p-3 font-bold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"}`}>{formatCurrency(targets.cf)}</td>
+              <td className={`p-3 font-bold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`} title={`Prix Cible CFA (Cash Flow): ${formatCurrency(targets.cf)}\n\nCalculé avec:\nCF Projeté (${futureValues.cf.toFixed(2)}) × P/CF Cible (${assumptions.targetPCF}x)\n\n= ${formatCurrency(targets.cf)}\n\n${assumptions.excludeCF ? '❌ Exclu du prix cible moyen' : '✅ Inclus dans le prix cible moyen'}`}>{formatCurrency(targets.cf)}</td>
             </tr>
             {expandedMetrics.cf && (
               <tr>
@@ -604,7 +612,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   </button>
                 </div>
               </td>
-              <td className={`p-3 font-semibold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"}`}>{baseValues.bv.toFixed(2)}</td>
+              <td className={`p-3 font-semibold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`BV (Book Value) Actuel: ${baseValues.bv.toFixed(2)} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.bv.toFixed(2)}</td>
               <td className={`p-3 ${assumptions.excludeBV ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -612,9 +620,10 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   onChange={(e) => handleInput(e, 'growthRateBV')} 
                   disabled={assumptions.excludeBV}
                   className={`w-16 text-right border-b outline-none focus:border-orange-500 bg-transparent font-medium ${assumptions.excludeBV ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-orange-300 text-orange-700"}`}
+                  title={`Taux de croissance BV (Book Value)\n\nTaux de croissance annuel composé pour projeter la Book Value sur 5 ans.\n\nPlage recommandée: 0% à 20%\nLimite système: -50% à +50%\n\nAuto-rempli avec le CAGR historique.\n\nFormule projection: BV × (1 + Taux/100)⁵`}
                 />
               </td>
-              <td className={`p-3 font-medium ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"}`}>{futureValues.bv.toFixed(2)}</td>
+              <td className={`p-3 font-medium ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`} title={`BV (Book Value) Projeté (5 ans): ${futureValues.bv.toFixed(2)} $\n\nCalculé avec:\nBV Actuel (${baseValues.bv.toFixed(2)}) × (1 + ${assumptions.growthRateBV}%)⁵\n\n= ${futureValues.bv.toFixed(2)} $\n\nValeur projetée utilisée pour calculer le prix cible.`}>{futureValues.bv.toFixed(2)}</td>
               <td className={`p-3 ${assumptions.excludeBV ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -622,9 +631,10 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   onChange={(e) => handleInput(e, 'targetPBV')} 
                   disabled={assumptions.excludeBV}
                   className={`w-16 text-right border-b outline-none focus:border-orange-500 bg-transparent font-medium ${assumptions.excludeBV ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-orange-300 text-orange-700"}`}
+                  title={`P/BV Cible (Ratio Prix/Valeur Comptable)\n\nRatio P/BV attendu dans 5 ans.\n\nPlage recommandée: 0.5x à 50x\nLimite système: 0.5x à 50x\n\nAuto-rempli avec la moyenne historique.\n\nPrix Cible = BV Projeté × P/BV Cible`}
                 />
               </td>
-              <td className={`p-3 font-bold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"}`}>{formatCurrency(targets.bv)}</td>
+              <td className={`p-3 font-bold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`} title={`Prix Cible BV (Book Value): ${formatCurrency(targets.bv)}\n\nCalculé avec:\nBV Projeté (${futureValues.bv.toFixed(2)}) × P/BV Cible (${assumptions.targetPBV}x)\n\n= ${formatCurrency(targets.bv)}\n\n${assumptions.excludeBV ? '❌ Exclu du prix cible moyen' : '✅ Inclus dans le prix cible moyen'}`}>{formatCurrency(targets.bv)}</td>
             </tr>
             {expandedMetrics.bv && (
               <tr>
@@ -660,7 +670,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   </button>
                 </div>
               </td>
-              <td className={`p-3 font-semibold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"}`}>{baseValues.div.toFixed(2)}</td>
+              <td className={`p-3 font-semibold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`DIV (Dividende) Actuel: ${baseValues.div.toFixed(2)} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.div.toFixed(2)}</td>
               <td className={`p-3 ${assumptions.excludeDIV ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -668,9 +678,10 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   onChange={(e) => handleInput(e, 'growthRateDiv')} 
                   disabled={assumptions.excludeDIV}
                   className={`w-16 text-right border-b outline-none focus:border-orange-500 bg-transparent font-medium ${assumptions.excludeDIV ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-orange-300 text-orange-700"}`}
+                  title={`Taux de croissance DIV (Dividende)\n\nTaux de croissance annuel composé pour projeter le Dividende sur 5 ans.\n\nPlage recommandée: 0% à 20%\nLimite système: -50% à +50%\n\nAuto-rempli avec le CAGR historique.\n\nFormule projection: DIV × (1 + Taux/100)⁵`}
                 />
               </td>
-              <td className={`p-3 font-medium ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"}`}>{futureValues.div.toFixed(2)}</td>
+              <td className={`p-3 font-medium ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`} title={`DIV (Dividende) Projeté (5 ans): ${futureValues.div.toFixed(2)} $\n\nCalculé avec:\nDIV Actuel (${baseValues.div.toFixed(2)}) × (1 + ${assumptions.growthRateDiv}%)⁵\n\n= ${futureValues.div.toFixed(2)} $\n\nValeur projetée utilisée pour calculer le prix cible.`}>{futureValues.div.toFixed(2)}</td>
               <td className={`p-3 ${assumptions.excludeDIV ? "bg-gray-200" : "bg-orange-50"}`}>
                 <div className="flex items-center justify-end gap-1">
                   <input 
@@ -680,11 +691,12 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                     onChange={(e) => handleInput(e, 'targetYield')} 
                     disabled={assumptions.excludeDIV}
                     className={`w-12 text-right border-b outline-none focus:border-orange-500 bg-transparent font-medium ${assumptions.excludeDIV ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-orange-300 text-orange-700"}`}
+                    title={`Yield Cible (Rendement Dividende)\n\nRendement en dividendes attendu dans 5 ans (en %).\n\nPlage recommandée: 0.1% à 20%\nLimite système: 0.1% à 20%\n\nAuto-rempli avec la moyenne historique.\n\nPrix Cible = DIV Projeté / (Yield Cible / 100)`}
                   />
                   <span className={`text-xs ${assumptions.excludeDIV ? "text-gray-400" : "text-orange-600"}`}>%</span>
                 </div>
               </td>
-              <td className={`p-3 font-bold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"}`}>{formatCurrency(targets.div)}</td>
+              <td className={`p-3 font-bold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`} title={`Prix Cible DIV (Dividende): ${formatCurrency(targets.div)}\n\nCalculé avec:\nDIV Projeté (${futureValues.div.toFixed(2)}) / (Yield Cible (${assumptions.targetYield}%) / 100)\n\n= ${formatCurrency(targets.div)}\n\n${assumptions.excludeDIV ? '❌ Exclu du prix cible moyen' : '✅ Inclus dans le prix cible moyen'}`}>{formatCurrency(targets.div)}</td>
             </tr>
             {expandedMetrics.div && (
               <tr>
@@ -697,22 +709,22 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
         </table>
       </div>
 
-      <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-end gap-4 sm:gap-6 items-end">
+      <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 md:gap-6 items-end">
         <div className="text-right w-full sm:w-auto">
-          <div className="text-xs text-gray-500 uppercase mb-1">Prix Cible Moyen (5 ans)</div>
-          <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 border-b-2 border-gray-800 inline-block px-2">
+          <div className="text-xs text-gray-500 uppercase mb-1 cursor-help" title="Prix Cible Moyen (5 ans)\n\nMoyenne des prix cibles des métriques incluses (non exclues).\n\nCalcul:\n(Prix Cible EPS + Prix Cible CF + Prix Cible BV + Prix Cible DIV) / Nombre de métriques incluses\n\n= ${formatCurrency(avgTargetPrice)}\n\nBasé sur ${validTargets.length} métrique(s) valide(s).">Prix Cible Moyen (5 ans)</div>
+          <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-800 border-b-2 border-gray-800 inline-block px-2 cursor-help break-words" title={`Prix Cible Moyen: ${formatCurrency(avgTargetPrice)}\n\nCalculé à partir de ${validTargets.length} métrique(s):\n${validTargets.map((t, i) => `• Métrique ${i + 1}: ${formatCurrency(t)}`).join('\n')}\n\nMoyenne: ${formatCurrency(avgTargetPrice)}\n\nUtilisé pour:\n• Calcul du rendement total\n• Zones de prix recommandées\n• Ratio 3:1`}>
             {formatCurrency(avgTargetPrice)}
           </div>
         </div>
 
-        <div className="bg-green-50 p-3 sm:p-4 rounded-lg border border-green-200 text-right w-full sm:min-w-[200px]">
-          <div className="text-xs text-green-800 uppercase font-bold mb-1" title="Incluant appréciation du prix et dividendes cumulés">
+        <div className="bg-green-50 p-2.5 sm:p-3 md:p-4 rounded-lg border border-green-200 text-right w-full sm:w-auto sm:min-w-[180px] md:min-w-[200px]">
+          <div className="text-xs text-green-800 uppercase font-bold mb-1 cursor-help" title="Rendement Total Potentiel (5 ans)\n\nInclut:\n• Appréciation du prix (Prix Cible - Prix Actuel)\n• Dividendes cumulés sur 5 ans\n\nFormule:\n((Prix Cible Moyen + Dividendes Totaux - Prix Actuel) / Prix Actuel) × 100\n\n= ${totalReturnPercent.toFixed(2)}%\n\n⚠️ Basé sur vos hypothèses, pas une garantie de performance.">
             Rendement Total Potentiel
           </div>
-          <div className="text-xl sm:text-2xl md:text-3xl font-black text-green-600">
+          <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black text-green-600 cursor-help break-words" title={`Rendement Total: ${totalReturnPercent.toFixed(2)}%\n\nDétail:\n• Prix Actuel: ${formatCurrency(assumptions.currentPrice)}\n• Prix Cible Moyen: ${formatCurrency(avgTargetPrice)}\n• Appréciation: ${((avgTargetPrice - assumptions.currentPrice) / assumptions.currentPrice * 100).toFixed(2)}%\n• Dividendes (5 ans): ~${((totalReturnPercent - ((avgTargetPrice - assumptions.currentPrice) / assumptions.currentPrice * 100)) * assumptions.currentPrice / 100).toFixed(2)} $\n\nBasé sur ${validTargets.length} métrique(s) incluse(s).`}>
             {totalReturnPercent.toFixed(2)}%
           </div>
-          <div className="text-[10px] text-green-700 mt-1 opacity-80">
+          <div className="text-[10px] sm:text-xs text-green-700 mt-1 opacity-80">
             (Gain Prix + Dividendes)
           </div>
         </div>

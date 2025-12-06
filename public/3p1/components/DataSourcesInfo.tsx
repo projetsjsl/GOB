@@ -1,14 +1,26 @@
 import React from 'react';
-import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { InformationCircleIcon, BookOpenIcon } from '@heroicons/react/24/outline';
 
 export const DataSourcesInfo: React.FC = () => {
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-lg shadow-sm border border-blue-200 mt-8">
-            <div className="flex items-start gap-3 mb-4">
-                <InformationCircleIcon className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
-                <h3 className="text-lg font-bold text-gray-800">
-                    📊 Sources des Données et Méthodologie de Calcul
-                </h3>
+            <div className="flex items-start justify-between gap-3 mb-4">
+                <div className="flex items-start gap-3">
+                    <InformationCircleIcon className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <h3 className="text-lg font-bold text-gray-800">
+                        📊 Sources des Données et Méthodologie de Calcul
+                    </h3>
+                </div>
+                <a
+                    href="https://github.com/projetsjsl/GOB/blob/main/docs/3P1_GUIDE_UTILISATION_METHODOLOGIE.md"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold"
+                    title="Ouvrir le guide complet dans GitHub"
+                >
+                    <BookOpenIcon className="w-5 h-5" />
+                    Guide Complet
+                </a>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -5,6 +5,7 @@ import { ValuationCharts } from './components/ValuationCharts';
 import { Sidebar } from './components/Sidebar';
 import { RightSidebar } from './components/RightSidebar';
 import { SensitivityTable } from './components/SensitivityTable';
+import { SensitivityTablePCF } from './components/SensitivityTablePCF';
 import { NotesEditor } from './components/NotesEditor';
 import { EvaluationDetails } from './components/EvaluationDetails';
 import { HistoricalRangesTable } from './components/HistoricalRangesTable';
@@ -300,11 +301,12 @@ export default function App() {
                                             ...autoFilledAssumptions
                                         },
                                         info: {
-                                            ...result.info,
                                             symbol: symbol,
                                             name: result.info.name || supabaseTicker.company_name || symbol,
                                             sector: result.info.sector || supabaseTicker.sector || '',
                                             securityRank: supabaseTicker.security_rank || 'N/A',
+                                            marketCap: result.info.marketCap || 'N/A',
+                                            ...result.info,
                                             earningsPredictability: supabaseTicker.earnings_predictability,
                                             priceGrowthPersistence: supabaseTicker.price_growth_persistence,
                                             priceStability: supabaseTicker.price_stability,
@@ -585,7 +587,16 @@ export default function App() {
                     ...preservedValueLineMetrics // Préserver les métriques ValueLine
                 };
                 
-                setInfo(updatedInfo);
+                // Ensure required fields are present
+                const completeInfo: CompanyInfo = {
+                    symbol: updatedInfo.symbol || activeId,
+                    name: updatedInfo.name || activeId,
+                    sector: updatedInfo.sector || '',
+                    securityRank: updatedInfo.securityRank || 'N/A',
+                    marketCap: updatedInfo.marketCap || 'N/A',
+                    ...updatedInfo
+                };
+                setInfo(completeInfo);
                 // Also update in library to persist logo and beta
                 setLibrary(prev => {
                     const profile = prev[activeId];
@@ -1142,7 +1153,14 @@ export default function App() {
                     ...INITIAL_ASSUMPTIONS,
                     ...autoFilledAssumptions
                 },
-                info: result.info,
+                info: {
+                    symbol: symbol,
+                    name: result.info.name || symbol,
+                    sector: result.info.sector || '',
+                    securityRank: result.info.securityRank || 'N/A',
+                    marketCap: result.info.marketCap || 'N/A',
+                    ...result.info
+                },
                 notes: '',
                 isWatchlist: false
             };
@@ -1166,7 +1184,16 @@ export default function App() {
             setActiveId(upperSymbol);
             setData(result.data);
             setAssumptions(newProfile.assumptions);
-            setInfo(result.info);
+            // Ensure required fields are present
+            const completeInfo: CompanyInfo = {
+                symbol: symbol,
+                name: result.info.name || symbol,
+                sector: result.info.sector || '',
+                securityRank: result.info.securityRank || 'N/A',
+                marketCap: result.info.marketCap || 'N/A',
+                ...result.info
+            };
+            setInfo(completeInfo);
             setNotes('');
             
             showNotification(`✅ ${upperSymbol} chargé avec succès`, 'success');
@@ -1577,10 +1604,11 @@ export default function App() {
                                         ...autoFilledAssumptions
                                     },
                                     info: {
-                                        ...result.info,
                                         symbol: symbol,
                                         name: result.info.name || supabaseTicker.company_name || symbol,
                                         sector: result.info.sector || supabaseTicker.sector || '',
+                                        marketCap: result.info.marketCap || 'N/A',
+                                        ...result.info,
                                         securityRank: supabaseTicker.security_rank || 'N/A',
                                         earningsPredictability: supabaseTicker.earnings_predictability,
                                         priceGrowthPersistence: supabaseTicker.price_growth_persistence,
@@ -1641,6 +1669,7 @@ export default function App() {
     const validHistory = data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
     const baseYearData = data.find(d => d.year === assumptions.baseYear) || data[data.length - 1];
     const baseEPS = baseYearData?.earningsPerShare || 0;
+    const baseCF = baseYearData?.cashFlowPerShare || 0;
     const effectiveBaseYear = baseYearData?.year || new Date().getFullYear();
 
     // History CAGR
@@ -1705,8 +1734,8 @@ export default function App() {
                     />
                 )}
 
-                <div className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-8 print-full-width">
-                    <div className="max-w-7xl mx-auto">
+                <div className="flex-1 overflow-y-auto p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 print-full-width">
+                    <div className="max-w-7xl mx-auto w-full">
 
                         {/* TOP BAR & NAVIGATION */}
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6 no-print">
@@ -1792,10 +1821,10 @@ export default function App() {
                                 onSelect={setActiveId}
                             />
                         ) : (
-                            <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+                            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
 
                                 {/* LEFT COLUMN - MAIN DATA */}
-                                <div className="xl:col-span-3">
+                                <div className="lg:col-span-3 order-2 lg:order-1">
                                     <div className="flex items-center justify-between mb-2 px-1">
                                         <h3 className="text-lg font-bold text-gray-700 flex items-center gap-2">
                                             Données Historiques
@@ -1831,13 +1860,22 @@ export default function App() {
                                         recommendation={recommendation}
                                     />
 
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                                        {/* Sensitivity Matrix */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6 mb-4 sm:mb-6">
+                                        {/* Sensitivity Matrix P/E */}
                                         <SensitivityTable
                                             baseEPS={baseEPS}
                                             baseGrowth={assumptions.growthRateEPS}
                                             basePE={assumptions.targetPE}
                                         />
+                                        {/* Sensitivity Matrix P/FCF */}
+                                        <SensitivityTablePCF
+                                            baseCF={baseCF}
+                                            baseGrowth={assumptions.growthRateCF}
+                                            basePCF={assumptions.targetPCF}
+                                        />
+                                    </div>
+                                    
+                                    <div className="mb-6">
                                         {/* Analyst Notes */}
                                         <NotesEditor initialNotes={notes} onSave={setNotes} />
                                     </div>
@@ -1873,7 +1911,7 @@ export default function App() {
                                 </div>
 
                                 {/* RIGHT COLUMN - SUMMARY & PARAMS */}
-                                <div className="xl:col-span-1 space-y-4 sm:space-y-6 no-print order-1 xl:order-2">
+                                <div className="lg:col-span-1 space-y-3 sm:space-y-4 md:space-y-6 no-print order-1 lg:order-2">
 
                                     {/* Summary Card */}
                                     <div className="bg-gradient-to-br from-slate-800 to-slate-900 text-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg">
@@ -1885,41 +1923,14 @@ export default function App() {
                                             Le titre se négocie à <strong className="text-white">{formatPercent(Math.abs(1 - (assumptions.currentPrice / targetPrice)) * 100)} {assumptions.currentPrice < targetPrice ? 'sous' : 'au-dessus de'}</strong> l'objectif de prix EPS de {formatCurrency(targetPrice)}.
                                         </p>
 
-                                        <div className="space-y-3 mt-6">
-                                            <div className="bg-slate-700/50 p-3 rounded">
-                                                <div className="text-xs text-slate-400 uppercase">Financial Strength</div>
-                                                <div className="text-2xl font-bold text-green-400">{info.securityRank}</div>
-                                                <div className="text-[10px] text-slate-500 mt-1">ValueLine 3 déc 2025</div>
+                                        {/* Note: Les métriques ValueLine sont affichées dans le Header (barre supérieure) et dans la section Configuration ci-dessous */}
+                                        {info.beta !== undefined && info.beta !== null && (
+                                            <div className="bg-slate-700/50 p-3 rounded mt-6">
+                                                <div className="text-xs text-slate-400 uppercase">Beta</div>
+                                                <div className="text-2xl font-bold text-blue-400">{info.beta.toFixed(2)}</div>
+                                                <div className="text-[10px] text-slate-500 mt-1">Source: API FMP</div>
                                             </div>
-                                            {info.earningsPredictability && (
-                                                <div className="bg-slate-700/50 p-3 rounded">
-                                                    <div className="text-xs text-slate-400 uppercase">Earnings Predictability</div>
-                                                    <div className="text-2xl font-bold text-purple-400">{info.earningsPredictability}</div>
-                                                    <div className="text-[10px] text-slate-500 mt-1">ValueLine 3 déc 2025</div>
-                                                </div>
-                                            )}
-                                            {info.priceGrowthPersistence && (
-                                                <div className="bg-slate-700/50 p-3 rounded">
-                                                    <div className="text-xs text-slate-400 uppercase">Price Growth Persistence</div>
-                                                    <div className="text-2xl font-bold text-pink-400">{info.priceGrowthPersistence}</div>
-                                                    <div className="text-[10px] text-slate-500 mt-1">ValueLine 3 déc 2025</div>
-                                                </div>
-                                            )}
-                                            {info.priceStability && (
-                                                <div className="bg-slate-700/50 p-3 rounded">
-                                                    <div className="text-xs text-slate-400 uppercase">Price Stability</div>
-                                                    <div className="text-2xl font-bold text-teal-400">{info.priceStability}</div>
-                                                    <div className="text-[10px] text-slate-500 mt-1">ValueLine 3 déc 2025</div>
-                                                </div>
-                                            )}
-                                            {info.beta !== undefined && info.beta !== null && (
-                                                <div className="bg-slate-700/50 p-3 rounded">
-                                                    <div className="text-xs text-slate-400 uppercase">Beta</div>
-                                                    <div className="text-2xl font-bold text-blue-400">{info.beta.toFixed(2)}</div>
-                                                    <div className="text-[10px] text-slate-500 mt-1">Source: API FMP</div>
-                                                </div>
-                                            )}
-                                        </div>
+                                        )}
                                     </div>
 
                                     {/* Editable Company Info */}
@@ -1957,7 +1968,7 @@ export default function App() {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs text-gray-500 mb-1 flex items-center gap-1">
+                                                <label className="flex text-xs text-gray-500 mb-1 items-center gap-1">
                                                     Financial Strength (ValueLine 3 déc 2025)
                                                     <span className="text-[10px] text-blue-600" title="Synchronisé depuis Supabase - Lecture seule">🔒</span>
                                                 </label>
@@ -1971,7 +1982,7 @@ export default function App() {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs text-gray-500 mb-1 flex items-center gap-1">
+                                                <label className="flex text-xs text-gray-500 mb-1 items-center gap-1">
                                                     Earnings Predictability (ValueLine 3 déc 2025)
                                                     <span className="text-[10px] text-blue-600" title="Synchronisé depuis Supabase - Lecture seule">🔒</span>
                                                 </label>
@@ -1985,7 +1996,7 @@ export default function App() {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs text-gray-500 mb-1 flex items-center gap-1">
+                                                <label className="flex text-xs text-gray-500 mb-1 items-center gap-1">
                                                     Price Growth Persistence (ValueLine 3 déc 2025)
                                                     <span className="text-[10px] text-blue-600" title="Synchronisé depuis Supabase - Lecture seule">🔒</span>
                                                 </label>
@@ -1999,7 +2010,7 @@ export default function App() {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs text-gray-500 mb-1 flex items-center gap-1">
+                                                <label className="flex text-xs text-gray-500 mb-1 items-center gap-1">
                                                     Price Stability (ValueLine 3 déc 2025)
                                                     <span className="text-[10px] text-blue-600" title="Synchronisé depuis Supabase - Lecture seule">🔒</span>
                                                 </label>

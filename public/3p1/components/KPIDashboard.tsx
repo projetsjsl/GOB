@@ -3,7 +3,7 @@ import { StarIcon, EyeIcon } from '@heroicons/react/24/solid';
 import { AnalysisProfile } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
 import { formatCurrency, formatPercent } from '../utils/calculations';
-import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon, ExclamationCircleIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { listSnapshots } from '../services/snapshotApi';
 
 interface KPIDashboardProps {
@@ -23,6 +23,27 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   const [matrixView, setMatrixView] = useState<'grid' | 'list' | 'compact'>('grid');
   const [approvedVersions, setApprovedVersions] = useState<Set<string>>(new Set());
   const [isLoadingApprovedVersions, setIsLoadingApprovedVersions] = useState(false);
+  
+  // États pour gérer la visibilité des sections (collapse/expand)
+  const [sectionsVisibility, setSectionsVisibility] = useState<Record<string, boolean>>({
+    globalStats: true,
+    comparison: true,
+    filters: true,
+    performanceMatrix: true,
+    scatterPlot: true,
+    scatterPlotRatio31: true,
+    returnDistribution: true,
+    otherVisualizations: true,
+    correlationMatrix: true,
+    detailedTable: true
+  });
+  
+  const toggleSection = (sectionKey: string) => {
+    setSectionsVisibility(prev => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey]
+    }));
+  };
 
   // Calculer les métriques pour chaque profil
   const profileMetrics = useMemo(() => {
@@ -359,7 +380,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         minJPEGY: 0,
         maxJPEGY: 10,
         sector: '',
-        recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL'
+        recommendation: 'all' as 'all' | 'ACHAT' | 'CONSERVER' | 'VENTE'
       };
     }
     
@@ -399,7 +420,19 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       // Filtrer JPEGY seulement si la valeur est calculable (non null)
       if (metric.jpegy !== null && (metric.jpegy < filters.minJPEGY || metric.jpegy > filters.maxJPEGY)) return false;
       if (filters.sector && metric.profile.info.sector.toLowerCase() !== filters.sector.toLowerCase()) return false;
-      if (filters.recommendation !== 'all' && metric.recommendation !== filters.recommendation) return false;
+      if (filters.recommendation !== 'all') {
+        // Mapping entre les valeurs du filtre et les valeurs réelles
+        const filterMap: Record<string, string> = {
+          'BUY': 'ACHAT',
+          'HOLD': 'CONSERVER',
+          'SELL': 'VENTE',
+          'ACHAT': 'ACHAT',
+          'CONSERVER': 'CONSERVER',
+          'VENTE': 'VENTE'
+        };
+        const expectedValue = filterMap[filters.recommendation] || filters.recommendation;
+        if (metric.recommendation !== expectedValue) return false;
+      }
       // Filtre portefeuille/watchlist
       if (filters.source !== 'all') {
         const isWatchlist = metric.profile.isWatchlist ?? false;
@@ -478,6 +511,14 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     if (jpegy <= 1.75) return '#eab308'; // Jaune
     if (jpegy <= 2.0) return '#f97316'; // Orange
     return '#dc2626'; // Rouge
+  };
+
+  // Fonction pour obtenir la couleur du Ratio 3:1
+  const getRatio31Color = (ratio: number | null): string | null => {
+    if (ratio === null || !isFinite(ratio) || ratio < 0) return null;
+    if (ratio >= 3) return '#16a34a'; // Vert foncé (favorable ≥ 3:1)
+    if (ratio >= 1) return '#eab308'; // Jaune (acceptable 1:1 à 3:1)
+    return '#dc2626'; // Rouge (défavorable < 1:1)
   };
 
   // Obtenir la couleur du rendement
@@ -599,8 +640,22 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     <div className="space-y-6">
       {/* Statistiques Globales */}
       {globalStats && (
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg shadow-lg border border-blue-200">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">📊 Statistiques Globales du Portefeuille</h3>
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-blue-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📊 Statistiques Globales du Portefeuille</h3>
+            <button
+              onClick={() => toggleSection('globalStats')}
+              className="p-1.5 hover:bg-blue-100 rounded transition-colors cursor-help"
+              title={sectionsVisibility.globalStats ? "Réduire cette section" : "Agrandir cette section"}
+            >
+              {sectionsVisibility.globalStats ? (
+                <ChevronUpIcon className="w-5 h-5 text-gray-600" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5 text-gray-600" />
+              )}
+            </button>
+          </div>
+          {sectionsVisibility.globalStats && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
             <div className="bg-white p-2 sm:p-3 md:p-4 rounded-lg shadow border border-gray-200">
               <div className="text-xs text-gray-500 mb-1">Rendement Moyen</div>
@@ -628,6 +683,12 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     {globalStats.avgJPEGY.toFixed(2)}
                   </div>
                   <div className="text-xs text-gray-400 mt-1">Médiane: {globalStats.medianJPEGY !== null ? globalStats.medianJPEGY.toFixed(2) : 'N/A'}</div>
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <div className="text-[10px] text-gray-400 space-y-0.5">
+                      <div><strong>Source:</strong> P/E Actuel ÷ (Croissance EPS % + Yield %)</div>
+                      <div><strong>Fournisseur:</strong> Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Ajuste le P/E par la somme du taux de croissance et du rendement du dividende pour une évaluation nuancée de la valorisation.</div>
+                    </div>
+                  </div>
                 </>
               ) : (
                 <>
@@ -649,26 +710,42 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               </div>
             </div>
           </div>
+          )}
         </div>
       )}
 
       {/* Mode Comparaison */}
       {comparisonMode && selectedForComparison.length > 0 && (
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg border-2 border-purple-300">
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border-2 border-purple-300">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 flex items-center gap-2">
               🔍 Mode Comparaison ({selectedForComparison.length} titre(s))
             </h3>
-            <button
-              onClick={() => {
-                setComparisonMode(false);
-                setSelectedForComparison([]);
-              }}
-              className="px-4 py-2 bg-red-500 text-white text-sm font-semibold rounded-lg hover:bg-red-600 transition-colors"
-            >
-              Fermer
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => toggleSection('comparison')}
+                className="p-1.5 hover:bg-purple-100 rounded transition-colors cursor-help"
+                title={sectionsVisibility.comparison ? "Réduire cette section" : "Agrandir cette section"}
+              >
+                {sectionsVisibility.comparison ? (
+                  <ChevronUpIcon className="w-5 h-5 text-gray-600" />
+                ) : (
+                  <ChevronDownIcon className="w-5 h-5 text-gray-600" />
+                )}
+              </button>
+              <button
+                onClick={() => {
+                  setComparisonMode(false);
+                  setSelectedForComparison([]);
+                }}
+                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-red-500 text-white text-xs sm:text-sm font-semibold rounded-lg hover:bg-red-600 transition-colors"
+                title="Fermer le mode comparaison"
+              >
+                Fermer
+              </button>
+            </div>
           </div>
+          {sectionsVisibility.comparison && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {selectedForComparison.map(ticker => {
               const metric = filteredMetrics.find(m => m.profile.id === ticker);
@@ -689,17 +766,27 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                       <span className="text-gray-600">Rendement:</span>
                       <span className="font-bold text-green-600">{metric.totalReturnPercent.toFixed(1)}%</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-start">
                       <span className="text-gray-600">JPEGY:</span>
-                      {metric.jpegy !== null ? (
-                        <span className="font-bold" style={{ color: getJpegyColor(metric.jpegy) || '#9ca3af' }}>
-                          {metric.jpegy.toFixed(2)}
-                        </span>
-                      ) : (
-                        <span className="font-bold text-gray-400 flex items-center gap-1">
-                          N/A <ExclamationTriangleIcon className="w-4 h-4 text-orange-500" title="JPEGY non calculable" />
-                        </span>
-                      )}
+                      <div className="text-right">
+                        {metric.jpegy !== null ? (
+                          <>
+                            <span className="font-bold" style={{ color: getJpegyColor(metric.jpegy) || '#9ca3af' }}>
+                              {metric.jpegy.toFixed(2)}
+                            </span>
+                            <div className="mt-1 pt-1 border-t border-gray-200">
+                              <div className="text-[9px] text-gray-400 space-y-0.5 text-left">
+                                <div><strong>Source:</strong> P/E ÷ (Growth % + Yield %)</div>
+                                <div><strong>Fournisseur:</strong> JSLAI™ - Métrique propriétaire ajustant le P/E par croissance et dividende.</div>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <span className="font-bold text-gray-400 flex items-center gap-1">
+                            N/A <ExclamationTriangleIcon className="w-4 h-4 text-orange-500" title="JPEGY non calculable" />
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Ratio 3:1:</span>
@@ -740,6 +827,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               );
             })}
           </div>
+          )}
         </div>
       )}
 
@@ -753,6 +841,17 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 mb-3 sm:mb-4">
           <div className="flex items-center gap-2 sm:gap-3">
             <h3 className="text-base sm:text-lg font-bold">🔍 Filtres de Screening</h3>
+            <button
+              onClick={() => toggleSection('filters')}
+              className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
+              title={sectionsVisibility.filters ? "Réduire cette section" : "Agrandir cette section"}
+            >
+              {sectionsVisibility.filters ? (
+                <ChevronUpIcon className="w-5 h-5 text-gray-600" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5 text-gray-600" />
+              )}
+            </button>
             {(filters.minReturn !== -100 || filters.maxReturn !== 500 || filters.minJPEGY !== 0 || 
               filters.maxJPEGY !== 5 || filters.sector !== '' || filters.recommendation !== 'all') && (
               <span className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full flex items-center gap-1">
@@ -769,13 +868,16 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   ? 'bg-purple-500 text-white' 
                   : 'bg-purple-100 hover:bg-purple-200 text-purple-700'
               }`}
+              title={comparisonMode 
+                ? "Désactiver le Mode Comparaison\n\nCliquez pour désactiver le mode comparaison.\n\nEn mode comparaison, vous pouvez sélectionner jusqu'à 5 tickers pour les comparer côte à côte."
+                : "Activer le Mode Comparaison\n\nCliquez pour activer le mode comparaison.\n\nEn mode comparaison:\n• Sélectionnez jusqu'à 5 tickers (cliquez sur les tuiles)\n• Les tickers sélectionnés sont marqués avec un numéro\n• Comparez leurs métriques côte à côte\n\nUtile pour comparer plusieurs opportunités d'investissement."}
             >
               {comparisonMode ? '✕ Mode Comparaison' : '🔍 Mode Comparaison'}
             </button>
             <button
               onClick={() => setFilters(defaultFilterValues)}
               className="px-2 sm:px-3 py-1 text-[10px] sm:text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
-              title="Réinitialiser tous les filtres pour afficher tous les titres"
+              title="Réinitialiser tous les filtres\n\nRéinitialise tous les filtres actifs:\n• Rendement\n• JPEGY\n• Ratio 3:1\n• Recommandation\n• Secteur\n• Source\n\nAffiche tous les titres du portefeuille."
             >
               🔄 Réinitialiser
             </button>
@@ -787,6 +889,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 setFilters(prev => ({ ...prev, minReturn: minReturn - 5, maxReturn: maxReturn + 5 }));
               }}
               className="px-2 sm:px-3 py-1 text-[10px] sm:text-xs bg-gray-100 hover:bg-blue-100 hover:text-blue-600 text-gray-700 rounded transition-colors"
+              title="Zoom Top 10\n\nFiltre automatiquement pour afficher uniquement les 10 tickers avec le meilleur rendement total projeté.\n\nAjuste les filtres Min/Max de rendement pour encadrer ces 10 tickers."
             >
               Top 10
             </button>
@@ -801,11 +904,14 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 }
               }}
               className="px-2 sm:px-3 py-1 text-[10px] sm:text-xs bg-green-100 hover:bg-green-200 rounded transition-colors"
+              title="Sous-évalués (JPEGY ≤ 1.5)\n\nFiltre automatiquement pour afficher uniquement les tickers avec un JPEGY ≤ 1.5.\n\nJPEGY ≤ 1.5 indique une action sous-évaluée ou raisonnablement valorisée.\n\nAjuste automatiquement les filtres JPEGY Min/Max."
             >
               Sous-évalués
             </button>
           </div>
         </div>
+        {sectionsVisibility.filters && (
+          <>
         <div className="mb-4 flex items-center justify-between">
           <div className="text-sm text-gray-600">
             <span className="font-bold text-blue-600">{filteredMetrics.length}</span> titre(s) affiché(s) sur{' '}
@@ -826,100 +932,106 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         </div>
         
         {/* Filtres avec indicateurs visuels */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-2.5 md:gap-3 lg:gap-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">Rendement Min (%)</label>
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Rendement Total Projeté Minimum (%)\n\nFiltre les tickers avec un rendement total projeté supérieur ou égal à cette valeur.\n\nLe rendement total inclut:\n• Appréciation du prix (5 ans)\n• Dividendes cumulés (5 ans)\n\nPlage par défaut: -100% à +1000%">Rendement Min (%)</label>
             <input
               type="number"
               value={filters.minReturn}
               onChange={(e) => setFilters({ ...filters, minReturn: parseFloat(e.target.value) || defaultFilterValues.minReturn })}
-              className={`w-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 border-2 rounded-lg text-xs sm:text-sm transition-all ${
+              className={`w-full px-2 sm:px-2.5 md:px-3 lg:px-4 py-1.5 sm:py-2 border-2 rounded-lg text-xs sm:text-sm transition-all ${
                 filters.minReturn !== defaultFilterValues.minReturn 
                   ? 'border-blue-400 bg-blue-50 focus:ring-2 focus:ring-blue-500' 
                   : 'border-gray-300 focus:border-blue-400'
               }`}
+              title={`Filtre: Rendement Min = ${filters.minReturn}%\n\nAffiche uniquement les tickers avec un rendement total projeté ≥ ${filters.minReturn}%.\n\n${filters.minReturn !== defaultFilterValues.minReturn ? '✅ Filtre actif' : 'Filtre par défaut'}`}
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">Rendement Max (%)</label>
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Rendement Total Projeté Maximum (%)\n\nFiltre les tickers avec un rendement total projeté inférieur ou égal à cette valeur.\n\nLe rendement total inclut:\n• Appréciation du prix (5 ans)\n• Dividendes cumulés (5 ans)\n\nPlage par défaut: -100% à +1000%">Rendement Max (%)</label>
             <input
               type="number"
               value={filters.maxReturn}
               onChange={(e) => setFilters({ ...filters, maxReturn: parseFloat(e.target.value) || defaultFilterValues.maxReturn })}
-              className={`w-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 border-2 rounded-lg text-xs sm:text-sm transition-all ${
+              className={`w-full px-2 sm:px-2.5 md:px-3 lg:px-4 py-1.5 sm:py-2 border-2 rounded-lg text-xs sm:text-sm transition-all ${
                 filters.maxReturn !== defaultFilterValues.maxReturn 
                   ? 'border-blue-400 bg-blue-50 focus:ring-2 focus:ring-blue-500' 
                   : 'border-gray-300 focus:border-blue-400'
               }`}
+              title={`Filtre: Rendement Max = ${filters.maxReturn}%\n\nAffiche uniquement les tickers avec un rendement total projeté ≤ ${filters.maxReturn}%.\n\n${filters.maxReturn !== defaultFilterValues.maxReturn ? '✅ Filtre actif' : 'Filtre par défaut'}`}
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">JPEGY Min</label>
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="JPEGY Minimum\n\nFiltre les tickers avec un JPEGY supérieur ou égal à cette valeur.\n\nJPEGY = P/E ÷ (Croissance % + Yield %)\n\nPlage recommandée: 0.0 à 5.0\n\nPlus le JPEGY est bas, plus l'action est attractive.">JPEGY Min</label>
             <input
               type="number"
               step="0.1"
               value={filters.minJPEGY}
               onChange={(e) => setFilters({ ...filters, minJPEGY: parseFloat(e.target.value) || defaultFilterValues.minJPEGY })}
-              className={`w-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 border-2 rounded-lg text-xs sm:text-sm transition-all ${
+              className={`w-full px-2 sm:px-2.5 md:px-3 lg:px-4 py-1.5 sm:py-2 border-2 rounded-lg text-xs sm:text-sm transition-all ${
                 filters.minJPEGY !== defaultFilterValues.minJPEGY 
                   ? 'border-green-400 bg-green-50 focus:ring-2 focus:ring-green-500' 
                   : 'border-gray-300 focus:border-green-400'
               }`}
+              title={`Filtre: JPEGY Min = ${filters.minJPEGY}\n\nAffiche uniquement les tickers avec un JPEGY ≥ ${filters.minJPEGY}.\n\n${filters.minJPEGY !== defaultFilterValues.minJPEGY ? '✅ Filtre actif' : 'Filtre par défaut'}`}
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">JPEGY Max</label>
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="JPEGY Maximum\n\nFiltre les tickers avec un JPEGY inférieur ou égal à cette valeur.\n\nJPEGY = P/E ÷ (Croissance % + Yield %)\n\nPlage recommandée: 0.0 à 5.0\n\nPlus le JPEGY est bas, plus l'action est attractive.">JPEGY Max</label>
             <input
               type="number"
               step="0.1"
               value={filters.maxJPEGY}
               onChange={(e) => setFilters({ ...filters, maxJPEGY: parseFloat(e.target.value) || defaultFilterValues.maxJPEGY })}
-              className={`w-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 border-2 rounded-lg text-xs sm:text-sm transition-all ${
+              className={`w-full px-2 sm:px-2.5 md:px-3 lg:px-4 py-1.5 sm:py-2 border-2 rounded-lg text-xs sm:text-sm transition-all ${
                 filters.maxJPEGY !== defaultFilterValues.maxJPEGY 
                   ? 'border-green-400 bg-green-50 focus:ring-2 focus:ring-green-500' 
                   : 'border-gray-300 focus:border-green-400'
               }`}
+              title={`Filtre: JPEGY Max = ${filters.maxJPEGY}\n\nAffiche uniquement les tickers avec un JPEGY ≤ ${filters.maxJPEGY}.\n\n${filters.maxJPEGY !== defaultFilterValues.maxJPEGY ? '✅ Filtre actif' : 'Filtre par défaut'}`}
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">Secteur</label>
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Filtre par Secteur\n\nFiltre les tickers par secteur d'activité.\n\nLaissez vide pour afficher tous les secteurs.\n\nLa recherche est insensible à la casse et cherche dans le nom du secteur.">Secteur</label>
             <input
               type="text"
               value={filters.sector}
               onChange={(e) => setFilters({ ...filters, sector: e.target.value })}
               placeholder="Tous"
-              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded text-xs sm:text-sm"
+              className="w-full px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 border border-gray-300 rounded text-xs sm:text-sm"
+              title={`Filtre: Secteur = "${filters.sector || 'Tous'}"\n\n${filters.sector ? `Affiche uniquement les tickers du secteur contenant "${filters.sector}".` : 'Affiche tous les secteurs.'}\n\n${filters.sector ? '✅ Filtre actif' : 'Filtre par défaut'}`}
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">Recommandation</label>
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Filtre par Recommandation\n\nFiltre les tickers selon la recommandation calculée:\n\n• ACHAT: Prix actuel ≤ Limite d'achat\n• CONSERVER: Entre limite d'achat et vente\n• VENTE: Prix actuel ≥ Limite de vente\n\nSélectionnez 'Toutes' pour afficher toutes les recommandations.">Recommandation</label>
             <select
               value={filters.recommendation}
               onChange={(e) => setFilters({ ...filters, recommendation: e.target.value as any })}
-              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded text-xs sm:text-sm"
+              className="w-full px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 border border-gray-300 rounded text-xs sm:text-sm"
+              title={`Filtre: Recommandation = "${filters.recommendation === 'all' ? 'Toutes' : filters.recommendation}"\n\n${filters.recommendation !== 'all' ? `Affiche uniquement les tickers avec la recommandation "${filters.recommendation}".` : 'Affiche toutes les recommandations.'}\n\n${filters.recommendation !== 'all' ? '✅ Filtre actif' : 'Filtre par défaut'}`}
             >
               <option value="all">Toutes</option>
-              <option value="BUY">Achat</option>
-              <option value="HOLD">Conserver</option>
-              <option value="SELL">Vendre</option>
+              <option value="ACHAT">Achat</option>
+              <option value="CONSERVER">Conserver</option>
+              <option value="VENTE">Vendre</option>
             </select>
           </div>
           <div className="relative">
-            <label className="block text-xs font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              Source
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-700 mb-1.5 sm:mb-2 flex items-center gap-1.5 sm:gap-2 cursor-help" title="Filtre par Source\n\nFiltre les tickers selon leur source:\n\n• ⭐ Portefeuille: Titres détenus actuellement\n• 👁️ Watchlist: Titres surveillés (non détenus)\n• Tous: Affiche les deux sources\n\nLe badge coloré indique le filtre actif.">
+              <span className="truncate">Source</span>
               {filters.source !== 'all' && (
-                <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full flex items-center gap-1 ${
+                <span className={`px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-bold rounded-full flex items-center gap-0.5 sm:gap-1 flex-shrink-0 ${
                   filters.source === 'watchlist' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'
                 }`}>
                   {filters.source === 'watchlist' ? (
                     <>
-                      <EyeIcon className="w-3 h-3" />
-                      Watchlist
+                      <EyeIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                      <span className="hidden sm:inline">Watchlist</span>
                     </>
                   ) : (
                     <>
-                      <StarIcon className="w-3 h-3" />
-                      Portefeuille
+                      <StarIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                      <span className="hidden sm:inline">Portefeuille</span>
                     </>
                   )}
                 </span>
@@ -929,7 +1041,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               <select
                 value={filters.source}
                 onChange={(e) => setFilters({ ...filters, source: e.target.value as any })}
-                className={`w-full px-4 py-2.5 border-2 rounded-lg text-sm transition-all appearance-none ${
+                className={`w-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 border-2 rounded-lg text-xs sm:text-sm transition-all appearance-none ${
                   filters.source !== 'all' 
                     ? filters.source === 'watchlist'
                       ? 'border-blue-400 bg-blue-50 focus:ring-2 focus:ring-blue-500' 
@@ -944,8 +1056,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               {filters.source !== 'all' && (
                 <button
                   onClick={() => setFilters({ ...filters, source: 'all' })}
-                  className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 text-xs"
-                  title="Réinitialiser"
+                  className="absolute right-6 sm:right-8 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 text-xs"
+                  title="Réinitialiser le filtre Source\n\nRemet le filtre Source à 'Tous' (Portefeuille + Watchlist)."
                 >
                   ✕
                 </button>
@@ -953,13 +1065,28 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             </div>
           </div>
         </div>
+          </>
+        )}
       </div>
 
       {/* Matrice à carreaux Améliorée avec Vues Multiples */}
       <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
         <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">🎯 Matrice de Performance</h3>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">🎯 Matrice de Performance</h3>
+              <button
+                onClick={() => toggleSection('performanceMatrix')}
+                className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
+                title={sectionsVisibility.performanceMatrix ? "Réduire cette section" : "Agrandir cette section"}
+              >
+                {sectionsVisibility.performanceMatrix ? (
+                  <ChevronUpIcon className="w-5 h-5 text-gray-600" />
+                ) : (
+                  <ChevronDownIcon className="w-5 h-5 text-gray-600" />
+                )}
+              </button>
+            </div>
             <p className="text-xs text-gray-500 mt-1">Cliquez sur un carreau pour sélectionner le titre</p>
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
@@ -972,7 +1099,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     ? 'bg-white text-blue-600 shadow-sm' 
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
-                title="Vue grille"
+                title="Vue grille\n\nAffiche les tickers dans une grille de tuiles colorées.\n\nChaque tuile montre:\n• Symbole du ticker\n• Rendement total projeté\n• JPEGY\n• Icônes (Portefeuille/Watchlist)\n\nLes couleurs indiquent le rendement (vert = élevé, rouge = faible)."
               >
                 ⬜ Grille
               </button>
@@ -983,7 +1110,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     ? 'bg-white text-blue-600 shadow-sm' 
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
-                title="Vue liste"
+                title="Vue liste détaillée\n\nAffiche les tickers dans un tableau détaillé.\n\nColonnes:\n• Symbole\n• Nom\n• Rendement Total\n• JPEGY\n• Ratio 3:1\n• P/E, P/CF, P/BV, Yield\n• Recommandation\n• Secteur\n\nCliquez sur une ligne pour voir l'analyse complète."
               >
                 ☰ Liste
               </button>
@@ -994,7 +1121,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     ? 'bg-white text-blue-600 shadow-sm' 
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
-                title="Vue compacte"
+                title="Vue compacte (matrice)\n\nAffiche les tickers dans une matrice compacte.\n\nChaque case montre:\n• Symbole du ticker\n• Rendement total projeté\n• JPEGY\n\nIdéal pour une vue d'ensemble rapide de tous les tickers.\n\nLes cases sont colorées selon le rendement."
               >
                 ▦ Compacte
               </button>
@@ -1019,6 +1146,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             </div>
           </div>
         </div>
+        {sectionsVisibility.performanceMatrix && (
+          <>
         {filteredMetrics.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             Aucun titre ne correspond aux filtres sélectionnés.
@@ -1084,6 +1213,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     }, 100);
                   }}
                   className="px-3 py-1 text-xs bg-gray-100 hover:bg-blue-100 hover:text-blue-600 text-gray-700 rounded transition-colors"
+                  title="Zoom Top 10\n\nFait défiler automatiquement vers les 10 meilleurs tickers (par rendement total projeté).\n\nUtile pour se concentrer rapidement sur les meilleures opportunités."
                 >
                   Zoom Top 10
                 </button>
@@ -1091,7 +1221,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             </div>
             {/* Vue Grille */}
             {matrixView === 'grid' && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-2 sm:gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-2 sm:gap-2.5 md:gap-3">
                 {filteredMetrics.map((metric) => (
                   <div
                     key={metric.profile.id}
@@ -1111,7 +1241,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                         onSelect(metric.profile.id);
                       }
                     }}
-                    className={`p-2 sm:p-2.5 md:p-3 rounded-lg cursor-pointer transition-all hover:scale-105 sm:hover:scale-110 hover:shadow-xl border-2 ${
+                    className={`p-1.5 sm:p-2 md:p-2.5 lg:p-3 rounded-lg cursor-pointer transition-all hover:scale-105 sm:hover:scale-110 hover:shadow-xl border-2 ${
                       currentId === metric.profile.id ? 'border-blue-600 ring-4 ring-blue-300 shadow-xl' : 
                       comparisonMode && selectedForComparison.includes(metric.profile.id)
                         ? 'border-purple-600 ring-4 ring-purple-300 shadow-xl' 
@@ -1236,6 +1366,14 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                           {metric.jpegy === null && <ExclamationTriangleIcon className="w-3 h-3 text-orange-500" title="JPEGY non calculable" />}
                         </div>
                         <div className="text-xs text-gray-500">JPEGY</div>
+                        {metric.jpegy !== null && (
+                          <div className="mt-1 pt-1 border-t border-gray-200">
+                            <div className="text-[9px] text-gray-400 space-y-0.5 text-left">
+                              <div><strong>Source:</strong> P/E ÷ (Growth % + Yield %)</div>
+                              <div><strong>Fournisseur:</strong> JSLAI™ - Métrique propriétaire ajustant le P/E par croissance et dividende.</div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       <div className="text-right">
                         <div className={`font-semibold ${
@@ -1266,7 +1404,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
 
             {/* Vue Compacte */}
             {matrixView === 'compact' && (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-15 gap-1.5 sm:gap-2">
+              <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12 gap-1 sm:gap-1.5 md:gap-2">
                 {filteredMetrics.map((metric) => (
                   <div
                     key={metric.profile.id}
@@ -1319,25 +1457,42 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
               </div>
             )}
           </>
+          )}
+          </>
         )}
       </div>
 
       {/* Graphique X/Y Amélioré */}
       <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📊 Positionnement JPEGY vs Rendement Total</h3>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📊 Positionnement JPEGY vs Rendement Total</h3>
+            <button
+              onClick={() => toggleSection('scatterPlot')}
+              className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
+              title={sectionsVisibility.scatterPlot ? "Réduire cette section" : "Agrandir cette section"}
+            >
+              {sectionsVisibility.scatterPlot ? (
+                <ChevronUpIcon className="w-5 h-5 text-gray-600" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5 text-gray-600" />
+              )}
+            </button>
+          </div>
           <div className="text-xs text-gray-500">
             {filteredMetrics.length} titre(s) affiché(s)
           </div>
         </div>
+        {sectionsVisibility.scatterPlot && (
+          <>
         {filteredMetrics.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             Aucun titre à afficher sur le graphique.
           </div>
         ) : (
-          <div className="overflow-x-auto bg-gray-50 p-2 sm:p-4 rounded-lg">
-            <div className="min-w-[600px]">
-              <svg width={chartWidth} height={chartHeight} className="border border-gray-300 rounded bg-white w-full" viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="xMidYMid meet">
+          <div className="overflow-x-auto bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg">
+            <div className="min-w-[600px] sm:min-w-[700px] md:min-w-[800px]">
+              <svg width={chartWidth} height={chartHeight} className="border border-gray-300 rounded bg-white w-full max-w-full" viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="xMidYMid meet">
                 {/* Grille de fond */}
               {xTicks.map((tick, i) => (
                 <line
@@ -1445,6 +1600,18 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                 Rendement Total Projeté (5 ans, %) - Ratio 3:1
               </text>
               
+              {/* Note explicative JPEGY sous le graphique */}
+              <g transform={`translate(${chartWidth / 2}, ${chartHeight - 5})`}>
+                <text 
+                  x={0} 
+                  y={0} 
+                  textAnchor="middle" 
+                  className="text-[9px] fill-gray-500"
+                >
+                  JPEGY = P/E ÷ (Growth % + Yield %) | Source: JSLAI™ (Jean-Sébastien)
+                </text>
+              </g>
+              
               {/* Légende JPEGY */}
               <g transform={`translate(${chartWidth - 200}, ${padding + 20})`}>
                 <text x={0} y={0} className="text-xs font-semibold fill-gray-700">Légende JPEGY:</text>
@@ -1507,14 +1674,329 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
               }
               </svg>
             </div>
+            {/* Note explicative JPEGY sous le graphique */}
+            <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="text-xs text-gray-700 space-y-1">
+                <div className="font-semibold mb-1">📊 À propos de JPEGY :</div>
+                <div><strong>Source de calcul:</strong> P/E Actuel ÷ (Taux de croissance EPS % + Rendement dividende %)</div>
+                <div><strong>Formule:</strong> JPEGY = Prix Actuel / BPA ÷ (Taux de croissance annuel des bénéfices % + Rendement du dividende %)</div>
+                <div><strong>Fournisseur:</strong> Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Le fournisseur établit cette métrique en ajustant le ratio P/E traditionnel par la somme du taux de croissance des bénéfices et du rendement du dividende, permettant une évaluation plus nuancée de la valorisation d'une action en tenant compte de sa capacité de croissance et de sa distribution de dividendes. Plus le ratio est bas, plus l'action est attractive.</div>
+              </div>
+            </div>
           </div>
+        )}
+          </>
+        )}
+      </div>
+
+      {/* Graphique X/Y Ratio 3:1 vs Rendement Total */}
+      <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📊 Positionnement Ratio 3:1 vs Rendement Total</h3>
+            <button
+              onClick={() => toggleSection('scatterPlotRatio31')}
+              className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
+              title={sectionsVisibility.scatterPlotRatio31 ? "Réduire cette section" : "Agrandir cette section"}
+            >
+              {sectionsVisibility.scatterPlotRatio31 ? (
+                <ChevronUpIcon className="w-5 h-5 text-gray-600" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5 text-gray-600" />
+              )}
+            </button>
+          </div>
+          <div className="text-xs text-gray-500">
+            {filteredMetrics.length} titre(s) affiché(s)
+          </div>
+        </div>
+        {sectionsVisibility.scatterPlotRatio31 && (
+          <>
+        {filteredMetrics.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            Aucun titre à afficher sur le graphique.
+          </div>
+        ) : (
+          <div className="overflow-x-auto bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg">
+            <div className="min-w-[600px] sm:min-w-[700px] md:min-w-[800px]">
+              {(() => {
+                // Calculer les échelles pour Ratio 3:1
+                const validMetricsForRatio31Chart = filteredMetrics.filter(m => 
+                  !m.hasInvalidData && 
+                  m.totalReturnPercent >= -100 && m.totalReturnPercent <= 1000 &&
+                  m.ratio31 >= 0 && m.ratio31 <= 100 &&
+                  isFinite(m.totalReturnPercent) && isFinite(m.ratio31)
+                );
+                
+                const maxRatio31 = validMetricsForRatio31Chart.length > 0 
+                  ? Math.max(...validMetricsForRatio31Chart.map(m => m.ratio31), 10)
+                  : 10;
+                const minRatio31 = validMetricsForRatio31Chart.length > 0
+                  ? Math.min(...validMetricsForRatio31Chart.map(m => m.ratio31), 0)
+                  : 0;
+                const maxReturnRatio31 = validMetricsForRatio31Chart.length > 0
+                  ? Math.max(...validMetricsForRatio31Chart.map(m => m.totalReturnPercent), 200)
+                  : 200;
+                const minReturnRatio31 = validMetricsForRatio31Chart.length > 0
+                  ? Math.min(...validMetricsForRatio31Chart.map(m => m.totalReturnPercent), -50)
+                  : -50;
+                
+                const xScaleRatio31 = (ratio: number) => {
+                  const range = maxRatio31 - minRatio31 || 1;
+                  return padding + ((ratio - minRatio31) / range) * (chartWidth - 2 * padding);
+                };
+                
+                const yScaleRatio31 = (returnPercent: number) => {
+                  const range = maxReturnRatio31 - minReturnRatio31 || 1;
+                  return chartHeight - padding - (((returnPercent - minReturnRatio31) / range) * (chartHeight - 2 * padding));
+                };
+                
+                // Générer les ticks pour les axes Ratio 3:1
+                const xTicksRatio31 = [];
+                const xTickCountRatio31 = 10;
+                for (let i = 0; i <= xTickCountRatio31; i++) {
+                  const value = minRatio31 + (maxRatio31 - minRatio31) * (i / xTickCountRatio31);
+                  xTicksRatio31.push({ value, position: xScaleRatio31(value) });
+                }
+                
+                const yTicksRatio31 = [];
+                const yTickCountRatio31 = 10;
+                for (let i = 0; i <= yTickCountRatio31; i++) {
+                  const value = minReturnRatio31 + (maxReturnRatio31 - minReturnRatio31) * (i / yTickCountRatio31);
+                  yTicksRatio31.push({ value, position: yScaleRatio31(value) });
+                }
+                
+                return (
+                  <svg width={chartWidth} height={chartHeight} className="border border-gray-300 rounded bg-white w-full max-w-full" viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="xMidYMid meet">
+                    {/* Grille de fond */}
+                    {xTicksRatio31.map((tick, i) => (
+                      <line
+                        key={`x-grid-ratio31-${i}`}
+                        x1={tick.position}
+                        y1={padding}
+                        x2={tick.position}
+                        y2={chartHeight - padding}
+                        stroke="#e5e7eb"
+                        strokeWidth="1"
+                        strokeDasharray="2,2"
+                      />
+                    ))}
+                    {yTicksRatio31.map((tick, i) => (
+                      <line
+                        key={`y-grid-ratio31-${i}`}
+                        x1={padding}
+                        y1={tick.position}
+                        x2={chartWidth - padding}
+                        y2={tick.position}
+                        stroke="#e5e7eb"
+                        strokeWidth="1"
+                        strokeDasharray="2,2"
+                      />
+                    ))}
+                    
+                    {/* Ligne de référence à 3:1 */}
+                    {maxRatio31 >= 3 && minRatio31 <= 3 && (
+                      <line
+                        x1={xScaleRatio31(3)}
+                        y1={padding}
+                        x2={xScaleRatio31(3)}
+                        y2={chartHeight - padding}
+                        stroke="#16a34a"
+                        strokeWidth="2"
+                        strokeDasharray="5,5"
+                        opacity="0.6"
+                      />
+                    )}
+                    
+                    {/* Axes */}
+                    <line
+                      x1={padding}
+                      y1={chartHeight - padding}
+                      x2={chartWidth - padding}
+                      y2={chartHeight - padding}
+                      stroke="#1f2937"
+                      strokeWidth="2"
+                    />
+                    <line
+                      x1={padding}
+                      y1={padding}
+                      x2={padding}
+                      y2={chartHeight - padding}
+                      stroke="#1f2937"
+                      strokeWidth="2"
+                    />
+                  
+                    {/* Ticks et Labels sur l'axe X */}
+                    {xTicksRatio31.map((tick, i) => (
+                      <g key={`x-tick-ratio31-${i}`}>
+                        <line
+                          x1={tick.position}
+                          y1={chartHeight - padding}
+                          x2={tick.position}
+                          y2={chartHeight - padding + 5}
+                          stroke="#1f2937"
+                          strokeWidth="1.5"
+                        />
+                        <text
+                          x={tick.position}
+                          y={chartHeight - padding + 20}
+                          textAnchor="middle"
+                          className="text-xs font-medium fill-gray-700"
+                        >
+                          {tick.value.toFixed(1)}:1
+                        </text>
+                      </g>
+                    ))}
+                    
+                    {/* Ticks et Labels sur l'axe Y */}
+                    {yTicksRatio31.map((tick, i) => (
+                      <g key={`y-tick-ratio31-${i}`}>
+                        <line
+                          x1={padding}
+                          y1={tick.position}
+                          x2={padding - 5}
+                          y2={tick.position}
+                          stroke="#1f2937"
+                          strokeWidth="1.5"
+                        />
+                        <text
+                          x={padding - 10}
+                          y={tick.position + 4}
+                          textAnchor="end"
+                          className="text-xs font-medium fill-gray-700"
+                        >
+                          {tick.value.toFixed(0)}%
+                        </text>
+                      </g>
+                    ))}
+                  
+                    {/* Labels des axes */}
+                    <text 
+                      x={chartWidth / 2} 
+                      y={chartHeight - 15} 
+                      textAnchor="middle" 
+                      className="text-sm font-bold fill-gray-800"
+                    >
+                      Ratio 3:1 (Potentiel de Hausse vs Risque de Baisse)
+                    </text>
+                    <text
+                      x={25}
+                      y={chartHeight / 2}
+                      textAnchor="middle"
+                      transform={`rotate(-90, 25, ${chartHeight / 2})`}
+                      className="text-sm font-bold fill-gray-800"
+                    >
+                      Rendement Total Projeté (5 ans, %)
+                    </text>
+                    
+                    {/* Note explicative Ratio 3:1 sous le graphique */}
+                    <g transform={`translate(${chartWidth / 2}, ${chartHeight - 5})`}>
+                      <text 
+                        x={0} 
+                        y={0} 
+                        textAnchor="middle" 
+                        className="text-[9px] fill-gray-500"
+                      >
+                        Ratio 3:1 = Potentiel de Hausse (%) ÷ Risque de Baisse (%) | Source: JSLAI™
+                      </text>
+                    </g>
+                    
+                    {/* Légende Ratio 3:1 */}
+                    <g transform={`translate(${chartWidth - 200}, ${padding + 20})`}>
+                      <text x={0} y={0} className="text-xs font-semibold fill-gray-700">Légende Ratio 3:1:</text>
+                      {[
+                        { label: 'Favorable (≥3:1)', color: '#16a34a' },
+                        { label: 'Acceptable (1:1-3:1)', color: '#eab308' },
+                        { label: 'Défavorable (<1:1)', color: '#dc2626' }
+                      ].map((item, idx) => (
+                        <g key={idx} transform={`translate(0, ${(idx + 1) * 18})`}>
+                          <circle cx={8} cy={0} r={6} fill={item.color} />
+                          <text x={20} y={4} className="text-[10px] fill-gray-600">{item.label}</text>
+                        </g>
+                      ))}
+                    </g>
+
+                    {/* Points - EXCLURE les données invalides du graphique */}
+                    {filteredMetrics
+                      .filter(metric => !metric.hasInvalidData) // Exclure complètement les données invalides
+                      .map((metric) => {
+                        // Validation supplémentaire: exclure les valeurs aberrantes
+                        if (metric.ratio31 < 0 || metric.ratio31 > 100 || 
+                            metric.totalReturnPercent > 1000 || metric.totalReturnPercent < -100 || 
+                            !isFinite(metric.totalReturnPercent) || !isFinite(metric.ratio31)) {
+                          return null; // Ne pas afficher ce point
+                        }
+                        
+                        const x = xScaleRatio31(metric.ratio31);
+                        const y = yScaleRatio31(metric.totalReturnPercent);
+                        const ratio31Color = getRatio31Color(metric.ratio31);
+                        return (
+                          <g key={`ratio31-${metric.profile.id}`}>
+                            <circle
+                              cx={x}
+                              cy={y}
+                              r={currentId === metric.profile.id ? 8 : 6}
+                              fill={ratio31Color || '#9ca3af'}
+                              stroke={currentId === metric.profile.id ? '#2563eb' : '#fff'}
+                              strokeWidth={currentId === metric.profile.id ? 2 : 1}
+                              className="cursor-pointer hover:r-8"
+                              onClick={() => onSelect(metric.profile.id)}
+                            />
+                            {currentId === metric.profile.id && (
+                              <text
+                                x={x}
+                                y={y - 15}
+                                textAnchor="middle"
+                                className="text-xs font-bold fill-blue-600"
+                              >
+                                {metric.profile.id}
+                              </text>
+                            )}
+                          </g>
+                        );
+                      })
+                      .filter(Boolean) // Retirer les null
+                    }
+                  </svg>
+                );
+              })()}
+            </div>
+            {/* Note explicative Ratio 3:1 sous le graphique */}
+            <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="text-xs text-gray-700 space-y-1">
+                <div className="font-semibold mb-1">📊 À propos du Ratio 3:1 :</div>
+                <div><strong>Source de calcul:</strong> Potentiel de Hausse (%) ÷ Risque de Baisse (%)</div>
+                <div><strong>Formule:</strong> Ratio 3:1 = ((Prix Projeté - Prix Actuel) / Prix Actuel × 100) ÷ ((Prix Actuel - Prix Plancher) / Prix Actuel × 100)</div>
+                <div><strong>Fournisseur:</strong> Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Le fournisseur établit cette métrique en comparant le potentiel de hausse (gain potentiel si le prix atteint le prix projeté) au risque de baisse (perte potentielle jusqu'au prix plancher historique). Un ratio ≥ 3:1 indique que le potentiel de hausse est au moins 3 fois supérieur au risque de baisse, ce qui représente un bon rapport risque/rendement.</div>
+              </div>
+            </div>
+          </div>
+        )}
+          </>
         )}
       </div>
 
       {/* Graphique de Distribution des Rendements */}
       {filteredMetrics.length > 0 && (
         <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
-          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">📊 Distribution des Rendements Totaux</h3>
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📊 Distribution des Rendements Totaux</h3>
+              <button
+                onClick={() => toggleSection('returnDistribution')}
+                className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
+                title={sectionsVisibility.returnDistribution ? "Réduire cette section" : "Agrandir cette section"}
+              >
+                {sectionsVisibility.returnDistribution ? (
+                  <ChevronUpIcon className="w-5 h-5 text-gray-600" />
+                ) : (
+                  <ChevronDownIcon className="w-5 h-5 text-gray-600" />
+                )}
+              </button>
+            </div>
+          </div>
+          {sectionsVisibility.returnDistribution && (
+            <>
           <div className="flex items-end justify-between gap-2 h-64 border-b border-l border-gray-300 pb-2 pl-2">
             {(() => {
               if (filteredMetrics.length === 0) return null;
@@ -1563,12 +2045,33 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                 : 'N/A'
             }
           </div>
+            </>
+          )}
         </div>
       )}
 
       {/* 5 Autres Idées de Visualisation */}
       {filteredMetrics.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📈 Visualisations Avancées</h3>
+              <button
+                onClick={() => toggleSection('otherVisualizations')}
+                className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
+                title={sectionsVisibility.otherVisualizations ? "Réduire cette section" : "Agrandir cette section"}
+              >
+                {sectionsVisibility.otherVisualizations ? (
+                  <ChevronUpIcon className="w-5 h-5 text-gray-600" />
+                ) : (
+                  <ChevronDownIcon className="w-5 h-5 text-gray-600" />
+                )}
+              </button>
+            </div>
+          </div>
+          {sectionsVisibility.otherVisualizations && (
+            <>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
         {/* Idée 1: Heatmap de Secteurs Amélioré */}
         <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
           <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">🔥 Performance par Secteur</h3>
@@ -1779,31 +2282,31 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
         </div>
 
         {/* Idée 5: Timeline de Performance Amélioré */}
-        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 md:col-span-2">
+        <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200 md:col-span-2">
           <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">📈 Timeline de Performance (Triée par Rendement)</h3>
           <div className="text-xs text-gray-500 mb-3">
             Barres horizontales classées par rendement décroissant
           </div>
-          <div className="overflow-x-auto">
-            <div className="flex gap-2 min-w-max">
+          <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
+            <div className="flex gap-1.5 sm:gap-2 min-w-max pb-2">
               {filteredMetrics
                 .sort((a, b) => b.totalReturnPercent - a.totalReturnPercent)
                 .map((metric) => (
                   <div
                     key={metric.profile.id}
-                    className="flex flex-col items-center p-2 bg-gray-50 rounded min-w-[80px] cursor-pointer hover:bg-blue-50 transition-colors"
+                    className="flex flex-col items-center p-1.5 sm:p-2 bg-gray-50 rounded min-w-[60px] sm:min-w-[70px] md:min-w-[80px] cursor-pointer hover:bg-blue-50 transition-colors"
                     onClick={() => onSelect(metric.profile.id)}
                   >
-                    <div className="text-xs font-bold mb-1">{metric.profile.id}</div>
+                    <div className="text-[10px] sm:text-xs font-bold mb-1 truncate w-full text-center">{metric.profile.id}</div>
                     <div
                       className="w-full rounded mb-1"
                       style={{
                         height: `${Math.max(Math.min((metric.totalReturnPercent + 50) / 200 * 100, 100), 5)}px`,
                         backgroundColor: getReturnColor(metric.totalReturnPercent),
-                        minHeight: '20px'
+                        minHeight: '15px'
                       }}
                     />
-                    <div className={`text-xs font-semibold ${metric.hasInvalidData ? 'text-gray-400' : ''}`} style={metric.hasInvalidData ? {} : { color: getReturnColor(metric.totalReturnPercent) }}>
+                    <div className={`text-[9px] sm:text-xs font-semibold ${metric.hasInvalidData ? 'text-gray-400' : ''}`} style={metric.hasInvalidData ? {} : { color: getReturnColor(metric.totalReturnPercent) }}>
                       {metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`}
                     </div>
                   </div>
@@ -1812,12 +2315,32 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           </div>
         </div>
         </div>
+            </>
+          )}
+        </div>
       )}
 
       {/* Matrice de Corrélation */}
       {filteredMetrics.length > 1 && (
         <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
-          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">🔗 Matrice de Corrélation entre Métriques</h3>
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">🔗 Matrice de Corrélation entre Métriques</h3>
+              <button
+                onClick={() => toggleSection('correlationMatrix')}
+                className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
+                title={sectionsVisibility.correlationMatrix ? "Réduire cette section" : "Agrandir cette section"}
+              >
+                {sectionsVisibility.correlationMatrix ? (
+                  <ChevronUpIcon className="w-5 h-5 text-gray-600" />
+                ) : (
+                  <ChevronDownIcon className="w-5 h-5 text-gray-600" />
+                )}
+              </button>
+            </div>
+          </div>
+          {sectionsVisibility.correlationMatrix && (
+            <>
           <div className="text-xs text-gray-500 mb-4">
             Corrélations entre JPEGY, Rendement, Ratio 3:1, P/E, Yield et Croissance
           </div>
@@ -1915,13 +2438,28 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
             </div>
             <div className="text-gray-500">Intensité = valeur absolue</div>
           </div>
+            </>
+          )}
         </div>
       )}
 
       {/* Tableau détaillé Amélioré */}
       <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 mb-3 sm:mb-4">
-          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📋 Tableau de Performance Détaillé</h3>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📋 Tableau de Performance Détaillé</h3>
+            <button
+              onClick={() => toggleSection('detailedTable')}
+              className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
+              title={sectionsVisibility.detailedTable ? "Réduire cette section" : "Agrandir cette section"}
+            >
+              {sectionsVisibility.detailedTable ? (
+                <ChevronUpIcon className="w-5 h-5 text-gray-600" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5 text-gray-600" />
+              )}
+            </button>
+          </div>
           <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
             <div className="text-xs text-gray-500">
               {filteredMetrics.length} titre(s)
@@ -1935,17 +2473,19 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
             </button>
           </div>
         </div>
+        {sectionsVisibility.detailedTable && (
+          <>
         {filteredMetrics.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             Aucun titre ne correspond aux filtres sélectionnés.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto -mx-3 sm:mx-0">
+            <table className="w-full text-xs sm:text-sm min-w-[800px]">
               <thead className="bg-gradient-to-r from-slate-100 to-slate-50 sticky top-0">
                 <tr>
                   <th 
-                    className="p-3 text-left font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors"
+                    className="p-2 sm:p-3 text-left font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors text-xs sm:text-sm"
                     onClick={() => handleSort('ticker')}
                   >
                     <div className="flex items-center gap-1">
@@ -1956,8 +2496,8 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     </div>
                   </th>
                   <th 
-                    className="p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors" 
-                    title="P/E ajusté pour croissance et rendement"
+                    className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors text-xs sm:text-sm" 
+                    title="JPEGY (Jean-Sebastien's P/E Adjusted for Growth & Yield) - Source: P/E Actuel ÷ (Taux de croissance EPS % + Rendement dividende %) - Fournisseur: Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Ajuste le ratio P/E traditionnel par la somme du taux de croissance des bénéfices et du rendement du dividende, permettant une évaluation plus nuancée de la valorisation d'une action."
                     onClick={() => handleSort('jpegy')}
                   >
                     <div className="flex items-center justify-end gap-1">
@@ -1968,7 +2508,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     </div>
                   </th>
                   <th 
-                    className="p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors" 
+                    className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors text-xs sm:text-sm" 
                     title="Rendement total projeté sur 5 ans"
                     onClick={() => handleSort('totalReturnPercent')}
                   >
@@ -1980,7 +2520,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     </div>
                   </th>
                   <th 
-                    className="p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors" 
+                    className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors text-xs sm:text-sm" 
                     title="Ratio potentiel de hausse vs risque de baisse"
                     onClick={() => handleSort('ratio31')}
                   >
@@ -1991,12 +2531,12 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       )}
                     </div>
                   </th>
-                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Potentiel de hausse en %">Hausse</th>
-                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Risque de baisse en %">Baisse</th>
-                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Ratio cours/bénéfice actuel">P/E</th>
-                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Rendement du dividende">Yield</th>
+                  <th className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm hidden md:table-cell" title="Potentiel de hausse en %">Hausse</th>
+                  <th className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm hidden md:table-cell" title="Risque de baisse en %">Baisse</th>
+                  <th className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm hidden lg:table-cell" title="Ratio cours/bénéfice actuel">P/E</th>
+                  <th className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm hidden lg:table-cell" title="Rendement du dividende">Yield</th>
                   <th 
-                    className="p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors" 
+                    className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors text-xs sm:text-sm hidden lg:table-cell" 
                     title="Croissance historique des EPS"
                     onClick={() => handleSort('historicalGrowth')}
                   >
@@ -2007,9 +2547,9 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       )}
                     </div>
                   </th>
-                  <th className="p-3 text-center font-bold text-gray-700 border-b border-gray-300">Approuvé</th>
+                  <th className="p-2 sm:p-3 text-center font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm">Approuvé</th>
                   <th 
-                    className="p-3 text-center font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors"
+                    className="p-2 sm:p-3 text-center font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors text-xs sm:text-sm"
                     onClick={() => handleSort('recommendation')}
                   >
                     <div className="flex items-center justify-center gap-1">
@@ -2030,50 +2570,67 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     currentId === metric.profile.id ? 'bg-blue-100' : ''
                   }`}
                 >
-                  <td className="p-2 font-bold">
-                    <div className="flex items-center gap-2">
-                      <span>{metric.profile.id}</span>
+                  <td className="p-2 sm:p-3 font-bold text-xs sm:text-sm">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <span className="truncate">{metric.profile.id}</span>
                       {(metric.profile.isWatchlist ?? false) ? (
-                        <EyeIcon className="w-4 h-4 text-blue-500" title="Watchlist" />
+                        <EyeIcon className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 flex-shrink-0" title="Watchlist" />
                       ) : (
-                        <StarIcon className="w-4 h-4 text-yellow-500" title="Portefeuille" />
+                        <StarIcon className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 flex-shrink-0" title="Portefeuille" />
                       )}
                     </div>
                   </td>
-                  <td className="p-2 text-right">
+                  <td className="p-2 sm:p-3 text-right text-xs sm:text-sm">
                     {metric.jpegy !== null ? (
-                      <>
-                        <span
-                          className="inline-block w-4 h-4 rounded-full mr-2"
-                          style={{ backgroundColor: getJpegyColor(metric.jpegy) || '#9ca3af' }}
-                        />
-                        {metric.jpegy.toFixed(2)}
-                      </>
+                      <div className="group relative">
+                        <div className="flex items-center justify-end">
+                          <span
+                            className="inline-block w-4 h-4 rounded-full mr-2"
+                            style={{ backgroundColor: getJpegyColor(metric.jpegy) || '#9ca3af' }}
+                          />
+                          {metric.jpegy.toFixed(2)}
+                        </div>
+                        <div className="absolute right-0 top-full mt-1 w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
+                          <div className="font-semibold mb-1">JPEGY: {metric.jpegy.toFixed(2)}</div>
+                          <div className="space-y-1 text-[10px]">
+                            <div><strong>Source de calcul:</strong> P/E Actuel ÷ (Taux de croissance EPS % + Rendement dividende %)</div>
+                            <div><strong>Formule:</strong> JPEGY = {metric.currentPE?.toFixed(2) || 'P/E'} ÷ ({metric.historicalGrowth?.toFixed(1) || 'Growth'}% + {metric.currentYield?.toFixed(2) || 'Yield'}%)</div>
+                            <div><strong>Fournisseur:</strong> Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Le fournisseur établit cette métrique en ajustant le ratio P/E traditionnel par la somme du taux de croissance des bénéfices et du rendement du dividende, permettant une évaluation plus nuancée de la valorisation d'une action en tenant compte de sa capacité de croissance et de sa distribution de dividendes.</div>
+                          </div>
+                        </div>
+                      </div>
                     ) : (
                       <span className="text-gray-400 flex items-center justify-end gap-1">
-                        <ExclamationTriangleIcon className="w-4 h-4 text-orange-500" title="JPEGY non calculable" />
+                        <ExclamationTriangleIcon className="w-4 h-4 text-orange-500" title="JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%" />
                         N/A
                       </span>
                     )}
                   </td>
-                  <td className="p-2 text-right font-semibold" style={{ color: metric.hasInvalidData ? '#9ca3af' : getReturnColor(metric.totalReturnPercent) }}>
+                  <td className="p-2 sm:p-3 text-right font-semibold text-xs sm:text-sm" style={{ color: metric.hasInvalidData ? '#9ca3af' : getReturnColor(metric.totalReturnPercent) }}>
                     {metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(1)}%`}
                   </td>
-                  <td className="p-2 text-right">{metric.ratio31.toFixed(2)}</td>
-                  <td className="p-2 text-right text-green-600">{metric.upsidePotential.toFixed(1)}%</td>
-                  <td className="p-2 text-right text-red-600">{metric.downsideRisk.toFixed(1)}%</td>
-                  <td className="p-2 text-center">
+                  <td className="p-2 sm:p-3 text-right text-xs sm:text-sm">{metric.ratio31.toFixed(2)}</td>
+                  <td className="p-2 sm:p-3 text-right text-green-600 text-xs sm:text-sm hidden md:table-cell">{metric.upsidePotential.toFixed(1)}%</td>
+                  <td className="p-2 sm:p-3 text-right text-red-600 text-xs sm:text-sm hidden md:table-cell">{metric.downsideRisk.toFixed(1)}%</td>
+                  <td className="p-2 sm:p-3 text-center hidden lg:table-cell">
+                    <span className="text-xs sm:text-sm">{metric.currentPE?.toFixed(1) || 'N/A'}x</span>
+                  </td>
+                  <td className="p-2 sm:p-3 text-center hidden lg:table-cell">
+                    <span className="text-xs sm:text-sm">{metric.currentYield?.toFixed(2) || 'N/A'}%</span>
+                  </td>
+                  <td className="p-2 sm:p-3 text-right text-xs sm:text-sm hidden lg:table-cell">{metric.historicalGrowth?.toFixed(1) || 'N/A'}%</td>
+                  <td className="p-2 sm:p-3 text-center">
                     {metric.hasApprovedVersion ? (
-                      <CheckCircleIcon className="w-5 h-5 text-green-500 mx-auto" />
+                      <CheckCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mx-auto" />
                     ) : (
-                      <XCircleIcon className="w-5 h-5 text-gray-300 mx-auto" />
+                      <XCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-300 mx-auto" />
                     )}
                   </td>
-                  <td className="p-2 text-center">
+                  <td className="p-2 sm:p-3 text-center text-xs sm:text-sm">
                     <span
                       className={`px-2 py-1 rounded text-xs font-semibold ${
-                        metric.recommendation === 'BUY' ? 'bg-green-100 text-green-800' :
-                        metric.recommendation === 'SELL' ? 'bg-red-100 text-red-800' :
+                        metric.recommendation === 'ACHAT' || metric.recommendation === 'BUY' ? 'bg-green-100 text-green-800' :
+                        metric.recommendation === 'VENTE' || metric.recommendation === 'SELL' ? 'bg-red-100 text-red-800' :
                         'bg-yellow-100 text-yellow-800'
                       }`}
                     >
@@ -2085,6 +2642,8 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
               </tbody>
             </table>
           </div>
+        )}
+          </>
         )}
       </div>
     </div>

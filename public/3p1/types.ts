@@ -60,6 +60,8 @@ export interface CompanyInfo {
   actualSymbol?: string; // Symbole réellement utilisé par FMP
   logoSymbol?: string; // Symbole optimisé pour les logos
   beta?: number; // Beta (volatilité relative au marché)
+  roe?: number; // Return on Equity (ROE) - Source: FMP key-metrics
+  roa?: number; // Return on Assets (ROA) - Source: FMP key-metrics
   // Métriques ValueLine (Source: ValueLine au 3 décembre 2025)
   earningsPredictability?: string; // Earnings Predictability
   priceGrowthPersistence?: string; // Price Growth Persistence (note numérique 5-100, mesure la croissance persistante du prix sur 10 ans)
