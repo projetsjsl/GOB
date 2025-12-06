@@ -166,6 +166,26 @@
       "source": "/nouveauclient",
       "destination": "/nouveauclient/index.html",
       "permanent": false
+    },
+    {
+      "source": "/3p1",
+      "destination": "/3p1/dist/index.html",
+      "permanent": false
+    },
+    {
+      "source": "/3p1/",
+      "destination": "/3p1/dist/index.html",
+      "permanent": false
+    },
+    {
+      "source": "/jlab",
+      "destination": "/beta-combined-dashboard.html",
+      "permanent": false
+    },
+    {
+      "source": "/jlab/",
+      "destination": "/beta-combined-dashboard.html",
+      "permanent": false
     }
   ]
 }
