@@ -656,6 +656,31 @@
       }
     }
 
+    // ✅ Mise à jour automatique du cache prix dès le chargement de la page de login
+    // Pendant que l'utilisateur entre ses informations, on met à jour le cache en arrière-plan
+    const refreshPriceCacheOnLogin = async () => {
+      try {
+        console.log('🔄 Vérification cache prix (page login)...');
+        // Vérifier si le cache est frais (< 15 minutes) avec un ticker exemple
+        const response = await fetch('/api/market-data-batch?tickers=AAPL&checkOnly=true');
+        const result = await response.json();
+        
+        // Si le cache est expiré ou manquant, déclencher la mise à jour
+        if (result.stats?.stale > 0 || result.stats?.missing > 0) {
+          console.log('🔄 Cache prix expiré - Mise à jour automatique en arrière-plan...');
+          // Déclencher la mise à jour en arrière-plan (non-bloquant)
+          fetch('/api/fmp-batch-sync', { method: 'POST' })
+            .then(() => console.log('✅ Cache prix mis à jour (prêt pour le dashboard)'))
+            .catch(err => console.warn('⚠️ Erreur mise à jour cache prix:', err));
+        } else {
+          console.log('✅ Cache prix frais - Prêt pour le dashboard');
+        }
+      } catch (error) {
+        console.warn('⚠️ Erreur vérification cache prix (non-bloquant):', error);
+        // Non-bloquant - ne pas affecter l'expérience de login
+      }
+    };
+
     // Vérifier si déjà connecté
     window.addEventListener('DOMContentLoaded', () => {
       // Utiliser le sessionStorage NATIF pour vérifier (pas le wrapper avec fallback mémoire)
@@ -674,6 +699,10 @@
         window.location.href = '/beta-combined-dashboard.html';
         return;
       }
+
+      // ✅ Mise à jour du cache prix en arrière-plan pendant que l'utilisateur entre ses infos
+      // Cela optimise l'expérience : le cache sera frais quand l'utilisateur arrive sur le dashboard
+      refreshPriceCacheOnLogin();
 
       // Le préchargement est maintenant géré par dashboard-preloader.js
       // qui s'initialise automatiquement et précharge les données en arrière-plan
