@@ -826,17 +826,17 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     isFinite(m.totalReturnPercent) && isFinite(m.jpegy)
   );
   
-  const maxJPEGY = validMetricsForChart.length > 0 
-    ? Math.max(...validMetricsForChart.map(m => m.jpegy!), 5)
+  const maxJPEGY = validMetricsForChart.length > 0
+    ? Math.max(...validMetricsForChart.map(m => m.jpegy!).filter((j): j is number => j !== null && j !== undefined && isFinite(j)), 5)
     : 5;
   const minJPEGY = validMetricsForChart.length > 0
-    ? Math.min(...validMetricsForChart.map(m => m.jpegy!), 0)
+    ? Math.min(...validMetricsForChart.map(m => m.jpegy!).filter((j): j is number => j !== null && j !== undefined && isFinite(j)), 0)
     : 0;
   const maxReturn = validMetricsForChart.length > 0
-    ? Math.max(...validMetricsForChart.map(m => m.totalReturnPercent), 200)
+    ? Math.max(...validMetricsForChart.map(m => m.totalReturnPercent).filter((r): r is number => r !== null && r !== undefined && isFinite(r)), 200)
     : 200;
   const minReturn = validMetricsForChart.length > 0
-    ? Math.min(...validMetricsForChart.map(m => m.totalReturnPercent), -50)
+    ? Math.min(...validMetricsForChart.map(m => m.totalReturnPercent).filter((r): r is number => r !== null && r !== undefined && isFinite(r)), -50)
     : -50;
   
   const xScale = (jpegy: number) => {
@@ -2235,7 +2235,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     textAnchor="middle"
                     className="text-xs font-medium fill-gray-700"
                   >
-                    {tick.value.toFixed(1)}
+                    {tick.value !== null && tick.value !== undefined ? tick.value.toFixed(1) : 'N/A'}
                   </text>
                 </g>
               ))}
@@ -2257,7 +2257,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     textAnchor="end"
                     className="text-xs font-medium fill-gray-700"
                   >
-                    {tick.value.toFixed(0)}%
+                    {tick.value !== null && tick.value !== undefined ? tick.value.toFixed(0) : 'N/A'}%
                   </text>
                 </g>
               ))}
@@ -2444,16 +2444,16 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                 );
                 
                 const maxRatio31 = validMetricsForRatio31Chart.length > 0 
-                  ? Math.max(...validMetricsForRatio31Chart.map(m => m.ratio31), 10)
+                  ? Math.max(...validMetricsForRatio31Chart.map(m => m.ratio31).filter((r): r is number => r !== null && r !== undefined && isFinite(r)), 10)
                   : 10;
                 const minRatio31 = validMetricsForRatio31Chart.length > 0
-                  ? Math.min(...validMetricsForRatio31Chart.map(m => m.ratio31), 0)
+                  ? Math.min(...validMetricsForRatio31Chart.map(m => m.ratio31).filter((r): r is number => r !== null && r !== undefined && isFinite(r)), 0)
                   : 0;
                 const maxReturnRatio31 = validMetricsForRatio31Chart.length > 0
-                  ? Math.max(...validMetricsForRatio31Chart.map(m => m.totalReturnPercent), 200)
+                  ? Math.max(...validMetricsForRatio31Chart.map(m => m.totalReturnPercent).filter((r): r is number => r !== null && r !== undefined && isFinite(r)), 200)
                   : 200;
                 const minReturnRatio31 = validMetricsForRatio31Chart.length > 0
-                  ? Math.min(...validMetricsForRatio31Chart.map(m => m.totalReturnPercent), -50)
+                  ? Math.min(...validMetricsForRatio31Chart.map(m => m.totalReturnPercent).filter((r): r is number => r !== null && r !== undefined && isFinite(r)), -50)
                   : -50;
                 
                 const xScaleRatio31 = (ratio: number) => {
@@ -2585,7 +2585,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                           textAnchor="middle"
                           className="text-xs font-medium fill-gray-700"
                         >
-                          {tick.value.toFixed(1)}:1
+                          {tick.value !== null && tick.value !== undefined ? tick.value.toFixed(1) : 'N/A'}:1
                         </text>
                       </g>
                     ))}
@@ -2607,7 +2607,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                           textAnchor="end"
                           className="text-xs font-medium fill-gray-700"
                         >
-                          {tick.value.toFixed(0)}%
+                          {tick.value !== null && tick.value !== undefined ? tick.value.toFixed(0) : 'N/A'}%
                         </text>
                       </g>
                     ))}
@@ -2772,10 +2772,10 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       height: `${(bin.count / maxCount) * 240}px`,
                       minHeight: bin.count > 0 ? '4px' : '0px'
                     }}
-                    title={`${bin.min.toFixed(0)}% - ${bin.max.toFixed(0)}%: ${bin.count} titre(s)`}
+                    title={`${bin.min !== null && bin.min !== undefined ? bin.min.toFixed(0) : 'N/A'}% - ${bin.max !== null && bin.max !== undefined ? bin.max.toFixed(0) : 'N/A'}%: ${bin.count} titre(s)`}
                   />
                   {idx % 3 === 0 && (
-                    <span className="text-[8px] text-gray-500 mt-1">{bin.min.toFixed(0)}%</span>
+                    <span className="text-[8px] text-gray-500 mt-1">{bin.min !== null && bin.min !== undefined ? bin.min.toFixed(0) : 'N/A'}%</span>
                   )}
                 </div>
               ));
@@ -2784,7 +2784,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           <div className="mt-2 text-xs text-gray-500 text-center">
             {filteredMetrics.length} titre(s) | Range: {
               filteredMetrics.length > 0 
-                ? `${Math.min(...filteredMetrics.map(m => m.totalReturnPercent)).toFixed(0)}% à ${Math.max(...filteredMetrics.map(m => m.totalReturnPercent)).toFixed(0)}%`
+                ? (() => {
+                    const validReturns = filteredMetrics.map(m => m.totalReturnPercent).filter((r): r is number => r !== null && r !== undefined);
+                    if (validReturns.length === 0) return 'N/A';
+                    return `${Math.min(...validReturns).toFixed(0)}% à ${Math.max(...validReturns).toFixed(0)}%`;
+                  })()
                 : 'N/A'
             }
           </div>
