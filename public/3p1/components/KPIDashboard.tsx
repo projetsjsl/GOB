@@ -535,11 +535,46 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     maxReturn: 500,
     minJPEGY: 0,
     maxJPEGY: 10,
+    minRatio31: 0,
+    maxRatio31: 100,
+    minPE: 0,
+    maxPE: 1000,
+    minYield: 0,
+    maxYield: 50,
+    minVolatility: 0,
+    maxVolatility: 200,
+    minGrowth: -50,
+    maxGrowth: 100,
     sector: '',
     recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL',
-    source: 'all' as 'all' | 'portfolio' | 'watchlist', // Nouveau filtre pour portefeuille/watchlist
-    showOnlyNA: false // Nouveau filtre pour afficher uniquement les N/A
+    source: 'all' as 'all' | 'portfolio' | 'watchlist',
+    showOnlyNA: false,
+    showOnlyApproved: false,
+    showOnlySkeleton: false,
+    groupBy: 'none' as 'none' | 'sector' | 'recommendation' | 'source'
   }));
+
+  // Options d'affichage
+  const [displayOptions, setDisplayOptions] = useState({
+    visibleColumns: {
+      ticker: true,
+      jpegy: true,
+      return: true,
+      ratio31: true,
+      upside: true,
+      downside: true,
+      pe: true,
+      yield: true,
+      growth: true,
+      volatility: true,
+      approved: true,
+      recommendation: true
+    },
+    compactMode: false,
+    showSector: true,
+    showNames: true,
+    density: 'comfortable' as 'compact' | 'comfortable' | 'spacious'
+  });
 
   // Mettre à jour les filtres quand defaultFilterValues change (nouveaux profils chargés)
   useEffect(() => {
@@ -554,9 +589,28 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         return false;
       }
       
+      // Filtre squelette
+      if (filters.showOnlySkeleton && !metric.profile._isSkeleton) {
+        return false;
+      }
+      
+      // Filtre approuvé
+      if (filters.showOnlyApproved && !metric.hasApprovedVersion) {
+        return false;
+      }
+      
       if (metric.totalReturnPercent < filters.minReturn || metric.totalReturnPercent > filters.maxReturn) return false;
+      
       // Filtrer JPEGY seulement si la valeur est calculable (non null)
       if (metric.jpegy !== null && (metric.jpegy < filters.minJPEGY || metric.jpegy > filters.maxJPEGY)) return false;
+      
+      // Filtres par métrique supplémentaires
+      if (metric.ratio31 !== null && (metric.ratio31 < filters.minRatio31 || metric.ratio31 > filters.maxRatio31)) return false;
+      if (metric.currentPE !== null && (metric.currentPE < filters.minPE || metric.currentPE > filters.maxPE)) return false;
+      if (metric.currentYield !== null && (metric.currentYield < filters.minYield || metric.currentYield > filters.maxYield)) return false;
+      if (metric.volatility !== null && (metric.volatility < filters.minVolatility || metric.volatility > filters.maxVolatility)) return false;
+      if (metric.historicalGrowth !== null && (metric.historicalGrowth < filters.minGrowth || metric.historicalGrowth > filters.maxGrowth)) return false;
+      
       if (filters.sector && metric.profile.info.sector.toLowerCase() !== filters.sector.toLowerCase()) return false;
       if (filters.recommendation !== 'all') {
         // Mapping entre les valeurs du filtre et les valeurs réelles
@@ -580,8 +634,34 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       return true;
     });
     
+    // Groupement (si activé)
+    let grouped = filtered;
+    if (filters.groupBy !== 'none') {
+      const groups = new Map<string, typeof filtered>();
+      filtered.forEach(metric => {
+        let key = '';
+        switch (filters.groupBy) {
+          case 'sector':
+            key = metric.profile.info.sector || 'Autre';
+            break;
+          case 'recommendation':
+            key = metric.recommendation || 'N/A';
+            break;
+          case 'source':
+            key = (metric.profile.isWatchlist ?? false) ? 'Watchlist' : 'Portefeuille';
+            break;
+        }
+        if (!groups.has(key)) {
+          groups.set(key, []);
+        }
+        groups.get(key)!.push(metric);
+      });
+      // Aplatir les groupes (on peut améliorer pour afficher par groupe)
+      grouped = Array.from(groups.values()).flat();
+    }
+    
     // Trier
-    const sorted = [...filtered].sort((a, b) => {
+    const sorted = [...grouped].sort((a, b) => {
       let aValue: any = a[sortConfig.key as keyof typeof a];
       let bValue: any = b[sortConfig.key as keyof typeof b];
       
@@ -592,7 +672,35 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       } else if (sortConfig.key === 'sector') {
         aValue = a.profile.info.sector;
         bValue = b.profile.info.sector;
+      } else if (sortConfig.key === 'name') {
+        aValue = a.profile.info.name || a.profile.id;
+        bValue = b.profile.info.name || b.profile.id;
+      } else if (sortConfig.key === 'ratio31') {
+        aValue = a.ratio31 ?? 0;
+        bValue = b.ratio31 ?? 0;
+      } else if (sortConfig.key === 'upsidePotential') {
+        aValue = a.upsidePotential;
+        bValue = b.upsidePotential;
+      } else if (sortConfig.key === 'downsideRisk') {
+        aValue = a.downsideRisk;
+        bValue = b.downsideRisk;
+      } else if (sortConfig.key === 'currentPE') {
+        aValue = a.currentPE ?? 0;
+        bValue = b.currentPE ?? 0;
+      } else if (sortConfig.key === 'currentYield') {
+        aValue = a.currentYield ?? 0;
+        bValue = b.currentYield ?? 0;
+      } else if (sortConfig.key === 'volatility') {
+        aValue = a.volatility ?? 0;
+        bValue = b.volatility ?? 0;
+      } else if (sortConfig.key === 'targetPrice') {
+        aValue = a.targetPrice ?? 0;
+        bValue = b.targetPrice ?? 0;
       }
+      
+      // Gérer les valeurs null
+      if (aValue === null || aValue === undefined) aValue = -Infinity;
+      if (bValue === null || bValue === undefined) bValue = -Infinity;
       
       if (typeof aValue === 'string' && typeof bValue === 'string') {
         return sortConfig.direction === 'asc' 
@@ -1225,6 +1333,226 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   ✕
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+        
+        {/* Filtres avancés supplémentaires */}
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-sm font-semibold text-gray-700">Filtres avancés</h4>
+            <button
+              onClick={() => setFilters(prev => ({ ...prev, showOnlyNA: !prev.showOnlyNA }))}
+              className={`px-2 py-1 text-xs rounded transition-colors ${
+                filters.showOnlyNA ? 'bg-orange-500 text-white' : 'bg-gray-100 hover:bg-orange-100 text-gray-700'
+              }`}
+            >
+              {filters.showOnlyNA ? '✓ N/A uniquement' : 'Afficher N/A'}
+            </button>
+            <button
+              onClick={() => setFilters(prev => ({ ...prev, showOnlyApproved: !prev.showOnlyApproved }))}
+              className={`px-2 py-1 text-xs rounded transition-colors ${
+                filters.showOnlyApproved ? 'bg-green-500 text-white' : 'bg-gray-100 hover:bg-green-100 text-gray-700'
+              }`}
+            >
+              {filters.showOnlyApproved ? '✓ Approuvés uniquement' : 'Approuvés'}
+            </button>
+            <button
+              onClick={() => setFilters(prev => ({ ...prev, showOnlySkeleton: !prev.showOnlySkeleton }))}
+              className={`px-2 py-1 text-xs rounded transition-colors ${
+                filters.showOnlySkeleton ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-blue-100 text-gray-700'
+              }`}
+            >
+              {filters.showOnlySkeleton ? '✓ Squelettes uniquement' : 'Squelettes'}
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 md:gap-3">
+            {/* Ratio 3:1 */}
+            <div>
+              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Ratio 3:1 Min</label>
+              <input
+                type="number"
+                step="0.1"
+                value={filters.minRatio31}
+                onChange={(e) => setFilters({ ...filters, minRatio31: parseFloat(e.target.value) || 0 })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Ratio 3:1 Max</label>
+              <input
+                type="number"
+                step="0.1"
+                value={filters.maxRatio31}
+                onChange={(e) => setFilters({ ...filters, maxRatio31: parseFloat(e.target.value) || 100 })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs"
+              />
+            </div>
+            
+            {/* P/E */}
+            <div>
+              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">P/E Min</label>
+              <input
+                type="number"
+                step="0.1"
+                value={filters.minPE}
+                onChange={(e) => setFilters({ ...filters, minPE: parseFloat(e.target.value) || 0 })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">P/E Max</label>
+              <input
+                type="number"
+                step="0.1"
+                value={filters.maxPE}
+                onChange={(e) => setFilters({ ...filters, maxPE: parseFloat(e.target.value) || 1000 })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs"
+              />
+            </div>
+            
+            {/* Yield */}
+            <div>
+              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Yield Min (%)</label>
+              <input
+                type="number"
+                step="0.1"
+                value={filters.minYield}
+                onChange={(e) => setFilters({ ...filters, minYield: parseFloat(e.target.value) || 0 })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Yield Max (%)</label>
+              <input
+                type="number"
+                step="0.1"
+                value={filters.maxYield}
+                onChange={(e) => setFilters({ ...filters, maxYield: parseFloat(e.target.value) || 50 })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs"
+              />
+            </div>
+            
+            {/* Volatilité */}
+            <div>
+              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Volatilité Min (%)</label>
+              <input
+                type="number"
+                step="0.1"
+                value={filters.minVolatility}
+                onChange={(e) => setFilters({ ...filters, minVolatility: parseFloat(e.target.value) || 0 })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Volatilité Max (%)</label>
+              <input
+                type="number"
+                step="0.1"
+                value={filters.maxVolatility}
+                onChange={(e) => setFilters({ ...filters, maxVolatility: parseFloat(e.target.value) || 200 })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs"
+              />
+            </div>
+            
+            {/* Croissance */}
+            <div>
+              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Croissance Min (%)</label>
+              <input
+                type="number"
+                step="0.1"
+                value={filters.minGrowth}
+                onChange={(e) => setFilters({ ...filters, minGrowth: parseFloat(e.target.value) || -50 })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Croissance Max (%)</label>
+              <input
+                type="number"
+                step="0.1"
+                value={filters.maxGrowth}
+                onChange={(e) => setFilters({ ...filters, maxGrowth: parseFloat(e.target.value) || 100 })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs"
+              />
+            </div>
+            
+            {/* Groupement */}
+            <div>
+              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Grouper par</label>
+              <select
+                value={filters.groupBy}
+                onChange={(e) => setFilters({ ...filters, groupBy: e.target.value as any })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs"
+              >
+                <option value="none">Aucun</option>
+                <option value="sector">Secteur</option>
+                <option value="recommendation">Recommandation</option>
+                <option value="source">Source</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        {/* Options d'affichage */}
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <h4 className="text-sm font-semibold text-gray-700 mb-3">Options d'affichage</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Densité</label>
+              <select
+                value={displayOptions.density}
+                onChange={(e) => setDisplayOptions({ ...displayOptions, density: e.target.value as any })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs"
+              >
+                <option value="compact">Compacte</option>
+                <option value="comfortable">Confortable</option>
+                <option value="spacious">Spacieuse</option>
+              </select>
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  checked={displayOptions.showSector}
+                  onChange={(e) => setDisplayOptions({ ...displayOptions, showSector: e.target.checked })}
+                  className="w-4 h-4"
+                />
+                Afficher secteur
+              </label>
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  checked={displayOptions.showNames}
+                  onChange={(e) => setDisplayOptions({ ...displayOptions, showNames: e.target.checked })}
+                  className="w-4 h-4"
+                />
+                Afficher noms
+              </label>
+            </div>
+          </div>
+          
+          {/* Colonnes visibles */}
+          <div className="mt-3">
+            <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-2">Colonnes visibles</label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+              {Object.entries(displayOptions.visibleColumns).map(([key, visible]) => (
+                <label key={key} className="flex items-center gap-2 text-xs cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={visible}
+                    onChange={(e) => setDisplayOptions({
+                      ...displayOptions,
+                      visibleColumns: { ...displayOptions.visibleColumns, [key]: e.target.checked }
+                    })}
+                    className="w-4 h-4"
+                  />
+                  <span className="capitalize">{key === 'ratio31' ? 'Ratio 3:1' : key === 'pe' ? 'P/E' : key}</span>
+                </label>
+              ))}
             </div>
           </div>
         </div>
@@ -3039,16 +3367,25 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       </div>
                     ) : metric.ratio31 !== null ? metric.ratio31.toFixed(2) : 'N/A'}
                   </td>
-                  <td className="p-2 sm:p-3 text-right text-green-600 text-xs sm:text-sm hidden md:table-cell">{metric.upsidePotential.toFixed(1)}%</td>
-                  <td className="p-2 sm:p-3 text-right text-red-600 text-xs sm:text-sm hidden md:table-cell">{metric.downsideRisk.toFixed(1)}%</td>
-                  <td className="p-2 sm:p-3 text-center hidden lg:table-cell">
+                  <td className={`p-2 sm:p-3 text-right text-green-600 text-xs sm:text-sm ${!displayOptions.visibleColumns.upside ? 'hidden' : ''} ${displayOptions.density === 'compact' ? 'hidden md:table-cell' : 'md:table-cell'}`}>
+                    {metric.upsidePotential.toFixed(1)}%
+                  </td>
+                  <td className={`p-2 sm:p-3 text-right text-red-600 text-xs sm:text-sm ${!displayOptions.visibleColumns.downside ? 'hidden' : ''} ${displayOptions.density === 'compact' ? 'hidden md:table-cell' : 'md:table-cell'}`}>
+                    {metric.downsideRisk.toFixed(1)}%
+                  </td>
+                  <td className={`p-2 sm:p-3 text-center ${!displayOptions.visibleColumns.pe ? 'hidden' : ''} ${displayOptions.density === 'compact' ? 'hidden lg:table-cell' : 'lg:table-cell'}`}>
                     <span className="text-xs sm:text-sm">{metric.currentPE?.toFixed(1) || 'N/A'}x</span>
                   </td>
-                  <td className="p-2 sm:p-3 text-center hidden lg:table-cell">
+                  <td className={`p-2 sm:p-3 text-center ${!displayOptions.visibleColumns.yield ? 'hidden' : ''} ${displayOptions.density === 'compact' ? 'hidden lg:table-cell' : 'lg:table-cell'}`}>
                     <span className="text-xs sm:text-sm">{metric.currentYield?.toFixed(2) || 'N/A'}%</span>
                   </td>
-                  <td className="p-2 sm:p-3 text-right text-xs sm:text-sm hidden lg:table-cell">{metric.historicalGrowth?.toFixed(1) || 'N/A'}%</td>
-                  <td className="p-2 sm:p-3 text-center">
+                  <td className={`p-2 sm:p-3 text-right text-xs sm:text-sm ${!displayOptions.visibleColumns.growth ? 'hidden' : ''} ${displayOptions.density === 'compact' ? 'hidden lg:table-cell' : 'lg:table-cell'}`}>
+                    {metric.historicalGrowth?.toFixed(1) || 'N/A'}%
+                  </td>
+                  <td className={`p-2 sm:p-3 text-right text-xs sm:text-sm ${!displayOptions.visibleColumns.volatility ? 'hidden' : ''} hidden xl:table-cell`}>
+                    {metric.volatility?.toFixed(1) || 'N/A'}%
+                  </td>
+                  <td className={`p-2 sm:p-3 text-center ${!displayOptions.visibleColumns.approved ? 'hidden' : ''}`}>
                     {metric.hasApprovedVersion ? (
                       <CheckCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mx-auto" />
                     ) : (
