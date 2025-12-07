@@ -593,6 +593,16 @@ export default function App() {
         
         // Charger les tickers
         loadTickersFromSupabase();
+
+        // ✅ Mise à jour automatique du cache prix toutes les 5 minutes pendant la session
+        const intervalId = setInterval(() => {
+            refreshPriceCacheIfNeeded();
+        }, 5 * 60 * 1000); // 5 minutes
+
+        // Nettoyer l'interval quand le composant est démonté ou la page est fermée
+        return () => {
+            clearInterval(intervalId);
+        };
     }, [isInitialized]); // Seulement après l'initialisation - pas de dépendance à library pour éviter la boucle
 
     // --- ACTIVE SESSION STATE ---
