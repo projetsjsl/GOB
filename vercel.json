@@ -43,6 +43,9 @@
     "api/admin/tickers.js": {
       "maxDuration": 15
     },
+    "api/admin/unrecoverable-tickers.js": {
+      "maxDuration": 300
+    },
     "api/admin/redirects.js": {
       "maxDuration": 30
     },
