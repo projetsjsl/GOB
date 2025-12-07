@@ -344,7 +344,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
           invalidReason.push(`Aucun ratio cible valide${excludedText} - Vérifiez les ratios cibles (P/E, P/CF, P/BV, Yield) et les données historiques`);
         }
         if (jpegy === null) {
-          invalidReason.push(`JPEGY non calculable: Croissance EPS (${profile.assumptions.growthRateEPS?.toFixed(2) || 0}%) + Yield (${baseYield.toFixed(2) || 0}%) trop faible (≤0.01%) ou EPS invalide - Ajustez la croissance, le dividende ou synchronisez les données`);
+          const growthRate = profile.assumptions.growthRateEPS !== null && profile.assumptions.growthRateEPS !== undefined ? profile.assumptions.growthRateEPS.toFixed(2) : '0.00';
+          const yieldValue = baseYield !== null && baseYield !== undefined ? baseYield.toFixed(2) : '0.00';
+          invalidReason.push(`JPEGY non calculable: Croissance EPS (${growthRate}%) + Yield (${yieldValue}%) trop faible (≤0.01%) ou EPS invalide - Ajustez la croissance, le dividende ou synchronisez les données`);
         }
         if (totalReturnPercent <= -99.9) {
           invalidReason.push('Rendement impossible à calculer - Vérifiez le prix actuel et les ratios cibles');
@@ -866,9 +868,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   const globalStats = useMemo(() => {
     if (filteredMetrics.length === 0) return null;
     
-    const returns = filteredMetrics.map(m => m.totalReturnPercent);
-    const jpegyValues = filteredMetrics.map(m => m.jpegy).filter((j): j is number => j !== null); // Exclure les null
-    const ratios = filteredMetrics.map(m => m.ratio31);
+    // Filtrer les valeurs null/undefined avant de calculer les statistiques
+    const returns = filteredMetrics.map(m => m.totalReturnPercent).filter((r): r is number => r !== null && r !== undefined);
+    const jpegyValues = filteredMetrics.map(m => m.jpegy).filter((j): j is number => j !== null && j !== undefined);
+    const ratios = filteredMetrics.map(m => m.ratio31).filter((r): r is number => r !== null && r !== undefined);
     
     const avg = (arr: number[]) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
     const median = (arr: number[]) => {
@@ -883,22 +886,22 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       return Math.sqrt(variance);
     };
     
-    const avgReturn = avg(returns);
-    const medianReturn = median(returns);
-    const stdReturn = stdDev(returns, avgReturn);
+    const avgReturn = returns.length > 0 ? avg(returns) : 0;
+    const medianReturn = returns.length > 0 ? median(returns) : 0;
+    const stdReturn = returns.length > 0 ? stdDev(returns, avgReturn) : 0;
     
     const avgJPEGY = jpegyValues.length > 0 ? avg(jpegyValues) : null;
     const medianJPEGY = jpegyValues.length > 0 ? median(jpegyValues) : null;
     
-    const avgRatio = avg(ratios);
-    const medianRatio = median(ratios);
+    const avgRatio = ratios.length > 0 ? avg(ratios) : 0;
+    const medianRatio = ratios.length > 0 ? median(ratios) : 0;
     
     return {
       avgReturn,
       medianReturn,
       stdReturn,
-      minReturn: Math.min(...returns),
-      maxReturn: Math.max(...returns),
+      minReturn: returns.length > 0 ? Math.min(...returns) : 0,
+      maxReturn: returns.length > 0 ? Math.max(...returns) : 0,
       avgJPEGY,
       medianJPEGY,
       avgRatio,
@@ -1035,7 +1038,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Rendement:</span>
-                      <span className="font-bold text-green-600">{metric.totalReturnPercent.toFixed(1)}%</span>
+                      <span className="font-bold text-green-600">{metric.totalReturnPercent !== null && metric.totalReturnPercent !== undefined ? metric.totalReturnPercent.toFixed(1) : 'N/A'}%</span>
                     </div>
                     <div className="flex justify-between items-start">
                       <span className="text-gray-600">JPEGY:</span>
@@ -1868,10 +1871,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                       opacity: currentId === metric.profile.id ? 1 : 0.85
                     }}
                     title={`${metric.profile.info.name || metric.profile.id}
-Rendement: ${metric.hasInvalidData ? 'N/A (données invalides)' : `${metric.totalReturnPercent.toFixed(1)}%`}
+Rendement: ${metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A (données invalides)' : `${metric.totalReturnPercent.toFixed(1)}%`}
 JPEGY: ${metric.jpegy !== null ? metric.jpegy.toFixed(2) : 'N/A (non calculable)'}
-Ratio 3:1: ${metric.hasInvalidData || metric.ratio31 === null ? 'N/A' : metric.ratio31.toFixed(2)}
-P/E: ${metric.currentPE?.toFixed(1) || 'N/A'}x
+Ratio 3:1: ${metric.hasInvalidData || metric.ratio31 === null || metric.ratio31 === undefined ? 'N/A' : metric.ratio31.toFixed(2)}
+P/E: ${metric.currentPE !== null && metric.currentPE !== undefined ? metric.currentPE.toFixed(1) : 'N/A'}x
 Secteur: ${metric.profile.info.sector}
 ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}
 ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
@@ -1896,7 +1899,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         )}
                       </div>
                       <div className={`text-[10px] font-semibold mb-1 ${metric.hasInvalidData ? 'opacity-50' : ''}`}>
-                        {metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`}
+                        {metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`}
                       </div>
                       <div className={`text-[8px] opacity-90 ${metric.hasInvalidData || metric.jpegy === null ? 'opacity-50' : ''}`}>
                         JPEGY: {metric.jpegy !== null ? metric.jpegy.toFixed(1) : 'N/A'}
@@ -1972,7 +1975,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       </div>
                       <div className="text-right">
                         <div className={`font-bold text-lg ${metric.hasInvalidData ? 'text-gray-400' : ''}`} style={metric.hasInvalidData ? {} : { color: getReturnColor(metric.totalReturnPercent) }}>
-                          {metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(1)}%`}
+                          {metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A' : `${metric.totalReturnPercent.toFixed(1)}%`}
                         </div>
                         <div className="text-xs text-gray-500">Rendement</div>
                       </div>
@@ -2052,7 +2055,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       backgroundColor: metric.hasInvalidData ? '#fee2e2' : getReturnColor(metric.totalReturnPercent),
                       opacity: currentId === metric.profile.id ? 1 : (metric.hasInvalidData ? 0.6 : 0.8)
                     }}
-                    title={`${metric.profile.id}: ${metric.hasInvalidData ? 'Données invalides' : `${metric.totalReturnPercent.toFixed(1)}%`}`}
+                    title={`${metric.profile.id}: ${metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'Données invalides' : `${metric.totalReturnPercent.toFixed(1)}%`}`}
                   >
                     <div className={`flex flex-col items-center ${metric.hasInvalidData ? 'text-gray-600' : 'text-white'} text-[9px] relative`}>
                       {metric.hasInvalidData && (
@@ -2066,7 +2069,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                           <StarIcon className="w-2.5 h-2.5 text-yellow-400" title="Portefeuille" />
                         )}
                       </div>
-                      <div className="text-[8px]">{metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`}</div>
+                      <div className="text-[8px]">{metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`}</div>
                     </div>
                   </div>
                 ))}
