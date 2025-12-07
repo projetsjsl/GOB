@@ -156,10 +156,14 @@
         { "source": "/api/finnhub", "destination": "/api/marketdata" }
       ],
       "crons": [
-        {
-          "path": "/api/cron/fmp-batch-sync",
-          "schedule": "*/15 * * * *"
-        }
+        // ⚠️ DÉSACTIVÉ : Mise à jour à la demande au lieu de cron continu
+        // Le cron continu consomme des ressources même sans utilisateurs
+        // La mise à jour se fait maintenant automatiquement quand quelqu'un ouvre le site
+        // Si vous avez beaucoup d'utilisateurs actifs, vous pouvez réactiver :
+        // {
+        //   "path": "/api/cron/fmp-batch-sync",
+        //   "schedule": "*/15 * * * *"
+        // }
       ],
       "redirects": [
     {

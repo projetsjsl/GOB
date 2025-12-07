@@ -64,7 +64,35 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { tickers } = req.query;
+  const { tickers, checkOnly } = req.query;
+
+  // Mode "checkOnly" : Vérifier seulement si le cache est frais (pour déclencher mise à jour)
+  if (checkOnly === 'true') {
+    try {
+      // Utiliser un ticker exemple pour vérifier l'état du cache
+      const sampleTicker = tickers ? tickers.split(',')[0] : 'AAPL';
+      const cachedData = await getCachedPriceData([sampleTicker]);
+      const { fresh, stale } = filterFreshData(cachedData);
+      
+      return res.status(200).json({
+        success: true,
+        isFresh: fresh.length > 0,
+        stats: {
+          fresh: fresh.length,
+          stale: stale.length,
+          missing: cachedData.length === 0 ? 1 : 0
+        },
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: false,
+        isFresh: false,
+        stats: { fresh: 0, stale: 0, missing: 1 },
+        error: error.message
+      });
+    }
+  }
 
   if (!tickers) {
     return res.status(400).json({ 

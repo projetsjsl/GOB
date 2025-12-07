@@ -181,7 +181,9 @@ Cette section détaille comment traiter chaque élément de la marque « Termina
 **Points de vigilance :**
 - Vérifier s'il existe des marques "JLab" ou similaires (recherche préalable)
 - "Lab" seul est faible, mais "JLab" comme combinaison est plus protectable
-- **Recommandation** : "JLab" renforce la distinctivité globale, surtout avec "Emma"
+- **⚠️ VÉRIFICATION EFFECTUÉE** : "JLab Audio" existe comme marque d'équipements audio (depuis 2005) - voir section 8.1.G pour rapport complet
+- **Risque identifié** : JLab Audio est probablement enregistré en classe 9 (appareils électroniques), mais secteur différent (audio vs finance)
+- **Recommandation** : "JLab" renforce la distinctivité globale, surtout avec "Emma". Vérifier classes exactes de "JLab Audio" dans bases de données officielles (risque faible car secteurs différents)
 
 #### E. Stratégie globale de combinaison
 
@@ -207,22 +209,25 @@ Cette section détaille comment traiter chaque élément de la marque « Termina
 
 **Tableau récapitulatif de gestion des composants :**
 
-| Composant | Distinctivité | Risque OPIC | Stratégie | Dépôt séparé ? |
-|-----------|--------------|-------------|-----------|----------------|
-| **Terminal** | Faible (descriptif) | Modéré | Inclure dans marque complète | ❌ Non recommandé |
-| **Emma** | Forte (prénom) | Faible | Élément clé, mettre en avant | ✅ Oui (dans "Emma IA JLab") |
-| **IA** | Très faible (descriptif) | Élevé | Accepter comme partie composite | ❌ Non recommandé |
-| **JLab** | Modérée à forte | Faible | Renforce distinctivité globale | ⚠️ À évaluer selon usage |
+| Composant | Distinctivité | Risque OPIC | Stratégie | Dépôt séparé ? | Vérification |
+|-----------|--------------|-------------|-----------|----------------|---------------|
+| **Terminal** | Faible (descriptif) | Modéré | Inclure dans marque complète | ❌ Non recommandé | ✅ Effectuée |
+| **Emma** | Forte (prénom) | Faible | Élément clé, mettre en avant | ✅ Oui (dans "Emma IA JLab") | ✅ Effectuée (8.1.F) |
+| **IA** | Très faible (descriptif) | Élevé | Accepter comme partie composite | ❌ Non recommandé | ✅ Effectuée (8.1.F) |
+| **JLab** | Modérée à forte | Faible | Renforce distinctivité globale | ⚠️ À évaluer selon usage | ✅ Effectuée (8.1.G) |
 
 **Recommandations finales :**
 
-1. **⚠️ VÉRIFICATION PRIORITAIRE** : Effectuer une recherche approfondie de "Emma IA" sur le web et dans les bases de données de marques AVANT tout dépôt (voir section 8.1.E pour checklist complète)
-2. **Déposer la marque complète "Terminal Emma IA JLab"** pour protection de l'usage actuel (si vérification OK)
-3. **Déposer également "Emma IA JLab"** pour protection renforcée de l'élément le plus distinctif (si vérification OK)
+1. **⚠️ VÉRIFICATIONS PRIORITAIRES** : 
+   - Effectuer une recherche approfondie de "Emma IA" sur le web et dans les bases de données de marques AVANT tout dépôt (voir section 8.1.E pour checklist complète)
+   - Vérifier "JLab" et "JLab Audio" dans les bases de données officielles (voir section 8.1.G pour rapport de vérification)
+2. **Déposer la marque complète "Terminal Emma IA JLab"** pour protection de l'usage actuel (si vérifications OK)
+3. **Déposer également "Emma IA JLab"** pour protection renforcée de l'élément le plus distinctif (si vérifications OK)
 4. **Préparer des arguments** mettant en avant "Emma" et "JLab" comme éléments distinctifs clés
 5. **Accepter que "Terminal" et "IA" sont descriptifs** mais argumenter qu'ils font partie d'un signe global distinctive
 6. **Documenter l'usage** de "Emma" comme assistant IA et de "JLab" comme identité de marque pour renforcer la distinctivité
 7. **Si "Emma IA" est trouvé comme usage conflictuel** : Consulter un agent de marques et considérer les stratégies adaptatives (section 8.1.E)
+8. **Pour "JLab"** : Risque faible identifié (JLab Audio dans secteur différent), mais vérifier classes exactes dans bases officielles (section 8.1.G)
 
 ---
 
@@ -730,21 +735,322 @@ Terminal Emma IA JLab
 
 | Recherche | Outil/Méthode | Statut | Résultats trouvés |
 |-----------|---------------|--------|-------------------|
-| Base OPIC | Site OPIC - Recherche marques | ☐ À faire | ________________ |
-| Base USPTO | uspto.gov/trademarks/search | ☐ À faire | ________________ |
-| Base EUIPO | euipo.europa.eu/eSearch | ☐ À faire | ________________ |
-| Base WIPO | wipo.int/branddb | ☐ À faire | ________________ |
-| Google Web | "Emma IA" + "Emma AI" | ☐ À faire | ________________ |
+| Base OPIC | Site OPIC - Recherche marques | ☐ À faire | **CRITIQUE - À vérifier** |
+| Base USPTO | uspto.gov/trademarks/search | ☐ À faire | **CRITIQUE - À vérifier** |
+| Base EUIPO | euipo.europa.eu/eSearch | ☐ À faire | **CRITIQUE - À vérifier** |
+| Base WIPO | wipo.int/branddb | ☐ À faire | **CRITIQUE - À vérifier** |
+| Google Web | "Emma IA" + "Emma AI" | ✅ Effectué | **7 usages trouvés** (voir rapport 8.1.F) |
 | Google Images | Recherche visuelle logos | ☐ À faire | ________________ |
-| Noms de domaine | whois.net, domain.com | ☐ À faire | ________________ |
+| Noms de domaine | whois.net, domain.com | ☐ À faire | **emma.ai existe** |
 | Réseaux sociaux | Twitter, LinkedIn, Facebook | ☐ À faire | ________________ |
-| App Stores | Apple, Google Play | ☐ À faire | ________________ |
-| Secteur fintech | Recherche sectorielle | ☐ À faire | ________________ |
-| Agent professionnel | Recherche approfondie (optionnel) | ☐ À faire | ________________ |
+| App Stores | Apple, Google Play | ☐ À faire | **"Emma - Parler anglais" trouvé** |
+| Secteur fintech | Recherche sectorielle | ✅ Effectué | **Aucun usage fintech trouvé** |
+| Agent professionnel | Recherche approfondie (optionnel) | ☐ Recommandé | **Recommandé avant dépôt** |
+
+**Note** : Voir section 8.1.F pour le rapport détaillé de la recherche web effectuée.
 
 **Recommandation finale :**
 
 **AVANT de déposer, effectuer TOUTES les vérifications ci-dessus.** Si "Emma IA" est trouvé comme usage significatif dans le même secteur (fintech, IA financière), consulter un agent de marques avant de procéder. Le coût d'une recherche professionnelle (500-2000 $) est inférieur au coût d'une opposition ou d'un refus (plusieurs milliers de dollars).
+
+---
+
+### 8.1.F Rapport de vérification réelle "Emma IA" (exemple)
+
+**Date de vérification** : [Date actuelle]  
+**Méthode** : Recherche web approfondie
+
+#### Résultats de la recherche web
+
+**Usages trouvés de "Emma IA" / "Emma AI" :**
+
+1. **Emma AI (emma.ai)** - Plateforme d'IA générale
+   - Secteur : Intelligence artificielle générale (plateforme unifiée de modèles d'IA)
+   - Classes probables : 9 (logiciels), 42 (services SaaS)
+   - **Évaluation** : Secteur différent (IA générale vs fintech), mais classes potentiellement conflictuelles
+   - **Risque** : Modéré - Vérifier si enregistré comme marque
+
+2. **Emma AI Tutor (intallaga.com)** - Tuteur virtuel IA
+   - Secteur : Éducation (tutorat pour enfants 6-16 ans)
+   - Classes probables : 41 (services éducatifs), 9 (applications)
+   - **Évaluation** : Secteur différent (éducation vs finance)
+   - **Risque** : Faible - Classes différentes, secteur non concurrent
+
+3. **Emma - AI Email Companion** - Extension Gmail
+   - Secteur : Productivité email
+   - Classes probables : 9 (extensions logiciels), 42 (services SaaS)
+   - **Évaluation** : Secteur différent (email vs finance)
+   - **Risque** : Faible à modéré - Classes similaires mais secteur différent
+
+4. **Emma Robot (emmarobot.io)** - Automatisation de workflows
+   - Secteur : Automatisation d'entreprise
+   - Classes probables : 9 (logiciels), 42 (services)
+   - **Évaluation** : Secteur différent (automatisation générale vs finance)
+   - **Risque** : Faible - Secteur non concurrent
+
+5. **Emma de StackEasy** - Agent IA marketing
+   - Secteur : Marketing automation
+   - Classes probables : 35 (services marketing), 42 (services SaaS)
+   - **Évaluation** : Secteur différent (marketing vs finance)
+   - **Risque** : Faible - Secteur non concurrent
+
+6. **Emma - Parler anglais** - Application mobile éducation
+   - Secteur : Éducation linguistique
+   - Classes probables : 41 (services éducatifs), 9 (applications)
+   - **Évaluation** : Secteur différent (éducation vs finance)
+   - **Risque** : Faible - Classes et secteur différents
+
+7. **Emma AI by Hoopla** - Assistant virtuel téléphonique
+   - Secteur : Services téléphoniques / call center
+   - Classes probables : 35 (services commerciaux), 42 (services)
+   - **Évaluation** : Secteur différent (téléphonie vs finance)
+   - **Risque** : Faible - Secteur non concurrent
+
+#### Analyse des résultats
+
+**Points positifs :**
+- ✅ **Aucun usage trouvé spécifiquement dans le secteur fintech/finance**
+- ✅ Tous les usages trouvés sont dans des secteurs différents (éducation, email, marketing, automatisation générale)
+- ✅ Aucun usage direct concurrent dans le domaine de l'analyse financière ou de la planification de placements
+
+**Points d'attention :**
+- ⚠️ **Emma AI (emma.ai)** - Plateforme générale d'IA pourrait être dans classes 9 et 42 (potentiellement conflictuelles)
+- ⚠️ Plusieurs usages dans classe 9 (logiciels) et 42 (services SaaS) - nécessite vérification des classes exactes
+- ⚠️ "Emma IA" semble être une combinaison populaire pour des assistants IA (tendance générale)
+
+**Recommandations basées sur cette vérification :**
+
+1. **Vérification prioritaire** : Rechercher "Emma AI" dans les bases de données de marques (OPIC, USPTO, EUIPO) pour confirmer si "Emma AI" (emma.ai) est enregistré dans les classes 9, 36, 42
+2. **Stratégie recommandée** : 
+   - Si "Emma AI" n'est pas enregistré dans classes 36 (services financiers) : **Procéder avec le dépôt** de "Terminal Emma IA JLab" et "Emma IA JLab"
+   - Si "Emma AI" est enregistré dans classes 9/42 mais pas 36 : **Déposer dans classe 36** (services financiers) avec focus sur le secteur financier
+   - Si conflit majeur : Consulter agent de marques et considérer variantes (ex. : "Emma JLab" sans "IA")
+3. **Différenciation** : Mettre l'accent sur "JLab" et le secteur financier pour se différencier des usages généraux d'IA
+4. **Documentation** : Documenter votre usage spécifique dans le secteur financier pour renforcer la distinctivité
+
+**Statut de vérification :**
+- [x] Recherche web effectuée
+- [ ] Bases de données OPIC vérifiées (à faire)
+- [ ] Bases de données USPTO vérifiées (à faire)
+- [ ] Bases de données EUIPO vérifiées (à faire)
+- [ ] Consultation agent de marques (recommandé avant dépôt final)
+
+**Conclusion préliminaire :**
+Les usages trouvés sont principalement dans des secteurs non concurrents. Cependant, une vérification approfondie dans les bases de données officielles de marques est **ESSENTIELLE** avant le dépôt, particulièrement pour "Emma AI" (emma.ai) qui pourrait avoir des classes conflictuelles.
+
+---
+
+### 8.1.G Rapport de vérification réelle "JLab" (exemple)
+
+**Date de vérification** : [Date actuelle]  
+**Méthode** : Recherche web approfondie
+
+#### Résultats de la recherche web
+
+**Usages trouvés de "JLab" :**
+
+1. **JLab Audio (jlab.com)** - Marque d'équipements audio
+   - **Secteur** : Équipements audio grand public (écouteurs, casques, haut-parleurs Bluetooth)
+   - **Fondée** : 2005
+   - **Statut** : Acquise par Noritsu en 2021
+   - **Classes probables** : Classe 9 (appareils électroniques, équipements audio)
+   - **Évaluation** : Secteur complètement différent (audio/électronique grand public vs fintech/finance)
+   - **Risque** : **FAIBLE** - Secteur non concurrent, mais vérifier classes exactes dans bases de données
+
+2. **Jefferson Lab / JLab (jlab.org)** - Laboratoire de recherche gouvernemental
+   - **Secteur** : Recherche en physique nucléaire et particules (gouvernement américain)
+   - **Type** : Laboratoire national du Département de l'Énergie des États-Unis
+   - **Fondé** : 1984
+   - **Classes probables** : Aucune (organisme gouvernemental, pas une marque commerciale)
+   - **Évaluation** : Organisme gouvernemental, pas une marque commerciale concurrente
+   - **Risque** : **TRÈS FAIBLE** - Pas de conflit commercial possible
+
+3. **JROTC Leadership & Academic Bowl (JLAB)** - Compétition académique
+   - **Secteur** : Éducation / Compétitions académiques militaires
+   - **Type** : Compétition pour cadets JROTC
+   - **Classes probables** : Aucune (événement, pas une marque commerciale)
+   - **Évaluation** : Événement éducatif, pas une marque commerciale
+   - **Risque** : **TRÈS FAIBLE** - Pas de conflit commercial
+
+#### Analyse des résultats
+
+**Points positifs :**
+- ✅ **Aucun usage trouvé dans le secteur fintech/finance**
+- ✅ JLab Audio est dans un secteur complètement différent (audio vs finance)
+- ✅ Jefferson Lab est un organisme gouvernemental (pas de conflit commercial)
+- ✅ Aucun usage concurrent dans le domaine de l'analyse financière ou des services financiers
+
+**Points d'attention :**
+- ⚠️ **JLab Audio** est une marque commerciale active depuis 2005, probablement enregistrée en classe 9
+- ⚠️ Si JLab Audio est enregistré en classe 9 (appareils électroniques), vérifier si cela couvre aussi les logiciels/applications
+- ⚠️ "JLab" seul pourrait être considéré comme similaire à "JLab Audio" dans certaines bases de données
+
+**Recommandations basées sur cette vérification :**
+
+1. **Vérification prioritaire** : 
+   - Rechercher "JLab" et "JLab Audio" dans les bases de données de marques (OPIC, USPTO, EUIPO)
+   - Vérifier les classes exactes de "JLab Audio" - si seulement classe 9 (appareils électroniques), pas de conflit avec classes 36 (services financiers) ou 42 (services SaaS)
+   - Vérifier si "JLab Audio" a des enregistrements dans classes 9 pour logiciels/applications
+
+2. **Stratégie recommandée** :
+   - Si "JLab Audio" est seulement en classe 9 pour appareils électroniques (écouteurs, casques) : **AUCUN CONFLIT** - Secteurs et classes différents
+   - Si "JLab Audio" a aussi classe 9 pour logiciels/applications : **Vérifier la portée** - logiciels audio vs logiciels financiers (secteurs différents)
+   - Si conflit potentiel : Consulter agent de marques pour évaluation
+   - **Recommandation générale** : Risque très faible car secteurs complètement différents
+
+3. **Différenciation** :
+   - "JLab" dans "Terminal Emma IA JLab" est clairement dans un contexte financier/fintech
+   - "JLab Audio" est exclusivement associé à l'audio/électronique
+   - La combinaison "Emma IA JLab" est suffisamment différente de "JLab Audio" pour éviter la confusion
+
+4. **Documentation** :
+   - Documenter l'usage de "JLab" dans le contexte financier/fintech
+   - Mettre l'accent sur la combinaison complète "Terminal Emma IA JLab" ou "Emma IA JLab" plutôt que "JLab" seul
+
+**Statut de vérification :**
+- [x] Recherche web effectuée
+- [ ] Bases de données OPIC vérifiées (à faire - vérifier "JLab" et "JLab Audio")
+- [ ] Bases de données USPTO vérifiées (à faire - JLab Audio est américain)
+- [ ] Bases de données EUIPO vérifiées (à faire)
+- [ ] Consultation agent de marques (optionnel - risque faible mais recommandé pour confirmation)
+
+**Conclusion préliminaire :**
+Les usages trouvés de "JLab" sont dans des secteurs complètement différents (audio/électronique, recherche gouvernementale). **JLab Audio** est la seule marque commerciale identifiée, mais elle est dans un secteur non concurrent (équipements audio vs services financiers). Le risque de conflit est **FAIBLE**, mais une vérification dans les bases de données officielles est recommandée pour confirmer les classes exactes de "JLab Audio" et s'assurer qu'il n'y a pas de chevauchement dans les classes 9 (si JLab Audio couvre aussi les logiciels).
+
+**Note importante** : Même si "JLab Audio" est enregistré en classe 9, il est probable qu'il soit limité aux appareils électroniques/audio, pas aux logiciels d'analyse financière. Les secteurs sont suffisamment différents pour éviter la confusion des consommateurs.
+
+---
+
+### 8.1.H Rapport de vérification variantes "Terminal JLab" et "Terminal EmmaIA"
+
+**Date de vérification** : [Date actuelle]  
+**Méthode** : Recherche web approfondie  
+**Variantes vérifiées** : "Terminal JLab" et "Terminal EmmaIA" (sans espace)
+
+#### Résultats de la recherche web
+
+**1. "Terminal JLab" - Résultats :**
+
+- **Jefferson Lab (JLab) - Terminaux informatiques**
+  - **Type** : Terminaux informatiques utilisés au Jefferson Lab (laboratoire gouvernemental)
+  - **Usage** : Accès aux ressources informatiques du laboratoire (contrôle accélérateurs, CAO, calcul scientifique)
+  - **Secteur** : Recherche scientifique gouvernementale (physique nucléaire)
+  - **Classes probables** : Aucune (usage interne gouvernemental, pas une marque commerciale)
+  - **Évaluation** : Organisme gouvernemental, pas de conflit commercial possible
+  - **Risque** : **TRÈS FAIBLE** - Pas de marque commerciale
+
+- **JLab Audio - Association possible**
+  - **Type** : Marque d'équipements audio (voir section 8.1.G)
+  - **Évaluation** : "Terminal JLab" n'est pas utilisé par JLab Audio
+  - **Risque** : **FAIBLE** - Aucun usage commercial identifié de "Terminal JLab"
+
+**2. "Terminal EmmaIA" (sans espace) - Résultats :**
+
+- **Aucun usage commercial trouvé**
+  - Aucune référence à "Terminal EmmaIA" comme marque ou produit commercial
+  - Aucun site web, application ou service portant ce nom
+  - **Risque** : **TRÈS FAIBLE** - Aucun usage identifié
+
+- **EMMA Systems (emma.aero) - Association possible mais différente**
+  - **Type** : Solutions IA pour opérations aéroportuaires
+  - **Secteur** : Aéroports / compagnies aériennes (plateforme SaaS IA)
+  - **Classes probables** : 9 (logiciels), 42 (services SaaS)
+  - **Évaluation** : "Terminal EmmaIA" n'est pas utilisé par EMMA Systems
+  - **Note** : EMMA Systems utilise "EMMA" (pas "EmmaIA") et est dans le secteur aéroportuaire (vs finance)
+  - **Risque** : **TRÈS FAIBLE** - Secteur différent, nom différent
+
+#### Analyse comparative des variantes
+
+**Tableau comparatif des variantes :**
+
+| Variante | Usage trouvé | Secteur | Risque | Recommandation |
+|----------|--------------|---------|--------|----------------|
+| **"Terminal Emma IA JLab"** | Aucun (marque proposée) | Fintech/Finance | - | ✅ Dépôt recommandé |
+| **"Emma IA JLab"** | Aucun (marque proposée) | Fintech/Finance | - | ✅ Dépôt recommandé |
+| **"Terminal JLab"** | Terminaux Jefferson Lab (gouvernemental) | Recherche scientifique | TRÈS FAIBLE | ✅ Dépôt possible |
+| **"Terminal EmmaIA"** | Aucun | - | TRÈS FAIBLE | ✅ Dépôt possible |
+| **"Emma IA"** | 7 usages (secteurs différents) | Variés | MODÉRÉ | ⚠️ Voir section 8.1.F |
+| **"JLab"** | JLab Audio (audio) | Audio/Électronique | FAIBLE | ⚠️ Voir section 8.1.G |
+
+#### Recommandations stratégiques pour les variantes
+
+**Option 1 : Dépôt de "Terminal JLab" (sans Emma IA)**
+- **Avantages** :
+  - Aucun usage commercial identifié
+  - Plus court, plus mémorable
+  - Évite les risques potentiels de "Emma IA"
+- **Inconvénients** :
+  - Perd la référence à "Emma" (élément distinctif clé)
+  - Perd la référence à "IA" (bien que descriptif)
+  - Moins de personnalité de marque
+- **Risque** : **TRÈS FAIBLE** - Aucun conflit identifié
+- **Recommandation** : **Option viable** si vous souhaitez éviter les risques de "Emma IA", mais moins distinctive
+
+**Option 2 : Dépôt de "Terminal EmmaIA" (sans espace)**
+- **Avantages** :
+  - Aucun usage commercial identifié
+  - Conserve "Emma" (distinctif) et "IA" (descriptif mais acceptable)
+  - Évite potentiellement certains conflits avec "Emma IA" (avec espace)
+- **Inconvénients** :
+  - Perd "JLab" (élément distinctif)
+  - "EmmaIA" sans espace peut être moins lisible
+  - Moins de différenciation
+- **Risque** : **TRÈS FAIBLE** - Aucun usage identifié
+- **Recommandation** : **Option viable** mais moins recommandée que les variantes avec "JLab"
+
+**Option 3 : Dépôt de "Terminal Emma IA JLab" (marque complète)**
+- **Avantages** :
+  - Marque complète, protection maximale
+  - Tous les éléments présents
+  - Plus de personnalité et de distinctivité
+- **Inconvénients** :
+  - Plus longue
+  - Risques potentiels de "Emma IA" (voir section 8.1.F)
+- **Risque** : **FAIBLE à MODÉRÉ** selon vérification "Emma IA"
+- **Recommandation** : **Recommandé** si vérification "Emma IA" OK
+
+**Option 4 : Dépôt de "Emma IA JLab" (sans Terminal)**
+- **Avantages** :
+  - Plus courte, plus mémorable
+  - Conserve "Emma" et "JLab" (éléments distinctifs)
+  - Moins descriptive que "Terminal Emma IA JLab"
+- **Inconvénients** :
+  - Perd "Terminal" (bien que descriptif)
+  - Risques potentiels de "Emma IA" (voir section 8.1.F)
+- **Risque** : **FAIBLE à MODÉRÉ** selon vérification "Emma IA"
+- **Recommandation** : **FORTEMENT RECOMMANDÉ** - Meilleur équilibre distinctivité/risque
+
+#### Stratégie de dépôt recommandée (ordre de priorité)
+
+1. **PRIORITÉ 1** : "Emma IA JLab" (sans Terminal)
+   - Plus distinctive, moins descriptive
+   - Conserve les éléments clés (Emma + JLab)
+   - Risque modéré (selon vérification "Emma IA")
+
+2. **PRIORITÉ 2** : "Terminal Emma IA JLab" (marque complète)
+   - Protection de l'usage actuel complet
+   - Si budget et vérifications OK
+
+3. **PRIORITÉ 3** : "Terminal JLab" (sans Emma IA)
+   - Si risques "Emma IA" sont trop élevés
+   - Protection minimale mais sûre
+
+4. **PRIORITÉ 4** : "Terminal EmmaIA" (sans espace, sans JLab)
+   - Dernière option si autres variantes problématiques
+
+**Statut de vérification :**
+- [x] Recherche web "Terminal JLab" effectuée
+- [x] Recherche web "Terminal EmmaIA" effectuée
+- [ ] Bases de données OPIC vérifiées (à faire)
+- [ ] Bases de données USPTO vérifiées (à faire)
+- [ ] Bases de données EUIPO vérifiées (à faire)
+
+**Conclusion préliminaire :**
+- **"Terminal JLab"** : Aucun usage commercial identifié (seulement terminaux gouvernementaux). Risque **TRÈS FAIBLE**. Dépôt possible mais moins recommandé (perd éléments distinctifs).
+- **"Terminal EmmaIA"** : Aucun usage commercial identifié. Risque **TRÈS FAIBLE**. Dépôt possible mais moins recommandé (perd "JLab").
+- **Recommandation globale** : Privilégier "Emma IA JLab" ou "Terminal Emma IA JLab" pour meilleure protection et distinctivité, après vérification des bases de données officielles pour "Emma IA".
+
+---
 
 ### 8.2 Recommandations pratiques
 

@@ -192,6 +192,29 @@ export default function App() {
             return;
         }
 
+        // ✅ Mise à jour automatique des prix à l'ouverture (remplace le cron continu)
+        const refreshPriceCacheIfNeeded = async () => {
+            try {
+                // Vérifier si le cache est frais (< 15 minutes) avec un ticker exemple
+                const response = await fetch('/api/market-data-batch?tickers=AAPL&checkOnly=true');
+                const result = await response.json();
+                
+                // Si le cache est expiré ou manquant, déclencher la mise à jour
+                if (result.stats?.stale > 0 || result.stats?.missing > 0) {
+                    console.log('🔄 Cache prix expiré - Mise à jour automatique...');
+                    // Déclencher la mise à jour en arrière-plan (non-bloquant)
+                    fetch('/api/fmp-batch-sync', { method: 'POST' })
+                        .then(() => console.log('✅ Cache prix mis à jour'))
+                        .catch(err => console.warn('⚠️ Erreur mise à jour cache prix:', err));
+                } else {
+                    console.log('✅ Cache prix frais - Pas de mise à jour nécessaire');
+                }
+            } catch (error) {
+                console.warn('⚠️ Erreur vérification cache prix:', error);
+                // Non-bloquant - continuer le chargement même si la vérification échoue
+            }
+        };
+
         const loadTickersFromSupabase = async () => {
             hasLoadedTickersRef.current = true; // Marquer comme chargé
             setIsLoadingTickers(true);
@@ -565,6 +588,10 @@ export default function App() {
             }
         };
 
+        // ✅ Vérifier et mettre à jour le cache prix en parallèle (non-bloquant)
+        refreshPriceCacheIfNeeded();
+        
+        // Charger les tickers
         loadTickersFromSupabase();
     }, [isInitialized]); // Seulement après l'initialisation - pas de dépendance à library pour éviter la boucle
 
