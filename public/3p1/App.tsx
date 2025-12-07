@@ -26,6 +26,7 @@ import { fetchCompanyData } from './services/financeApi';
 import { saveSnapshot, hasManualEdits, loadSnapshot, listSnapshots } from './services/snapshotApi';
 import { RestoreDataDialog } from './components/RestoreDataDialog';
 import { loadAllTickersFromSupabase, mapSourceToIsWatchlist } from './services/tickersApi';
+import { loadProfilesBatchFromSupabase, loadProfileFromSupabase } from './services/supabaseDataLoader';
 
 // Données initiales par défaut (placeholder uniquement - les données réelles sont toujours récupérées depuis l'API FMP)
 // Ces données ne sont utilisées que temporairement avant le chargement des données réelles depuis l'API
@@ -303,8 +304,8 @@ export default function App() {
                     return updated;
                 });
 
-                // ⚠️ RIGUEUR 100% : Ne créer des profils QUE si FMP réussit
-                // OPTIMISATION EGRESS : Utiliser le cache d'abord, puis FMP si nécessaire
+                // ✅ OPTIMISATION PERFORMANCE : Créer des profils "squelettes" immédiatement
+                // pour affichage instantané, puis charger les données FMP en arrière-plan
                 if (newTickers.length > 0) {
                     // Filtrer les fonds mutuels AVANT tout appel API
                     const validTickers = newTickers.filter(t => {
@@ -318,75 +319,179 @@ export default function App() {
 
                     if (validTickers.length === 0) {
                         console.log('✅ Aucun ticker valide après filtrage des fonds mutuels');
+                        setIsLoadingTickers(false); // ✅ Libérer le loading immédiatement
                         return;
                     }
 
-                    // OPTIMISATION : Charger par batch de 20 (au lieu de 5) pour réduire les requêtes
-                    const batchSize = 20;
-                    const delayBetweenBatches = 1000; // 1 seconde entre batches
-
-                    for (let i = 0; i < validTickers.length; i += batchSize) {
-                        const batch = validTickers.slice(i, i + batchSize);
+                    // ✅ ÉTAPE 1 : Créer des profils "squelettes" immédiatement pour affichage instantané
+                    const skeletonProfiles: Record<string, AnalysisProfile> = {};
+                    validTickers.forEach(supabaseTicker => {
+                        const symbol = supabaseTicker.ticker.toUpperCase();
+                        const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
                         
-                        // Attendre avant de charger le batch suivant
-                        if (i > 0) {
-                            await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
-                        }
+                        skeletonProfiles[symbol] = {
+                            id: symbol,
+                            lastModified: Date.now(),
+                            data: [], // Données vides pour l'instant
+                            assumptions: INITIAL_ASSUMPTIONS,
+                            info: {
+                                symbol: symbol,
+                                name: supabaseTicker.company_name || symbol,
+                                sector: supabaseTicker.sector || '',
+                                securityRank: supabaseTicker.security_rank || 'N/A',
+                                marketCap: 'N/A',
+                                earningsPredictability: supabaseTicker.earnings_predictability,
+                                priceGrowthPersistence: supabaseTicker.price_growth_persistence,
+                                priceStability: supabaseTicker.price_stability,
+                                beta: supabaseTicker.beta,
+                                preferredSymbol: supabaseTicker.ticker
+                            },
+                            notes: '',
+                            isWatchlist,
+                            _isSkeleton: true // Flag pour indiquer que c'est un profil incomplet
+                        };
+                    });
 
-                        // Charger les données FMP pour ce batch en parallèle
-                        await Promise.allSettled(
-                            batch.map(async (supabaseTicker) => {
-                                const symbol = supabaseTicker.ticker.toUpperCase();
-                                
-                                try {
-                                    // OPTIMISATION : Essayer d'abord le cache, puis FMP si nécessaire
-                                    // Pour l'instant, on garde fetchCompanyData mais on pourrait optimiser plus tard
-                                    const result = await fetchCompanyData(symbol);
-                                            
-                                            // VALIDATION STRICTE : Vérifier que les données sont valides
-                                            if (!result.data || result.data.length === 0) {
-                                                console.error(`❌ ${symbol}: Aucune donnée FMP retournée - profil NON créé`);
-                                                return;
-                                            }
-                                            
-                                            if (!result.currentPrice || result.currentPrice <= 0) {
-                                                console.error(`❌ ${symbol}: Prix actuel invalide (${result.currentPrice}) - profil NON créé`);
-                                                return;
-                                            }
-                                            
-                                            // Vérifier qu'on a au moins une année avec des données valides
-                                            const hasValidData = result.data.some(d => 
-                                                d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
-                                            );
-                                            
-                                            if (!hasValidData) {
-                                                // Vérifier si c'est un fonds mutuel (même si le pattern n'a pas matché)
-                                                if (isMutualFund(symbol, result.info.name)) {
-                                                    console.warn(`⚠️ ${symbol}: Fonds mutuel détecté (pas de données financières) - profil NON créé`);
-                                                } else {
-                                                    console.error(`❌ ${symbol}: Aucune donnée financière valide - profil NON créé`);
-                                                }
-                                                return;
-                                            }
+                    // Ajouter les profils squelettes immédiatement pour affichage
+                    setLibrary(prev => {
+                        const updated = { ...prev, ...skeletonProfiles };
+                        try {
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                        } catch (e) {
+                            console.warn('Failed to save to LocalStorage:', e);
+                        }
+                        return updated;
+                    });
+
+                    // ✅ Libérer le loading immédiatement pour afficher la liste
+                    setIsLoadingTickers(false);
+                    console.log(`✅ ${validTickers.length} profils squelettes créés - affichage immédiat`);
+
+                    // ✅ ÉTAPE 2 : Charger les données depuis Supabase d'abord, puis FMP si nécessaire
+                    // Utiliser requestIdleCallback pour ne pas bloquer l'UI
+                    const loadDataInBackground = async () => {
+                        const batchSize = 50; // Plus grand batch car Supabase est rapide
+                        const delayBetweenBatches = 200; // Délai réduit
+
+                        for (let i = 0; i < validTickers.length; i += batchSize) {
+                            const batch = validTickers.slice(i, i + batchSize);
+                            
+                            // Petit délai entre batches pour ne pas surcharger
+                            if (i > 0) {
+                                await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
+                            }
+
+                            // ✅ OPTIMISATION : Charger depuis Supabase en batch (beaucoup plus rapide)
+                            const tickerSymbols = batch.map(t => t.ticker.toUpperCase());
+                            const supabaseResults = await loadProfilesBatchFromSupabase(tickerSymbols);
+
+                            // Traiter chaque résultat
+                            await Promise.allSettled(
+                                batch.map(async (supabaseTicker) => {
+                                    const symbol = supabaseTicker.ticker.toUpperCase();
+                                    const supabaseResult = supabaseResults[symbol];
                                     
-                                    // ✅ TOUTES LES VALIDATIONS PASSÉES - Créer le profil avec les données réelles
+                                    try {
+                                        let result: any;
+                                        
+                                        // ✅ LOGIQUE SIMPLIFIÉE : Utiliser Supabase si disponible, sinon FMP
+                                        if (supabaseResult && supabaseResult.source === 'supabase' && 
+                                            supabaseResult.data && supabaseResult.data.length > 0) {
+                                            // ✅ CAS 1 : Snapshot Supabase existe → Utiliser directement (PAS de FMP)
+                                            result = supabaseResult;
+                                            console.log(`✅ ${symbol}: Chargé depuis Supabase (snapshot existant)`);
+                                        } else {
+                                            // ✅ CAS 2 : Pas de snapshot → Charger depuis FMP (première fois)
+                                            console.log(`⚠️ ${symbol}: Pas de snapshot Supabase → Chargement FMP`);
+                                            const fmpResult = await fetchCompanyData(symbol);
+                                            
+                                            if (!fmpResult.data || fmpResult.data.length === 0) {
+                                                console.error(`❌ ${symbol}: Aucune donnée FMP disponible`);
+                                                return;
+                                            }
+                                            
+                                            result = {
+                                                data: fmpResult.data,
+                                                info: fmpResult.info,
+                                                currentPrice: fmpResult.currentPrice,
+                                                source: 'fmp' as const
+                                            };
+                                            
+                                            // ✅ IMPORTANT : Sauvegarder dans Supabase après chargement FMP
+                                            // (pour éviter de recharger depuis FMP à la prochaine ouverture)
+                                            try {
+                                                const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                                                    fmpResult.data,
+                                                    fmpResult.currentPrice,
+                                                    INITIAL_ASSUMPTIONS
+                                                );
+                                                
+                                                await saveSnapshot(
+                                                    symbol,
+                                                    fmpResult.data,
+                                                    autoFilledAssumptions,
+                                                    fmpResult.info,
+                                                    `Auto-sauvegarde après chargement initial - ${new Date().toLocaleString()}`,
+                                                    true,  // is_current
+                                                    true   // auto_fetched
+                                                );
+                                                console.log(`✅ ${symbol}: Snapshot sauvegardé dans Supabase (première fois)`);
+                                            } catch (saveError) {
+                                                console.warn(`⚠️ ${symbol}: Erreur sauvegarde snapshot (non bloquant):`, saveError);
+                                            }
+                                        }
+                                        
+                                        // VALIDATION : Vérifier que les données sont valides
+                                        if (!result.data || result.data.length === 0) {
+                                            console.error(`❌ ${symbol}: Données invalides après chargement`);
+                                            return;
+                                        }
+                                        
+                                        if (!result.currentPrice || result.currentPrice <= 0) {
+                                            console.error(`❌ ${symbol}: Prix invalide (${result.currentPrice})`);
+                                            return;
+                                        }
+                                        
+                                        // Vérifier qu'on a au moins une année avec des données valides
+                                        const hasValidData = result.data.some(d => 
+                                            d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
+                                        );
+                                        
+                                        if (!hasValidData) {
+                                            if (isMutualFund(symbol, result.info.name)) {
+                                                console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - profil NON créé`);
+                                            } else {
+                                                console.error(`❌ ${symbol}: Aucune donnée financière valide`);
+                                            }
+                                            return;
+                                        }
+                                    
+                                    // ✅ TOUTES LES VALIDATIONS PASSÉES - Créer le profil avec les données
                                     const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
                                     
-                                    // Auto-fill assumptions basées sur les données historiques FMP (fonction centralisée)
-                                    const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-                                        result.data,
-                                        result.currentPrice,
-                                        INITIAL_ASSUMPTIONS
-                                    );
+                                    // Si les assumptions viennent de Supabase, les utiliser, sinon auto-fill
+                                    let finalAssumptions: Assumptions;
+                                    if (result.assumptions && result.source === 'supabase') {
+                                        // Utiliser les assumptions du snapshot (déjà sauvegardées)
+                                        finalAssumptions = {
+                                            ...INITIAL_ASSUMPTIONS,
+                                            ...result.assumptions,
+                                            currentPrice: result.currentPrice
+                                        };
+                                    } else {
+                                        // Auto-fill depuis les données FMP (nouveau chargement)
+                                        finalAssumptions = autoFillAssumptionsFromFMPData(
+                                            result.data,
+                                            result.currentPrice,
+                                            INITIAL_ASSUMPTIONS
+                                        );
+                                    }
                                     
                                     const newProfile: AnalysisProfile = {
                                         id: symbol,
                                         lastModified: Date.now(),
                                         data: result.data,
-                                        assumptions: {
-                                            ...INITIAL_ASSUMPTIONS,
-                                            ...autoFilledAssumptions
-                                        },
+                                        assumptions: finalAssumptions,
                                         info: {
                                             symbol: symbol,
                                             name: result.info.name || supabaseTicker.company_name || symbol,
@@ -404,11 +509,16 @@ export default function App() {
                                         isWatchlist
                                     };
                                     
-                                    // Créer le profil UNIQUEMENT avec des données valides
+                                    // ✅ Mettre à jour le profil squelette avec les données complètes
                                     setLibrary(prev => {
+                                        if (!prev[symbol]) return prev; // Profil supprimé entre temps
+                                        
                                         const updated = {
                                             ...prev,
-                                            [symbol]: newProfile
+                                            [symbol]: {
+                                                ...newProfile,
+                                                _isSkeleton: false // Marquer comme complet
+                                            }
                                         };
                                         
                                         try {
@@ -420,14 +530,30 @@ export default function App() {
                                         return updated;
                                     });
                                     
-                                    console.log(`✅ ${symbol}: Profil créé avec données FMP valides`);
+                                    console.log(`✅ ${symbol}: Profil mis à jour depuis ${result.source === 'supabase' ? 'Supabase' : 'FMP'}`);
                                 } catch (error) {
-                                    console.error(`❌ ${symbol}: Erreur FMP - profil NON créé:`, error);
-                                    // ⚠️ RIGUEUR 100% : Ne pas créer de profil si FMP échoue
+                                    console.error(`❌ ${symbol}: Erreur chargement données - profil squelette conservé:`, error);
+                                    // Le profil squelette reste affiché même si le chargement échoue
                                 }
                             })
                         );
+                        }
+                    };
+
+                    // Démarrer le chargement en arrière-plan (non-bloquant)
+                    if (typeof requestIdleCallback !== 'undefined') {
+                        requestIdleCallback(() => {
+                            loadFMPDataInBackground();
+                        }, { timeout: 2000 }); // Timeout de 2s max pour démarrer
+                    } else {
+                        // Fallback pour navigateurs sans requestIdleCallback
+                        setTimeout(() => {
+                            loadFMPDataInBackground();
+                        }, 100);
                     }
+                } else {
+                    // Aucun nouveau ticker - libérer le loading
+                    setIsLoadingTickers(false);
                 }
 
             } catch (error: any) {

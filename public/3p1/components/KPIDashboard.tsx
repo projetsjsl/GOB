@@ -79,6 +79,28 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   const profileMetrics = useMemo(() => {
     if (profiles.length === 0) return [];
     return profiles.map(profile => {
+      // ✅ OPTIMISATION : Si c'est un profil squelette (données incomplètes), retourner des valeurs par défaut
+      if (profile._isSkeleton || !profile.data || profile.data.length === 0) {
+        return {
+          profile,
+          recommendation: null,
+          jpegy: null,
+          totalReturnPercent: null,
+          ratio31: null,
+          downsideRisk: null,
+          upsidePotential: null,
+          hasApprovedVersion: false,
+          targetPrice: null,
+          currentPE: null,
+          currentPCF: null,
+          currentPBV: null,
+          currentYield: null,
+          historicalGrowth: null,
+          volatility: null,
+          _isLoading: true // Flag pour afficher un indicateur de chargement
+        };
+      }
+      
       const { recommendation, targetPrice } = calculateRecommendation(profile.data, profile.assumptions);
       
       // VALIDATION: Vérifier que currentPrice est valide
@@ -2971,7 +2993,12 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     </div>
                   </td>
                   <td className="p-2 sm:p-3 text-right text-xs sm:text-sm">
-                    {metric.jpegy !== null ? (
+                    {metric._isLoading ? (
+                      <div className="flex items-center justify-end gap-1 text-gray-400">
+                        <ArrowPathIcon className="w-3 h-3 animate-spin" />
+                        <span className="text-[10px]">Chargement...</span>
+                      </div>
+                    ) : metric.jpegy !== null ? (
                       <div className="group relative">
                         <div className="flex items-center justify-end">
                           <span
@@ -2996,10 +3023,22 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       </span>
                     )}
                   </td>
-                  <td className="p-2 sm:p-3 text-right font-semibold text-xs sm:text-sm" style={{ color: metric.hasInvalidData ? '#9ca3af' : getReturnColor(metric.totalReturnPercent) }}>
-                    {metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(1)}%`}
+                  <td className="p-2 sm:p-3 text-right font-semibold text-xs sm:text-sm" style={{ color: metric._isLoading ? '#9ca3af' : (metric.hasInvalidData ? '#9ca3af' : getReturnColor(metric.totalReturnPercent)) }}>
+                    {metric._isLoading ? (
+                      <div className="flex items-center justify-end gap-1 text-gray-400">
+                        <ArrowPathIcon className="w-3 h-3 animate-spin" />
+                        <span className="text-[10px]">...</span>
+                      </div>
+                    ) : metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(1)}%`}
                   </td>
-                  <td className="p-2 sm:p-3 text-right text-xs sm:text-sm">{metric.ratio31.toFixed(2)}</td>
+                  <td className="p-2 sm:p-3 text-right text-xs sm:text-sm">
+                    {metric._isLoading ? (
+                      <div className="flex items-center justify-end gap-1 text-gray-400">
+                        <ArrowPathIcon className="w-3 h-3 animate-spin" />
+                        <span className="text-[10px]">...</span>
+                      </div>
+                    ) : metric.ratio31 !== null ? metric.ratio31.toFixed(2) : 'N/A'}
+                  </td>
                   <td className="p-2 sm:p-3 text-right text-green-600 text-xs sm:text-sm hidden md:table-cell">{metric.upsidePotential.toFixed(1)}%</td>
                   <td className="p-2 sm:p-3 text-right text-red-600 text-xs sm:text-sm hidden md:table-cell">{metric.downsideRisk.toFixed(1)}%</td>
                   <td className="p-2 sm:p-3 text-center hidden lg:table-cell">

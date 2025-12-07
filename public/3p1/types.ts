@@ -104,4 +104,6 @@ export interface AnalysisProfile {
   valuelineCorridor?: ValueLineCorridor;
   // Métriques ValueLine initiales (pour Phase 1 - Initialisation)
   valuelineInitial?: ValueLineInitial;
+  // Flag pour indiquer un profil "squelette" (données incomplètes, chargement en cours)
+  _isSkeleton?: boolean;
 }
