@@ -2918,7 +2918,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     <span className="font-semibold">{metric.profile.id}</span>
                   </div>
                   <span className={`text-sm font-bold ${metric.hasInvalidData ? 'text-gray-400' : 'text-green-600'}`}>
-                    {metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(1)}%`}
+                    {metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A' : `${metric.totalReturnPercent.toFixed(1)}%`}
                   </span>
                 </div>
               ))}
@@ -3056,7 +3056,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       }}
                     />
                     <div className={`text-[9px] sm:text-xs font-semibold ${metric.hasInvalidData ? 'text-gray-400' : ''}`} style={metric.hasInvalidData ? {} : { color: getReturnColor(metric.totalReturnPercent) }}>
-                      {metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`}
+                      {metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`}
                     </div>
                   </div>
                 ))}
@@ -3366,7 +3366,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         <ArrowPathIcon className="w-3 h-3 animate-spin" />
                         <span className="text-[10px]">...</span>
                       </div>
-                    ) : metric.hasInvalidData ? 'N/A' : `${metric.totalReturnPercent.toFixed(1)}%`}
+                    ) : metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A' : `${metric.totalReturnPercent.toFixed(1)}%`}
                   </td>
                   <td className="p-2 sm:p-3 text-right text-xs sm:text-sm">
                     {metric._isLoading ? (
