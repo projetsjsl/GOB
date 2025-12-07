@@ -738,17 +738,17 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         m.ratio31 !== null && m.ratio31 !== undefined ? m.ratio31.toFixed(2) : 'N/A',
         m.upsidePotential !== null && m.upsidePotential !== undefined ? m.upsidePotential.toFixed(2) : 'N/A',
         m.downsideRisk !== null && m.downsideRisk !== undefined ? m.downsideRisk.toFixed(2) : 'N/A',
-        m.currentPE?.toFixed(1) || 'N/A',
-        m.currentYield?.toFixed(2) || 'N/A',
-        m.historicalGrowth?.toFixed(2) || 'N/A',
+        (m.currentPE !== null && m.currentPE !== undefined ? m.currentPE.toFixed(1) : 'N/A'),
+        (m.currentYield !== null && m.currentYield !== undefined ? m.currentYield.toFixed(2) : 'N/A'),
+        (m.historicalGrowth !== null && m.historicalGrowth !== undefined ? m.historicalGrowth.toFixed(2) : 'N/A'),
         m.recommendation,
-        m.profile.assumptions.currentPrice?.toFixed(2) || 'N/A',
-        m.targetPrice?.toFixed(2) || 'N/A',
-        m.profile.assumptions.currentPrice ? (m.profile.assumptions.currentPrice * 0.9).toFixed(2) : 'N/A',
-        m.profile.assumptions.currentPrice ? (m.profile.assumptions.currentPrice * 1.1).toFixed(2) : 'N/A',
-        m.currentPCF?.toFixed(1) || 'N/A',
-        m.currentPBV?.toFixed(2) || 'N/A',
-        m.volatility?.toFixed(2) || 'N/A'
+        (m.profile.assumptions.currentPrice !== null && m.profile.assumptions.currentPrice !== undefined ? m.profile.assumptions.currentPrice.toFixed(2) : 'N/A'),
+        (m.targetPrice !== null && m.targetPrice !== undefined ? m.targetPrice.toFixed(2) : 'N/A'),
+        (m.profile.assumptions.currentPrice !== null && m.profile.assumptions.currentPrice !== undefined ? (m.profile.assumptions.currentPrice * 0.9).toFixed(2) : 'N/A'),
+        (m.profile.assumptions.currentPrice !== null && m.profile.assumptions.currentPrice !== undefined ? (m.profile.assumptions.currentPrice * 1.1).toFixed(2) : 'N/A'),
+        (m.currentPCF !== null && m.currentPCF !== undefined ? m.currentPCF.toFixed(1) : 'N/A'),
+        (m.currentPBV !== null && m.currentPBV !== undefined ? m.currentPBV.toFixed(2) : 'N/A'),
+        (m.volatility !== null && m.volatility !== undefined ? m.volatility.toFixed(2) : 'N/A')
       ].join(','))
     ].join('\n');
     
@@ -929,25 +929,25 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               )}
             </button>
           </div>
-          {sectionsVisibility.globalStats && (
+          {sectionsVisibility.globalStats && globalStats && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
             <div className="bg-white p-2 sm:p-3 md:p-4 rounded-lg shadow border border-gray-200">
               <div className="text-xs text-gray-500 mb-1">Rendement Moyen</div>
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">{globalStats.avgReturn.toFixed(1)}%</div>
-              <div className="text-xs text-gray-400 mt-1">Médiane: {globalStats.medianReturn.toFixed(1)}%</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">{globalStats.avgReturn !== null && globalStats.avgReturn !== undefined ? globalStats.avgReturn.toFixed(1) : 'N/A'}%</div>
+              <div className="text-xs text-gray-400 mt-1">Médiane: {globalStats.medianReturn !== null && globalStats.medianReturn !== undefined ? globalStats.medianReturn.toFixed(1) : 'N/A'}%</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
               <div className="text-xs text-gray-500 mb-1">Écart-Type</div>
-              <div className="text-2xl font-bold text-purple-600">{globalStats.stdReturn.toFixed(1)}%</div>
+              <div className="text-2xl font-bold text-purple-600">{globalStats.stdReturn !== null && globalStats.stdReturn !== undefined ? globalStats.stdReturn.toFixed(1) : 'N/A'}%</div>
               <div className="text-xs text-gray-400 mt-1">Volatilité</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
               <div className="text-xs text-gray-500 mb-1">Rendement Min</div>
-              <div className="text-2xl font-bold text-red-600">{globalStats.minReturn.toFixed(1)}%</div>
+              <div className="text-2xl font-bold text-red-600">{globalStats.minReturn !== null && globalStats.minReturn !== undefined ? globalStats.minReturn.toFixed(1) : 'N/A'}%</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
               <div className="text-xs text-gray-500 mb-1">Rendement Max</div>
-              <div className="text-2xl font-bold text-green-600">{globalStats.maxReturn.toFixed(1)}%</div>
+              <div className="text-2xl font-bold text-green-600">{globalStats.maxReturn !== null && globalStats.maxReturn !== undefined ? globalStats.maxReturn.toFixed(1) : 'N/A'}%</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
               <div className="text-xs text-gray-500 mb-1">JPEGY Moyen</div>
@@ -980,7 +980,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 globalStats.avgRatio >= 1 ? 'text-yellow-600' :
                 'text-red-600'
               }`}>
-                {globalStats.avgRatio.toFixed(2)}
+                {globalStats.avgRatio !== null && globalStats.avgRatio !== undefined ? globalStats.avgRatio.toFixed(2) : 'N/A'}
               </div>
             </div>
           </div>
@@ -2829,10 +2829,12 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
             {Array.from(new Set(filteredMetrics.map(m => m.profile.info.sector)))
               .map(sector => {
                 const sectorMetrics = filteredMetrics.filter(m => m.profile.info.sector === sector);
-                const avgReturn = sectorMetrics.reduce((sum, m) => sum + m.totalReturnPercent, 0) / sectorMetrics.length;
-                const validJPEGY = sectorMetrics.filter(m => m.jpegy !== null).map(m => m.jpegy!);
+                const validReturns = sectorMetrics.map(m => m.totalReturnPercent).filter((r): r is number => r !== null && r !== undefined && isFinite(r));
+                const avgReturn = validReturns.length > 0 ? validReturns.reduce((sum, r) => sum + r, 0) / validReturns.length : 0;
+                const validJPEGY = sectorMetrics.filter(m => m.jpegy !== null && m.jpegy !== undefined && isFinite(m.jpegy)).map(m => m.jpegy!);
                 const avgJPEGY = validJPEGY.length > 0 ? validJPEGY.reduce((sum, j) => sum + j, 0) / validJPEGY.length : null;
-                const avgRatio31 = sectorMetrics.reduce((sum, m) => sum + m.ratio31, 0) / sectorMetrics.length;
+                const validRatios = sectorMetrics.map(m => m.ratio31).filter((r): r is number => r !== null && r !== undefined && isFinite(r));
+                const avgRatio31 = validRatios.length > 0 ? validRatios.reduce((sum, r) => sum + r, 0) / validRatios.length : 0;
                 return { sector, avgReturn, avgJPEGY, avgRatio31, count: sectorMetrics.length };
               })
               .sort((a, b) => b.avgReturn - a.avgReturn)
@@ -2863,7 +2865,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                           avgReturn >= 0 ? 'text-yellow-600' :
                           'text-red-600'
                         }`}>
-                          {avgReturn.toFixed(1)}%
+                          {avgReturn !== null && avgReturn !== undefined && isFinite(avgReturn) ? avgReturn.toFixed(1) : 'N/A'}%
                         </span>
                       </div>
                     </div>
@@ -2889,7 +2891,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         avgRatio31 >= 1 ? 'text-yellow-600' :
                         'text-red-600'
                       }`}>
-                        {avgRatio31.toFixed(2)}
+                        {avgRatio31 !== null && avgRatio31 !== undefined && isFinite(avgRatio31) ? avgRatio31.toFixed(2) : 'N/A'}
                       </span>
                     </div>
                   </div>
