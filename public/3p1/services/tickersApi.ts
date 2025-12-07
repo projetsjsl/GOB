@@ -55,7 +55,9 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
     // Valider que les tickers ont le champ source
     const tickers = (result.tickers || []).map((ticker: any) => {
       if (!ticker.source) {
-        console.warn(`⚠️ Ticker ${ticker.ticker} n'a pas de champ source, utilisation de 'manual' par défaut`);
+        // Utiliser debug au lieu de warn pour réduire le bruit dans la console
+        // La valeur par défaut 'manual' est appliquée automatiquement
+        console.debug(`Ticker ${ticker.ticker} n'a pas de champ source, utilisation de 'manual' par défaut`);
         return { ...ticker, source: 'manual' as const };
       }
       return ticker;

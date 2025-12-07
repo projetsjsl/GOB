@@ -732,10 +732,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         `"${m.profile.info.name}"`,
         m.profile.info.sector,
         m.jpegy !== null ? m.jpegy.toFixed(2) : 'N/A',
-        m.totalReturnPercent.toFixed(2),
-        m.ratio31.toFixed(2),
-        m.upsidePotential.toFixed(2),
-        m.downsideRisk.toFixed(2),
+        m.totalReturnPercent !== null && m.totalReturnPercent !== undefined ? m.totalReturnPercent.toFixed(2) : 'N/A',
+        m.ratio31 !== null && m.ratio31 !== undefined ? m.ratio31.toFixed(2) : 'N/A',
+        m.upsidePotential !== null && m.upsidePotential !== undefined ? m.upsidePotential.toFixed(2) : 'N/A',
+        m.downsideRisk !== null && m.downsideRisk !== undefined ? m.downsideRisk.toFixed(2) : 'N/A',
         m.currentPE?.toFixed(1) || 'N/A',
         m.currentYield?.toFixed(2) || 'N/A',
         m.historicalGrowth?.toFixed(2) || 'N/A',
@@ -1066,7 +1066,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                         metric.ratio31 >= 1 ? 'text-yellow-600' :
                         'text-red-600'
                       }`}>
-                        {metric.ratio31.toFixed(2)}
+                        {metric.ratio31 !== null ? metric.ratio31.toFixed(2) : 'N/A'}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -1870,7 +1870,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     title={`${metric.profile.info.name || metric.profile.id}
 Rendement: ${metric.hasInvalidData ? 'N/A (données invalides)' : `${metric.totalReturnPercent.toFixed(1)}%`}
 JPEGY: ${metric.jpegy !== null ? metric.jpegy.toFixed(2) : 'N/A (non calculable)'}
-Ratio 3:1: ${metric.hasInvalidData ? 'N/A' : metric.ratio31.toFixed(2)}
+Ratio 3:1: ${metric.hasInvalidData || metric.ratio31 === null ? 'N/A' : metric.ratio31.toFixed(2)}
 P/E: ${metric.currentPE?.toFixed(1) || 'N/A'}x
 Secteur: ${metric.profile.info.sector}
 ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}
@@ -1998,7 +1998,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                           metric.ratio31 >= 1 ? 'text-yellow-600' :
                           'text-red-600'
                         }`}>
-                          {metric.hasInvalidData ? 'N/A' : metric.ratio31.toFixed(2)}
+                          {metric.hasInvalidData || metric.ratio31 === null ? 'N/A' : metric.ratio31.toFixed(2)}
                         </div>
                         <div className="text-xs text-gray-500">Ratio 3:1</div>
                       </div>
@@ -3368,10 +3368,20 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     ) : metric.ratio31 !== null ? metric.ratio31.toFixed(2) : 'N/A'}
                   </td>
                   <td className={`p-2 sm:p-3 text-right text-green-600 text-xs sm:text-sm ${!displayOptions.visibleColumns.upside ? 'hidden' : ''} ${displayOptions.density === 'compact' ? 'hidden md:table-cell' : 'md:table-cell'}`}>
-                    {metric.upsidePotential.toFixed(1)}%
+                    {metric._isLoading ? (
+                      <div className="flex items-center justify-end gap-1 text-gray-400">
+                        <ArrowPathIcon className="w-3 h-3 animate-spin" />
+                        <span className="text-[10px]">...</span>
+                      </div>
+                    ) : (metric.upsidePotential !== null && metric.upsidePotential !== undefined) ? `${metric.upsidePotential.toFixed(1)}%` : 'N/A'}
                   </td>
                   <td className={`p-2 sm:p-3 text-right text-red-600 text-xs sm:text-sm ${!displayOptions.visibleColumns.downside ? 'hidden' : ''} ${displayOptions.density === 'compact' ? 'hidden md:table-cell' : 'md:table-cell'}`}>
-                    {metric.downsideRisk.toFixed(1)}%
+                    {metric._isLoading ? (
+                      <div className="flex items-center justify-end gap-1 text-gray-400">
+                        <ArrowPathIcon className="w-3 h-3 animate-spin" />
+                        <span className="text-[10px]">...</span>
+                      </div>
+                    ) : (metric.downsideRisk !== null && metric.downsideRisk !== undefined) ? `${metric.downsideRisk.toFixed(1)}%` : 'N/A'}
                   </td>
                   <td className={`p-2 sm:p-3 text-center ${!displayOptions.visibleColumns.pe ? 'hidden' : ''} ${displayOptions.density === 'compact' ? 'hidden lg:table-cell' : 'lg:table-cell'}`}>
                     <span className="text-xs sm:text-sm">{metric.currentPE?.toFixed(1) || 'N/A'}x</span>
