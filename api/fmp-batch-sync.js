@@ -26,21 +26,25 @@ const FMP_API_KEY = process.env.FMP_API_KEY;
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY doivent être définis');
+// Lazy initialization of Supabase client
+let supabase = null;
+function getSupabaseClient() {
+  if (!supabase && supabaseUrl && supabaseKey) {
+    supabase = createClient(supabaseUrl, supabaseKey);
+  }
+  return supabase;
 }
-
-if (!FMP_API_KEY) {
-  throw new Error('FMP_API_KEY doit être définie');
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 /**
  * Récupère tous les tickers actifs depuis Supabase
  */
 async function getAllActiveTickers() {
-  const { data, error } = await supabase
+  const sb = getSupabaseClient();
+  if (!sb) {
+    throw new Error('Supabase n\'est pas initialisé (variables d\'environnement manquantes)');
+  }
+
+  const { data, error } = await sb
     .from('tickers')
     .select('ticker')
     .eq('is_active', true)
@@ -150,7 +154,13 @@ async function syncAllTickers() {
 
     // 4. Upsert massif dans ticker_price_cache (1 requête) - PRIX UNIQUEMENT
     console.log('💾 Upsert dans ticker_price_cache (PRIX UNIQUEMENT)...');
-    const { data, error } = await supabase.rpc('upsert_ticker_price_cache_batch', {
+    
+    const sb = getSupabaseClient();
+    if (!sb) {
+      throw new Error('Supabase n\'est pas initialisé');
+    }
+
+    const { data, error } = await sb.rpc('upsert_ticker_price_cache_batch', {
       p_data: priceData
     });
 
@@ -191,6 +201,14 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'GET' || req.method === 'POST') {
+    if (!process.env.FMP_API_KEY) {
+       return res.status(500).json({ success: false, error: 'FMP_API_KEY manquante' });
+    }
+    
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+       return res.status(500).json({ success: false, error: 'Configuration Supabase manquante' });
+    }
+
     const result = await syncAllTickers();
     return res.status(result.success ? 200 : 500).json(result);
   }
