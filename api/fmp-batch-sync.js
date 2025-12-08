@@ -152,20 +152,36 @@ async function syncAllTickers() {
       marketCap: quote.marketCap || 0
     }));
 
-    // 4. Upsert massif dans ticker_price_cache (1 requête) - PRIX UNIQUEMENT
-    console.log('💾 Upsert dans ticker_price_cache (PRIX UNIQUEMENT)...');
+    // 4. Upsert en batch dans ticker_price_cache - PRIX UNIQUEMENT
+    console.log('💾 Upsert dans ticker_price_cache (PRIX UNIQUEMENT) par lots...');
     
     const sb = getSupabaseClient();
     if (!sb) {
       throw new Error('Supabase n\'est pas initialisé');
     }
 
-    const { data, error } = await sb.rpc('upsert_ticker_price_cache_batch', {
-      p_data: priceData
-    });
+    // Taille du lot pour l'upsert Supabase
+    const UPSERT_BATCH_SIZE = 100;
+    let successCount = 0;
+    let failCount = 0;
 
-    if (error) {
-      throw new Error(`Erreur upsert: ${error.message}`);
+    for (let i = 0; i < priceData.length; i += UPSERT_BATCH_SIZE) {
+      const batch = priceData.slice(i, i + UPSERT_BATCH_SIZE);
+      
+      const { error } = await sb.rpc('upsert_ticker_price_cache_batch', {
+        p_data: batch
+      });
+
+      if (error) {
+        console.error(`❌ Erreur upsert batch ${i}-${i + batch.length}:`, error.message);
+        failCount += batch.length;
+      } else {
+        successCount += batch.length;
+      }
+    }
+
+    if (failCount > 0 && successCount === 0) {
+      throw new Error(`Tous les lots d'upsert ont échoué. Ex: ${failCount} échecs.`);
     }
 
     const executionTime = Date.now() - startTime;
