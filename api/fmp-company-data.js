@@ -226,9 +226,35 @@ export default async function handler(req, res) {
         const profile = profileResult.profile;
         usedSymbol = profileResult.usedSymbol;
 
-        // 2. Fetch Key Metrics (Annual) - utiliser le symbole qui a fonctionné
-        // Premium: Augmenter limit à 30 pour avoir 20+ ans d'historique
-        const metricsRes = await fetch(`${FMP_BASE}/key-metrics/${usedSymbol}?period=annual&limit=30&apikey=${FMP_KEY}`);
+        const profile = profileResult.profile;
+        usedSymbol = profileResult.usedSymbol;
+
+        // PARALLEL FETCHING: Fetch all independent data sources concurrently
+        // 2. Key Metrics
+        // 3. Dividends
+        // 4. Historical Prices
+        // 5. Realtime Quote (Finnhub)
+        
+        const keyMetricsPromise = fetch(`${FMP_BASE}/key-metrics/${usedSymbol}?period=annual&limit=30&apikey=${FMP_KEY}`);
+        const dividendPromise = fetch(`${FMP_BASE}/historical-price-full/stock_dividend/${usedSymbol}?apikey=${FMP_KEY}`);
+        // Premium: Augmenter timeseries à 7300 jours (~20 ans) au lieu de 1825 (5 ans)
+        const pricePromise = fetch(`${FMP_BASE}/historical-price-full/${usedSymbol}?serietype=line&timeseries=7300&apikey=${FMP_KEY}`);
+        
+        let quotePromise = Promise.resolve(null);
+        if (FINNHUB_KEY) {
+            const finnhubSymbol = cleanSymbol.replace('.', '-');
+            quotePromise = fetch(`https://finnhub.io/api/v1/quote?symbol=${finnhubSymbol}&token=${FINNHUB_KEY}`).catch(e => null);
+        }
+
+        // Wait for all requests to complete
+        const [metricsRes, dividendRes, priceRes, quoteRes] = await Promise.all([
+            keyMetricsPromise,
+            dividendPromise,
+            pricePromise,
+            quotePromise
+        ]);
+
+        // --- PROCESS KEY METRICS ---
         if (!metricsRes.ok) {
             const errorText = await metricsRes.text();
             console.error(`❌ FMP Key Metrics error for ${usedSymbol}: ${metricsRes.status} - ${errorText.substring(0, 200)}`);
@@ -236,7 +262,7 @@ export default async function handler(req, res) {
         }
         let metricsData = await metricsRes.json();
         
-        // Vérifier si c'est un objet d'erreur
+        // Check for error object
         if (metricsData && typeof metricsData === 'object' && !Array.isArray(metricsData)) {
             if (metricsData['Error Message']) {
                 console.error(`❌ FMP Key Metrics Error: ${metricsData['Error Message']}`);
@@ -244,7 +270,6 @@ export default async function handler(req, res) {
             }
         }
         
-        // Vérifier que c'est un tableau valide
         if (!Array.isArray(metricsData)) {
             console.error(`❌ FMP Key Metrics returned invalid data type for ${usedSymbol}`);
             throw new Error(`FMP Key Metrics returned invalid data`);
@@ -254,38 +279,26 @@ export default async function handler(req, res) {
             console.warn(`⚠️ FMP Key Metrics returned empty array for ${usedSymbol} - continuing with empty data`);
         }
 
-        // Deduplicate metrics by year (keep the one with the latest date if duplicates exist)
+        // Deduplicate metrics
         const uniqueMetrics = {};
         metricsData.forEach(metric => {
             const year = new Date(metric.date).getFullYear();
-            // If year exists, only replace if this metric is 'newer' or has more data (heuristic)
-            // FMP usually returns sorted, but let's be safe.
-            // Actually, FMP sometimes returns multiple entries for same year (restated).
-            // We'll assume the first one encountered (if sorted desc) or latest date is best.
             if (!uniqueMetrics[year]) {
                 uniqueMetrics[year] = metric;
             }
         });
         metricsData = Object.values(uniqueMetrics);
 
-        // 2a. Fetch Dividend History (separate endpoint since key-metrics doesn't include it)
-        const dividendRes = await fetch(`${FMP_BASE}/historical-price-full/stock_dividend/${usedSymbol}?apikey=${FMP_KEY}`);
+        // --- PROCESS DIVIDENDS ---
         let dividendsByFiscalYear = {};
-
         if (dividendRes.ok) {
             const dividendData = await dividendRes.json();
-
-            // Aggregate dividends by fiscal year (ACN fiscal year ends Aug 31)
-            // For most companies: fiscal year = calendar year, but we use the metric date as reference
             if (dividendData.historical && dividendData.historical.length > 0) {
                 dividendData.historical.forEach(div => {
                     const divDate = new Date(div.date);
                     const divYear = divDate.getFullYear();
                     const divMonth = divDate.getMonth(); // 0-11
-
-                    // Determine fiscal year based on month
                     // For ACN (fiscal ends Aug 31): Sept-Aug = fiscal year
-                    // Simplified: if month >= Sept (8), it belongs to next calendar year's fiscal
                     const fiscalYear = divMonth >= 8 ? divYear + 1 : divYear;
 
                     if (!dividendsByFiscalYear[fiscalYear]) {
@@ -293,16 +306,13 @@ export default async function handler(req, res) {
                     }
                     dividendsByFiscalYear[fiscalYear] += div.dividend || div.adjDividend || 0;
                 });
-
-                console.log(`✅ Dividends aggregated for ${usedSymbol} (original: ${cleanSymbol}):`, dividendsByFiscalYear);
+                console.log(`✅ Dividends aggregated for ${usedSymbol}:`, dividendsByFiscalYear);
             }
         } else {
             console.warn(`⚠️ No dividend data available for ${cleanSymbol}`);
         }
 
-        // 3. Fetch Historical Prices for High/Low
-        // Premium: Augmenter timeseries à 7300 jours (~20 ans) au lieu de 1825 (5 ans)
-        const priceRes = await fetch(`${FMP_BASE}/historical-price-full/${usedSymbol}?serietype=line&timeseries=7300&apikey=${FMP_KEY}`);
+        // --- PROCESS PRICES ---
         if (!priceRes.ok) {
             const errorText = await priceRes.text();
             console.error(`❌ FMP Historical Price error for ${usedSymbol}: ${priceRes.status} - ${errorText.substring(0, 200)}`);
@@ -310,31 +320,24 @@ export default async function handler(req, res) {
         }
         const priceData = await priceRes.json();
         
-        // Vérifier si c'est un objet d'erreur
         if (priceData && typeof priceData === 'object' && !Array.isArray(priceData) && priceData['Error Message']) {
             console.error(`❌ FMP Historical Price Error: ${priceData['Error Message']}`);
             throw new Error(`FMP Historical Price error: ${priceData['Error Message']}`);
         }
         
-        // Vérifier que les données historiques existent
         if (!priceData || !priceData.historical || !Array.isArray(priceData.historical)) {
             console.warn(`⚠️ FMP Historical Price returned invalid data for ${usedSymbol} - continuing with empty price history`);
             priceData.historical = [];
         }
 
-        // 4. Fetch Realtime Quote (Finnhub if available)
+        // --- PROCESS QUOTE ---
         let currentPrice = profile.price || 0;
-        if (FINNHUB_KEY) {
+        if (quoteRes && quoteRes.ok) {
             try {
-                // Pour Finnhub, utiliser le symbole original ou nettoyer le format
-                const finnhubSymbol = cleanSymbol.replace('.', '-');
-                const quoteRes = await fetch(`https://finnhub.io/api/v1/quote?symbol=${finnhubSymbol}&token=${FINNHUB_KEY}`);
-                if (quoteRes.ok) {
-                    const quoteData = await quoteRes.json();
-                    if (quoteData.c) currentPrice = quoteData.c;
-                }
+                const quoteData = await quoteRes.json();
+                if (quoteData.c) currentPrice = quoteData.c;
             } catch (e) {
-                console.warn('Finnhub quote fetch failed, using FMP price:', e.message);
+                console.warn('Finnhub quote parse error:', e.message);
             }
         }
 

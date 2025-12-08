@@ -54,7 +54,7 @@
       "maxDuration": 120
     },
     "api/fmp-company-data.js": {
-      "maxDuration": 30
+      "maxDuration": 60
     },
     "api/fmp-search.js": {
       "maxDuration": 15
