@@ -344,8 +344,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
           invalidReason.push(`Aucun ratio cible valide${excludedText} - Vérifiez les ratios cibles (P/E, P/CF, P/BV, Yield) et les données historiques`);
         }
         if (jpegy === null) {
-          const growthRate = profile.assumptions.growthRateEPS !== null && profile.assumptions.growthRateEPS !== undefined ? profile.assumptions.growthRateEPS.toFixed(2) : '0.00';
-          const yieldValue = baseYield !== null && baseYield !== undefined ? baseYield.toFixed(2) : '0.00';
+          const growthRate = (profile.assumptions.growthRateEPS != null && isFinite(profile.assumptions.growthRateEPS)) ? profile.assumptions.growthRateEPS.toFixed(2) : '0.00';
+          const yieldValue = (baseYield != null && isFinite(baseYield)) ? baseYield.toFixed(2) : '0.00';
           invalidReason.push(`JPEGY non calculable: Croissance EPS (${growthRate}%) + Yield (${yieldValue}%) trop faible (≤0.01%) ou EPS invalide - Ajustez la croissance, le dividende ou synchronisez les données`);
         }
         if (totalReturnPercent <= -99.9) {
@@ -795,7 +795,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   };
 
   // Obtenir la couleur du rendement
-  const getReturnColor = (returnPercent: number): string => {
+  const getReturnColor = (returnPercent: number | null | undefined): string => {
+    if (returnPercent === null || returnPercent === undefined) return '#9ca3af'; // Gris pour N/A
     if (returnPercent >= 50) return '#16a34a'; // Vert foncé
     if (returnPercent >= 20) return '#86efac'; // Vert pâle
     if (returnPercent >= 0) return '#eab308'; // Jaune
@@ -951,12 +952,12 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
               <div className="text-xs text-gray-500 mb-1">JPEGY Moyen</div>
-              {globalStats.avgJPEGY !== null ? (
+              {globalStats.avgJPEGY != null && isFinite(globalStats.avgJPEGY) ? (
                 <>
                   <div className="text-2xl font-bold" style={{ color: getJpegyColor(globalStats.avgJPEGY) || '#9ca3af' }}>
                     {globalStats.avgJPEGY.toFixed(2)}
                   </div>
-                  <div className="text-xs text-gray-400 mt-1">Médiane: {globalStats.medianJPEGY !== null ? globalStats.medianJPEGY.toFixed(2) : 'N/A'}</div>
+                  <div className="text-xs text-gray-400 mt-1">Médiane: {(globalStats.medianJPEGY != null && isFinite(globalStats.medianJPEGY)) ? globalStats.medianJPEGY.toFixed(2) : 'N/A'}</div>
                   <div className="mt-2 pt-2 border-t border-gray-200">
                     <div className="text-[10px] text-gray-400 space-y-0.5">
                       <div><strong>Source:</strong> P/E Actuel ÷ (Croissance EPS % + Yield %)</div>
@@ -976,11 +977,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
               <div className="text-xs text-gray-500 mb-1">Ratio 3:1 Moyen</div>
               <div className={`text-2xl font-bold ${
-                globalStats.avgRatio >= 3 ? 'text-green-600' :
-                globalStats.avgRatio >= 1 ? 'text-yellow-600' :
+                (globalStats.avgRatio != null && globalStats.avgRatio >= 3) ? 'text-green-600' :
+                (globalStats.avgRatio != null && globalStats.avgRatio >= 1) ? 'text-yellow-600' :
                 'text-red-600'
               }`}>
-                {globalStats.avgRatio !== null && globalStats.avgRatio !== undefined ? globalStats.avgRatio.toFixed(2) : 'N/A'}
+                {(globalStats.avgRatio != null && isFinite(globalStats.avgRatio)) ? globalStats.avgRatio.toFixed(2) : 'N/A'}
               </div>
             </div>
           </div>
@@ -1038,7 +1039,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Rendement:</span>
-                      <span className="font-bold text-green-600">{metric.totalReturnPercent !== null && metric.totalReturnPercent !== undefined ? metric.totalReturnPercent.toFixed(1) : 'N/A'}%</span>
+                      <span className="font-bold text-green-600">{(metric.totalReturnPercent != null && isFinite(metric.totalReturnPercent)) ? metric.totalReturnPercent.toFixed(1) : 'N/A'}%</span>
                     </div>
                     <div className="flex justify-between items-start">
                       <span className="text-gray-600">JPEGY:</span>
@@ -1065,11 +1066,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     <div className="flex justify-between">
                       <span className="text-gray-600">Ratio 3:1:</span>
                       <span className={`font-bold ${
-                        metric.ratio31 >= 3 ? 'text-green-600' :
-                        metric.ratio31 >= 1 ? 'text-yellow-600' :
+                        (metric.ratio31 != null && metric.ratio31 >= 3) ? 'text-green-600' :
+                        (metric.ratio31 != null && metric.ratio31 >= 1) ? 'text-yellow-600' :
                         'text-red-600'
                       }`}>
-                        {metric.ratio31 !== null ? metric.ratio31.toFixed(2) : 'N/A'}
+                        {(metric.ratio31 != null && isFinite(metric.ratio31)) ? metric.ratio31.toFixed(2) : 'N/A'}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -2887,11 +2888,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-600">Ratio 3:1 moyen:</span>
                       <span className={`text-xs font-semibold ${
-                        avgRatio31 >= 3 ? 'text-green-600' :
-                        avgRatio31 >= 1 ? 'text-yellow-600' :
+                        (avgRatio31 != null && avgRatio31 >= 3) ? 'text-green-600' :
+                        (avgRatio31 != null && avgRatio31 >= 1) ? 'text-yellow-600' :
                         'text-red-600'
                       }`}>
-                        {avgRatio31 !== null && avgRatio31 !== undefined && isFinite(avgRatio31) ? avgRatio31.toFixed(2) : 'N/A'}
+                        {(avgRatio31 != null && isFinite(avgRatio31)) ? avgRatio31.toFixed(2) : 'N/A'}
                       </span>
                     </div>
                   </div>
@@ -3342,10 +3343,10 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                             className="inline-block w-4 h-4 rounded-full mr-2"
                             style={{ backgroundColor: getJpegyColor(metric.jpegy) || '#9ca3af' }}
                           />
-                          {metric.jpegy.toFixed(2)}
+                          {metric.jpegy !== null && metric.jpegy !== undefined ? metric.jpegy.toFixed(2) : 'N/A'}
                         </div>
                         <div className="absolute right-0 top-full mt-1 w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
-                          <div className="font-semibold mb-1">JPEGY: {metric.jpegy.toFixed(2)}</div>
+                          <div className="font-semibold mb-1">JPEGY: {metric.jpegy !== null && metric.jpegy !== undefined ? metric.jpegy.toFixed(2) : 'N/A'}</div>
                           <div className="space-y-1 text-[10px]">
                             <div><strong>Source de calcul:</strong> P/E Actuel ÷ (Taux de croissance EPS % + Rendement dividende %)</div>
                             <div><strong>Formule:</strong> JPEGY = {metric.currentPE?.toFixed(2) || 'P/E'} ÷ ({metric.historicalGrowth?.toFixed(1) || 'Growth'}% + {metric.currentYield?.toFixed(2) || 'Yield'}%)</div>
@@ -3374,7 +3375,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         <ArrowPathIcon className="w-3 h-3 animate-spin" />
                         <span className="text-[10px]">...</span>
                       </div>
-                    ) : metric.ratio31 !== null ? metric.ratio31.toFixed(2) : 'N/A'}
+                    ) : (metric.ratio31 !== null && metric.ratio31 !== undefined) ? metric.ratio31.toFixed(2) : 'N/A'}
                   </td>
                   <td className={`p-2 sm:p-3 text-right text-green-600 text-xs sm:text-sm ${!displayOptions.visibleColumns.upside ? 'hidden' : ''} ${displayOptions.density === 'compact' ? 'hidden md:table-cell' : 'md:table-cell'}`}>
                     {metric._isLoading ? (
