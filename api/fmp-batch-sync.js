@@ -15,7 +15,7 @@
  * 
  * Usage:
  * - Appel manuel : POST /api/fmp-batch-sync (recommandé - à la demande)
- * - Cron optionnel : */15 * * * * (toutes les 15 min si nécessaire)
+ * - Cron optionnel : every 15 min (toutes les 15 min si nécessaire)
  */
 
 import { createClient } from '@supabase/supabase-js';

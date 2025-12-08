@@ -226,8 +226,7 @@ export default async function handler(req, res) {
         const profile = profileResult.profile;
         usedSymbol = profileResult.usedSymbol;
 
-        const profile = profileResult.profile;
-        usedSymbol = profileResult.usedSymbol;
+
 
         // PARALLEL FETCHING: Fetch all independent data sources concurrently
         // 2. Key Metrics
