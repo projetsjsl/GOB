@@ -599,10 +599,9 @@ async function sendSMS(to, message, simulate = false) {
       // Limite réelle: 1600 (Twilio) - 30 (préfixe "👩🏻 Partie X/Y\n\n") - 70 (marge sécurité)
       const chunks = chunkMessage(message, 1500);
 
-      // Envoyer les SMS dans l'ORDRE INVERSE pour compenser l'affichage inversé des téléphones
-      // Les téléphones affichent souvent le dernier SMS reçu en haut
-      // Donc on envoie 3/3, puis 2/3, puis 1/3 pour qu'ils s'affichent 1/3, 2/3, 3/3
-      for (let i = chunks.length - 1; i >= 0; i--) {
+      // Envoyer les SMS dans l'ORDRE NORMAL (1, 2, 3...)
+      // Les réseaux modernes trient souvent par timestamp de réception
+      for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
         // 🚨 PAS d'emoji 📱 dans le préfixe (force UCS-2 = coût ×2.3)
         const prefix = chunks.length > 1 ? `👩🏻 Partie ${i + 1}/${chunks.length}\n\n` : '👩🏻 ';
@@ -613,9 +612,9 @@ async function sendSMS(to, message, simulate = false) {
           body: prefix + chunk
         });
 
-        // Délai entre les SMS pour garantir l'ordre (Twilio peut livrer hors séquence)
-        // 5 secondes garantit que le message est REÇU et AFFICHÉ avant d'envoyer le suivant
-        if (i > 0) {
+        // Délai explicite entre les SMS pour garantir l'ordre de réception
+        // 5 secondes garantit que le premier message a un timestamp distinct du second
+        if (i < chunks.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 5000));
         }
       }

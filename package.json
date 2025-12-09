@@ -21,7 +21,7 @@
     "@browserbasehq/stagehand": "^2.5.2",
     "@google/generative-ai": "^0.21.0",
     "@octokit/rest": "^20.0.0",
-    "@supabase/supabase-js": "^2.39.0",
+    "@supabase/supabase-js": "^2.87.1",
     "@vercel/functions": "^3.3.4",
     "axios": "^1.13.2",
     "body-parser": "^2.2.0",
