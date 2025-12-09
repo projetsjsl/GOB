@@ -170,6 +170,12 @@ export const autoFillAssumptionsFromFMPData = (
   currentPrice: number,
   existingAssumptions?: Partial<Assumptions>
 ): Partial<Assumptions> => {
+  // Guard clause for empty or invalid data
+  if (!data || data.length === 0) {
+    console.warn('⚠️ autoFillAssumptionsFromFMPData: Aucune donnée fournie pour les calculs');
+    return existingAssumptions || {};
+  }
+
   // Filtrer les données valides (avec prix High/Low > 0)
   const validHistory = data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
   

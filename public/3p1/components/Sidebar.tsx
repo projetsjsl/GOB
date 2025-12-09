@@ -179,7 +179,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
 
                   {/* Logo - Masqué immédiatement si erreur pour éviter 404 */}
                   <img 
-                    src={profile.info.logo || `https://financialmodelingprep.com/image-stock/${profile.info.logoSymbol || profile.info.actualSymbol?.replace('.TO', '').replace('-', '.') || profile.info.preferredSymbol || profile.id}.png`}
+                    src={profile.info.logo || ((profile.info.logoSymbol || profile.info.actualSymbol?.replace('.TO', '').replace('-', '.') || profile.info.preferredSymbol || profile.id) ? `https://financialmodelingprep.com/image-stock/${profile.info.logoSymbol || profile.info.actualSymbol?.replace('.TO', '').replace('-', '.') || profile.info.preferredSymbol || profile.id}.png` : '')}
                     alt={profile.info.name}
                     className="w-8 h-8 rounded object-cover flex-shrink-0 cursor-help"
                     title={`Logo de ${profile.info.name}\n\nSource: FMP API (image-stock)`}

@@ -75,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto">
           {/* Logo - Masqué par défaut si pas de logo, affiché seulement si chargé avec succès */}
           <img 
-            src={info.logo || `https://financialmodelingprep.com/image-stock/${info.preferredSymbol || info.symbol}.png`}
+            src={info.logo || ((info.preferredSymbol || info.symbol) ? `https://financialmodelingprep.com/image-stock/${info.preferredSymbol || info.symbol}.png` : '')}
             alt={info.name}
             className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200 cursor-help"
             title={`Logo de ${info.name}\n\nSource: FMP API (image-stock)\n\nLe logo est chargé automatiquement depuis l'API Financial Modeling Prep.`}

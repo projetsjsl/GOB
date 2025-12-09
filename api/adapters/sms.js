@@ -300,12 +300,7 @@ export default async function handler(req, res) {
             }
           }
           
-          // Message d'erreur standard (si pas en mode test ou si simulation échoue)
-          await sendSMS(
-            senderPhone,
-            '❌ Désolé, une erreur est survenue. Réessayez dans quelques instants.'
-          );
-          return;
+          throw error; // Propager l'erreur pour le catch global du background process
         }
 
         // 6. ENVOYER LA RÉPONSE PAR SMS (en arrière-plan)
@@ -352,26 +347,19 @@ export default async function handler(req, res) {
 
         } catch (error) {
           console.error('[SMS Adapter] Erreur envoi SMS (arrière-plan):', error);
-          // Envoyer message d'erreur à l'utilisateur
-          try {
-            await sendSMS(
-              senderPhone,
-              '❌ Erreur technique. Réessayez ou consultez gobapps.com'
-            );
-          } catch (smsError) {
-            console.error('[SMS Adapter] Impossible d\'envoyer SMS d\'erreur:', smsError);
-          }
+          throw error; // Propager pour le catch global
         }
       } catch (error) {
-        console.error('[SMS Adapter] Erreur traitement arrière-plan:', error);
-        // Envoyer message d'erreur à l'utilisateur
+        console.error('[SMS Adapter] CRITICAL ERROR IN BACKGROUND PROCESS:', error);
+        // Envoyer message d'erreur à l'utilisateur (Rescue SMS)
         try {
           await sendSMS(
             senderPhone,
-            '❌ Erreur système. Contactez le support GOB si le problème persiste.'
+            '❌ Désolé, j\'ai rencontré une erreur technique lors de l\'analyse. Mon équipe a été notifiée. Veuillez réessayer dans quelques instants.'
           );
+          console.log('[SMS Adapter] Rescue SMS sent successfully');
         } catch (smsError) {
-          console.error('[SMS Adapter] Impossible d\'envoyer SMS d\'erreur:', smsError);
+          console.error('[SMS Adapter] FAILED TO SEND RESCUE SMS:', smsError);
         }
       }
     })();
