@@ -136,11 +136,11 @@ export default async function handler(req, res) {
         const marketCapMoreThan = req.query.marketCapMoreThan || '0';
         const marketCapLowerThan = req.query.marketCapLowerThan || '';
         const sector = req.query.sector || '';
-        const limit = req.query.limit || '100';
+        const screenerLimit = req.query.limit || '100';
         
         let screenerParams = new URLSearchParams({
           marketCapMoreThan,
-          limit,
+          limit: screenerLimit,
           apikey: apiKey
         });
         
