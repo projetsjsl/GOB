@@ -19,6 +19,7 @@ import { HistoricalVersionBanner } from './components/HistoricalVersionBanner';
 import { NotificationManager } from './components/Notification';
 import { SyncProgressBar } from './components/SyncProgressBar';
 import { AdminDashboard } from './components/AdminDashboard';
+import { LandingPage } from './components/LandingPage';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
 import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation, autoFillAssumptionsFromFMPData, isMutualFund } from './utils/calculations';
 import { detectOutlierMetrics } from './utils/outlierDetection';
@@ -77,6 +78,7 @@ const STORAGE_KEY = 'finance_pro_profiles';
 
 export default function App() {
     // --- GLOBAL STATE & PERSISTENCE ---
+    const [showLanding, setShowLanding] = useState(true); // Show landing page by default
     const [library, setLibrary] = useState<Record<string, AnalysisProfile>>({});
     const [activeId, setActiveId] = useState<string>('ACN');
     const [isInitialized, setIsInitialized] = useState(false);
@@ -2368,10 +2370,15 @@ export default function App() {
 
     if (!isInitialized) return <div className="flex items-center justify-center h-screen text-slate-500">Chargement...</div>;
 
+    // Show landing page on first visit
+    if (showLanding) {
+        return <LandingPage onGetStarted={() => setShowLanding(false)} />;
+    }
+
     if (showAdmin) {
         return (
             <div className="fixed inset-0 z-50 bg-slate-900 pointer-events-auto">
-                <button 
+                <button
                     onClick={() => setShowAdmin(false)}
                     className="absolute top-4 right-4 p-2 bg-slate-800 text-white rounded z-50 hover:bg-slate-700 pointer-events-auto"
                 >
