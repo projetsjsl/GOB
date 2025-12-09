@@ -18,6 +18,58 @@ import { generateCacheKey, getCachedResponse, setCachedResponse } from '../lib/r
 import { configManager } from '../lib/config-manager.js';
 
 /**
+ * Fetch market news from Perplexity API (fallback when FMP fails)
+ */
+async function fetchPerplexityMarketNews() {
+  const apiKey = process.env.PERPLEXITY_API_KEY;
+  if (!apiKey) {
+    console.warn('[Chat API] PERPLEXITY_API_KEY not configured');
+    return null;
+  }
+
+  const prompt = `Donne-moi un résumé TRÈS COURT des actualités financières d'aujourd'hui en format bullet points:
+- 3 actualités majeures des marchés américains (S&P 500, Nasdaq, secteurs tech/finance)
+- 2 actualités du marché canadien (TSX, secteurs clés)
+- 2 actualités européennes
+
+Format chaque ligne ainsi: • [Titre court de l'actualité]
+Pas d'introduction ni de conclusion. Juste les bullet points.`;
+
+  try {
+    const response = await fetch('https://api.perplexity.ai/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-sonar-small-128k-online',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 800,
+        temperature: 0.2
+      })
+    });
+
+    if (!response.ok) {
+      console.error('[Chat API] Perplexity API error:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
+    
+    if (content) {
+      console.log('[Chat API] Perplexity returned market news successfully');
+      return `📰 ACTUALITÉS DU JOUR\n${content}\n`;
+    }
+    return null;
+  } catch (error) {
+    console.error('[Chat API] Perplexity fetch error:', error.message);
+    return null;
+  }
+}
+
+/**
  * Valide qu'une réponse est complète selon le type d'analyse
  * 
  * @param {string} response - La réponse à valider
@@ -757,14 +809,37 @@ Comment puis-je t'aider ? 🚀`;
               capsuleText += `• ${item.title?.substring(0, 70) || 'N/A'}${item.title?.length > 70 ? '...' : ''}\n`;
             });
           } else {
-            // Fallback when FMP returns empty
-            capsuleText += `📰 ACTUALITÉS\n`;
-            capsuleText += `• Les marchés sont calmes aujourd'hui\n`;
-            capsuleText += `• Utilisez ANALYSE [TICKER] pour des détails\n\n`;
+            // FMP returned empty - try Perplexity as fallback
+            console.log('[Chat API] FMP empty, trying Perplexity fallback...');
+            try {
+              const perplexityNews = await fetchPerplexityMarketNews();
+              if (perplexityNews) {
+                capsuleText += perplexityNews;
+              } else {
+                capsuleText += `📰 ACTUALITÉS\n`;
+                capsuleText += `• Les marchés sont calmes aujourd'hui\n`;
+                capsuleText += `• Utilisez ANALYSE [TICKER] pour des détails\n\n`;
+              }
+            } catch (pErr) {
+              console.error('[Chat API] Perplexity fallback failed:', pErr.message);
+              capsuleText += `📰 ACTUALITÉS\n`;
+              capsuleText += `• Les marchés sont calmes aujourd'hui\n\n`;
+            }
           }
         } else {
-          console.error('[Chat API] Market Overview - News API failed:', generalNewsRes.status);
-          capsuleText += `⚠️ Actualités indisponibles momentanément\n\n`;
+          // FMP API failed - use Perplexity
+          console.error('[Chat API] FMP API failed, trying Perplexity...');
+          try {
+            const perplexityNews = await fetchPerplexityMarketNews();
+            if (perplexityNews) {
+              capsuleText += perplexityNews;
+            } else {
+              capsuleText += `⚠️ Actualités indisponibles momentanément\n\n`;
+            }
+          } catch (pErr) {
+            console.error('[Chat API] Perplexity also failed:', pErr.message);
+            capsuleText += `⚠️ Actualités indisponibles momentanément\n\n`;
+          }
         }
 
         capsuleText += `\n📊 ANALYSE [TICKER] pour détails`;
