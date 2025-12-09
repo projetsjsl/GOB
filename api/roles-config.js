@@ -6,7 +6,20 @@
 import { createSupabaseClient } from '../lib/supabase-config.js';
 import crypto from 'crypto';
 
-const supabase = createSupabaseClient(true); // Service role pour admin
+// Lazy initialization - don't crash on module load if service role key is missing
+let supabase = null;
+function getSupabase() {
+    if (!supabase) {
+        try {
+            supabase = createSupabaseClient(true); // Service role pour admin
+        } catch (error) {
+            console.warn('Supabase not configured for roles-config:', error.message);
+            return null;
+        }
+    }
+    return supabase;
+}
+
 
 // Hash du mot de passe admin (par défaut: "admin")
 // En production, utiliser bcrypt ou argon2
