@@ -220,6 +220,8 @@ export default async function handler(req, res) {
 
 Je suis Emma, ton assistante IA financière propulsée par JSLAI 🚀
 
+Je peux t'aider sur 4 commandes spécifiques:
+
 📊 Analyses → ANALYSE [TICKER]
 💰 Prix → PRIX [TICKER]
 📰 News → NEWS [TICKER]
