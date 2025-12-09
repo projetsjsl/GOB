@@ -219,3 +219,4 @@ Si vous revenez après **plus de 15 minutes** :
 
 **Conclusion** : Le système fonctionne **24/7** en arrière-plan, même si personne n'est sur le site. Vous bénéficiez toujours des **dernières données** quand vous revenez.
 
+

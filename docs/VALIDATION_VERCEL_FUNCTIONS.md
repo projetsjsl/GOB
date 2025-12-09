@@ -142,3 +142,4 @@ Les fonctions suivantes ont été supprimées car elles utilisaient la valeur pa
 - ✅ **Endpoints critiques** : Tous fonctionnels
 - ⚠️ **Endpoints auth/roles** : Surveiller les timeouts (10s par défaut)
 
+

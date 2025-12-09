@@ -69,3 +69,4 @@ AND NOT ('watchlist' = ANY(categories))
 ORDER BY ticker;
 ```
 
+

@@ -70,3 +70,4 @@ AND NOT ('team' = ANY(categories))
 ORDER BY ticker;
 ```
 
+

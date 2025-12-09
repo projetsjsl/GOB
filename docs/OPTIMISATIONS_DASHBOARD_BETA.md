@@ -191,3 +191,4 @@ window.addEventListener('error', (event) => {
 
 Tous les 50 tests de navigation sont maintenant couverts avec les optimisations appliquées.
 
+

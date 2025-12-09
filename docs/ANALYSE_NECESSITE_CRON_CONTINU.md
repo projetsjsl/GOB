@@ -243,3 +243,4 @@ useEffect(() => {
 - **5-20 utilisateurs/jour** → Cron léger (30 min) ou à la demande
 - **> 20 utilisateurs/jour** → Cron continu (5 min) peut être justifié
 
+

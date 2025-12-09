@@ -92,3 +92,4 @@ ORDER BY priority DESC, ticker;
 
 La migration est **100% réussie** pour les team tickers.
 
+

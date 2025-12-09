@@ -108,3 +108,4 @@ JNJ: category='both', categories=['team', 'watchlist', 'instrument']
 3. ⏳ Tests d'intégration complets
 4. ⏳ Optionnel : Supprimer la colonne `source` après validation complète
 
+

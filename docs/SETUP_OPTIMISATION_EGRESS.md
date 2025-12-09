@@ -156,3 +156,4 @@ curl -X POST https://gobapps.com/api/fmp-batch-sync
 
 **Confiance** : Élevée sur la cause (polling par ticker) et sur les solutions architecturales.
 
+

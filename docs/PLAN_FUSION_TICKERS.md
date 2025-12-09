@@ -144,3 +144,4 @@ Avec une colonne `category` pour catégoriser :
 4. Tester tous les composants frontend
 5. Vérifier les performances
 
+

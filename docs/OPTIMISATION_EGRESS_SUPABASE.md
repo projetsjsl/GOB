@@ -250,3 +250,4 @@ Après implémentation, vérifier dans Supabase Dashboard :
 
 **Confiance** : Élevée sur la cause (polling par ticker) et sur les solutions architecturales.
 
+

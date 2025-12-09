@@ -95,3 +95,4 @@ export async function fetchMarketData(ticker: string): Promise<MarketData | null
   return null;
 }
 
+

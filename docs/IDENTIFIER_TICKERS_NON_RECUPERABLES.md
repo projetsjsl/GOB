@@ -215,3 +215,4 @@ Pour plus d'informations, consultez :
 - `docs/FIX_PROBLEMATIC_TICKERS.md` - Guide de correction des tickers problématiques
 - `api/fmp-company-data.js` - Logique de fallback automatique
 
+

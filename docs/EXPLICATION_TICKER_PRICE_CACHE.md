@@ -253,3 +253,4 @@ CREATE FUNCTION cleanup_expired_ticker_price_cache()
 - ✅ Données historiques : Depuis `finance_pro_snapshots` (si existe)
 - ✅ Synchronisation : FMP complet (action utilisateur)
 
+

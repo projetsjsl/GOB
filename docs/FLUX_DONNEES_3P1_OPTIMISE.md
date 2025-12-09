@@ -170,3 +170,4 @@ Ouverture → Supabase (snapshots) → LocalStorage
 3. **Données manuelles** : Toujours préservées lors du merge
 4. **Fallback FMP** : Seulement si snapshot manquant (pas de rechargement systématique)
 
+

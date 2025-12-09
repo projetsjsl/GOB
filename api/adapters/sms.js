@@ -209,14 +209,16 @@ export default async function handler(req, res) {
   <Message>${escapeXml(immediateResponse)}</Message>
 </Response>`);
     
-    // Traiter la requête en arrière-plan (ne pas bloquer la réponse n8n)
+    // Traiter la requête en arrière-plan (ne pas bloquer la réponse n8n/Twilio)
     // En mode test, on a déjà envoyé la réponse simulée, donc on peut skip le traitement
     if (isTest) {
       console.log('[SMS Adapter] 🧪 Mode test: Réponse simulée déjà envoyée, skip traitement arrière-plan');
       return;
     }
     
-    (async () => {
+    // ✅ FIX VERCEL FREEZE: Utiliser waitUntil pour garder la Lambda vivante après res.send()
+    // Sans cela, Vercel tue le processus (et les requêtes HTTP sortantes) dès que la réponse est envoyée
+    waitUntil((async () => {
       try {
         // 4.5. ENVOYER UN SMS DE CONFIRMATION IMMÉDIAT (UX)
         // L'utilisateur sait qu'Emma travaille pendant le traitement
@@ -362,7 +364,7 @@ export default async function handler(req, res) {
           console.error('[SMS Adapter] FAILED TO SEND RESCUE SMS:', smsError);
         }
       }
-    })();
+    })());
     
     // Retourner immédiatement (réponse déjà envoyée ci-dessus)
     return;

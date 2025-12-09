@@ -115,3 +115,4 @@ if (ticker.category === 'team') { ... }
 4. ⏳ Tests complets
 5. ⏳ Supprimer la colonne `source` (optionnel, après validation)
 
+

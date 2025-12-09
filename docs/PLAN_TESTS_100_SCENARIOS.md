@@ -194,3 +194,4 @@ Les ajustements nécessaires seront documentés ici après l'exécution des test
 - Certains tests peuvent nécessiter des données de test spécifiques
 - Les tests d'API nécessitent que l'application soit déployée ou accessible localement
 
+
