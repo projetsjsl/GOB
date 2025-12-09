@@ -45,7 +45,12 @@ export const TickerSearch: React.FC<TickerSearchProps> = ({ onSelect, onClose })
 
                 const data = await response.json();
 
-                setResults(data);
+                if (Array.isArray(data)) {
+                    setResults(data);
+                } else {
+                    console.warn('Search API returned non-array:', data);
+                    setResults([]);
+                }
                 setSelectedIndex(0);
             } catch (error) {
                 console.error('Search error:', error);

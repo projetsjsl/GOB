@@ -836,8 +836,12 @@ export default function App() {
         try {
             // Save current version if requested AND we have valid data
             if (saveCurrentVersion) {
-                // Don't save empty state
-                if (data.length > 0 && info.symbol) {
+                // Strict validation to prevent 400 errors from API
+                const hasValidData = data && data.length > 0;
+                const hasValidInfo = info && info.symbol && info.name;
+                const hasValidAssumptions = assumptions && typeof assumptions === 'object';
+
+                if (hasValidData && hasValidInfo && hasValidAssumptions) {
                     console.log('💾 Saving current version before sync...');
                     const saveResult = await saveSnapshot(
                         activeId,
@@ -850,12 +854,11 @@ export default function App() {
                     );
 
                     if (!saveResult.success) {
-                        console.error('Failed to save snapshot:', saveResult.error);
-                        showNotification(`Erreur lors de la sauvegarde: ${saveResult.error}`, 'error');
-                        // Continue anyway?
+                        console.warn('Backup save warning:', saveResult.error);
+                        // Non-blocking error
                     }
                 } else {
-                    console.log('⚠️ Skipping backup save: Current state is empty or invalid');
+                    console.log('⚠️ Skipping backup save: Incomplete data state', { hasValidData, hasValidInfo, hasValidAssumptions });
                 }
             }
 

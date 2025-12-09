@@ -202,41 +202,31 @@ export default async function handler(req, res) {
       }
     }
     
-    // Répondre immédiatement à n8n (avec réponse simulée en mode test, ou message d'attente en prod)
-    res.setHeader('Content-Type', 'text/xml');
-    res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Message>${escapeXml(immediateResponse)}</Message>
-</Response>`);
-    
-    // Traiter la requête en arrière-plan (ne pas bloquer la réponse n8n/Twilio)
-    // En mode test, on a déjà envoyé la réponse simulée, donc on peut skip le traitement
-    if (isTest) {
-      console.log('[SMS Adapter] 🧪 Mode test: Réponse simulée déjà envoyée, skip traitement arrière-plan');
-      return;
-    }
-    
-    // ✅ FIX VERCEL FREEZE: Utiliser waitUntil pour garder la Lambda vivante après res.send()
-    // Sans cela, Vercel tue le processus (et les requêtes HTTP sortantes) dès que la réponse est envoyée
-    waitUntil((async () => {
+    // 5. PRÉPARER LA TÂCHE DE FOND (ARRIÈRE-PLAN)
+    // On la définit mais on ne l'attend pas tout de suite
+    const backgroundTask = (async () => {
+      // Si mode test, on ne fait rien en arrière-plan (réponse déjà simulée)
+      if (isTest) {
+        console.log('[SMS Adapter] 🧪 Mode test: Skip background task');
+        return;
+      }
+
       try {
-        // 4.5. ENVOYER UN SMS DE CONFIRMATION IMMÉDIAT (UX)
-        // L'utilisateur sait qu'Emma travaille pendant le traitement
-        try {
-          await sendSMS(
-            senderPhone,
-            '👩🏻 Message reçu! J\'analyse ta demande, je te reviens! 📈🔍⏳'
-          );
-          console.log('[SMS Adapter] SMS de confirmation envoyé');
-        } catch (confirmError) {
-          console.error('[SMS Adapter] Erreur envoi SMS confirmation:', confirmError);
-          // Non-bloquant: on continue même si la confirmation échoue
-        }
+        // 4.5. ENVOYER UN SMS DE CONFIRMATION IMMÉDIAT (UX) (Si pas déjà fait pour n8n)
+        // En prod, n8n a reçu le XML mais l'utilisateur sur son mobile ne voit rien encore
+        // sauf si le XML Twilio envoie un SMS. Le XML envoyait "Analyse en cours..."
+        // On envoie QUAND MÊME un SMS de confirmation "Message reçu" pour être sûr
+        // Ou on s'abstient pour éviter le doublon ?
+        // Le XML renvoyé à Twilio : <Message>⏳ Analyse en cours...</Message>
+        // Donc l'utilisateur REÇOIT ce message.
+        // Envoyer un 2ème message "Message reçu" est redondant.
+        // On log juste.
+        console.log('[SMS Adapter] Confirmation envoyée via TwiML (XML)');
 
         // 5. APPELER L'API CHAT CENTRALISÉE
         let chatResponse;
         try {
-          // Import dynamique pour éviter les circular dependencies
+          // Import dynamique
           const chatModule = await import('../chat.js');
 
           const chatRequest = {
@@ -266,18 +256,11 @@ export default async function handler(req, res) {
 
           await chatModule.default(chatRequest, chatRes);
 
-          // ✅ FIX: Logging détaillé pour diagnostiquer les erreurs
-          if (!chatResponseData) {
-            console.error('[SMS Adapter] ❌ Chat API n\'a retourné aucune donnée');
-            throw new Error('Chat API returned no data');
-          }
-
+          // Validation réponse
+          if (!chatResponseData) throw new Error('Chat API returned no data');
           if (!chatResponseData.success) {
-            console.error('[SMS Adapter] ❌ Chat API returned unsuccessful response:');
-            console.error('[SMS Adapter] ❌ Error:', chatResponseData.error);
-            console.error('[SMS Adapter] ❌ Details:', chatResponseData.details);
-            console.error('[SMS Adapter] ❌ Full response:', JSON.stringify(chatResponseData, null, 2));
-            throw new Error(`Chat API returned unsuccessful response: ${chatResponseData.error || 'Unknown error'}`);
+            console.error('[SMS Adapter] ❌ Chat API error:', JSON.stringify(chatResponseData, null, 2));
+            throw new Error(`Chat API error: ${chatResponseData.error}`);
           }
 
           chatResponse = chatResponseData;
@@ -285,48 +268,28 @@ export default async function handler(req, res) {
 
         } catch (error) {
           console.error('[SMS Adapter] Erreur appel /api/chat:', error);
-          
-          // ✅ FIX: En mode test, générer une réponse simulée basée sur l'intent
-          if (isTestPhoneNumber(senderPhone)) {
-            console.log('[SMS Adapter] 🧪 Mode test: Génération réponse simulée basée sur intent...');
-            try {
-              const simulatedResponse = await generateSimulatedResponse(messageBody, senderPhone);
-              console.log(`[SMS Adapter] 🧪 Réponse simulée générée (${simulatedResponse.length} chars)`);
-              
-              // Envoyer la réponse simulée
-              await sendSMS(senderPhone, simulatedResponse);
-              return;
-            } catch (simError) {
-              console.error('[SMS Adapter] Erreur génération réponse simulée:', simError);
-              // Fallback: message d'erreur standard
-            }
-          }
-          
-          throw error; // Propager l'erreur pour le catch global du background process
+          // Pour les vrais utilisateurs, une erreur ici est fatale pour l'analyse
+          // On propage pour le catch global qui enverra le Rescue SMS
+          throw error;
         }
 
-        // 6. ENVOYER LA RÉPONSE PAR SMS (en arrière-plan)
+        // 6. ENVOYER LA RÉPONSE PAR SMS
         try {
           const response = chatResponse.response;
 
-          // 🛡️ PROTECTION ANTI-SPAM: Refuser les réponses > 4500 chars (3 SMS max)
+          // Protection anti-spam
           if (response.length > 4500) {
-            console.error(`❌ [SMS Adapter] RÉPONSE TROP LONGUE (${response.length} chars) - REFUSÉE!`);
-
-            // Envoyer un message d'erreur court
             await sendSMS(
               senderPhone,
-              "❌ Désolé, la réponse est trop longue pour SMS. Essayez une question plus spécifique ou consultez gobapps.com pour l'analyse complète."
+              "❌ Désolé, la réponse est trop longue pour SMS. Essayez une question plus spécifique."
             );
             return;
           }
 
-          // Envoyer la vraie réponse via Twilio API (tous les messages, pas seulement > 800 chars)
-          // Car on a déjà répondu à n8n avec TwiML, donc on envoie toujours via API
-          console.log(`[SMS Adapter] Envoi réponse via Twilio API (${response.length} chars)`);
+          console.log(`[SMS Adapter] Envoi réponse finale via Twilio API`);
           await sendSMS(senderPhone, response);
 
-          // 6.5. ENVOYER NOTIFICATION EMAIL EN ARRIÈRE-PLAN (après SMS)
+          // 6.5. EMAIL (Non-bloquant)
           sendConversationEmail({
             userName: chatResponse.metadata?.name || senderPhone,
             userPhone: senderPhone,
@@ -336,40 +299,45 @@ export default async function handler(req, res) {
             metadata: {
               conversationId: chatResponse.metadata?.conversation_id,
               model: chatResponse.metadata?.model,
-              tools_used: chatResponse.metadata?.tools_used || [],
-              execution_time_ms: chatResponse.metadata?.execution_time_ms,
-              intent_data: chatResponse.metadata?.intent,
               timestamp: new Date().toISOString()
             }
-          }).then(() => {
-            console.log('✅ [SMS Adapter] Notification email envoyée (arrière-plan)');
-          }).catch((emailError) => {
-            console.error('⚠️ [SMS Adapter] Erreur envoi email (non-bloquant):', emailError.message);
-          });
+          }).catch(e => console.error('⚠️ Email notification failed:', e.message));
 
         } catch (error) {
-          console.error('[SMS Adapter] Erreur envoi SMS (arrière-plan):', error);
-          throw error; // Propager pour le catch global
+          console.error('[SMS Adapter] Erreur envoi SMS final:', error);
+          throw error;
         }
+
       } catch (error) {
-        console.error('[SMS Adapter] CRITICAL ERROR IN BACKGROUND PROCESS:', error);
-        // Envoyer message d'erreur à l'utilisateur (Rescue SMS)
+        console.error('[SMS Adapter] ❌ CRITICAL BACKGROUND ERROR:', error);
+        // RESCUE SMS
         try {
           await sendSMS(
             senderPhone,
-            '❌ Désolé, j\'ai rencontré une erreur technique lors de l\'analyse. Mon équipe a été notifiée. Veuillez réessayer dans quelques instants.'
+            '❌ Désolé, une erreur technique est survenue. Veuillez réessayer.'
           );
-          console.log('[SMS Adapter] Rescue SMS sent successfully');
-        } catch (smsError) {
-          console.error('[SMS Adapter] FAILED TO SEND RESCUE SMS:', smsError);
+        } catch (e) {
+          console.error('Failed to send rescue SMS:', e);
         }
       }
-    })());
+    })();
+
+    // ✅ FIX: Enregistrer la tâche de fond AVANT de répondre
+    // Cela garantit que Vercel est au courant qu'il doit attendre
+    waitUntil(backgroundTask);
+
+    // 7. RÉPONDRE AU WEBHOOK (immédiatement)
+    res.setHeader('Content-Type', 'text/xml');
+    res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Message>${escapeXml(immediateResponse)}</Message>
+</Response>`);
     
-    // Retourner immédiatement (réponse déjà envoyée ci-dessus)
+    // Fin de la fonction handler
     return;
 
   } catch (error) {
+    console.error('[SMS Adapter] Erreur générale Handler:', error);
     console.error('[SMS Adapter] Erreur générale:', error);
 
     // Tenter d'envoyer un SMS d'erreur
