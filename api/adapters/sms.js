@@ -276,7 +276,7 @@ export default async function handler(req, res) {
 
         // 6. ENVOYER LA RÉPONSE PAR SMS
         try {
-          const response = chatResponse.response;
+          let response = chatResponse.response;
 
           // Protection anti-spam / Limite SMS
           // Au lieu de rejeter, on tronque à ~3 SMS (4400 chars + suffixe)

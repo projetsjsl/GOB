@@ -143,14 +143,20 @@ async function syncAllTickers() {
     console.log(`✅ ${quotes.length} quotes récupérées`);
 
     // 3. Formater les données (PRIX UNIQUEMENT - pas de ratios)
-    const priceData = quotes.map(quote => ({
-      symbol: quote.symbol?.toUpperCase(),
-      price: quote.price || 0,
-      change: quote.change || 0,
-      changePercent: quote.changesPercentage || 0,
-      volume: quote.volume || 0,
-      marketCap: quote.marketCap || 0
-    }));
+    const priceData = quotes.map(quote => {
+      // Convert to integers for bigint columns and validate
+      const volume = Number.isFinite(quote.volume) ? Math.round(quote.volume) : 0;
+      const marketCap = Number.isFinite(quote.marketCap) ? Math.round(quote.marketCap) : 0;
+      
+      return {
+        symbol: quote.symbol?.toUpperCase(),
+        price: Number.isFinite(quote.price) ? quote.price : 0,
+        change: Number.isFinite(quote.change) ? quote.change : 0,
+        changePercent: Number.isFinite(quote.changesPercentage) ? quote.changesPercentage : 0,
+        volume: Math.abs(volume) > Number.MAX_SAFE_INTEGER ? 0 : volume,
+        marketCap: Math.abs(marketCap) > Number.MAX_SAFE_INTEGER ? 0 : marketCap
+      };
+    });
 
     // 4. Upsert en batch dans ticker_price_cache - PRIX UNIQUEMENT
     console.log('💾 Upsert dans ticker_price_cache (PRIX UNIQUEMENT) par lots...');
