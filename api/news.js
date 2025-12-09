@@ -451,13 +451,22 @@ async function fetchRSSNews(feedKeys, limit, query) {
   try {
     const articles = await fetchMultipleRSSFeeds(feedKeys, Math.ceil(limit / feedKeys.length));
     
-    // Filtrer par query si fourni
-    if (query && query.length > 5) {
+    // FIXED: Filter by query if provided - previously only filtered when query.length > 5
+    // This caused tickers (1-5 chars) to return unfiltered RSS news
+    if (query) {
       const queryLower = query.toLowerCase();
-      return articles.filter(article => 
-        article.title.toLowerCase().includes(queryLower) ||
-        (article.summary && article.summary.toLowerCase().includes(queryLower))
-      );
+      const tickerBase = queryLower.split('.')[0]; // Handle BRK.A → brk, MFC.TO → mfc
+      
+      return articles.filter(article => {
+        const title = (article.title || '').toLowerCase();
+        const summary = (article.summary || '').toLowerCase();
+        
+        // Match full ticker/query or base ticker
+        return title.includes(queryLower) || 
+               summary.includes(queryLower) ||
+               title.includes(tickerBase) ||
+               summary.includes(tickerBase);
+      });
     }
 
     return articles;
