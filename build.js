@@ -71,65 +71,6 @@ async function build() {
       }
     }
 
-    // Créer la structure Vercel Build Output API
-    // https://vercel.com/docs/build-output-api/v3
-    const VERCEL_OUTPUT = '.vercel/output';
-    const STATIC_DIR = join(VERCEL_OUTPUT, 'static');
-
-    console.log('📦 Création de la structure Vercel Build Output...');
-
-    // 1. Créer les dossiers
-    await mkdir(STATIC_DIR, { recursive: true });
-
-    // 2. Copier public/ vers .vercel/output/static/
-    async function copyRecursive(src, dest) {
-      const entries = await readdir(src, { withFileTypes: true });
-
-      for (const entry of entries) {
-        const srcPath = join(src, entry.name);
-        const destPath = join(dest, entry.name);
-
-        if (entry.isDirectory()) {
-          await mkdir(destPath, { recursive: true });
-          await copyRecursive(srcPath, destPath);
-        } else {
-          await cp(srcPath, destPath);
-        }
-      }
-    }
-
-    await copyRecursive(PUBLIC_DIR, STATIC_DIR);
-    console.log('✅ Fichiers statiques copiés vers .vercel/output/static/');
-
-    // 3. Créer config.json
-    const configJson = {
-      version: 3
-    };
-    await writeFile(
-      join(VERCEL_OUTPUT, 'config.json'),
-      JSON.stringify(configJson, null, 2)
-    );
-    console.log('✅ config.json créé');
-
-    // Injection des variables d'environnement dans emma-config.js
-    const emmaConfigPath = join(STATIC_DIR, 'emma-config.js');
-    if (existsSync(emmaConfigPath)) {
-      console.log('🔑 Injection des clés API dans emma-config.js...');
-      let emmaConfigContent = await readFile(emmaConfigPath, 'utf8');
-
-      if (process.env.GEMINI_API_KEY) {
-        emmaConfigContent = emmaConfigContent.replace('YOUR_GEMINI_API_KEY', process.env.GEMINI_API_KEY);
-        console.log('✅ Clé Gemini injectée');
-      }
-
-      if (process.env.TAVUS_API_KEY) {
-        emmaConfigContent = emmaConfigContent.replace('YOUR_TAVUS_API_KEY', process.env.TAVUS_API_KEY);
-        console.log('✅ Clé Tavus injectée');
-      }
-
-      await writeFile(emmaConfigPath, emmaConfigContent);
-    }
-
     console.log('✅ Build terminé avec succès');
 
   } catch (error) {
