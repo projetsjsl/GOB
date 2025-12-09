@@ -188,7 +188,7 @@ export default async function handler(req, res) {
     
     // ✅ FIX MODE TEST: En mode test, générer réponse simulée immédiate pour dashboard
     const isTest = isTestPhoneNumber(senderPhone);
-    let immediateResponse = '⏳ Analyse en cours, réponse dans quelques instants...';
+    let immediateResponse = '👩🏻 Message reçu! J\'analyse ta demande, je te reviens! 📈🔍⏳';
     
     if (isTest) {
       console.log('[SMS Adapter] 🧪 Mode test: Génération réponse simulée immédiate pour dashboard...');
