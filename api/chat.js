@@ -291,14 +291,12 @@ export default async function handler(req, res) {
 
 Je suis Emma, ton assistante IA financière propulsée par JSLAI 🚀
 
-Je peux t'aider sur 4 commandes spécifiques:
+Je peux t'aider sur 3 commandes spécifiques:
 
 📊 Analyses → ANALYSE [TICKER]
 💰 Prix → PRIX [TICKER]
 📰 News → NEWS [TICKER]
-🌍 Marché → INDICES
-
-Ex: "ANALYSE AAPL" ou "INDICES"
+Ex: "ANALYSE AAPL" ou "PRIX TSLA"
 
 Pour arrêter: réponds STOP`;
 
@@ -532,127 +530,26 @@ Pour arrêter: réponds STOP`;
     // 🔄 NORMALISATION: Support du préfixe # optionnel
     const normalizedMessage = messageUpper.startsWith('#') ? messageUpper.substring(1).trim() : messageUpper;
 
-    if (normalizedMessage === 'SKILLS' || normalizedMessage === 'SKILL') {
-      console.log('[Chat API] Commande SKILLS détectée');
+    // COMMANDES GÉNÉRALES
+    // ==========================================
 
-      const skillsResponse = `🤖 EMMA IA - MES COMPÉTENCES
-
-📊 ANALYSES (Mots-clés MAJUSCULES):
-• ANALYSE [TICKER] → Analyse complète
-• FONDAMENTAUX [TICKER] → Ratios & finances
-• TECHNIQUE [TICKER] → Analyse technique
-• COMPARER [T1] [T2] → Comparaison
-• PRIX [TICKER] → Prix temps réel
-• RATIOS [TICKER] → Ratios financiers
-• CROISSANCE [TICKER] → Croissance revenus
-
-📈 INDICATEURS TECHNIQUES:
-• RSI [TICKER] → Force relative
-• MACD [TICKER] → Momentum
-• MOYENNES [TICKER] → Moyennes mobiles
-
-📰 ACTUALITÉS:
-• TOP 5 NEWS → Top 5 news du jour
-• NEWS [TICKER] → News du ticker
-• ACTUALITES [TICKER] → Actualités
-
-📅 CALENDRIERS:
-• RESULTATS → Earnings calendar
-• RESULTATS [TICKER] → Earnings ticker
-• CALENDRIER ECONOMIQUE → Événements macro
-
-📊 WATCHLIST:
-• LISTE → Voir ta watchlist
-• AJOUTER [TICKER] → Ajouter ticker
-• RETIRER [TICKER] → Supprimer ticker
-
-📈 MARCHÉ:
-• INDICES → Dow, S&P, Nasdaq
-• MARCHE → Vue marchés
-• SECTEUR [NOM] → Analyse secteur
-
-💼 INVESTISSEMENT:
-• ACHETER [TICKER] → Avis achat
-• VENDRE [TICKER] → Avis vente
-
-🌍 ÉCONOMIE:
-• INFLATION → Données inflation
-• FED → Infos Fed/taux
-• TAUX → Taux directeurs
-
-🎯 BRIEFINGS AUTO (email):
-• 7h20 → Pré-marché
-• 15h50 → Intraday
-• 20h20 → Post-marché
-
-📚 AIDE:
-• AIDE → Guide complet
-• EXEMPLES → Exemples questions
-
-💡 TU PEUX AUSSI PARLER NATURELLEMENT:
-"Pourquoi Apple monte ?"
-"Devrais-je acheter Tesla ?"
-
-🚀 30+ mots-clés disponibles !`;
-
-      // Sauvegarder dans la conversation
-      try {
-        await saveConversationTurn(conversation.id, message, skillsResponse, {
-          type: 'command_skills',
-          channel: channel
-        });
-      } catch (error) {
-        console.error('[Chat API] Erreur sauvegarde SKILLS:', error);
-      }
-
-      return res.status(200).json({
-        success: true,
-        response: skillsResponse,
-        metadata: { command: 'SKILLS' }
-      });
-    }
-
-    if (normalizedMessage === 'AIDE' || normalizedMessage === 'HELP') {
+    if (normalizedMessage === 'AIDE' || normalizedMessage === 'HELP' || normalizedMessage === 'SKILLS' || normalizedMessage === 'SKILL' || normalizedMessage === 'MENU') {
       console.log('[Chat API] Commande AIDE détectée');
 
-      const helpResponse = `📖 GUIDE EMMA IA
+      const helpResponse = `🤖 EMMA SMS - AIDE
 
-🗣️ PARLE NATURELLEMENT:
-Pas besoin de commandes strictes.
-Je comprends le français courant !
+Voici les commandes disponibles :
 
-✅ CE QUE JE FAIS:
-• Analyses complètes d'actions
-• Prix et données temps réel
-• Indicateurs techniques (RSI, MACD)
-• Actualités financières
-• Calendriers (résultats, événements)
-• Gestion watchlist
-• Briefings quotidiens (email)
+📊 ANALYSE
+"Analyse [Ticker]" (ex: Analyse AAPL)
+"Prix [Ticker]"
+"News [Ticker]"
 
-📊 SOURCES DE DONNÉES:
-• FMP (Financial Modeling Prep)
-• Polygon.io & Twelve Data
-• Finnhub & Alpha Vantage
-• Données en cache 5-60 min
+🗣️ DISCUSSION
+Posez simplement vos questions !
+Ex: "Que penses-tu de Tesla ?"
 
-🎯 ANALYSE TYPIQUE INCLUT:
-• Prix actuel & variation
-• Ratios: P/E, P/B, ROE, marges
-• Croissance revenus/bénéfices
-• Consensus analystes
-• News récentes avec sources
-• Indicateurs techniques
-
-⚡ RÉPONSE RAPIDE:
-• Commandes: ~instant
-• Analyses: ~10-13 secondes
-• Briefings: automatiques 3x/jour
-
-💼 SKILLS → Toutes mes capacités
-📱 Contact: 1-438-544-EMMA
-
-Comment puis-je t'aider ? 🚀`;
+❌ STOP pour arrêter`;
 
       try {
         await saveConversationTurn(conversation.id, message, helpResponse, {
@@ -670,71 +567,6 @@ Comment puis-je t'aider ? 🚀`;
       });
     }
 
-    if (normalizedMessage === 'EXEMPLES' || normalizedMessage === 'EXAMPLES') {
-      console.log('[Chat API] Commande EXEMPLES détectée');
-
-      const examplesResponse = `💡 EXEMPLES QUI FONCTIONNENT
-
-📊 ANALYSES COMPLÈTES:
-• "Analyse AAPL"
-• "Analyse complète Microsoft"
-• "Dis-moi tout sur NVDA"
-
-💰 PRIX & RATIOS:
-• "Prix Tesla"
-• "C'est quoi le P/E de MSFT ?"
-• "ROE de Apple"
-• "Marges bénéficiaires GOOGL"
-
-📈 INDICATEURS TECHNIQUES:
-• "RSI de NVDA"
-• "MACD Tesla"
-• "Moyennes mobiles AAPL"
-• "TSLA est suracheté ?"
-
-📰 ACTUALITÉS:
-• "Actualités Apple"
-• "Pourquoi TSLA monte ?"
-• "Quoi de neuf en bourse ?"
-
-📅 CALENDRIERS:
-• "Prochains résultats AAPL"
-• "Résultats cette semaine"
-• "Événements économiques"
-• "Earnings calendar"
-
-📊 WATCHLIST:
-• "Ma liste"
-• "Ajouter NVDA"
-• "Retirer TSLA"
-• "Watchlist de l'équipe"
-
-🎯 COMPARAISONS:
-• "Comparer AAPL et MSFT"
-• "NVDA vs AMD fondamentaux"
-
-💭 QUESTIONS OUVERTES:
-• "Devrais-je acheter Tesla ?"
-• "Microsoft est-il cher ?"
-• "Meilleures actions IA ?"
-
-👉 Essaie et je comprendrai ! 🤖`;
-
-      try {
-        await saveConversationTurn(conversation.id, message, examplesResponse, {
-          type: 'command_examples',
-          channel: channel
-        });
-      } catch (error) {
-        console.error('[Chat API] Erreur sauvegarde EXEMPLES:', error);
-      }
-
-      return res.status(200).json({
-        success: true,
-        response: examplesResponse,
-        metadata: { command: 'EXEMPLES' }
-      });
-    }
 
     // Commande TOP NEWS / Market Overview (revue complète des marchés)
     // REMOVED: The previous TOP NEWS handler was removed as per user instruction.
@@ -870,14 +702,6 @@ Comment puis-je t'aider ? 🚀`;
     }
 
     // ACTUALITÉS
-    else if (normalizedMessage === 'TOP NEWS' || normalizedMessage === 'TOP' || normalizedMessage.startsWith('TOP NEWS ')) {
-      // COMMANDE SUPPRIMÉE SUR DEMANDE UTILISATEUR (RISQUÉE)
-      return res.status(200).json({
-        success: true,
-        response: "⚠️ La commande 'TOP NEWS' a été désactivée.\nUtilisez plutôt 'Indices' ou 'Actualités [Ticker]'.",
-        metadata: { command: 'TOP_NEWS_DISABLED' }
-      });
-    }
     else if (normalizedMessage.startsWith('NEWS ') || normalizedMessage.startsWith('ACTUALITES ')) {
       const keyword = normalizedMessage.startsWith('NEWS') ? 'NEWS' : 'ACTUALITES';
       const ticker = extractTickerFromCommand(normalizedMessage, keyword);
@@ -898,10 +722,8 @@ Comment puis-je t'aider ? 🚀`;
         // "RESULTATS" seul → earnings calendar général
         forcedIntent = { intent: 'earnings', tickers: [], confidence: 1.0, method: 'keyword_shortcut' };
       }
-    } else if (normalizedMessage.includes('CALENDRIER') && normalizedMessage.includes('ECONOMIQUE')) {
+    } else if (normalizedMessage.includes('CALENDRIER')) {
       forcedIntent = { intent: 'economic_analysis', tickers: [], confidence: 1.0, method: 'keyword_shortcut' };
-    } else if (normalizedMessage.includes('CALENDRIER') && normalizedMessage.includes('EARNINGS')) {
-      forcedIntent = { intent: 'earnings', tickers: [], confidence: 1.0, method: 'keyword_shortcut' };
     }
 
     // WATCHLIST
@@ -921,11 +743,8 @@ Comment puis-je t'aider ? 🚀`;
     }
 
     // MARCHÉ
-    else if (normalizedMessage === 'INDICES' || normalizedMessage === 'MARCHE' || normalizedMessage === 'MARCHÉS') {
+    else if (normalizedMessage === 'INDICES') {
       forcedIntent = { intent: 'market_overview', tickers: [], confidence: 1.0, method: 'keyword_shortcut' };
-    } else if (normalizedMessage.includes('SECTEUR ')) {
-      // "SECTEUR TECH", "SECTEUR FINANCE", etc.
-      forcedIntent = { intent: 'market_overview', tickers: [], confidence: 1.0, method: 'keyword_shortcut', sector: true };
     }
 
     // RECOMMANDATION
