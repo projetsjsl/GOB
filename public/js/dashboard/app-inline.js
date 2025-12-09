@@ -484,6 +484,30 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         );
     };
 
+    // ============================================================================
+    // IMPORT TAB COMPONENTS FROM WINDOW
+    // Tabs loaded from external files need to be imported from window object
+    // before they can be used in JSX syntax
+    // ============================================================================
+    const DansWatchlistTab = window.DansWatchlistTab;
+    const ScrappingSATab = window.ScrappingSATab;
+    const EmailBriefingsTab = window.EmailBriefingsTab;
+    const SeekingAlphaTab = window.SeekingAlphaTab;
+    const EconomicCalendarTab = window.EconomicCalendarTab;
+    const InvestingCalendarTab = window.InvestingCalendarTab;
+    const FinVoxTab = window.FinVoxTab;
+    const EmmAIATab = window.EmmAIATab;
+    const FastGraphsTab = window.FastGraphsTab;
+    const VoiceAssistantTab = window.VoiceAssistantTab;
+    const PlusTab = window.PlusTab;
+    const AskEmmaTab = window.AskEmmaTab;
+    const TerminalEmmaIATab = window.TerminalEmmaIATab;
+    const ChatGPTGroupTab = window.ChatGPTGroupTab;
+    const IntelliStocksTab = window.IntelliStocksTab;
+    const StocksNewsTab = window.StocksNewsTab;
+    const YieldCurveTab = window.YieldCurveTab;
+    const AdvancedAnalysisTab = window.AdvancedAnalysisTab;
+
     const BetaCombinedDashboard = () => {
         // État pour le thème actuel
         const [currentThemeId, setCurrentThemeId] = useState(() => {
