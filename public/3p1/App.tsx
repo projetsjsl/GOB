@@ -570,20 +570,36 @@ export default function App() {
                                     const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
                                     
                                     // Si les assumptions viennent de Supabase, les utiliser, sinon auto-fill
-                                    let finalAssumptions: Assumptions;
+                                    let baseAssumptions: Assumptions;
                                     if (result.assumptions && result.source === 'supabase') {
-                                        finalAssumptions = {
+                                        baseAssumptions = {
                                             ...INITIAL_ASSUMPTIONS,
                                             ...result.assumptions,
                                             currentPrice: result.currentPrice
                                         };
                                     } else {
-                                        finalAssumptions = autoFillAssumptionsFromFMPData(
+                                        baseAssumptions = autoFillAssumptionsFromFMPData(
                                             result.data,
                                             result.currentPrice,
                                             INITIAL_ASSUMPTIONS
                                         ) as Assumptions;
                                     }
+                                    
+                                    // Détecter et exclure automatiquement les métriques avec prix cibles aberrants
+                                    const outlierDetection = detectOutlierMetrics(result.data, baseAssumptions);
+                                    
+                                    if (outlierDetection.detectedOutliers.length > 0) {
+                                        console.log(`⚠️ ${symbol}: Métriques aberrantes auto-exclues: ${outlierDetection.detectedOutliers.join(', ')}`);
+                                    }
+                                    
+                                    // Appliquer les exclusions détectées
+                                    const finalAssumptions = {
+                                        ...baseAssumptions,
+                                        excludeEPS: outlierDetection.excludeEPS,
+                                        excludeCF: outlierDetection.excludeCF,
+                                        excludeBV: outlierDetection.excludeBV,
+                                        excludeDIV: outlierDetection.excludeDIV
+                                    };
                                     
                                     const newProfile: AnalysisProfile = {
                                         id: symbol,
@@ -2181,14 +2197,31 @@ export default function App() {
                                     INITIAL_ASSUMPTIONS
                                 );
                                 
+                                // Détecter et exclure automatiquement les métriques avec prix cibles aberrants
+                                const tempAssumptions = {
+                                    ...INITIAL_ASSUMPTIONS,
+                                    ...autoFilledAssumptions
+                                } as Assumptions;
+                                const outlierDetection = detectOutlierMetrics(result.data, tempAssumptions);
+                                
+                                if (outlierDetection.detectedOutliers.length > 0) {
+                                    console.log(`⚠️ ${symbol}: Métriques aberrantes auto-exclues: ${outlierDetection.detectedOutliers.join(', ')}`);
+                                }
+                                
+                                // Appliquer les exclusions détectées
+                                const finalAssumptions = {
+                                    ...tempAssumptions,
+                                    excludeEPS: outlierDetection.excludeEPS,
+                                    excludeCF: outlierDetection.excludeCF,
+                                    excludeBV: outlierDetection.excludeBV,
+                                    excludeDIV: outlierDetection.excludeDIV
+                                };
+                                
                                 const newProfile: AnalysisProfile = {
                                     id: symbol,
                                     lastModified: Date.now(),
                                     data: result.data,
-                                    assumptions: {
-                                        ...INITIAL_ASSUMPTIONS,
-                                        ...autoFilledAssumptions
-                                    },
+                                    assumptions: finalAssumptions,
                                     info: {
                                         symbol: symbol,
                                         name: result.info.name || supabaseTicker.company_name || symbol,
