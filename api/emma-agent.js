@@ -14,6 +14,7 @@ import { TickerExtractor } from '../lib/utils/ticker-extractor.js';
 // import { CFA_SYSTEM_PROMPT } from '../config/emma-cfa-prompt.js'; // REMOVED: Now using ConfigManager
 // import { getIntentPrompt, hasCustomPrompt } from '../config/intent-prompts.js'; // REMOVED: Now using ConfigManager
 import { PERPLEXITY_SYSTEM_PROMPT } from '../config/perplexity-prompt.js';
+import { INTENT_PROMPTS } from '../config/intent-prompts.js';
 import { configManager } from '../lib/config-manager.js'; // NEW: Config Manager
 import { geminiFetchWithRetry } from '../lib/utils/gemini-retry.js';
 import { ContextMemory } from '../lib/context-memory.js';
@@ -92,8 +93,17 @@ class SmartAgent {
             userMessage = this._autoCorrectTickers(userMessage);
 
 
-            // 0. COGNITIVE SCAFFOLDING: Analyse d'intention avec Perplexity
-            const intentData = await this._analyzeIntent(userMessage, context);
+            // 0. COGNITIVE SCAFFOLDING: Analyse d'intention avec Perplexity (ou forced intent)
+            let intentData = context.forced_intent;
+            
+            if (!intentData) {
+                intentData = await this._analyzeIntent(userMessage, context);
+            } else {
+                console.log(`🎯 Using forced intent from context: ${intentData.intent} (${intentData.method || 'manual'})`);
+                // Assurer que parameters existe
+                if (!intentData.parameters) intentData.parameters = {};
+            }
+            
             console.log('🧠 Intent analysis:', intentData ? intentData.intent : 'fallback to keyword scoring');
 
             // ✨ NOUVEAU: Mise à jour de la mémoire contextuelle
@@ -3152,7 +3162,10 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
 
             // Vérifier si un prompt custom existe pour cet intent
             if (intentData && intentData.intent) {
-                const customPrompt = await configManager.get('prompts', `intent_${intentData.intent}`);
+                // Utiliser le prompt du fichier comme fallback si non trouvé en DB
+                const defaultPrompt = INTENT_PROMPTS[intentData.intent] || null;
+                const customPrompt = await configManager.get('prompts', `intent_${intentData.intent}`, defaultPrompt);
+                
                 if (customPrompt) {
                     systemPrompt = customPrompt;
 

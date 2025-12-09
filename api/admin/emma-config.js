@@ -4,6 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { INTENT_PROMPTS } from '../../config/intent-prompts.js';
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
@@ -14,7 +15,7 @@ if (supabaseUrl && supabaseKey) {
 }
 
 // Table Supabase pour stocker la configuration
-const CONFIG_TABLE = 'emma_config';
+const CONFIG_TABLE = 'emma_system_config';
 
 export default async function handler(req, res) {
     // CORS headers
@@ -293,6 +294,16 @@ function getDefaultConfig(section = null, key = null) {
     
     const defaultConfig = {
         prompts: {
+            // Import dynamic prompts from intent-prompts.js
+            ...Object.entries(INTENT_PROMPTS).reduce((acc, [key, value]) => {
+                acc[`intent_${key}`] = {
+                    value: value,
+                    type: 'string',
+                    description: `Prompt pour l'intention: ${key}`
+                };
+                return acc;
+            }, {}),
+
             cfa_identity: {
                 value: `Tu es Emma, CFA® - Analyste Financière Senior et Gestionnaire de Portefeuille Institutionnel.
 
@@ -447,6 +458,18 @@ function getDefaultConfig(section = null, key = null) {
                 value: ['prix actuel', 'ratio exact', 'rsi', 'macd'],
                 type: 'json',
                 description: 'Keywords nécessitant des APIs complémentaires'
+            },
+            sms_allowed_commands: {
+                value: [
+                    'ANALYSE', 'ANALYZE', 
+                    'PRIX', 'PRICE', 'COURS', 'QUOTE',
+                    'NEWS', 'ACTUALITES', 'ACTUALITÉS', 'INFOS',
+                    'TOP', // Pour TOP NEWS
+                    'SKILLS', 'AIDE', 'HELP', 'COMMANDES',
+                    'TEST'
+                ],
+                type: 'json',
+                description: 'Liste des commandes autorisées en mode SMS (Guardrail)'
             }
         }
     };

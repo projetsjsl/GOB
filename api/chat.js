@@ -15,6 +15,7 @@ import { getNameFromPhone, isKnownContact } from '../lib/phone-contacts.js';
 import { TickerExtractor } from '../lib/utils/ticker-extractor.js';
 import { validateYTDData, enrichStockDataWithSources } from '../lib/ytd-validator.js';
 import { generateCacheKey, getCachedResponse, setCachedResponse } from '../lib/response-cache.js';
+import { configManager } from '../lib/config-manager.js';
 
 /**
  * Valide qu'une réponse est complète selon le type d'analyse
@@ -248,13 +249,18 @@ export default async function handler(req, res) {
           'RESULTATS', 'EARNINGS', 'CALENDRIER', 'CALENDAR', 'INFLATION', 'FED', 'TAUX'
         ];
         
-        const isFinancialRequest = financialKeywords.some(keyword => 
+        let isFinancialRequest = financialKeywords.some(keyword => 
           messageUpper.includes(keyword) || messageUpper.startsWith(keyword + ' ')
         );
         
         // Détecter aussi les tickers (mots en majuscules de 1-5 lettres)
         const tickerPattern = /^[A-Z]{1,5}(\s|$)/;
         const hasTicker = tickerPattern.test(messageUpper) || messageUpper.match(/[A-Z]{2,5}/);
+        
+        // ✨ NOUVEAU: TOP NEWS (Market Overview)
+        if (messageUpper.startsWith('TOP') && (messageUpper.includes('NEWS') || messageUpper.includes('TITRES'))) {
+           isFinancialRequest = true;
+        }
 
         if (!isFinancialRequest && !hasTicker) {
           // Ce n'est pas une requête financière → demander le nom
@@ -287,6 +293,41 @@ export default async function handler(req, res) {
           console.log(`[Chat API] Numéro inconnu mais requête financière détectée, traitement de la requête d'abord`);
           // Continuer le flux normal pour traiter la requête
         }
+      }
+    }
+
+    // 4. SMS STRICT MODE GUARDRAIL (Nouvelle restriction)
+    if (channel === 'sms') {
+      const messageUpper = message.trim().toUpperCase();
+      
+      // Récupérer les commandes autorisées depuis la config (avec fallback)
+      const allowedCommands = await configManager.get('routing', 'sms_allowed_commands', [
+        'ANALYSE', 'ANALYZE', 
+        'PRIX', 'PRICE', 'COURS', 'QUOTE',
+        'NEWS', 'ACTUALITES', 'ACTUALITÉS', 'INFOS',
+        'TOP', // Pour TOP NEWS
+        'SKILLS', 'AIDE', 'HELP', 'COMMANDES',
+        'TEST'
+      ]);
+      
+      const startsWithCommand = allowedCommands.some(cmd => messageUpper.startsWith(cmd));
+      const isTickerOnly = /^[A-Z]{1,5}$/.test(messageUpper);
+      const isShortReply = message.length < 10 && (['OUI', 'NON', 'YES', 'NO', 'OK'].includes(messageUpper) || /^\d+$/.test(messageUpper));
+
+      if (!startsWithCommand && !isTickerOnly && !isShortReply) {
+        console.log(`[Chat API] 🛡️ SMS Guardrail: Message rejeté "${message}"`);
+        const guardrailResponse = `⚠️ Commande non reconnue.\n\nPour garantir la qualité, le SMS est limité aux fonctions clés :\n\n📊 ANALYSE [TICKER]\n💰 PRIX [TICKER]\n📰 NEWS [TICKER]\n🌍 TOP NEWS (Marchés)\n\nEx: "Analyse MSFT"`;
+        
+        await saveConversationTurn(conversation.id, message, guardrailResponse, {
+          type: 'guardrail_rejection',
+          channel: channel
+        });
+
+        return res.status(200).json({
+          success: true,
+          response: guardrailResponse,
+          metadata: { guardrail: true }
+        });
       }
     }
 
@@ -809,6 +850,9 @@ Comment puis-je t'aider ? 🚀`;
     }
 
     // ACTUALITÉS
+    else if (normalizedMessage === 'TOP NEWS' || normalizedMessage === 'TOP' || normalizedMessage.startsWith('TOP NEWS ')) {
+       forcedIntent = { intent: 'market_overview', tickers: [], confidence: 1.0, method: 'keyword_shortcut' };
+    }
     else if (normalizedMessage.startsWith('NEWS ') || normalizedMessage.startsWith('ACTUALITES ')) {
       const keyword = normalizedMessage.startsWith('NEWS') ? 'NEWS' : 'ACTUALITES';
       const ticker = extractTickerFromCommand(normalizedMessage, keyword);
