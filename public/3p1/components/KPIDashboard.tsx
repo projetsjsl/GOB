@@ -408,6 +408,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         await Promise.all(
           batch.map(async (profile) => {
             try {
+              if (!profile.id) return; // ✅ Guard clause pour éviter les erreurs 400
               const result = await listSnapshots(profile.id, 50);
               if (result.success && result.snapshots) {
                 const hasApproved = result.snapshots.some(
