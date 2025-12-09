@@ -296,9 +296,9 @@ Je peux t'aider sur 4 commandes spécifiques:
 📊 Analyses → ANALYSE [TICKER]
 💰 Prix → PRIX [TICKER]
 📰 News → NEWS [TICKER]
-🌍 Marché → TOP NEWS
+🌍 Marché → INDICES
 
-Ex: "ANALYSE AAPL" ou "NEWS TSLA"
+Ex: "ANALYSE AAPL" ou "INDICES"
 
 Pour arrêter: réponds STOP`;
 
@@ -693,7 +693,6 @@ Comment puis-je t'aider ? 🚀`;
 • "TSLA est suracheté ?"
 
 📰 ACTUALITÉS:
-• "Top 5 news" → Top 5 news du jour
 • "Actualités Apple"
 • "Pourquoi TSLA monte ?"
 • "Quoi de neuf en bourse ?"
@@ -738,145 +737,7 @@ Comment puis-je t'aider ? 🚀`;
     }
 
     // Commande TOP NEWS / Market Overview (revue complète des marchés)
-    if (normalizedMessage.includes('TOP 5') || normalizedMessage.includes('TOP5') || normalizedMessage === 'TOP NEWS' || normalizedMessage === 'TOP' || (normalizedMessage.includes('ACTUALIT') && normalizedMessage.includes('AUJOURD'))) {
-      console.log('[Chat API] Commande TOP NEWS (Market Overview) détectée');
-
-      try {
-        const baseUrl = process.env.VERCEL_URL
-          ? `https://${process.env.VERCEL_URL}`
-          : 'https://gob-projetsjsls-projects.vercel.app';
-
-        let capsuleText = `🌍 REVUE DES MARCHÉS\n${new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}\n\n`;
-
-        // 1. TENTATIVE PERPLEXITY (Source Principale)
-        console.log('[Chat API] TOP NEWS: Appel Perplexity (Source Principale)...');
-        try {
-          const perplexityNews = await fetchPerplexityMarketNews();
-          if (perplexityNews) {
-             // Si succès Perplexity, on utilise ça DIRECTEMENT sans rien d'autre
-             // Plus de header d'indices séparé pour éviter erreur 402 ou délai
-
-             capsuleText += perplexityNews.replace('📰 ACTUALITÉS DU JOUR\n', ''); // Remove duplicate header if present
-             
-             capsuleText += `\n📊 ANALYSE [TICKER] pour détails`;
-
-             await saveConversationTurn(conversation.id, message, capsuleText, {
-               type: 'command_market_overview',
-               channel: channel
-             });
-
-             return res.status(200).json({
-               success: true,
-               response: capsuleText,
-               metadata: { command: 'MARKET_OVERVIEW', source: 'perplexity' }
-             });
-          }
-        } catch (perplexError) {
-          console.error('[Chat API] Erreur Perplexity:', perplexError);
-          // Fallback continue below
-        }
-
-        console.log('[Chat API] TOP NEWS: Fallback FMP activé');
-        // 2. FALLBACK FMP (Si Perplexity échoue ou retourne null)
-        
-        // Section News par région (Fallback Logic Améliorée)
-        if (generalNewsRes && generalNewsRes.ok) {
-          const newsData = await generalNewsRes.json();
-          // Handle both array and wrapped response formats
-          const rawNews = Array.isArray(newsData) ? newsData : (newsData.data || newsData.news || []);
-          
-          if (rawNews.length > 0) {
-             // DEDUPLICATION STRICTE
-             const seenTitles = new Set();
-             const uniqueNews = [];
-             
-             for (const item of rawNews) {
-                // Créer une clé unique basée sur les 20 premiers chars du titre (ignore variations mineures)
-                const titleKey = (item.title || '').substring(0, 20).toLowerCase();
-                if (!seenTitles.has(titleKey)) {
-                   seenTitles.add(titleKey);
-                   uniqueNews.push(item);
-                }
-             }
-
-             // Catégoriser les news (Mutuellement exclusif pour éviter doublons d'affichage)
-             const usNews = [];
-             const caNews = [];
-             const euNews = [];
-             const otherNews = [];
-
-             uniqueNews.forEach(n => {
-                const symbol = n.symbol || '';
-                const title = (n.title || '').toLowerCase();
-                
-                if (symbol.includes('.TO') || title.includes('canada') || title.includes('six')) {
-                   caNews.push(n);
-                } else if (symbol.includes('.PA') || symbol.includes('.L') || title.includes('euro')) {
-                   euNews.push(n);
-                } else if (!symbol.includes('.') || title.includes('usa') || title.includes('fed') || title.includes('wall street')) {
-                   usNews.push(n);
-                } else {
-                   otherNews.push(n);
-                }
-             });
-
-             // Affichage structuré
-             if (usNews.length > 0) {
-               capsuleText += `🇺🇸 ÉTATS-UNIS\n`;
-               usNews.slice(0, 3).forEach(item => {
-                 capsuleText += `• ${item.title?.substring(0, 80)}... ${item.url ? `\n  🔗 ${item.url}` : ''}\n`;
-               });
-               capsuleText += `\n`;
-             }
-
-             if (caNews.length > 0) {
-               capsuleText += `🇨🇦 CANADA\n`;
-               caNews.slice(0, 2).forEach(item => {
-                 capsuleText += `• ${item.title?.substring(0, 80)}... ${item.url ? `\n  🔗 ${item.url}` : ''}\n`;
-               });
-               capsuleText += `\n`;
-             }
-
-             if (euNews.length > 0) {
-               capsuleText += `🇪🇺 EUROPE\n`;
-               euNews.slice(0, 2).forEach(item => {
-                 capsuleText += `• ${item.title?.substring(0, 80)}... ${item.url ? `\n  🔗 ${item.url}` : ''}\n`;
-               });
-               capsuleText += `\n`;
-             }
-             
-             // Si vraiment rien de spécifique, mettre le reste
-             if (usNews.length === 0 && caNews.length === 0 && euNews.length === 0 && otherNews.length > 0) {
-                capsuleText += `📰 ACTUALITÉS\n`;
-                otherNews.slice(0, 5).forEach(item => {
-                   capsuleText += `• ${item.title?.substring(0, 80)}... ${item.url ? `\n  🔗 ${item.url}` : ''}\n`;
-                });
-             }
-          } else {
-             capsuleText += `⚠️ Actualités indisponibles momentanément (FMP vide)\n\n`;
-          }
-        } else {
-           capsuleText += `⚠️ Actualités indisponibles momentanément (Erreur API)\n\n`;
-        }
-
-        capsuleText += `\n📊 ANALYSE [TICKER] pour détails`;
-
-        await saveConversationTurn(conversation.id, message, capsuleText, {
-          type: 'command_market_overview',
-          channel: channel
-        });
-
-        return res.status(200).json({
-          success: true,
-          response: capsuleText,
-          metadata: { command: 'MARKET_OVERVIEW', source: 'fmp_fallback' }
-        });
-
-      } catch (error) {
-        console.error('[Chat API] Erreur Market Overview:', error.message);
-        // Fallback: laisser Emma gérer normalement
-      }
-    }
+    // REMOVED: The previous TOP NEWS handler was removed as per user instruction.
 
     // 5.6. DÉTECTION MOTS-CLÉS MAJUSCULES (Raccourcis directs - ultra-rapide)
     // Ces mots-clés forcent une intention spécifique sans analyse NLP
@@ -1010,7 +871,12 @@ Comment puis-je t'aider ? 🚀`;
 
     // ACTUALITÉS
     else if (normalizedMessage === 'TOP NEWS' || normalizedMessage === 'TOP' || normalizedMessage.startsWith('TOP NEWS ')) {
-       forcedIntent = { intent: 'market_overview', tickers: [], confidence: 1.0, method: 'keyword_shortcut' };
+      // COMMANDE SUPPRIMÉE SUR DEMANDE UTILISATEUR (RISQUÉE)
+      return res.status(200).json({
+        success: true,
+        response: "⚠️ La commande 'TOP NEWS' a été désactivée.\nUtilisez plutôt 'Indices' ou 'Actualités [Ticker]'.",
+        metadata: { command: 'TOP_NEWS_DISABLED' }
+      });
     }
     else if (normalizedMessage.startsWith('NEWS ') || normalizedMessage.startsWith('ACTUALITES ')) {
       const keyword = normalizedMessage.startsWith('NEWS') ? 'NEWS' : 'ACTUALITES';
