@@ -61,10 +61,11 @@ RÈGLES STRICTES:
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'llama-3.1-sonar-small-128k-online',
+        model: 'sonar-pro',
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 1000,
-        temperature: 0.1
+        temperature: 0.1,
+        search_recency_filter: 'day'
       })
     });
 
@@ -753,24 +754,7 @@ Comment puis-je t'aider ? 🚀`;
           const perplexityNews = await fetchPerplexityMarketNews();
           if (perplexityNews) {
              // Si succès Perplexity, on utilise ça DIRECTEMENT sans rien d'autre
-             // On ajoute juste les indices en haut si on les a, mais le corps vient de Perplexity
-             
-             // Fetch Indices only (lightweight) for header
-             try {
-                const indicesRes = await fetch(`${baseUrl}/api/fmp?endpoint=quote&symbol=^GSPC,^DJI,^IXIC,^GSPTSE`);
-                if (indicesRes.ok) {
-                   const indicesData = await indicesRes.json();
-                   if (Array.isArray(indicesData) && indicesData.length > 0) {
-                      capsuleText += `📈 INDICES CLÉS\n`;
-                      indicesData.forEach(idx => {
-                        const change = idx.changesPercentage || idx.change || 0;
-                        const arrow = change >= 0 ? '🟢' : '🔴';
-                        capsuleText += `${arrow} ${idx.name || idx.symbol}: ${idx.price?.toFixed(2) || 'N/A'} (${change >= 0 ? '+' : ''}${change.toFixed(2)}%)\n`;
-                      });
-                      capsuleText += `\n`;
-                   }
-                }
-             } catch(e) { console.log('Indices header failed, ignoring'); }
+             // Plus de header d'indices séparé pour éviter erreur 402 ou délai
 
              capsuleText += perplexityNews.replace('📰 ACTUALITÉS DU JOUR\n', ''); // Remove duplicate header if present
              
@@ -794,29 +778,9 @@ Comment puis-je t'aider ? 🚀`;
 
         console.log('[Chat API] TOP NEWS: Fallback FMP activé');
         // 2. FALLBACK FMP (Si Perplexity échoue ou retourne null)
-        const [generalNewsRes, indicesResFallback] = await Promise.all([
-          fetch(`${baseUrl}/api/fmp?endpoint=news&limit=15`, { headers: { 'Content-Type': 'application/json' } }), // Increased limit for better filtering
-          fetch(`${baseUrl}/api/fmp?endpoint=quote&symbol=^GSPC,^DJI,^IXIC,^GSPTSE`, { headers: { 'Content-Type': 'application/json' } }).catch(() => null)
-        ]);
         
-        // Section Indices (si disponible)
-        if (indicesResFallback && indicesResFallback.ok) {
-          try {
-            const indicesData = await indicesResFallback.json();
-            if (Array.isArray(indicesData) && indicesData.length > 0) {
-              capsuleText += `📈 INDICES\n`;
-              indicesData.forEach(idx => {
-                const change = idx.changesPercentage || idx.change || 0;
-                const arrow = change >= 0 ? '🟢' : '🔴';
-                capsuleText += `${arrow} ${idx.name || idx.symbol}: ${idx.price?.toFixed(2) || 'N/A'} (${change >= 0 ? '+' : ''}${change.toFixed(2)}%)\n`;
-              });
-              capsuleText += `\n`;
-            }
-          } catch (e) { console.warn('Indices parse error:', e.message); }
-        }
-
         // Section News par région (Fallback Logic Améliorée)
-        if (generalNewsRes.ok) {
+        if (generalNewsRes && generalNewsRes.ok) {
           const newsData = await generalNewsRes.json();
           // Handle both array and wrapped response formats
           const rawNews = Array.isArray(newsData) ? newsData : (newsData.data || newsData.news || []);
