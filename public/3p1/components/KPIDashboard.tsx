@@ -398,38 +398,42 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       }
       
       setIsLoadingApprovedVersions(true);
-      const approvedSet = new Set<string>();
-      
-      // Traiter par batch de 10 pour éviter de surcharger l'API
-      const batchSize = 10;
-      for (let i = 0; i < profiles.length; i += batchSize) {
-        const batch = profiles.slice(i, i + batchSize);
-        
-        await Promise.all(
-          batch.map(async (profile) => {
-            try {
-              if (!profile.id) return; // ✅ Guard clause pour éviter les erreurs 400
-              const result = await listSnapshots(profile.id, 50);
-              if (result.success && result.snapshots) {
-                const hasApproved = result.snapshots.some(
-                  (snapshot: any) => snapshot.is_approved === true
-                );
-                if (hasApproved) {
-                  approvedSet.add(profile.id);
-                }
-              }
-            } catch (error) {
-              // Erreur silencieuse pour ne pas polluer la console
-              // Les versions approuvées sont une fonctionnalité bonus
+  const approvedSet = new Set<string>();
+  
+  // Traiter par batch de 5 pour éviter de surcharger l'API (réduit de 10)
+  const batchSize = 5;
+  let batchCount = 0;
+  for (let i = 0; i < profiles.length; i += batchSize) {
+    const batch = profiles.slice(i, i + batchSize);
+    batchCount++;
+    
+    await Promise.all(
+      batch.map(async (profile) => {
+        try {
+          if (!profile.id) return; // ✅ Guard clause pour éviter les erreurs 400
+          const result = await listSnapshots(profile.id, 50);
+          if (result.success && result.snapshots) {
+            const hasApproved = result.snapshots.some(
+              (snapshot: any) => snapshot.is_approved === true
+            );
+            if (hasApproved) {
+              approvedSet.add(profile.id);
             }
-          })
-        );
-        
-        // Petit délai entre les batches pour éviter de surcharger l'API
-        if (i + batchSize < profiles.length) {
-          await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        } catch (error) {
+          // Erreur silencieuse pour ne pas polluer la console
+          // Les versions approuvées sont une fonctionnalité bonus
         }
-      }
+      })
+    );
+    
+    // Délai entre les batches pour éviter de surcharger l'API (augmenté à 500ms)
+    if (i + batchSize < profiles.length) {
+      // Pause plus longue tous les 10 batches pour permettre à la base de récupérer
+      const delay = (batchCount % 10 === 0) ? 2000 : 500;
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
       
       // Mettre à jour le cache
       approvedVersionsCacheRef.current = {
