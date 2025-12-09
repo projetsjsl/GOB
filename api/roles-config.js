@@ -375,21 +375,41 @@ export default async function handler(req, res) {
                 });
             }
 
-            const { data: permissions, error } = await db
-                .from('user_permissions')
-                .select('*')
-                .eq('username', username.toLowerCase().trim())
-                .single();
+            // Wrap in try-catch to handle missing table or other DB errors gracefully
+            try {
+                const { data: permissions, error } = await db
+                    .from('user_permissions')
+                    .select('*')
+                    .eq('username', username.toLowerCase().trim())
+                    .single();
 
-            if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-                throw error;
+                if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+                    // Log error but return graceful fallback
+                    console.warn('[roles-config] DB error fetching permissions:', error.message);
+                    return res.status(200).json({
+                        success: true,
+                        permissions: null,
+                        fallback: true,
+                        message: 'Could not fetch permissions, using defaults'
+                    });
+                }
+
+                return res.status(200).json({
+                    success: true,
+                    permissions: permissions || null
+                });
+            } catch (dbError) {
+                // Any DB error - return graceful fallback so dashboard loads
+                console.warn('[roles-config] Exception fetching permissions:', dbError.message);
+                return res.status(200).json({
+                    success: true,
+                    permissions: null,
+                    fallback: true,
+                    message: 'Database error, using default permissions'
+                });
             }
-
-            return res.status(200).json({
-                success: true,
-                permissions: permissions || null
-            });
         }
+
 
         // Action non reconnue
         return res.status(400).json({
