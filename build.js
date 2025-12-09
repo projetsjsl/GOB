@@ -83,7 +83,7 @@ async function build() {
       return;
     }
 
-    // Fonction récursive pour copier en excluant node_modules
+    // Fonction récursive pour copier en excluant node_modules et fichiers source
     async function copyDir(src, dest) {
       await mkdir(dest, { recursive: true });
       const entries = await readdir(src, { withFileTypes: true });
@@ -92,14 +92,30 @@ async function build() {
         const srcPath = join(src, entry.name);
         const destPath = join(dest, entry.name);
 
-        // Exclure node_modules
-        if (entry.name === 'node_modules') {
+        // Exclure node_modules, package.json, et fichiers de dev
+        if (entry.name === 'node_modules' ||
+            entry.name === 'package.json' ||
+            entry.name === 'package-lock.json' ||
+            entry.name === 'tsconfig.json' ||
+            entry.name === 'vite.config.ts' ||
+            entry.name === 'postcss.config.js' ||
+            entry.name === 'tailwind.config.js') {
           continue;
         }
 
+        // Exclure les dossiers source TypeScript (mais garder dist)
         if (entry.isDirectory()) {
+          // Pour 3p1, on ne copie QUE le dossier dist si on est dans public/3p1
+          if (src.endsWith('3p1') && entry.name !== 'dist') {
+            continue;
+          }
           await copyDir(srcPath, destPath);
         } else {
+          // Exclure les fichiers source TypeScript/React
+          if (entry.name.endsWith('.tsx') ||
+              entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts')) {
+            continue;
+          }
           await cp(srcPath, destPath);
         }
       }
