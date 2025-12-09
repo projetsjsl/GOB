@@ -834,23 +834,28 @@ export default function App() {
 
     const performSync = async (saveCurrentVersion: boolean) => {
         try {
-            // Save current version if requested
+            // Save current version if requested AND we have valid data
             if (saveCurrentVersion) {
-                console.log('💾 Saving current version before sync...');
-                const saveResult = await saveSnapshot(
-                    activeId,
-                    data,
-                    assumptions,
-                    info,
-                    `Before API sync - ${new Date().toLocaleString()}`,
-                    false, // Not current (we're about to replace it)
-                    false  // Not auto-fetched
-                );
+                // Don't save empty state
+                if (data.length > 0 && info.symbol) {
+                    console.log('💾 Saving current version before sync...');
+                    const saveResult = await saveSnapshot(
+                        activeId,
+                        data,
+                        assumptions,
+                        info,
+                        `Before API sync - ${new Date().toLocaleString()}`,
+                        false, // Not current (we're about to replace it)
+                        false  // Not auto-fetched
+                    );
 
-                if (!saveResult.success) {
-                    console.error('Failed to save snapshot:', saveResult.error);
-                    showNotification(`Erreur lors de la sauvegarde: ${saveResult.error}`, 'error');
-                    // Continue anyway?
+                    if (!saveResult.success) {
+                        console.error('Failed to save snapshot:', saveResult.error);
+                        showNotification(`Erreur lors de la sauvegarde: ${saveResult.error}`, 'error');
+                        // Continue anyway?
+                    }
+                } else {
+                    console.log('⚠️ Skipping backup save: Current state is empty or invalid');
                 }
             }
 
