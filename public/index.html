@@ -2,48 +2,55 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="refresh" content="0; url=/login.html" />
+    <title>GOB Dashboard - Redirection...</title>
+    
     <!-- Favicon JLab -->
     <link rel="icon" type="image/png" href="/jlab.png" />
     <link rel="apple-touch-icon" href="/jlab.png" />
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#1e293b" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>GOB Dashboard - Terminal Financier</title>
-
-    <!-- Iconoir - Beautiful open source icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
     
-    <!-- CDN Globals (chargés AVANT le code Vite) -->
-    <!-- Ces bibliothèques restent en CDN pour éviter le refactoring massif -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/recharts@2.10.3/dist/Recharts.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Fallback CDN si les principaux échouent -->
-    <script>
-        // Vérifier Chart.js
-        if (typeof Chart === 'undefined') {
-            console.warn('⚠️ CDN Chart.js principal échoué, chargement fallback...');
-            document.write('<script src="https://unpkg.com/chart.js"><\/script>');
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: system-ui, -apple-system, sans-serif;
+            color: #fff;
         }
-        // Vérifier Recharts
-        if (typeof Recharts === 'undefined' && typeof window !== 'undefined' && !window.Recharts) {
-            console.warn('⚠️ CDN Recharts principal échoué, chargement fallback...');
-            document.write('<script src="https://unpkg.com/recharts@2.10.3/dist/Recharts.js"><\/script>');
+        .loader {
+            text-align: center;
         }
-    </script>
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top: 3px solid #10b981;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body class="min-h-screen">
-    <div id="root"></div>
-
-    <!-- Auth Guard (gestion authentification) -->
-    <script src="/auth-guard.js"></script>
-
-    <!-- Module Vite - React/TypeScript compilé -->
-    <script type="module" src="/src/main.tsx"></script>
+<body>
+    <div class="loader">
+        <div class="spinner"></div>
+        <p>Redirection vers l'authentification...</p>
+    </div>
+    
+    <script>
+        // Fallback JavaScript redirect if meta refresh fails
+        setTimeout(() => {
+            window.location.href = '/login.html';
+        }, 100);
+    </script>
 </body>
 </html>
