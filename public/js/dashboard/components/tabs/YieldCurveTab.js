@@ -224,6 +224,16 @@ const YieldCurveTab = () => {
 
     return (
         <div className="space-y-6">
+            {/* Navigation Secondaire */}
+            {window.SecondaryNavBar && (
+                <window.SecondaryNavBar 
+                    activeTab={activeTab} 
+                    onTabChange={setActiveTab} 
+                    isDarkMode={isDarkMode} 
+                />
+            )}
+
+
             {/* En-tête avec contrôles */}
             <div className={`p-6 rounded-lg transition-colors duration-300 ${
                 darkMode ? 'bg-gray-800' : 'bg-white'

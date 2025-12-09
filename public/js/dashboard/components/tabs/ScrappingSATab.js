@@ -20,6 +20,16 @@ const ScrappingSATab = () => {
 
     return (
                 <div className="space-y-6">
+            {/* Navigation Secondaire */}
+            {window.SecondaryNavBar && (
+                <window.SecondaryNavBar 
+                    activeTab={activeTab} 
+                    onTabChange={setActiveTab} 
+                    isDarkMode={isDarkMode} 
+                />
+            )}
+
+
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'

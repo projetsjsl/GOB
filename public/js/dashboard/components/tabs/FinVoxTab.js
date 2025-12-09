@@ -23,6 +23,16 @@ const FinVoxTab = ({ isDarkMode }) => {
 
     return (
         <div className="h-full w-full relative" style={{ minHeight: 'calc(100vh - 140px)' }}>
+            {/* Navigation Secondaire */}
+            {window.SecondaryNavBar && (
+                <window.SecondaryNavBar 
+                    activeTab={activeTab} 
+                    onTabChange={setActiveTab} 
+                    isDarkMode={isDarkMode} 
+                />
+            )}
+
+
             {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50 z-10">
                     <div className="text-center">

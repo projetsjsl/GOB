@@ -430,6 +430,16 @@ const DansWatchlistTab = () => {
 
     return (
         <div className="space-y-6">
+            {/* Navigation Secondaire */}
+            {window.SecondaryNavBar && (
+                <window.SecondaryNavBar 
+                    activeTab={activeTab} 
+                    onTabChange={setActiveTab} 
+                    isDarkMode={isDarkMode} 
+                />
+            )}
+
+
             {/* TradingView Ticker Tape - VAGUE 2: Quick Wins */}
             {watchlistTickers.length > 0 && (
                 <div className={`rounded-lg overflow-hidden border transition-colors duration-300 ${

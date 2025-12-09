@@ -601,6 +601,16 @@ const InvestingCalendarTab = () => {
 
     return (
         <div className="space-y-3 md:space-y-6">
+            {/* Navigation Secondaire */}
+            {window.SecondaryNavBar && (
+                <window.SecondaryNavBar 
+                    activeTab={activeTab} 
+                    onTabChange={setActiveTab} 
+                    isDarkMode={isDarkMode} 
+                />
+            )}
+
+
             {/* En-tête principal TESTS JS */}
             <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                 isDarkMode ? 'bg-gradient-to-r from-blue-900 to-purple-900' : 'bg-gradient-to-r from-blue-100 to-purple-100'

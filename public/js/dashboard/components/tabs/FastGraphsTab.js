@@ -87,6 +87,16 @@ const FastGraphsTab = ({ isDarkMode = true }) => {
 
     return (
         <div className={`p-6 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+            {/* Navigation Secondaire */}
+            {window.SecondaryNavBar && (
+                <window.SecondaryNavBar 
+                    activeTab={activeTab} 
+                    onTabChange={setActiveTab} 
+                    isDarkMode={isDarkMode} 
+                />
+            )}
+
+
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">

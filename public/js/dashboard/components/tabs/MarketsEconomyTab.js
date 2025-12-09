@@ -252,6 +252,16 @@ const MarketsEconomyTab = () => {
 
     return (
         <div className="space-y-6">
+            {/* Navigation Secondaire */}
+            {window.SecondaryNavBar && (
+                <window.SecondaryNavBar 
+                    activeTab={activeTab} 
+                    onTabChange={setActiveTab} 
+                    isDarkMode={isDarkMode} 
+                />
+            )}
+
+
             {/* Header */}
             <div className="space-y-4">
                 <div className="flex justify-between items-center">

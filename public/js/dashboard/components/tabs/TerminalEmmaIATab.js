@@ -39,6 +39,16 @@ const TerminalEmmaIATab = ({ isDarkMode }) => {
                 isolation: 'isolate'
             }}
         >
+            {/* Navigation Secondaire */}
+            {window.SecondaryNavBar && (
+                <window.SecondaryNavBar 
+                    activeTab={activeTab} 
+                    onTabChange={setActiveTab} 
+                    isDarkMode={isDarkMode} 
+                />
+            )}
+
+
             {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50 z-10">
                     <div className="text-center">

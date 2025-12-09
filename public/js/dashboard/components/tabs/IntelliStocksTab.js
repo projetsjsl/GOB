@@ -1347,6 +1347,16 @@ const IntelliStocksTab = () => {
         return (
             <div className={`min-h-screen p-2 flex items-center justify-center transition-colors duration-300 ${isDarkMode ? 'bg-neutral-950 text-gray-100' : 'bg-gray-50 text-gray-900'
                 }`}>
+            {/* Navigation Secondaire */}
+            {window.SecondaryNavBar && (
+                <window.SecondaryNavBar 
+                    activeTab={activeTab} 
+                    onTabChange={setActiveTab} 
+                    isDarkMode={isDarkMode} 
+                />
+            )}
+
+
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500 mx-auto mb-4"></div>
                     <div className="text-sm text-gray-400">Chargement des données…</div>

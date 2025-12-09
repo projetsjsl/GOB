@@ -485,6 +485,13 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
     // RENDU DU COMPOSANT
     // ============================================
     return React.createElement('div', { className: 'space-y-6 p-6' },
+        // Navigation Secondaire
+        window.SecondaryNavBar && React.createElement(window.SecondaryNavBar, {
+            activeTab: 'chatgpt-group',
+            onTabChange: () => {}, // ChatGPTGroupTab doesn't have setActiveTab prop, so use empty function
+            isDarkMode: isDarkMode
+        }),
+
         // Sélecteur de mode (Partagé vs Intégré)
         React.createElement('div', { 
             className: `p-4 rounded-xl ${themeStyles.surface} border ${themeStyles.border} shadow` 
