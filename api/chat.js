@@ -215,8 +215,19 @@ export default async function handler(req, res) {
           });
           console.log(`[Chat API] Nom enregistré: ${userName}`);
 
-          // Réponse de bienvenue (Commandes seulement)
-          const welcomeResponse = `Enchanté ${userName} ! 👋\n\nVoici ce que je peux faire :\n\n📊 ANALYSE [TICKER]\n💰 PRIX [TICKER]\n📰 NEWS [TICKER]\n🌍 TOP NEWS (Marché)\n\nEx: "Analyse AAPL" ou "News TSLA"`;
+          // Réponse de bienvenue (Avec commandes explicites)
+          const welcomeResponse = `Enchanté ${userName} ! 👋
+
+Je suis Emma, ton assistante IA financière propulsée par JSLAI 🚀
+
+📊 Analyses → ANALYSE [TICKER]
+💰 Prix → PRIX [TICKER]
+📰 News → NEWS [TICKER]
+🌍 Marché → TOP NEWS
+
+Ex: "ANALYSE AAPL" ou "NEWS TSLA"
+
+Pour arrêter: réponds STOP`;
 
           // Sauvegarder dans la conversation
           await saveConversationTurn(conversation.id, message, welcomeResponse, {
