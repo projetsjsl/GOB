@@ -703,7 +703,11 @@ Comment puis-je t'aider ? 🚀`;
         // Section News par région
         if (generalNewsRes.ok) {
           const newsData = await generalNewsRes.json();
-          const news = Array.isArray(newsData) ? newsData : (newsData.data || []);
+          console.log('[Chat API] Market Overview - Raw news response keys:', Object.keys(newsData || {}));
+          
+          // Handle both array and wrapped response formats
+          const news = Array.isArray(newsData) ? newsData : (newsData.data || newsData.news || []);
+          console.log(`[Chat API] Market Overview - Parsed ${news.length} news items`);
 
           if (news.length > 0) {
             // Catégoriser les news
@@ -738,12 +742,29 @@ Comment puis-je t'aider ? 🚀`;
               capsuleText += `\n`;
             }
 
+            // If no regional news matched, show all news under general section
+            if (usNews.length === 0 && caNews.length === 0 && euNews.length === 0) {
+              capsuleText += `📰 ACTUALITÉS\n`;
+              news.slice(0, 5).forEach(item => {
+                capsuleText += `• ${item.title?.substring(0, 80) || 'N/A'}${item.title?.length > 80 ? '...' : ''}\n`;
+              });
+              capsuleText += `\n`;
+            }
+
             // Headlines économiques générales
             capsuleText += `💼 CE QUI SE JASE\n`;
             news.slice(0, 3).forEach(item => {
               capsuleText += `• ${item.title?.substring(0, 70) || 'N/A'}${item.title?.length > 70 ? '...' : ''}\n`;
             });
+          } else {
+            // Fallback when FMP returns empty
+            capsuleText += `📰 ACTUALITÉS\n`;
+            capsuleText += `• Les marchés sont calmes aujourd'hui\n`;
+            capsuleText += `• Utilisez ANALYSE [TICKER] pour des détails\n\n`;
           }
+        } else {
+          console.error('[Chat API] Market Overview - News API failed:', generalNewsRes.status);
+          capsuleText += `⚠️ Actualités indisponibles momentanément\n\n`;
         }
 
         capsuleText += `\n📊 ANALYSE [TICKER] pour détails`;

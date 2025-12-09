@@ -162,11 +162,15 @@ export function detectOutlierMetrics(
     };
   }
 
-  // Détecter les outliers : prix à plus de 2 écarts-types de la médiane
-  const threshold = 2 * stdDev;
+  // Détecter les outliers avec deux méthodes combinées:
+  // 1. Prix à plus de 1.5 écarts-types de la médiane (statistique)
+  // 2. Prix à plus de 50% d'écart de la médiane (pourcentage)
+  const stdDevThreshold = 1.5 * stdDev;
+  const percentThreshold = median * 0.5; // 50% de la médiane
+  const threshold = Math.min(stdDevThreshold, percentThreshold); // Utiliser le plus strict
   const detectedOutliers: string[] = [];
 
-  // Vérifier chaque métrique
+  // Vérifier chaque métrique - exclure si au-delà du seuil
   const excludeEPS = assumptions.excludeEPS || (targets.eps > 0 && Math.abs(targets.eps - median) > threshold);
   const excludeCF = assumptions.excludeCF || (targets.cf > 0 && Math.abs(targets.cf - median) > threshold);
   const excludeBV = assumptions.excludeBV || (targets.bv > 0 && Math.abs(targets.bv - median) > threshold);
