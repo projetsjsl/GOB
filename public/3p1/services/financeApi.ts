@@ -1,16 +1,22 @@
+
 import { AnnualData, CompanyInfo } from '../types';
 
 /**
  * Fetch company data via backend API proxy
  * No API keys needed on client side
  */
-export const fetchCompanyData = async (symbol: string): Promise<{
-  data: AnnualData[];
-  info: Partial<CompanyInfo>;
-  currentPrice: number;
-  financials?: any;
-  analysisData?: any;
-}> => {
+export const fetchCompanyData = async (symbol: string): Promise<any> => {
+    if (!symbol || symbol.trim() === '') {
+        console.warn('⚠️ fetchCompanyData called with empty symbol');
+        // Return empty structure instead of throwing 500
+        return {
+            data: [],
+            info: { symbol: '', name: 'Invalid Symbol' },
+            currentPrice: 0,
+            financials: [],
+            analysisData: null
+        };
+    }
   const cleanSymbol = symbol.toUpperCase();
 
   try {

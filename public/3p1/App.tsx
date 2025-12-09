@@ -484,8 +484,13 @@ export default function App() {
 
                             // Traiter chaque résultat
                             await Promise.allSettled(
+
                                 batch.map(async (supabaseTicker) => {
+                                    if (!supabaseTicker.ticker) return; // ✅ Guard clause: Skip invalid tickers
+                                    
                                     const symbol = supabaseTicker.ticker.toUpperCase();
+                                    if (!symbol || symbol.trim() === '') return; // ✅ Double check
+                                    
                                     const supabaseResult = supabaseResults[symbol];
                                     
                                     try {
