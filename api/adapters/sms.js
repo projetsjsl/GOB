@@ -485,9 +485,17 @@ async function generateSimulatedResponse(message, phoneNumber) {
         }
     }
     
-    // Ajouter emoji Emma au début si pas déjà présent
+    // Ajouter emoji Emma au début de façon intelligente
+    // Éviter le "Double Salut" (ex: "👩🏻 Salut! Salut Daniel")
+    const greetingRegex = /^(salut|bonjour|hello|hi|hey|coucou|bonsoir)/i;
+    
     if (!response.startsWith('👩🏻') && !response.startsWith('👋') && !response.startsWith('📊') && !response.startsWith('💰') && !response.startsWith('📈') && !response.startsWith('📰') && !response.startsWith('🆘') && !response.startsWith('💡') && !response.startsWith('🌍')) {
-      response = `👩🏻 ${response}`;
+      // Si la réponse commence déjà par une salutation, on insère l'emoji AVANT
+      if (greetingRegex.test(response)) {
+         response = `👩🏻 ${response}`;
+      } else {
+         response = `👩🏻 ${response}`;
+      }
     }
     
     return response;

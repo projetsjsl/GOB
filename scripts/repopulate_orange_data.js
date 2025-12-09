@@ -259,8 +259,8 @@ async function main() {
             failCount++;
         }
         
-        // Brief pause to be nice to APIs
-        await new Promise(r => setTimeout(r, 200));
+        // Brief pause to be nice to APIs (5 seconds to avoid 429)
+        await new Promise(r => setTimeout(r, 5000));
     }
 
     console.log('\n--- SUMMARY ---');

@@ -312,7 +312,14 @@ export default async function handler(req, res) {
 
         // --- PROCESS DIVIDENDS ---
         let dividendsByFiscalYear = {};
-
+        
+        if (dividendRes.ok) {
+            const dividendData = await dividendRes.json();
+            if (dividendData && dividendData.historical) {
+                dividendData.historical.forEach(div => {
+                    const mkDate = new Date(div.date);
+                    const fiscalYear = mkDate.getFullYear();
+                    
                     if (!dividendsByFiscalYear[fiscalYear]) {
                         dividendsByFiscalYear[fiscalYear] = 0;
                     }
@@ -344,9 +351,9 @@ export default async function handler(req, res) {
 
         // --- PROCESS QUOTE ---
         let currentPrice = profile.price || 0;
-        if (quoteRes && quoteRes.ok) {
+        if (quoteResRaw && quoteResRaw.ok) {
             try {
-                const quoteData = await quoteRes.json();
+                const quoteData = await quoteResRaw.json();
                 if (quoteData.c) currentPrice = quoteData.c;
             } catch (e) {
                 console.warn('Finnhub quote parse error:', e.message);
@@ -388,6 +395,25 @@ export default async function handler(req, res) {
                 isEstimate: false
             };
         }).sort((a, b) => a.year - b.year);
+
+        // --- PROCESS FINANCIAL STATEMENTS & ANALYSIS DATA ---
+        const getJsonSafe = async (res) => {
+            if (!res || !res.ok) return [];
+            try { return await res.json(); } catch (e) { return []; }
+        };
+
+        const incomeAnnual = await getJsonSafe(incomeAnnualRes);
+        const balanceAnnual = await getJsonSafe(balanceAnnualRes);
+        const cashAnnual = await getJsonSafe(cashAnnualRes);
+        
+        const incomeQuarterly = await getJsonSafe(incomeQuarterlyRes);
+        const balanceQuarterly = await getJsonSafe(balanceQuarterlyRes);
+        const cashQuarterly = await getJsonSafe(cashQuarterlyRes);
+        
+        const analystEstimates = await getJsonSafe(analystRes);
+        const insiderTrading = await getJsonSafe(insiderRes);
+        const institutionalHolders = await getJsonSafe(instHolderRes);
+        const earningsSurprises = await getJsonSafe(surprisesRes);
 
         // 6a. Fetch Beta, ROE, ROA from Key Metrics (most recent)
         let beta = null;
