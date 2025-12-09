@@ -137,13 +137,23 @@ export default async function handler(req, res) {
     };
 
     try {
-        // 0. Premium: Utiliser FMP Search pour résoudre automatiquement le symbole
-        let resolvedSymbol = await searchSymbol(cleanSymbol);
-        let searchSymbolToTry = resolvedSymbol || cleanSymbol;
-
-        // 1. Essayer d'abord le symbole résolu par Search (ou original)
-        let profileResult = await tryFetchProfile(searchSymbolToTry);
-        let usedSymbol = searchSymbolToTry;
+        // 0. OPTIMIZATION: Skip FMP Search for simple symbols to reduce API calls during bulk sync
+        // Simple symbols (no dots, dashes, or special chars) should work directly with profile lookup
+        const isSimpleSymbol = /^[A-Z]{1,5}$/.test(cleanSymbol);
+        
+        let profileResult = null;
+        let usedSymbol = cleanSymbol;
+        
+        if (isSimpleSymbol) {
+            // 1a. For simple symbols, try direct profile lookup first (faster, less API calls)
+            profileResult = await tryFetchProfile(cleanSymbol);
+        } else {
+            // 1b. For complex symbols (like .TO, .B, etc.), use Search API to resolve
+            let resolvedSymbol = await searchSymbol(cleanSymbol);
+            let searchSymbolToTry = resolvedSymbol || cleanSymbol;
+            profileResult = await tryFetchProfile(searchSymbolToTry);
+            usedSymbol = searchSymbolToTry;
+        }
 
         // 2. Si échec et qu'on a des variantes, les essayer
         if (!profileResult && symbolVariants[cleanSymbol]) {
@@ -275,29 +285,29 @@ export default async function handler(req, res) {
             analystEstimatesPromise, insiderTradingPromise, institutionalHoldersPromise, earningsSurprisesPromise
         ]);
 
-        // --- PROCESS KEY METRICS ---
-        if (!metricsRes.ok) {
-            const errorText = await metricsRes.text();
-            console.error(`❌ FMP Key Metrics error for ${usedSymbol}: ${metricsRes.status} - ${errorText.substring(0, 200)}`);
-            throw new Error(`FMP Metrics error: ${metricsRes.status} ${metricsRes.statusText}`);
-        }
-        let metricsData = await metricsRes.json();
-        
-        // Check for error object
-        if (metricsData && typeof metricsData === 'object' && !Array.isArray(metricsData)) {
-            if (metricsData['Error Message']) {
-                console.error(`❌ FMP Key Metrics Error: ${metricsData['Error Message']}`);
-                throw new Error(`FMP Key Metrics error: ${metricsData['Error Message']}`);
+        // --- PROCESS KEY METRICS (non-fatal - continue with empty if fails) ---
+        let metricsData = [];
+        try {
+            if (metricsRes.ok) {
+                const metricsJson = await metricsRes.json();
+                
+                // Check for error object
+                if (metricsJson && typeof metricsJson === 'object' && !Array.isArray(metricsJson)) {
+                    if (metricsJson['Error Message']) {
+                        console.warn(`⚠️ FMP Key Metrics Error (non-fatal): ${metricsJson['Error Message']}`);
+                    }
+                } else if (Array.isArray(metricsJson)) {
+                    metricsData = metricsJson;
+                }
+            } else {
+                console.warn(`⚠️ FMP Key Metrics HTTP ${metricsRes.status} for ${usedSymbol} - continuing with empty data`);
             }
-        }
-        
-        if (!Array.isArray(metricsData)) {
-            console.error(`❌ FMP Key Metrics returned invalid data type for ${usedSymbol}`);
-            throw new Error(`FMP Key Metrics returned invalid data`);
+        } catch (metricsError) {
+            console.warn(`⚠️ FMP Key Metrics parse error for ${usedSymbol}: ${metricsError.message}`);
         }
         
         if (metricsData.length === 0) {
-            console.warn(`⚠️ FMP Key Metrics returned empty array for ${usedSymbol} - continuing with empty data`);
+            console.warn(`⚠️ No Key Metrics data for ${usedSymbol} - profile data will still be returned`);
         }
 
         // Deduplicate metrics
