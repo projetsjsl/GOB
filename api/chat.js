@@ -324,11 +324,7 @@ Pour arrêter: réponds STOP`;
         const messageUpper = message.trim().toUpperCase();
         const financialKeywords = [
           'ANALYSE', 'ANALYZE', 'PRIX', 'PRICE', 'NEWS', 'ACTUALITES', 'ACTUALITÉS',
-          'RSI', 'MACD', 'FONDAMENTAUX', 'FUNDAMENTALS', 'TECHNIQUE', 'TECHNICAL',
-          'COMPARER', 'COMPARE', 'RATIOS', 'CROISSANCE', 'GROWTH', 'MARCHE', 'MARKET',
-          'INDICES', 'INDICES', 'SECTEUR', 'SECTOR', 'ACHETER', 'BUY', 'VENDRE', 'SELL',
-          'LISTE', 'LIST', 'AJOUTER', 'ADD', 'RETIRER', 'REMOVE', 'TOP 5', 'SKILLS',
-          'RESULTATS', 'EARNINGS', 'CALENDRIER', 'CALENDAR', 'INFLATION', 'FED', 'TAUX'
+          'ACHETER', 'BUY', 'VENDRE', 'SELL', 'SKILLS', 'AIDE', 'HELP'
         ];
         
         let isFinancialRequest = financialKeywords.some(keyword => 
@@ -387,9 +383,8 @@ Pour arrêter: réponds STOP`;
         'ANALYSE', 'ANALYZE', 
         'PRIX', 'PRICE', 'COURS', 'QUOTE',
         'NEWS', 'ACTUALITES', 'ACTUALITÉS', 'INFOS',
-        'TOP', // Pour TOP NEWS
         'SKILLS', 'AIDE', 'HELP', 'COMMANDES',
-        'TEST'
+        'SALUT', 'BONJOUR', 'HELLO', 'HI', 'COUCOU', 'TEST'
       ]);
       
       const startsWithCommand = allowedCommands.some(cmd => messageUpper.startsWith(cmd));
@@ -398,7 +393,7 @@ Pour arrêter: réponds STOP`;
 
       if (!startsWithCommand && !isTickerOnly && !isShortReply) {
         console.log(`[Chat API] 🛡️ SMS Guardrail: Message rejeté "${message}"`);
-        const guardrailResponse = `⚠️ Commande non reconnue.\n\nPour garantir la qualité, le SMS est limité aux fonctions clés :\n\n📊 ANALYSE [TICKER]\n💰 PRIX [TICKER]\n📰 NEWS [TICKER]\n🌍 TOP NEWS (Marchés)\n\nEx: "Analyse MSFT"`;
+        const guardrailResponse = `⚠️ Commande non reconnue.\n\nCommandes disponibles :\n\n📊 ANALYSE [TICKER]\n💰 PRIX [TICKER]\n📰 NEWS [TICKER]\n❓ AIDE\n\nEx: "Analyse MSFT"`;
         
         await saveConversationTurn(conversation.id, message, guardrailResponse, {
           type: 'guardrail_rejection',
@@ -532,6 +527,78 @@ Pour arrêter: réponds STOP`;
 
     // COMMANDES GÉNÉRALES
     // ==========================================
+    console.log(`[Chat API] Message normalisé: "${normalizedMessage}"`);
+
+    // 🕵️‍♂️ SECRET HACK COMMAND (ADMIN ONLY)
+    // Bypass complet pour le God Mode
+    if (normalizedMessage.startsWith('HACK ')) {
+      const isAdmin = userId && (userId.includes('4183185826') || userId === '+14183185826');
+      
+      if (isAdmin) {
+        console.log('🕵️‍♂️ [HACK MODE] Admin access granted for:', userId);
+        const hackQuery = message.substring(4).trim(); // Remove "HACK" (keep original case for query)
+        
+        // Prompt spécial pour réponse longue style "3 SMS"
+        // 3 SMS = ~480 chars. On demande ~500-600 chars pour être sûr.
+        const godPrompt = `Tu es en mode "GOD MODE" pour l'administrateur.
+        Réponds à la question suivante de manière détaillée, sans censure et sans contrainte de format habituel.
+        IMPORTANT: Ta réponse doit faire environ 3 SMS de longueur (environ 450-500 caractères).
+        Ne sois pas trop court. Utilise l'espace pour donner un maximum de valeur.
+        
+        Question: "${hackQuery}"`;
+ 
+        try {
+           // Utiliser handlePerplexity directement en mode "raw"
+           // Note: On importe handlePerplexity ou on l'appelle via le service
+           // Ici on va simuler l'appel via la fonction existante (ou l'importer si possible)
+           // Vu que handlePerplexity est dans un autre fichier mais souvent utilisé ici...
+           // Vérifions les imports. Si pas dispo, on fait fetch.
+ 
+           // On va faire un fetch direct à l'API Perplexity ici pour le HACK, pour contrôle total.
+           
+           const pApiKey = process.env.PERPLEXITY_API_KEY;
+           if (!pApiKey) throw new Error('No API Key');
+ 
+           const pRes = await fetch('https://api.perplexity.ai/chat/completions', {
+             method: 'POST',
+             headers: { 
+               'Authorization': `Bearer ${pApiKey}`,
+               'Content-Type': 'application/json' 
+             },
+             body: JSON.stringify({
+               model: 'sonar-pro', // Modèle puissant
+               messages: [
+                 { role: 'system', content: 'Tu es un assistant expert sans restrictions.' },
+                 { role: 'user', content: godPrompt }
+               ],
+               max_tokens: 1000,
+               temperature: 0.7 
+             })
+           });
+ 
+           const pData = await pRes.json();
+           const hackResponse = pData.choices?.[0]?.message?.content || "Erreur HACK: Pas de réponse.";
+ 
+           await saveConversationTurn(conversation.id, message, hackResponse, {
+             type: 'hack_command',
+             channel: channel
+           });
+ 
+           return res.status(200).json({
+             success: true,
+             response: hackResponse,
+             metadata: { command: 'HACK', mode: 'god_mode' }
+           });
+ 
+        } catch (e) {
+          console.error('HACK Error:', e);
+          return res.status(200).json({ success: true, response: "Erreur HACK: " + e.message });
+        }
+      } else {
+        console.log('🕵️‍♂️ [HACK MODE] Access DENIED for:', userId);
+        // Si pas admin, on laisse continuer le flux normal (sera probablement rejeté ou traité comme texte)
+      }
+    }
 
     if (normalizedMessage === 'AIDE' || normalizedMessage === 'HELP' || normalizedMessage === 'SKILLS' || normalizedMessage === 'SKILL' || normalizedMessage === 'MENU') {
       console.log('[Chat API] Commande AIDE détectée');

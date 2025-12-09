@@ -1394,23 +1394,13 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 return news.title.length > 120 ? news.title.substring(0, 120) + '...' : news.title;
             }
 
-            // PRIORITÉ 3: Chercher dans les news générales si pas de news spécifique
+            // PRIORITÉ 3: DÉSACTIVÉE - Trop d'erreurs de matching (ex: "T" matche "The")
+            // On fait confiance uniquement à l'API serveur /api/news qui filtre strictement
+            /*
             if (!news && newsData && newsData.length > 0) {
-                const tickerLower = ticker.toLowerCase();
-                const tickerBase = tickerLower.split('.')[0]; // Pour les tickers .TO, .US, etc.
-
-                const relevantNews = newsData.find(article => {
-                    const title = (article.title || article.headline || '').toLowerCase();
-                    const desc = (article.description || article.summary || '').toLowerCase();
-                    return title.includes(tickerLower) || desc.includes(tickerLower) ||
-                        title.includes(tickerBase) || desc.includes(tickerBase);
-                });
-
-                if (relevantNews) {
-                    const newsTitle = relevantNews.title || relevantNews.headline || '';
-                    return newsTitle.length > 120 ? newsTitle.substring(0, 120) + '...' : newsTitle;
-                }
+                 // ... code removed to prevent false positives ...
             }
+            */
 
             // FALLBACK: Message générique seulement si vraiment aucune news trouvée
             const directionLabel = changePercent > 0 ? 'hausse' : 'baisse';
@@ -4818,16 +4808,29 @@ STRUCTURE JSON OBLIGATOIRE:
 
             return (
                 <div className="space-y-6">
-                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
-                        ? 'bg-gray-900 border-gray-700'
-                        : 'bg-gray-50 border-gray-200'
-                        }`}>
-                        <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
+                    <div className="flex justify-between items-center">
+                        <h2 className={`text-2xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
                             <Icon emoji="⚙️" size={24} className="mr-2 inline-block" />
                             Paramètres
                         </h2>
+                        <button
+                            onClick={handleLogout}
+                            className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 flex items-center gap-2 ${isDarkMode
+                                ? 'bg-red-600 hover:bg-red-700 text-white'
+                                : 'bg-red-500 hover:bg-red-600 text-white'
+                                } shadow-md hover:shadow-lg`}
+                        >
+                            <Icon emoji="🚪" size={20} />
+                            Se déconnecter
+                        </button>
+                    </div>
 
+                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
+                        ? 'bg-gray-900 border-gray-700'
+                        : 'bg-gray-50 border-gray-200'
+                        }`}>
+                        
                         <div className="space-y-4">
                             <div className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode
                                 ? 'bg-gray-800 border-gray-700'
@@ -4837,20 +4840,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                     }`}>
                                     Compte
                                 </h3>
-                                <p className={`text-sm mb-4 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                     }`}>
                                     Gérez votre compte et vos préférences
                                 </p>
-                                <button
-                                    onClick={handleLogout}
-                                    className={`w-full px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${isDarkMode
-                                        ? 'bg-red-600 hover:bg-red-700 text-white'
-                                        : 'bg-red-500 hover:bg-red-600 text-white'
-                                        } shadow-lg hover:shadow-xl transform hover:scale-105`}
-                                >
-                                    <Icon emoji="🚪" size={20} className="mr-2 inline-block" />
-                                    Se déconnecter
-                                </button>
                             </div>
 
                             <div className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode
@@ -14157,7 +14150,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             return (
                 <div className="space-y-6">
-                    <div className="flex justify-end items-center">
+                    <div className="flex justify-between items-center">
+                        <h2 className={`text-2xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>💬 Ask Emma</h2>
                         <div className="flex gap-2">
                             <button
                                 onClick={clearChat}
