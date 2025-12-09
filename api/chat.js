@@ -27,13 +27,31 @@ async function fetchPerplexityMarketNews() {
     return null;
   }
 
-  const prompt = `Donne-moi un résumé TRÈS COURT des actualités financières d'aujourd'hui en format bullet points:
-- 3 actualités majeures des marchés américains (S&P 500, Nasdaq, secteurs tech/finance)
-- 2 actualités du marché canadien (TSX, secteurs clés)
-- 2 actualités européennes
+  const prompt = `Agis comme un GESTIONNAIRE DE PORTEFEUILLE SENIOR à Wall Street.
+Rédige un briefing "REVUE DE MARCHÉ" concis et professionnel pour tes clients VIP.
 
-Format chaque ligne ainsi: • [Titre court de l'actualité]
-Pas d'introduction ni de conclusion. Juste les bullet points.`;
+STRUCTURE OBLIGATOIRE DU BRIEFING:
+
+1. 🇺🇸 ÉTATS-UNIS (S&P 500, NASDAQ, DOW)
+• [Mouvement majeur des indices en % si dispo]
+• [Actualité #1 la plus critique qui bouge le marché] (Source: [Nom], [URL])
+• [Actualité #2 secteur Tech/Finance] (Source: [Nom], [URL])
+• [Actualité #3 autre secteur clé] (Source: [Nom], [URL])
+
+2. 🇨🇦 CANADA (TSX, CAD/USD)
+• [Actualité #1 Énergie/Banques/Mines] (Source: [Nom], [URL])
+• [Actualité #2 Économie] (Source: [Nom], [URL])
+
+3. 🇪🇺 EUROPE & MONDE
+• [Actualité #1 majeure] (Source: [Nom], [URL])
+• [Actualité #2 majeure] (Source: [Nom], [URL])
+
+RÈGLES STRICTES:
+- INCLURE LES URLS pour chaque point (c'est CRITIQUE).
+- Ton professionnel, direct, pas de blabla.
+- Focus sur ce qui fait bouger les prix MAINTENANT.
+- Pas d'introduction "Voici le résumé...". Commence direct par la section 1.
+- SI AUCUNE NEWS MAJEURE: Dis "Marchés calmes" pour la section.`;
 
   try {
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
@@ -45,8 +63,8 @@ Pas d'introduction ni de conclusion. Juste les bullet points.`;
       body: JSON.stringify({
         model: 'llama-3.1-sonar-small-128k-online',
         messages: [{ role: 'user', content: prompt }],
-        max_tokens: 800,
-        temperature: 0.2
+        max_tokens: 1000,
+        temperature: 0.1
       })
     });
 
@@ -727,19 +745,64 @@ Comment puis-je t'aider ? 🚀`;
           ? `https://${process.env.VERCEL_URL}`
           : 'https://gob-projetsjsls-projects.vercel.app';
 
-        // Fetch multiple data sources in parallel
-        const [generalNewsRes, forexRes, indicesRes] = await Promise.all([
-          fetch(`${baseUrl}/api/fmp?endpoint=news&limit=8`, { headers: { 'Content-Type': 'application/json' } }),
-          fetch(`${baseUrl}/api/fmp?endpoint=forex&pairs=EURUSD,CADUSD,GBPUSD`, { headers: { 'Content-Type': 'application/json' } }).catch(() => null),
-          fetch(`${baseUrl}/api/fmp?endpoint=quote&symbol=^GSPC,^DJI,^IXIC,^GSPTSE`, { headers: { 'Content-Type': 'application/json' } }).catch(() => null)
-        ]);
-
         let capsuleText = `🌍 REVUE DES MARCHÉS\n${new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}\n\n`;
 
+        // 1. TENTATIVE PERPLEXITY (Source Principale)
+        console.log('[Chat API] TOP NEWS: Appel Perplexity (Source Principale)...');
+        try {
+          const perplexityNews = await fetchPerplexityMarketNews();
+          if (perplexityNews) {
+             // Si succès Perplexity, on utilise ça DIRECTEMENT sans rien d'autre
+             // On ajoute juste les indices en haut si on les a, mais le corps vient de Perplexity
+             
+             // Fetch Indices only (lightweight) for header
+             try {
+                const indicesRes = await fetch(`${baseUrl}/api/fmp?endpoint=quote&symbol=^GSPC,^DJI,^IXIC,^GSPTSE`);
+                if (indicesRes.ok) {
+                   const indicesData = await indicesRes.json();
+                   if (Array.isArray(indicesData) && indicesData.length > 0) {
+                      capsuleText += `📈 INDICES CLÉS\n`;
+                      indicesData.forEach(idx => {
+                        const change = idx.changesPercentage || idx.change || 0;
+                        const arrow = change >= 0 ? '🟢' : '🔴';
+                        capsuleText += `${arrow} ${idx.name || idx.symbol}: ${idx.price?.toFixed(2) || 'N/A'} (${change >= 0 ? '+' : ''}${change.toFixed(2)}%)\n`;
+                      });
+                      capsuleText += `\n`;
+                   }
+                }
+             } catch(e) { console.log('Indices header failed, ignoring'); }
+
+             capsuleText += perplexityNews.replace('📰 ACTUALITÉS DU JOUR\n', ''); // Remove duplicate header if present
+             
+             capsuleText += `\n📊 ANALYSE [TICKER] pour détails`;
+
+             await saveConversationTurn(conversation.id, message, capsuleText, {
+               type: 'command_market_overview',
+               channel: channel
+             });
+
+             return res.status(200).json({
+               success: true,
+               response: capsuleText,
+               metadata: { command: 'MARKET_OVERVIEW', source: 'perplexity' }
+             });
+          }
+        } catch (perplexError) {
+          console.error('[Chat API] Erreur Perplexity:', perplexError);
+          // Fallback continue below
+        }
+
+        console.log('[Chat API] TOP NEWS: Fallback FMP activé');
+        // 2. FALLBACK FMP (Si Perplexity échoue ou retourne null)
+        const [generalNewsRes, indicesResFallback] = await Promise.all([
+          fetch(`${baseUrl}/api/fmp?endpoint=news&limit=15`, { headers: { 'Content-Type': 'application/json' } }), // Increased limit for better filtering
+          fetch(`${baseUrl}/api/fmp?endpoint=quote&symbol=^GSPC,^DJI,^IXIC,^GSPTSE`, { headers: { 'Content-Type': 'application/json' } }).catch(() => null)
+        ]);
+        
         // Section Indices (si disponible)
-        if (indicesRes && indicesRes.ok) {
+        if (indicesResFallback && indicesResFallback.ok) {
           try {
-            const indicesData = await indicesRes.json();
+            const indicesData = await indicesResFallback.json();
             if (Array.isArray(indicesData) && indicesData.length > 0) {
               capsuleText += `📈 INDICES\n`;
               indicesData.forEach(idx => {
@@ -752,94 +815,84 @@ Comment puis-je t'aider ? 🚀`;
           } catch (e) { console.warn('Indices parse error:', e.message); }
         }
 
-        // Section News par région
+        // Section News par région (Fallback Logic Améliorée)
         if (generalNewsRes.ok) {
           const newsData = await generalNewsRes.json();
-          console.log('[Chat API] Market Overview - Raw news response keys:', Object.keys(newsData || {}));
-          
           // Handle both array and wrapped response formats
-          const news = Array.isArray(newsData) ? newsData : (newsData.data || newsData.news || []);
-          console.log(`[Chat API] Market Overview - Parsed ${news.length} news items`);
+          const rawNews = Array.isArray(newsData) ? newsData : (newsData.data || newsData.news || []);
+          
+          if (rawNews.length > 0) {
+             // DEDUPLICATION STRICTE
+             const seenTitles = new Set();
+             const uniqueNews = [];
+             
+             for (const item of rawNews) {
+                // Créer une clé unique basée sur les 20 premiers chars du titre (ignore variations mineures)
+                const titleKey = (item.title || '').substring(0, 20).toLowerCase();
+                if (!seenTitles.has(titleKey)) {
+                   seenTitles.add(titleKey);
+                   uniqueNews.push(item);
+                }
+             }
 
-          if (news.length > 0) {
-            // Catégoriser les news
-            const usNews = news.filter(n => !n.symbol?.includes('.TO') && !n.symbol?.includes('.PA') && !n.symbol?.includes('.L'));
-            const caNews = news.filter(n => n.symbol?.includes('.TO') || n.title?.toLowerCase().includes('canada') || n.title?.toLowerCase().includes('tsx'));
-            const euNews = news.filter(n => n.symbol?.includes('.PA') || n.symbol?.includes('.L') || n.title?.toLowerCase().includes('euro') || n.title?.toLowerCase().includes('europe'));
+             // Catégoriser les news (Mutuellement exclusif pour éviter doublons d'affichage)
+             const usNews = [];
+             const caNews = [];
+             const euNews = [];
+             const otherNews = [];
 
-            // US Market
-            if (usNews.length > 0) {
-              capsuleText += `🇺🇸 ÉTATS-UNIS\n`;
-              usNews.slice(0, 3).forEach(item => {
-                capsuleText += `• ${item.title?.substring(0, 80) || 'N/A'}${item.title?.length > 80 ? '...' : ''}\n`;
-              });
-              capsuleText += `\n`;
-            }
+             uniqueNews.forEach(n => {
+                const symbol = n.symbol || '';
+                const title = (n.title || '').toLowerCase();
+                
+                if (symbol.includes('.TO') || title.includes('canada') || title.includes('six')) {
+                   caNews.push(n);
+                } else if (symbol.includes('.PA') || symbol.includes('.L') || title.includes('euro')) {
+                   euNews.push(n);
+                } else if (!symbol.includes('.') || title.includes('usa') || title.includes('fed') || title.includes('wall street')) {
+                   usNews.push(n);
+                } else {
+                   otherNews.push(n);
+                }
+             });
 
-            // Canada Market
-            if (caNews.length > 0) {
-              capsuleText += `🇨🇦 CANADA\n`;
-              caNews.slice(0, 2).forEach(item => {
-                capsuleText += `• ${item.title?.substring(0, 80) || 'N/A'}${item.title?.length > 80 ? '...' : ''}\n`;
-              });
-              capsuleText += `\n`;
-            }
+             // Affichage structuré
+             if (usNews.length > 0) {
+               capsuleText += `🇺🇸 ÉTATS-UNIS\n`;
+               usNews.slice(0, 3).forEach(item => {
+                 capsuleText += `• ${item.title?.substring(0, 80)}... ${item.url ? `\n  🔗 ${item.url}` : ''}\n`;
+               });
+               capsuleText += `\n`;
+             }
 
-            // Europe
-            if (euNews.length > 0) {
-              capsuleText += `🇪🇺 EUROPE\n`;
-              euNews.slice(0, 2).forEach(item => {
-                capsuleText += `• ${item.title?.substring(0, 80) || 'N/A'}${item.title?.length > 80 ? '...' : ''}\n`;
-              });
-              capsuleText += `\n`;
-            }
+             if (caNews.length > 0) {
+               capsuleText += `🇨🇦 CANADA\n`;
+               caNews.slice(0, 2).forEach(item => {
+                 capsuleText += `• ${item.title?.substring(0, 80)}... ${item.url ? `\n  🔗 ${item.url}` : ''}\n`;
+               });
+               capsuleText += `\n`;
+             }
 
-            // If no regional news matched, show all news under general section
-            if (usNews.length === 0 && caNews.length === 0 && euNews.length === 0) {
-              capsuleText += `📰 ACTUALITÉS\n`;
-              news.slice(0, 5).forEach(item => {
-                capsuleText += `• ${item.title?.substring(0, 80) || 'N/A'}${item.title?.length > 80 ? '...' : ''}\n`;
-              });
-              capsuleText += `\n`;
-            }
-
-            // Headlines économiques générales
-            capsuleText += `💼 CE QUI SE JASE\n`;
-            news.slice(0, 3).forEach(item => {
-              capsuleText += `• ${item.title?.substring(0, 70) || 'N/A'}${item.title?.length > 70 ? '...' : ''}\n`;
-            });
-          } else {
-            // FMP returned empty - try Perplexity as fallback
-            console.log('[Chat API] FMP empty, trying Perplexity fallback...');
-            try {
-              const perplexityNews = await fetchPerplexityMarketNews();
-              if (perplexityNews) {
-                capsuleText += perplexityNews;
-              } else {
+             if (euNews.length > 0) {
+               capsuleText += `🇪🇺 EUROPE\n`;
+               euNews.slice(0, 2).forEach(item => {
+                 capsuleText += `• ${item.title?.substring(0, 80)}... ${item.url ? `\n  🔗 ${item.url}` : ''}\n`;
+               });
+               capsuleText += `\n`;
+             }
+             
+             // Si vraiment rien de spécifique, mettre le reste
+             if (usNews.length === 0 && caNews.length === 0 && euNews.length === 0 && otherNews.length > 0) {
                 capsuleText += `📰 ACTUALITÉS\n`;
-                capsuleText += `• Les marchés sont calmes aujourd'hui\n`;
-                capsuleText += `• Utilisez ANALYSE [TICKER] pour des détails\n\n`;
-              }
-            } catch (pErr) {
-              console.error('[Chat API] Perplexity fallback failed:', pErr.message);
-              capsuleText += `📰 ACTUALITÉS\n`;
-              capsuleText += `• Les marchés sont calmes aujourd'hui\n\n`;
-            }
+                otherNews.slice(0, 5).forEach(item => {
+                   capsuleText += `• ${item.title?.substring(0, 80)}... ${item.url ? `\n  🔗 ${item.url}` : ''}\n`;
+                });
+             }
+          } else {
+             capsuleText += `⚠️ Actualités indisponibles momentanément (FMP vide)\n\n`;
           }
         } else {
-          // FMP API failed - use Perplexity
-          console.error('[Chat API] FMP API failed, trying Perplexity...');
-          try {
-            const perplexityNews = await fetchPerplexityMarketNews();
-            if (perplexityNews) {
-              capsuleText += perplexityNews;
-            } else {
-              capsuleText += `⚠️ Actualités indisponibles momentanément\n\n`;
-            }
-          } catch (pErr) {
-            console.error('[Chat API] Perplexity also failed:', pErr.message);
-            capsuleText += `⚠️ Actualités indisponibles momentanément\n\n`;
-          }
+           capsuleText += `⚠️ Actualités indisponibles momentanément (Erreur API)\n\n`;
         }
 
         capsuleText += `\n📊 ANALYSE [TICKER] pour détails`;
@@ -852,7 +905,7 @@ Comment puis-je t'aider ? 🚀`;
         return res.status(200).json({
           success: true,
           response: capsuleText,
-          metadata: { command: 'MARKET_OVERVIEW' }
+          metadata: { command: 'MARKET_OVERVIEW', source: 'fmp_fallback' }
         });
 
       } catch (error) {
