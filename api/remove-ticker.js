@@ -156,6 +156,24 @@ export default async function handler(req, res) {
             results.errors.push(`supabase_finance_snapshots: ${error.message}`);
         }
 
+        // 7. ✅ FIX: Mark ticker as inactive in tickers table (instead of deleting)
+        // This prevents the ticker from being recreated during sync
+        try {
+            const { data, error } = await supabase
+                .from('tickers')
+                .update({ is_active: false })
+                .eq('ticker', tickerUpper);
+
+            if (!error) {
+                results.removed_from.push('supabase_tickers (marked inactive)');
+            } else if (error.code !== 'PGRST116') {
+                results.errors.push(`supabase_tickers: ${error.message}`);
+            }
+        } catch (error) {
+            results.errors.push(`supabase_tickers: ${error.message}`);
+        }
+
+
         // Prepare response
         const success = results.removed_from.length > 0;
         const hasErrors = results.errors.length > 0;
