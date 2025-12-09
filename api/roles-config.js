@@ -50,7 +50,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { action, adminPassword, roleId, roleName, displayName, description, componentPermissions, username, role_id } = req.body;
+        const { action, adminPassword, roleId, roleName, displayName, description, componentPermissions, username, role_id, is_admin } = req.body;
 
         // ============================================================
         // ACTION: VERIFY_ADMIN - Vérifier le mot de passe admin
