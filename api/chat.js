@@ -249,7 +249,7 @@ export default async function handler(req, res) {
         ];
         
         const isFinancialRequest = financialKeywords.some(keyword => 
-          normalizedMessage.includes(keyword) || normalizedMessage.startsWith(keyword + ' ')
+          messageUpper.includes(keyword) || messageUpper.startsWith(keyword + ' ')
         );
         
         // Détecter aussi les tickers (mots en majuscules de 1-5 lettres)

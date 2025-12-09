@@ -12,6 +12,7 @@
  */
 
 import twilio from 'twilio';
+import { waitUntil } from '@vercel/functions';
 import { sendConversationEmail } from '../../lib/email-notifier.js';
 import { isInvitationCommand, handleInvitationCommand } from '../../lib/invitation-handler.js';
 import { isKnownContact } from '../../lib/phone-contacts.js';
