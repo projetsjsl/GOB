@@ -65,6 +65,30 @@ export default async function handler(req, res) {
     try {
         const { action, adminPassword, roleId, roleName, displayName, description, componentPermissions, username, role_id, is_admin } = req.body;
 
+        // Check if Supabase is available for database operations
+        const db = getSupabase();
+        
+        // For get_user_permissions, return graceful fallback if Supabase is not configured
+        // This allows the dashboard to work even without the roles database
+        if (action === 'get_user_permissions' && !db) {
+            console.log('[roles-config] Supabase not configured, returning empty permissions (dashboard will show all)');
+            return res.status(200).json({
+                success: true,
+                permissions: null,
+                fallback: true,
+                message: 'Supabase not configured, all permissions granted by default'
+            });
+        }
+        
+        // For other database operations, return error if Supabase is not available
+        if (!db && ['get_roles', 'get_role', 'create_role', 'update_role', 'delete_role', 'assign_role'].includes(action)) {
+            return res.status(503).json({
+                success: false,
+                error: 'Database not configured. Please set SUPABASE_SERVICE_ROLE_KEY environment variable.',
+                action: action
+            });
+        }
+
         // ============================================================
         // ACTION: VERIFY_ADMIN - Vérifier le mot de passe admin
         // ============================================================
@@ -99,7 +123,7 @@ export default async function handler(req, res) {
         // ACTION: GET_ROLES - Récupérer tous les rôles
         // ============================================================
         if (action === 'get_roles') {
-            const { data: roles, error } = await supabase
+            const { data: roles, error } = await db
                 .from('user_roles')
                 .select('*')
                 .order('display_name');
@@ -126,7 +150,7 @@ export default async function handler(req, res) {
                 });
             }
 
-            let query = supabase.from('user_roles').select('*');
+            let query = db.from('user_roles').select('*');
             
             if (roleId) {
                 query = query.eq('id', roleId);
@@ -181,7 +205,7 @@ export default async function handler(req, res) {
                 component_permissions: componentPermissions || {}
             };
 
-            const { data: role, error } = await supabase
+            const { data: role, error } = await db
                 .from('user_roles')
                 .insert([newRole])
                 .select()
@@ -231,7 +255,7 @@ export default async function handler(req, res) {
             if (componentPermissions) updates.component_permissions = componentPermissions;
             if (is_admin !== undefined) updates.is_admin = is_admin;
 
-            const { data: role, error } = await supabase
+            const { data: role, error } = await db
                 .from('user_roles')
                 .update(updates)
                 .eq('id', roleId)
@@ -276,7 +300,7 @@ export default async function handler(req, res) {
                 });
             }
 
-            const { error } = await supabase
+            const { error } = await db
                 .from('user_roles')
                 .delete()
                 .eq('id', roleId);
@@ -318,7 +342,7 @@ export default async function handler(req, res) {
                 });
             }
 
-            const { data: mapping, error } = await supabase
+            const { data: mapping, error } = await db
                 .from('user_role_mapping')
                 .upsert({
                     username: username.toLowerCase().trim(),
@@ -351,7 +375,7 @@ export default async function handler(req, res) {
                 });
             }
 
-            const { data: permissions, error } = await supabase
+            const { data: permissions, error } = await db
                 .from('user_permissions')
                 .select('*')
                 .eq('username', username.toLowerCase().trim())
