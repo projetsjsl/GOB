@@ -71,62 +71,12 @@ async function build() {
       }
     }
 
-    // Créer le dossier dist s'il n'existe pas
-    if (!existsSync(DIST_DIR)) {
-      await mkdir(DIST_DIR, { recursive: true });
-      console.log(`✅ Dossier ${DIST_DIR} créé`);
-    }
+    // Note: On ne copie PLUS vers dist/ - Vercel servira directement depuis public/
+    // Le dossier dist/ est seulement pour le build de 3p1 (qui est dans public/3p1/dist/)
+    console.log('✅ Fichiers restent dans public/ - pas de copie vers dist/ nécessaire');
 
-    // Vérifier que public existe
-    if (!existsSync(PUBLIC_DIR)) {
-      console.warn(`⚠️ Dossier ${PUBLIC_DIR} n'existe pas`);
-      return;
-    }
-
-    // Fonction récursive pour copier en excluant node_modules et fichiers source
-    async function copyDir(src, dest) {
-      await mkdir(dest, { recursive: true });
-      const entries = await readdir(src, { withFileTypes: true });
-
-      for (const entry of entries) {
-        const srcPath = join(src, entry.name);
-        const destPath = join(dest, entry.name);
-
-        // Exclure node_modules, package.json, et fichiers de dev
-        if (entry.name === 'node_modules' ||
-            entry.name === 'package.json' ||
-            entry.name === 'package-lock.json' ||
-            entry.name === 'tsconfig.json' ||
-            entry.name === 'vite.config.ts' ||
-            entry.name === 'postcss.config.js' ||
-            entry.name === 'tailwind.config.js') {
-          continue;
-        }
-
-        // Exclure les dossiers source TypeScript (mais garder dist)
-        if (entry.isDirectory()) {
-          // Pour 3p1, on ne copie QUE le dossier dist si on est dans public/3p1
-          if (src.endsWith('3p1') && entry.name !== 'dist') {
-            continue;
-          }
-          await copyDir(srcPath, destPath);
-        } else {
-          // Exclure les fichiers source TypeScript/React
-          if (entry.name.endsWith('.tsx') ||
-              entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts')) {
-            continue;
-          }
-          await cp(srcPath, destPath);
-        }
-      }
-    }
-
-    // Copier récursivement tous les fichiers de public vers dist
-    await copyDir(PUBLIC_DIR, DIST_DIR);
-    console.log(`✅ Fichiers copiés de ${PUBLIC_DIR}/ vers ${DIST_DIR}/`);
-
-    // Injection des variables d'environnement dans emma-config.js
-    const emmaConfigPath = join(DIST_DIR, 'emma-config.js');
+    // Injection des variables d'environnement dans emma-config.js (dans public/)
+    const emmaConfigPath = join(PUBLIC_DIR, 'emma-config.js');
     if (existsSync(emmaConfigPath)) {
       console.log('🔑 Injection des clés API dans emma-config.js...');
       let emmaConfigContent = await readFile(emmaConfigPath, 'utf8');
@@ -142,15 +92,6 @@ async function build() {
       }
 
       await writeFile(emmaConfigPath, emmaConfigContent);
-    }
-
-    // Copier index.html de la racine vers dist
-    const INDEX_HTML = 'index.html';
-    if (existsSync(INDEX_HTML)) {
-      await cp(INDEX_HTML, join(DIST_DIR, INDEX_HTML));
-      console.log(`✅ ${INDEX_HTML} copié vers ${DIST_DIR}/`);
-    } else {
-      console.warn(`⚠️ ${INDEX_HTML} n'existe pas à la racine`);
     }
 
     console.log('✅ Build terminé avec succès');
