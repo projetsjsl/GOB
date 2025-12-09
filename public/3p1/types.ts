@@ -66,6 +66,8 @@ export interface CompanyInfo {
   earningsPredictability?: string; // Earnings Predictability
   priceGrowthPersistence?: string; // Price Growth Persistence (note numérique 5-100, mesure la croissance persistante du prix sur 10 ans)
   priceStability?: string; // Price Stability
+  financials?: any; // Raw financial statements (Income, Balance, CashFlow)
+  analysisData?: any; // Premium data (Estimates, Insider, etc.)
 }
 
 export enum Recommendation {

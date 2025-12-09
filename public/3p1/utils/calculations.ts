@@ -51,16 +51,17 @@ export const isMutualFund = (symbol: string, companyName?: string): boolean => {
   const symbolUpper = symbol.toUpperCase().trim();
   const nameUpper = (companyName || '').toUpperCase();
   
-  // Liste exhaustive d'actions légitimes qui finissent par X ou IX (pour éviter les faux positifs)
-  const knownStocksEndingInX = [
+  // Liste exhaustive d'actions légitimes qui pourraient être confondues
+  const knownStocksWhitelist = [
     'CGNX', 'EQIX', 'GATX', 'HOLX', 'LRCX', 'NBIX', 'NFLX', 'OTEX', 'PAYX', 
     'IDXX', 'VRTX', 'TXN', 'XOM', 'XEL', 'XPO', 'XRAY', 'XYL', 'XEC', 'XENE',
     'AMZN', 'CMNX', 'CNX', 'DEX', 'FLEX', 'HEX', 'JXN', 'KEX', 'LEX', 'MEX',
-    'NEX', 'PEX', 'QEX', 'REX', 'SEX', 'TEX', 'UEX', 'VEX', 'WEX', 'YEX', 'ZEX'
+    'NEX', 'PEX', 'QEX', 'REX', 'SEX', 'TEX', 'UEX', 'VEX', 'WEX', 'YEX', 'ZEX',
+    'POW', 'TROW', 'T', 'AT', 'V', 'MA', 'BLK' // Ajout de POW, TROW et autres
   ];
   
   // Si c'est une action connue, ce n'est PAS un fonds mutuel
-  if (knownStocksEndingInX.includes(symbolUpper)) {
+  if (knownStocksWhitelist.includes(symbolUpper)) {
     return false;
   }
   
@@ -69,34 +70,32 @@ export const isMutualFund = (symbol: string, companyName?: string): boolean => {
       nameUpper.includes('FUND TRUST') ||
       nameUpper.includes('INVESTMENT FUND') ||
       nameUpper.includes('INDEX FUND') ||
-      nameUpper.includes('ETF') ||
+      /* nameUpper.includes('ETF') || */ // ETF sont OK, on les garde souvent
       (nameUpper.includes('FUND') && nameUpper.includes('SERIES')) ||
-      nameUpper.includes('VANGUARD') ||
-      nameUpper.includes('FIDELITY FUNDS') ||
-      nameUpper.includes('T. ROWE PRICE')) {
+      nameUpper.includes('VANGUARD FUNDS') || // Plus spécifique
+      nameUpper.includes('FIDELITY FUNDS')
+      /* Removed T. ROWE PRICE checks which was flagging the company itself */) {
     return true;
   }
   
   // Patterns spécifiques connus de fonds mutuels (Vanguard, Fidelity, etc.)
   // VTSAX, VFIAX, VTSIX, etc. - fonds Vanguard avec pattern V + 3-4 lettres + X/IX
-  const vanguardPattern = /^V[A-Z]{3,4}[IX]$/;
-  if (vanguardPattern.test(symbolUpper)) {
+  // DOIT faire 5 lettres pour être un mutual fund typique US
+  const vanguardPattern = /^V[A-Z]{3}X$/; 
+  if (vanguardPattern.test(symbolUpper) && symbolUpper.length === 5) {
     return true;
   }
   
   // Fonds Fidelity : FIDXX, FDRXX, etc.
-  const fidelityPattern = /^FD[A-Z]{2,3}X$/;
-  if (fidelityPattern.test(symbolUpper)) {
+  const fidelityPattern = /^F[D|I][A-Z]{2}X$/;
+  if (fidelityPattern.test(symbolUpper) && symbolUpper.length === 5) {
     return true;
   }
   
   // Fonds avec suffixe XX (double X) - très commun pour les fonds mutuels
+  // MAIS attention aux actions comme MAXX, TJX, etc.
+  // On exige 5 lettres minimum pour ce pattern
   if (symbolUpper.endsWith('XX') && symbolUpper.length >= 5) {
-    return true;
-  }
-  
-  // Fonds avec suffixe FX (Foreign Exchange funds)
-  if (symbolUpper.endsWith('FX') && symbolUpper.length >= 4) {
     return true;
   }
   
@@ -104,12 +103,11 @@ export const isMutualFund = (symbol: string, companyName?: string): boolean => {
   // - Le symbole contient un point (ex: XOM.MX = bourse mexicaine)
   // - Le symbole est trop court (< 4 caractères)
   // - Le symbole est trop long (> 6 caractères, sauf patterns spécifiques)
-  if (symbolUpper.includes('.') || symbolUpper.length < 4) {
+  if (symbolUpper.includes('.') || symbolUpper.length < 5) { // Mutual funds are usually 5 chars
     return false;
   }
   
   // Par défaut, ne pas considérer comme fonds mutuel
-  // (mieux vaut un faux négatif qu'un faux positif)
   return false;
 };
 

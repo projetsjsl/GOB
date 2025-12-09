@@ -18,50 +18,44 @@ import { ConfirmSyncDialog } from './components/ConfirmSyncDialog';
 import { HistoricalVersionBanner } from './components/HistoricalVersionBanner';
 import { NotificationManager } from './components/Notification';
 import { SyncProgressBar } from './components/SyncProgressBar';
+import { AdminDashboard } from './components/AdminDashboard';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
 import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation, autoFillAssumptionsFromFMPData, isMutualFund } from './utils/calculations';
 import { detectOutlierMetrics } from './utils/outlierDetection';
-import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon, ClockIcon, PresentationChartBarIcon } from '@heroicons/react/24/outline';
+import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon, ClockIcon, PresentationChartBarIcon, PlayIcon, PauseIcon, StopIcon } from '@heroicons/react/24/outline';
 import { fetchCompanyData } from './services/financeApi';
 import { saveSnapshot, hasManualEdits, loadSnapshot, listSnapshots } from './services/snapshotApi';
 import { RestoreDataDialog } from './components/RestoreDataDialog';
 import { loadAllTickersFromSupabase, mapSourceToIsWatchlist } from './services/tickersApi';
 import { loadProfilesBatchFromSupabase, loadProfileFromSupabase } from './services/supabaseDataLoader';
+import { storage } from './utils/storage';
 
-// Données initiales par défaut (placeholder uniquement - les données réelles sont toujours récupérées depuis l'API FMP)
-// Ces données ne sont utilisées que temporairement avant le chargement des données réelles depuis l'API
-const INITIAL_DATA: AnnualData[] = [
-    { year: 2021, priceHigh: 417.40, priceLow: 241.70, cashFlowPerShare: 11.96, dividendPerShare: 3.52, bookValuePerShare: 30.87, earningsPerShare: 8.80 },
-    { year: 2022, priceHigh: 415.50, priceLow: 243.00, cashFlowPerShare: 14.19, dividendPerShare: 3.88, bookValuePerShare: 35.00, earningsPerShare: 10.71 },
-    { year: 2023, priceHigh: 355.40, priceLow: 242.80, cashFlowPerShare: 15.46, dividendPerShare: 4.48, bookValuePerShare: 40.87, earningsPerShare: 11.67 },
-    { year: 2024, priceHigh: 387.50, priceLow: 278.70, cashFlowPerShare: 15.61, dividendPerShare: 5.16, bookValuePerShare: 45.24, earningsPerShare: 11.95 },
-    { year: 2025, priceHigh: 398.30, priceLow: 229.40, cashFlowPerShare: 16.13, dividendPerShare: 5.92, bookValuePerShare: 50.16, earningsPerShare: 12.93, isEstimate: true },
-    { year: 2026, priceHigh: 0, priceLow: 0, cashFlowPerShare: 17.90, dividendPerShare: 0, bookValuePerShare: 53.40, earningsPerShare: 13.75, isEstimate: true },
-];
+// Données initiales par défaut (VIDE - en attente de chargement)
+const INITIAL_DATA: AnnualData[] = [];
 
 const INITIAL_ASSUMPTIONS: Assumptions = {
-    currentPrice: 250.00,
-    currentDividend: 6.00,
-    growthRateEPS: 5.0,
-    growthRateSales: 5.0,
-    growthRateCF: 5.0,
-    growthRateBV: 3.0,
-    growthRateDiv: 1.0,
-    targetPE: 23.0,
-    targetPCF: 18.0,
-    targetPBV: 6.0,
-    targetYield: 1.8,
-    requiredReturn: 10.0,
-    dividendPayoutRatio: 35.0,
-    baseYear: 2025
+    currentPrice: 0,
+    currentDividend: 0,
+    growthRateEPS: 0,
+    growthRateSales: 0,
+    growthRateCF: 0,
+    growthRateBV: 0,
+    growthRateDiv: 0,
+    targetPE: 0,
+    targetPCF: 0,
+    targetPBV: 0,
+    targetYield: 0,
+    requiredReturn: 10.0, // Default sane value
+    dividendPayoutRatio: 0,
+    baseYear: new Date().getFullYear()
 };
 
 const INITIAL_INFO: CompanyInfo = {
-    symbol: 'ACN',
-    name: 'Accenture PLC',
-    sector: 'Services TI',
-    securityRank: 'A+',
-    marketCap: '156.4B',
+    symbol: '',
+    name: 'Chargement...',
+    sector: '',
+    securityRank: '',
+    marketCap: '',
     logo: undefined,
     country: undefined,
     exchange: undefined,
@@ -70,7 +64,7 @@ const INITIAL_INFO: CompanyInfo = {
 };
 
 const DEFAULT_PROFILE: AnalysisProfile = {
-    id: 'ACN',
+    id: '',
     lastModified: Date.now(),
     data: INITIAL_DATA,
     assumptions: INITIAL_ASSUMPTIONS,
@@ -105,6 +99,85 @@ export default function App() {
         }, 5000);
     };
 
+    // --- ADMIN DASHBOARD STATE ---
+    const [showAdmin, setShowAdmin] = useState(false);
+    const [isRepairing, setIsRepairing] = useState<string | null>(null);
+
+    // Keyboard shortcut to toggle admin (Ctrl+Shift+A)
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'a') {
+                e.preventDefault();
+                setShowAdmin(prev => !prev);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
+    const handleAdminRepair = async (tickerToRepair: string) => {
+        setIsRepairing(tickerToRepair);
+        try {
+            console.log(`🔧 Admin: Repairing ${tickerToRepair}...`);
+            const result = await fetchCompanyData(tickerToRepair);
+            
+            if (result.data && result.data.length > 0) {
+                 const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                    result.data,
+                    result.currentPrice,
+                    INITIAL_ASSUMPTIONS
+                );
+
+                await saveSnapshot(
+                    tickerToRepair,
+                    result.data,
+                    {
+                        ...INITIAL_ASSUMPTIONS,
+                        ...autoFilledAssumptions
+                    },
+                    {
+                        symbol: tickerToRepair,
+                        name: result.info.name || tickerToRepair,
+                        ...result.info,
+                        financials: result.financials, 
+                        analysisData: result.analysisData 
+                    } as CompanyInfo,
+                    `Admin Repair - ${new Date().toLocaleString()}`,
+                    true,
+                    true
+                );
+                
+                // Update local library if present
+                setLibrary(prev => {
+                   if (!prev[tickerToRepair]) return prev;
+                   return {
+                       ...prev,
+                       [tickerToRepair]: {
+                           ...prev[tickerToRepair],
+                           data: result.data,
+                           info: {
+                               ...prev[tickerToRepair].info,
+                               ...result.info,
+                               financials: result.financials,
+                               analysisData: result.analysisData
+                           },
+                           lastModified: Date.now()
+                       }
+                   };
+                });
+                
+                showNotification(`✅ Repaired ${tickerToRepair}`, 'success');
+            } else {
+                showNotification(`❌ Failed to fetch data for ${tickerToRepair}`, 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            showNotification(`❌ Error repairing ${tickerToRepair}`, 'error');
+        } finally {
+            setIsRepairing(null);
+        }
+    };
+
     // Historical Version State
     const [currentSnapshot, setCurrentSnapshot] = useState<{
         id: string;
@@ -114,14 +187,24 @@ export default function App() {
     } | null>(null);
     const [isReadOnly, setIsReadOnly] = useState(false);
 
-    // Load from LocalStorage on Mount
+    // Load from Storage (IndexedDB/LocalStorage) on Mount
     useEffect(() => {
-        try {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
+        const loadFromStorage = async () => {
+            try {
+                const saved = await storage.getItem(STORAGE_KEY);
+                if (saved) {
+                    let parsed: Record<string, AnalysisProfile> = saved;
                     
+                    // If saved is string (from localStorage migration), parse it
+                    if (typeof saved === 'string') {
+                        try {
+                           parsed = JSON.parse(saved);
+                        } catch (e) {
+                           console.error('Failed to parse stringified data', e);
+                           parsed = {};
+                        }
+                    }
+
                     // NETTOYER LES FONDS MUTUELS : Supprimer automatiquement les fonds mutuels existants
                     const cleaned: Record<string, AnalysisProfile> = {};
                     const removedMutualFunds: string[] = [];
@@ -130,20 +213,14 @@ export default function App() {
                         const companyName = (profile as AnalysisProfile)?.info?.name || '';
                         if (isMutualFund(symbol, companyName)) {
                             removedMutualFunds.push(symbol);
-                            console.warn(`⚠️ ${symbol}: Fonds mutuel détecté dans la library - suppression automatique`);
                         } else {
                             cleaned[symbol] = profile as AnalysisProfile;
                         }
                     }
                     
                     if (removedMutualFunds.length > 0) {
-                        console.log(`🧹 ${removedMutualFunds.length} fonds mutuel(s) supprimé(s) automatiquement: ${removedMutualFunds.join(', ')}`);
-                        // Sauvegarder la library nettoyée
-                        try {
-                            localStorage.setItem(STORAGE_KEY, JSON.stringify(cleaned));
-                        } catch (e) {
-                            console.warn('Failed to save cleaned library:', e);
-                        }
+                        console.log(`🧹 ${removedMutualFunds.length} fonds mutuel(s) supprimé(s) automatiquement`);
+                        await storage.setItem(STORAGE_KEY, cleaned);
                     }
                     
                     if (Object.keys(cleaned).length > 0) {
@@ -153,21 +230,19 @@ export default function App() {
                         setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
                         setActiveId(DEFAULT_PROFILE.id);
                     }
-                } catch (e) {
-                    console.error("Failed to parse profiles from localStorage", e);
+                } else {
                     setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
                     setActiveId(DEFAULT_PROFILE.id);
                 }
-            } else {
+            } catch (e) {
+                console.warn("Storage access failed", e);
                 setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
                 setActiveId(DEFAULT_PROFILE.id);
             }
-        } catch (e) {
-            console.warn("LocalStorage access failed", e);
-            setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
-            setActiveId(DEFAULT_PROFILE.id);
-        }
-        setIsInitialized(true);
+            setIsInitialized(true);
+        };
+        
+        loadFromStorage();
     }, []);
 
     // --- LOAD TICKERS FROM SUPABASE ON INITIALIZATION ---
@@ -376,13 +451,11 @@ export default function App() {
                     });
 
                     // Ajouter les profils squelettes immédiatement pour affichage
+                    // Ajouter les profils squelettes immédiatement pour affichage
                     setLibrary(prev => {
                         const updated = { ...prev, ...skeletonProfiles };
-                        try {
-                            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-                        } catch (e) {
-                            console.warn('Failed to save to LocalStorage:', e);
-                        }
+                        // Fire and forget async save
+                        storage.setItem(STORAGE_KEY, updated).catch(e => console.warn('Failed to save to Storage:', e));
                         return updated;
                     });
 
@@ -390,9 +463,10 @@ export default function App() {
                     setIsLoadingTickers(false);
                     console.log(`✅ ${validTickers.length} profils squelettes créés - affichage immédiat`);
 
+
                     // ✅ ÉTAPE 2 : Charger les données depuis Supabase d'abord, puis FMP si nécessaire
                     // Utiliser requestIdleCallback pour ne pas bloquer l'UI
-                    const loadDataInBackground = async () => {
+                    const loadFMPDataInBackground = async () => {
                         const batchSize = 50; // Plus grand batch car Supabase est rapide
                         const delayBetweenBatches = 200; // Délai réduit
 
@@ -441,7 +515,6 @@ export default function App() {
                                             };
                                             
                                             // ✅ IMPORTANT : Sauvegarder dans Supabase après chargement FMP
-                                            // (pour éviter de recharger depuis FMP à la prochaine ouverture)
                                             try {
                                                 const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
                                                     fmpResult.data,
@@ -452,13 +525,19 @@ export default function App() {
                                                 await saveSnapshot(
                                                     symbol,
                                                     fmpResult.data,
-                                                    autoFilledAssumptions,
-                                                    fmpResult.info,
+                                                    {
+                                                        ...INITIAL_ASSUMPTIONS,
+                                                        ...autoFilledAssumptions
+                                                    },
+                                                    {
+                                                        symbol: symbol,
+                                                        name: fmpResult.info.name || symbol,
+                                                        ...fmpResult.info
+                                                    } as CompanyInfo,
                                                     `Auto-sauvegarde après chargement initial - ${new Date().toLocaleString()}`,
                                                     true,  // is_current
                                                     true   // auto_fetched
                                                 );
-                                                console.log(`✅ ${symbol}: Snapshot sauvegardé dans Supabase (première fois)`);
                                             } catch (saveError) {
                                                 console.warn(`⚠️ ${symbol}: Erreur sauvegarde snapshot (non bloquant):`, saveError);
                                             }
@@ -466,26 +545,19 @@ export default function App() {
                                         
                                         // VALIDATION : Vérifier que les données sont valides
                                         if (!result.data || result.data.length === 0) {
-                                            console.error(`❌ ${symbol}: Données invalides après chargement`);
                                             return;
                                         }
                                         
                                         if (!result.currentPrice || result.currentPrice <= 0) {
-                                            console.error(`❌ ${symbol}: Prix invalide (${result.currentPrice})`);
                                             return;
                                         }
                                         
                                         // Vérifier qu'on a au moins une année avec des données valides
-                                        const hasValidData = result.data.some(d => 
+                                        const hasValidData = result.data.some((d: any) => 
                                             d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
                                         );
                                         
                                         if (!hasValidData) {
-                                            if (isMutualFund(symbol, result.info.name)) {
-                                                console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - profil NON créé`);
-                                            } else {
-                                                console.error(`❌ ${symbol}: Aucune donnée financière valide`);
-                                            }
                                             return;
                                         }
                                     
@@ -495,19 +567,17 @@ export default function App() {
                                     // Si les assumptions viennent de Supabase, les utiliser, sinon auto-fill
                                     let finalAssumptions: Assumptions;
                                     if (result.assumptions && result.source === 'supabase') {
-                                        // Utiliser les assumptions du snapshot (déjà sauvegardées)
                                         finalAssumptions = {
                                             ...INITIAL_ASSUMPTIONS,
                                             ...result.assumptions,
                                             currentPrice: result.currentPrice
                                         };
                                     } else {
-                                        // Auto-fill depuis les données FMP (nouveau chargement)
                                         finalAssumptions = autoFillAssumptionsFromFMPData(
                                             result.data,
                                             result.currentPrice,
                                             INITIAL_ASSUMPTIONS
-                                        );
+                                        ) as Assumptions;
                                     }
                                     
                                     const newProfile: AnalysisProfile = {
@@ -522,6 +592,8 @@ export default function App() {
                                             securityRank: supabaseTicker.security_rank || 'N/A',
                                             marketCap: result.info.marketCap || 'N/A',
                                             ...result.info,
+                                            financials: result.financials,
+                                            analysisData: result.analysisData,
                                             earningsPredictability: supabaseTicker.earnings_predictability,
                                             priceGrowthPersistence: supabaseTicker.price_growth_persistence,
                                             priceStability: supabaseTicker.price_stability,
@@ -532,31 +604,23 @@ export default function App() {
                                         isWatchlist
                                     };
                                     
-                                    // ✅ Mettre à jour le profil squelette avec les données complètes
+                                    // ✅ Mettre à jour le profil
                                     setLibrary(prev => {
-                                        if (!prev[symbol]) return prev; // Profil supprimé entre temps
-                                        
+                                        if (!prev[symbol]) return prev;
                                         const updated = {
                                             ...prev,
                                             [symbol]: {
                                                 ...newProfile,
-                                                _isSkeleton: false // Marquer comme complet
+                                                _isSkeleton: false
                                             }
                                         };
-                                        
-                                        try {
-                                            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-                                        } catch (e) {
-                                            console.warn('Failed to save to LocalStorage:', e);
-                                        }
-                                        
+                                        storage.setItem(STORAGE_KEY, updated).catch(e => console.warn('Failed to save to Storage:', e));
                                         return updated;
                                     });
                                     
                                     console.log(`✅ ${symbol}: Profil mis à jour depuis ${result.source === 'supabase' ? 'Supabase' : 'FMP'}`);
                                 } catch (error) {
-                                    console.error(`❌ ${symbol}: Erreur chargement données - profil squelette conservé:`, error);
-                                    // Le profil squelette reste affiché même si le chargement échoue
+                                    console.error(`❌ ${symbol}: Erreur chargement données:`, error);
                                 }
                             })
                         );
@@ -567,9 +631,8 @@ export default function App() {
                     if (typeof requestIdleCallback !== 'undefined') {
                         requestIdleCallback(() => {
                             loadFMPDataInBackground();
-                        }, { timeout: 2000 }); // Timeout de 2s max pour démarrer
+                        }, { timeout: 2000 });
                     } else {
-                        // Fallback pour navigateurs sans requestIdleCallback
                         setTimeout(() => {
                             loadFMPDataInBackground();
                         }, 100);
@@ -676,20 +739,20 @@ export default function App() {
                 };
                 // Sauvegarder de manière asynchrone pour ne pas bloquer le thread principal
                 if (typeof requestIdleCallback !== 'undefined') {
-                    requestIdleCallback(() => {
+                    requestIdleCallback(async () => {
                         try {
-                            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                            await storage.setItem(STORAGE_KEY, updated);
                         } catch (e) {
-                            console.warn('Failed to save to LocalStorage:', e);
+                            console.warn('Failed to save to Storage:', e);
                         }
                     }, { timeout: 1000 });
                 } else {
                     // Fallback pour navigateurs sans requestIdleCallback
-                    setTimeout(() => {
+                    setTimeout(async () => {
                         try {
-                            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                            await storage.setItem(STORAGE_KEY, updated);
                         } catch (e) {
-                            console.warn('Failed to save to LocalStorage:', e);
+                            console.warn('Failed to save to Storage:', e);
                         }
                     }, 0);
                 }
@@ -886,7 +949,9 @@ export default function App() {
                     sector: updatedInfo.sector || '',
                     securityRank: updatedInfo.securityRank || 'N/A',
                     marketCap: updatedInfo.marketCap || 'N/A',
-                    ...updatedInfo
+                    ...updatedInfo,
+                    financials: result.financials, // Strategic: Store full financials
+                    analysisData: result.analysisData // Strategic: Store premium analysis data
                 };
                 setInfo(completeInfo);
                 // Also update in library to persist logo and beta
@@ -1211,7 +1276,7 @@ export default function App() {
             const tempAssumptions = {
                 ...assumptions,
                 ...autoFilledAssumptions
-            };
+            } as Assumptions;
             const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
             
             if (outlierDetection.detectedOutliers.length > 0) {
@@ -1470,7 +1535,7 @@ export default function App() {
                 assumptions: {
                     ...INITIAL_ASSUMPTIONS,
                     ...autoFilledAssumptions
-                },
+                } as Assumptions,
                 info: {
                     symbol: symbol,
                     name: result.info.name || symbol,
@@ -1593,6 +1658,11 @@ export default function App() {
     const [isBulkSyncing, setIsBulkSyncing] = useState(false);
     const [bulkSyncProgress, setBulkSyncProgress] = useState({ current: 0, total: 0 });
     const [syncStats, setSyncStats] = useState({ successCount: 0, errorCount: 0 });
+    
+    // Sync Control Refs & State
+    const abortSync = useRef(false);
+    const isSyncPaused = useRef(false);
+    const [syncPausedState, setSyncPausedState] = useState(false);
 
     const handleBulkSyncAllTickers = async () => {
         if (!confirm(`Synchroniser tous les ${Object.keys(library).length} tickers ?\n\nChaque version sera sauvegardée avant la synchronisation.\nLes données manuelles et hypothèses (orange) seront préservées.`)) {
@@ -1600,6 +1670,11 @@ export default function App() {
         }
 
         setIsBulkSyncing(true);
+        // Reset controls
+        abortSync.current = false;
+        isSyncPaused.current = false;
+        setSyncPausedState(false);
+
         const allTickers = Object.keys(library);
         setBulkSyncProgress({ current: 0, total: allTickers.length });
         setSyncStats({ successCount: 0, errorCount: 0 });
@@ -1607,164 +1682,132 @@ export default function App() {
         let successCount = 0;
         let errorCount = 0;
         const errors: string[] = [];
+        const delayBetweenTickers = 2000; // 2 seconds delay for stability
 
-        // Traiter par batch pour éviter de surcharger
-        const batchSize = 3;
-        const delayBetweenBatches = 1000;
+        for (const tickerSymbol of allTickers) {
+             // 0. Check for Pause or Abort
+             if (abortSync.current) {
+                 console.log('🛑 Synchronisation arrêtée par l\'utilisateur.');
+                 break;
+             }
 
-        for (let i = 0; i < allTickers.length; i += batchSize) {
-            const batch = allTickers.slice(i, i + batchSize);
+             while (isSyncPaused.current) {
+                 if (abortSync.current) break;
+                 await new Promise(resolve => setTimeout(resolve, 500));
+             }
 
-            // Attendre entre les batches
-            if (i > 0) {
-                await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
-            }
+             if (abortSync.current) break;
 
-            // Traiter le batch en parallèle
-            await Promise.allSettled(
-                batch.map(async (tickerSymbol) => {
-                    try {
-                        setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
+            try {
+                // Update Progress
+                setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
 
-                        const profile = library[tickerSymbol];
-                        if (!profile) return;
+                const profile = library[tickerSymbol];
+                if (!profile) continue;
 
-                        // 1. Sauvegarder un snapshot avant la sync
-                        console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
-                        await saveSnapshot(
-                            tickerSymbol,
-                            profile.data,
-                            profile.assumptions,
-                            profile.info,
-                            `Avant synchronisation globale - ${new Date().toLocaleString()}`,
-                            false, // Not current (on va le remplacer)
-                            false  // Not auto-fetched
-                        );
+                // 1. Sauvegarder un snapshot avant la sync
+                console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
+                await saveSnapshot(
+                    tickerSymbol,
+                    profile.data,
+                    profile.assumptions,
+                    profile.info,
+                    `Avant synchronisation globale - ${new Date().toLocaleString()}`,
+                    false, 
+                    false 
+                );
 
-                        // 2. Charger les nouvelles données FMP
-                        console.log(`🔄 Synchronisation ${tickerSymbol}...`);
-                        const result = await fetchCompanyData(tickerSymbol);
+                // 2. Charger les nouvelles données FMP
+                console.log(`🔄 Synchronisation ${tickerSymbol}...`);
+                const result = await fetchCompanyData(tickerSymbol);
 
-                        // 3. Merge intelligent : préserver les données manuelles
-                        // Créer un map des nouvelles données par année pour faciliter le merge
-                        const newDataByYear = new Map(result.data.map(row => [row.year, row]));
-                        
-                        const mergedData = profile.data.map((existingRow) => {
-                            const newRow = newDataByYear.get(existingRow.year);
-                            
-                            // Si pas de nouvelle donnée pour cette année, garder l'existant
-                            if (!newRow) {
-                                return existingRow;
-                            }
-
-                            // Si la donnée existante est manuelle (autoFetched: false ou undefined), la garder
-                            if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
-                                return existingRow; // Préserver la donnée manuelle
-                            }
-
-                            // Sinon, utiliser la nouvelle donnée avec autoFetched: true
-                            return {
-                                ...newRow,
-                                autoFetched: true
-                            };
-                        });
-
-                        // Ajouter les nouvelles années qui n'existent pas dans les données existantes
-                        result.data.forEach(newRow => {
-                            const exists = mergedData.some(row => row.year === newRow.year);
-                            if (!exists) {
-                                mergedData.push({
-                                    ...newRow,
-                                    autoFetched: true
-                                });
-                            }
-                        });
-
-                        // Trier par année
-                        mergedData.sort((a, b) => a.year - b.year);
-
-                        // 4. Recalculer les métriques avec la fonction centralisée (bonnes pratiques cohérentes)
-                        // ⚠️ IMPORTANT : On préserve les exclusions (excludeEPS, excludeCF, etc.) mais on recalcule tout le reste
-                        const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-                            mergedData, // Utiliser les données mergées (avec préservation des données manuelles)
-                            result.currentPrice,
-                            profile.assumptions // Préserver les valeurs existantes (excludeEPS, excludeCF, etc.)
-                        );
-
-                        // 5. Détecter et exclure automatiquement les métriques avec prix cibles aberrants
-                        const tempAssumptions = {
-                            ...profile.assumptions,
-                            ...autoFilledAssumptions
-                        };
-                        const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
-                        
-                        if (outlierDetection.detectedOutliers.length > 0) {
-                            console.log(`⚠️ ${tickerSymbol}: Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(', ')}`);
-                        }
-
-                        // Appliquer les exclusions détectées
-                        const finalAssumptions = {
-                            ...tempAssumptions,
-                            excludeEPS: outlierDetection.excludeEPS,
-                            excludeCF: outlierDetection.excludeCF,
-                            excludeBV: outlierDetection.excludeBV,
-                            excludeDIV: outlierDetection.excludeDIV
-                        };
-
-                        // 6. Mettre à jour le profil avec les nouvelles métriques calculées et exclusions automatiques
-                        setLibrary(prev => {
-                            const updated = {
-                                ...prev,
-                                [tickerSymbol]: {
-                                    ...profile,
-                                    data: mergedData,
-                                    info: {
-                                        ...profile.info,
-                                        ...result.info, // Mettre à jour les infos (nom, secteur, etc.)
-                                        // S'assurer que le nom de FMP remplace toujours celui de Supabase
-                                        name: result.info.name || profile.info.name
-                                    },
-                                    assumptions: finalAssumptions, // Inclure les exclusions automatiques
-                                    lastModified: Date.now()
-                                }
-                            };
-
-                            try {
-                                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-                            } catch (e) {
-                                console.warn('Failed to save to LocalStorage:', e);
-                            }
-
-                            return updated;
-                        });
-
-                        // 7. Sauvegarder le snapshot après sync avec les nouvelles métriques et exclusions automatiques
-                        await saveSnapshot(
-                            tickerSymbol,
-                            mergedData,
-                            finalAssumptions, // Inclure les exclusions automatiques
-                            {
-                                ...profile.info,
-                                ...result.info
-                            },
-                            `Synchronisation globale - ${new Date().toLocaleString()}`,
-                            true,  // Mark as current
-                            true   // Auto-fetched
-                        );
-
-                        successCount++;
-                        setSyncStats({ successCount, errorCount });
-                        console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
-
-                    } catch (error: any) {
-                        errorCount++;
-                        setSyncStats({ successCount, errorCount });
-                        const errorMsg = `${tickerSymbol}: ${error.message || 'Erreur inconnue'}`;
-                        errors.push(errorMsg);
-                        console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
+                // 3. Merge intelligent
+                const newDataByYear = new Map(result.data.map(row => [row.year, row]));
+                const mergedData = profile.data.map((existingRow) => {
+                    const newRow = newDataByYear.get(existingRow.year);
+                    if (!newRow) return existingRow;
+                    if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
+                        return existingRow; 
                     }
-                })
-            );
+                    return { ...newRow, autoFetched: true };
+                });
+
+                result.data.forEach(newRow => {
+                    const exists = mergedData.some(row => row.year === newRow.year);
+                    if (!exists) {
+                        mergedData.push({ ...newRow, autoFetched: true });
+                    }
+                });
+                mergedData.sort((a, b) => a.year - b.year);
+
+                // 4. Recalculer métriques
+                const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                    mergedData,
+                    result.currentPrice,
+                    profile.assumptions 
+                );
+
+                // 5. Detect Outliers
+                const tempAssumptions = { ...profile.assumptions, ...autoFilledAssumptions } as Assumptions;
+                const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
+                
+                if (outlierDetection.detectedOutliers.length > 0) {
+                    console.log(`⚠️ ${tickerSymbol}: Outliers détectés: ${outlierDetection.detectedOutliers.join(', ')}`);
+                }
+
+                const finalAssumptions = {
+                    ...tempAssumptions,
+                    excludeEPS: outlierDetection.excludeEPS,
+                    excludeCF: outlierDetection.excludeCF,
+                    excludeBV: outlierDetection.excludeBV,
+                    excludeDIV: outlierDetection.excludeDIV
+                };
+
+                // 6. Update Library
+                setLibrary(prev => {
+                    const updated = {
+                        ...prev,
+                        [tickerSymbol]: {
+                            ...profile,
+                            data: mergedData,
+                            info: {
+                                ...profile.info,
+                                ...result.info,
+                                name: result.info.name || profile.info.name
+                            },
+                            assumptions: finalAssumptions,
+                            lastModified: Date.now()
+                        }
+                    };
+                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(updated)); } catch (e) { console.warn(e); }
+                    return updated;
+                });
+
+                // 7. Save Snapshot
+                await saveSnapshot(
+                    tickerSymbol,
+                    mergedData,
+                    finalAssumptions,
+                    { ...profile.info, ...result.info },
+                    `Synchronisation globale - ${new Date().toLocaleString()}`,
+                    true, 
+                    true   
+                );
+
+                successCount++;
+                setSyncStats({ successCount, errorCount });
+                console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
+
+                // 8. Delai de sécurité
+                await new Promise(resolve => setTimeout(resolve, delayBetweenTickers));
+
+            } catch (error: any) {
+                errorCount++;
+                setSyncStats({ successCount, errorCount });
+                const errorMsg = `${tickerSymbol}: ${error.message || 'Erreur inconnue'}`;
+                errors.push(errorMsg);
+                console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
+            }
         }
 
         setIsBulkSyncing(false);
@@ -1776,7 +1819,11 @@ export default function App() {
             `Erreurs: ${errorCount}` +
             (errors.length > 0 ? `\n\nErreurs:\n${errors.slice(0, 5).join('\n')}${errors.length > 5 ? `\n... et ${errors.length - 5} autres` : ''}` : '');
         
-        showNotification(message, errorCount > 0 ? 'warning' : 'success');
+        if (!abortSync.current) {
+             showNotification(message, errorCount > 0 ? 'warning' : 'success');
+        } else {
+             showNotification("Synchronisation arrêtée manuellement.", 'warning');
+        }
         console.log(`✅ ${message}`);
     };
 
@@ -1878,20 +1925,20 @@ export default function App() {
                         const tempAssumptions = {
                             ...profile.assumptions,
                             ...autoFilledAssumptions
-                        };
+                        } as Assumptions;
                         const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
                         
                         if (outlierDetection.detectedOutliers.length > 0) {
                             console.log(`⚠️ ${tickerSymbol}: Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(', ')}`);
                         }
 
-                        const finalAssumptions = {
+                        const finalAssumptions: Assumptions = {
                             ...tempAssumptions,
                             excludeEPS: outlierDetection.excludeEPS,
                             excludeCF: outlierDetection.excludeCF,
                             excludeBV: outlierDetection.excludeBV,
                             excludeDIV: outlierDetection.excludeDIV
-                        };
+                        } as Assumptions;
 
                         // 6. Mettre à jour le profil
                         setLibrary(prev => {
@@ -2049,15 +2096,28 @@ export default function App() {
             // Exclure les fonds mutuels
             const newTickers = result.tickers.filter(t => {
                 const symbol = t.ticker.toUpperCase();
-                // Exclure si déjà dans library
-                if (library[symbol]) {
-                    return false;
-                }
-                // Exclure les fonds mutuels
+                
+                // Vérifier si fonds mutuel
                 if (isMutualFund(symbol, t.company_name)) {
                     console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - exclu de la synchronisation`);
                     return false;
                 }
+
+                // Si déjà dans library
+                if (library[symbol]) {
+                    const profile = library[symbol];
+                    // Vérifier si les données sont valides (au moins une année avec EPS ou CF > 0)
+                    const hasValidData = profile.data && profile.data.length > 0 && profile.data.some(d => 
+                        d.earningsPerShare !== 0 || d.cashFlowPerShare !== 0
+                    );
+                    
+                    if (hasValidData) {
+                        return false; // Données valides, on passe
+                    }
+                    console.log(`⚠️ ${symbol}: Profil existant mais données invalides/vides - Force resync FMP`);
+                    // On laisse passer pour re-fetch FMP
+                }
+
                 return true;
             });
 
@@ -2194,7 +2254,66 @@ export default function App() {
 
     const availableYears = data.map(d => d.year);
 
+    const syncOverlay = isBulkSyncing ? (
+        <div className="fixed bottom-4 right-4 bg-slate-800 p-4 rounded-lg shadow-xl border border-slate-700 z-[100] w-80 animate-in fade-in slide-in-from-bottom-5">
+            <div className="flex justify-between items-center mb-2">
+                <span className="font-bold text-white text-sm flex items-center gap-2">
+                    <ArrowPathIcon className={`w-4 h-4 ${!syncPausedState ? 'animate-spin' : ''}`} />
+                    Syncing... {bulkSyncProgress.current}/{bulkSyncProgress.total}
+                </span>
+                <span className="text-xs text-slate-400 font-mono">{Math.round((bulkSyncProgress.current / bulkSyncProgress.total) * 100)}%</span>
+            </div>
+            <div className="w-full bg-slate-700 h-2 rounded-full mb-3 overflow-hidden">
+                <div 
+                    className="bg-blue-500 h-full rounded-full transition-all duration-300 ease-out" 
+                    style={{ width: `${(bulkSyncProgress.current / bulkSyncProgress.total) * 100}%` }}
+                ></div>
+            </div>
+            
+            <div className="flex justify-between items-center text-xs text-slate-400 mb-3">
+                 <span>Success: <span className="text-green-400">{syncStats.successCount}</span></span>
+                 <span>Errors: <span className="text-red-400">{syncStats.errorCount}</span></span>
+            </div>
+
+            <div className="flex gap-2">
+                <button 
+                    onClick={() => { 
+                        isSyncPaused.current = !isSyncPaused.current; 
+                        setSyncPausedState(isSyncPaused.current); 
+                    }} 
+                    className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded transition-colors ${syncPausedState ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-yellow-600 hover:bg-yellow-500 text-white'}`}
+                >
+                    {syncPausedState ? <PlayIcon className="w-4 h-4" /> : <PauseIcon className="w-4 h-4" />}
+                    <span>{syncPausedState ? "Resume" : "Pause"}</span>
+                </button>
+                <button 
+                    onClick={() => abortSync.current = true} 
+                    className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded transition-colors"
+                >
+                    <StopIcon className="w-4 h-4" />
+                    <span>Stop</span>
+                </button>
+            </div>
+        </div>
+    ) : null;
+
     if (!isInitialized) return <div className="flex items-center justify-center h-screen text-slate-500">Chargement...</div>;
+
+    if (showAdmin) {
+        return (
+            <div className="fixed inset-0 z-50 bg-slate-900 pointer-events-auto">
+                <button 
+                    onClick={() => setShowAdmin(false)}
+                    className="absolute top-4 right-4 p-2 bg-slate-800 text-white rounded z-50 hover:bg-slate-700 pointer-events-auto"
+                >
+                    Close Admin
+                </button>
+                <div className="h-full w-full">
+                     <AdminDashboard onRepair={handleAdminRepair} isRepairing={isRepairing} />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex h-screen bg-gray-100 font-sans text-slate-800 overflow-hidden">
@@ -2229,6 +2348,7 @@ export default function App() {
                         onBulkSyncAll={handleBulkSyncAllTickers}
                         isBulkSyncing={isBulkSyncing}
                         bulkSyncProgress={bulkSyncProgress}
+                        onOpenAdmin={() => setShowAdmin(true)}
                     />
                 </div>
             </div>

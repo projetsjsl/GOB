@@ -79,6 +79,7 @@ async function getSnapshots(req, res, supabase) {
             .select('*')
             .eq('ticker', ticker.toUpperCase())
             .order('snapshot_date', { ascending: false })
+            .order('id', { ascending: false })
             .limit(parseInt(limit));
 
         if (error) {

@@ -229,16 +229,33 @@ export default async function handler(req, res) {
 
 
         // PARALLEL FETCHING: Fetch all independent data sources concurrently
-        // 2. Key Metrics
+        // 2. Key Metrics - Strategic: Fetch full 30 years history for database archival
         // 3. Dividends
-        // 4. Historical Prices
+        // 4. Historical Prices - Strategic: Fetch full 20 years (7300 days) for database archival
         // 5. Realtime Quote (Finnhub)
+        // 6. Financial Statements (Income, Balance, Cash Flow) - Strategic: Deep data ingestion
         
         const keyMetricsPromise = fetch(`${FMP_BASE}/key-metrics/${usedSymbol}?period=annual&limit=30&apikey=${FMP_KEY}`);
         const dividendPromise = fetch(`${FMP_BASE}/historical-price-full/stock_dividend/${usedSymbol}?apikey=${FMP_KEY}`);
-        // Premium: Augmenter timeseries à 7300 jours (~20 ans) au lieu de 1825 (5 ans)
+        
+        // Strategic: Fetch full history (20 years) so Supabase becomes a complete historical warehouse
         const pricePromise = fetch(`${FMP_BASE}/historical-price-full/${usedSymbol}?serietype=line&timeseries=7300&apikey=${FMP_KEY}`);
         
+        // Financial Statements - Deep History (30 years annual, 20 years quarterly)
+        const incomeStatementAnnualPromise = fetch(`${FMP_BASE}/income-statement/${usedSymbol}?period=annual&limit=30&apikey=${FMP_KEY}`);
+        const balanceSheetAnnualPromise = fetch(`${FMP_BASE}/balance-sheet-statement/${usedSymbol}?period=annual&limit=30&apikey=${FMP_KEY}`);
+        const cashFlowAnnualPromise = fetch(`${FMP_BASE}/cash-flow-statement/${usedSymbol}?period=annual&limit=30&apikey=${FMP_KEY}`);
+        
+        const incomeStatementQuarterlyPromise = fetch(`${FMP_BASE}/income-statement/${usedSymbol}?period=quarter&limit=80&apikey=${FMP_KEY}`);
+        const balanceSheetQuarterlyPromise = fetch(`${FMP_BASE}/balance-sheet-statement/${usedSymbol}?period=quarter&limit=80&apikey=${FMP_KEY}`);
+        const cashFlowQuarterlyPromise = fetch(`${FMP_BASE}/cash-flow-statement/${usedSymbol}?period=quarter&limit=80&apikey=${FMP_KEY}`);
+        
+        // Premium Data - Strategic Analysis
+        const analystEstimatesPromise = fetch(`${FMP_BASE}/analyst-estimates/${usedSymbol}?limit=30&apikey=${FMP_KEY}`);
+        const insiderTradingPromise = fetch(`${FMP_BASE}/insider-trading/${usedSymbol}?limit=100&apikey=${FMP_KEY}`);
+        const institutionalHoldersPromise = fetch(`${FMP_BASE}/institutional-holder/${usedSymbol}?apikey=${FMP_KEY}`);
+        const earningsSurprisesPromise = fetch(`${FMP_BASE}/earnings-surprises/${usedSymbol}?limit=50&apikey=${FMP_KEY}`);
+
         let quotePromise = Promise.resolve(null);
         if (FINNHUB_KEY) {
             const finnhubSymbol = cleanSymbol.replace('.', '-');
@@ -246,11 +263,16 @@ export default async function handler(req, res) {
         }
 
         // Wait for all requests to complete
-        const [metricsRes, dividendRes, priceRes, quoteRes] = await Promise.all([
-            keyMetricsPromise,
-            dividendPromise,
-            pricePromise,
-            quotePromise
+        const [
+            metricsRes, dividendRes, priceRes, quoteResRaw, // Renamed quoteRes to quoteResRaw to avoid conflict
+            incomeAnnualRes, balanceAnnualRes, cashAnnualRes,
+            incomeQuarterlyRes, balanceQuarterlyRes, cashQuarterlyRes,
+            analystRes, insiderRes, instHolderRes, surprisesRes
+        ] = await Promise.all([
+            keyMetricsPromise, dividendPromise, pricePromise, quotePromise,
+            incomeStatementAnnualPromise, balanceSheetAnnualPromise, cashFlowAnnualPromise,
+            incomeStatementQuarterlyPromise, balanceSheetQuarterlyPromise, cashFlowQuarterlyPromise,
+            analystEstimatesPromise, insiderTradingPromise, institutionalHoldersPromise, earningsSurprisesPromise
         ]);
 
         // --- PROCESS KEY METRICS ---
@@ -290,15 +312,6 @@ export default async function handler(req, res) {
 
         // --- PROCESS DIVIDENDS ---
         let dividendsByFiscalYear = {};
-        if (dividendRes.ok) {
-            const dividendData = await dividendRes.json();
-            if (dividendData.historical && dividendData.historical.length > 0) {
-                dividendData.historical.forEach(div => {
-                    const divDate = new Date(div.date);
-                    const divYear = divDate.getFullYear();
-                    const divMonth = divDate.getMonth(); // 0-11
-                    // For ACN (fiscal ends Aug 31): Sept-Aug = fiscal year
-                    const fiscalYear = divMonth >= 8 ? divYear + 1 : divYear;
 
                     if (!dividendsByFiscalYear[fiscalYear]) {
                         dividendsByFiscalYear[fiscalYear] = 0;
@@ -477,7 +490,18 @@ export default async function handler(req, res) {
         };
 
         return res.status(200).json({
-            data: annualData.slice(-15), // Premium: Keep last 15 years (au lieu de 6) pour analyses long terme
+            data: annualData, // Strategic: Return full available history (up to 30 years) for archival
+            financials: {
+                income: { annual: incomeAnnual, quarterly: incomeQuarterly },
+                balance: { annual: balanceAnnual, quarterly: balanceQuarterly },
+                cash: { annual: cashAnnual, quarterly: cashQuarterly }
+            },
+            analysisData: {
+                analystEstimates,
+                insiderTrading,
+                institutionalHolders,
+                earningsSurprises
+            },
             info: mappedInfo,
             currentPrice: parseFloat(currentPrice.toFixed(2))
         });

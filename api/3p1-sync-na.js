@@ -159,7 +159,61 @@ export default async function handler(req, res) {
             });
         }
 
-        // 4. Retourner l'analyse
+        // 5. Si action = 'validate', rechercher des corrections potentielles
+        if (action === 'validate' && (naTickers.length > 0 || errorTickers.length > 0)) {
+            const validationResults = [];
+            const tickersToValidate = [...errorTickers, ...naTickers];
+            
+            console.log(`🔍 Validation de ${tickersToValidate.length} tickers problématiques...`);
+            
+            for (let i = 0; i < tickersToValidate.length; i++) {
+                const problemTicker = tickersToValidate[i];
+                const companyName = problemTicker.companyName;
+                
+                if (!companyName) continue;
+                
+                try {
+                    // Recherche intelligente dans FMP
+                    const searchUrl = `https://financialmodelingprep.com/api/v3/search?query=${encodeURIComponent(companyName)}&limit=5&apikey=${fmpApiKey}`;
+                    const searchResponse = await fetch(searchUrl);
+                    const searchResults = await searchResponse.json();
+                    
+                    if (Array.isArray(searchResults) && searchResults.length > 0) {
+                        // Trouver le meilleur match
+                        const bestMatch = searchResults.find(r => 
+                            r.name && r.name.toUpperCase() === companyName.toUpperCase() &&
+                            r.currency === 'USD' // Prioriser USD souvent
+                        ) || searchResults[0];
+                        
+                        if (bestMatch && bestMatch.symbol !== problemTicker.ticker) {
+                            validationResults.push({
+                                currentTicker: problemTicker.ticker,
+                                suggestedTicker: bestMatch.symbol,
+                                companyName: bestMatch.name,
+                                exchange: bestMatch.exchangeShortName,
+                                reason: 'Found better match via FMP Search',
+                                confidence: 'High'
+                            });
+                        }
+                    }
+                } catch (err) {
+                    console.warn(`Failed to validate ${problemTicker.ticker}:`, err);
+                }
+                
+                // Rate limiting
+                if (i < tickersToValidate.length - 1) await new Promise(r => setTimeout(r, 200));
+            }
+            
+            return res.status(200).json({
+                success: true,
+                message: 'Validation terminée',
+                action: 'validate',
+                validationResults,
+                scannedCount: tickersToValidate.length
+            });
+        }
+
+        // 4. Retourner l'analyse (par défaut)
         return res.status(200).json({
             success: true,
             message: 'Analyse terminée',
@@ -168,7 +222,7 @@ export default async function handler(req, res) {
             naTickers: naTickers.map(t => t.ticker),
             naTickersDetails: naTickers,
             validTickers: validTickers.length,
-            errorTickers: errorTickers.length,
+            errorTickers: errorTickers,
             summary: {
                 total: tickers.length,
                 valid: validTickers.length,

@@ -8,6 +8,8 @@ export const fetchCompanyData = async (symbol: string): Promise<{
   data: AnnualData[];
   info: Partial<CompanyInfo>;
   currentPrice: number;
+  financials?: any;
+  analysisData?: any;
 }> => {
   const cleanSymbol = symbol.toUpperCase();
 
@@ -40,7 +42,9 @@ export const fetchCompanyData = async (symbol: string): Promise<{
     return {
       data: dataWithFlag,
       info: result.info || {},
-      currentPrice: result.currentPrice || 0
+      currentPrice: result.currentPrice || 0,
+      financials: result.financials,
+      analysisData: result.analysisData
     };
 
   } catch (error) {

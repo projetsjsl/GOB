@@ -9,7 +9,8 @@ import {
   DocumentDuplicateIcon,
   EyeIcon,
   StarIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  ShieldCheckIcon
 } from '@heroicons/react/24/outline';
 import { AnalysisProfile, Recommendation } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
@@ -30,9 +31,10 @@ interface SidebarProps {
   onBulkSyncAll?: () => void;
   isBulkSyncing?: boolean;
   bulkSyncProgress?: { current: number; total: number };
+  onOpenAdmin?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, isBulkSyncing = false, bulkSyncProgress }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredProfiles = profiles
@@ -105,18 +107,44 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
           </button>
         )}
         {onBulkSyncAll && (
+          <div className="flex flex-col gap-1">
+             <button
+              onClick={onBulkSyncAll}
+              disabled={isBulkSyncing || isLoadingTickers}
+              className="w-full bg-green-700 hover:bg-green-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors"
+              title="Strategic Warehouse Sync (Deep Data)\n\nSynchronise TOUS les tickers avec historique COMPLET (30 ans).\n\nInclus maintenant:\n• États Financiers Complets (Bilan, Compte de résultat, Flux de trésorerie)\n• Historique Prix 20 ans\n• Métriques 30 ans\n\nC'est l'option recommandée pour construire votre base de données."
+            >
+              <ArrowPathIcon className={`w-4 h-4 ${isBulkSyncing ? 'animate-spin' : ''}`} />
+              <span className="flex-1 text-left">
+                {isBulkSyncing && bulkSyncProgress
+                  ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}`
+                  : 'Sync Warehouse (Deep)'}
+              </span>
+            </button>
+            
+            <div className="flex gap-1">
+                 <button
+                    onClick={() => {
+                        if(confirm("Forcer le rafraîchissement complet ? Cela effacera le cache local.")) {
+                             window.location.reload();
+                        }
+                    }}
+                    className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider transition-colors"
+                    title="Forcer le rechargement de l'application"
+                >
+                    FORCE RELOAD
+                </button>
+            </div>
+          </div>
+        )}
+        {onOpenAdmin && (
           <button
-            onClick={onBulkSyncAll}
-            disabled={isBulkSyncing || isLoadingTickers}
-            className="w-full bg-green-700 hover:bg-green-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors"
-            title="Synchroniser tous les tickers\n\nSynchronise TOUS les tickers de votre portefeuille avec l'API FMP.\n\n⚠️ IMPORTANT:\n• Crée automatiquement un snapshot de sauvegarde AVANT la sync\n• Met à jour uniquement les données auto-fetchées (autoFetched: true)\n• Préserve toutes vos modifications manuelles (autoFetched: false)\n• Ajoute les nouvelles années disponibles\n• Recalcule les hypothèses (préserve les exclusions)\n• Préserve les métriques ValueLine\n\nCette opération peut prendre plusieurs minutes selon le nombre de tickers."
+            onClick={onOpenAdmin}
+            className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors mt-2 border border-slate-700"
+            title="Ouvrir le tableau de bord d'administration (Ctrl+Shift+A)\n\n• État de la synchronisation\n• Inspecteur de données brutes\n• Réparation et diagnostic"
           >
-            <ArrowPathIcon className={`w-4 h-4 ${isBulkSyncing ? 'animate-spin' : ''}`} />
-            <span className="flex-1 text-left">
-              {isBulkSyncing && bulkSyncProgress
-                ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}`
-                : 'Sync Tous les Tickers'}
-            </span>
+            <ShieldCheckIcon className="w-4 h-4" />
+            <span>Admin Warehouse</span>
           </button>
         )}
       </div>
