@@ -5,7 +5,7 @@
 
 
 
-const PlusTab = ({ isDarkMode, isProfessionalMode }) => {
+const PlusTab = ({ isDarkMode, isProfessionalMode, setActiveTab, activeTab }) => {
     const handleLogout = () => {
         // Nettoyer toutes les données de session
         sessionStorage.clear();
@@ -17,6 +17,15 @@ const PlusTab = ({ isDarkMode, isProfessionalMode }) => {
 
     return (
         <div className="space-y-6">
+            {/* Navigation Secondaire */}
+            {window.SecondaryNavBar && (
+                <window.SecondaryNavBar 
+                    activeTab={activeTab} 
+                    onTabChange={setActiveTab} 
+                    isDarkMode={isDarkMode} 
+                />
+            )}
+
             <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
                 isDarkMode
                     ? 'bg-gray-900 border-gray-700'

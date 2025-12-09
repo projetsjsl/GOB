@@ -25312,9 +25312,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         setShowTemperatureEditor={setShowTemperatureEditor}
                         showLengthEditor={showLengthEditor}
                         setShowLengthEditor={setShowLengthEditor}
+                        setActiveTab={setActiveTab}
+                        activeTab={activeTab}
                     />}
                     {activeTab === 'assistant-vocal' && <VoiceAssistantTab isDarkMode={isDarkMode} />}
-                    {activeTab === 'plus' && <PlusTab />}
+                    {activeTab === 'plus' && <PlusTab 
+                        setActiveTab={setActiveTab} 
+                        activeTab={activeTab} 
+                        isDarkMode={isDarkMode}
+                        isProfessionalMode={isProfessionalMode}
+                    />}
                     {activeTab === 'admin-jsla' && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, {
                         emmaConnected: emmaConnected,
                         setEmmaConnected: setEmmaConnected,
@@ -25324,7 +25331,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         setShowTemperatureEditor: setShowTemperatureEditor,
                         showLengthEditor: showLengthEditor,
                         setShowLengthEditor: setShowLengthEditor,
-                        isDarkMode: isDarkMode
+                        isDarkMode: isDarkMode,
+                        setActiveTab: setActiveTab,
+                        activeTab: activeTab
                     })}
                     {activeTab === 'dans-watchlist' && <DansWatchlistTab />}
                     {activeTab === 'scrapping-sa' && <ScrappingSATab />}

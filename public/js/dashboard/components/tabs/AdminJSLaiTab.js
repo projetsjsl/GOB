@@ -12,7 +12,9 @@ const AdminJSLaiTab = ({
                 setShowTemperatureEditor = () => {},
                 showLengthEditor = false,
                 setShowLengthEditor = () => {},
-                isDarkMode = true
+                isDarkMode = true,
+                setActiveTab,
+                activeTab
             }) => {
                 // Validation des props avec valeurs par défaut
                 const darkMode = isDarkMode !== undefined ? isDarkMode : true;
@@ -205,6 +207,14 @@ const AdminJSLaiTab = ({
                 
                 return (
                 <div className="space-y-6">
+                    {/* Navigation Secondaire */}
+                    {window.SecondaryNavBar && (
+                        <window.SecondaryNavBar 
+                            activeTab={activeTab} 
+                            onTabChange={setActiveTab} 
+                            isDarkMode={darkMode} 
+                        />
+                    )}
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             darkMode ? 'text-white' : 'text-gray-900'
