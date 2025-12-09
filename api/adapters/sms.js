@@ -278,13 +278,11 @@ export default async function handler(req, res) {
         try {
           const response = chatResponse.response;
 
-          // Protection anti-spam
+          // Protection anti-spam / Limite SMS
+          // Au lieu de rejeter, on tronque à ~3 SMS (4400 chars + suffixe)
           if (response.length > 4500) {
-            await sendSMS(
-              senderPhone,
-              "❌ Désolé, la réponse est trop longue pour SMS. Essayez une question plus spécifique."
-            );
-            return;
+            console.warn(`[SMS Adapter] Réponse trop longue (${response.length} chars), tronquée à 4500.`);
+            response = response.substring(0, 4400) + "\n\n[...Suite trop longue pour SMS]";
           }
 
           console.log(`[SMS Adapter] Envoi réponse finale via Twilio API`);
