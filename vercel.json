@@ -29,23 +29,19 @@
       "maxDuration": 15
     },
     "api/calendar-economic.js": {
-      "maxDuration": 15,
-      "memory": 1024
+      "maxDuration": 15
     },
     "api/calendar-earnings.js": {
-      "maxDuration": 15,
-      "memory": 1024
+      "maxDuration": 15
     },
     "api/calendar-dividends.js": {
-      "maxDuration": 15,
-      "memory": 1024
+      "maxDuration": 15
     },
     "api/admin/tickers.js": {
       "maxDuration": 15
     },
     "api/admin/unrecoverable-tickers.js": {
-      "maxDuration": 300,
-      "memory": 1024
+      "maxDuration": 300
     },
     "api/admin/redirects.js": {
       "maxDuration": 30
@@ -93,8 +89,7 @@
       "maxDuration": 15
     },
     "api/rsi-screener.js": {
-      "maxDuration": 300,
-      "memory": 1024
+      "maxDuration": 300
     },
     "api/treasury-rates.js": {
       "maxDuration": 30
@@ -124,23 +119,19 @@
       "maxDuration": 30
     },
     "api/fmp-sync.js": {
-      "maxDuration": 300,
-      "memory": 1024
+      "maxDuration": 300
     },
     "api/kpi-engine.js": {
-      "maxDuration": 60,
-      "memory": 512
+      "maxDuration": 60
     },
     "api/terminal-data.js": {
       "maxDuration": 30
     },
     "api/fmp-batch-sync.js": {
-      "maxDuration": 300,
-      "memory": 1024
+      "maxDuration": 300
     },
     "api/cron/fmp-batch-sync.js": {
-      "maxDuration": 300,
-      "memory": 1024
+      "maxDuration": 300
     },
     "api/market-data-batch.js": {
       "maxDuration": 30
