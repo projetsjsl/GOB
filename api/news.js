@@ -243,7 +243,20 @@ async function fetchFinnhubNews(query, limit) {
       image: article.image,
       category: article.category,
       source_original: article.source || null
-    }));
+    })).filter(article => {
+      // STRICT RELEVANCE CHECK
+      // Finnhub often returns general news for a ticker query
+      // We filter to ensure specific ticker mention if query is a ticker
+      if (query && query.length <= 5) {
+        const text = ((article.title || '') + ' ' + (article.summary || '')).toLowerCase();
+        const qLower = query.toLowerCase();
+        
+        // Check for Ticker as whole word
+        const regex = new RegExp(`\\b${qLower}\\b`, 'i');
+        return regex.test(text);
+      }
+      return true;
+    });
 
   } catch (error) {
     console.error('❌ Finnhub news fetch error:', error.message);
@@ -458,18 +471,15 @@ async function fetchRSSNews(feedKeys, limit, query) {
     // FIXED: Filter by query if provided - previously only filtered when query.length > 5
     // This caused tickers (1-5 chars) to return unfiltered RSS news
     if (query) {
-      const queryLower = query.toLowerCase();
-      const tickerBase = queryLower.split('.')[0]; // Handle BRK.A → brk, MFC.TO → mfc
+      // Prepare regex for word boundary matching to avoid partial matches
+      // e.g. "T" matching "The", "AI" matching "Main"
+      const regex = new RegExp(`\\b(${queryLower}|${tickerBase})\\b`, 'i');
       
       return articles.filter(article => {
         const title = (article.title || '').toLowerCase();
         const summary = (article.summary || '').toLowerCase();
         
-        // Match full ticker/query or base ticker
-        return title.includes(queryLower) || 
-               summary.includes(queryLower) ||
-               title.includes(tickerBase) ||
-               summary.includes(tickerBase);
+        return regex.test(title) || regex.test(summary);
       });
     }
 
