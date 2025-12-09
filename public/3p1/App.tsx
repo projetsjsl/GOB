@@ -1618,12 +1618,14 @@ export default function App() {
         }
     };
 
-    const handleDeleteTicker = (id: string) => {
+    const handleDeleteTicker = async (id: string) => {
+        // Delete from local storage and state
         const newLib = { ...library };
         delete newLib[id];
         setLibrary(newLib);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(newLib));
 
+        // Update active ticker if needed
         if (activeId === id) {
             const remaining = Object.keys(newLib);
             if (remaining.length > 0) {
@@ -1632,6 +1634,27 @@ export default function App() {
                 setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
                 setActiveId(DEFAULT_PROFILE.id);
             }
+        }
+
+        // Delete from Supabase in background
+        try {
+            const response = await fetch('/api/remove-ticker', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ticker: id, confirm: true })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                console.log(`✅ ${id} supprimé de Supabase:`, result.removed_from);
+                showNotification(`✅ ${id} supprimé définitivement`, 'success');
+            } else {
+                console.warn(`⚠️ ${id} non trouvé dans Supabase`, result);
+            }
+        } catch (error) {
+            console.error(`❌ Erreur suppression Supabase pour ${id}:`, error);
+            // Ne pas bloquer l'UI - la suppression locale a déjà été faite
         }
     };
 

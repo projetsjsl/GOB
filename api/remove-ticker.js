@@ -140,6 +140,22 @@ export default async function handler(req, res) {
             results.errors.push(`supabase_seeking_alpha_analysis: ${error.message}`);
         }
 
+        // 6. Remove from Supabase finance_snapshots (used by 3p1 app)
+        try {
+            const { data, error } = await supabase
+                .from('finance_snapshots')
+                .delete()
+                .eq('ticker', tickerUpper);
+
+            if (!error) {
+                results.removed_from.push('supabase_finance_snapshots');
+            } else if (error.code !== 'PGRST116') {
+                results.errors.push(`supabase_finance_snapshots: ${error.message}`);
+            }
+        } catch (error) {
+            results.errors.push(`supabase_finance_snapshots: ${error.message}`);
+        }
+
         // Prepare response
         const success = results.removed_from.length > 0;
         const hasErrors = results.errors.length > 0;
