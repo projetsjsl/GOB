@@ -666,68 +666,101 @@ Comment puis-je t'aider ? 🚀`;
       });
     }
 
-    // Commande TOP 5 NEWS / NEWS du jour (rapide, pas d'appel Emma complet)
-    if (normalizedMessage.includes('TOP 5') || normalizedMessage.includes('TOP5') || (normalizedMessage.includes('ACTUALIT') && normalizedMessage.includes('AUJOURD'))) {
-      console.log('[Chat API] Commande TOP 5 NEWS détectée');
+    // Commande TOP NEWS / Market Overview (revue complète des marchés)
+    if (normalizedMessage.includes('TOP 5') || normalizedMessage.includes('TOP5') || normalizedMessage === 'TOP NEWS' || normalizedMessage === 'TOP' || (normalizedMessage.includes('ACTUALIT') && normalizedMessage.includes('AUJOURD'))) {
+      console.log('[Chat API] Commande TOP NEWS (Market Overview) détectée');
 
-      // Appeler endpoint news directement (plus rapide que Emma complète)
       try {
         const baseUrl = process.env.VERCEL_URL
           ? `https://${process.env.VERCEL_URL}`
           : 'https://gob-projetsjsls-projects.vercel.app';
 
-        const newsResponse = await fetch(`${baseUrl}/api/fmp?endpoint=news&limit=5`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
-        });
+        // Fetch multiple data sources in parallel
+        const [generalNewsRes, forexRes, indicesRes] = await Promise.all([
+          fetch(`${baseUrl}/api/fmp?endpoint=news&limit=8`, { headers: { 'Content-Type': 'application/json' } }),
+          fetch(`${baseUrl}/api/fmp?endpoint=forex&pairs=EURUSD,CADUSD,GBPUSD`, { headers: { 'Content-Type': 'application/json' } }).catch(() => null),
+          fetch(`${baseUrl}/api/fmp?endpoint=quote&symbol=^GSPC,^DJI,^IXIC,^GSPTSE`, { headers: { 'Content-Type': 'application/json' } }).catch(() => null)
+        ]);
 
-        if (newsResponse.ok) {
-          const newsData = await newsResponse.json();
+        let capsuleText = `🌍 REVUE DES MARCHÉS\n${new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}\n\n`;
 
-          // Vérifier si c'est un array ou un objet avec data
-          const news = Array.isArray(newsData) ? newsData.slice(0, 5) : (newsData.data || []).slice(0, 5);
+        // Section Indices (si disponible)
+        if (indicesRes && indicesRes.ok) {
+          try {
+            const indicesData = await indicesRes.json();
+            if (Array.isArray(indicesData) && indicesData.length > 0) {
+              capsuleText += `📈 INDICES\n`;
+              indicesData.forEach(idx => {
+                const change = idx.changesPercentage || idx.change || 0;
+                const arrow = change >= 0 ? '🟢' : '🔴';
+                capsuleText += `${arrow} ${idx.name || idx.symbol}: ${idx.price?.toFixed(2) || 'N/A'} (${change >= 0 ? '+' : ''}${change.toFixed(2)}%)\n`;
+              });
+              capsuleText += `\n`;
+            }
+          } catch (e) { console.warn('Indices parse error:', e.message); }
+        }
+
+        // Section News par région
+        if (generalNewsRes.ok) {
+          const newsData = await generalNewsRes.json();
+          const news = Array.isArray(newsData) ? newsData : (newsData.data || []);
 
           if (news.length > 0) {
-            let capsuleText = `📰 TOP 5 NEWS FINANCIÈRES\n${new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\n\n`;
+            // Catégoriser les news
+            const usNews = news.filter(n => !n.symbol?.includes('.TO') && !n.symbol?.includes('.PA') && !n.symbol?.includes('.L'));
+            const caNews = news.filter(n => n.symbol?.includes('.TO') || n.title?.toLowerCase().includes('canada') || n.title?.toLowerCase().includes('tsx'));
+            const euNews = news.filter(n => n.symbol?.includes('.PA') || n.symbol?.includes('.L') || n.title?.toLowerCase().includes('euro') || n.title?.toLowerCase().includes('europe'));
 
-            news.forEach((item, idx) => {
-              capsuleText += `${idx + 1}. ${item.title || item.headline || 'Sans titre'}\n`;
+            // US Market
+            if (usNews.length > 0) {
+              capsuleText += `🇺🇸 ÉTATS-UNIS\n`;
+              usNews.slice(0, 3).forEach(item => {
+                capsuleText += `• ${item.title?.substring(0, 80) || 'N/A'}${item.title?.length > 80 ? '...' : ''}\n`;
+              });
+              capsuleText += `\n`;
+            }
 
-              // Ajouter un court extrait si disponible
-              if (item.text || item.summary) {
-                const excerpt = (item.text || item.summary).substring(0, 120).trim();
-                capsuleText += `   ${excerpt}...\n`;
-              }
+            // Canada Market
+            if (caNews.length > 0) {
+              capsuleText += `🇨🇦 CANADA\n`;
+              caNews.slice(0, 2).forEach(item => {
+                capsuleText += `• ${item.title?.substring(0, 80) || 'N/A'}${item.title?.length > 80 ? '...' : ''}\n`;
+              });
+              capsuleText += `\n`;
+            }
 
-              // Ajouter l'URL
-              if (item.url || item.link) {
-                capsuleText += `   🔗 ${item.url || item.link}\n`;
-              }
+            // Europe
+            if (euNews.length > 0) {
+              capsuleText += `🇪🇺 EUROPE\n`;
+              euNews.slice(0, 2).forEach(item => {
+                capsuleText += `• ${item.title?.substring(0, 80) || 'N/A'}${item.title?.length > 80 ? '...' : ''}\n`;
+              });
+              capsuleText += `\n`;
+            }
 
-              capsuleText += '\n';
+            // Headlines économiques générales
+            capsuleText += `💼 CE QUI SE JASE\n`;
+            news.slice(0, 3).forEach(item => {
+              capsuleText += `• ${item.title?.substring(0, 70) || 'N/A'}${item.title?.length > 70 ? '...' : ''}\n`;
             });
-
-            capsuleText += '💼 Tape SKILLS pour toutes mes capacités';
-
-            await saveConversationTurn(conversation.id, message, capsuleText, {
-              type: 'command_top5news',
-              channel: channel,
-              news_count: news.length
-            });
-
-            return res.status(200).json({
-              success: true,
-              response: capsuleText,
-              metadata: { command: 'TOP5NEWS', news_count: news.length }
-            });
-          } else {
-            console.log('[Chat API] Aucune actualité trouvée');
           }
-        } else {
-          console.error('[Chat API] Erreur API news:', newsResponse.status);
         }
+
+        capsuleText += `\n📊 ANALYSE [TICKER] pour détails`;
+
+        await saveConversationTurn(conversation.id, message, capsuleText, {
+          type: 'command_market_overview',
+          channel: channel
+        });
+
+        return res.status(200).json({
+          success: true,
+          response: capsuleText,
+          metadata: { command: 'MARKET_OVERVIEW' }
+        });
+
       } catch (error) {
-        console.error('[Chat API] Erreur capsule news:', error.message);
+        console.error('[Chat API] Erreur Market Overview:', error.message);
         // Fallback: laisser Emma gérer normalement
       }
     }
