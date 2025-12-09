@@ -77,10 +77,14 @@ export default async function handler(req, res) {
     }
 
     // Source 4: RSS Feeds (blogs et sources premium)
-    // Sélectionner les flux RSS selon le contexte
-    const rssFeeds = selectRSSFeedsForContext(context);
-    if (rssFeeds.length > 0) {
-      newsPromises.push(fetchRSSNews(rssFeeds, maxLimit, searchQuery));
+    // IMPORTANT: Skip RSS for ticker queries - RSS doesn't support ticker filtering natively
+    // Only use RSS for general/topic queries where we search by keyword
+    const isTickerQuery = searchQuery && searchQuery.length <= 5;
+    if (!isTickerQuery) {
+      const rssFeeds = selectRSSFeedsForContext(context);
+      if (rssFeeds.length > 0) {
+        newsPromises.push(fetchRSSNews(rssFeeds, maxLimit, searchQuery));
+      }
     }
 
     // Attendre toutes les réponses
