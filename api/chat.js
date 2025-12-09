@@ -287,7 +287,7 @@ export default async function handler(req, res) {
           console.log(`[Chat API] Nom enregistré: ${userName}`);
 
           // Réponse de bienvenue (Avec commandes explicites)
-          const welcomeResponse = `Enchanté ${userName} ! 👋
+          const welcomeResponse = `👩🏻 Enchanté ${userName} ! 👋
 
 Je suis Emma, ton assistante IA financière propulsée par JSLAI 🚀
 
@@ -603,7 +603,7 @@ Pour arrêter: réponds STOP`;
     if (normalizedMessage === 'AIDE' || normalizedMessage === 'HELP' || normalizedMessage === 'SKILLS' || normalizedMessage === 'SKILL' || normalizedMessage === 'MENU') {
       console.log('[Chat API] Commande AIDE détectée');
 
-      const helpResponse = `🤖 EMMA SMS - AIDE
+      const helpResponse = `👩🏻 EMMA SMS - AIDE
 
 Voici les commandes disponibles :
 

@@ -508,7 +508,7 @@ Heure: [timestamp]
 • Avis CFA®: [ACHAT FORT/ACHAT/CONSERVER/VENDRE]
 • Prix cible 12M: $XXX (upside: +/-XX%)
 • Profil: [Value/Growth/GARP/Income]
-• 3 questions de suivi pertinentes
+• 3 réflexions diverses
 
 ⚠️ VÉRIFICATION FINALE - 12 sections obligatoires:
 ✓ 1. VUE D'ENSEMBLE ✓ 2. VALORISATION ✓ 3. FONDAMENTAUX ✓ 4. CROISSANCE
