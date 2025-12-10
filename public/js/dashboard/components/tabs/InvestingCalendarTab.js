@@ -601,14 +601,7 @@ const InvestingCalendarTab = () => {
 
     return (
         <div className="space-y-3 md:space-y-6">
-            {/* Navigation Secondaire */}
-            {window.SecondaryNavBar && (
-                <window.SecondaryNavBar 
-                    activeTab={activeTab} 
-                    onTabChange={setActiveTab} 
-                    isDarkMode={isDarkMode} 
-                />
-            )}
+
 
 
             {/* En-tête principal TESTS JS */}

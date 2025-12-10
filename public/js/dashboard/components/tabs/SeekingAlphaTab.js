@@ -96,14 +96,7 @@ const SeekingAlphaTab = () => (
                                 if (claudeData || parsedData) {
                                     return (
                                         <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-            {/* Navigation Secondaire */}
-            {window.SecondaryNavBar && (
-                <window.SecondaryNavBar 
-                    activeTab={activeTab} 
-                    onTabChange={setActiveTab} 
-                    isDarkMode={isDarkMode} 
-                />
-            )}
+
 
 
                                             {/* Header avec gradient bleu */}

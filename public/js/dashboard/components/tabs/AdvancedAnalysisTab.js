@@ -252,14 +252,7 @@ const AdvancedAnalysisTab = () => {
 
     return (
         <div className={`min-h-screen p-6 ${isDarkMode ? 'bg-neutral-950 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
-            {/* Navigation Secondaire */}
-            {window.SecondaryNavBar && (
-                <window.SecondaryNavBar 
-                    activeTab={activeTab} 
-                    onTabChange={setActiveTab} 
-                    isDarkMode={isDarkMode} 
-                />
-            )}
+
 
 
 

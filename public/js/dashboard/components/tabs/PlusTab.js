@@ -18,13 +18,7 @@ const PlusTab = ({ isDarkMode, isProfessionalMode, setActiveTab, activeTab }) =>
     return (
         <div className="space-y-6">
             {/* Navigation Secondaire */}
-            {window.SecondaryNavBar && (
-                <window.SecondaryNavBar 
-                    activeTab={activeTab} 
-                    onTabChange={setActiveTab} 
-                    isDarkMode={isDarkMode} 
-                />
-            )}
+
 
             <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
                 isDarkMode

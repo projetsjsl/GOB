@@ -23,14 +23,7 @@ const EmmAIATab = ({ isDarkMode, activeTab, setActiveTab }) => {
 
     return (
         <div className="h-full w-full relative" style={{ minHeight: 'calc(100vh - 140px)' }}>
-            {/* Navigation Secondaire */}
-            {window.SecondaryNavBar && (
-                <window.SecondaryNavBar 
-                    activeTab={activeTab} 
-                    onTabChange={setActiveTab} 
-                    isDarkMode={isDarkMode} 
-                />
-            )}
+
 
 
             {isLoading && (

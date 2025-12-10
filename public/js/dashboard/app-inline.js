@@ -508,7 +508,66 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     const YieldCurveTab = window.YieldCurveTab;
     const AdvancedAnalysisTab = window.AdvancedAnalysisTab;
 
+    // ============================================================================
+    // CONSTANTS & CONFIGURATION
+    // ============================================================================
+    
+    // Master list of all available secondary navigation links
+    const MASTER_NAV_LINKS = [
+        { id: 'intellistocks', label: 'Tableau de bord', icon: 'LayoutDashboard' },
+        { id: 'markets-economy', label: 'Marchés & Éco', icon: 'TrendingUp' },
+        { id: 'ask-emma', label: 'Emma IA', icon: 'MessageSquare' },
+        { id: 'assistant-vocal', label: 'Assistant Vocal', icon: 'Mic' },
+        { id: 'groupchat', label: 'Group Chat', icon: 'Users' },
+        { id: 'terminal-emmaia', label: 'Terminal EmmAIA', icon: 'Monitor' }, // Updated icon
+        { id: 'emmaia', label: 'EmmAIA (Live)', icon: 'Brain' },
+        { id: 'finvox', label: 'FinVox', icon: 'Activity' },
+        { id: 'investing-calendar', label: 'Cal. Investing', icon: 'Calendar' },
+        { id: 'economic-calendar', label: 'Cal. Éco', icon: 'Calendar' },
+        { id: 'seeking-alpha', label: 'Seeking Alpha', icon: 'Newspaper' },
+        { id: 'email-briefings', label: 'Briefings', icon: 'Mail' },
+        { id: 'scrapping-sa', label: 'Scraping SA', icon: 'Database' },
+        { id: 'dans-watchlist', label: 'Watchlist Dan', icon: 'Star' },
+        { id: 'fastgraphs', label: 'FastGraphs', icon: 'BarChart3' },
+        { id: 'plus', label: 'Paramètres', icon: 'Settings' },
+        { id: 'admin-jsla', label: 'Admin', icon: 'Shield' }
+    ];
+
+    // Default configuration for secondary navigation per tab
+    // This defines which links show up when you are on a specific tab
+    const DEFAULT_NAV_CONFIG = {
+        'intellistocks': ['ask-emma', 'markets-economy', 'plus'],
+        'ask-emma': ['intellistocks', 'assistant-vocal', 'plus'],
+        'default': ['intellistocks', 'ask-emma', 'plus']
+    };
+
+    // ============================================================================
+    // MAIN APP COMPONENT
+    // ============================================================================
     const BetaCombinedDashboard = () => {
+        // ... existing hooks ...
+        
+        // State for Secondary Navigation Configuration
+        const [secondaryNavConfig, setSecondaryNavConfig] = useState(() => {
+            if (typeof window !== 'undefined') {
+                try {
+                    const saved = localStorage.getItem('gob-secondary-nav-config');
+                    return saved ? JSON.parse(saved) : DEFAULT_NAV_CONFIG;
+                } catch (e) {
+                    console.error('Error loading nav config:', e);
+                    return DEFAULT_NAV_CONFIG;
+                }
+            }
+            return DEFAULT_NAV_CONFIG;
+        });
+
+        // Persist nav config changes
+        useEffect(() => {
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('gob-secondary-nav-config', JSON.stringify(secondaryNavConfig));
+            }
+        }, [secondaryNavConfig]);
+
         // État pour le thème actuel
         const [currentThemeId, setCurrentThemeId] = useState(() => {
             if (window.GOBThemes) {
@@ -25337,6 +25396,28 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 {/* Contenu principal */}
                 <main className={`max-w-7xl mx-auto p-6 pb-24 transition-opacity duration-500 ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'
                     }`} style={{ minHeight: '500px', backgroundColor: isDarkMode ? '#000' : '#fff' }}>
+                    
+                    {/* Centralized Secondary Navigation Bar */}
+                    {(() => {
+                        // Determine which links to show based on active tab
+                        const configKey = secondaryNavConfig[activeTab] ? activeTab : 'default';
+                        const linkIds = secondaryNavConfig[configKey] || secondaryNavConfig['default'] || [];
+                        
+                        // Map IDs to full link objects
+                        const currentNavItems = linkIds.map(id => MASTER_NAV_LINKS.find(link => link.id === id)).filter(Boolean);
+                        
+                        return window.SecondaryNavBar && (
+                            <div className="mb-6">
+                                <window.SecondaryNavBar 
+                                    activeTab={activeTab} 
+                                    onTabChange={setActiveTab} 
+                                    isDarkMode={isDarkMode}
+                                    items={currentNavItems}
+                                />
+                            </div>
+                        );
+                    })()}
+
                     {console.log('🎯 Active Tab:', activeTab, 'Loading Screen:', showLoadingScreen)}
                     {activeTab === 'markets-economy' && <MarketsEconomyTab />}
                     {/* {activeTab === 'yield-curve' && <YieldCurveTab />} */} {/* Intégré dans Marchés & Économie */}
@@ -25376,7 +25457,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         setShowLengthEditor: setShowLengthEditor,
                         isDarkMode: isDarkMode,
                         setActiveTab: setActiveTab,
-                        activeTab: activeTab
+                        activeTab: activeTab,
+                        // Secondary Navigation Config Props
+                        secondaryNavConfig: secondaryNavConfig,
+                        setSecondaryNavConfig: setSecondaryNavConfig,
+                        availableNavLinks: MASTER_NAV_LINKS
                     })}
                     {activeTab === 'dans-watchlist' && <DansWatchlistTab />}
                     {activeTab === 'scrapping-sa' && <ScrappingSATab />}

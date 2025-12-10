@@ -216,14 +216,7 @@ const GroupChatTab = ({ isDarkMode = true, dashboardTab, onDashboardTabChange })
 
   return (
     <div style={{ display:'flex', flexDirection:'column', height:'100%', background: themeStyles.bg, color: themeStyles.text }}>
-            {/* Navigation Secondaire */}
-            {window.SecondaryNavBar && (
-                <window.SecondaryNavBar 
-                    activeTab={activeTab} 
-                    onTabChange={setActiveTab} 
-                    isDarkMode={isDarkMode} 
-                />
-            )}
+
 
 
       <header style={{ background: `linear-gradient(180deg,${themeStyles.surface},${themeStyles.bg})`, padding:'8px 16px', display:'flex', alignItems:'center', gap:12, borderBottom:`1px solid ${themeStyles.border}` }}>

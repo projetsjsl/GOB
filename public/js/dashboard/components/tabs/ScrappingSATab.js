@@ -20,14 +20,7 @@ const ScrappingSATab = () => {
 
     return (
                 <div className="space-y-6">
-            {/* Navigation Secondaire */}
-            {window.SecondaryNavBar && (
-                <window.SecondaryNavBar 
-                    activeTab={activeTab} 
-                    onTabChange={setActiveTab} 
-                    isDarkMode={isDarkMode} 
-                />
-            )}
+
 
 
                     <div className="flex justify-between items-center">

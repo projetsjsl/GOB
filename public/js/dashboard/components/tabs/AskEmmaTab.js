@@ -1850,13 +1850,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 return (
                     <div className="space-y-6">
                         {/* Navigation Secondaire */}
-                        {window.SecondaryNavBar && (
-                            <window.SecondaryNavBar 
-                                activeTab={activeTab} 
-                                onTabChange={setActiveTab} 
-                                isDarkMode={isDarkMode} 
-                            />
-                        )}
+
                         <div className="flex justify-end items-center">
                             <div className="flex gap-2">
                                 <button

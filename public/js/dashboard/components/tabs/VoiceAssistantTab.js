@@ -261,14 +261,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
 
     return (
         <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-140px)]`}>
-            {/* Navigation Secondaire */}
-            {window.SecondaryNavBar && (
-                <window.SecondaryNavBar 
-                    activeTab={activeTab} 
-                    onTabChange={setActiveTab} 
-                    isDarkMode={isDarkMode} 
-                />
-            )}
+
 
 
             {/* Left Column: Avatar/Video Area */}

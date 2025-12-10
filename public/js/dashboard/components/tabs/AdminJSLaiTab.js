@@ -14,7 +14,10 @@ const AdminJSLaiTab = ({
                 setShowLengthEditor = () => {},
                 isDarkMode = true,
                 setActiveTab,
-                activeTab
+                activeTab,
+                secondaryNavConfig,
+                setSecondaryNavConfig,
+                availableNavLinks
             }) => {
                 // Validation des props avec valeurs par défaut
                 const darkMode = isDarkMode !== undefined ? isDarkMode : true;
@@ -48,6 +51,8 @@ const AdminJSLaiTab = ({
                 });
                 
                 const [showIndicesManager, setShowIndicesManager] = React.useState(false);
+                const [showNavManager, setShowNavManager] = React.useState(false);
+                const [navConfigTargetTab, setNavConfigTargetTab] = React.useState('intellistocks');
                 
                 // États locaux pour les variables manquantes
                 const [githubToken, setGithubToken] = React.useState(() => {
@@ -207,14 +212,7 @@ const AdminJSLaiTab = ({
                 
                 return (
                 <div className="space-y-6">
-                    {/* Navigation Secondaire */}
-                    {window.SecondaryNavBar && (
-                        <window.SecondaryNavBar 
-                            activeTab={activeTab} 
-                            onTabChange={setActiveTab} 
-                            isDarkMode={darkMode} 
-                        />
-                    )}
+
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             darkMode ? 'text-white' : 'text-gray-900'
@@ -222,6 +220,113 @@ const AdminJSLaiTab = ({
                     </div>
 
                     {typeof EmmaSmsPanel !== 'undefined' && <EmmaSmsPanel />}
+
+                    {/* 🧭 Gestion de la Navigation Secondaire */}
+                    {secondaryNavConfig && setSecondaryNavConfig && availableNavLinks && (
+                        <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+                            darkMode ? 'bg-gradient-to-br from-indigo-900/20 to-gray-900 border-indigo-700' : 'bg-gradient-to-br from-indigo-50 to-gray-50 border-indigo-200'
+                        }`}>
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-indigo-300' : 'text-indigo-900'}`}>
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="🧭" size={20} /> : '🧭'}
+                                    Gestion Navigation Secondaire
+                                </h3>
+                                <button
+                                    onClick={() => setShowNavManager(!showNavManager)}
+                                    className={`px-3 py-1 text-xs rounded transition-all duration-200 ${
+                                        darkMode ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-indigo-500 hover:bg-indigo-600 text-white'
+                                    }`}
+                                >
+                                    {showNavManager ? '▼ Masquer' : '▶ Configurer'}
+                                </button>
+                            </div>
+
+                            {showNavManager && (
+                                <div className={`space-y-4 animate-fadeIn ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    <div className={`p-4 rounded-lg border ${darkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                        <div className="flex flex-col md:flex-row gap-4 mb-4">
+                                            <div className="flex-1">
+                                                <label className="block text-xs font-medium mb-1 opacity-70">
+                                                    Onglet à configurer
+                                                </label>
+                                                <select
+                                                    value={navConfigTargetTab}
+                                                    onChange={(e) => setNavConfigTargetTab(e.target.value)}
+                                                    className={`w-full p-2 rounded border ${
+                                                        darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
+                                                    }`}
+                                                >
+                                                    {availableNavLinks.map(link => (
+                                                        <option key={link.id} value={link.id}>{link.label}</option>
+                                                    ))}
+                                                    <option value="default">Par défaut (Fallback)</option>
+                                                </select>
+                                            </div>
+                                            <div className="flex items-end">
+                                                <div className="text-xs opacity-70 mb-2">
+                                                    {((secondaryNavConfig[navConfigTargetTab] || secondaryNavConfig['default'] || []).length)} liens actifs
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-96 overflow-y-auto pr-1 custom-scrollbar">
+                                            {availableNavLinks.map(link => {
+                                                const currentConfig = secondaryNavConfig[navConfigTargetTab] || secondaryNavConfig['default'] || [];
+                                                const isSelected = currentConfig.includes(link.id);
+                                                
+                                                return (
+                                                    <label
+                                                        key={link.id}
+                                                        className={`flex items-center gap-2 p-2 rounded-md cursor-pointer border transition-all ${
+                                                            isSelected
+                                                                ? darkMode ? 'bg-indigo-900/40 border-indigo-500' : 'bg-indigo-50 border-indigo-300'
+                                                                : darkMode ? 'bg-gray-800/30 border-gray-700 opacity-60 hover:opacity-100' : 'bg-gray-50 border-gray-200 opacity-60 hover:opacity-100'
+                                                        }`}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={isSelected}
+                                                            onChange={(e) => {
+                                                                const newConfig = { ...secondaryNavConfig };
+                                                                let targetList = [...(newConfig[navConfigTargetTab] || newConfig['default'] || [])];
+                                                                
+                                                                if (e.target.checked) {
+                                                                    if (!targetList.includes(link.id)) targetList.push(link.id);
+                                                                } else {
+                                                                    targetList = targetList.filter(id => id !== link.id);
+                                                                }
+                                                                
+                                                                newConfig[navConfigTargetTab] = targetList;
+                                                                setSecondaryNavConfig(newConfig);
+                                                            }}
+                                                            className="rounded text-indigo-500 focus:ring-indigo-500"
+                                                        />
+                                                        {typeof Icon !== 'undefined' ? <Icon name={link.icon} size={16} /> : <span>📌</span>}
+                                                        <span className="text-sm truncate">{link.label}</span>
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+                                        
+                                        <div className="mt-4 pt-3 border-t border-gray-700/50 flex justify-end gap-2">
+                                            <button
+                                                onClick={() => {
+                                                    if (confirm('Réinitialiser la configuration pour cet onglet ?')) {
+                                                        const newConfig = { ...secondaryNavConfig };
+                                                        delete newConfig[navConfigTargetTab];
+                                                        setSecondaryNavConfig(newConfig);
+                                                    }
+                                                }}
+                                                className="px-3 py-1.5 text-xs text-red-400 hover:text-red-300 transition-colors"
+                                            >
+                                                Réinitialiser par défaut
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${

@@ -3,15 +3,12 @@
  * Standardized secondary navigation bar for dashboard tabs.
  */
 
-const SecondaryNavBar = ({ activeTab, onTabChange, isDarkMode }) => {
-    // Liste des onglets de navigation secondaire
-    // Note: Ces liens sont des exemples, à adapter selon les besoins spécifiques
-    const navItems = [
-        { id: 'intellistocks', label: 'Tableau de bord', icon: 'LayoutDashboard' },
-        { id: 'ask-emma', label: 'Emma IA', icon: 'MessageSquare' },
-        { id: 'admin-jsla', label: 'Admin', icon: 'Shield' },
-        { id: 'plus', label: 'Paramètres', icon: 'Settings' }
-    ];
+const SecondaryNavBar = ({ activeTab, onTabChange, isDarkMode, items = [] }) => {
+    // Liste des onglets de navigation secondaire fournie via props (items)
+    // Si items est vide, on n'affiche rien ou une liste par défaut si nécessaire
+    const navItems = items;
+
+    if (!navItems || navItems.length === 0) return null;
 
     return (
         <div className={`mb-6 p-2 rounded-lg flex items-center gap-2 overflow-x-auto ${
