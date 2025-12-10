@@ -5,6 +5,12 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
+
+// Simple password hashing function using SHA-256
+function hashPassword(password) {
+    return crypto.createHash('sha256').update(password).digest('hex');
+}
 
 // Initialize Supabase client
 let supabase = null;
