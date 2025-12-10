@@ -3,7 +3,7 @@
 
 const { useState, useRef, useEffect, useCallback } = React;
 
-const GroupChatTab = ({ isDarkMode = true }) => {
+const GroupChatTab = ({ isDarkMode = true, dashboardTab, onDashboardTabChange }) => {
   const [providers, setProviders] = useState({});
   const [currentProvider, setCurrentProvider] = useState('simulation');
   const [messages, setMessages] = useState([{ 

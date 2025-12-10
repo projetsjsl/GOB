@@ -8,7 +8,7 @@
 
 const { useState } = React;
 
-const EmmAIATab = ({ isDarkMode }) => {
+const EmmAIATab = ({ isDarkMode, activeTab, setActiveTab }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     const handleIframeLoad = () => {

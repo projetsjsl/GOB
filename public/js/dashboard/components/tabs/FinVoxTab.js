@@ -8,7 +8,7 @@
 
 const { useState } = React;
 
-const FinVoxTab = ({ isDarkMode }) => {
+const FinVoxTab = ({ isDarkMode, activeTab, setActiveTab }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     const handleIframeLoad = () => {

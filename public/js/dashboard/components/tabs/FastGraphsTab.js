@@ -9,7 +9,7 @@
 
 const { useState, useEffect } = React;
 
-const FastGraphsTab = ({ isDarkMode = true }) => {
+const FastGraphsTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [sessionUrl, setSessionUrl] = useState(null);
     const [error, setError] = useState(null);

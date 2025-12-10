@@ -555,7 +555,14 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         }, []);
         
         // États principaux
-        const [activeTab, setActiveTab] = useState('intellistocks'); // Onglet par défaut: JLab™ (contient Titres & Nouvelles et Finance Pro)
+        const [activeTab, setActiveTab] = useState(() => {
+            if (typeof window !== 'undefined') {
+                const params = new URLSearchParams(window.location.search);
+                const tab = params.get('tab');
+                if (tab) return tab;
+            }
+            return 'intellistocks';
+        }); // Onglet par défaut: JLab™ (contient Titres & Nouvelles et Finance Pro)
         const [tickers, setTickers] = useState([]);
         const [teamTickers, setTeamTickers] = useState([]);
         const [watchlistTickers, setWatchlistTickers] = useState([]);
@@ -5270,10 +5277,22 @@ STRUCTURE JSON OBLIGATOIRE:
                     await loadWatchlistData(tickers);
                     console.log('✅ Watchlist chargée depuis Supabase');
                 } catch (e) {
+```
                     console.error('Erreur chargement Supabase watchlist:', e);
                     showMessage('Erreur chargement Supabase', 'error');
                 }
             };
+
+            // Sync URL with activeTab
+        useEffect(() => {
+            if (typeof window !== 'undefined') {
+                const url = new URL(window.location);
+                if (url.searchParams.get('tab') !== activeTab) {
+                    url.searchParams.set('tab', activeTab);
+                    window.history.pushState({}, '', url);
+                }
+            }
+        }, [activeTab]);
 
             // Effet pour initialiser le TradingView Ticker Tape avec les tickers de la watchlist
             useEffect(() => {
@@ -25322,7 +25341,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {activeTab === 'markets-economy' && <MarketsEconomyTab />}
                     {/* {activeTab === 'yield-curve' && <YieldCurveTab />} */} {/* Intégré dans Marchés & Économie */}
                     {activeTab === 'intellistocks' && <JLabUnifiedTab />}
-                    {activeTab === 'groupchat' && window.GroupChatTab && React.createElement(window.GroupChatTab, { isDarkMode: isDarkMode })}
+                    {activeTab === 'groupchat' && window.GroupChatTab && React.createElement(window.GroupChatTab, { isDarkMode: isDarkMode, dashboardTab: activeTab, onDashboardTabChange: setActiveTab })}
                     {activeTab === 'ask-emma' && <AskEmmaTab
                         prefillMessage={emmaPrefillMessage}
                         setPrefillMessage={setEmmaPrefillMessage}
@@ -25339,7 +25358,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         setActiveTab={setActiveTab}
                         activeTab={activeTab}
                     />}
-                    {activeTab === 'assistant-vocal' && <VoiceAssistantTab isDarkMode={isDarkMode} />}
+                    {activeTab === 'assistant-vocal' && <VoiceAssistantTab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
                     {activeTab === 'plus' && <PlusTab 
                         setActiveTab={setActiveTab} 
                         activeTab={activeTab} 
@@ -25365,9 +25384,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
                     {activeTab === 'economic-calendar' && <EconomicCalendarTab />}
                     {activeTab === 'investing-calendar' && <InvestingCalendarTab />}
-                    {activeTab === 'finvox' && <FinVoxTab />}
-                    {activeTab === 'emmaia' && <EmmAIATab isDarkMode={isDarkMode} />}
-                    {activeTab === 'fastgraphs' && <FastGraphsTab isDarkMode={isDarkMode} />}
+                    {activeTab === 'finvox' && <FinVoxTab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
+                    {activeTab === 'emmaia' && <EmmAIATab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
+                    {activeTab === 'terminal-emmaia' && <TerminalEmmaIATab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
+                    {activeTab === 'fastgraphs' && <FastGraphsTab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
                     {activeTab === 'emma-config' && <EmmaConfigTab />}
                 </main>
 

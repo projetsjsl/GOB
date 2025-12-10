@@ -39,7 +39,7 @@
 
 const { useState, useEffect, useRef } = React;
 
-const VoiceAssistantTab = ({ isDarkMode }) => {
+const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
     // Use prop if passed, otherwise check global or default to true
     const darkMode = isDarkMode !== undefined ? isDarkMode : (typeof window.isDarkMode !== 'undefined' ? window.isDarkMode : true);
     const [messages, setMessages] = useState([

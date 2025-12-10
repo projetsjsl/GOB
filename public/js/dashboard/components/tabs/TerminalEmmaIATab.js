@@ -14,7 +14,7 @@
 
 const { useState } = React;
 
-const TerminalEmmaIATab = ({ isDarkMode }) => {
+const TerminalEmmaIATab = ({ isDarkMode, activeTab, setActiveTab }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 

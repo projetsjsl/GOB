@@ -8,7 +8,7 @@
 
 const { useState, useEffect, useMemo } = React;
 
-const ChatGPTGroupTab = ({ isDarkMode = true }) => {
+const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
     // ============================================
     // CONFIGURATION INITIALE
     // ============================================
@@ -487,8 +487,8 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
     return React.createElement('div', { className: 'space-y-6 p-6' },
         // Navigation Secondaire
         window.SecondaryNavBar && React.createElement(window.SecondaryNavBar, {
-            activeTab: 'chatgpt-group',
-            onTabChange: () => {}, // ChatGPTGroupTab doesn't have setActiveTab prop, so use empty function
+            activeTab: activeTab,
+            onTabChange: setActiveTab,
             isDarkMode: isDarkMode
         }),
 
