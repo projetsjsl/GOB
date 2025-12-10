@@ -857,7 +857,6 @@ const AdminJSLaiTab = ({
                                     </p>
                                 </div>
                             </div>
-                        )}
 
                                 {/* NOUVEAU: Liste Gestion Utilisateurs */}
                                 <div className={`mt-6 rounded-lg border overflow-hidden ${darkMode ? 'bg-gray-800/30 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
@@ -1239,8 +1238,7 @@ const AdminJSLaiTab = ({
 
                     </div>
                 )}
-
-                    </div>
+                </div>
 
                     {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
