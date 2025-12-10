@@ -1236,6 +1236,10 @@ const AdminJSLaiTab = ({
                         )}
 
 
+                        )}
+                    </div>
+                )}
+
                     {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         darkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
