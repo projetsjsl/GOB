@@ -143,7 +143,19 @@
             backdrop-filter: blur(20px);
         }
 
+        .brand-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #15803d, #166534, #14532d, #ca8a04);
+            z-index: 99999;
+            box-shadow: 0 1px 10px rgba(0,0,0,0.1);
+        }
+
         .login-card {
+            margin-top: 20px; /* Space for banner */
             width: 100%;
             max-width: 440px;
             background: rgba(255, 255, 255, 0.85); /* Slightly more opaque */
@@ -382,6 +394,7 @@
     </style>
 </head>
 <body>
+    <div class="brand-banner"></div>
     <div class="bg-mesh"></div>
     <div class="circle-blur c1"></div>
     <div class="circle-blur c2"></div>

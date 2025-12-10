@@ -545,9 +545,20 @@
             border: 1px solid rgba(0,0,0,0.1) !important;
             color: var(--text-main) !important;
         }
+        .brand-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #15803d, #166534, #14532d, #ca8a04);
+            z-index: 99999;
+            box-shadow: 0 1px 10px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
+    <div class="brand-banner"></div>
     <div class="container">
         <!-- Header -->
         <header class="header">
