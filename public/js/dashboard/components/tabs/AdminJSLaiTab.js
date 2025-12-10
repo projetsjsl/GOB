@@ -1234,7 +1234,7 @@ const AdminJSLaiTab = ({
                                 </div>
                             </div>
                         )}
-                    </div>
+
 
                     {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
