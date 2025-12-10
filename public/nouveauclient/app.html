@@ -576,18 +576,24 @@
         <div class="progress-container">
             <div class="progress-steps">
                 <div class="progress-line active" id="progressLine"></div>
-                <div class="progress-step">
-                    <div class="step-circle active" id="circle1">1</div>
-                    <div class="step-label active">Identité</div>
+                <div class="step-item">
+                <div class="step-circle active" id="circle1">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                 </div>
-                <div class="progress-step">
-                    <div class="step-circle" id="circle2">2</div>
-                    <div class="step-label">Situation</div>
+                <div class="step-label active">Identité</div>
+            </div>
+            <div class="step-item">
+                <div class="step-circle" id="circle2">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 </div>
-                <div class="progress-step">
-                    <div class="step-circle" id="circle3">3</div>
-                    <div class="step-label">Finances</div>
+                <div class="step-label">Situation</div>
+            </div>
+            <div class="step-item">
+                <div class="step-circle" id="circle3">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                 </div>
+                <div class="step-label">Finances</div>
+            </div>
             </div>
         </div>
 
@@ -700,7 +706,7 @@
                     
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="annualIncome" class="required">Revenu Annuel ($)</label>
+                            <label for="annualIncome" class="required">Revenu Annuel Brut ($) <span title="Avant impôts, incluant bonus" style="cursor:help; opacity:0.6;">(?)</span></label>
                             <input type="number" id="annualIncome" name="annualIncome" placeholder="0" min="0" required>
                         </div>
                         <div class="form-group">
@@ -708,25 +714,25 @@
                             <input type="number" id="spouseIncome" name="spouseIncome" placeholder="0" min="0">
                         </div>
                         <div class="form-group">
-                            <label for="realEstateValue">Immobilier ($)</label>
+                            <label for="realEstateValue">Valeur Immobilière ($)</label>
                             <input type="number" id="realEstateValue" name="realEstateValue" placeholder="0" min="0">
                         </div>
                         <div class="form-group">
-                            <label for="liquidAssets">Liquidités ($)</label>
+                            <label for="liquidAssets">Actifs Liquides ($) <span title="Compte chèque, épargne, placements non-enregistrés" style="cursor:help; opacity:0.6;">(?)</span></label>
                             <input type="number" id="liquidAssets" name="liquidAssets" placeholder="0" min="0">
                         </div>
                         <div class="form-group">
-                            <label for="investmentHorizon" class="required">Horizon</label>
+                            <label for="investmentHorizon" class="required">Horizon de Placement <span title="Durée pendant laquelle vous prévoyez investir sans retirer les fonds" style="cursor:help; opacity:0.6;">(?)</span></label>
                             <select id="investmentHorizon" name="investmentHorizon" required>
-                                <option value="">Choisir...</option>
-                                <option value="court">1-3 ans (Court)</option>
-                                <option value="moyen">3-5 ans (Moyen)</option>
-                                <option value="long">5-10 ans (Long)</option>
-                                <option value="tres-long">10+ ans (Très Long)</option>
+                                <option value="">Sélectionner</option>
+                                <option value="court">Court terme (0-3 ans)</option>
+                                <option value="moyen">Moyen terme (3-7 ans)</option>
+                                <option value="long">Long terme (7+ ans)</option>
+                                <option value="retraite">Jusqu'à la retraite</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="riskTolerance" class="required">Tolérance Risque</label>
+                            <label for="riskTolerance" class="required">Tolérance au Risque <span title="Votre capacité et volonté à supporter les fluctuations du marché" style="cursor:help; opacity:0.6;">(?)</span></label>
                             <select id="riskTolerance" name="riskTolerance" required>
                                 <option value="">Choisir...</option>
                                 <option value="faible">Prudent</option>

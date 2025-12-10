@@ -64,15 +64,59 @@ function populateForm() {
     });
 }
 
-// Attacher les listeners d'auto-save
+// Attacher les listeners d'auto-save et validation
 function attachFormListeners() {
     const form = document.getElementById('collectionForm');
     const inputs = form.querySelectorAll('input, select, textarea');
     
     inputs.forEach(input => {
         input.addEventListener('change', autoSaveForm);
-        input.addEventListener('blur', autoSaveForm);
+        input.addEventListener('blur', () => {
+            autoSaveForm();
+            validateField(input);
+        });
+        
+        // Validation temps réel pour Phone/NAS
+        if (input.id === 'phone' || input.id === 'nas') {
+            input.addEventListener('input', (e) => formatInput(e.target));
+        }
     });
+
+    // Navigation via les cercles
+    for (let i = 1; i <= 3; i++) {
+        const circle = document.getElementById(`circle${i}`);
+        if (circle) {
+            circle.style.cursor = 'pointer';
+            circle.addEventListener('click', () => {
+                if (i < currentStep) {
+                    currentStep = i;
+                    updateDisplay();
+                }
+            });
+        }
+    }
+}
+
+function formatInput(input) {
+    let value = input.value.replace(/\D/g, ''); // Garder chiffres
+    if (input.id === 'phone') {
+        // Format (555) 555-5555
+        if (value.length > 6) value = `(${value.substring(0,3)}) ${value.substring(3,6)}-${value.substring(6,10)}`;
+        else if (value.length > 3) value = `(${value.substring(0,3)}) ${value.substring(3)}`;
+    } else if (input.id === 'nas') {
+        // Format 123 456 789
+        if (value.length > 6) value = `${value.substring(0,3)} ${value.substring(3,6)} ${value.substring(6,9)}`;
+        else if (value.length > 3) value = `${value.substring(0,3)} ${value.substring(3)}`;
+    }
+    input.value = value;
+}
+
+function validateField(input) {
+    if (input.required && !input.value.trim()) {
+        input.style.borderColor = 'var(--error)';
+    } else {
+        input.style.borderColor = 'var(--success)'; // Feedback positif
+    }
 }
 
 // Navigation entre étapes

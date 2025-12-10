@@ -77,17 +77,25 @@ class EmmaAI {
         this.showTypingIndicator();
 
         // Simuler délai réseau et répondre
-        setTimeout(() => {
-            this.removeTypingIndicator();
-            const response = this.generateResponse(userMessage.toLowerCase());
-            this.addMessage(response, 'emma');
+        // Utiliser requestAnimationFrame pour s'assurer que l'UI a update
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                this.removeTypingIndicator();
+                try {
+                    const response = this.generateResponse(userMessage.toLowerCase());
+                    this.addMessage(response, 'emma');
 
-            this.conversationHistory.push({
-                role: 'emma',
-                message: response,
-                timestamp: new Date()
-            });
-        }, 800 + Math.random() * 400);
+                    this.conversationHistory.push({
+                        role: 'emma',
+                        message: response,
+                        timestamp: new Date()
+                    });
+                } catch (e) {
+                    console.error("Emma Error:", e);
+                    this.addMessage("Désolée, j'ai eu un petit problème technique. Pouvez-vous répéter?", 'emma');
+                }
+            }, 800 + Math.random() * 400);
+        });
     }
 
     addMessage(text, sender) {

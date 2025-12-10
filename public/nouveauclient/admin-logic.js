@@ -58,8 +58,11 @@ function loadDashboard() {
 
     // Storage info
     let usage = 0;
-    for (let key in localStorage) {
-        usage += localStorage[key].length;
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (localStorage.getItem(key)) {
+            usage += localStorage.getItem(key).length;
+        }
     }
     document.getElementById('storageInfo').textContent = `${(usage / 1024).toFixed(2)} KB / 5 MB`;
 }
