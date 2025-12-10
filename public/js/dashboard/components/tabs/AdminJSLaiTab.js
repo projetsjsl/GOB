@@ -92,6 +92,49 @@ const AdminJSLaiTab = ({
                 const [availableComponents, setAvailableComponents] = React.useState([]);
                 const [assignUserForm, setAssignUserForm] = React.useState({ username: '', roleId: '' });
 
+                // --- Password Management State (Moved to Top) ---
+                const [selectedUserForReset, setSelectedUserForReset] = React.useState(null);
+                const [newPassword, setNewPassword] = React.useState('');
+                const [showPasswordResetModal, setShowPasswordResetModal] = React.useState(false);
+
+                // --- Password Management Handler (Moved to Top) ---
+                const handlePasswordResetSubmit = async () => {
+                   if (!selectedUserForReset || !newPassword) return;
+                   
+                   if (!confirm(`Confirmer le changement de mot de passe pour ${selectedUserForReset.username} ?`)) return;
+
+                   setLoadingRoles(true);
+                   try {
+                       if (!typeof window !== 'undefined' && window.authGuard) {
+                           const currentUser = window.authGuard.getCurrentUser();
+                           const response = await fetch('/api/auth', {
+                               method: 'POST',
+                               headers: { 'Content-Type': 'application/json' },
+                               body: JSON.stringify({
+                                   action: 'update_user',
+                                   admin_username: currentUser.username,
+                                   target_id: selectedUserForReset.id,
+                                   updates: { password: newPassword }
+                               })
+                           });
+                           const data = await response.json();
+                           if (data.success) {
+                               showMessage('✅ Mot de passe mis à jour avec succès', 'success');
+                               setShowPasswordResetModal(false);
+                               setNewPassword('');
+                               setSelectedUserForReset(null);
+                           } else {
+                               showMessage('❌ Erreur: ' + data.error, 'error');
+                           }
+                       }
+                   } catch (e) {
+                       console.error(e);
+                       showMessage('❌ Erreur technique', 'error');
+                   } finally {
+                       setLoadingRoles(false);
+                   }
+                };
+
                 // --- Constants for Announcement Bars (Moved to Top Level) ---
                 const DEFAULT_PROMPTS = {
                     'news': 'Utilise Google Search pour trouver la principale actualité financière de l\'heure. Génère un message court (max 80 caractères) pour une barre d\'annonce en haut de page. Format: "📰 [Titre accrocheur]"',
@@ -112,43 +155,46 @@ const AdminJSLaiTab = ({
                 // --- Announcement Bars State ---
                 const [editingBar, setEditingBar] = React.useState(null);
                 const [barConfigs, setBarConfigs] = React.useState(() => {
-                    // Try to load from local storage first
-                    let savedConfig = {};
-                    try {
-                        const savedJson = localStorage.getItem('announcement-bars-config');
-                        if (savedJson) {
-                            savedConfig = JSON.parse(savedJson);
-                        } else if (typeof window.getAnnouncementBarsConfig === 'function') {
-                            savedConfig = window.getAnnouncementBarsConfig();
-                        }
-                    } catch (e) {
-                         console.warn('Error loading bar configs', e);
-                    }
-
-                    // Defaults
-                    const finalConfig = { ...savedConfig };
+                    // Defaults (Initial state before DB load)
+                    const initialConfig = {};
                     BAR_TYPES.forEach(({ key, type }) => {
-                        if (!finalConfig[key]) {
-                            finalConfig[key] = { 
-                                enabled: false, 
-                                type: type, 
-                                section: 'top', 
-                                design: 'default',
-                                prompt: DEFAULT_PROMPTS[type] || '',
-                                temperature: 0.7,
-                                maxOutputTokens: 150,
-                                useGoogleSearch: ['news', 'event', 'market-alert'].includes(type)
-                            };
-                        } else {
-                            // Ensure missing fields are filled
-                            if (!finalConfig[key].prompt) finalConfig[key].prompt = DEFAULT_PROMPTS[type] || '';
-                            if (finalConfig[key].useGoogleSearch === undefined) finalConfig[key].useGoogleSearch = ['news', 'event', 'market-alert'].includes(type);
-                        }
+                        initialConfig[key] = { 
+                            enabled: false, 
+                            type: type, 
+                            section: 'top', 
+                            design: 'default',
+                            prompt: DEFAULT_PROMPTS[type] || '',
+                            temperature: 0.7,
+                            maxOutputTokens: 150,
+                            useGoogleSearch: ['news', 'event', 'market-alert'].includes(type)
+                        };
                     });
-                    return finalConfig;
+                    return initialConfig;
                 });
 
-                const saveBarConfig = (key, updates) => {
+                // Load from Supabase on mount
+                React.useEffect(() => {
+                    const loadBarConfigs = async () => {
+                        try {
+                            const response = await fetch('/api/admin/emma-config?section=ui&key=announcement_bars');
+                            const data = await response.json();
+                            
+                            if (data && data.config && data.config.value) {
+                                // Merge DB config with defaults to ensure structure
+                                setBarConfigs(prev => ({
+                                    ...prev,
+                                    ...data.config.value
+                                }));
+                                console.log('✅ Announcement Bars config loaded from DB');
+                            }
+                        } catch (e) {
+                            console.error('Error loading bar configs from DB:', e);
+                        }
+                    };
+                    loadBarConfigs();
+                }, []);
+
+                const saveBarConfig = async (key, updates) => {
                     const newConfig = {
                         ...barConfigs,
                         [key]: {
@@ -157,13 +203,29 @@ const AdminJSLaiTab = ({
                         }
                     };
                     setBarConfigs(newConfig);
+                    
+                    // Save to Supabase
                     try {
+                        await fetch('/api/admin/emma-config', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                action: 'set',
+                                category: 'ui',
+                                key: 'announcement_bars',
+                                value: newConfig
+                            })
+                        });
+                        
+                        // Also update localStorage for immediate offline/backup
                         localStorage.setItem('announcement-bars-config', JSON.stringify(newConfig));
+                        
                         if (typeof window !== 'undefined') {
                             window.dispatchEvent(new Event('announcement-config-changed'));
                         }
                     } catch (e) {
-                        console.error('Erreur sauvegarde config:', e);
+                        console.error('Erreur sauvegarde config DB:', e);
+                        // Fallback local storage already done above
                     }
                 };
 
@@ -797,6 +859,62 @@ const AdminJSLaiTab = ({
                             </div>
                         )}
 
+                                {/* NOUVEAU: Liste Gestion Utilisateurs */}
+                                <div className={`mt-6 rounded-lg border overflow-hidden ${darkMode ? 'bg-gray-800/30 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                                    <div className={`p-3 border-b font-semibold flex items-center justify-between ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-100 border-gray-200'}`}>
+                                        <span className="flex items-center gap-2">👥 Liste des Utilisateurs</span>
+                                        <button onClick={fetchUsers} className="text-xs opacity-50 hover:opacity-100" title="Rafraîchir">🔄</button>
+                                    </div>
+                                    <div className="max-h-60 overflow-y-auto custom-scrollbar">
+                                        <table className="w-full text-left text-sm">
+                                            <thead className={`sticky top-0 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'} shadow-sm`}>
+                                                <tr>
+                                                    <th className="p-3 font-medium opacity-70">Utilisateur</th>
+                                                    <th className="p-3 font-medium opacity-70">Rôle</th>
+                                                    <th className="p-3 font-medium opacity-70 text-right">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-700/20">
+                                                {availableUsers.map(u => (
+                                                    <tr key={u.id} className={`hover:bg-indigo-900/10 transition-colors`}>
+                                                        <td className="p-3">
+                                                            <div className="font-medium">{u.display_name}</div>
+                                                            <div className="text-xs opacity-50 font-mono">{u.username}</div>
+                                                        </td>
+                                                        <td className="p-3">
+                                                            <span className={`px-2 py-0.5 rounded text-xs ${
+                                                                u.role === 'admin' ? 'bg-red-500/20 text-red-300' : 'bg-blue-500/20 text-blue-300'
+                                                            }`}>
+                                                                {u.role}
+                                                            </span>
+                                                        </td>
+                                                        <td className="p-3 text-right">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setSelectedUserForReset(u);
+                                                                    setNewPassword('');
+                                                                    setShowPasswordResetModal(true);
+                                                                }}
+                                                                className={`px-2 py-1 text-xs rounded transition-colors ${
+                                                                    darkMode ? 'bg-gray-700 hover:bg-gray-600 text-yellow-500' : 'bg-white border hover:bg-gray-50 text-yellow-600'
+                                                                }`}
+                                                                title="Changer Mot de Passe"
+                                                            >
+                                                                🔑 Reset MDP
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                {availableUsers.length === 0 && (
+                                                    <tr>
+                                                        <td colSpan="3" className="p-4 text-center opacity-50 italic">Aucun utilisateur trouvé</td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
                         {/* Modal Édition Rôle */}
                         {showRoleModal && (
                             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -908,6 +1026,51 @@ const AdminJSLaiTab = ({
                                             className="px-6 py-2 rounded text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition shadow-lg"
                                         >
                                             {selectedRole ? 'Mettre à jour' : 'Créer le Rôle'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Modal Changement Mot de Passe */}
+                        {showPasswordResetModal && selectedUserForReset && (
+                             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                                <div className={`w-full max-w-md p-6 rounded-xl shadow-2xl border ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                                        🔑 Changer le mot de passe
+                                    </h3>
+                                    <p className="text-sm opacity-70 mb-4">
+                                        Utilisateur: <strong>{selectedUserForReset.username}</strong>
+                                    </p>
+                                    
+                                    <div className="mb-4">
+                                        <label className="block text-xs font-medium mb-1">Nouveau mot de passe</label>
+                                        <input
+                                            type="password"
+                                            className={`w-full p-2 rounded border ${darkMode ? 'bg-gray-800 border-gray-600' : 'bg-gray-50 border-gray-300'}`}
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            placeholder="Nouveau mot de passe..."
+                                        />
+                                    </div>
+                                    
+                                    <div className="flex justify-end gap-2">
+                                        <button
+                                            onClick={() => {
+                                                setShowPasswordResetModal(false);
+                                                setNewPassword('');
+                                                setSelectedUserForReset(null);
+                                            }}
+                                            className="px-3 py-1.5 text-sm opacity-60 hover:opacity-100"
+                                        >
+                                            Annuler
+                                        </button>
+                                        <button
+                                            onClick={handlePasswordResetSubmit}
+                                            disabled={!newPassword}
+                                            className={`px-4 py-1.5 rounded text-sm font-medium text-white transition ${ !newPassword ? 'bg-gray-500 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+                                        >
+                                            Sauvegarder
                                         </button>
                                     </div>
                                 </div>

@@ -243,14 +243,20 @@ export default async function handler(req, res) {
             return res.status(403).json({ success: false, error: 'Non autorisé' });
         }
         
-        const { new_username, display_name, role, permissions } = payload;
+        const { new_username, display_name, role, permissions, password: initialPassword } = payload;
         
-        const { data, error } = await supabase.from('users').insert([{
+        const newUserObj = {
             username: new_username.toLowerCase().trim(),
             display_name,
             role,
             permissions
-        }]).select().single();
+        };
+
+        if (initialPassword) {
+            newUserObj.password_hash = hashPassword(initialPassword);
+        }
+
+        const { data, error } = await supabase.from('users').insert([newUserObj]).select().single();
 
         if (error) return res.status(500).json({ success: false, error: error.message });
         return res.status(200).json({ success: true, user: data });
@@ -264,7 +270,13 @@ export default async function handler(req, res) {
             return res.status(403).json({ success: false, error: 'Non autorisé' });
         }
 
-        const { target_id, updates } = payload; // updates can include role, display_name, permissions
+        const { target_id, updates } = payload; 
+        
+        // Handle password update separately
+        if (updates.password) {
+            updates.password_hash = hashPassword(updates.password);
+            delete updates.password; // Don't save raw password
+        }
         
         const { data, error } = await supabase.from('users').update(updates).eq('id', target_id).select().single();
         
