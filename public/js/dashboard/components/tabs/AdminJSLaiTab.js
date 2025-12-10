@@ -857,6 +857,7 @@ const AdminJSLaiTab = ({
                                     </p>
                                 </div>
                             </div>
+                        )}
 
                                 {/* NOUVEAU: Liste Gestion Utilisateurs */}
                                 <div className={`mt-6 rounded-lg border overflow-hidden ${darkMode ? 'bg-gray-800/30 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
@@ -968,165 +969,48 @@ const AdminJSLaiTab = ({
                                                 </div>
                                             </div>
 
-                                            {/* Advanced Permission Tree */}
-                                            <div className={`p-4 rounded-lg border flex flex-col h-[500px] ${darkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-                                                <div className="flex justify-between items-center mb-4 pb-2 border-b border-opacity-20 border-gray-500">
-                                                    <h4 className="font-semibold flex items-center gap-2">
-                                                        🛡️ Permissions
-                                                    </h4>
-                                                    <div className="flex gap-2">
-                                                        <button 
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                const allIds = {};
-                                                                availableComponents.forEach(c => allIds[c.id] = true);
-                                                                setRoleForm({...roleForm, componentPermissions: allIds});
-                                                            }}
-                                                            className="text-xs px-2 py-1 rounded hover:bg-green-500/20 text-green-500 transition"
-                                                        >
-                                                            Tout Cocher
-                                                        </button>
-                                                        <button 
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                setRoleForm({...roleForm, componentPermissions: {}});
-                                                            }}
-                                                            className="text-xs px-2 py-1 rounded hover:bg-red-500/20 text-red-500 transition"
-                                                        >
-                                                            Tout Décocher
-                                                        </button>
-                                                    </div>
+                                            {/* Permissions Matrix */}
+                                            <div className={`p-4 rounded-lg border ${darkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                                                <h4 className="font-semibold mb-3 flex items-center gap-2">
+                                                    🛡️ Permissions Composants
+                                                </h4>
+                                                <div className="space-y-1 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                                                    {availableComponents.map(comp => {
+                                                        const isPermitted = roleForm.componentPermissions[comp.id] === true;
+                                                        return (
+                                                            <label key={comp.id} className={`flex items-center justify-between p-2 rounded hover:bg-opacity-10 transition-colors ${
+                                                                isPermitted 
+                                                                    ? darkMode ? 'bg-green-900/20 text-green-300' : 'bg-green-50 text-green-900' 
+                                                                    : darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                                                            }`}>
+                                                                <span className="text-sm">{comp.label}</span>
+                                                                <div className="relative inline-block w-10 h-5 transition duration-200 ease-in-out">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        className="opacity-0 w-0 h-0"
+                                                                        checked={isPermitted}
+                                                                        onChange={e => {
+                                                                            const newPerms = { ...roleForm.componentPermissions };
+                                                                            if (e.target.checked) {
+                                                                                newPerms[comp.id] = true;
+                                                                            } else {
+                                                                                delete newPerms[comp.id]; // Remove key to deny (default deny strategy) or set false
+                                                                            }
+                                                                            setRoleForm({...roleForm, componentPermissions: newPerms});
+                                                                        }}
+                                                                    />
+                                                                    <span className={`block border border-gray-500 rounded-full absolute top-0 bottom-0 left-0 right-0 transition-colors duration-200 ${
+                                                                        isPermitted ? 'bg-green-500 border-green-500' : 'bg-gray-700'
+                                                                    }`}></span>
+                                                                    <span className={`block w-3 h-3 bg-white rounded-full absolute top-1 transition-transform duration-200 ${
+                                                                        isPermitted ? 'left-6 transform -translate-x-full' : 'left-1'
+                                                                    }`}></span>
+                                                                </div>
+                                                            </label>
+                                                        );
+                                                    })}
                                                 </div>
-
-                                                <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-4">
-                                                    {(() => {
-                                                        // 1. Group Components Logic
-                                                        const categories = {
-                                                            '📊 Tableaux de Bord': ['terminal', 'market_news', 'investing_calendar', 'yield_curve', 'markets_economy', 'intelli_stocks', 'advanced_analysis', 'scrapping_sa', 'seeking_alpha', 'dans_watchlist', 'fmp_screener', 'economic_calendar', 'email_briefings'],
-                                                            '🧠 Intelligence Artificielle': ['ask_emma', 'voice_assistant', 'terminal_emma_ia'],
-                                                            '⚙️ Administration & Outils': ['admin_jslai', 'plus_tab', 'debug_data', 'server_status'],
-                                                            '🔌 Autres / Non classé': []
-                                                        };
-
-                                                        // Helper to find category for a component ID
-                                                        const getCategory = (id) => {
-                                                            for (const [cat, ids] of Object.entries(categories)) {
-                                                                if (ids.includes(id)) return cat;
-                                                            }
-                                                            return '🔌 Autres / Non classé';
-                                                        };
-
-                                                        const grouped = {};
-                                                        availableComponents.forEach(comp => {
-                                                            const cat = getCategory(comp.id);
-                                                            if (!grouped[cat]) grouped[cat] = [];
-                                                            grouped[cat].push(comp);
-                                                        });
-
-                                                        // 2. Render Groups
-                                                        return Object.entries(grouped).map(([category, components]) => {
-                                                            if (components.length === 0) return null;
-                                                            
-                                                            // Calculate stats for badge
-                                                            const activeCount = components.filter(c => roleForm.componentPermissions[c.id]).length;
-                                                            const allActive = activeCount === components.length && components.length > 0;
-                                                            const someActive = activeCount > 0 && !allActive;
-
-                                                            return (
-                                                                <details key={category} open className={`group rounded-lg border overflow-hidden transition-all duration-300 ${
-                                                                    darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'
-                                                                }`}>
-                                                                    <summary className={`p-3 cursor-pointer font-medium flex justify-between items-center select-none transition-colors ${
-                                                                        darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-                                                                    }`}>
-                                                                        <div className="flex items-center gap-2">
-                                                                            <span className="transform transition-transform group-open:rotate-90 opacity-70">▶</span>
-                                                                            <span>{category}</span>
-                                                                        </div>
-                                                                        <div className="flex items-center gap-3">
-                                                                            <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                                                                allActive ? 'bg-green-500 text-white' :
-                                                                                someActive ? 'bg-yellow-500 text-black' :
-                                                                                'bg-gray-500 text-white opacity-50'
-                                                                            }`}>
-                                                                                {activeCount} / {components.length}
-                                                                            </span>
-                                                                            
-                                                                            {/* Category Bulk Actions */}
-                                                                            <div className="flex gap-1" onClick={e => e.preventDefault()}>
-                                                                                <button
-                                                                                    title="Sélectionner tout le groupe"
-                                                                                    className="p-1 hover:text-green-500 opacity-50 hover:opacity-100 transition"
-                                                                                    onClick={() => {
-                                                                                        const newPerms = { ...roleForm.componentPermissions };
-                                                                                        components.forEach(c => newPerms[c.id] = true);
-                                                                                        setRoleForm({...roleForm, componentPermissions: newPerms});
-                                                                                    }}
-                                                                                >
-                                                                                    ✅
-                                                                                </button>
-                                                                                <button
-                                                                                    title="Désélectionner tout le groupe"
-                                                                                    className="p-1 hover:text-red-500 opacity-50 hover:opacity-100 transition"
-                                                                                    onClick={() => {
-                                                                                        const newPerms = { ...roleForm.componentPermissions };
-                                                                                        components.forEach(c => delete newPerms[c.id]);
-                                                                                        setRoleForm({...roleForm, componentPermissions: newPerms});
-                                                                                    }}
-                                                                                >
-                                                                                    🚫
-                                                                                </button>
-                                                                            </div>
-                                                                        </div>
-                                                                    </summary>
-                                                                    
-                                                                    <div className={`p-2 space-y-1 border-t ${darkMode ? 'border-gray-700 bg-black/20' : 'border-gray-100 bg-gray-50/50'}`}>
-                                                                        {components.map(comp => {
-                                                                            const isPermitted = roleForm.componentPermissions[comp.id] === true;
-                                                                            return (
-                                                                                <label key={comp.id} className={`flex items-center justify-between p-2 pl-8 rounded cursor-pointer transition-colors ${
-                                                                                    isPermitted 
-                                                                                        ? darkMode ? 'bg-green-900/10 text-green-300' : 'bg-green-50 text-green-900' 
-                                                                                        : darkMode ? 'hover:bg-gray-700/50' : 'hover:bg-white'
-                                                                                }`}>
-                                                                                    <div className="flex flex-col">
-                                                                                        <span className="text-sm font-medium">{comp.label}</span>
-                                                                                        <span className="text-[10px] font-mono opacity-50">{comp.id}</span>
-                                                                                    </div>
-                                                                                    
-                                                                                    <div className="relative inline-block w-10 h-5 transition duration-200 ease-in-out">
-                                                                                        <input
-                                                                                            type="checkbox"
-                                                                                            className="opacity-0 w-0 h-0"
-                                                                                            checked={isPermitted}
-                                                                                            onChange={e => {
-                                                                                                const newPerms = { ...roleForm.componentPermissions };
-                                                                                                if (e.target.checked) {
-                                                                                                    newPerms[comp.id] = true;
-                                                                                                } else {
-                                                                                                    delete newPerms[comp.id]; 
-                                                                                                }
-                                                                                                setRoleForm({...roleForm, componentPermissions: newPerms});
-                                                                                            }}
-                                                                                        />
-                                                                                        <span className={`block border rounded-full absolute top-0 bottom-0 left-0 right-0 transition-colors duration-200 ${
-                                                                                            isPermitted 
-                                                                                                ? 'bg-green-500 border-green-500' 
-                                                                                                : darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-300 border-gray-300'
-                                                                                        }`}></span>
-                                                                                        <span className={`block w-3 h-3 bg-white rounded-full absolute top-1 transition-transform duration-200 ${
-                                                                                            isPermitted ? 'left-6 transform -translate-x-full' : 'left-1'
-                                                                                        }`}></span>
-                                                                                    </div>
-                                                                                </label>
-                                                                            );
-                                                                        })}
-                                                                    </div>
-                                                                </details>
-                                                            );
-                                                        });
-                                                    })()}
-                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     
@@ -1233,12 +1117,7 @@ const AdminJSLaiTab = ({
                                 </div>
                             </div>
                         )}
-
-
-
                     </div>
-                )}
-                </div>
 
                     {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
