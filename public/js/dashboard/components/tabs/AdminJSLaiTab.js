@@ -79,6 +79,19 @@ const AdminJSLaiTab = ({
                 const [cacheStatus, setCacheStatus] = React.useState({});
                 const [loadingCacheStatus, setLoadingCacheStatus] = React.useState(false);
                 
+                // États pour la Gestion des Rôles (RBAC)
+                const [roles, setRoles] = React.useState([]);
+                const [loadingRoles, setLoadingRoles] = React.useState(false);
+                const [showRoleManager, setShowRoleManager] = React.useState(false);
+                const [selectedRole, setSelectedRole] = React.useState(null);
+                const [showRoleModal, setShowRoleModal] = React.useState(false);
+                const [roleForm, setRoleForm] = React.useState({ roleName: '', displayName: '', description: '', is_admin: false, componentPermissions: {} });
+                const [adminPassword, setAdminPassword] = React.useState(''); 
+                const [showPasswordModal, setShowPasswordModal] = React.useState(false);
+                const [pendingAction, setPendingAction] = React.useState(null);
+                const [availableComponents, setAvailableComponents] = React.useState([]);
+                const [assignUserForm, setAssignUserForm] = React.useState({ username: '', roleId: '' });
+
                 // Fonctions helper pour les actions manquantes
                 const refreshAllStocks = () => {
                     setLoading(true);
@@ -184,6 +197,155 @@ const AdminJSLaiTab = ({
                     }
                 };
                 
+                // --- RBAC Helpers ---
+                const fetchRoles = async (password = adminPassword) => {
+                    setLoadingRoles(true);
+                    try {
+                        const response = await fetch('/api/roles-config', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action: 'get_roles', adminPassword: password })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            setRoles(data.roles);
+                            if (data.components) setAvailableComponents(data.components);
+                        } else {
+                           console.error('Error fetching roles:', data.error);
+                        }
+                    } catch (e) {
+                        console.error('Error fetching roles:', e);
+                    } finally {
+                        setLoadingRoles(false);
+                    }
+                };
+
+                const handleManageRoles = () => {
+                   if (!adminPassword) {
+                       setPendingAction('manage_roles');
+                       setShowPasswordModal(true);
+                   } else {
+                       setShowRoleManager(!showRoleManager);
+                       if (!showRoleManager) fetchRoles();
+                   }
+                };
+
+                const handleCreateRole = async () => {
+                    setLoadingRoles(true);
+                    try {
+                        const response = await fetch('/api/roles-config', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                action: 'create_role', 
+                                adminPassword, 
+                                roleName: roleForm.roleName,
+                                displayName: roleForm.displayName,
+                                description: roleForm.description,
+                                componentPermissions: roleForm.componentPermissions
+                            })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            fetchRoles();
+                            setShowRoleModal(false);
+                            setRoleForm({ roleName: '', displayName: '', description: '', is_admin: false, componentPermissions: {} });
+                        } else {
+                            alert('Erreur: ' + data.error);
+                        }
+                    } catch (e) {
+                        alert('Erreur: ' + e.message);
+                    } finally {
+                        setLoadingRoles(false);
+                    }
+                };
+
+                const handleUpdateRole = async () => {
+                    if (!selectedRole) return;
+                    setLoadingRoles(true);
+                    try {
+                        const response = await fetch('/api/roles-config', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                action: 'update_role', 
+                                adminPassword, 
+                                roleId: selectedRole.id, // Use ID for updates
+                                displayName: roleForm.displayName,
+                                description: roleForm.description,
+                                componentPermissions: roleForm.componentPermissions,
+                                is_admin: roleForm.is_admin
+                            })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            fetchRoles();
+                            setShowRoleModal(false);
+                            setSelectedRole(null);
+                        } else {
+                            alert('Erreur: ' + data.error);
+                        }
+                    } catch (e) {
+                        alert('Erreur: ' + e.message);
+                    } finally {
+                        setLoadingRoles(false);
+                    }
+                };
+
+                const handleDeleteRole = async (roleId) => {
+                    if (!confirm('Êtes-vous sûr de vouloir supprimer ce rôle ?')) return;
+                    setLoadingRoles(true);
+                    try {
+                        const response = await fetch('/api/roles-config', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                action: 'delete_role', 
+                                adminPassword, 
+                                roleId
+                            })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            fetchRoles();
+                        } else {
+                            alert('Erreur: ' + data.error);
+                        }
+                    } catch (e) {
+                        alert('Erreur: ' + e.message);
+                    } finally {
+                        setLoadingRoles(false);
+                    }
+                };
+                
+                const handleAssignRole = async () => {
+                    if (!assignUserForm.username || !assignUserForm.roleId) return alert('Veuillez remplir tous les champs');
+                    setLoadingRoles(true);
+                    try {
+                        const response = await fetch('/api/roles-config', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                action: 'assign_role', 
+                                adminPassword, 
+                                username: assignUserForm.username,
+                                role_id: assignUserForm.roleId
+                            })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            alert(`Rôle assigné avec succès à ${assignUserForm.username}`);
+                            setAssignUserForm({ username: '', roleId: '' });
+                        } else {
+                            alert('Erreur: ' + data.error);
+                        }
+                    } catch (e) {
+                        alert('Erreur: ' + e.message);
+                    } finally {
+                        setLoadingRoles(false);
+                    }
+                };
+
                 // Fonction helper pour obtenir tous les indices disponibles
                 const getAllIndices = () => {
                     if (typeof window !== 'undefined' && typeof window.getAllAvailableIndices === 'function') {
@@ -277,32 +439,41 @@ const AdminJSLaiTab = ({
                                                 return (
                                                     <label
                                                         key={link.id}
-                                                        className={`flex items-center gap-2 p-2 rounded-md cursor-pointer border transition-all ${
+                                                        className={`flex items-start gap-2 p-2 rounded-md cursor-pointer border transition-all ${
                                                             isSelected
                                                                 ? darkMode ? 'bg-indigo-900/40 border-indigo-500' : 'bg-indigo-50 border-indigo-300'
                                                                 : darkMode ? 'bg-gray-800/30 border-gray-700 opacity-60 hover:opacity-100' : 'bg-gray-50 border-gray-200 opacity-60 hover:opacity-100'
                                                         }`}
                                                     >
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={isSelected}
-                                                            onChange={(e) => {
-                                                                const newConfig = { ...secondaryNavConfig };
-                                                                let targetList = [...(newConfig[navConfigTargetTab] || newConfig['default'] || [])];
-                                                                
-                                                                if (e.target.checked) {
-                                                                    if (!targetList.includes(link.id)) targetList.push(link.id);
-                                                                } else {
-                                                                    targetList = targetList.filter(id => id !== link.id);
-                                                                }
-                                                                
-                                                                newConfig[navConfigTargetTab] = targetList;
-                                                                setSecondaryNavConfig(newConfig);
-                                                            }}
-                                                            className="rounded text-indigo-500 focus:ring-indigo-500"
-                                                        />
-                                                        {typeof Icon !== 'undefined' ? <Icon name={link.icon} size={16} /> : <span>📌</span>}
-                                                        <span className="text-sm truncate">{link.label}</span>
+                                                        <div className="mt-1">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={isSelected}
+                                                                onChange={(e) => {
+                                                                    const newConfig = { ...secondaryNavConfig };
+                                                                    let targetList = [...(newConfig[navConfigTargetTab] || newConfig['default'] || [])];
+                                                                    
+                                                                    if (e.target.checked) {
+                                                                        if (!targetList.includes(link.id)) targetList.push(link.id);
+                                                                    } else {
+                                                                        targetList = targetList.filter(id => id !== link.id);
+                                                                    }
+                                                                    
+                                                                    newConfig[navConfigTargetTab] = targetList;
+                                                                    setSecondaryNavConfig(newConfig);
+                                                                }}
+                                                                className="rounded text-indigo-500 focus:ring-indigo-500"
+                                                            />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center gap-2 mb-0.5">
+                                                                {typeof Icon !== 'undefined' ? <Icon name={link.icon} size={16} /> : <span>📌</span>}
+                                                                <span className="text-sm font-medium truncate">{link.label}</span>
+                                                            </div>
+                                                            <div className={`text-[10px] font-mono truncate ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                                                ?tab={link.id}
+                                                            </div>
+                                                        </div>
                                                     </label>
                                                 );
                                             })}
@@ -327,6 +498,284 @@ const AdminJSLaiTab = ({
                             )}
                         </div>
                     )}
+
+
+                    {/* 🛡️ Gestion des Rôles & Permissions */}
+                    <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+                        darkMode ? 'bg-gradient-to-br from-slate-900/20 to-gray-900 border-slate-700' : 'bg-gradient-to-br from-slate-50 to-gray-50 border-slate-200'
+                    }`}>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-slate-300' : 'text-slate-900'}`}>
+                                {typeof Icon !== 'undefined' ? <Icon emoji="🛡️" size={20} /> : '🛡️'}
+                                Gestion des Rôles & Permissions
+                            </h3>
+                            <button
+                                onClick={handleManageRoles}
+                                className={`px-3 py-1 text-xs rounded transition-all duration-200 ${
+                                    darkMode ? 'bg-slate-600 hover:bg-slate-700 text-white' : 'bg-slate-500 hover:bg-slate-600 text-white'
+                                }`}
+                            >
+                                {showRoleManager ? '▼ Masquer' : '▶ Configurer'}
+                            </button>
+                        </div>
+
+                        {showRoleManager && (
+                            <div className={`space-y-4 animate-fadeIn ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                {/* Liste des Rôles */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {/* Carte "Nouveau Rôle" */}
+                                    <button
+                                        onClick={() => {
+                                            setSelectedRole(null);
+                                            setRoleForm({ roleName: '', displayName: '', description: '', is_admin: false, componentPermissions: {} });
+                                            setShowRoleModal(true);
+                                        }}
+                                        className={`p-4 rounded-lg border border-dashed flex flex-col items-center justify-center gap-2 transition-all ${
+                                            darkMode ? 'border-gray-600 hover:border-slate-400 bg-gray-800/30' : 'border-gray-300 hover:border-slate-500 bg-gray-50'
+                                        }`}
+                                    >
+                                        <div className="text-2xl text-slate-500">+</div>
+                                        <span className="text-sm font-medium">Nouveau Rôle</span>
+                                    </button>
+
+                                    {/* Rôles Existants */}
+                                    {roles.map(role => (
+                                        <div key={role.id} className={`p-4 rounded-lg border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                            <div className="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <div className="font-bold flex items-center gap-2">
+                                                        {role.display_name}
+                                                        {role.is_admin && <span className="text-xs bg-red-500 text-white px-1.5 py-0.5 rounded">Admin</span>}
+                                                    </div>
+                                                    <div className="text-xs opacity-70 font-mono">{role.role_name}</div>
+                                                </div>
+                                                <div className="flex gap-1">
+                                                    <button
+                                                        onClick={() => {
+                                                            setSelectedRole(role);
+                                                            setRoleForm({
+                                                                roleName: role.role_name,
+                                                                displayName: role.display_name,
+                                                                description: role.description || '',
+                                                                is_admin: role.is_admin,
+                                                                componentPermissions: role.component_permissions || {}
+                                                            });
+                                                            setShowRoleModal(true);
+                                                        }}
+                                                        className="p-1 hover:bg-slate-700 rounded"
+                                                        title="Modifier"
+                                                    >
+                                                        ✏️
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteRole(role.id)}
+                                                        className="p-1 hover:bg-red-900/50 rounded text-red-400"
+                                                        title="Supprimer"
+                                                    >
+                                                        🗑️
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="text-xs opacity-60 line-clamp-2 mb-2">
+                                                {role.description || 'Aucune description'}
+                                            </div>
+                                            <div className="text-xs">
+                                                <span className="font-semibold">{Object.keys(role.component_permissions || {}).length}</span> permissions configurées
+                                            </div>
+                                        </div>
+                                    ))}
+                                    </div>
+                                
+                                {/* Assignation Utilisateurs */}
+                                <div className={`mt-6 p-4 rounded-lg border ${darkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                                    <h4 className="font-semibold mb-3 flex items-center gap-2">
+                                        👤 Assigner un Rôle Utilisateur
+                                    </h4>
+                                    <div className="flex flex-col md:flex-row gap-2 items-center">
+                                        <input 
+                                            type="text" 
+                                            placeholder="Nom d'utilisateur"
+                                            className={`flex-1 w-full p-2.5 rounded border ${darkMode ? 'bg-gray-700 border-gray-600 focus:border-indigo-500' : 'bg-white border-gray-300 focus:border-indigo-500'}`}
+                                            value={assignUserForm.username}
+                                            onChange={e => setAssignUserForm({...assignUserForm, username: e.target.value})}
+                                        />
+                                        <select
+                                            className={`w-full md:w-auto p-2.5 rounded border ${darkMode ? 'bg-gray-700 border-gray-600 focus:border-indigo-500' : 'bg-white border-gray-300 focus:border-indigo-500'}`}
+                                            value={assignUserForm.roleId}
+                                            onChange={e => setAssignUserForm({...assignUserForm, roleId: e.target.value})}
+                                        >
+                                            <option value="">Sélectionner un rôle</option>
+                                            {roles.map(r => <option key={r.id} value={r.id}>{r.display_name}</option>)}
+                                        </select>
+                                        <button 
+                                            onClick={handleAssignRole}
+                                            className="w-full md:w-auto px-6 py-2.5 bg-indigo-600 text-white font-medium rounded hover:bg-indigo-700 transition shadow-sm"
+                                        >
+                                            Assigner
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Modal Édition Rôle */}
+                        {showRoleModal && (
+                            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                                <div className={`w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-xl shadow-2xl flex flex-col ${darkMode ? 'bg-gray-900 border border-gray-700' : 'bg-white'}`}>
+                                    <div className={`p-4 border-b flex justify-between items-center ${darkMode ? 'border-gray-800' : 'border-gray-100'}`}>
+                                        <h3 className="text-xl font-bold">{selectedRole ? 'Modifier le Rôle' : 'Nouveau Rôle'}</h3>
+                                        <button onClick={() => setShowRoleModal(false)} className="text-2xl opacity-50 hover:opacity-100">×</button>
+                                    </div>
+                                    
+                                    <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium mb-1">Nom d'affichage</label>
+                                                    <input
+                                                        type="text"
+                                                        value={roleForm.displayName}
+                                                        onChange={e => setRoleForm({...roleForm, displayName: e.target.value})}
+                                                        className={`w-full p-2 rounded border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'}`}
+                                                        placeholder="Ex: Analyste Senior"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium mb-1">Identifiant (tech)</label>
+                                                    <input
+                                                        type="text"
+                                                        value={roleForm.roleName}
+                                                        onChange={e => setRoleForm({...roleForm, roleName: e.target.value})}
+                                                        disabled={!!selectedRole}
+                                                        className={`w-full p-2 rounded border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'} ${selectedRole ? 'opacity-50' : ''}`}
+                                                        placeholder="Ex: senior_analyst"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium mb-1">Description</label>
+                                                    <textarea
+                                                        value={roleForm.description}
+                                                        onChange={e => setRoleForm({...roleForm, description: e.target.value})}
+                                                        className={`w-full p-2 rounded border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'}`}
+                                                        rows={3}
+                                                    />
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={roleForm.is_admin}
+                                                        onChange={e => setRoleForm({...roleForm, is_admin: e.target.checked})}
+                                                        id="isAdminCheck"
+                                                        className="rounded text-red-500 focus:ring-red-500"
+                                                    />
+                                                    <label htmlFor="isAdminCheck" className="text-sm font-bold text-red-400">Rôle Administrateur (Accès Complet)</label>
+                                                </div>
+                                            </div>
+
+                                            {/* Permissions Matrix */}
+                                            <div className={`p-4 rounded-lg border ${darkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                                                <h4 className="font-semibold mb-3 flex items-center gap-2">
+                                                    🛡️ Permissions Composants
+                                                </h4>
+                                                <div className="space-y-1 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                                                    {availableComponents.map(comp => {
+                                                        const isPermitted = roleForm.componentPermissions[comp.id] === true;
+                                                        return (
+                                                            <label key={comp.id} className={`flex items-center justify-between p-2 rounded hover:bg-opacity-10 transition-colors ${
+                                                                isPermitted 
+                                                                    ? darkMode ? 'bg-green-900/20 text-green-300' : 'bg-green-50 text-green-900' 
+                                                                    : darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                                                            }`}>
+                                                                <span className="text-sm">{comp.label}</span>
+                                                                <div className="relative inline-block w-10 h-5 transition duration-200 ease-in-out">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        className="opacity-0 w-0 h-0"
+                                                                        checked={isPermitted}
+                                                                        onChange={e => {
+                                                                            const newPerms = { ...roleForm.componentPermissions };
+                                                                            if (e.target.checked) {
+                                                                                newPerms[comp.id] = true;
+                                                                            } else {
+                                                                                delete newPerms[comp.id]; // Remove key to deny (default deny strategy) or set false
+                                                                            }
+                                                                            setRoleForm({...roleForm, componentPermissions: newPerms});
+                                                                        }}
+                                                                    />
+                                                                    <span className={`block border border-gray-500 rounded-full absolute top-0 bottom-0 left-0 right-0 transition-colors duration-200 ${
+                                                                        isPermitted ? 'bg-green-500 border-green-500' : 'bg-gray-700'
+                                                                    }`}></span>
+                                                                    <span className={`block w-3 h-3 bg-white rounded-full absolute top-1 transition-transform duration-200 ${
+                                                                        isPermitted ? 'left-6 transform -translate-x-full' : 'left-1'
+                                                                    }`}></span>
+                                                                </div>
+                                                            </label>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className={`p-4 border-t flex justify-end gap-3 ${darkMode ? 'border-gray-800' : 'border-gray-100'}`}>
+                                        <button
+                                            onClick={() => setShowRoleModal(false)}
+                                            className="px-4 py-2 rounded text-sm hover:bg-gray-700 transition"
+                                        >
+                                            Annuler
+                                        </button>
+                                        <button
+                                            onClick={selectedRole ? handleUpdateRole : handleCreateRole}
+                                            className="px-6 py-2 rounded text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition shadow-lg"
+                                        >
+                                            {selectedRole ? 'Mettre à jour' : 'Créer le Rôle'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Modal Mot de Passe Admin */}
+                        {showPasswordModal && (
+                            <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[60]">
+                                <div className={`p-8 rounded-xl shadow-2xl max-w-sm w-full border ${darkMode ? 'bg-gray-900 border-red-900' : 'bg-white border-red-200'}`}>
+                                    <div className="text-center mb-6">
+                                        <div className="text-4xl mb-2">🔒</div>
+                                        <h3 className="text-xl font-bold">Sécurité Admin</h3>
+                                        <p className="text-sm opacity-70 mt-2">Veuillez entrer le mot de passe administrateur pour accéder à cette section.</p>
+                                    </div>
+                                    <input
+                                        type="password"
+                                        className={`w-full p-3 rounded-lg text-center text-lg tracking-widest mb-4 border focus:ring-2 focus:ring-red-500 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-300'}`}
+                                        autoFocus
+                                        placeholder="••••••••"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                setAdminPassword(e.target.value);
+                                                setShowPasswordModal(false);
+                                                // Trigger pending action
+                                                if (pendingAction === 'manage_roles') {
+                                                    // Little hack to wait for state update
+                                                    const pwd = e.target.value;
+                                                    setTimeout(() => {
+                                                        fetchRoles(pwd);
+                                                        setShowRoleManager(true);
+                                                    }, 100);
+                                                }
+                                                setPendingAction(null);
+                                            }
+                                        }}
+                                    />
+                                    <button
+                                        onClick={() => setShowPasswordModal(false)}
+                                        className="w-full py-2 text-sm opacity-50 hover:opacity-100"
+                                    >
+                                        Annuler
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
                     {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
