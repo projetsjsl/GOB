@@ -36,6 +36,36 @@ const AnnouncementBarManager = ({ isDarkMode = true }) => {
         }
     }, [bars]);
 
+    // Charger la configuration depuis Supabase (Synchro Admin)
+    useEffect(() => {
+        const fetchConfig = async () => {
+            try {
+                const response = await fetch('/api/admin/emma-config?section=ui&key=announcement_bars');
+                const data = await response.json();
+                
+                if (data && data.config && data.config.value) {
+                    const dbConfig = data.config.value;
+                    setBars(prev => {
+                        // Fusionner en gardant les états locaux si nécessaire, 
+                        // mais ici on veut surtout que l'admin dicte l'état enabled/disabled
+                        // On merge pour ne pas perdre des clés qui n'existeraient pas en DB (backward compat)
+                        const merged = { ...prev, ...dbConfig };
+                        
+                        // Si le contenu a changé, on met à jour
+                        if (JSON.stringify(prev) !== JSON.stringify(merged)) {
+                            console.log('🔄 Config Announcement Bars mise à jour depuis Supabase');
+                            return merged;
+                        }
+                        return prev;
+                    });
+                }
+            } catch (e) {
+                console.warn('Erreur synchro config barres:', e);
+            }
+        };
+        fetchConfig();
+    }, []);
+
     const toggleBar = (key) => {
         setBars(prev => ({
             ...prev,
