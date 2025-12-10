@@ -5277,7 +5277,7 @@ STRUCTURE JSON OBLIGATOIRE:
                     await loadWatchlistData(tickers);
                     console.log('✅ Watchlist chargée depuis Supabase');
                 } catch (e) {
-```
+
                     console.error('Erreur chargement Supabase watchlist:', e);
                     showMessage('Erreur chargement Supabase', 'error');
                 }
