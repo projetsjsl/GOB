@@ -106,9 +106,13 @@ const AdminJSLaiTab = ({
 
                 // --- Password Management Handler (Moved to Top) ---
                 const handlePasswordResetSubmit = async () => {
-                   if (!selectedUserForReset || !newPassword) return;
+                   console.log('🔑 handlePasswordResetSubmit called', { selectedUserForReset, newPassword });
                    
-                   if (!confirm(`Confirmer le changement de mot de passe pour ${selectedUserForReset.username} ?`)) return;
+                   if (!selectedUserForReset || !newPassword) {
+                       console.log('❌ Missing data:', { selectedUserForReset, newPassword: newPassword ? 'has value' : 'empty' });
+                       showMessage('❌ Veuillez entrer un nouveau mot de passe', 'error');
+                       return;
+                   }
 
                    setLoadingRoles(true);
                    try {
@@ -116,6 +120,7 @@ const AdminJSLaiTab = ({
                            ? window.authGuard.getCurrentUser() 
                            : { username: 'Admin' };
                        
+                       console.log('📡 Sending password update request...');
                        const response = await fetch('/api/auth', {
                            method: 'POST',
                            headers: { 'Content-Type': 'application/json' },
@@ -125,23 +130,24 @@ const AdminJSLaiTab = ({
                                target_id: selectedUserForReset.id,
                                updates: { 
                                    password: newPassword,
-                                   password_display: newPassword  // Store readable password for display
+                                   password_display: newPassword
                                }
                            })
                        });
                        const data = await response.json();
+                       console.log('📥 Response:', data);
+                       
                        if (data.success) {
                            showMessage(`✅ Mot de passe de ${selectedUserForReset.username} changé en: ${newPassword}`, 'success');
                            setShowPasswordResetModal(false);
                            setNewPassword('');
                            setSelectedUserForReset(null);
-                           // Refresh user list to show new password
                            fetchUsers();
                        } else {
-                           showMessage('❌ Erreur: ' + data.error, 'error');
+                           showMessage('❌ Erreur: ' + (data.error || 'Erreur inconnue'), 'error');
                        }
                    } catch (e) {
-                       console.error(e);
+                       console.error('💥 Error:', e);
                        showMessage('❌ Erreur technique: ' + e.message, 'error');
                    } finally {
                        setLoadingRoles(false);
