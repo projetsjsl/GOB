@@ -112,31 +112,37 @@ const AdminJSLaiTab = ({
 
                    setLoadingRoles(true);
                    try {
-                       if (!typeof window !== 'undefined' && window.authGuard) {
-                           const currentUser = window.authGuard.getCurrentUser();
-                           const response = await fetch('/api/auth', {
-                               method: 'POST',
-                               headers: { 'Content-Type': 'application/json' },
-                               body: JSON.stringify({
-                                   action: 'update_user',
-                                   admin_username: currentUser.username,
-                                   target_id: selectedUserForReset.id,
-                                   updates: { password: newPassword }
-                               })
-                           });
-                           const data = await response.json();
-                           if (data.success) {
-                               showMessage('✅ Mot de passe mis à jour avec succès', 'success');
-                               setShowPasswordResetModal(false);
-                               setNewPassword('');
-                               setSelectedUserForReset(null);
-                           } else {
-                               showMessage('❌ Erreur: ' + data.error, 'error');
-                           }
+                       const currentUser = typeof window !== 'undefined' && window.authGuard 
+                           ? window.authGuard.getCurrentUser() 
+                           : { username: 'Admin' };
+                       
+                       const response = await fetch('/api/auth', {
+                           method: 'POST',
+                           headers: { 'Content-Type': 'application/json' },
+                           body: JSON.stringify({
+                               action: 'update_user',
+                               admin_username: currentUser.username,
+                               target_id: selectedUserForReset.id,
+                               updates: { 
+                                   password: newPassword,
+                                   password_display: newPassword  // Store readable password for display
+                               }
+                           })
+                       });
+                       const data = await response.json();
+                       if (data.success) {
+                           showMessage(`✅ Mot de passe de ${selectedUserForReset.username} changé en: ${newPassword}`, 'success');
+                           setShowPasswordResetModal(false);
+                           setNewPassword('');
+                           setSelectedUserForReset(null);
+                           // Refresh user list to show new password
+                           fetchUsers();
+                       } else {
+                           showMessage('❌ Erreur: ' + data.error, 'error');
                        }
                    } catch (e) {
                        console.error(e);
-                       showMessage('❌ Erreur technique', 'error');
+                       showMessage('❌ Erreur technique: ' + e.message, 'error');
                    } finally {
                        setLoadingRoles(false);
                    }
@@ -887,6 +893,7 @@ const AdminJSLaiTab = ({
                                             <thead className={`sticky top-0 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'} shadow-sm`}>
                                                 <tr>
                                                     <th className="p-3 font-medium opacity-70">Utilisateur</th>
+                                                    <th className="p-3 font-medium opacity-70">Mot de passe</th>
                                                     <th className="p-3 font-medium opacity-70">Rôle</th>
                                                     <th className="p-3 font-medium opacity-70 text-right">Actions</th>
                                                 </tr>
@@ -897,6 +904,11 @@ const AdminJSLaiTab = ({
                                                         <td className="p-3">
                                                             <div className="font-medium">{u.display_name}</div>
                                                             <div className="text-xs opacity-50 font-mono">{u.username}</div>
+                                                        </td>
+                                                        <td className="p-3">
+                                                            <code className={`px-2 py-1 rounded text-xs font-mono ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
+                                                                {u.password_display || u.username}
+                                                            </code>
                                                         </td>
                                                         <td className="p-3">
                                                             <span className={`px-2 py-0.5 rounded text-xs ${
@@ -924,7 +936,7 @@ const AdminJSLaiTab = ({
                                                 ))}
                                                 {availableUsers.length === 0 && (
                                                     <tr>
-                                                        <td colSpan="3" className="p-4 text-center opacity-50 italic">Aucun utilisateur trouvé</td>
+                                                        <td colSpan="4" className="p-4 text-center opacity-50 italic">Aucun utilisateur trouvé</td>
                                                     </tr>
                                                 )}
                                             </tbody>
