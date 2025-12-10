@@ -334,6 +334,36 @@ const AdminJSLaiTab = ({
                    }
                 };
 
+                const handlePopulateDefaults = async () => {
+                    if (!confirm('Cela va créer les rôles par défaut (Invite, Client, Daniel, GOB, Admin) s\'ils n\'existent pas.\nContinuer ?')) return;
+                    
+                    setLoadingRoles(true);
+                    try {
+                        const response = await fetch('/api/roles-config', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                action: 'populate_defaults',
+                                adminPassword: adminPassword,
+                                is_admin: isAdmin
+                            })
+                        });
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            showMessage('✅ ' + data.message, 'success');
+                            fetchRoles(); // Refresh list
+                        } else {
+                            showMessage('❌ ' + data.error, 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error populating defaults:', error);
+                        showMessage('❌ Erreur lors de l\'initialisation', 'error');
+                    } finally {
+                        setLoadingRoles(false);
+                    }
+                };
+
                 const handleCreateRole = async () => {
                     setLoadingRoles(true);
                     try {
@@ -626,6 +656,19 @@ const AdminJSLaiTab = ({
                         {showRoleManager && (
                             <div className={`space-y-4 animate-fadeIn ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 {/* Liste des Rôles */}
+                                <div className="flex justify-end mb-2">
+                                    <button
+                                        onClick={handlePopulateDefaults}
+                                        className={`px-3 py-1.5 text-xs rounded border transition-colors ${
+                                            darkMode 
+                                                ? 'bg-indigo-900/30 border-indigo-700 text-indigo-300 hover:bg-indigo-900/50' 
+                                                : 'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100'
+                                        }`}
+                                        title="Initialiser les rôles système par défaut s'ils manquent (Invite, Client...)"
+                                    >
+                                        🔄 Initialiser les Rôles par Défaut
+                                    </button>
+                                </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                     {/* Carte "Nouveau Rôle" */}
                                     <button

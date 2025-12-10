@@ -25418,7 +25418,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         );
                     })()}
 
-                    {console.log('🎯 Active Tab:', activeTab, 'Loading Screen:', showLoadingScreen)}
+
                     {activeTab === 'markets-economy' && <MarketsEconomyTab />}
                     {/* {activeTab === 'yield-curve' && <YieldCurveTab />} */} {/* Intégré dans Marchés & Économie */}
                     {activeTab === 'intellistocks' && <JLabUnifiedTab />}

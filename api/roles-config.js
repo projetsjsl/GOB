@@ -411,6 +411,120 @@ export default async function handler(req, res) {
         }
 
 
+        // ============================================================
+        // ACTION: POPULATE_DEFAULTS - Peupler les rôles par défaut
+        // ============================================================
+        if (action === 'populate_defaults') {
+            if (!adminPassword) {
+                return res.status(401).json({
+                    success: false,
+                    error: 'Authentification admin requise'
+                });
+            }
+
+            const ADMIN_PASSWORD = process.env.ROLES_ADMIN_PASSWORD || 'admin';
+            if (adminPassword !== ADMIN_PASSWORD) {
+                return res.status(401).json({
+                    success: false,
+                    error: 'Mot de passe admin incorrect'
+                });
+            }
+
+            const DEFAULT_ROLES = [
+                {
+                    role_name: 'invite',
+                    display_name: 'Invité',
+                    description: 'Accès limité en lecture seule',
+                    is_admin: false,
+                    component_permissions: { 
+                        'stocks-news': true, 'ask-emma': true, 'intellistocks': false, 
+                        'economic-calendar': true, 'investing-calendar': true, 'yield-curve': false, 
+                        'markets-economy': false, 'dans-watchlist': false, 'scrapping-sa': false, 
+                        'seeking-alpha': false, 'email-briefings': false, 'admin-jslai': false, 
+                        'emma-sms': false, 'fastgraphs': false, 'plus': false 
+                    }
+                },
+                {
+                    role_name: 'client',
+                    display_name: 'Client',
+                    description: 'Accès standard au tableau de bord',
+                    is_admin: false,
+                    component_permissions: { 
+                        'stocks-news': true, 'ask-emma': true, 'intellistocks': true, 
+                        'economic-calendar': true, 'investing-calendar': true, 'yield-curve': true, 
+                        'markets-economy': true, 'dans-watchlist': false, 'scrapping-sa': false, 
+                        'seeking-alpha': false, 'email-briefings': false, 'admin-jslai': false, 
+                        'emma-sms': false, 'fastgraphs': false, 'plus': true 
+                    }
+                },
+                {
+                    role_name: 'daniel',
+                    display_name: 'Daniel',
+                    description: 'Accès avancé et outils de gestion',
+                    is_admin: false,
+                    component_permissions: { 
+                        'stocks-news': true, 'ask-emma': true, 'intellistocks': true, 
+                        'economic-calendar': true, 'investing-calendar': true, 'yield-curve': true, 
+                        'markets-economy': true, 'dans-watchlist': true, 'scrapping-sa': true, 
+                        'seeking-alpha': true, 'email-briefings': true, 'admin-jslai': false, 
+                        'emma-sms': true, 'fastgraphs': true, 'plus': true 
+                    }
+                },
+                {
+                    role_name: 'gob',
+                    display_name: 'GOB',
+                    description: 'Accès super-utilisateur système',
+                    is_admin: true,
+                    component_permissions: { 
+                        'stocks-news': true, 'ask-emma': true, 'intellistocks': true, 
+                        'economic-calendar': true, 'investing-calendar': true, 'yield-curve': true, 
+                        'markets-economy': true, 'dans-watchlist': true, 'scrapping-sa': true, 
+                        'seeking-alpha': true, 'email-briefings': true, 'admin-jslai': true, 
+                        'emma-sms': true, 'fastgraphs': true, 'plus': true 
+                    }
+                },
+                 {
+                    role_name: 'admin',
+                    display_name: 'Admin',
+                    description: 'Administrateur global',
+                    is_admin: true,
+                    component_permissions: { 
+                        'stocks-news': true, 'ask-emma': true, 'intellistocks': true, 
+                        'economic-calendar': true, 'investing-calendar': true, 'yield-curve': true, 
+                        'markets-economy': true, 'dans-watchlist': true, 'scrapping-sa': true, 
+                        'seeking-alpha': true, 'email-briefings': true, 'admin-jslai': true, 
+                        'emma-sms': true, 'fastgraphs': true, 'plus': true 
+                    }
+                }
+            ];
+
+            const results = { created: 0, skipped: 0, errors: [] };
+
+            for (const role of DEFAULT_ROLES) {
+                try {
+                    // Check if role exists
+                    const { data: existing } = await db.from('user_roles').select('id').eq('role_name', role.role_name).single();
+                    
+                    if (!existing) {
+                        const { error } = await db.from('user_roles').insert([role]);
+                        if (error) throw error;
+                        results.created++;
+                    } else {
+                        results.skipped++;
+                    }
+                } catch (err) {
+                    console.error(`Error processing role ${role.role_name}:`, err);
+                    results.errors.push(role.role_name);
+                }
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: `Opération terminée: ${results.created} créés, ${results.skipped} existants.`,
+                details: results
+            });
+        }
+
         // Action non reconnue
         return res.status(400).json({
             success: false,
