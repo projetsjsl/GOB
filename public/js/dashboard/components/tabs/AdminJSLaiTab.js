@@ -197,7 +197,33 @@ const AdminJSLaiTab = ({
                     }
                 };
                 
+                const [availableUsers, setAvailableUsers] = React.useState([]); // Users list for assignment
+
                 // --- RBAC Helpers ---
+                const fetchUsers = async () => {
+                   if (!typeof window !== 'undefined' && window.authGuard) {
+                       const currentUser = window.authGuard.getCurrentUser();
+                       if (!currentUser) return;
+
+                       try {
+                           const response = await fetch('/api/auth', {
+                               method: 'POST',
+                               headers: { 'Content-Type': 'application/json' },
+                               body: JSON.stringify({ 
+                                   action: 'list_users',
+                                   admin_username: currentUser.username // API requires admin username
+                               })
+                           });
+                           const data = await response.json();
+                           if (data.success) {
+                               setAvailableUsers(data.users || []);
+                           }
+                       } catch (e) {
+                           console.error('Error fetching users:', e);
+                       }
+                   } 
+                };
+
                 const fetchRoles = async (password = adminPassword) => {
                     setLoadingRoles(true);
                     try {
@@ -226,7 +252,10 @@ const AdminJSLaiTab = ({
                        setShowPasswordModal(true);
                    } else {
                        setShowRoleManager(!showRoleManager);
-                       if (!showRoleManager) fetchRoles();
+                       if (!showRoleManager) {
+                           fetchRoles();
+                           fetchUsers(); // Fetch users when opening manager
+                       }
                    }
                 };
 
@@ -592,19 +621,42 @@ const AdminJSLaiTab = ({
                                         👤 Assigner un Rôle Utilisateur
                                     </h4>
                                     <div className="flex flex-col md:flex-row gap-2 items-center">
-                                        <input 
-                                            type="text" 
-                                            placeholder="Nom d'utilisateur"
+                                        {/* SÉLECTEUR D'UTILISATEUR (Lié aux comptes existants) */}
+                                        <select
                                             className={`flex-1 w-full p-2.5 rounded border ${darkMode ? 'bg-gray-700 border-gray-600 focus:border-indigo-500' : 'bg-white border-gray-300 focus:border-indigo-500'}`}
                                             value={assignUserForm.username}
                                             onChange={e => setAssignUserForm({...assignUserForm, username: e.target.value})}
-                                        />
+                                        >
+                                            <option value="">-- Sélectionner un utilisateur --</option>
+                                            
+                                            {/* Liste des utilisateurs récupérés depuis l'API */}
+                                            {availableUsers && availableUsers.length > 0 ? (
+                                                availableUsers.map(user => (
+                                                    <option key={user.id || user.username} value={user.username}>
+                                                        {user.display_name} ({user.username})
+                                                    </option>
+                                                ))
+                                            ) : (
+                                                <>
+                                                 {/* Fallback si pas de liste (ex: pas admin ou erreur) */}
+                                                 <option value="" disabled>Aucun utilisateur trouvé ou chargement...</option>
+                                                </>
+                                            )}
+                                        </select>
+
+                                        {/* Input manuel de secours (si nécessaire) ou caché */}
+                                        {/* <input 
+                                            type="text" 
+                                            placeholder="Ou entrer username manuel..."
+                                            className={`w-32 p-2.5 rounded border ...`}
+                                        /> */}
+
                                         <select
                                             className={`w-full md:w-auto p-2.5 rounded border ${darkMode ? 'bg-gray-700 border-gray-600 focus:border-indigo-500' : 'bg-white border-gray-300 focus:border-indigo-500'}`}
                                             value={assignUserForm.roleId}
                                             onChange={e => setAssignUserForm({...assignUserForm, roleId: e.target.value})}
                                         >
-                                            <option value="">Sélectionner un rôle</option>
+                                            <option value="">-- Sélectionner un rôle --</option>
                                             {roles.map(r => <option key={r.id} value={r.id}>{r.display_name}</option>)}
                                         </select>
                                         <button 
@@ -614,6 +666,9 @@ const AdminJSLaiTab = ({
                                             Assigner
                                         </button>
                                     </div>
+                                    <p className="text-xs opacity-50 mt-2">
+                                        ℹ️ L'assignation lie le rôle au <strong>nom d'utilisateur</strong>. Assurez-vous que l'utilisateur existe.
+                                    </p>
                                 </div>
                             </div>
                         )}
