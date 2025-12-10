@@ -23,7 +23,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     updateProgressBar();
+    updateProgressBar();
     attachFormListeners();
+    
+    // Fix: Attach navigation event listeners
+    document.getElementById('btnNext')?.addEventListener('click', nextStep);
+    document.getElementById('btnPrev')?.addEventListener('click', previousStep);
 });
 
 // Sauvegarde automatique
