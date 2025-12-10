@@ -312,10 +312,16 @@ const AdminJSLaiTab = ({
                             setRoles(data.roles);
                             if (data.components) setAvailableComponents(data.components);
                         } else {
-                           console.error('Error fetching roles:', data.error);
+                            console.error('Error fetching roles:', data.error);
+                            if (data.error && data.error.includes('relation "user_roles" does not exist')) {
+                                showMessage('⚠️ Tables manquantes. Veuillez exécuter le script SQL.', 'error');
+                            } else {
+                                showMessage('❌ Erreur chargement rôles: ' + (data.error || 'Erreur inconnue'), 'error');
+                            }
                         }
                     } catch (e) {
                         console.error('Error fetching roles:', e);
+                        showMessage('❌ Erreur connexion: ' + e.message, 'error');
                     } finally {
                         setLoadingRoles(false);
                     }
