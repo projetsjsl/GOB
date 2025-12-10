@@ -1129,7 +1129,6 @@ const AdminJSLaiTab = ({
                                                     })()}
                                                 </div>
                                         </div>
-                                    </div>
                                     
                                     <div className={`p-4 border-t flex justify-end gap-3 ${darkMode ? 'border-gray-800' : 'border-gray-100'}`}>
                                         <button
