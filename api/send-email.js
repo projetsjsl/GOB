@@ -4,6 +4,41 @@
  * Envoie les briefings Emma par email en utilisant la plateforme Resend
  *
  * @route POST /api/send-email
+ * 
+ * ════════════════════════════════════════════════════════════════════════════
+ * BONNES PRATIQUES HTML EMAIL (compatibilité Outlook, Gmail, Apple Mail)
+ * ════════════════════════════════════════════════════════════════════════════
+ * 
+ * Le paramètre `html` envoyé à ce endpoint DOIT respecter les règles suivantes
+ * pour garantir un affichage correct dans TOUS les clients email:
+ * 
+ * ✅ STRUCTURE OBLIGATOIRE:
+ * - Utiliser <table role="presentation"> pour le layout
+ * - Attributs sur chaque table: cellpadding="0" cellspacing="0" border="0"
+ * - Largeur conteneur principal: width="600" style="max-width: 600px;"
+ * - Wrapper externe centré avec <td align="center">
+ * 
+ * ✅ STYLES:
+ * - 100% inline (style="...") sur chaque élément
+ * - Font stack: font-family: Arial, Helvetica, sans-serif;
+ * - Couleurs hexadécimales complètes (#FFFFFF, pas #FFF)
+ * - Utiliser padding au lieu de margin
+ * - vertical-align: middle pour aligner images/texte
+ * 
+ * ❌ NE JAMAIS UTILISER:
+ * - <div> pour structure principale
+ * - <style> block dans <head> (Outlook ignore)
+ * - Classes CSS
+ * - Flexbox (display: flex, inline-flex)
+ * - Grid
+ * - linear-gradient, box-shadow
+ * - border-radius > 4px
+ * - margin (utiliser padding)
+ * - onerror JavaScript
+ * 
+ * 📧 TEMPLATE DE RÉFÉRENCE:
+ * Voir /GOB/.agent/workflows/email-best-practices.md pour un template complet
+ * ════════════════════════════════════════════════════════════════════════════
  */
 
 export default async function handler(req, res) {

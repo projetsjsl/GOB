@@ -12,32 +12,39 @@
 
     <style>
         :root {
-            /* Zen Pro Light Palette */
-            --bg-deep: #F9FAFB;
-            --bg-surface: #FFFFFF;
-            --primary: #15803d; 
-            --primary-dark: #14532d;
-            --accent: #166534;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --glass-border: rgba(0, 0, 0, 0.06);
-            --glass-bg: rgba(255, 255, 255, 0.95);
-            --success: #15803d;
-            --danger: #dc2626;
+            /* Executive Dark Gold Palette */
+            --bg-deep: #0a0f1a;
+            --bg-surface: #111827;
+            --bg-card: rgba(30, 41, 59, 0.8);
+            --primary: #d4af37;
+            --primary-dark: #b8960c;
+            --accent: #f4c430;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(30, 41, 59, 0.85);
+            --success: #10b981;
+            --danger: #ef4444;
             
             --sidebar-width: 260px;
             --font-main: 'Inter', sans-serif;
             --font-display: 'Playfair Display', serif;
+
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 30px rgba(212, 175, 55, 0.3);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         
         body {
             font-family: var(--font-main);
-            background-color: var(--bg-deep);
+            background: var(--bg-deep);
             color: var(--text-main);
             min-height: 100vh;
-            background-image: radial-gradient(circle at 10% 20%, rgba(21, 128, 61, 0.03) 0%, transparent 40%);
+            background-image: 
+                radial-gradient(ellipse at 20% 0%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(59, 130, 246, 0.06) 0%, transparent 50%),
+                linear-gradient(180deg, #0a0f1a 0%, #111827 100%);
         }
 
         .admin-container {
@@ -48,14 +55,14 @@
         /* Sidebar */
         .sidebar {
             width: var(--sidebar-width);
-            background: #ffffff;
-            border-right: 1px solid rgba(0,0,0,0.04);
+            background: var(--bg-surface);
+            border-right: 1px solid var(--glass-border);
             padding: 30px 20px;
             position: fixed;
             height: 100vh;
             overflow-y: auto;
             z-index: 100;
-            box-shadow: 4px 0 24px rgba(0,0,0,0.02);
+            box-shadow: 4px 0 24px rgba(0,0,0,0.3);
         }
 
         .sidebar h2 {
@@ -64,7 +71,7 @@
             margin-bottom: 40px;
             padding-bottom: 20px;
             border-bottom: 1px solid var(--glass-border);
-            color: var(--text-main);
+            color: var(--primary);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -81,6 +88,9 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .menu-item:hover {
@@ -90,10 +100,10 @@
         }
 
         .menu-item.active {
-            background: linear-gradient(90deg, rgba(21, 128, 61, 0.1) 0%, transparent 100%);
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.15) 0%, transparent 100%);
             border-left: 3px solid var(--primary);
             color: var(--primary);
-            border-radius: 4px 12px 12px 4px; /* flat left side */
+            border-radius: 4px 12px 12px 4px;
         }
 
         .sidebar-footer {
@@ -165,8 +175,8 @@
         table { width: 100%; border-collapse: collapse; }
 
         thead {
-            background: #f9fafb;
-            border-bottom: 2px solid rgba(0,0,0,0.05);
+            background: rgba(30, 41, 59, 0.9);
+            border-bottom: 1px solid var(--glass-border);
         }
 
         th {
@@ -187,7 +197,7 @@
 
         tr:last-child td { border-bottom: none; }
         
-        tr:hover td { background: #f3f4f6; }
+        tr:hover td { background: rgba(255,255,255,0.03); }
 
         .action-btn {
             padding: 6px 12px;
@@ -339,14 +349,14 @@
         .modal.active { display: flex; }
 
         .modal-content {
-            background: white;
+            background: var(--bg-surface);
             padding: 40px;
             border-radius: 16px;
             max-width: 600px;
             width: 90%;
-            border: none;
+            border: 1px solid var(--glass-border);
             position: relative;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         .modal-header h2 { color: var(--text-main); margin-bottom: 20px; font-family: var(--font-display); }
@@ -363,19 +373,19 @@
             .btn-logout-admin { padding: 10px 0; }
         }
 
-        /* Emma styles override */
+        /* Emma styles override - Dark Gold */
         .emma-toggle {
-            box-shadow: 0 4px 20px rgba(14, 165, 233, 0.4);
+            box-shadow: 0 4px 25px rgba(212, 175, 55, 0.5);
         }
         .brand-banner {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 8px;
-            background: linear-gradient(90deg, #15803d, #166534, #14532d, #ca8a04);
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
             z-index: 99999;
-            box-shadow: 0 1px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
         }
     </style>
 </head>

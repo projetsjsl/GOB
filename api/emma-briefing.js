@@ -148,114 +148,102 @@ async function callEmmaAgent(prompt, context) {
     }
 }
 
+/**
+ * ════════════════════════════════════════════════════════════════════════════
+ * BONNES PRATIQUES HTML EMAIL (compatibilité Outlook, Gmail, Apple Mail)
+ * ════════════════════════════════════════════════════════════════════════════
+ * 
+ * ✅ UTILISER:
+ * - Tables avec role="presentation" pour le layout
+ * - Attributs: cellpadding="0" cellspacing="0" border="0"
+ * - Styles 100% inline (pas de <style> dans <head>)
+ * - Couleurs hexadécimales complètes (#FFFFFF, pas #FFF)
+ * - Font stack: Arial, Helvetica, sans-serif
+ * - Width explicites sur tables (max 600px)
+ * - Padding au lieu de margin
+ * 
+ * ❌ NE PAS UTILISER:
+ * - <div> pour structure principale
+ * - Flexbox, Grid, CSS moderne
+ * - linear-gradient, box-shadow
+ * - border-radius > 4px (Outlook l'ignore)
+ * - Classes CSS ou <style> block
+ * - margin (utiliser padding)
+ * ════════════════════════════════════════════════════════════════════════════
+ */
 function generateEmailHtml(content, promptConfig, context) {
     const subject = promptConfig.email_config.subject_template.replace('{date}', context.date);
+    const formattedContent = formatContentForHtml(content);
+    const disclaimerText = promptConfig.config?.disclaimer_text || 'Les informations fournies sont à des fins éducatives uniquement et ne constituent pas des conseils financiers personnalisés.';
     
-    return `
-<!DOCTYPE html>
+    return `<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${subject}</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f8f9fa;
-        }
-        .email-container {
-            background: white;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .header {
-            text-align: center;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-        .header h1 {
-            color: #007bff;
-            margin: 0;
-            font-size: 24px;
-        }
-        .header .subtitle {
-            color: #666;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-        .content {
-            font-size: 16px;
-            line-height: 1.8;
-        }
-        .content h2 {
-            color: #007bff;
-            font-size: 18px;
-            margin-top: 25px;
-            margin-bottom: 10px;
-        }
-        .content h3 {
-            color: #495057;
-            font-size: 16px;
-            margin-top: 20px;
-            margin-bottom: 8px;
-        }
-        .highlight {
-            background-color: #e3f2fd;
-            padding: 15px;
-            border-radius: 5px;
-            border-left: 4px solid #007bff;
-            margin: 15px 0;
-        }
-        .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #dee2e6;
-            text-align: center;
-            font-size: 12px;
-            color: #666;
-        }
-        .signature {
-            margin-top: 20px;
-            font-style: italic;
-            color: #007bff;
-        }
-        .disclaimer {
-            font-size: 10px;
-            color: #999;
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 3px;
-        }
-    </style>
 </head>
-<body>
-    <div class="email-container">
-        <div class="header">
-            <h1>Emma En Direct</h1>
-            <div class="subtitle">${context.montreal_time} - ${promptConfig.name}</div>
-        </div>
-        
-        <div class="content">
-            ${formatContentForHtml(content)}
-        </div>
-        
-        <div class="footer">
-            <div class="signature">
-                — Emma, votre assistante financière intelligente
-            </div>
-            <div class="disclaimer">
-                ${promptConfig.config?.disclaimer_text || 'Les informations fournies sont à des fins éducatives uniquement et ne constituent pas des conseils financiers personnalisés.'}
-            </div>
-        </div>
-    </div>
+<body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f4f4f4;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                
+                <!-- CONTENEUR PRINCIPAL - max 600px -->
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background-color: #ffffff;">
+                    
+                    <!-- HEADER -->
+                    <tr>
+                        <td style="text-align: center; border-bottom: 2px solid #007bff; padding: 20px 30px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="font-size: 24px; font-weight: bold; color: #007bff; font-family: Arial, Helvetica, sans-serif; text-align: center;">
+                                        Emma En Direct
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="height: 5px; line-height: 5px;">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size: 14px; color: #666666; font-family: Arial, Helvetica, sans-serif; text-align: center;">
+                                        ${context.montreal_time} - ${promptConfig.name}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- CONTENT -->
+                    <tr>
+                        <td style="padding: 30px; font-size: 16px; line-height: 1.8; color: #333333; font-family: Arial, Helvetica, sans-serif;">
+                            ${formattedContent}
+                        </td>
+                    </tr>
+                    
+                    <!-- FOOTER -->
+                    <tr>
+                        <td style="padding: 20px 30px; border-top: 1px solid #dee2e6;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <!-- Signature -->
+                                <tr>
+                                    <td style="font-size: 14px; font-style: italic; color: #007bff; font-family: Arial, Helvetica, sans-serif; text-align: center; padding-bottom: 15px;">
+                                        — Emma, votre assistante financière intelligente
+                                    </td>
+                                </tr>
+                                <!-- Disclaimer -->
+                                <tr>
+                                    <td style="font-size: 10px; color: #999999; font-family: Arial, Helvetica, sans-serif; text-align: center; background-color: #f8f9fa; padding: 10px;">
+                                        ${disclaimerText}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                </table>
+                
+            </td>
+        </tr>
+    </table>
 </body>
 </html>`;
 }

@@ -23,29 +23,42 @@ const DEFAULT_COLORS = {
 };
 
 /**
- * Convertit markdown en HTML pour email
+ * ════════════════════════════════════════════════════════════════════════════
+ * BONNES PRATIQUES HTML EMAIL (compatibilité Outlook, Gmail, Apple Mail)
+ * ════════════════════════════════════════════════════════════════════════════
+ * 
+ * ✅ UTILISER: Tables role="presentation", inline styles, Arial font, padding
+ * ❌ NE PAS UTILISER: divs, flexbox, linear-gradient, box-shadow, margin
+ * ════════════════════════════════════════════════════════════════════════════
+ */
+
+/**
+ * Convertit markdown en HTML pour email (Outlook-compatible)
  */
 function markdownToEmailHtml(text, colors) {
   if (!text) return '';
+  
+  const fontStack = 'Arial, Helvetica, sans-serif';
 
   return text
-    .replace(/^### (.+)$/gm, `<h3 style="color:${colors.primary};margin:24px 0 12px;font-size:18px;font-weight:600;border-left:4px solid ${colors.primaryLight};padding-left:12px;">$1</h3>`)
-    .replace(/^## (.+)$/gm, `<h2 style="color:${colors.primaryDark};margin:28px 0 16px;font-size:20px;font-weight:700;border-bottom:3px solid ${colors.primary};padding-bottom:8px;">$1</h2>`)
-    .replace(/^# (.+)$/gm, `<h1 style="color:${colors.primaryDark};margin:32px 0 20px;font-size:24px;font-weight:700;">$1</h1>`)
-    .replace(/\*\*(.+?)\*\*/g, `<strong style="font-weight:700;color:${colors.primary};">$1</strong>`)
+    .replace(/^### (.+)$/gm, `<tr><td style="color:${colors.primary};padding:20px 0 10px 12px;font-size:16px;font-weight:bold;border-left:4px solid ${colors.primaryLight};font-family:${fontStack};">$1</td></tr>`)
+    .replace(/^## (.+)$/gm, `<tr><td style="color:${colors.primaryDark};padding:24px 0 12px 0;font-size:18px;font-weight:bold;border-bottom:2px solid ${colors.primary};font-family:${fontStack};">$1</td></tr>`)
+    .replace(/^# (.+)$/gm, `<tr><td style="color:${colors.primaryDark};padding:28px 0 16px 0;font-size:22px;font-weight:bold;font-family:${fontStack};">$1</td></tr>`)
+    .replace(/\*\*(.+?)\*\*/g, `<strong style="font-weight:bold;color:${colors.primary};">$1</strong>`)
     .replace(/\*(.+?)\*/g, '<em style="font-style:italic;">$1</em>')
-    .replace(/\n\n/g, `</p><p style="margin:12px 0;line-height:1.8;color:${colors.textDark};">`)
+    .replace(/\n\n/g, `</td></tr><tr><td style="padding:8px 0;line-height:1.7;color:${colors.textDark};font-family:${fontStack};">`)
     .replace(/\n/g, '<br>');
 }
 
 /**
- * Génère le template email complet
+ * Génère le template email complet (TABLE-BASED pour Outlook)
  */
 function generateEmailTemplate(content, type, config) {
   const colors = config.colors;
   const branding = config.branding;
   const header = config.header;
   const footer = config.footer;
+  const fontStack = 'Arial, Helvetica, sans-serif';
 
   const html = markdownToEmailHtml(content, colors);
   const date = new Date().toLocaleDateString('fr-FR', {
@@ -57,42 +70,87 @@ function generateEmailTemplate(content, type, config) {
   const emojis = { morning: '☀️', midday: '📊', evening: '🌙' };
   const labels = { morning: 'MATIN', midday: 'MI-JOURNÉE', evening: 'SOIRÉE' };
 
-  // Avatar dans le header (optionnel)
+  // Avatar dans le header (optionnel) - avec attributs width/height explicites
   const avatarHtml = header.showAvatar && branding.avatar.url
-    ? `<img src="${branding.avatar.url}" alt="${branding.avatar.alt}" style="width:${branding.avatar.size}px;height:${branding.avatar.size}px;border-radius:50%;margin-bottom:16px;border:4px solid rgba(255,255,255,0.3);">`
-    : `<div style="font-size:48px;margin-bottom:12px;">${emojis[type] || '📊'}</div>`;
+    ? `<tr><td style="text-align:center;padding-bottom:16px;"><img src="${branding.avatar.url}" alt="${branding.avatar.alt}" width="${branding.avatar.size}" height="${branding.avatar.size}" style="border-radius:50%;border:4px solid rgba(255,255,255,0.3);display:block;margin:0 auto;"></td></tr>`
+    : `<tr><td style="font-size:48px;text-align:center;padding-bottom:12px;">${emojis[type] || '📊'}</td></tr>`;
 
   // Date et édition
-  const dateHtml = header.showDate ? `<div style="opacity:0.95;font-size:14px;">${header.showEdition ? `ÉDITION ${labels[type] || 'BRIEFING'} | ` : ''}${date}</div>` : '';
+  const dateHtml = header.showDate ? `<tr><td style="font-size:14px;color:#ffffff;text-align:center;opacity:0.95;font-family:${fontStack};">${header.showEdition ? `ÉDITION ${labels[type] || 'BRIEFING'} | ` : ''}${date}</td></tr>` : '';
 
   // Logo dans le footer (optionnel)
   const logoHtml = footer.showLogo && branding.logo.url
-    ? `<img src="${branding.logo.url}" alt="${branding.logo.alt}" style="width:${branding.logo.width}px;margin-bottom:12px;">`
+    ? `<tr><td style="text-align:center;padding-bottom:12px;"><img src="${branding.logo.url}" alt="${branding.logo.alt}" width="${branding.logo.width}" style="display:block;margin:0 auto;border:0;"></td></tr>`
     : '';
 
   // Disclaimer
   const disclaimerHtml = footer.showDisclaimer && footer.disclaimerText
-    ? `<p style="margin:8px 0;font-size:11px;color:${colors.textMuted};">${footer.disclaimerText}</p>`
+    ? `<tr><td style="padding:8px 0;font-size:11px;color:${colors.textMuted};text-align:center;font-family:${fontStack};">${footer.disclaimerText}</td></tr>`
     : '';
 
+  // Template TABLE-BASED pour compatibilité Outlook
   return `
-    <div style="max-width:600px;margin:0 auto;font-family:'Segoe UI',Roboto,sans-serif;background:${colors.background || '#f8fafc'};padding:10px;">
-      <div style="background:linear-gradient(135deg,${colors.primary} 0%,${colors.primaryLight} 100%);color:white;padding:32px 24px;border-radius:12px 12px 0 0;text-align:center;">
-        ${avatarHtml}
-        <h1 style="margin:0 0 8px;font-size:28px;font-weight:700;">${branding.companyName}</h1>
-        <div style="opacity:0.9;font-size:13px;margin-bottom:4px;">${branding.tagline}</div>
-        ${dateHtml}
-      </div>
-      <div style="background:white;padding:32px 24px;border-radius:0 0 12px 12px;box-shadow:0 4px 6px rgba(0,0,0,0.1);">
-        <p style="margin:12px 0;line-height:1.8;color:${colors.textDark};">${html}</p>
-      </div>
-      <div style="text-align:center;padding:20px;color:${colors.textMuted};font-size:12px;">
-        ${logoHtml}
-        <p style="margin:0;">🤖 Généré par <strong style="color:${colors.primaryDark};">Emma IA</strong></p>
-        ${disclaimerHtml}
-        <p style="margin:8px 0 0;font-size:10px;">${footer.copyrightText || '© 2025 GOB Apps - Tous droits réservés'}</p>
-      </div>
-    </div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${colors.background || '#f8fafc'};">
+  <tr>
+    <td align="center" style="padding:10px;">
+      
+      <!-- CONTENEUR PRINCIPAL - max 600px -->
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background-color:#ffffff;">
+        
+        <!-- HEADER - couleur solide (pas de gradient) -->
+        <tr>
+          <td style="background-color:${colors.primary};color:#ffffff;padding:32px 24px;text-align:center;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              ${avatarHtml}
+              <tr>
+                <td style="font-size:28px;font-weight:bold;color:#ffffff;text-align:center;font-family:${fontStack};padding-bottom:8px;">
+                  ${branding.companyName}
+                </td>
+              </tr>
+              <tr>
+                <td style="font-size:13px;color:#ffffff;text-align:center;opacity:0.9;font-family:${fontStack};padding-bottom:4px;">
+                  ${branding.tagline}
+                </td>
+              </tr>
+              ${dateHtml}
+            </table>
+          </td>
+        </tr>
+        
+        <!-- CONTENT -->
+        <tr>
+          <td style="padding:32px 24px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr><td style="padding:8px 0;line-height:1.7;color:${colors.textDark};font-family:${fontStack};">${html}</td></tr>
+            </table>
+          </td>
+        </tr>
+        
+        <!-- FOOTER -->
+        <tr>
+          <td style="padding:20px 24px;text-align:center;border-top:1px solid #e0e0e0;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              ${logoHtml}
+              <tr>
+                <td style="font-size:12px;color:${colors.textMuted};text-align:center;font-family:${fontStack};">
+                  🤖 Généré par <strong style="color:${colors.primaryDark};">Emma IA</strong>
+                </td>
+              </tr>
+              ${disclaimerHtml}
+              <tr>
+                <td style="padding-top:8px;font-size:10px;color:${colors.textMuted};text-align:center;font-family:${fontStack};">
+                  ${footer.copyrightText || '© 2025 GOB Apps - Tous droits réservés'}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        
+      </table>
+      
+    </td>
+  </tr>
+</table>
   `;
 }
 

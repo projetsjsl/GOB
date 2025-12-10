@@ -47,6 +47,10 @@ export const CeoMode: React.FC<CeoModeProps> = ({ onBack, onInjectPrompt, avatar
       return (
           <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-slate-950 to-blue-900/20 animate-gradient-x"></div>
+              {/* Back button in upper left corner */}
+              <button onClick={onBack} className="absolute top-6 left-6 bg-white/5 hover:bg-white/10 p-3 rounded-full text-white border border-white/10 backdrop-blur transition-all z-10" title="Retour au menu">
+                  <ArrowLeft className="w-5 h-5" />
+              </button>
               <div className="w-full max-w-lg bg-slate-900/60 border border-white/10 rounded-3xl p-10 shadow-2xl relative backdrop-blur-xl">
                   <div className="text-center mb-10">
                       <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10 shadow-inner overflow-hidden backdrop-blur-md">

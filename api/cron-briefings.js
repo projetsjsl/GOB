@@ -173,6 +173,28 @@ export default async function handler(req, res) {
 
 /**
  * Crée le HTML du briefing pour l'email
+ * 
+ * ════════════════════════════════════════════════════════════════════════════
+ * BONNES PRATIQUES HTML EMAIL (compatibilité Outlook, Gmail, Apple Mail)
+ * ════════════════════════════════════════════════════════════════════════════
+ * 
+ * ✅ UTILISER:
+ * - Tables avec role="presentation" pour le layout
+ * - Attributs: cellpadding="0" cellspacing="0" border="0"
+ * - Styles 100% inline (pas de <style> dans <head>)
+ * - Couleurs hexadécimales complètes (#FFFFFF, pas #FFF)
+ * - Font stack: Arial, Helvetica, sans-serif
+ * - Width explicites sur tables (max 600px)
+ * - Padding au lieu de margin
+ * 
+ * ❌ NE PAS UTILISER:
+ * - <div> pour structure principale
+ * - Flexbox, Grid, CSS moderne
+ * - linear-gradient, box-shadow
+ * - border-radius > 4px (Outlook l'ignore)
+ * - Classes CSS ou <style> block
+ * - margin (utiliser padding)
+ * ════════════════════════════════════════════════════════════════════════════
  */
 function createBriefingHTML(markdownContent, briefingType, data) {
     const typeEmojis = {
@@ -197,54 +219,96 @@ function createBriefingHTML(markdownContent, briefingType, data) {
     const title = typeTitles[briefingType] || 'Briefing Financier';
     const subtitle = typeSubtitles[briefingType] || 'Analyse de marché';
 
-    // Convertir Markdown en HTML simplifié
+    // Convertir Markdown en HTML simplifié avec styles inline
     let htmlBody = markdownContent
-        .replace(/^### (.+)$/gm, '<h3 style="color: #1e40af; margin-top: 24px;">$1</h3>')
-        .replace(/^## (.+)$/gm, '<h2 style="color: #1e3a8a; margin-top: 28px;">$1</h2>')
-        .replace(/^# (.+)$/gm, '<h1 style="color: #1e3a8a;">$1</h1>')
+        .replace(/^### (.+)$/gm, '<tr><td style="color: #1e40af; font-size: 16px; font-weight: bold; padding: 20px 0 8px 0; font-family: Arial, Helvetica, sans-serif;">$1</td></tr>')
+        .replace(/^## (.+)$/gm, '<tr><td style="color: #1e3a8a; font-size: 18px; font-weight: bold; padding: 24px 0 10px 0; font-family: Arial, Helvetica, sans-serif;">$1</td></tr>')
+        .replace(/^# (.+)$/gm, '<tr><td style="color: #1e3a8a; font-size: 22px; font-weight: bold; padding: 0 0 12px 0; font-family: Arial, Helvetica, sans-serif;">$1</td></tr>')
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.+?)\*/g, '<em>$1</em>')
-        .replace(/\n\n/g, '</p><p style="margin: 12px 0; line-height: 1.6;">')
+        .replace(/\n\n/g, '</td></tr><tr><td style="padding: 8px 0; font-size: 14px; line-height: 1.6; color: #333333; font-family: Arial, Helvetica, sans-serif;">')
         .replace(/\n/g, '<br>');
 
-    // Wrapper de paragraphe
-    htmlBody = `<p style="margin: 12px 0; line-height: 1.6;">${htmlBody}</p>`;
+    // Wrapper le contenu dans une structure table
+    htmlBody = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr><td style="padding: 8px 0; font-size: 14px; line-height: 1.6; color: #333333; font-family: Arial, Helvetica, sans-serif;">${htmlBody}</td></tr>
+    </table>`;
 
-    // Template HTML complet
-    return `
-<!DOCTYPE html>
+    const dateStr = new Date().toLocaleDateString('fr-CA');
+    const timeStr = new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' });
+
+    // Template HTML complet - TABLE-BASED pour compatibilité Outlook
+    return `<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title} - Emma Financial</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f9fafb;">
-    <div style="max-width: 680px; margin: 0 auto; padding: 20px;">
-
-        <!-- Header -->
-        <div style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; padding: 32px; border-radius: 12px; margin-bottom: 24px;">
-            <div style="font-size: 48px; margin-bottom: 12px;">${emoji}</div>
-            <h1 style="margin: 0 0 8px 0; font-size: 28px; font-weight: 700;">${title}</h1>
-            <p style="margin: 0; opacity: 0.9; font-size: 14px;">${subtitle}</p>
-            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 12px; opacity: 0.8;">
-                📡 Généré par Emma Agent • ${new Date().toLocaleDateString('fr-CA')} ${new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' })}
-            </div>
-        </div>
-
-        <!-- Content -->
-        <div style="background: white; padding: 32px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px;">
-            ${htmlBody}
-        </div>
-
-        <!-- Footer -->
-        <div style="text-align: center; padding: 24px; color: #6b7280; font-size: 12px;">
-            <p style="margin: 0 0 8px 0;">🤖 Généré automatiquement par <strong>Emma Agent</strong></p>
-            <p style="margin: 0; opacity: 0.7;">GOB Apps • Intelligence Financière</p>
-        </div>
-
-    </div>
+<body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f4f4f4;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                
+                <!-- CONTENEUR PRINCIPAL - max 600px -->
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background-color: #ffffff;">
+                    
+                    <!-- HEADER - couleur solide (pas de gradient pour Outlook) -->
+                    <tr>
+                        <td style="background-color: #1e3a8a; color: #ffffff; padding: 32px; text-align: center;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="font-size: 48px; text-align: center; padding-bottom: 12px;">${emoji}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size: 28px; font-weight: bold; text-align: center; color: #ffffff; font-family: Arial, Helvetica, sans-serif; padding-bottom: 8px;">${title}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size: 14px; text-align: center; color: #ffffff; opacity: 0.9; font-family: Arial, Helvetica, sans-serif;">${subtitle}</td>
+                                </tr>
+                                <tr>
+                                    <td style="height: 16px; line-height: 16px;">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td style="border-top: 1px solid rgba(255,255,255,0.3); padding-top: 16px; font-size: 12px; text-align: center; color: #ffffff; opacity: 0.8; font-family: Arial, Helvetica, sans-serif;">
+                                        📡 Généré par Emma Agent &bull; ${dateStr} ${timeStr}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- CONTENT -->
+                    <tr>
+                        <td style="padding: 32px;">
+                            ${htmlBody}
+                        </td>
+                    </tr>
+                    
+                    <!-- FOOTER -->
+                    <tr>
+                        <td style="padding: 24px; text-align: center; border-top: 1px solid #e0e0e0;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="font-size: 12px; color: #6b7280; text-align: center; font-family: Arial, Helvetica, sans-serif; padding-bottom: 8px;">
+                                        🤖 Généré automatiquement par <strong>Emma Agent</strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size: 12px; color: #9ca3af; text-align: center; font-family: Arial, Helvetica, sans-serif;">
+                                        GOB Apps &bull; Intelligence Financière
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                </table>
+                
+            </td>
+        </tr>
+    </table>
 </body>
-</html>
-    `.trim();
+</html>`;
 }
+

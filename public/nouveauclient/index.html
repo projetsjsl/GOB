@@ -12,37 +12,38 @@
 
     <style>
         :root {
-            /* Zen Pro Light Palette */
-            --bg-deep: #FFFFFF;
-            --bg-surface: #F3F4F6;
-            --primary: #15803d; /* Zen Green */
-            --primary-dark: #14532d;
-            --accent: #166534;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --glass-border: rgba(0, 0, 0, 0.08);
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --success: #15803d;
-            --error: #dc2626;
+            /* Executive Dark Gold Palette */
+            --bg-deep: #0a0f1a;
+            --bg-surface: #111827;
+            --bg-card: rgba(30, 41, 59, 0.8);
+            --primary: #d4af37;
+            --primary-dark: #b8960c;
+            --accent: #f4c430;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(30, 41, 59, 0.85);
+            --success: #10b981;
+            --error: #ef4444;
             --font-main: 'Inter', sans-serif;
             --font-display: 'Playfair Display', serif;
             
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-glow: 0 0 15px rgba(21, 128, 61, 0.15);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 30px rgba(212, 175, 55, 0.3);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         
         body {
             font-family: var(--font-main);
-            background-color: var(--bg-deep);
+            background: var(--bg-deep);
             color: var(--text-main);
             min-height: 100vh;
             line-height: 1.6;
             background-image: 
-                radial-gradient(circle at 0% 0%, rgba(21, 128, 61, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(22, 101, 52, 0.08) 0%, transparent 50%),
-                linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+                radial-gradient(ellipse at 20% 0%, rgba(212, 175, 55, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                linear-gradient(180deg, #0a0f1a 0%, #111827 100%);
         }
 
         .layout {
@@ -155,19 +156,16 @@
         }
 
         .login-card {
-            margin-top: 20px; /* Space for banner */
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
             width: 100%;
             max-width: 440px;
-            background: rgba(255, 255, 255, 0.85); /* Slightly more opaque */
-            -webkit-backdrop-filter: blur(20px);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.6);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 
-                0 20px 25px -5px rgba(0, 0, 0, 0.1), 
-                0 8px 10px -6px rgba(0, 0, 0, 0.05),
-                0 0 0 1px rgba(0,0,0,0.02);
+            margin: auto;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-lg);
             position: relative;
             overflow: hidden;
         }
@@ -179,7 +177,7 @@
             left: 0;
             width: 100%;
             height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
         }
 
         .login-header {
@@ -241,8 +239,8 @@
 
         .form-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
-            background: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
+            background: rgba(0, 0, 0, 0.4);
         }
 
         .btn-submit {
@@ -252,7 +250,7 @@
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             border: none;
             border-radius: 12px;
-            color: white;
+            color: #0a0f1a;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
@@ -262,7 +260,7 @@
 
         .btn-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.4);
+            box-shadow: 0 10px 30px -5px rgba(212, 175, 55, 0.5);
         }
 
         .btn-submit:active {
@@ -596,7 +594,7 @@
 
     <!-- Emma IA Integration -->
     <style>
-        /* Complete Emma Widget Styles - Light Zen Theme */
+        /* Complete Emma Widget Styles - Executive Dark Gold Theme */
         .emma-container {
             position: fixed;
             bottom: 20px;
@@ -609,11 +607,11 @@
             height: 60px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
+            color: #0a0f1a;
             border: none;
             font-size: 1.8rem;
             cursor: pointer;
-            box-shadow: 0 4px 20px rgba(21, 128, 61, 0.4);
+            box-shadow: 0 4px 25px rgba(212, 175, 55, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -622,6 +620,7 @@
 
         .emma-toggle:hover {
             transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 30px rgba(212, 175, 55, 0.6);
         }
 
         .emma-window {
@@ -634,9 +633,9 @@
             display: none;
             flex-direction: column;
             overflow: hidden;
-            background: #ffffff;
-            border: 1px solid rgba(0,0,0,0.1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            background: var(--bg-surface);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             z-index: 10000;
         }
 
@@ -649,10 +648,10 @@
             justify-content: space-between;
             align-items: center;
             padding: 16px 20px;
-            background: #f9fafb;
-            border-bottom: 1px solid rgba(0,0,0,0.08);
+            background: rgba(30, 41, 59, 0.9);
+            border-bottom: 1px solid var(--glass-border);
             font-weight: 600;
-            color: #1f2937;
+            color: var(--text-main);
         }
         
         .emma-close {
@@ -660,15 +659,15 @@
             border: none;
             font-size: 1.2rem;
             cursor: pointer;
-            color: #6b7280;
+            color: var(--text-muted);
             padding: 4px 8px;
             border-radius: 4px;
             transition: all 0.2s;
         }
         
         .emma-close:hover {
-            background: rgba(0,0,0,0.05);
-            color: #1f2937;
+            background: rgba(255,255,255,0.1);
+            color: var(--text-main);
         }
 
         .emma-messages {
@@ -678,7 +677,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            background: #ffffff;
+            background: var(--bg-surface);
         }
 
         .emma-message {
@@ -721,14 +720,14 @@
         }
 
         .emma-bubble.emma {
-            background: #f3f4f6;
-            color: #1f2937;
+            background: rgba(30, 41, 59, 0.9);
+            color: var(--text-main);
             border-bottom-left-radius: 4px;
         }
 
         .emma-bubble.user {
             background: var(--primary);
-            color: white;
+            color: #0a0f1a;
             border-bottom-right-radius: 4px;
         }
 
@@ -741,7 +740,7 @@
         .emma-typing span {
             width: 8px;
             height: 8px;
-            background: #6b7280;
+            background: var(--primary);
             border-radius: 50%;
             animation: typing 1s infinite;
         }
@@ -758,18 +757,18 @@
             display: flex;
             gap: 10px;
             padding: 16px;
-            border-top: 1px solid rgba(0,0,0,0.08);
-            background: #f9fafb;
+            border-top: 1px solid var(--glass-border);
+            background: rgba(30, 41, 59, 0.9);
         }
 
         .emma-input-area input {
             flex: 1;
             padding: 12px 16px;
-            border: 1px solid rgba(0,0,0,0.1);
+            border: 1px solid var(--glass-border);
             border-radius: 24px;
             font-size: 0.9rem;
-            background: #ffffff;
-            color: #1f2937;
+            background: rgba(0,0,0,0.3);
+            color: var(--text-main);
             outline: none;
             transition: border-color 0.2s;
         }
@@ -779,7 +778,7 @@
         }
 
         .emma-input-area input::placeholder {
-            color: #6b7280;
+            color: var(--text-muted);
         }
 
         .emma-send {
@@ -787,7 +786,7 @@
             height: 44px;
             border-radius: 50%;
             background: var(--primary);
-            color: white;
+            color: #0a0f1a;
             border: none;
             font-size: 1.1rem;
             cursor: pointer;
