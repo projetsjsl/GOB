@@ -79,6 +79,13 @@ const AdminJSLaiTab = ({
                 const [cacheStatus, setCacheStatus] = React.useState({});
                 const [loadingCacheStatus, setLoadingCacheStatus] = React.useState(false);
                 
+                // État et fonction pour les messages utilisateur
+                const [message, setMessage] = React.useState({ text: '', type: '' });
+                const showMessage = (text, type = 'info') => {
+                    setMessage({ text, type });
+                    setTimeout(() => setMessage({ text: '', type: '' }), 5000);
+                };
+                
                 // États pour la Gestion des Rôles (RBAC)
                 const [roles, setRoles] = React.useState([]);
                 const [loadingRoles, setLoadingRoles] = React.useState(false);
@@ -576,6 +583,16 @@ const AdminJSLaiTab = ({
                 
                 return (
                 <div className="space-y-6">
+                    {/* Toast de notification */}
+                    {message.text && (
+                        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
+                            message.type === 'success' ? 'bg-green-600 text-white' :
+                            message.type === 'error' ? 'bg-red-600 text-white' :
+                            'bg-blue-600 text-white'
+                        }`}>
+                            {message.text}
+                        </div>
+                    )}
 
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
