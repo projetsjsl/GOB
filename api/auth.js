@@ -96,8 +96,24 @@ export default async function handler(req, res) {
 
       // 1. User found in DB
       if (user) {
-        // Password check (Simple: password == username for legacy reasons, or future real auth)
-        if (password.toLowerCase().trim() !== normalizedUsername) {
+        // Password verification logic:
+        // 1. Check password_hash (hashed password) if it exists
+        // 2. Check password_display (plain text, for simple deployments) if it exists
+        // 3. Fallback to legacy: password == username
+        let passwordValid = false;
+        
+        if (user.password_hash) {
+            // Compare with hashed password
+            passwordValid = (hashPassword(password) === user.password_hash);
+        } else if (user.password_display) {
+            // Compare with stored plain password
+            passwordValid = (password === user.password_display);
+        } else {
+            // Legacy fallback: password == username
+            passwordValid = (password.toLowerCase().trim() === normalizedUsername);
+        }
+        
+        if (!passwordValid) {
            return res.status(401).json({ success: false, error: 'Mot de passe incorrect' });
         }
 
