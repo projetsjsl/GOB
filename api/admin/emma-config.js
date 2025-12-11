@@ -44,8 +44,8 @@ export default async function handler(req, res) {
 
             case 'POST':
             case 'PUT': {
-                const { action, key, value, category } = req.body || {};
-                return handleSet(req, res, action, key, value, category);
+                const { action, key, value, category, section } = req.body || {};
+                return handleSet(req, res, action, key, value, category, section);
             }
 
             case 'DELETE': {
@@ -80,9 +80,9 @@ async function handleGet(req, res, section, key) {
 
         let query = supabase.from(CONFIG_TABLE).select('*');
 
-        // Filtrer par catégorie au lieu de section
+        // Filtrer par section (anciennement category)
         if (section) {
-            query = query.eq('category', section);
+            query = query.eq('section', section);
         }
 
         if (key) {
@@ -100,13 +100,15 @@ async function handleGet(req, res, section, key) {
             });
         }
 
-        // Organiser par catégorie (ex: prompts, variables, directives)
+        // Organiser par section/catégorie
         const config = {};
         data.forEach(item => {
-            const category = item.category || 'prompts';
+            // DB utilise 'section', mais l'API retourne souvent sous 'category' ou 'section'
+            // On utilise 'section' comme clé de regroupement
+            const group = item.section || item.category || 'prompts';
 
-            if (!config[category]) {
-                config[category] = {};
+            if (!config[group]) {
+                config[group] = {};
             }
 
             // Parser la valeur selon le type
@@ -168,7 +170,7 @@ async function handleGet(req, res, section, key) {
 /**
  * POST/PUT - Sauvegarder la configuration
  */
-async function handleSet(req, res, action, key, value, category) {
+async function handleSet(req, res, action, key, value, category, explicitSection) {
     if (!key) {
         return res.status(400).json({
             error: 'Key requis'
@@ -191,11 +193,18 @@ async function handleSet(req, res, action, key, value, category) {
                          typeof value === 'number' ? 'number' :
                          typeof value === 'boolean' ? 'boolean' : 'string';
 
+        // Logique de détermination de section:
+        // 1. Explicit 'section' param
+        // 2. 'category' param
+        // 3. 'prompt' fallback
+        const finalSection = explicitSection || category || 'prompt';
+
         const configData = {
             key,
             value: typeof value === 'object' ? JSON.stringify(value) : value,
             type: valueType,
-            category: category || 'prompt',
+            section: finalSection, 
+            category: category || finalSection, // Backward compatibility
             updated_at: new Date().toISOString(),
             updated_by: req.headers['x-admin-user'] || 'admin'
         };

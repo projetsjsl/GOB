@@ -237,6 +237,7 @@ const AdminJSLaiTab = ({
                             body: JSON.stringify({
                                 action: 'set',
                                 category: 'ui',
+                                section: 'ui', // Explicitly setting section
                                 key: 'announcement_bars',
                                 value: newConfig
                             })
@@ -266,6 +267,7 @@ const AdminJSLaiTab = ({
                             body: JSON.stringify({
                                 action: 'set',
                                 category: 'ui',
+                                section: 'ui', // Explicitly setting section
                                 key: key,
                                 value: config
                             })
