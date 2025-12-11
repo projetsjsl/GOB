@@ -32,9 +32,10 @@ interface SidebarProps {
   isBulkSyncing?: boolean;
   bulkSyncProgress?: { current: number; total: number };
   onOpenAdmin?: () => void;
+  isAdmin?: boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, isAdmin = false }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredProfiles = profiles
@@ -95,7 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
             <span className="hidden sm:inline">Ajouter</span>
           </button>
         </div>
-        {onSyncFromSupabase && (
+        {isAdmin && onSyncFromSupabase && (
           <button
             onClick={onSyncFromSupabase}
             disabled={isLoadingTickers || isBulkSyncing}
@@ -106,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
             <span>{isLoadingTickers ? 'Synchronisation...' : 'Synchroniser Supabase'}</span>
           </button>
         )}
-        {onBulkSyncAll && (
+        {isAdmin && onBulkSyncAll && (
           <div className="flex flex-col gap-1">
              <button
               onClick={onBulkSyncAll}
@@ -137,7 +138,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
             </div>
           </div>
         )}
-        {onOpenAdmin && (
+        {isAdmin && onOpenAdmin && (
           <button
             onClick={onOpenAdmin}
             className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors mt-2 border border-slate-700"
@@ -247,16 +248,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
                     >
                       <DocumentDuplicateIcon className="w-3.5 h-3.5" />
                     </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (confirm(`Supprimer ${profile.id} ?`)) onDelete(profile.id);
-                      }}
-                      title="Supprimer ce ticker\n\n⚠️ ATTENTION: Cette action est irréversible!\n\nSupprime définitivement:\n• Toutes les données historiques\n• Toutes les hypothèses\n• Tous les snapshots associés\n\nUne confirmation sera demandée avant suppression."
-                      className="p-1.5 hover:bg-red-900/50 hover:text-red-400 rounded"
-                    >
-                      <TrashIcon className="w-3.5 h-3.5" />
-                    </button>
+                    {isAdmin && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm(`Supprimer ${profile.id} ?`)) onDelete(profile.id);
+                        }}
+                        title="Supprimer ce ticker\n\n⚠️ ATTENTION: Cette action est irréversible!\n\nSupprime définitivement:\n• Toutes les données historiques\n• Toutes les hypothèses\n• Tous les snapshots associés\n\nUne confirmation sera demandée avant suppression."
+                        className="p-1.5 hover:bg-red-900/50 hover:text-red-400 rounded"
+                      >
+                        <TrashIcon className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

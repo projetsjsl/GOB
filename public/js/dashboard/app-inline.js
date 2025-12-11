@@ -590,6 +590,33 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             }
         }, [primaryNavConfig]);
 
+        // ☁️ Load Nav Configuration from Supabase (Sync)
+        useEffect(() => {
+            const loadSupabaseConfig = async () => {
+                try {
+                    // Fetch Primary Nav Config
+                    const resPrimary = await fetch('/api/admin/emma-config?section=ui&key=primary_nav_config');
+                    const dataPrimary = await resPrimary.json();
+                    if (dataPrimary && dataPrimary.config && dataPrimary.config.value) {
+                        console.log('☁️ Primary Nav Config loaded from Supabase');
+                        setPrimaryNavConfig(dataPrimary.config.value);
+                    }
+
+                    // Fetch Secondary Nav Config
+                    const resSecondary = await fetch('/api/admin/emma-config?section=ui&key=secondary_nav_config');
+                    const dataSecondary = await resSecondary.json();
+                    if (dataSecondary && dataSecondary.config && dataSecondary.config.value) {
+                        console.log('☁️ Secondary Nav Config loaded from Supabase');
+                        setSecondaryNavConfig(dataSecondary.config.value);
+                    }
+                } catch (error) {
+                    console.error('❌ Error loading nav config from Supabase:', error);
+                }
+            };
+
+            loadSupabaseConfig();
+        }, []);
+
 
         // État pour le thème actuel
         const [currentThemeId, setCurrentThemeId] = useState(() => {

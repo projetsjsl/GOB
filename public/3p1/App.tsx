@@ -117,6 +117,25 @@ export default function App() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
+    // --- USER ROLE MANAGEMENT ---
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        try {
+            const userJson = sessionStorage.getItem('gob-user');
+            if (userJson) {
+                const user = JSON.parse(userJson);
+                // Check multiple possible admin indicators
+                if (user.role === 'admin' || user.is_admin === true || user.username === 'admin' || user.id === 'admin') {
+                    setIsAdmin(true);
+                    console.log('🔐 Admin access granted');
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to parse user role', e);
+        }
+    }, []);
+
     const handleAdminRepair = async (tickerToRepair: string) => {
         setIsRepairing(tickerToRepair);
         try {
@@ -2425,6 +2444,7 @@ export default function App() {
                         isBulkSyncing={isBulkSyncing}
                         bulkSyncProgress={bulkSyncProgress}
                         onOpenAdmin={() => setShowAdmin(true)}
+                        isAdmin={isAdmin}
                     />
                 </div>
             </div>

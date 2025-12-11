@@ -212,15 +212,17 @@ const NewsTicker = ({ isDarkMode = true }) => {
                 }
             `}</style>
             <div
-                className="relative w-full border-b overflow-hidden"
+                className="relative w-full border-b overflow-hidden transition-colors duration-300"
                 style={{
-                    backgroundColor: '#0a0e27', // Couleur fixe sombre pour contraste
-                    borderTop: '3px solid #10b981', // Bordure supérieure verte visible et fixe
-                    borderBottom: '2px solid #10b981', // Bordure inférieure verte visible et fixe
-                    height: '52px', // Hauteur augmentée pour plus de visibilité
+                    backgroundColor: 'var(--theme-header-bg, #0a0e27)',
+                    borderTop: '1px solid var(--theme-border, rgba(16, 185, 129, 0.3))',
+                    borderBottom: '1px solid var(--theme-border, rgba(16, 185, 129, 0.3))',
+                    height: '52px',
                     zIndex: 5,
                     position: 'relative',
-                    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.2)' // Ombre verte subtile
+                    boxShadow: 'var(--theme-shadow, 0 2px 8px rgba(0, 0, 0, 0.1))',
+                    backdropFilter: 'var(--theme-backdrop-filter, none)',
+                    WebkitBackdropFilter: 'var(--theme-backdrop-filter, none)',
                 }}
             >
             {/* Left icon + Type selector */}
@@ -228,11 +230,11 @@ const NewsTicker = ({ isDarkMode = true }) => {
                 className="absolute left-4 top-0 bottom-0 flex items-center gap-2 z-20"
             >
                 <div
-                    className="flex items-center justify-center"
+                    className="flex items-center justify-center transition-colors duration-300"
                     style={{
                         width: '20px',
                         height: '20px',
-                        color: '#10b981',
+                        color: 'var(--theme-primary, #10b981)',
                         pointerEvents: 'none'
                     }}
                 >
@@ -244,12 +246,12 @@ const NewsTicker = ({ isDarkMode = true }) => {
                 {/* Type selector button */}
                 <button
                     onClick={() => setShowTypeSelector(!showTypeSelector)}
-                    className="px-3 py-1.5 rounded-md text-sm font-semibold transition-colors hover:opacity-90"
+                    className="px-3 py-1.5 rounded-md text-sm font-semibold transition-all duration-300 hover:opacity-90"
                     style={{
-                        backgroundColor: 'rgba(16, 185, 129, 0.25)',
-                        color: '#10b981',
-                        border: '2px solid #10b981',
-                        boxShadow: '0 2px 4px rgba(16, 185, 129, 0.3)'
+                        backgroundColor: 'rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15)',
+                        color: 'var(--theme-primary, #10b981)',
+                        border: '1px solid rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)',
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
                     }}
                     title="Filtrer par type de nouvelle"
                 >
@@ -259,10 +261,10 @@ const NewsTicker = ({ isDarkMode = true }) => {
                 {/* Type selector dropdown */}
                 {showTypeSelector && (
                     <div
-                        className="absolute left-0 top-full mt-1 rounded-lg shadow-xl border overflow-hidden"
+                        className="absolute left-0 top-full mt-1 rounded-lg shadow-xl border overflow-hidden backdrop-blur-md"
                         style={{
-                            backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                            borderColor: isDarkMode ? 'rgba(75, 85, 99, 0.5)' : 'rgba(209, 213, 219, 0.5)',
+                            backgroundColor: 'var(--theme-surface, #1f2937)',
+                            borderColor: 'var(--theme-border, rgba(255,255,255,0.1))',
                             minWidth: '150px',
                             maxHeight: '300px',
                             overflowY: 'auto',
@@ -279,9 +281,9 @@ const NewsTicker = ({ isDarkMode = true }) => {
                                 className="w-full text-left px-3 py-2 text-sm transition-colors hover:opacity-80 flex items-center gap-2"
                                 style={{
                                     backgroundColor: newsType === type.value 
-                                        ? (isDarkMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.1)')
+                                        ? 'rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2)'
                                         : 'transparent',
-                                    color: isDarkMode ? '#ffffff' : '#1f2937'
+                                    color: 'var(--theme-text, #e0e7ff)'
                                 }}
                             >
                                 <span>{type.icon}</span>
@@ -300,10 +302,10 @@ const NewsTicker = ({ isDarkMode = true }) => {
                 {isLoading ? (
                     <div
                         className="flex items-center gap-2 px-4"
-                        style={{ color: '#10b981' }}
+                        style={{ color: 'var(--theme-primary, #10b981)' }}
                     >
                         <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                        <span className="text-sm font-medium" style={{ color: '#10b981' }}>Chargement des actualités...</span>
+                        <span className="text-sm font-medium" style={{ color: 'var(--theme-text, #e0e7ff)' }}>Chargement des actualités...</span>
                     </div>
                 ) : news.length > 0 ? (
                     <div 
@@ -332,15 +334,15 @@ const NewsTicker = ({ isDarkMode = true }) => {
                         </span>
                         
                         <span
-                            className="text-sm font-semibold"
-                            style={{ color: '#10b981', minWidth: '80px', maxWidth: '100px', flexShrink: 0 }}
+                            className="text-sm font-semibold transition-colors duration-300"
+                            style={{ color: 'var(--theme-primary, #10b981)', minWidth: '80px', maxWidth: '100px', flexShrink: 0 }}
                         >
                             {news[currentNewsIndex]?.source || news[currentNewsIndex]?.source_provider || news[currentNewsIndex]?.source_original || 'Source'}
                         </span>
                         <span
-                            className="text-base font-medium flex-1"
+                            className="text-base font-medium flex-1 transition-colors duration-300"
                             style={{ 
-                                color: '#e0e7ff',
+                                color: 'var(--theme-text, #e0e7ff)',
                                 cursor: news[currentNewsIndex]?.url ? 'pointer' : 'default',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
@@ -357,7 +359,7 @@ const NewsTicker = ({ isDarkMode = true }) => {
                                 stroke="currentColor" 
                                 strokeWidth="2" 
                                 className="w-3 h-3 flex-shrink-0"
-                                style={{ color: isDarkMode ? 'rgba(156, 163, 175, 0.6)' : 'rgba(107, 114, 128, 0.6)' }}
+                                style={{ color: 'var(--theme-text-secondary, rgba(156, 163, 175, 0.6))' }}
                             >
                                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                                 <polyline points="15 3 21 3 21 9"></polyline>
@@ -366,13 +368,13 @@ const NewsTicker = ({ isDarkMode = true }) => {
                         )}
                         {/* Indicateur de progression (comme un compteur) */}
                         <div className="flex items-center gap-1 ml-2 flex-shrink-0">
-                            <span className="text-xs" style={{ color: '#10b981' }}>
+                            <span className="text-xs transition-colors duration-300" style={{ color: 'var(--theme-primary, #10b981)' }}>
                                 {currentNewsIndex + 1}/{news.length}
                             </span>
                         </div>
                     </div>
                 ) : (
-                    <div className="px-4 text-sm" style={{ color: '#10b981' }}>
+                    <div className="px-4 text-sm transition-colors duration-300" style={{ color: 'var(--theme-text-secondary, #9ca3af)' }}>
                         Aucune actualité disponible
                     </div>
                 )}
@@ -381,14 +383,14 @@ const NewsTicker = ({ isDarkMode = true }) => {
             {/* Close button */}
             <button
                 onClick={handleClose}
-                className="absolute right-4 top-0 bottom-0 flex items-center justify-center z-20 transition-opacity hover:opacity-80"
+                className="absolute right-4 top-0 bottom-0 flex items-center justify-center z-20 transition-all duration-300 hover:opacity-80"
                 style={{
                     width: '28px',
                     height: '28px',
-                    color: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    color: 'var(--theme-primary, #10b981)',
+                    backgroundColor: 'rgba(var(--theme-primary-rgb, 16, 185, 129), 0.1)',
                     borderRadius: '6px',
-                    border: '1px solid rgba(16, 185, 129, 0.3)'
+                    border: '1px solid rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)'
                 }}
                 title="Fermer le bandeau d'actualités"
             >

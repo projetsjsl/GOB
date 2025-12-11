@@ -545,26 +545,38 @@ function applyTheme(themeId) {
     root.style.setProperty('--theme-danger', theme.colors.danger);
     root.style.setProperty('--theme-warning', theme.colors.warning);
     
-    // Backdrop Filter Support
+    
+    // Backdrop Filter Support AND Premium Interactions
     if (theme.styles.backdropFilter) {
         root.style.setProperty('--theme-backdrop-filter', theme.styles.backdropFilter);
-        // Injecter style global pour forcer le blur sur les éléments clés si nécessaire
-        // Note: Idéalement, les composants devraient utiliser var(--theme-backdrop-filter)
-        // On l'ajoute dynamiquement au root pour être sûr
+        
         const backdropStyle = document.getElementById('theme-backdrop-style');
+         // Define premium interactions (Hover lift + opacity boost)
+        const cssRules = `
+            .glass-panel, .card, .dashboard-card, header, .nav-bar {
+                backdrop-filter: var(--theme-backdrop-filter, none);
+                -webkit-backdrop-filter: var(--theme-backdrop-filter, none);
+                transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+            }
+            .card:hover, .dashboard-card:hover {
+                transform: translateY(-2px);
+                background-color: ${theme.id === 'lightglass' ? 'rgba(255,255,255, 0.65)' : 'rgba(30, 41, 59, 0.7)'} !important;
+                box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            }
+        `;
+
         if (!backdropStyle) {
             const style = document.createElement('style');
             style.id = 'theme-backdrop-style';
-            style.innerHTML = `
-                .glass-panel, .card, .dashboard-card, header, .nav-bar {
-                    backdrop-filter: var(--theme-backdrop-filter, none);
-                    -webkit-backdrop-filter: var(--theme-backdrop-filter, none);
-                }
-            `;
+            style.innerHTML = cssRules;
             document.head.appendChild(style);
+        } else {
+             backdropStyle.innerHTML = cssRules;
         }
     } else {
         root.style.setProperty('--theme-backdrop-filter', 'none');
+        const backdropStyle = document.getElementById('theme-backdrop-style');
+        if (backdropStyle) backdropStyle.innerHTML = '';
     }
     
     // Ajouter les valeurs RGB pour les rgba() dans les styles inline

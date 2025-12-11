@@ -11,10 +11,11 @@
 //
 // ✅ CONFIGURATION VALIDÉE (Testée le 15/10/2025) :
 // - OpenAI: fetch() direct (PAS le SDK) + gpt-4o + 2000 tokens + temp 0.7
-// - Perplexity: sonar-pro + 1500 tokens + temp 0.1 + recency filter
-// - Anthropic: Claude-3-Sonnet (fallback si OpenAI échoue)
-// - Marketaux: SUPPRIMÉ (plus de fallback)
-// - Twelve Data: fallback pour actualités si Perplexity échoue
+import { configManager } from '../lib/config-manager.js';
+import { createSupabaseClient } from '../lib/supabase-config.js';
+
+// Initialize config manager (non-blocking)
+configManager.initialize().catch(console.error);
 //
 // 🔒 VARIABLES D'ENVIRONNEMENT REQUISES :
 // - OPENAI_API_KEY (sk-...) : ✅ Configurée
@@ -182,7 +183,9 @@ export default async function handler(req, res) {
 const cache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-// 🎯 MODÈLES PERPLEXITY - HIÉRARCHIE DE BACKUP
+
+// 🎯 MODÈLES PERPLEXITY - HIÉRARCHIE DE BACKUP (DÉFINITION INITIALE)
+// Ces valeurs seront écrasées par configManager si disponible
 const PERPLEXITY_MODELS = {
   // TIER 0-5 : Modèles premium (50 req/min)
   primary: 'sonar-reasoning-pro',    // DeepSeek-R1 + CoT (analyses complexes)
@@ -221,22 +224,36 @@ const MODEL_CONFIG = {
 // 🔄 FONCTION DE BACKUP INTELLIGENT
 async function tryPerplexityWithBackup(perplexityKey, prompt, section, recency = 'day') {
   const config = MODEL_CONFIG[section] || MODEL_CONFIG['analysis'];
-  const models = config.models;
-  const maxTokensList = config.max_tokens;
+    const models = config.models;
+    const maxTokensList = config.max_tokens;
 
-  for (let i = 0; i < models.length; i++) {
-    const model = models[i];
-    const maxTokens = maxTokensList[i];
-
+    // Récupérer la config dynamique pour Perplexity (Rôle Researcher par défaut pour analysis)
+    let dynamicConfig = null;
     try {
-      console.log(`Tentative avec ${model} (${config.description})`);
+        const role = section === 'expert_analysis' ? 'critic' : 'researcher';
+        const roleConfig = await configManager.get('ai_roles', role);
+        if (roleConfig) {
+            console.log(`📡 Config dynamique chargée pour ${role}:`, roleConfig);
+            dynamicConfig = roleConfig;
+        }
+    } catch (e) {
+        console.warn('⚠️ Impossible de charger la config dynamique, usage des défauts');
+    }
 
-      const response = await fetch('https://api.perplexity.ai/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${perplexityKey}`,
-          'Content-Type': 'application/json',
-        },
+    for (let i = 0; i < models.length; i++) {
+        const model = i === 0 && dynamicConfig?.modelId ? dynamicConfig.modelId : models[i];
+        const maxTokens = i === 0 && dynamicConfig?.max_tokens ? dynamicConfig.max_tokens : maxTokensList[i];
+        const temp = i === 0 && dynamicConfig?.temperature ? dynamicConfig.temperature : 0.1;
+
+        try {
+            console.log(`Tentative avec ${model} (Dynamic: ${!!dynamicConfig})`);
+
+            const response = await fetch('https://api.perplexity.ai/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${perplexityKey}`,
+                    'Content-Type': 'application/json',
+                },
         body: JSON.stringify({
           model: model,
           messages: [{ role: 'user', content: prompt }],
@@ -465,17 +482,35 @@ Rédige maintenant le briefing selon la structure demandée.
       // Utilise fetch() direct vers OpenAI API (PAS le SDK)
       console.log('🚀 Appel OpenAI avec fetch, clé:', `sk-...${openaiKey.slice(-4)}`);
       
-      response = await fetch('https://api.openai.com/v1/chat/completions', {
+
+        // Récupérer la config dynamique pour OpenAI (Rôle Writer)
+        let modelId = 'gpt-4o';
+        let maxTokens = 2000;
+        let temperature = 0.7;
+
+        try {
+            const writerConfig = await configManager.get('ai_roles', 'writer');
+            if (writerConfig) {
+                console.log('📡 Config Writer chargée:', writerConfig);
+                modelId = writerConfig.modelId || 'gpt-4o';
+                maxTokens = writerConfig.max_tokens || 2000;
+                temperature = writerConfig.temperature || 0.7;
+            }
+        } catch (e) {
+            console.warn('⚠️ Erreur charge config writer, usage défauts');
+        }
+
+       response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${openaiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o', // ✅ Modèle testé et fonctionnel
+          model: modelId, 
           messages: [{ role: 'user', content: contextualPrompt }],
-          max_tokens: 2000, // ✅ Limite optimale
-          temperature: 0.7, // ✅ Équilibre créativité/précision
+          max_tokens: maxTokens, 
+          temperature: temperature, 
         }),
         signal: AbortSignal.timeout(120000) // 120 secondes timeout pour Perplexity
       });
@@ -491,6 +526,19 @@ Rédige maintenant le briefing selon la structure demandée.
       }
     } else if (anthropicKey) {
       // Utiliser Anthropic Claude
+      // Config dynamique pour Anthropic (Critic)
+      let modelId = 'claude-3-sonnet-20240229';
+      let maxTokens = 2500;
+      
+      try {
+          const criticConfig = await configManager.get('ai_roles', 'critic');
+          if (criticConfig) {
+               console.log('📡 Config Critic chargée:', criticConfig);
+               modelId = criticConfig.modelId || 'claude-3-sonnet-20240229';
+               maxTokens = criticConfig.max_tokens || 2500;
+          }
+      } catch (e) { console.warn('Usage defaut critic'); }
+
       response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -500,8 +548,8 @@ Rédige maintenant le briefing selon la structure demandée.
         },
         signal: AbortSignal.timeout(120000), // 120 secondes timeout pour Perplexity
         body: JSON.stringify({
-          model: 'claude-3-sonnet-20240229',
-          max_tokens: 2500,
+          model: modelId,
+          max_tokens: maxTokens,
           messages: [{ role: 'user', content: contextualPrompt }]
         })
       });

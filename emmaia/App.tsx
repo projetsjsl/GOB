@@ -265,14 +265,8 @@ const App: React.FC = () => {
       <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
           <div className="absolute inset-0 animated-bg opacity-40"></div>
           {/* Dynamic Theme Gradients */}
-          <div className="absolute top-0 left-0 w-full h-full" style={{
-              background: `radial-gradient(ellipse at top, var(--theme-primary, rgba(59,130,246,0.15)), transparent 50%)`,
-              opacity: 0.2
-          }}></div>
-          <div className="absolute bottom-0 right-0 w-full h-full" style={{
-              background: `radial-gradient(ellipse at bottom, var(--theme-secondary, rgba(168,85,247,0.15)), transparent 50%)`,
-              opacity: 0.2
-          }}></div>
+          <div className="absolute top-0 left-0 w-full h-full emma-bg-gradient-top"></div>
+          <div className="absolute bottom-0 right-0 w-full h-full emma-bg-gradient-bottom"></div>
       </div>
   );
 
@@ -330,7 +324,7 @@ const App: React.FC = () => {
                     <ControlBar state={gemini.connectionState} onConnect={handleConnect} onDisconnect={handleDisconnect} onEmail={() => setShowEmailModal(true)} onOpenAdmin={() => setShowAdmin(true)} onToggleInsights={() => setShowContext(!showContext)} showInsights={showContext} />
                     
                     {/* Hidden trigger for reconnection logic */}
-                    <button id="connect-btn-trigger" className="hidden" onClick={handleConnect}></button>
+                    <button id="connect-btn-trigger" className="hidden" onClick={handleConnect} aria-label="Connect" title="Connect"></button>
                 </div>
             </main>
 

@@ -254,6 +254,36 @@ const AdminJSLaiTab = ({
                     }
                 };
 
+                // Fonction générique pour sauvegarder la config de navigation
+                const saveNavConfig = async (key, config) => {
+                    const label = key === 'primary_nav_config' ? 'Navigation Principale' : 'Navigation Secondaire';
+                    showMessage(`💾 Sauvegarde de ${label} en cours...`, 'info');
+                    
+                    try {
+                        const response = await fetch('/api/admin/emma-config', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                action: 'set',
+                                category: 'ui',
+                                key: key,
+                                value: config
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            showMessage(`✅ ${label} sauvegardée avec succès sur Supabase!`, 'success');
+                        } else {
+                            throw new Error(data.error || 'Erreur inconnue');
+                        }
+                    } catch (e) {
+                        console.error(`Erreur sauvegarde ${label}:`, e);
+                        showMessage(`❌ Erreur sauvegarde ${label}: ${e.message}`, 'error');
+                    }
+                };
+
                 // Fonctions helper pour les actions manquantes
                 const refreshAllStocks = () => {
                     setLoading(true);
@@ -638,6 +668,15 @@ const AdminJSLaiTab = ({
                                 >
                                     {showPrimaryNavManager ? '▼ Masquer' : '▶ Configurer'}
                                 </button>
+                                <button
+                                    onClick={() => saveNavConfig('primary_nav_config', primaryNavConfig)}
+                                    className={`ml-2 px-3 py-1 text-xs rounded transition-all duration-200 ${
+                                        darkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                    }`}
+                                    title="Sauvegarder sur Supabase (Cloud)"
+                                >
+                                    💾 Sauvegarder
+                                </button>
                             </div>
                             <p className={`text-xs mb-3 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                 Choisissez quels onglets s'affichent dans la barre de navigation inférieure.
@@ -728,6 +767,15 @@ const AdminJSLaiTab = ({
                                     }`}
                                 >
                                     {showNavManager ? '▼ Masquer' : '▶ Configurer'}
+                                </button>
+                                <button
+                                    onClick={() => saveNavConfig('secondary_nav_config', secondaryNavConfig)}
+                                    className={`ml-2 px-3 py-1 text-xs rounded transition-all duration-200 ${
+                                        darkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                    }`}
+                                    title="Sauvegarder sur Supabase (Cloud)"
+                                >
+                                    💾 Sauvegarder
                                 </button>
                             </div>
 

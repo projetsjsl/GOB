@@ -471,6 +471,28 @@ function getDefaultConfig(section = null, key = null) {
                 type: 'json',
                 description: 'Liste des commandes autorisées en mode SMS (Guardrail)'
             }
+        },
+        ai_roles: {
+            researcher: {
+                value: { modelId: 'sonar-pro', googleSearch: true, max_tokens: 2000, temperature: 0.2 },
+                type: 'json',
+                description: 'Configuration pour le rôle Researcher (Analyses approfondies)'
+            },
+            writer: {
+                value: { modelId: 'gpt-4o', googleSearch: false, max_tokens: 2500, temperature: 0.7 },
+                type: 'json',
+                description: 'Configuration pour le rôle Writer (Rédaction de contenu)'
+            },
+            critic: {
+                value: { modelId: 'claude-3-5-sonnet', googleSearch: true, max_tokens: 1500, temperature: 0.3 },
+                type: 'json',
+                description: 'Configuration pour le rôle Critic (Revue et critique)'
+            },
+            technical: {
+                value: { modelId: 'gemini-2.0-flash', googleSearch: false, max_tokens: 3000, temperature: 0.1 },
+                type: 'json',
+                description: 'Configuration pour le rôle Technical (Code et données)'
+            }
         }
     };
 
