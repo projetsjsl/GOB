@@ -1268,16 +1268,28 @@ const AdminJSLaiTab = ({
                                                 setNewPassword('');
                                                 setSelectedUserForReset(null);
                                             }}
-                                            className="px-3 py-1.5 text-sm opacity-60 hover:opacity-100"
+                                            disabled={loadingRoles}
+                                            className={`px-3 py-1.5 text-sm opacity-60 hover:opacity-100 transition ${loadingRoles ? 'cursor-not-allowed opacity-30' : ''}`}
                                         >
                                             Annuler
                                         </button>
                                         <button
                                             onClick={handlePasswordResetSubmit}
-                                            disabled={!newPassword}
-                                            className={`px-4 py-1.5 rounded text-sm font-medium text-white transition ${ !newPassword ? 'bg-gray-500 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+                                            disabled={!newPassword || loadingRoles}
+                                            className={`px-4 py-1.5 rounded text-sm font-medium text-white transition flex items-center gap-2 ${
+                                                !newPassword || loadingRoles 
+                                                    ? 'bg-gray-500 cursor-not-allowed' 
+                                                    : 'bg-indigo-600 hover:bg-indigo-700'
+                                            }`}
                                         >
-                                            Sauvegarder
+                                            {loadingRoles ? (
+                                                <>
+                                                    <span className="animate-spin">⏳</span>
+                                                    <span>Sauvegarde...</span>
+                                                </>
+                                            ) : (
+                                                'Sauvegarder'
+                                            )}
                                         </button>
                                     </div>
                                 </div>
