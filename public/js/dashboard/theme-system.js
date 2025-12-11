@@ -400,15 +400,15 @@ const customThemes = {
         colors: {
             primary: '#0ea5e9', // Sky Blue
             secondary: '#6366f1', // Indigo
-            background: '#ebf4ff', // Very light blue/slate
-            surface: 'rgba(255, 255, 255, 0.65)', // Glass effect
-            surfaceLight: 'rgba(255, 255, 255, 0.85)',
-            surfaceDark: 'rgba(255, 255, 255, 0.4)',
+            background: 'fixed', // Special keyword for mesh
+            surface: 'rgba(255, 255, 255, 0.45)', // More transparent for better glass effect
+            surfaceLight: 'rgba(255, 255, 255, 0.65)',
+            surfaceDark: 'rgba(255, 255, 255, 0.3)',
             text: '#0f172a', // Slate 900
             textSecondary: '#475569', // Slate 600
             textGreen: '#059669', // Emerald 600
             textRed: '#dc2626', // Red 600
-            border: 'rgba(255, 255, 255, 0.6)',
+            border: 'rgba(255, 255, 255, 0.5)',
             accent: '#0ea5e9',
             success: '#059669',
             danger: '#dc2626',
@@ -420,11 +420,12 @@ const customThemes = {
             mono: '"JetBrains Mono", "Fira Code", monospace'
         },
         styles: {
-            headerBg: 'rgba(255, 255, 255, 0.7)',
-            cardBg: 'rgba(255, 255, 255, 0.65)',
-            cardBorder: '1px solid rgba(255, 255, 255, 0.8)',
-            borderRadius: '1.25rem', // Extra rounded
-            shadow: '0 8px 32px rgba(31, 38, 135, 0.1)', // Glass shadow
+            headerBg: 'rgba(255, 255, 255, 0.5)',
+            cardBg: 'rgba(255, 255, 255, 0.45)',
+            cardBorder: '1px solid rgba(255, 255, 255, 0.6)',
+            borderRadius: '1.25rem',
+            shadow: '0 8px 32px rgba(31, 38, 135, 0.1)',
+            backdropFilter: 'blur(20px) saturate(180%)' // Premium Glass effect
         }
     }
 };
@@ -456,6 +457,7 @@ function applyTheme(themeId) {
     
     // Fonction helper pour convertir hex en RGB
     const hexToRgb = (hex) => {
+        if (!hex || hex === 'fixed') return { r: 14, g: 165, b: 233 }; // Default fallback
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? {
             r: parseInt(result[1], 16),
@@ -464,10 +466,40 @@ function applyTheme(themeId) {
         } : { r: 16, g: 185, b: 129 }; // Default emerald
     };
     
-    // Appliquer les variables CSS
+    // Gestion du Background Spécial (Mesh Gradient pour effet verre)
+    if (theme.id === 'lightglass') {
+        document.body.style.background = `
+            radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+            radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+            radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%)
+        `;
+        // Override avec le Light Mesh Gradient spécifique
+        document.body.style.backgroundImage = `
+            radial-gradient(at 40% 20%, hsla(28,100%,74%,1) 0px, transparent 50%),
+            radial-gradient(at 80% 0%, hsla(189,100%,56%,1) 0px, transparent 50%),
+            radial-gradient(at 0% 50%, hsla(340,100%,76%,1) 0px, transparent 50%),
+            radial-gradient(at 80% 50%, hsla(240,100%,70%,1) 0px, transparent 50%),
+            radial-gradient(at 0% 100%, hsla(22,100%,77%,1) 0px, transparent 50%),
+            radial-gradient(at 80% 100%, hsla(242,100%,70%,1) 0px, transparent 50%),
+            radial-gradient(at 0% 0%, hsla(343,100%,76%,1) 0px, transparent 50%)
+        `;
+        document.body.style.backgroundColor = '#e0f2fe';
+        document.body.style.backgroundAttachment = 'fixed';
+    } else {
+        // Reset background
+        document.body.style.background = '';
+        document.body.style.backgroundImage = '';
+        document.body.style.backgroundColor = '';
+        root.style.setProperty('--theme-bg', theme.colors.background);
+    }
+
+    // Appliquer les variables CSS de base
+    if (theme.colors.background !== 'fixed') {
+         root.style.setProperty('--theme-bg', theme.colors.background);
+    }
+    
     root.style.setProperty('--theme-primary', theme.colors.primary);
     root.style.setProperty('--theme-secondary', theme.colors.secondary);
-    root.style.setProperty('--theme-bg', theme.colors.background);
     root.style.setProperty('--theme-surface', theme.colors.surface);
     root.style.setProperty('--theme-surface-light', theme.colors.surfaceLight);
     root.style.setProperty('--theme-surface-dark', theme.colors.surfaceDark || theme.colors.surface);
@@ -478,6 +510,28 @@ function applyTheme(themeId) {
     root.style.setProperty('--theme-success', theme.colors.success);
     root.style.setProperty('--theme-danger', theme.colors.danger);
     root.style.setProperty('--theme-warning', theme.colors.warning);
+    
+    // Backdrop Filter Support
+    if (theme.styles.backdropFilter) {
+        root.style.setProperty('--theme-backdrop-filter', theme.styles.backdropFilter);
+        // Injecter style global pour forcer le blur sur les éléments clés si nécessaire
+        // Note: Idéalement, les composants devraient utiliser var(--theme-backdrop-filter)
+        // On l'ajoute dynamiquement au root pour être sûr
+        const backdropStyle = document.getElementById('theme-backdrop-style');
+        if (!backdropStyle) {
+            const style = document.createElement('style');
+            style.id = 'theme-backdrop-style';
+            style.innerHTML = `
+                .glass-panel, .card, .dashboard-card, header, .nav-bar {
+                    backdrop-filter: var(--theme-backdrop-filter, none);
+                    -webkit-backdrop-filter: var(--theme-backdrop-filter, none);
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    } else {
+        root.style.setProperty('--theme-backdrop-filter', 'none');
+    }
     
     // Ajouter les valeurs RGB pour les rgba() dans les styles inline
     const primaryRgb = hexToRgb(theme.colors.primary);
