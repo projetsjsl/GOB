@@ -41,6 +41,48 @@
  * ════════════════════════════════════════════════════════════════════════════
  */
 
+/**
+ * Valide le HTML email pour compatibilité Outlook
+ * @param {string} html - HTML à valider
+ * @returns {Object} { valid: boolean, warnings: string[] }
+ */
+function validateEmailHtml(html) {
+    const warnings = [];
+    
+    // Patterns problématiques pour Outlook
+    if (html.includes('display: flex') || html.includes('display:flex')) {
+        warnings.push('Utilise display:flex (non supporté Outlook)');
+    }
+    if (html.includes('inline-flex')) {
+        warnings.push('Utilise inline-flex (non supporté Outlook)');
+    }
+    if (html.includes('linear-gradient')) {
+        warnings.push('Utilise linear-gradient (non supporté Outlook)');
+    }
+    if (html.includes('box-shadow')) {
+        warnings.push('Utilise box-shadow (non supporté Outlook)');
+    }
+    if (/<style[^>]*>/.test(html)) {
+        warnings.push('Contient bloc <style> (partiellement ignoré Outlook)');
+    }
+    
+    // Vérifications positives
+    const hasTable = html.includes('<table');
+    const hasRolePresentation = html.includes('role="presentation"');
+    
+    if (!hasTable) {
+        warnings.push('Pas de structure table (recommandé pour Outlook)');
+    }
+    if (hasTable && !hasRolePresentation) {
+        warnings.push('Tables sans role="presentation"');
+    }
+    
+    return {
+        valid: warnings.length === 0,
+        warnings
+    };
+}
+
 export default async function handler(req, res) {
     // Méthode POST uniquement
     if (req.method !== 'POST') {
@@ -55,6 +97,20 @@ export default async function handler(req, res) {
             return res.status(400).json({
                 error: 'Missing required fields: subject and html are required'
             });
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // VALIDATION HTML EMAIL
+        // ═══════════════════════════════════════════════════════════════
+        const htmlValidation = validateEmailHtml(html);
+        if (htmlValidation.warnings.length > 0) {
+            console.warn('[Send Email] ⚠️ HTML Warnings:', htmlValidation.warnings.join(', '));
+        }
+
+        // Vérifier taille du HTML (limite Resend ~40MB, on prévient à 100KB)
+        const htmlSizeKB = Buffer.byteLength(html, 'utf8') / 1024;
+        if (htmlSizeKB > 100) {
+            console.warn(`[Send Email] ⚠️ Large email: ${htmlSizeKB.toFixed(1)}KB`);
         }
 
         // Configuration Resend

@@ -18,6 +18,7 @@ export interface ChatMessage {
   text: string;
   timestamp: Date;
   sentiment?: 'positive' | 'neutral' | 'negative';
+  citations?: string[]; // URLs from Perplexity or Google Search grounding
 }
 
 export interface VisualizerData {

@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Send, Activity, Zap, Image as ImageIcon, Sliders } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
+import { ArrowLeft, Send, Activity, Zap, Image as ImageIcon } from 'lucide-react';
 import { ChatMessage, TechnicalAnalysisData } from '../types';
-import { MODEL_TEXT_DEFAULT, TECHNICAL_SYSTEM_INSTRUCTION, AVATAR_IMAGES, MODE_STARTER_PROMPTS } from '../constants';
+import { TECHNICAL_SYSTEM_INSTRUCTION, AVATAR_IMAGES, MODE_STARTER_PROMPTS } from '../constants';
+import { ModelSelector } from './ModelSelector';
+import { useModeConfig } from '../hooks/useModeConfig';
+import { generateContent } from '../services/aiService';
 import { clsx } from 'clsx';
 
 interface TechnicalModeProps {
@@ -19,28 +21,37 @@ export const TechnicalMode: React.FC<TechnicalModeProps> = ({ onBack, avatarImag
   const [techData, setTechData] = useState<TechnicalAnalysisData | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   
+  const { config, setConfig, currentModel, availableModels } = useModeConfig('technical');
+  
   useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; }, [messages]);
 
   const handleSend = async (text: string = inputText) => {
-    if (!text.trim()) return;
+    if (!text.trim() || isLoading) return;
     const userMsg: ChatMessage = { id: Date.now().toString(), role: 'user', text: text, timestamp: new Date() };
     setMessages(prev => [...prev, userMsg]);
     setInputText('');
     setIsLoading(true);
 
     try {
-      const apiKey = process.env.API_KEY;
-      if (!apiKey) throw new Error("API Key missing");
-      const ai = new GoogleGenAI({ apiKey });
       const historyContext = messages.map(m => `${m.role === 'user' ? 'User' : 'Analyste'}: ${m.text}`).join('\n');
-      const prompt = `${TECHNICAL_SYSTEM_INSTRUCTION}\n\nHistorique:\n${historyContext}\n\nUser: ${userMsg.text}`;
-      const response = await ai.models.generateContent({ model: MODEL_TEXT_DEFAULT, contents: prompt });
+      const fullPrompt = `Historique:\n${historyContext}\n\nUser: ${userMsg.text}`;
+      
+      const response = await generateContent({
+          modelId: config.modelId,
+          prompt: fullPrompt,
+          systemInstruction: TECHNICAL_SYSTEM_INSTRUCTION,
+          googleSearch: config.googleSearch
+      });
+      
       const responseText = response.text || "Erreur d'analyse.";
       const jsonMatch = responseText.match(/###TECHNICAL_UPDATE_START###([\s\S]*?)###TECHNICAL_UPDATE_END###/);
       let cleanText = responseText.replace(/###TECHNICAL_UPDATE_START###[\s\S]*?###TECHNICAL_UPDATE_END###/g, '').trim();
       if (jsonMatch && jsonMatch[1]) { try { setTechData(JSON.parse(jsonMatch[1])); } catch (e) { console.error(e); } }
       setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', text: cleanText, timestamp: new Date() }]);
-    } catch (error) { console.error(error); } finally { setIsLoading(false); }
+    } catch (error) { 
+      console.error(error);
+      setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', text: `❌ Erreur: ${error instanceof Error ? error.message : 'Erreur inconnue'}`, timestamp: new Date() }]);
+    } finally { setIsLoading(false); }
   };
 
   const getSignalColor = (signal?: string) => {
@@ -60,9 +71,9 @@ export const TechnicalMode: React.FC<TechnicalModeProps> = ({ onBack, avatarImag
       <div className="w-full lg:w-1/2 flex flex-col border-r border-emerald-900/30 bg-slate-950/60 backdrop-blur-xl">
         <div className="p-6 border-b border-emerald-900/30 flex items-center justify-between">
           <div className="flex items-center gap-4">
-              <button onClick={onBack} className="p-2 hover:bg-white/10 rounded-full transition-colors"><ArrowLeft className="w-5 h-5 text-emerald-400" /></button>
+              <button onClick={onBack} className="p-2 hover:bg-white/10 rounded-full transition-colors" title="Retour au menu"><ArrowLeft className="w-5 h-5 text-emerald-400" /></button>
               <div className="w-12 h-12 rounded-full border-2 border-emerald-500/50 overflow-hidden shadow-[0_0_15px_rgba(16,185,129,0.3)]">
-                 <img src={avatarImage || AVATAR_IMAGES.geek} className="w-full h-full object-cover" />
+                 <img src={avatarImage || AVATAR_IMAGES.geek} alt="Emma Geek - Analyste Technique" className="w-full h-full object-cover" />
               </div>
               <div>
                 <h2 className="text-lg font-bold text-emerald-400 flex items-center gap-2 tracking-tight">Emma • GEEK</h2>
@@ -70,8 +81,15 @@ export const TechnicalMode: React.FC<TechnicalModeProps> = ({ onBack, avatarImag
               </div>
           </div>
           <div className="flex gap-2">
-              <button className="p-2 bg-emerald-950/30 hover:bg-emerald-900/50 rounded-lg border border-emerald-900/30 transition-colors"><Sliders className="w-4 h-4 text-emerald-400" /></button>
-              {onOpenGallery && <button onClick={onOpenGallery} className="p-2 bg-emerald-950/30 hover:bg-emerald-900/50 rounded-lg border border-emerald-900/30 transition-colors"><ImageIcon className="w-4 h-4 text-emerald-400" /></button>}
+              <ModelSelector
+                  currentModelId={config.modelId}
+                  availableModels={availableModels}
+                  googleSearch={config.googleSearch}
+                  onModelChange={(modelId) => setConfig({ modelId })}
+                  onGoogleSearchChange={(googleSearch) => setConfig({ googleSearch })}
+                  accentColor="cyan"
+              />
+              {onOpenGallery && <button onClick={onOpenGallery} className="p-2 bg-emerald-950/30 hover:bg-emerald-900/50 rounded-lg border border-emerald-900/30 transition-colors" title="Galerie d'images"><ImageIcon className="w-4 h-4 text-emerald-400" /></button>}
           </div>
         </div>
 
@@ -81,7 +99,7 @@ export const TechnicalMode: React.FC<TechnicalModeProps> = ({ onBack, avatarImag
                <div className={clsx("px-4 py-3 rounded-xl text-xs leading-relaxed border", msg.role === 'user' ? "bg-emerald-900/20 border-emerald-800 text-emerald-100" : "bg-slate-800 border-slate-700 text-slate-300")}>{msg.text}</div>
             </div>
           ))}
-          {isLoading && <div className="text-xs text-emerald-500 animate-pulse flex items-center gap-2 px-4"><Activity className="w-3 h-3" /> Calcul...</div>}
+          {isLoading && <div className="text-xs text-emerald-500 animate-pulse flex items-center gap-2 px-4"><Activity className="w-3 h-3" /> Calcul avec {currentModel.name}...</div>}
         </div>
 
         <div className="p-6 border-t border-emerald-900/30 bg-slate-900/30">
@@ -91,8 +109,8 @@ export const TechnicalMode: React.FC<TechnicalModeProps> = ({ onBack, avatarImag
                 ))}
             </div>
             <div className="relative">
-                <input type="text" value={inputText} onChange={(e) => setInputText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSend()} placeholder="Ex: Analyse TSLA RSI..." className="w-full bg-slate-950 border border-emerald-900/40 rounded-xl py-3 pl-4 pr-12 text-xs focus:border-emerald-500 outline-none font-mono" />
-                <button onClick={() => handleSend()} className="absolute right-2 top-2 p-1.5 bg-emerald-600/20 text-emerald-500 rounded-lg hover:bg-emerald-600 hover:text-white transition-all"><Send className="w-4 h-4" /></button>
+                <input type="text" value={inputText} onChange={(e) => setInputText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSend()} placeholder="Ex: Analyse TSLA RSI..." className="w-full bg-slate-950 border border-emerald-900/40 rounded-xl py-3 pl-4 pr-12 text-xs focus:border-emerald-500 outline-none font-mono" disabled={isLoading} />
+                <button onClick={() => handleSend()} className="absolute right-2 top-2 p-1.5 bg-emerald-600/20 text-emerald-500 rounded-lg hover:bg-emerald-600 hover:text-white transition-all" disabled={isLoading} title="Envoyer"><Send className="w-4 h-4" /></button>
             </div>
         </div>
       </div>

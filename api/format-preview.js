@@ -189,11 +189,16 @@ export default async function handler(req, res) {
   }
 
   try {
+    const startTime = Date.now();
     const { text, channel = 'web', briefingType = 'morning', customDesign } = req.body;
 
     if (!text) {
       return res.status(400).json({ error: 'text is required' });
     }
+
+    // Log request info for debugging
+    console.log(`[Format Preview] Channel: ${channel}, Type: ${briefingType}, Text length: ${text.length}`);
+
 
     // ═══════════════════════════════════════════════════════════
     // DESIGN: Chaque prompt peut avoir son propre design
@@ -225,6 +230,9 @@ export default async function handler(req, res) {
         result = { html: markdownToEmailHtml(text, colors) };
     }
 
+    const duration = Date.now() - startTime;
+    console.log(`[Format Preview] ✅ Generated in ${duration}ms`);
+
     return res.status(200).json({
       success: true,
       channel,
@@ -235,11 +243,15 @@ export default async function handler(req, res) {
         footer: config.footer,
         sms: config.sms
       },
+      performance: { generationTimeMs: duration },
       ...result
     });
 
   } catch (error) {
-    console.error('[Format Preview] Error:', error);
-    return res.status(500).json({ error: error.message });
+    console.error('[Format Preview] ❌ Error:', error.message);
+    return res.status(500).json({ 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 }

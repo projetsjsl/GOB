@@ -55,6 +55,12 @@ export function switchMainTab(tab) {
     document.getElementById('designTabContent').classList.toggle('hidden', tab !== 'design');
     document.getElementById('smsTabContent').classList.toggle('hidden', tab !== 'sms');
     document.getElementById('helpTabContent').classList.toggle('hidden', tab !== 'help');
+    
+    // Handle Emma IA tab if it exists
+    const emmaiaContent = document.getElementById('emmaiaTabContent');
+    if (emmaiaContent) {
+        emmaiaContent.classList.toggle('hidden', tab !== 'emmaia');
+    }
 
     // Update header
     const titles = {
@@ -62,7 +68,8 @@ export function switchMainTab(tab) {
         prompts: '📝 Gestion des Prompts',
         design: '🎨 Design des Emails',
         sms: '📱 Configuration SMS',
-        help: '📖 Mode d\'Emploi'
+        help: '📖 Mode d\'Emploi',
+        emmaia: '🤖 Emma IA - Modèles Chat'
     };
     document.getElementById('editorTitle').textContent = titles[tab] || 'Configuration';
     document.getElementById('editorSubtitle').textContent = '';
@@ -70,6 +77,11 @@ export function switchMainTab(tab) {
     // Load dashboard data if switching to dashboard
     if (tab === 'dashboard' && window.loadDashboard) {
         window.loadDashboard();
+    }
+    
+    // Load Emma IA configs if switching to emmaia
+    if (tab === 'emmaia' && window.loadEmmaIAConfigs) {
+        window.loadEmmaIAConfigs();
     }
 
     return tab;

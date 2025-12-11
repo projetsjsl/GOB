@@ -5,10 +5,12 @@ import { BrainCircuit, TrendingUp, Globe, Building2, Scale, FileText, Activity, 
 // ... (Previous Model Definitions remain unchanged) ...
 
 export const AVAILABLE_MODELS = [
+    // Gemini Models
     {
         id: 'gemini-2.5-flash',
         name: 'Gemini 2.5 Flash',
         type: 'directional',
+        provider: 'gemini',
         capabilities: ['Text', 'Image', 'Fast'],
         description: 'Le modèle le plus rapide et économique. Idéal pour les tâches simples et le chat rapide.'
     },
@@ -16,6 +18,7 @@ export const AVAILABLE_MODELS = [
         id: 'gemini-2.0-pro-exp-02-05',
         name: 'Gemini 2.0 Pro',
         type: 'directional',
+        provider: 'gemini',
         capabilities: ['Reasoning', 'Complex Context', 'Code'],
         description: 'Modèle de raisonnement avancé. Parfait pour l\'analyse financière profonde et la rédaction.'
     },
@@ -23,6 +26,7 @@ export const AVAILABLE_MODELS = [
         id: 'gemini-2.5-flash-thinking',
         name: 'Gemini 2.5 Thinking',
         type: 'directional',
+        provider: 'gemini',
         capabilities: ['Deep Reasoning', 'Chain of Thought'],
         description: 'Modèle expérimental qui "réfléchit" avant de répondre. Idéal pour les cas complexes.'
     },
@@ -30,14 +34,83 @@ export const AVAILABLE_MODELS = [
         id: 'gemini-2.5-flash-native-audio-preview-09-2025',
         name: 'Gemini Live (Audio Native)',
         type: 'bidirectional',
+        provider: 'gemini',
         capabilities: ['Realtime Audio', 'Interruption', 'Low Latency'],
         description: 'Le moteur exclusif pour les avatars vocaux. Latence ultra-faible.'
+    },
+    // Perplexity Models
+    {
+        id: 'sonar-pro',
+        name: 'Perplexity Sonar Pro',
+        type: 'directional',
+        provider: 'perplexity',
+        capabilities: ['Web Search', 'Citations', 'Real-time Data'],
+        description: 'Modèle Perplexity avec recherche web intégrée et citations. Idéal pour la recherche.'
+    },
+    // OpenAI Models
+    {
+        id: 'gpt-4o',
+        name: 'GPT-4o',
+        type: 'directional',
+        provider: 'openai',
+        capabilities: ['Multimodal', 'Fast', 'Vision'],
+        description: 'Modèle OpenAI multimodal rapide. Excellent pour texte, code et analyse d\'images.'
+    },
+    {
+        id: 'gpt-4-turbo',
+        name: 'GPT-4 Turbo',
+        type: 'directional',
+        provider: 'openai',
+        capabilities: ['Reasoning', 'Code', '128K Context'],
+        description: 'Modèle OpenAI puissant avec contexte élargi. Idéal pour l\'analyse de longs documents.'
+    },
+    {
+        id: 'o1-preview',
+        name: 'OpenAI o1 (Preview)',
+        type: 'directional',
+        provider: 'openai',
+        capabilities: ['Deep Reasoning', 'Math', 'Scientific'],
+        description: 'Modèle de raisonnement avancé. Parfait pour problèmes complexes et scientifiques.'
+    },
+    // Anthropic Models
+    {
+        id: 'claude-3-5-sonnet-20241022',
+        name: 'Claude 3.5 Sonnet',
+        type: 'directional',
+        provider: 'anthropic',
+        capabilities: ['Reasoning', 'Code', 'Analysis'],
+        description: 'Modèle Anthropic équilibré. Excellent pour l\'analyse et la rédaction de qualité.'
+    },
+    {
+        id: 'claude-3-opus-20240229',
+        name: 'Claude 3 Opus',
+        type: 'directional',
+        provider: 'anthropic',
+        capabilities: ['Deep Reasoning', 'Expert Analysis', 'Long Form'],
+        description: 'Le modèle Anthropic le plus puissant. Idéal pour analyses profondes et rédaction experte.'
+    },
+    {
+        id: 'claude-3-haiku-20240307',
+        name: 'Claude 3 Haiku',
+        type: 'directional',
+        provider: 'anthropic',
+        capabilities: ['Fast', 'Efficient', 'Cost-effective'],
+        description: 'Le modèle Anthropic le plus rapide. Idéal pour tâches simples et chat rapide.'
     }
 ];
+
+// Default model configs per mode (can be overridden via emma-config)
+export const DEFAULT_MODE_CONFIGS = {
+    researcher: { modelId: 'sonar-pro', googleSearch: true },
+    writer: { modelId: 'gemini-2.0-pro-exp-02-05', googleSearch: false },
+    critic: { modelId: 'claude-3-5-sonnet-20241022', googleSearch: true },
+    technical: { modelId: 'gemini-2.5-flash', googleSearch: false }
+};
 
 export const MODEL_FLASH = 'gemini-2.5-flash-native-audio-preview-09-2025'; 
 export const MODEL_TEXT_DEFAULT = 'gemini-2.5-flash'; 
 export const MODEL_PRO = 'gemini-2.0-pro-exp-02-05';
+
 
 export const DEFAULT_INTEGRATION_CONFIG = {
     supabaseUrl: '',

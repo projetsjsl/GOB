@@ -568,6 +568,29 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             }
         }, [secondaryNavConfig]);
 
+        // State for Primary Navigation Visibility Configuration
+        // This controls which tabs are VISIBLE in the bottom navigation bar
+        const [primaryNavConfig, setPrimaryNavConfig] = useState(() => {
+            if (typeof window !== 'undefined') {
+                try {
+                    const saved = localStorage.getItem('gob-primary-nav-config');
+                    return saved ? JSON.parse(saved) : {}; // Empty = all visible (default)
+                } catch (e) {
+                    console.error('Error loading primary nav config:', e);
+                    return {};
+                }
+            }
+            return {};
+        });
+
+        // Persist primary nav config changes
+        useEffect(() => {
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('gob-primary-nav-config', JSON.stringify(primaryNavConfig));
+            }
+        }, [primaryNavConfig]);
+
+
         // État pour le thème actuel
         const [currentThemeId, setCurrentThemeId] = useState(() => {
             if (window.GOBThemes) {
@@ -24288,8 +24311,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             { id: 'emma-config', label: 'Emma', icon: 'iconoir-settings', component: EmmaConfigTab }
         ];
 
+        // Filter tabs based on Primary Navigation Config (visibility settings)
+        // If a tab id is explicitly set to false in primaryNavConfig, hide it
+        // Admin tab is always kept visible for safety
+        const filteredAllTabs = allTabs.filter(tab => {
+            if (tab.id === 'admin-jsla') return true; // Always keep admin visible
+            return primaryNavConfig[tab.id] !== false; // Hide only if explicitly false
+        });
+
         // État pour gérer les onglets visibles et ceux dans "Plus"
-        const [visibleTabs, setVisibleTabs] = useState(allTabs);
+        const [visibleTabs, setVisibleTabs] = useState(filteredAllTabs);
+
         const [hiddenTabs, setHiddenTabs] = useState([]);
         const [showPlusMenu, setShowPlusMenu] = useState(false);
         const navRef = useRef(null);
@@ -24309,7 +24341,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             const visible = [];
             const hidden = [];
 
-            for (const tab of allTabs) {
+            for (const tab of filteredAllTabs) {
                 // Estimer la largeur de l'onglet (min-width: 70px + padding)
                 const estimatedWidth = 70 + (tab.label.length * 4); // Approximation
                 
@@ -24322,16 +24354,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             }
 
             // Toujours afficher au moins quelques onglets principaux
-            if (visible.length < 3 && allTabs.length > 3) {
-                const mainTabs = allTabs.slice(0, 3);
-                const restTabs = allTabs.slice(3);
+            if (visible.length < 3 && filteredAllTabs.length > 3) {
+                const mainTabs = filteredAllTabs.slice(0, 3);
+                const restTabs = filteredAllTabs.slice(3);
                 setVisibleTabs(mainTabs);
                 setHiddenTabs(restTabs);
             } else {
                 setVisibleTabs(visible);
                 setHiddenTabs(hidden);
             }
-        }, []);
+        }, [filteredAllTabs]);
+
 
         // Recalculer lors du redimensionnement
         useEffect(() => {
@@ -25461,8 +25494,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         // Secondary Navigation Config Props
                         secondaryNavConfig: secondaryNavConfig,
                         setSecondaryNavConfig: setSecondaryNavConfig,
-                        availableNavLinks: MASTER_NAV_LINKS
+                        availableNavLinks: MASTER_NAV_LINKS,
+                        // Primary Navigation Config Props
+                        primaryNavConfig: primaryNavConfig,
+                        setPrimaryNavConfig: setPrimaryNavConfig,
+                        allTabsList: allTabs.map(t => ({ id: t.id, label: t.label, icon: t.icon }))
                     })}
+
                     {activeTab === 'dans-watchlist' && <DansWatchlistTab />}
                     {activeTab === 'scrapping-sa' && <ScrappingSATab />}
                     {activeTab === 'email-briefings' && <EmailBriefingsTab />}

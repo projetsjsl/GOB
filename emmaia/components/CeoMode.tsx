@@ -54,7 +54,7 @@ export const CeoMode: React.FC<CeoModeProps> = ({ onBack, onInjectPrompt, avatar
               <div className="w-full max-w-lg bg-slate-900/60 border border-white/10 rounded-3xl p-10 shadow-2xl relative backdrop-blur-xl">
                   <div className="text-center mb-10">
                       <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10 shadow-inner overflow-hidden backdrop-blur-md">
-                          {company.name ? <img src={logoUrl} className="w-full h-full object-contain p-3" onError={(e) => (e.currentTarget.src = '')} /> : <Building2 className="w-10 h-10 text-cyan-400 opacity-50" />}
+                          {company.name ? <img src={logoUrl} alt={`Logo ${company.name}`} className="w-full h-full object-contain p-3" onError={(e) => (e.currentTarget.src = '')} /> : <Building2 className="w-10 h-10 text-cyan-400 opacity-50" />}
                       </div>
                       <h1 className="text-3xl font-bold text-white tracking-tight">CEO Simulator</h1>
                       <p className="text-sm text-cyan-200/60 mt-2">Simulation de haute fidélité. Entrez les paramètres.</p>
@@ -75,15 +75,15 @@ export const CeoMode: React.FC<CeoModeProps> = ({ onBack, onInjectPrompt, avatar
           <div className="absolute inset-0 z-0 bg-gradient-to-b from-slate-950/60 via-slate-950/80 to-slate-950"></div>
           <div className="relative z-20 p-6 flex justify-between items-center bg-gradient-to-b from-black/60 to-transparent">
               <div className="flex items-center gap-6">
-                  <button onClick={handleDisconnect} className="bg-white/5 hover:bg-white/10 p-3 rounded-full text-white border border-white/10 backdrop-blur transition-all"><ArrowLeft className="w-5 h-5" /></button>
+                  <button onClick={handleDisconnect} className="bg-white/5 hover:bg-white/10 p-3 rounded-full text-white border border-white/10 backdrop-blur transition-all" title="Retour à la configuration"><ArrowLeft className="w-5 h-5" /></button>
                   <div className="flex items-center gap-4 bg-white/5 px-6 py-2 rounded-2xl border border-white/10 backdrop-blur-md">
-                      <img src={logoUrl} className="w-8 h-8 rounded bg-white p-1 object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                      <img src={logoUrl} alt={`${company.name} logo`} className="w-8 h-8 rounded bg-white p-1 object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
                       <div><h1 className="text-xl font-bold text-white leading-none">{company.name}</h1><div className="flex items-center gap-2 text-[10px] font-mono text-cyan-300 mt-1 uppercase tracking-widest"><span>{company.ticker}</span> • <span className="text-green-400 animate-pulse">LIVE CONNECTED</span></div></div>
                   </div>
               </div>
               <div className="flex gap-2">
-                  <button className="p-3 bg-white/10 hover:bg-white/20 rounded-lg border border-white/10 transition-colors backdrop-blur-md"><Sliders className="w-5 h-5 text-white" /></button>
-                  {onOpenGallery && <button onClick={onOpenGallery} className="p-3 bg-white/10 hover:bg-white/20 rounded-lg border border-white/10 transition-colors backdrop-blur-md"><ImageIcon className="w-5 h-5 text-white" /></button>}
+                  <button className="p-3 bg-white/10 hover:bg-white/20 rounded-lg border border-white/10 transition-colors backdrop-blur-md" title="Paramètres"><Sliders className="w-5 h-5 text-white" /></button>
+                  {onOpenGallery && <button onClick={onOpenGallery} className="p-3 bg-white/10 hover:bg-white/20 rounded-lg border border-white/10 transition-colors backdrop-blur-md" title="Galerie d'images"><ImageIcon className="w-5 h-5 text-white" /></button>}
               </div>
           </div>
           <div className="flex-1 relative z-10 flex items-center justify-center">

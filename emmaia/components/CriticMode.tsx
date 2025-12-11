@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Scale, Send, ShieldAlert, AlertTriangle, XCircle, Search, Image as ImageIcon, Sliders } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
+import { ArrowLeft, Scale, Send, ShieldAlert, AlertTriangle, XCircle, Search, Image as ImageIcon } from 'lucide-react';
 import { ChatMessage, RiskReport } from '../types';
-import { MODEL_TEXT_DEFAULT, CRITIC_SYSTEM_INSTRUCTION, AVATAR_IMAGES, MODE_STARTER_PROMPTS } from '../constants';
+import { CRITIC_SYSTEM_INSTRUCTION, AVATAR_IMAGES, MODE_STARTER_PROMPTS } from '../constants';
+import { ModelSelector } from './ModelSelector';
+import { useModeConfig } from '../hooks/useModeConfig';
+import { generateContent } from '../services/aiService';
 import { clsx } from 'clsx';
 
 interface CriticModeProps {
@@ -18,29 +20,38 @@ export const CriticMode: React.FC<CriticModeProps> = ({ onBack, avatarImage, onO
   const [isLoading, setIsLoading] = useState(false);
   const [riskReport, setRiskReport] = useState<RiskReport | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  
+  const { config, setConfig, currentModel, availableModels } = useModeConfig('critic');
 
   useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; }, [messages]);
 
   const handleSend = async (text: string = inputText) => {
-    if (!text.trim()) return;
+    if (!text.trim() || isLoading) return;
     setInputText('');
     setIsLoading(true);
     const userMsg: ChatMessage = { id: Date.now().toString(), role: 'user', text: text, timestamp: new Date() };
     setMessages(prev => [...prev, userMsg]);
 
     try {
-        const apiKey = process.env.API_KEY;
-        if (!apiKey) throw new Error("API Key Missing");
-        const ai = new GoogleGenAI({ apiKey });
         const historyContext = messages.map(m => `${m.role === 'user' ? 'User' : 'Avocat'}: ${m.text}`).join('\n');
-        const prompt = `${CRITIC_SYSTEM_INSTRUCTION}\n\nHISTORIQUE:\n${historyContext}\n\nUSER ARGUMENT: ${text}`;
-        const response = await ai.models.generateContent({ model: MODEL_TEXT_DEFAULT, contents: prompt });
+        const fullPrompt = `HISTORIQUE:\n${historyContext}\n\nUSER ARGUMENT: ${text}`;
+        
+        const response = await generateContent({
+            modelId: config.modelId,
+            prompt: fullPrompt,
+            systemInstruction: CRITIC_SYSTEM_INSTRUCTION,
+            googleSearch: config.googleSearch
+        });
+        
         const respText = response.text || "";
         const jsonMatch = respText.match(/###RISK_REPORT_START###([\s\S]*?)###RISK_REPORT_END###/);
         const cleanText = respText.replace(/###RISK_REPORT_START###[\s\S]*?###RISK_REPORT_END###/g, '').trim();
         if (jsonMatch && jsonMatch[1]) { try { setRiskReport(JSON.parse(jsonMatch[1])); } catch (e) { console.error(e); } }
         setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', text: cleanText, timestamp: new Date() }]);
-    } catch (error) { console.error(error); } finally { setIsLoading(false); }
+    } catch (error) { 
+        console.error(error);
+        setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', text: `❌ Erreur: ${error instanceof Error ? error.message : 'Erreur inconnue'}`, timestamp: new Date() }]);
+    } finally { setIsLoading(false); }
   };
 
   const starterPrompts = MODE_STARTER_PROMPTS['critic-mode'];
@@ -50,9 +61,9 @@ export const CriticMode: React.FC<CriticModeProps> = ({ onBack, avatarImage, onO
           <div className="w-full lg:w-1/2 flex flex-col border-r border-red-900/30 bg-slate-950/50 backdrop-blur-xl relative">
               <div className="p-6 border-b border-red-900/30 flex items-center justify-between bg-gradient-to-r from-red-950/40 to-transparent">
                   <div className="flex items-center gap-4">
-                      <button onClick={onBack} className="p-2 hover:bg-white/10 rounded-full transition-colors"><ArrowLeft className="w-5 h-5 text-red-400" /></button>
+                      <button onClick={onBack} className="p-2 hover:bg-white/10 rounded-full transition-colors" title="Retour au menu"><ArrowLeft className="w-5 h-5 text-red-400" /></button>
                       <div className="w-12 h-12 rounded-full border-2 border-red-500/50 overflow-hidden shadow-[0_0_15px_rgba(239,68,68,0.4)]">
-                          <img src={avatarImage || AVATAR_IMAGES.professional} className="w-full h-full object-cover grayscale contrast-125" />
+                          <img src={avatarImage || AVATAR_IMAGES.professional} alt="Emma - L'Avocat du Diable" className="w-full h-full object-cover grayscale contrast-125" />
                       </div>
                       <div>
                           <h2 className="text-lg font-bold flex items-center gap-2 text-red-500 tracking-tight">Emma • CRITIQUE</h2>
@@ -60,8 +71,15 @@ export const CriticMode: React.FC<CriticModeProps> = ({ onBack, avatarImage, onO
                       </div>
                   </div>
                   <div className="flex gap-2">
-                      <button className="p-2 bg-red-950/30 hover:bg-red-900/50 rounded-lg border border-red-900/30 transition-colors"><Sliders className="w-4 h-4 text-red-400" /></button>
-                      {onOpenGallery && <button onClick={onOpenGallery} className="p-2 bg-red-950/30 hover:bg-red-900/50 rounded-lg border border-red-900/30 transition-colors"><ImageIcon className="w-4 h-4 text-red-400" /></button>}
+                      <ModelSelector
+                          currentModelId={config.modelId}
+                          availableModels={availableModels}
+                          googleSearch={config.googleSearch}
+                          onModelChange={(modelId) => setConfig({ modelId })}
+                          onGoogleSearchChange={(googleSearch) => setConfig({ googleSearch })}
+                          accentColor="red"
+                      />
+                      {onOpenGallery && <button onClick={onOpenGallery} className="p-2 bg-red-950/30 hover:bg-red-900/50 rounded-lg border border-red-900/30 transition-colors" title="Galerie d'images"><ImageIcon className="w-4 h-4 text-red-400" /></button>}
                   </div>
               </div>
 
@@ -69,7 +87,7 @@ export const CriticMode: React.FC<CriticModeProps> = ({ onBack, avatarImage, onO
                    {messages.map(m => (
                        <div key={m.id} className={clsx("p-4 rounded-2xl text-sm leading-relaxed shadow-lg max-w-[90%]", m.role === 'user' ? "bg-slate-700 text-white self-end ml-auto" : "bg-red-950/60 border border-red-900/40 text-red-50")}>{m.text}</div>
                    ))}
-                   {isLoading && <div className="text-xs text-red-500 animate-pulse flex items-center gap-2 ml-4"><Search className="w-3 h-3"/> Analyse des risques...</div>}
+                   {isLoading && <div className="text-xs text-red-500 animate-pulse flex items-center gap-2 ml-4"><Search className="w-3 h-3"/> Analyse avec {currentModel.name}...</div>}
               </div>
 
               <div className="p-6 border-t border-red-900/30 bg-slate-900/40 backdrop-blur-md">
@@ -79,8 +97,8 @@ export const CriticMode: React.FC<CriticModeProps> = ({ onBack, avatarImage, onO
                       ))}
                   </div>
                   <div className="relative">
-                      <input type="text" value={inputText} onChange={(e) => setInputText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSend()} className="w-full bg-slate-950/80 border border-red-900/30 rounded-xl py-4 pl-6 pr-12 text-sm focus:border-red-500 outline-none shadow-inner" placeholder="Défiez-moi avec une action..." />
-                      <button onClick={() => handleSend()} className="absolute right-3 top-3 p-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-lg transition-all"><Send className="w-4 h-4" /></button>
+                      <input type="text" value={inputText} onChange={(e) => setInputText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSend()} className="w-full bg-slate-950/80 border border-red-900/30 rounded-xl py-4 pl-6 pr-12 text-sm focus:border-red-500 outline-none shadow-inner" placeholder="Défiez-moi avec une action..." disabled={isLoading} />
+                      <button onClick={() => handleSend()} className="absolute right-3 top-3 p-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-lg transition-all" disabled={isLoading} title="Envoyer"><Send className="w-4 h-4" /></button>
                   </div>
               </div>
           </div>

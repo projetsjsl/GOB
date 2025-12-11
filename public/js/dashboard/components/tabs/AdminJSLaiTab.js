@@ -17,8 +17,13 @@ const AdminJSLaiTab = ({
                 activeTab,
                 secondaryNavConfig,
                 setSecondaryNavConfig,
-                availableNavLinks
+                availableNavLinks,
+                // Primary Navigation Config Props
+                primaryNavConfig = {},
+                setPrimaryNavConfig = () => {},
+                allTabsList = []
             }) => {
+
                 // Validation des props avec valeurs par défaut
                 const darkMode = isDarkMode !== undefined ? isDarkMode : true;
                 
@@ -53,6 +58,7 @@ const AdminJSLaiTab = ({
                 const [showIndicesManager, setShowIndicesManager] = React.useState(false);
                 const [showNavManager, setShowNavManager] = React.useState(false);
                 const [navConfigTargetTab, setNavConfigTargetTab] = React.useState('intellistocks');
+                const [showPrimaryNavManager, setShowPrimaryNavManager] = React.useState(false);
                 
                 // États locaux pour les variables manquantes
                 const [githubToken, setGithubToken] = React.useState(() => {
@@ -614,7 +620,98 @@ const AdminJSLaiTab = ({
 
                     {typeof EmmaSmsPanel !== 'undefined' && <EmmaSmsPanel />}
 
+                    {/* 🏠 Gestion de la Navigation Principale (Affichage des onglets) */}
+                    {allTabsList && allTabsList.length > 0 && (
+                        <div className={`rounded-lg p-4 border transition-colors duration-300 mb-4 ${
+                            darkMode ? 'bg-gradient-to-br from-emerald-900/20 to-gray-900 border-emerald-700' : 'bg-gradient-to-br from-emerald-50 to-gray-50 border-emerald-200'
+                        }`}>
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="🏠" size={20} /> : '🏠'}
+                                    Navigation Principale (Onglets)
+                                </h3>
+                                <button
+                                    onClick={() => setShowPrimaryNavManager(!showPrimaryNavManager)}
+                                    className={`px-3 py-1 text-xs rounded transition-all duration-200 ${
+                                        darkMode ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                                    }`}
+                                >
+                                    {showPrimaryNavManager ? '▼ Masquer' : '▶ Configurer'}
+                                </button>
+                            </div>
+                            <p className={`text-xs mb-3 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Choisissez quels onglets s'affichent dans la barre de navigation inférieure.
+                            </p>
+
+                            {showPrimaryNavManager && (
+                                <div className={`space-y-4 animate-fadeIn ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    <div className={`p-4 rounded-lg border ${darkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                                            {allTabsList.map(tab => {
+                                                const isVisible = primaryNavConfig[tab.id] !== false;
+                                                const isAdmin = tab.id === 'admin-jsla';
+                                                
+                                                return (
+                                                    <label
+                                                        key={tab.id}
+                                                        className={`flex items-center gap-2 p-3 rounded-lg cursor-pointer border transition-all ${
+                                                            isAdmin ? 'opacity-50 cursor-not-allowed' : ''
+                                                        } ${
+                                                            isVisible
+                                                                ? darkMode ? 'bg-emerald-900/40 border-emerald-500 text-emerald-200' : 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                                                                : darkMode ? 'bg-gray-800/30 border-gray-700 text-gray-500' : 'bg-gray-100 border-gray-200 text-gray-400'
+                                                        }`}
+                                                        title={isAdmin ? "L'onglet Admin est toujours visible" : `Cliquez pour ${isVisible ? 'masquer' : 'afficher'} cet onglet`}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={isVisible}
+                                                            disabled={isAdmin}
+                                                            onChange={(e) => {
+                                                                if (isAdmin) return;
+                                                                const newConfig = { ...primaryNavConfig };
+                                                                if (e.target.checked) {
+                                                                    delete newConfig[tab.id]; // Remove = visible (default)
+                                                                } else {
+                                                                    newConfig[tab.id] = false; // Explicitly hide
+                                                                }
+                                                                setPrimaryNavConfig(newConfig);
+                                                            }}
+                                                            className="rounded text-emerald-500 focus:ring-emerald-500"
+                                                        />
+                                                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                            {tab.icon && <i className={`${tab.icon} text-base`}></i>}
+                                                            <span className="text-sm font-medium truncate">{tab.label}</span>
+                                                        </div>
+                                                        {isAdmin && <span className="text-[10px] bg-gray-600 text-gray-300 px-1 rounded">Requis</span>}
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+                                        
+                                        <div className="mt-4 pt-3 border-t border-gray-700/50 flex justify-between items-center">
+                                            <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                                {allTabsList.filter(t => primaryNavConfig[t.id] !== false).length} / {allTabsList.length} onglets visibles
+                                            </span>
+                                            <button
+                                                onClick={() => {
+                                                    if (confirm('Réinitialiser et afficher tous les onglets ?')) {
+                                                        setPrimaryNavConfig({});
+                                                    }
+                                                }}
+                                                className="px-3 py-1.5 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                                            >
+                                                🔄 Tout afficher
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {/* 🧭 Gestion de la Navigation Secondaire */}
+
                     {secondaryNavConfig && setSecondaryNavConfig && availableNavLinks && (
                         <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                             darkMode ? 'bg-gradient-to-br from-indigo-900/20 to-gray-900 border-indigo-700' : 'bg-gradient-to-br from-indigo-50 to-gray-50 border-indigo-200'

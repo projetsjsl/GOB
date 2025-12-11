@@ -29,7 +29,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fix: Attach navigation event listeners
     document.getElementById('btnNext')?.addEventListener('click', nextStep);
     document.getElementById('btnPrev')?.addEventListener('click', previousStep);
+    
+    // Create toast container if not exists
+    if (!document.querySelector('.toast-container')) {
+        const container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
 });
+
+// Toast notification helper
+function showToast(message, type = 'info', duration = 3000) {
+    const container = document.querySelector('.toast-container');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <span>${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span>
+        <span>${message}</span>
+    `;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('toast-exit');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
 
 // Sauvegarde automatique
 function autoSaveForm() {
@@ -112,25 +139,58 @@ function formatInput(input) {
 }
 
 function validateField(input) {
+    // Remove previous states
+    input.classList.remove('valid', 'invalid');
+    
     if (input.required && !input.value.trim()) {
-        input.style.borderColor = 'var(--error)';
-    } else {
-        input.style.borderColor = 'var(--success)'; // Feedback positif
+        input.classList.add('invalid');
+        return false;
+    } else if (input.value.trim()) {
+        input.classList.add('valid');
+        return true;
     }
+    return true;
 }
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    // Enter or Right Arrow to go next (when not in textarea)
+    if ((e.key === 'Enter' || e.key === 'ArrowRight') && e.target.tagName !== 'TEXTAREA') {
+        if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+            e.preventDefault();
+            nextStep();
+        }
+    }
+    // Left Arrow or Backspace (when not in input) to go back
+    if (e.key === 'ArrowLeft' && currentStep > 1 && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+        previousStep();
+    }
+    // Escape to close Emma chatbot if open
+    if (e.key === 'Escape') {
+        const emmaWindow = document.getElementById('emmaWindow');
+        if (emmaWindow && emmaWindow.classList.contains('active')) {
+            emmaWindow.classList.remove('active');
+        }
+    }
+});
 
 // Navigation entre étapes
 function nextStep() {
-    if (validateStep(currentStep)) {
-        if (currentStep === 3) {
-            // Dernière étape, afficher récapitulatif
-            showSummary();
-            currentStep++;
-        } else if (currentStep < totalSteps) {
-            currentStep++;
+    const btn = document.getElementById('btnNext');
+    if (btn) btn.classList.add('loading');
+    
+    setTimeout(() => {
+        if (validateStep(currentStep)) {
+            if (currentStep === 3) {
+                showSummary();
+                currentStep++;
+            } else if (currentStep < totalSteps) {
+                currentStep++;
+            }
+            updateDisplay();
         }
-        updateDisplay();
-    }
+        if (btn) btn.classList.remove('loading');
+    }, 300);
 }
 
 function previousStep() {
