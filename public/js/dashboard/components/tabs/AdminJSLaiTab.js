@@ -148,7 +148,10 @@ const AdminJSLaiTab = ({
                            setShowPasswordResetModal(false);
                            setNewPassword('');
                            setSelectedUserForReset(null);
-                           fetchUsers();
+                           // Attendre un peu pour s'assurer que la DB est mise à jour, puis rafraîchir
+                           setTimeout(() => {
+                               fetchUsers();
+                           }, 500);
                        } else {
                            showMessage('❌ Erreur: ' + (data.error || 'Erreur inconnue'), 'error');
                        }
@@ -395,11 +398,15 @@ const AdminJSLaiTab = ({
 
                 // --- RBAC Helpers ---
                 const fetchUsers = async () => {
-                   if (!typeof window !== 'undefined' && window.authGuard) {
+                   if (typeof window !== 'undefined' && window.authGuard) {
                        const currentUser = window.authGuard.getCurrentUser();
-                       if (!currentUser) return;
+                       if (!currentUser) {
+                           console.warn('No current user found');
+                           return;
+                       }
 
                        try {
+                           console.log('📡 Fetching users list...');
                            const response = await fetch('/api/auth', {
                                method: 'POST',
                                headers: { 'Content-Type': 'application/json' },
@@ -409,13 +416,21 @@ const AdminJSLaiTab = ({
                                })
                            });
                            const data = await response.json();
+                           console.log('📥 Users list response:', data);
                            if (data.success) {
                                setAvailableUsers(data.users || []);
+                               console.log('✅ Users list updated:', data.users?.length || 0, 'users');
+                           } else {
+                               console.error('❌ Error fetching users:', data.error);
+                               showMessage('❌ Erreur lors du chargement des utilisateurs: ' + (data.error || 'Erreur inconnue'), 'error');
                            }
                        } catch (e) {
-                           console.error('Error fetching users:', e);
+                           console.error('💥 Error fetching users:', e);
+                           showMessage('❌ Erreur technique lors du chargement: ' + e.message, 'error');
                        }
-                   } 
+                   } else {
+                       console.warn('⚠️ authGuard not available');
+                   }
                 };
 
                 const fetchRoles = async (password = adminPassword) => {
@@ -1038,8 +1053,18 @@ const AdminJSLaiTab = ({
                                 {/* NOUVEAU: Liste Gestion Utilisateurs */}
                                 <div className={`mt-6 rounded-lg border overflow-hidden ${darkMode ? 'bg-gray-800/30 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
                                     <div className={`p-3 border-b font-semibold flex items-center justify-between ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-100 border-gray-200'}`}>
-                                        <span className="flex items-center gap-2">👥 Liste des Utilisateurs</span>
-                                        <button onClick={fetchUsers} className="text-xs opacity-50 hover:opacity-100" title="Rafraîchir">🔄</button>
+                                        <span className="flex items-center gap-2">
+                                            👥 Liste des Utilisateurs
+                                            {loadingRoles && <span className="text-xs opacity-50">(Chargement...)</span>}
+                                        </span>
+                                        <button 
+                                            onClick={fetchUsers} 
+                                            disabled={loadingRoles}
+                                            className={`text-xs opacity-50 hover:opacity-100 transition-opacity ${loadingRoles ? 'cursor-not-allowed opacity-30' : ''}`} 
+                                            title="Rafraîchir"
+                                        >
+                                            🔄
+                                        </button>
                                     </div>
                                     <div className="max-h-60 overflow-y-auto custom-scrollbar">
                                         <table className="w-full text-left text-sm">

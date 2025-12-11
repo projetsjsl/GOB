@@ -251,7 +251,9 @@ export default async function handler(req, res) {
             id: u.id,
             username: u.username || u.email?.split('@')[0], // Fallback if username missing
             display_name: u.display_name || u.full_name || u.username || 'Utilisateur',
-            role: u.role || (u.is_admin ? 'admin' : 'user')
+            role: u.role || (u.is_admin ? 'admin' : 'user'),
+            password_display: u.password_display || null, // Include password_display for admin view
+            password_hash: u.password_hash || null // Include password_hash for reference
         }));
 
         return res.status(200).json({ success: true, users: formattedUsers });
@@ -297,10 +299,17 @@ export default async function handler(req, res) {
         // Handle password update separately
         if (updates.password) {
             updates.password_hash = hashPassword(updates.password);
+            // Keep password_display if provided, otherwise set it to the new password
+            if (!updates.password_display) {
+                updates.password_display = updates.password;
+            }
             delete updates.password; // Don't save raw password
         }
         
-        const { data, error } = await supabase.from('users').update(updates).eq('id', target_id).select().single();
+        // Ensure password_display is preserved if provided
+        const updateData = { ...updates };
+        
+        const { data, error } = await supabase.from('users').update(updateData).eq('id', target_id).select().single();
         
         if (error) return res.status(500).json({ success: false, error: error.message });
         return res.status(200).json({ success: true, user: data });
