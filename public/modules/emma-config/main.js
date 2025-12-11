@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import { switchMainTab, clearFilters } from './ui-helpers.js';
+import './emmaia-logic.js'; // Import for side-effects (window exposure)
 import { updatePreview, updateChannelBadges } from './preview-manager.js';
 import { loadDesignConfig, updateDesignPreview, saveDesign, cancelDesignChanges, resetDesignToDefaults } from './design-manager.js';
 import { saveSms, cancelSmsChanges } from './sms-manager.js';
