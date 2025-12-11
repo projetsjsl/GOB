@@ -24294,7 +24294,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // Configuration des onglets (après déclaration de TOUS les composants)
         // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
         // Configuration des onglets (sans "Plus" dans la liste principale - il sera ajouté dynamiquement)
-        const allTabs = [
+        const allTabs = useMemo(() => [
             { id: 'markets-economy', label: 'Marchés', icon: 'iconoir-globe', component: MarketsEconomyTab },
             { id: 'intellistocks', label: 'JLab™', icon: 'iconoir-flask', component: JLabUnifiedTab },
             { id: 'groupchat', label: 'RobotWeb', icon: 'iconoir-robot', component: window.GroupChatTab || (() => <div>Chargement...</div>) },
@@ -24309,15 +24309,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             { id: 'email-briefings', label: 'Emma', icon: 'iconoir-antenna-signal', component: EmailBriefingsTab },
             { id: 'investing-calendar', label: 'TESTS', icon: 'iconoir-calendar', component: InvestingCalendarTab },
             { id: 'emma-config', label: 'Emma', icon: 'iconoir-settings', component: EmmaConfigTab }
-        ];
+        ], []);
 
         // Filter tabs based on Primary Navigation Config (visibility settings)
         // If a tab id is explicitly set to false in primaryNavConfig, hide it
         // Admin tab is always kept visible for safety
-        const filteredAllTabs = allTabs.filter(tab => {
+        const filteredAllTabs = useMemo(() => allTabs.filter(tab => {
             if (tab.id === 'admin-jsla') return true; // Always keep admin visible
             return primaryNavConfig[tab.id] !== false; // Hide only if explicitly false
-        });
+        }), [allTabs, primaryNavConfig]);
 
         // État pour gérer les onglets visibles et ceux dans "Plus"
         const [visibleTabs, setVisibleTabs] = useState(filteredAllTabs);
