@@ -407,10 +407,10 @@ const customThemes = {
             surfaceLight: 'rgba(255, 255, 255, 0.65)',
             surfaceDark: 'rgba(255, 255, 255, 0.3)',
             text: '#0f172a', // Slate 900
-            textSecondary: '#475569', // Slate 600
+            textSecondary: '#334155', // Slate 700 (Darker for better contrast on glass)
             textGreen: '#059669', // Emerald 600
             textRed: '#dc2626', // Red 600
-            border: 'rgba(255, 255, 255, 0.5)',
+            border: 'rgba(255, 255, 255, 0.6)',
             accent: '#0ea5e9',
             success: '#059669',
             danger: '#dc2626',
@@ -422,12 +422,12 @@ const customThemes = {
             mono: '"JetBrains Mono", "Fira Code", monospace'
         },
         styles: {
-            headerBg: 'rgba(255, 255, 255, 0.5)',
-            cardBg: 'rgba(255, 255, 255, 0.45)',
-            cardBorder: '1px solid rgba(255, 255, 255, 0.6)',
+            headerBg: 'rgba(255, 255, 255, 0.6)', // Slightly more opaque
+            cardBg: 'rgba(255, 255, 255, 0.55)', // Increased from 0.45 for better readability
+            cardBorder: '1px solid rgba(255, 255, 255, 0.8)',
             borderRadius: '1.25rem',
             shadow: '0 8px 32px rgba(31, 38, 135, 0.1)',
-            backdropFilter: 'blur(20px) saturate(180%)' // Premium Glass effect
+            backdropFilter: 'blur(20px) saturate(180%)'
         }
     }
 };
