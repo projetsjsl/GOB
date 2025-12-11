@@ -123,7 +123,8 @@ const ThemeSelector = ({ isDarkMode = true }) => {
             'seeking-alpha': '📈',
             'bloomberg-mobile': '📱',
             'bloomberg-nostalgie': '🕰️',
-            'desjardins': '🏦'
+            'desjardins': '🏦',
+            'lightglass': '💎'
         };
         return icons[themeId] || '✨';
     };

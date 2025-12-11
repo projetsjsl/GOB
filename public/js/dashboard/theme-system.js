@@ -393,6 +393,39 @@ const customThemes = {
             borderRadius: '0.5rem', // Arrondi modéré
             shadow: '0 2px 8px rgba(0, 103, 71, 0.1)', // Ombre verte subtile
         }
+    },
+    'lightglass': {
+        name: 'LightGlass Effect',
+        id: 'lightglass',
+        colors: {
+            primary: '#0ea5e9', // Sky Blue
+            secondary: '#6366f1', // Indigo
+            background: '#ebf4ff', // Very light blue/slate
+            surface: 'rgba(255, 255, 255, 0.65)', // Glass effect
+            surfaceLight: 'rgba(255, 255, 255, 0.85)',
+            surfaceDark: 'rgba(255, 255, 255, 0.4)',
+            text: '#0f172a', // Slate 900
+            textSecondary: '#475569', // Slate 600
+            textGreen: '#059669', // Emerald 600
+            textRed: '#dc2626', // Red 600
+            border: 'rgba(255, 255, 255, 0.6)',
+            accent: '#0ea5e9',
+            success: '#059669',
+            danger: '#dc2626',
+            warning: '#d97706',
+        },
+        fonts: {
+            primary: '"Outfit", "Inter", -apple-system, BlinkMacSystemFont, sans-serif',
+            secondary: '"Inter", sans-serif',
+            mono: '"JetBrains Mono", "Fira Code", monospace'
+        },
+        styles: {
+            headerBg: 'rgba(255, 255, 255, 0.7)',
+            cardBg: 'rgba(255, 255, 255, 0.65)',
+            cardBorder: '1px solid rgba(255, 255, 255, 0.8)',
+            borderRadius: '1.25rem', // Extra rounded
+            shadow: '0 8px 32px rgba(31, 38, 135, 0.1)', // Glass shadow
+        }
     }
 };
 
