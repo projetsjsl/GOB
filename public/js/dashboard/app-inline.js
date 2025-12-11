@@ -24358,17 +24358,48 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         const calculateVisibleTabs = useCallback(() => {
             if (!navRef.current) return;
 
+            // Vérifier si l'utilisateur est admin (plusieurs méthodes de fallback)
+            let isAdmin = false;
+            if (window.RolesPermissions && window.RolesPermissions.isAdminUser) {
+                isAdmin = window.RolesPermissions.isAdminUser();
+            } else {
+                // Fallback: vérifier directement depuis sessionStorage
+                try {
+                    const userData = sessionStorage.getItem('gob-user');
+                    if (userData) {
+                        const user = JSON.parse(userData);
+                        isAdmin = user.role === 'admin' || user.username === 'admin';
+                    }
+                } catch (e) {
+                    console.warn('[Tabs] Erreur vérification admin:', e);
+                }
+            }
+
             const navWidth = navRef.current.offsetWidth;
             const plusButtonWidth = 80; // Largeur approximative du bouton "Plus"
             const padding = 16; // Padding horizontal
             const gap = 4; // Gap entre les onglets
             const availableWidth = navWidth - padding * 2 - plusButtonWidth - gap;
 
+            // Séparer l'onglet admin des autres onglets
+            const adminTab = filteredAllTabs.find(tab => tab.id === 'admin-jsla');
+            const otherTabs = filteredAllTabs.filter(tab => tab.id !== 'admin-jsla');
+
             let currentWidth = 0;
             const visible = [];
             const hidden = [];
 
-            for (const tab of filteredAllTabs) {
+            // Si admin, toujours ajouter l'onglet admin en premier
+            if (isAdmin && adminTab) {
+                const adminWidth = 70 + (adminTab.label.length * 4);
+                if (adminWidth <= availableWidth) {
+                    visible.push(adminTab);
+                    currentWidth += adminWidth + gap;
+                }
+            }
+
+            // Ajouter les autres onglets
+            for (const tab of otherTabs) {
                 // Estimer la largeur de l'onglet (min-width: 70px + padding)
                 const estimatedWidth = 70 + (tab.label.length * 4); // Approximation
                 
@@ -24380,12 +24411,36 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 }
             }
 
+            // Si admin et l'onglet admin n'est pas visible, le forcer en retirant le dernier onglet si nécessaire
+            if (isAdmin && adminTab && !visible.some(t => t.id === 'admin-jsla')) {
+                if (visible.length > 0) {
+                    const lastTab = visible.pop();
+                    hidden.unshift(lastTab);
+                }
+                const adminWidth = 70 + (adminTab.label.length * 4);
+                if (adminWidth <= availableWidth) {
+                    visible.push(adminTab);
+                }
+            }
+
             // Toujours afficher au moins quelques onglets principaux
             if (visible.length < 3 && filteredAllTabs.length > 3) {
                 const mainTabs = filteredAllTabs.slice(0, 3);
                 const restTabs = filteredAllTabs.slice(3);
-                setVisibleTabs(mainTabs);
-                setHiddenTabs(restTabs);
+                // Si admin, s'assurer que l'onglet admin est dans les mainTabs
+                if (isAdmin && adminTab && !mainTabs.some(t => t.id === 'admin-jsla')) {
+                    if (mainTabs.length >= 3) {
+                        mainTabs.pop();
+                    }
+                    mainTabs.push(adminTab);
+                    // Retirer admin des restTabs si présent
+                    const restTabsFiltered = restTabs.filter(t => t.id !== 'admin-jsla');
+                    setVisibleTabs(mainTabs);
+                    setHiddenTabs(restTabsFiltered);
+                } else {
+                    setVisibleTabs(mainTabs);
+                    setHiddenTabs(restTabs);
+                }
             } else {
                 setVisibleTabs(visible);
                 setHiddenTabs(hidden);
@@ -25313,7 +25368,28 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 }`}
                                                 style={{ maxHeight: '60vh' }}
                                             >
-                                                {tab.hiddenTabs.map(hiddenTab => {
+                                                {tab.hiddenTabs
+                                                    .filter(hiddenTab => {
+                                                        // Ne pas afficher l'onglet admin dans le menu Plus si l'utilisateur est admin
+                                                        // (il devrait être dans visibleTabs, mais au cas où)
+                                                        if (hiddenTab.id === 'admin-jsla') {
+                                                            let isAdmin = false;
+                                                            if (window.RolesPermissions && window.RolesPermissions.isAdminUser) {
+                                                                isAdmin = window.RolesPermissions.isAdminUser();
+                                                            } else {
+                                                                try {
+                                                                    const userData = sessionStorage.getItem('gob-user');
+                                                                    if (userData) {
+                                                                        const user = JSON.parse(userData);
+                                                                        isAdmin = user.role === 'admin' || user.username === 'admin';
+                                                                    }
+                                                                } catch (e) {}
+                                                            }
+                                                            return !isAdmin; // Ne pas afficher si admin
+                                                        }
+                                                        return true;
+                                                    })
+                                                    .map(hiddenTab => {
                                                     const iconClass = hiddenTab.icon || getTabIcon(hiddenTab.id);
                                                     const isActive = activeTab === hiddenTab.id;
                                                     return (
