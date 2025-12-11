@@ -56,6 +56,13 @@ export function switchMainTab(tab) {
     document.getElementById('smsTabContent').classList.toggle('hidden', tab !== 'sms');
     document.getElementById('helpTabContent').classList.toggle('hidden', tab !== 'help');
     
+    // Builder tab
+    const builderContent = document.getElementById('builderTabContent');
+    if (builderContent) {
+        builderContent.classList.toggle('hidden', tab !== 'builder');
+        builderContent.classList.toggle('flex', tab === 'builder');
+    }
+    
     // Handle Emma IA tab if it exists
     const emmaiaContent = document.getElementById('emmaiaTabContent');
     if (emmaiaContent) {
@@ -69,7 +76,8 @@ export function switchMainTab(tab) {
         design: '🎨 Design des Emails',
         sms: '📱 Configuration SMS',
         help: '📖 Mode d\'Emploi',
-        emmaia: '🤖 Emma IA - Modèles Chat'
+        emmaia: '🤖 Emma IA - Modèles Chat',
+        builder: '🏗️ Visual Email Builder'
     };
     document.getElementById('editorTitle').textContent = titles[tab] || 'Configuration';
     document.getElementById('editorSubtitle').textContent = '';

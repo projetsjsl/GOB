@@ -11,6 +11,7 @@ import { showAddRecipientForm, hideAddRecipientForm, addRecipient, removeRecipie
 import { loadConfigs, renderConfigList, saveConfig, deleteConfig, createNewConfig, getCurrentConfig, selectConfig, getConfig } from './prompts-manager.js';
 import { loadDashboard, filterDashboard, editPromptFromDashboard, filterByRelatedPrompts, clearRelationshipFilter, reloadDashboard } from './dashboard-manager.js';
 import { initChatAssistant } from './chat-assistant.js';
+import { initBuilder } from './builder.js';
 
 /**
  * Fonction d'initialisation principale
@@ -160,4 +161,7 @@ export async function init() {
             loadDashboard();
         }
     }, 100);
+
+    // Initialiser le Visual Builder
+    initBuilder();
 }
