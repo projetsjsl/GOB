@@ -72,16 +72,52 @@ function hasPermission(componentId) {
 }
 
 /**
+ * Vérifier si l'utilisateur est admin
+ */
+function isAdminUser() {
+    // Vérifier depuis userRole
+    if (userRole === 'admin') {
+        return true;
+    }
+    
+    // Vérifier depuis sessionStorage directement
+    try {
+        const userData = sessionStorage.getItem('gob-user');
+        if (userData) {
+            const user = JSON.parse(userData);
+            if (user.role === 'admin' || user.username === 'admin') {
+                return true;
+            }
+        }
+    } catch (e) {
+        console.warn('[Roles] Erreur vérification admin:', e);
+    }
+    
+    return false;
+}
+
+/**
  * Filtrer les tabs selon les permissions
  */
 function filterTabsByPermissions(tabs) {
+    const isAdmin = isAdminUser();
+    
     if (!userPermissions) {
+        // Si pas de permissions chargées mais utilisateur admin, autoriser l'onglet admin
+        if (isAdmin) {
+            return tabs; // Tout autoriser pour admin si pas de permissions
+        }
         return tabs; // Pas de filtrage si pas de permissions
     }
 
     return tabs.filter(tab => {
         // Toujours autoriser certains tabs de base
         if (tab.id === 'plus' || tab.id === 'theme-selector') {
+            return true;
+        }
+
+        // Toujours autoriser l'onglet admin pour les utilisateurs admin
+        if (tab.id === 'admin-jsla' && isAdmin) {
             return true;
         }
 
@@ -98,6 +134,8 @@ function hideUnauthorizedComponents() {
         return; // Pas de masquage si pas de permissions
     }
 
+    const isAdmin = isAdminUser();
+
     // Liste des IDs de composants
     const componentIds = [
         'stocks-news',
@@ -112,6 +150,7 @@ function hideUnauthorizedComponents() {
         'seeking-alpha',
         'email-briefings',
         'admin-jslai',
+        'admin-jsla', // ID alternatif
         'emma-sms',
         'fastgraphs',
         'news-ticker',
@@ -119,6 +158,11 @@ function hideUnauthorizedComponents() {
     ];
 
     componentIds.forEach(componentId => {
+        // Ne pas masquer l'onglet admin pour les admins
+        if ((componentId === 'admin-jslai' || componentId === 'admin-jsla') && isAdmin) {
+            return;
+        }
+
         if (!hasPermission(componentId)) {
             // Masquer les tabs correspondants
             const tabElements = document.querySelectorAll(`[data-tab="${componentId}"], [data-component="${componentId}"]`);
@@ -165,6 +209,7 @@ window.RolesPermissions = {
     hasPermission,
     filterTabsByPermissions,
     hideUnauthorizedComponents,
-    initRolesPermissions
+    initRolesPermissions,
+    isAdminUser
 };
 
