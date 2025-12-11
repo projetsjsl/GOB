@@ -210,16 +210,26 @@ function validateStep(step) {
 
     const fields = requiredFields[step] || [];
     let isValid = true;
+    let firstInvalid = null;
 
     fields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
+        field.classList.remove('valid', 'invalid');
+        
         if (!field.value.trim()) {
-            field.style.borderColor = 'var(--danger)';
+            field.classList.add('invalid');
             isValid = false;
+            if (!firstInvalid) firstInvalid = field;
         } else {
-            field.style.borderColor = '';
+            field.classList.add('valid');
         }
     });
+
+    if (!isValid && firstInvalid) {
+        showToast('Veuillez remplir tous les champs requis', 'error');
+        firstInvalid.focus();
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 
     return isValid;
 }
@@ -323,10 +333,14 @@ function updateDisplay() {
         document.getElementById(`step${currentStep}`).classList.add('active');
     } else {
         document.getElementById('summary').classList.add('active');
+        showToast('Récapitulatif prêt - Vérifiez vos informations', 'success');
     }
 
     updateProgressBar();
     updateNavigation();
+    
+    // Smooth scroll to top on step change
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Mise à jour de la barre de progression

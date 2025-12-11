@@ -83,21 +83,53 @@ function validateEmailHtml(html) {
     };
 }
 
+import { logEmail, updateEmailLog } from '../lib/email-logger.js';
+import { checkRateLimit } from '../lib/rate-limiter.js';
+
 export default async function handler(req, res) {
     // Méthode POST uniquement
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    try {
-        const { subject, html, to, briefingType } = req.body;
+    // ═══════════════════════════════════════════════════════════════
+    // RATE LIMITING
+    // ═══════════════════════════════════════════════════════════════
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const rateLimitKey = `email:${clientIp}`;
+    const rateLimit = checkRateLimit(rateLimitKey, 'email');
 
+    if (!rateLimit.allowed) {
+        console.warn(`[Send Email] Rate limit exceeded for ${clientIp}`);
+        return res.status(429).json({
+            error: 'Too Many Requests',
+            message: `Rate limit exceeded. Try again in ${Math.ceil(rateLimit.resetIn / 1000)}s`
+        });
+    }
+
+    const { subject, html, to, briefingType } = req.body;
+    const startTime = Date.now();
+    let logId = null;
+
+    try {
         // Validation des paramètres
         if (!subject || !html) {
             return res.status(400).json({
                 error: 'Missing required fields: subject and html are required'
             });
         }
+
+        // ═══════════════════════════════════════════════════════════════
+        // LOGGING (Start)
+        // ═══════════════════════════════════════════════════════════════
+        logId = logEmail({
+            type: briefingType || 'manual',
+            channel: 'email',
+            recipient: to || 'default',
+            subject: subject,
+            sizeBytes: Buffer.byteLength(html, 'utf8'),
+            status: 'pending'
+        });
 
         // ═══════════════════════════════════════════════════════════════
         // VALIDATION HTML EMAIL
@@ -107,7 +139,7 @@ export default async function handler(req, res) {
             console.warn('[Send Email] ⚠️ HTML Warnings:', htmlValidation.warnings.join(', '));
         }
 
-        // Vérifier taille du HTML (limite Resend ~40MB, on prévient à 100KB)
+        // Vérifier taille du HTML
         const htmlSizeKB = Buffer.byteLength(html, 'utf8') / 1024;
         if (htmlSizeKB > 100) {
             console.warn(`[Send Email] ⚠️ Large email: ${htmlSizeKB.toFixed(1)}KB`);
@@ -119,9 +151,7 @@ export default async function handler(req, res) {
         const TO_EMAIL = to || process.env.RESEND_TO_EMAIL || 'projetsjsl@gmail.com';
 
         if (!RESEND_API_KEY) {
-            return res.status(500).json({
-                error: 'RESEND_API_KEY not configured in environment variables'
-            });
+            throw new Error('RESEND_API_KEY not configured');
         }
 
         // Appel API Resend
@@ -146,14 +176,18 @@ export default async function handler(req, res) {
         const data = await response.json();
 
         if (!response.ok) {
-            console.error('Resend API Error:', data);
-            return res.status(response.status).json({
-                error: 'Failed to send email via Resend',
-                details: data
-            });
+            throw new Error(data.message || 'Failed to send via Resend');
         }
 
-        // Succès
+        // ═══════════════════════════════════════════════════════════════
+        // LOGGING (Success)
+        // ═══════════════════════════════════════════════════════════════
+        updateEmailLog(logId, {
+            status: 'sent',
+            durationMs: Date.now() - startTime,
+            metadata: { resendId: data.id }
+        });
+
         return res.status(200).json({
             success: true,
             message: 'Email sent successfully',
@@ -162,6 +196,17 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
+        // ═══════════════════════════════════════════════════════════════
+        // LOGGING (Error)
+        // ═══════════════════════════════════════════════════════════════
+        if (logId) {
+            updateEmailLog(logId, {
+                status: 'failed',
+                durationMs: Date.now() - startTime,
+                error: error.message
+            });
+        }
+        
         console.error('Send Email Error:', error);
         return res.status(500).json({
             error: 'Internal server error',
