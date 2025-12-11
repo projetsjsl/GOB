@@ -582,6 +582,28 @@ function applyTheme(themeId) {
     
     // Déclencher un événement personnalisé
     window.dispatchEvent(new CustomEvent('themeChanged', { detail: { themeId } }));
+
+    // PROPAGATION AUX IFRAMES (pour Emma IA et autres sous-apps)
+    try {
+        const iframes = document.querySelectorAll('iframe');
+        iframes.forEach(iframe => {
+            try {
+                iframe.contentWindow.postMessage({
+                    type: 'THEME_CHANGE',
+                    theme: {
+                        id: theme.id,
+                        colors: theme.colors,
+                        styles: theme.styles,
+                        fonts: theme.fonts
+                    }
+                }, '*');
+            } catch (e) {
+                console.warn('Impossible de propager le thème à l\'iframe', e);
+            }
+        });
+    } catch (e) {
+        console.error('Erreur propagation iframe:', e);
+    }
     
     return theme;
 }

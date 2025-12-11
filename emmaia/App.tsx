@@ -230,12 +230,49 @@ const App: React.FC = () => {
     }
   }, [gemini.messages, gemini.connectionState]);
 
-  // Global Animated Background
+  // Theme Listener
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'THEME_CHANGE' && event.data.theme) {
+        const theme = event.data.theme;
+        const root = document.documentElement;
+        
+        // Helper to apply colors
+        const applyColor = (key: string, value: string) => {
+            if (value) root.style.setProperty(key, value);
+        };
+
+        if (theme.colors) {
+            applyColor('--theme-primary', theme.colors.primary);
+            applyColor('--theme-secondary', theme.colors.secondary);
+            applyColor('--theme-surface', theme.colors.surface);
+            applyColor('--theme-surface-light', theme.colors.surfaceLight);
+            applyColor('--theme-text', theme.colors.text);
+            applyColor('--theme-accent', theme.colors.accent);
+        }
+        
+        if (theme.styles) {
+            applyColor('--theme-backdrop-filter', theme.styles.backdropFilter || 'none');
+        }
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  // Global Animated Background with Theme Variables
   const Background = () => (
       <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
           <div className="absolute inset-0 animated-bg opacity-40"></div>
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_rgba(59,130,246,0.15),transparent_50%)]"></div>
-          <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom,_rgba(168,85,247,0.15),transparent_50%)]"></div>
+          {/* Dynamic Theme Gradients */}
+          <div className="absolute top-0 left-0 w-full h-full" style={{
+              background: `radial-gradient(ellipse at top, var(--theme-primary, rgba(59,130,246,0.15)), transparent 50%)`,
+              opacity: 0.2
+          }}></div>
+          <div className="absolute bottom-0 right-0 w-full h-full" style={{
+              background: `radial-gradient(ellipse at bottom, var(--theme-secondary, rgba(168,85,247,0.15)), transparent 50%)`,
+              opacity: 0.2
+          }}></div>
       </div>
   );
 
