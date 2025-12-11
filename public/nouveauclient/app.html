@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Collecteur - Formulaire d'Onboarding</title>
+    <title>Ouverture de nouveau compte client - Formulaire</title>
     
     <!-- Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -250,8 +250,8 @@
 
         .toast {
             background: var(--glass-bg);
-            backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
             padding: 16px 24px;
@@ -869,8 +869,8 @@
         <!-- Header -->
         <header class="header">
             <div>
-                <h1>📊 Collecteur Financier</h1>
-                <p style="margin-top: 5px; color: var(--text-muted); font-size: 0.9rem;">Onboarding Client Professionnel</p>
+                <h1>📊 Ouverture de Compte Client</h1>
+                <p style="margin-top: 5px; color: var(--text-muted); font-size: 0.9rem;">Processus d'ouverture de nouveau compte</p>
             </div>
             <div class="header-user">
                 <div>Connecté en tant que <span id="userName">User</span></div>
@@ -919,7 +919,7 @@
                 <!-- ÉTAPE 1: Identité -->
                 <div class="step-content active" id="step1">
                     <h2 class="step-title">Identité du Client</h2>
-                    <p class="step-description">Collectez les informations d'identité essentielles pour le dossier</p>
+                    <p class="step-description">Informations pour l'ouverture du nouveau compte</p>
                     
                     <div class="form-grid">
                         <div class="form-group">
@@ -1101,7 +1101,7 @@
                         <button type="button" onclick="exportData('pdf')">Générer .PDF</button>
                     </div>
                     <div class="action-card">
-                        <h4>💾 Nouveau Client</h4>
+                        <h4>💾 Nouvelle Ouverture</h4>
                         <p>Sauvegarder et recommencer</p>
                         <button type="button" onclick="resetForm()">Nouveau Dossier</button>
                     </div>
