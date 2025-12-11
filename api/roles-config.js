@@ -181,9 +181,10 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Vérifier le mot de passe admin
+            // Vérifier le mot de passe admin (avec hash)
             const ADMIN_PASSWORD = process.env.ROLES_ADMIN_PASSWORD || 'admin';
-            if (adminPassword !== ADMIN_PASSWORD) {
+            const passwordHash = hashPassword(ADMIN_PASSWORD);
+            if (!verifyPassword(adminPassword, passwordHash)) {
                 return res.status(401).json({
                     success: false,
                     error: 'Mot de passe admin incorrect'
@@ -233,9 +234,10 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Vérifier le mot de passe admin
+            // Vérifier le mot de passe admin (avec hash)
             const ADMIN_PASSWORD = process.env.ROLES_ADMIN_PASSWORD || 'admin';
-            if (adminPassword !== ADMIN_PASSWORD) {
+            const passwordHash = hashPassword(ADMIN_PASSWORD);
+            if (!verifyPassword(adminPassword, passwordHash)) {
                 return res.status(401).json({
                     success: false,
                     error: 'Mot de passe admin incorrect'
@@ -284,9 +286,10 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Vérifier le mot de passe admin
+            // Vérifier le mot de passe admin (avec hash)
             const ADMIN_PASSWORD = process.env.ROLES_ADMIN_PASSWORD || 'admin';
-            if (adminPassword !== ADMIN_PASSWORD) {
+            const passwordHash = hashPassword(ADMIN_PASSWORD);
+            if (!verifyPassword(adminPassword, passwordHash)) {
                 return res.status(401).json({
                     success: false,
                     error: 'Mot de passe admin incorrect'
@@ -326,9 +329,10 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Vérifier le mot de passe admin
+            // Vérifier le mot de passe admin (avec hash)
             const ADMIN_PASSWORD = process.env.ROLES_ADMIN_PASSWORD || 'admin';
-            if (adminPassword !== ADMIN_PASSWORD) {
+            const passwordHash = hashPassword(ADMIN_PASSWORD);
+            if (!verifyPassword(adminPassword, passwordHash)) {
                 return res.status(401).json({
                     success: false,
                     error: 'Mot de passe admin incorrect'
