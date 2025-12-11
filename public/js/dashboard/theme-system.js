@@ -46,8 +46,8 @@ const defaultThemes = {
         colors: {
             primary: '#8b5cf6', // purple (#8B5CF6) - couleur principale IA
             secondary: '#a78bfa', // lighter purple (#A78BFA) - accents secondaires
-            background: '#000000', // black (#000000) - fond principal
-            surface: '#111827', // gray-900 (#111827) - cards, panels
+            background: 'fixed', // Signal for Mesh Gradient
+            surface: 'rgba(17, 24, 39, 0.6)', // More transparent for glass effect
             surfaceLight: '#1f2937', // gray-800 (#1F2937) - hover states
             text: '#ffffff', // white (#FFFFFF) - texte principal
             textSecondary: '#9ca3af', // gray-400 (#9CA3AF) - texte secondaire
@@ -67,7 +67,8 @@ const defaultThemes = {
             cardBg: '#111827',
             cardBorder: '1px solid #374151',
             borderRadius: '0.75rem',
-            shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+            shadow: '0 8px 32px rgba(139, 92, 246, 0.15)', // Purple glow
+            backdropFilter: 'blur(16px) saturate(180%)'
         }
     },
     'darkmode': {
@@ -77,8 +78,8 @@ const defaultThemes = {
         colors: {
             primary: '#10b981', // emerald-500 (#10B981) - couleur principale
             secondary: '#3b82f6', // blue-500 (#3B82F6) - accents secondaires
-            background: '#000000', // black (#000000) - fond principal
-            surface: '#111827', // gray-900 (#111827) - cards, panels
+            background: 'fixed',
+            surface: 'rgba(17, 24, 39, 0.7)', // Slightly transparent
             surfaceLight: '#1f2937', // gray-800 (#1F2937) - hover states
             text: '#ffffff', // white (#FFFFFF) - texte principal
             textSecondary: '#9ca3af', // gray-400 (#9CA3AF) - texte secondaire
@@ -172,8 +173,8 @@ const customThemes = {
         colors: {
             primary: '#00d4ff', // cyan brillant (#00D4FF) - data-focused, accents principaux
             secondary: '#0066cc', // blue profond (#0066CC) - liens, actions secondaires
-            background: '#0a0e27', // dark navy blue (#0A0E27) - fond principal
-            surface: '#141b3d', // darker blue (#141B3D) - cards, panels
+            background: 'fixed', // Deep Navy/Cyan Technical Gradient
+            surface: 'rgba(20, 27, 61, 0.6)', // Glassy navy
             surfaceLight: '#1e2749', // medium blue (#1E2749) - hover states, active
             text: '#e0e7ff', // light blue-white (#E0E7FF) - texte principal
             textSecondary: '#94a3b8', // slate-400 (#94A3B8) - texte secondaire
@@ -195,7 +196,8 @@ const customThemes = {
             cardBg: '#141b3d',
             cardBorder: '1px solid rgba(0, 212, 255, 0.25)', // cyan avec transparence légèrement plus visible
             borderRadius: '0.5rem',
-            shadow: '0 4px 16px rgba(0, 212, 255, 0.2)', // glow cyan plus prononcé
+            shadow: '0 8px 32px rgba(0, 212, 255, 0.2)', // glow cyan plus prononcé
+            backdropFilter: 'blur(16px) saturate(150%)' // Cyberpunk glass
         }
     },
     'marketq-dark': {
@@ -467,29 +469,61 @@ function applyTheme(themeId) {
     };
     
     // Gestion du Background Spécial (Mesh Gradient pour effet verre)
-    if (theme.id === 'lightglass') {
-        document.body.style.background = `
-            radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-            radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-            radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%)
-        `;
-        // Override avec le Light Mesh Gradient spécifique
-        document.body.style.backgroundImage = `
-            radial-gradient(at 40% 20%, hsla(28,100%,74%,1) 0px, transparent 50%),
-            radial-gradient(at 80% 0%, hsla(189,100%,56%,1) 0px, transparent 50%),
-            radial-gradient(at 0% 50%, hsla(340,100%,76%,1) 0px, transparent 50%),
-            radial-gradient(at 80% 50%, hsla(240,100%,70%,1) 0px, transparent 50%),
-            radial-gradient(at 0% 100%, hsla(22,100%,77%,1) 0px, transparent 50%),
-            radial-gradient(at 80% 100%, hsla(242,100%,70%,1) 0px, transparent 50%),
-            radial-gradient(at 0% 0%, hsla(343,100%,76%,1) 0px, transparent 50%)
-        `;
-        document.body.style.backgroundColor = '#e0f2fe';
+    if (theme.colors.background === 'fixed' || theme.id === 'lightglass') {
+        let bgGradient = '';
+        let bgColor = '';
+
+        switch(theme.id) {
+            case 'lightglass':
+                 bgGradient = `
+                    radial-gradient(at 40% 20%, hsla(28,100%,74%,1) 0px, transparent 50%),
+                    radial-gradient(at 80% 0%, hsla(189,100%,56%,1) 0px, transparent 50%),
+                    radial-gradient(at 0% 50%, hsla(340,100%,76%,1) 0px, transparent 50%),
+                    radial-gradient(at 80% 50%, hsla(240,100%,70%,1) 0px, transparent 50%),
+                    radial-gradient(at 0% 100%, hsla(22,100%,77%,1) 0px, transparent 50%),
+                    radial-gradient(at 80% 100%, hsla(242,100%,70%,1) 0px, transparent 50%),
+                    radial-gradient(at 0% 0%, hsla(343,100%,76%,1) 0px, transparent 50%)
+                `;
+                bgColor = '#e0f2fe';
+                break;
+            case 'ia':
+                bgGradient = `
+                    radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+                    radial-gradient(circle at 0% 100%, rgba(76, 29, 149, 0.4) 0%, transparent 50%),
+                    radial-gradient(circle at 100% 100%, rgba(124, 58, 237, 0.2) 0%, transparent 50%)
+                `;
+                bgColor = '#000000';
+                break;
+            case 'marketq':
+                bgGradient = `
+                    radial-gradient(circle at 0% 0%, rgba(0, 212, 255, 0.15) 0%, transparent 40%),
+                    radial-gradient(circle at 100% 100%, rgba(0, 102, 204, 0.2) 0%, transparent 40%)
+                `;
+                bgColor = '#0a0e27';
+                break;
+            case 'darkmode':
+                bgGradient = `
+                    radial-gradient(circle at 80% 10%, rgba(16, 185, 129, 0.15) 0%, transparent 40%),
+                    radial-gradient(circle at 20% 90%, rgba(5, 150, 105, 0.1) 0%, transparent 40%)
+                `;
+                bgColor = '#000000';
+                break;
+            default:
+                // Fallback generic mesh
+               bgGradient = `radial-gradient(at top, ${theme.colors.primary}33 0%, transparent 70%)`;
+               bgColor = '#000000';
+        }
+
+        document.body.style.backgroundImage = bgGradient;
+        document.body.style.backgroundColor = bgColor;
         document.body.style.backgroundAttachment = 'fixed';
+        document.body.style.backgroundSize = 'cover';
     } else {
-        // Reset background
+        // Reset background for plain themes (Terminal, etc.)
         document.body.style.background = '';
         document.body.style.backgroundImage = '';
         document.body.style.backgroundColor = '';
+        document.body.style.backgroundAttachment = '';
         root.style.setProperty('--theme-bg', theme.colors.background);
     }
 
