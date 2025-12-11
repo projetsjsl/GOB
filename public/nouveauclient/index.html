@@ -85,8 +85,8 @@
             line-height: 1.1;
             margin-bottom: 1.5rem;
             background: linear-gradient(135deg, #fff 0%, #94A3B8 100%);
-            background-clip: text;
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.02em;
         }
@@ -324,6 +324,32 @@
             border-radius: 4px;
         }
 
+        /* Branding Badge */
+        .powered-by {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+            font-family: var(--font-main);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            pointer-events: none;
+            z-index: 100;
+            transition: opacity 0.3s;
+        }
+
+        .powered-by:hover {
+            opacity: 1;
+        }
+
+        .powered-by strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
         /* Abstract Circle Animation */
         .circle-blur {
             position: absolute;
@@ -482,6 +508,8 @@
                 </form>
 
             </div>
+
+    <div class="powered-by">Propulsé par <strong>JSLAI</strong></div>
         </main>
     </div>
 
