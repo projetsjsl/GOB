@@ -45,10 +45,30 @@ export const fetchCompanyData = async (symbol: string): Promise<any> => {
       autoFetched: true
     }));
 
+
+    // --- POST-PROCESSING ROBUSTENESS ---
+    // Fallback for currentPrice if 0 or invalid
+    let finalCurrentPrice = result.currentPrice;
+    if (!finalCurrentPrice || finalCurrentPrice === 0) {
+        // ERROR FIX: 'priceData' is not available here, it's a backend variable.
+        // We must use 'result.data' which contains AnnualData (year, priceHigh, priceLow, etc.)
+        if (result.data && result.data.length > 0) {
+            // Sort by year just in case
+            const sortedData = [...result.data].sort((a: AnnualData, b: AnnualData) => b.year - a.year);
+            const latest = sortedData[0];
+            
+            // Use average of high/low as a proxy for price if realtime missing
+            if (latest.priceHigh > 0 && latest.priceLow > 0) {
+                finalCurrentPrice = (latest.priceHigh + latest.priceLow) / 2;
+                console.log(`⚠️ currentPrice was 0, used latest annual average: ${finalCurrentPrice}`);
+            }
+        }
+    }
+
     return {
       data: dataWithFlag,
       info: result.info || {},
-      currentPrice: result.currentPrice || 0,
+      currentPrice: finalCurrentPrice, // Use validated/fallback price
       financials: result.financials,
       analysisData: result.analysisData
     };

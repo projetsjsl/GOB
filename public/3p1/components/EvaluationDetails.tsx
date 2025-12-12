@@ -390,30 +390,6 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
         <div className="text-xs font-semibold text-blue-800 mb-2 sm:mb-3">📊 Intervalles de Référence - {metricConfig[metric].ratioLabel}</div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4 text-xs">
           <div>
-            <div className="font-semibold text-gray-700 mb-2">Ratio {config.ratioLabel}</div>
-            <table className="w-full text-xs">
-              <thead className="bg-blue-100 text-gray-600">
-                <tr>
-                  <th className="p-1 text-left text-[10px]">Source</th>
-                  <th className="p-1 text-right text-[10px]">Historique</th>
-                  <th className="p-1 text-right text-[10px]">5 Ans</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-blue-200">
-                <tr>
-                  <td className="p-1 text-gray-600">Titre</td>
-                  <td className="p-1 text-right font-medium">{formatRange(titleRatio, config.ratioSuffix)}</td>
-                  <td className="p-1 text-right font-medium">{title5YRatio ? formatRange(title5YRatio, config.ratioSuffix) : 'N/A'}</td>
-                </tr>
-                <tr>
-                  <td className="p-1 text-gray-600">Secteur</td>
-                  <td className="p-1 text-right font-medium">{formatRange(sectorRatio, config.ratioSuffix)}</td>
-                  <td className="p-1 text-right font-medium">{formatRange(sector5YRatio, config.ratioSuffix)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div>
             <div className="font-semibold text-gray-700 mb-2">{config.growthLabel}</div>
             <table className="w-full text-xs">
               <thead className="bg-blue-100 text-gray-600">
@@ -433,6 +409,30 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   <td className="p-1 text-gray-600">Secteur</td>
                   <td className="p-1 text-right font-medium">{formatGrowthRange(sectorGrowth)}</td>
                   <td className="p-1 text-right font-medium">{formatGrowthRange(sector5YGrowth)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <div className="font-semibold text-gray-700 mb-2">Ratio {config.ratioLabel}</div>
+            <table className="w-full text-xs">
+              <thead className="bg-blue-100 text-gray-600">
+                <tr>
+                  <th className="p-1 text-left text-[10px]">Source</th>
+                  <th className="p-1 text-right text-[10px]">Historique</th>
+                  <th className="p-1 text-right text-[10px]">5 Ans</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-blue-200">
+                <tr>
+                  <td className="p-1 text-gray-600">Titre</td>
+                  <td className="p-1 text-right font-medium">{formatRange(titleRatio, config.ratioSuffix)}</td>
+                  <td className="p-1 text-right font-medium">{title5YRatio ? formatRange(title5YRatio, config.ratioSuffix) : 'N/A'}</td>
+                </tr>
+                <tr>
+                  <td className="p-1 text-gray-600">Secteur</td>
+                  <td className="p-1 text-right font-medium">{formatRange(sectorRatio, config.ratioSuffix)}</td>
+                  <td className="p-1 text-right font-medium">{formatRange(sector5YRatio, config.ratioSuffix)}</td>
                 </tr>
               </tbody>
             </table>

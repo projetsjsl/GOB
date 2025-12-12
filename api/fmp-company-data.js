@@ -294,16 +294,33 @@ export default async function handler(req, res) {
                 // Check for error object
                 if (metricsJson && typeof metricsJson === 'object' && !Array.isArray(metricsJson)) {
                     if (metricsJson['Error Message']) {
-                        console.warn(`⚠️ FMP Key Metrics Error (non-fatal): ${metricsJson['Error Message']}`);
+                        console.warn(`⚠️ FMP Key Metrics Error (limit=30): ${metricsJson['Error Message']}`);
                     }
                 } else if (Array.isArray(metricsJson)) {
                     metricsData = metricsJson;
                 }
             } else {
-                console.warn(`⚠️ FMP Key Metrics HTTP ${metricsRes.status} for ${usedSymbol} - continuing with empty data`);
+                console.warn(`⚠️ FMP Key Metrics HTTP ${metricsRes.status} for ${usedSymbol} (limit=30)`);
             }
         } catch (metricsError) {
             console.warn(`⚠️ FMP Key Metrics parse error for ${usedSymbol}: ${metricsError.message}`);
+        }
+        
+        // RETRY STRATEGY: If full history failed or returned empty (common for heavy symbols on weak connections), try lighter fetch
+        if (metricsData.length === 0) {
+            console.log(`⚠️ Retrying Key Metrics for ${usedSymbol} with limit=5 (fallback strategy)...`);
+            try {
+                const retryRes = await fetch(`${FMP_BASE}/key-metrics/${usedSymbol}?period=annual&limit=5&apikey=${FMP_KEY}`);
+                if (retryRes.ok) {
+                    const retryJson = await retryRes.json();
+                    if (Array.isArray(retryJson) && retryJson.length > 0) {
+                        metricsData = retryJson;
+                        console.log(`✅ Recovered ${metricsData.length} records for ${usedSymbol} using limit=5`);
+                    }
+                }
+            } catch (e) {
+                console.error(`❌ Retry failed for ${usedSymbol}:`, e);
+            }
         }
         
         if (metricsData.length === 0) {
@@ -369,6 +386,12 @@ export default async function handler(req, res) {
                 console.warn('Finnhub quote parse error:', e.message);
             }
         }
+        
+        // ROBUSTNESS: If currentPrice is still 0, use the most recent historical close
+        if ((!currentPrice || currentPrice === 0) && priceData && priceData.historical && priceData.historical.length > 0) {
+            currentPrice = priceData.historical[0].close;
+            console.log(`⚠️ Used latest historical closing price (${currentPrice}) as current price fallback`);
+        }
 
         // 5. Process prices by year
         const pricesByYear = {};
@@ -392,7 +415,22 @@ export default async function handler(req, res) {
             const low = priceStats.low < 999999 && priceStats.low > 0 ? priceStats.low : (high * 0.5);
 
             // Use aggregated dividend data by fiscal year
-            const dps = dividendsByFiscalYear[year] || 0;
+            let dps = dividendsByFiscalYear[year] || 0;
+            
+            // ROBUSTNESS: Fallback if stock_dividend endpoint returned 0/empty
+            // 1. Try metric.dividendPerShare (if available in FMP response)
+            if (dps === 0 && metric.dividendPerShare) {
+                dps = metric.dividendPerShare;
+            }
+            
+            // 2. Try Dividend Yield * Average Price (Most reliable fallback for EIX etc.)
+            // metric.dividendYield is typically decimal (e.g. 0.04 for 4%)
+            if (dps === 0 && metric.dividendYield && metric.dividendYield > 0) {
+                const avgPrice = (high + low) / 2;
+                if (avgPrice > 0) {
+                    dps = metric.dividendYield * avgPrice;
+                }
+            }
 
             return {
                 year: year,

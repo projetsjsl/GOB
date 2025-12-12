@@ -170,11 +170,18 @@ export function detectOutlierMetrics(
   const threshold = Math.min(stdDevThreshold, percentThreshold); // Utiliser le plus strict
   const detectedOutliers: string[] = [];
 
-  // Vérifier chaque métrique - exclure si au-delà du seuil
-  const excludeEPS = assumptions.excludeEPS || (targets.eps > 0 && Math.abs(targets.eps - median) > threshold);
-  const excludeCF = assumptions.excludeCF || (targets.cf > 0 && Math.abs(targets.cf - median) > threshold);
-  const excludeBV = assumptions.excludeBV || (targets.bv > 0 && Math.abs(targets.bv - median) > threshold);
-  const excludeDIV = assumptions.excludeDIV || (targets.div > 0 && Math.abs(targets.div - median) > threshold);
+  // Vérifier chaque métrique - exclure si au-delà du seuil OU si le retour est implausible
+  // Critère utilisateur: Retour > 300% ou < -75% sur 5 ans est considéré comme une erreur de données
+  const isImplausible = (targetPrice: number) => {
+    if (currentPrice <= 0) return false;
+    const returnPct = (targetPrice - currentPrice) / currentPrice;
+    return returnPct > 3.0 || returnPct < -0.75;
+  };
+
+  const excludeEPS = assumptions.excludeEPS || (targets.eps > 0 && (Math.abs(targets.eps - median) > threshold || isImplausible(targets.eps)));
+  const excludeCF = assumptions.excludeCF || (targets.cf > 0 && (Math.abs(targets.cf - median) > threshold || isImplausible(targets.cf)));
+  const excludeBV = assumptions.excludeBV || (targets.bv > 0 && (Math.abs(targets.bv - median) > threshold || isImplausible(targets.bv)));
+  const excludeDIV = assumptions.excludeDIV || (targets.div > 0 && (Math.abs(targets.div - median) > threshold || isImplausible(targets.div)));
 
   if (excludeEPS && !assumptions.excludeEPS) detectedOutliers.push('EPS');
   if (excludeCF && !assumptions.excludeCF) detectedOutliers.push('CF');

@@ -185,47 +185,82 @@ export const autoFillAssumptionsFromFMPData = (
   const firstData = data[0];
   const yearsDiff = Math.max(1, lastValidData.year - firstData.year); // Au moins 1 an
   
-  // Calculer les CAGRs historiques (taux de croissance annuel composé)
-  const histGrowthEPS = calculateCAGR(firstData.earningsPerShare, lastValidData.earningsPerShare, yearsDiff);
-  const histGrowthSales = calculateCAGR(firstData.cashFlowPerShare, lastValidData.cashFlowPerShare, yearsDiff);
-  const histGrowthBV = calculateCAGR(firstData.bookValuePerShare, lastValidData.bookValuePerShare, yearsDiff);
-  const histGrowthDiv = calculateCAGR(firstData.dividendPerShare, lastValidData.dividendPerShare, yearsDiff);
-  
-  // Calculer les ratios moyens historiques (P/E, P/CF, P/BV, Yield)
-  // P/E = Prix moyen / EPS moyen
-  const peRatios = validHistory
+  // Helper pour calculer la moyenne (arithmétique) - demandé par l'utilisateur "5 ans moyen"
+  const calculateAverage = (values: number[]): number => {
+    if (values.length === 0) return 0;
+    const sum = values.reduce((a, b) => a + b, 0);
+    return sum / values.length;
+  };
+
+  // Helper pour calculer le CAGR sur 5 ans (ou max disponible si < 5 ans)
+  const calculate5YearGrowth = (paramData: AnnualData[], metricKey: keyof AnnualData): number => {
+    if (paramData.length < 2) return 0;
+    const sorted = [...paramData].sort((a, b) => a.year - b.year);
+    const last = sorted[sorted.length - 1]; // Année N
+    
+    // Chercher Année N-5
+    let start = sorted.find(d => d.year === last.year - 5);
+    
+    // Fallback: Si N-5 n'existe pas, prendre le plus ancien disponible (dans la limite de 5 recul)
+    if (!start) {
+        // Prendre le max disponible, mais idéalement on veut N-5. 
+        // Si on a moins de 5 ans de données, on prend le premier dispo.
+        start = sorted[0]; 
+    }
+
+    const startValue = start[metricKey] as number;
+    const endValue = last[metricKey] as number;
+    const years = last.year - start.year;
+
+    if (years < 1 || startValue <= 0 || endValue <= 0) return 0;
+
+    return calculateCAGR(startValue, endValue, years);
+  };
+
+  // 1. Calculer Croissance 5 Ans (CAGR)
+  const growthEPS = calculate5YearGrowth(data, 'earningsPerShare');
+  const growthCF = calculate5YearGrowth(data, 'cashFlowPerShare');
+  const growthBV = calculate5YearGrowth(data, 'bookValuePerShare');
+  const growthDiv = calculate5YearGrowth(data, 'dividendPerShare');
+
+  // 2. Calculer Ratios Moyens 5 Ans
+  // Prendre les 5 dernières années de données VALIDES (avec prix)
+  const last5YearsData = validHistory.slice(-5); // Les 5 derniers éléments (supposant tri croissant)
+
+  // P/E = Prix moyen / EPS moyen (Moyenne 5 ans)
+  const peRatios = last5YearsData
     .map(d => {
       if (d.earningsPerShare <= 0) return null;
       return (d.priceHigh / d.earningsPerShare + d.priceLow / d.earningsPerShare) / 2;
     })
-    .filter((v): v is number => v !== null && isFinite(v) && v > 0);
+    .filter((v): v is number => v !== null && isFinite(v) && v > 0 && v < 200);
   const avgPE = peRatios.length > 0 ? calculateAverage(peRatios) : 15;
   
-  // P/CF = Prix moyen / Cash Flow moyen
-  const pcfRatios = validHistory
+  // P/CF = Prix moyen / Cash Flow moyen (Moyenne 5 ans)
+  const pcfRatios = last5YearsData
     .map(d => {
-      if (d.cashFlowPerShare <= 0) return null;
+      if (d.cashFlowPerShare <= 0.1) return null;
       return (d.priceHigh / d.cashFlowPerShare + d.priceLow / d.cashFlowPerShare) / 2;
     })
-    .filter((v): v is number => v !== null && isFinite(v) && v > 0);
+    .filter((v): v is number => v !== null && isFinite(v) && v > 0 && v < 200);
   const avgPCF = pcfRatios.length > 0 ? calculateAverage(pcfRatios) : 10;
   
-  // P/BV = Prix moyen / Book Value moyen
-  const pbvRatios = validHistory
+  // P/BV = Prix moyen / Book Value moyen (Moyenne 5 ans)
+  const pbvRatios = last5YearsData
     .map(d => {
       if (d.bookValuePerShare <= 0) return null;
       return (d.priceHigh / d.bookValuePerShare + d.priceLow / d.bookValuePerShare) / 2;
     })
-    .filter((v): v is number => v !== null && isFinite(v) && v > 0);
+    .filter((v): v is number => v !== null && isFinite(v) && v > 0 && v < 50);
   const avgPBV = pbvRatios.length > 0 ? calculateAverage(pbvRatios) : 6;
   
-  // Yield = Dividende / Prix (en pourcentage)
-  const yieldValues = validHistory
+  // Yield = Dividende / Prix (Moyenne 5 ans)
+  const yieldValues = last5YearsData
     .map(d => {
       if (d.priceHigh <= 0) return null;
       return (d.dividendPerShare / d.priceHigh) * 100;
     })
-    .filter((v): v is number => v !== null && isFinite(v) && v >= 0);
+    .filter((v): v is number => v !== null && isFinite(v) && v >= 0 && v < 100);
   const avgYield = yieldValues.length > 0 ? calculateAverage(yieldValues) : 2.0;
   
   // Retourner les assumptions auto-remplies avec limites de sécurité
@@ -234,11 +269,11 @@ export const autoFillAssumptionsFromFMPData = (
     currentDividend: lastData.dividendPerShare || existingAssumptions?.currentDividend || 0,
     baseYear: lastValidData.year,
     // Limiter les taux de croissance à 0-20% (valeurs raisonnables)
-    growthRateEPS: Math.min(Math.max(histGrowthEPS, 0), 20),
-    growthRateSales: Math.min(Math.max(histGrowthSales, 0), 20),
-    growthRateCF: Math.min(Math.max(histGrowthSales, 0), 20), // Utilise Sales pour CF (cohérent avec historique)
-    growthRateBV: Math.min(Math.max(histGrowthBV, 0), 20),
-    growthRateDiv: Math.min(Math.max(histGrowthDiv, 0), 20),
+    growthRateEPS: Math.min(Math.max(growthEPS, -20), 20),
+    growthRateSales: Math.min(Math.max(growthCF, -20), 20), // Proxy: utilise CF car pas de SalesPerShare dans AnnualData
+    growthRateCF: Math.min(Math.max(growthCF, -20), 20), 
+    growthRateBV: Math.min(Math.max(growthBV, -20), 20),
+    growthRateDiv: Math.min(Math.max(growthDiv, -20), 20),
     // Limiter les ratios à des valeurs raisonnables
     targetPE: parseFloat(Math.max(1, Math.min(avgPE, 100)).toFixed(1)),
     targetPCF: parseFloat(Math.max(1, Math.min(avgPCF, 100)).toFixed(1)),
