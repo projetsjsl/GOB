@@ -7,6 +7,9 @@ export interface SupabaseTicker {
   ticker: string;
   company_name?: string;
   sector?: string;
+  // Nouveaux champs possibles côté DB/API (migration source -> category)
+  category?: 'team' | 'watchlist' | 'both' | 'manual';
+  categories?: string[];
   source: 'team' | 'watchlist' | 'both' | 'manual';
   is_active: boolean;
   priority?: number;
@@ -52,15 +55,29 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
       throw new Error(result.error || 'Erreur lors du chargement des tickers');
     }
 
-    // Valider que les tickers ont le champ source
+    // Normaliser `source` (compatibilité source vs category/categories)
     const tickers = (result.tickers || []).map((ticker: any) => {
-      if (!ticker.source) {
-        // Utiliser debug au lieu de warn pour réduire le bruit dans la console
-        // La valeur par défaut 'manual' est appliquée automatiquement
-        // console.debug(`Ticker ${ticker.ticker} n'a pas de champ source, utilisation de 'manual' par défaut`);
-        return { ...ticker, source: 'manual' as const };
+      if (ticker.source) return ticker;
+
+      // Fallback 1: `category`
+      if (ticker.category) {
+        return { ...ticker, source: ticker.category as any };
       }
-      return ticker;
+
+      // Fallback 2: `categories`
+      if (Array.isArray(ticker.categories)) {
+        const hasTeam = ticker.categories.includes('team');
+        const hasWatchlist = ticker.categories.includes('watchlist');
+        const derived =
+          hasTeam && hasWatchlist ? 'both' :
+          hasWatchlist ? 'watchlist' :
+          hasTeam ? 'team' :
+          'manual';
+        return { ...ticker, source: derived as const };
+      }
+
+      // Fallback final
+      return { ...ticker, source: 'manual' as const };
     });
 
     return {

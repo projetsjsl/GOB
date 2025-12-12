@@ -19,7 +19,12 @@ export default async function handler(req, res) {
   }
 
   const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // Tolérance: certains environnements utilisent SUPABASE_KEY ou seulement l'ANON.
+  // Pour cet endpoint "admin", on privilégie SERVICE_ROLE, puis fallback.
+  const supabaseKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_KEY ||
+    process.env.SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
     return res.status(500).json({ 
@@ -68,44 +73,102 @@ async function handleGet(req, res, supabase) {
     order_direction = 'desc'
   } = req.query;
 
-  // Optimisation egress : sélectionner seulement les colonnes nécessaires
-  // Utilise maintenant 'category' au lieu de 'source'
-  let query = supabase
-    .from('tickers')
-    .select('id, ticker, company_name, sector, industry, country, exchange, currency, market_cap, category, categories, priority, is_active, user_id, target_price, stop_loss, notes, security_rank, earnings_predictability, price_growth_persistence, price_stability, beta, valueline_updated_at, valueline_proj_low_return, valueline_proj_high_return, created_at, updated_at', { count: 'exact' });
+  // ✅ Compatibilité schéma: certaines DB ont `category`/`categories`, d'autres `source`.
+  // On tente `category` d'abord, puis fallback sur `source` si colonne absente.
+  const commonSelect =
+    'id, ticker, company_name, sector, industry, country, exchange, currency, market_cap, priority, is_active, user_id, target_price, stop_loss, notes, security_rank, earnings_predictability, price_growth_persistence, price_stability, beta, valueline_updated_at, valueline_proj_low_return, valueline_proj_high_return, created_at, updated_at';
 
-  // Filtres (utilise 'category' au lieu de 'source')
-  if (source) {
-    if (source === 'both') {
-      query = query.or('category.eq.team,category.eq.both');
-    } else {
-      query = query.eq('category', source);
+  const buildQueryUsingCategory = () => {
+    let query = supabase
+      .from('tickers')
+      .select(`${commonSelect}, category, categories`, { count: 'exact' });
+
+    if (source) {
+      if (source === 'both') {
+        query = query.or('category.eq.team,category.eq.both');
+      } else {
+        query = query.eq('category', source);
+      }
     }
+
+    if (is_active !== undefined) {
+      query = query.eq('is_active', is_active === 'true');
+    }
+
+    if (order_by) {
+      query = query.order(order_by, { ascending: order_direction === 'asc' });
+    }
+
+    return query.range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
+  };
+
+  const buildQueryUsingSource = () => {
+    let query = supabase
+      .from('tickers')
+      .select(`${commonSelect}, source`, { count: 'exact' });
+
+    if (source) {
+      if (source === 'both') {
+        query = query.or('source.eq.team,source.eq.both');
+      } else {
+        query = query.eq('source', source);
+      }
+    }
+
+    if (is_active !== undefined) {
+      query = query.eq('is_active', is_active === 'true');
+    }
+
+    if (order_by) {
+      query = query.order(order_by, { ascending: order_direction === 'asc' });
+    }
+
+    return query.range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
+  };
+
+  let data = null;
+  let count = 0;
+  let error = null;
+
+  // 1) Try `category` schema
+  {
+    const result = await buildQueryUsingCategory();
+    data = result.data;
+    count = result.count || 0;
+    error = result.error;
   }
 
-  if (is_active !== undefined) {
-    query = query.eq('is_active', is_active === 'true');
+  // 2) Fallback to `source` schema if needed
+  if (error && typeof error.message === 'string' && error.message.toLowerCase().includes('category')) {
+    const result = await buildQueryUsingSource();
+    data = result.data;
+    count = result.count || 0;
+    error = result.error;
   }
-
-  // Tri
-  if (order_by) {
-    query = query.order(order_by, { 
-      ascending: order_direction === 'asc' 
-    });
-  }
-
-  // Pagination
-  query = query.range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
-
-  const { data, error, count } = await query;
 
   if (error) {
     throw new Error(`Supabase error: ${error.message}`);
   }
 
+  // Normaliser: exposer toujours `source` pour les clients (ex: public/3p1) même si DB = category/cats
+  const normalized = (data || []).map((row) => {
+    const categories = Array.isArray(row.categories) ? row.categories : null;
+    const derivedSource =
+      row.source ||
+      row.category ||
+      (categories && categories.includes('team') && categories.includes('watchlist')
+        ? 'both'
+        : categories && categories.includes('watchlist')
+          ? 'watchlist'
+          : categories && categories.includes('team')
+            ? 'team'
+            : 'manual');
+    return { ...row, source: derivedSource };
+  });
+
   return res.status(200).json({
     success: true,
-    tickers: data || [],
+    tickers: normalized,
     count: count || 0,
     limit: parseInt(limit),
     offset: parseInt(offset),
@@ -156,7 +219,7 @@ async function handlePost(req, res, supabase) {
   // Vérifier si le ticker existe déjà
   const { data: existing, error: checkError } = await supabase
     .from('tickers')
-    .select('id, ticker, source')
+    .select('id, ticker, source, category, categories')
     .eq('ticker', tickerUpper)
     .single();
 
@@ -184,7 +247,9 @@ async function handlePost(req, res, supabase) {
       exchange: exchange || null,
       currency: currency,
       market_cap: market_cap || null,
-      source: source,
+      // Compatibilité: écrire `category`/`categories` (nouveau) et aussi `source` si la colonne existe
+      category,
+      categories,
       priority: parseInt(priority) || 1,
       is_active: is_active === true || is_active === 'true',
       user_id: user_id || null,
@@ -224,7 +289,7 @@ async function handlePut(req, res, supabase) {
   const cleanData = {};
   const allowedFields = [
     'ticker', 'company_name', 'sector', 'industry', 'country', 'exchange',
-    'currency', 'market_cap', 'source', 'priority', 'is_active', 'user_id',
+    'currency', 'market_cap', 'source', 'category', 'categories', 'priority', 'is_active', 'user_id',
     'target_price', 'stop_loss', 'notes', 'scraping_enabled'
   ];
 
