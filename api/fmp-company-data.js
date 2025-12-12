@@ -55,7 +55,22 @@ export default async function handler(req, res) {
         'GWO': ['GWO.TO', 'GWO'],
         'EMA': ['EMA.TO', 'EMA'],
         'CCA': ['CCA.TO', 'CCA'],
-        'POW': ['POW.TO', 'POW']
+        'POW': ['POW.TO', 'POW'],
+        'REI.TO': ['REI-UN.TO', 'REI.TO', 'REI-UN'],
+        'REI': ['REI-UN.TO', 'REI.TO', 'REI-UN'],
+        // Autres REITs/Units Canadiens
+        'SRU.TO': ['SRU-UN.TO'], 'SRU': ['SRU-UN.TO'],
+        'AP.TO': ['AP-UN.TO'], 'AP': ['AP-UN.TO'],
+        'CAR.TO': ['CAR-UN.TO'], 'CAR': ['CAR-UN.TO'],
+        'DIR.TO': ['DIR-UN.TO'], 'DIR': ['DIR-UN.TO'],
+        'GRT.TO': ['GRT-UN.TO'], 'GRT': ['GRT-UN.TO'],
+        'CSH.TO': ['CSH-UN.TO'], 'CSH': ['CSH-UN.TO'],
+        'CHP.TO': ['CHP-UN.TO'], 'CHP': ['CHP-UN.TO'],
+        'BIP.TO': ['BIP-UN.TO'], 'BIP': ['BIP-UN.TO'],
+        'BEP.TO': ['BEP-UN.TO'], 'BEP': ['BEP-UN.TO'],
+        'HR.TO': ['HR-UN.TO'], 'HR': ['HR-UN.TO'],
+        'KMP.TO': ['KMP-UN.TO'], 'KMP': ['KMP-UN.TO'],
+        'NWH.TO': ['NWH-UN.TO'], 'NWH': ['NWH-UN.TO']
     };
 
     // Fonction pour utiliser FMP Search Premium pour résoudre automatiquement les symboles

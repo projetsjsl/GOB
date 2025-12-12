@@ -172,6 +172,7 @@ export function detectOutlierMetrics(
 
   // Vérifier chaque métrique - exclure si au-delà du seuil OU si le retour est implausible
   // Critère utilisateur: Retour > 300% ou < -75% sur 5 ans est considéré comme une erreur de données
+  const currentPrice = Math.max(assumptions.currentPrice || 0, 0.01);
   const isImplausible = (targetPrice: number) => {
     if (currentPrice <= 0) return false;
     const returnPct = (targetPrice - currentPrice) / currentPrice;
