@@ -157,98 +157,77 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
     onUpdateAssumption(metric as keyof Assumptions, currentValue ? 0 : 1);
   };
 
-  // Calculer les intervalles historiques pour chaque métrique
+  // Calculer les intervalles historiques pour chaque métrique (Basé sur tout l'historique disponible pour le contexte long terme)
   const calculateHistoricalRanges = useMemo(() => {
-    const validData = data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
+    // 1. Filtrer et trier les données (Ascendant)
+    const validData = data
+      .filter(d => d.priceHigh > 0 && d.priceLow > 0)
+      .sort((a, b) => a.year - b.year); // Ensure ascending order
+
+    // NOTE: On utilise TOUT l'historique disponible pour les "Intervalles de Référence" 
+    // afin de donner un contexte maximal à l'utilisateur, même si les valeurs par défaut (orange) sont basées sur 5 ans.
     
     if (validData.length === 0) {
       return null;
     }
 
-    // Calculer les ratios P/E historiques
+    // Calculer les ratios P/E historiques (et autres) sur cette période de 5 ans
     const peRatios: number[] = [];
     const pcfRatios: number[] = [];
     const pbvRatios: number[] = [];
     const yields: number[] = [];
+    
+    // Arrays pour les taux de croissance ANNUELS (pour montrer la volatilité Min/Max)
     const epsGrowthRates: number[] = [];
     const cfGrowthRates: number[] = [];
     const bvGrowthRates: number[] = [];
     const divGrowthRates: number[] = [];
 
     validData.forEach((row, idx) => {
+      // Ratios
       if (row.earningsPerShare > 0) {
-        const peHigh = row.priceHigh / row.earningsPerShare;
-        const peLow = row.priceLow / row.earningsPerShare;
-        peRatios.push(peHigh, peLow);
+        peRatios.push(row.priceHigh / row.earningsPerShare, row.priceLow / row.earningsPerShare);
       }
-
-      if (row.cashFlowPerShare > 0) {
-        const pcfHigh = row.priceHigh / row.cashFlowPerShare;
-        const pcfLow = row.priceLow / row.cashFlowPerShare;
-        pcfRatios.push(pcfHigh, pcfLow);
+      if (row.cashFlowPerShare > 0.1) { // Same threshold as calculations.ts
+        pcfRatios.push(row.priceHigh / row.cashFlowPerShare, row.priceLow / row.cashFlowPerShare);
       }
-
       if (row.bookValuePerShare > 0) {
-        const pbvHigh = row.priceHigh / row.bookValuePerShare;
-        const pbvLow = row.priceLow / row.bookValuePerShare;
-        pbvRatios.push(pbvHigh, pbvLow);
+        pbvRatios.push(row.priceHigh / row.bookValuePerShare, row.priceLow / row.bookValuePerShare);
+      }
+      if (row.priceHigh > 0 && row.dividendPerShare >= 0) {
+        yields.push((row.dividendPerShare / row.priceHigh) * 100);
       }
 
-      if (row.priceHigh > 0 && row.dividendPerShare > 0) {
-        const yieldValue = (row.dividendPerShare / row.priceHigh) * 100;
-        yields.push(yieldValue);
-      }
-
-      // Calculer les taux de croissance entre années consécutives
+      // Calculer les taux de croissance entre années consécutives (Yearly volatility)
       if (idx > 0) {
         const prevRow = validData[idx - 1];
         
         if (prevRow.earningsPerShare > 0 && row.earningsPerShare > 0) {
           const growth = ((row.earningsPerShare - prevRow.earningsPerShare) / prevRow.earningsPerShare) * 100;
-          epsGrowthRates.push(growth);
+          if (isFinite(growth) && Math.abs(growth) < 500) epsGrowthRates.push(growth);
         }
 
         if (prevRow.cashFlowPerShare > 0 && row.cashFlowPerShare > 0) {
           const growth = ((row.cashFlowPerShare - prevRow.cashFlowPerShare) / prevRow.cashFlowPerShare) * 100;
-          cfGrowthRates.push(growth);
+          if (isFinite(growth) && Math.abs(growth) < 500) cfGrowthRates.push(growth);
         }
 
         if (prevRow.bookValuePerShare > 0 && row.bookValuePerShare > 0) {
           const growth = ((row.bookValuePerShare - prevRow.bookValuePerShare) / prevRow.bookValuePerShare) * 100;
-          bvGrowthRates.push(growth);
+          if (isFinite(growth) && Math.abs(growth) < 500) bvGrowthRates.push(growth);
         }
 
         if (prevRow.dividendPerShare > 0 && row.dividendPerShare > 0) {
           const growth = ((row.dividendPerShare - prevRow.dividendPerShare) / prevRow.dividendPerShare) * 100;
-          divGrowthRates.push(growth);
+          if (isFinite(growth) && Math.abs(growth) < 500) divGrowthRates.push(growth);
         }
       }
     });
 
-    // Calculer CAGR sur toute la période
-    const firstRow = validData[0];
-    const lastRow = validData[validData.length - 1];
-    const yearsDiff = lastRow.year - firstRow.year;
-
-    const epsCAGR = firstRow.earningsPerShare > 0 && lastRow.earningsPerShare > 0
-      ? calculateCAGR(firstRow.earningsPerShare, lastRow.earningsPerShare, yearsDiff)
-      : null;
-    
-    const cfCAGR = firstRow.cashFlowPerShare > 0 && lastRow.cashFlowPerShare > 0
-      ? calculateCAGR(firstRow.cashFlowPerShare, lastRow.cashFlowPerShare, yearsDiff)
-      : null;
-    
-    const bvCAGR = firstRow.bookValuePerShare > 0 && lastRow.bookValuePerShare > 0
-      ? calculateCAGR(firstRow.bookValuePerShare, lastRow.bookValuePerShare, yearsDiff)
-      : null;
-    
-    const divCAGR = firstRow.dividendPerShare > 0 && lastRow.dividendPerShare > 0
-      ? calculateCAGR(firstRow.dividendPerShare, lastRow.dividendPerShare, yearsDiff)
-      : null;
-
     const calculateRange = (values: number[]): Range | null => {
       if (values.length === 0) return null;
-      const filtered = values.filter(v => isFinite(v) && v > -100 && v < 1000);
+      // Filter extreme outliers for display
+      const filtered = values.filter(v => isFinite(v) && v > -100 && v < 500);
       if (filtered.length === 0) return null;
       return {
         min: Math.min(...filtered),
@@ -257,15 +236,16 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
       };
     };
 
+    // Use calculateRange on the arrays of Y-o-Y growth to show true history range
     return {
       pe: calculateRange(peRatios),
       pcf: calculateRange(pcfRatios),
       pbv: calculateRange(pbvRatios),
       yield: calculateRange(yields),
-      epsGrowth: epsCAGR !== null ? { min: epsCAGR, max: epsCAGR, avg: epsCAGR } : calculateRange(epsGrowthRates),
-      cfGrowth: cfCAGR !== null ? { min: cfCAGR, max: cfCAGR, avg: cfCAGR } : calculateRange(cfGrowthRates),
-      bvGrowth: bvCAGR !== null ? { min: bvCAGR, max: bvCAGR, avg: bvCAGR } : calculateRange(bvGrowthRates),
-      divGrowth: divCAGR !== null ? { min: divCAGR, max: divCAGR, avg: divCAGR } : calculateRange(divGrowthRates)
+      epsGrowth: calculateRange(epsGrowthRates),
+      cfGrowth: calculateRange(cfGrowthRates),
+      bvGrowth: calculateRange(bvGrowthRates),
+      divGrowth: calculateRange(divGrowthRates)
     };
   }, [data]);
 
