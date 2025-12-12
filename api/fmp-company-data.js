@@ -288,17 +288,44 @@ export default async function handler(req, res) {
         }
 
         // Wait for all requests to complete
-        const [
-            metricsRes, dividendRes, priceRes, quoteResRaw, // Renamed quoteRes to quoteResRaw to avoid conflict
-            incomeAnnualRes, balanceAnnualRes, cashAnnualRes,
-            incomeQuarterlyRes, balanceQuarterlyRes, cashQuarterlyRes,
-            analystRes, insiderRes, instHolderRes, surprisesRes
-        ] = await Promise.all([
+        // Wait for all requests to complete (ROBUSTNESS: Use allSettled so one failure doesn't crash everything)
+        // Order must match the array destructuring below
+        const promises = [
             keyMetricsPromise, dividendPromise, pricePromise, quotePromise,
             incomeStatementAnnualPromise, balanceSheetAnnualPromise, cashFlowAnnualPromise,
             incomeStatementQuarterlyPromise, balanceSheetQuarterlyPromise, cashFlowQuarterlyPromise,
             analystEstimatesPromise, insiderTradingPromise, institutionalHoldersPromise, earningsSurprisesPromise
-        ]);
+        ];
+
+        const results = await Promise.allSettled(promises);
+        
+        // Helper to extract value safely
+        const getRes = (index) => results[index].status === 'fulfilled' ? results[index].value : { ok: false };
+        
+        const metricsRes = getRes(0);
+        const dividendRes = getRes(1);
+        const priceRes = getRes(2);
+        const quoteResRaw = getRes(3);
+        
+        const incomeAnnualRes = getRes(4);
+        const balanceAnnualRes = getRes(5);
+        const cashAnnualRes = getRes(6);
+        
+        const incomeQuarterlyRes = getRes(7);
+        const balanceQuarterlyRes = getRes(8);
+        const cashQuarterlyRes = getRes(9);
+        
+        const analystRes = getRes(10);
+        const insiderRes = getRes(11);
+        const instHolderRes = getRes(12);
+        const surprisesRes = getRes(13);
+
+        // Log specific failures for debugging (optional)
+        results.forEach((r, i) => {
+            if (r.status === 'rejected') {
+                console.warn(`⚠️ Promise ${i} rejected for ${usedSymbol}:`, r.reason);
+            }
+        });
 
         // --- PROCESS KEY METRICS (non-fatal - continue with empty if fails) ---
         let metricsData = [];
@@ -374,21 +401,35 @@ export default async function handler(req, res) {
         }
 
         // --- PROCESS PRICES ---
+        // --- PROCESS PRICES ---
         if (!priceRes.ok) {
-            const errorText = await priceRes.text();
-            console.error(`❌ FMP Historical Price error for ${usedSymbol}: ${priceRes.status} - ${errorText.substring(0, 200)}`);
-            throw new Error(`FMP Price error: ${priceRes.status} ${priceRes.statusText}`);
+            // Non-fatal error: Log and proceed with empty prices
+            try {
+               const errorText = await priceRes.text();
+               console.warn(`⚠️ FMP Historical Price warning for ${usedSymbol}: ${priceRes.status} - ${errorText.substring(0, 200)} (continuing without price history)`);
+            } catch (e) {
+               console.warn(`⚠️ FMP Historical Price warning for ${usedSymbol}: ${priceRes.status} (continuing without price history)`);
+            }
         }
-        const priceData = await priceRes.json();
         
-        if (priceData && typeof priceData === 'object' && !Array.isArray(priceData) && priceData['Error Message']) {
-            console.error(`❌ FMP Historical Price Error: ${priceData['Error Message']}`);
-            throw new Error(`FMP Historical Price error: ${priceData['Error Message']}`);
+        let priceData = { historical: [] };
+        try {
+            if (priceRes.ok) {
+                const json = await priceRes.json();
+                if (json && typeof json === 'object' && !Array.isArray(json) && json['Error Message']) {
+                     console.warn(`⚠️ FMP Historical Price API returned error: ${json['Error Message']}`);
+                } else if (json) {
+                    priceData = json;
+                }
+            }
+        } catch (priceParseError) {
+            console.warn(`⚠️ FMP Historical Price JSON parse error: ${priceParseError.message}`);
         }
         
         if (!priceData || !priceData.historical || !Array.isArray(priceData.historical)) {
-            console.warn(`⚠️ FMP Historical Price returned invalid data for ${usedSymbol} - continuing with empty price history`);
-            priceData.historical = [];
+            // Already initialized to { historical: [] } above, but ensuring deep safety
+            if (!priceData) priceData = {};
+            if (!priceData.historical) priceData.historical = [];
         }
 
         // --- PROCESS QUOTE ---
@@ -449,12 +490,12 @@ export default async function handler(req, res) {
 
             return {
                 year: year,
-                priceHigh: parseFloat(high.toFixed(2)),
-                priceLow: parseFloat(low.toFixed(2)),
-                cashFlowPerShare: parseFloat((metric.operatingCashFlowPerShare || 0).toFixed(2)),
-                dividendPerShare: parseFloat(dps.toFixed(2)),
-                bookValuePerShare: parseFloat((metric.bookValuePerShare || 0).toFixed(2)),
-                earningsPerShare: parseFloat((metric.netIncomePerShare || 0).toFixed(2)),
+                priceHigh: parseFloat(Number(high).toFixed(2)),
+                priceLow: parseFloat(Number(low).toFixed(2)),
+                cashFlowPerShare: parseFloat(Number(metric.operatingCashFlowPerShare || 0).toFixed(2)),
+                dividendPerShare: parseFloat(Number(dps).toFixed(2)),
+                bookValuePerShare: parseFloat(Number(metric.bookValuePerShare || 0).toFixed(2)),
+                earningsPerShare: parseFloat(Number(metric.netIncomePerShare || 0).toFixed(2)),
                 isEstimate: false
             };
         }).sort((a, b) => a.year - b.year);
