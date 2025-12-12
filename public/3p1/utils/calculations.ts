@@ -195,26 +195,38 @@ export const autoFillAssumptionsFromFMPData = (
   // Helper pour calculer le CAGR sur 5 ans (ou max disponible si < 5 ans)
   const calculate5YearGrowth = (paramData: AnnualData[], metricKey: keyof AnnualData): number => {
     if (paramData.length < 2) return 0;
-    const sorted = [...paramData].sort((a, b) => a.year - b.year);
+    
+    // Trier par année et assurer typage numérique
+    const sorted = [...paramData].sort((a, b) => Number(a.year) - Number(b.year));
     const last = sorted[sorted.length - 1]; // Année N
+    const lastValue = Number(last[metricKey]);
+
+    if (lastValue <= 0) return 0; // Si la fin est négative, croissance indéfinie
+
+    const targetStartYear = Number(last.year) - 5;
     
-    // Chercher Année N-5
-    let start = sorted.find(d => d.year === last.year - 5);
-    
-    // Fallback: Si N-5 n'existe pas, prendre le plus ancien disponible (dans la limite de 5 recul)
-    if (!start) {
-        // Prendre le max disponible, mais idéalement on veut N-5. 
-        // Si on a moins de 5 ans de données, on prend le premier dispo.
-        start = sorted[0]; 
+    // Stratégie plus robuste: Chercher le point de départ VALIDE (> 0) le plus proche de N-5 (en reculant)
+    // On cherche d'abord exactement N-5, sinon N-6, etc.
+    // On veut un point au moins 5 ans en arrière pour avoir une tendance long terme
+    let startCandidate = sorted
+        .filter(d => Number(d.year) <= targetStartYear && Number(d[metricKey]) > 0)
+        .sort((a, b) => Number(b.year) - Number(a.year))[0]; // Prendre le plus récent parmi les anciens (le plus proche de N-5)
+
+    // Fallback: Si rien trouvé avant N-5, essayer de trouver n'importe quel point de départ positif valide antérieur à N
+    if (!startCandidate) {
+        startCandidate = sorted
+            .filter(d => Number(d.year) < Number(last.year) && Number(d[metricKey]) > 0)
+            .sort((a, b) => Number(a.year) - Number(b.year))[0]; // Prendre le plus ancien disponible positif
     }
 
-    const startValue = start[metricKey] as number;
-    const endValue = last[metricKey] as number;
-    const years = last.year - start.year;
+    if (!startCandidate) return 0; // Aucun historique positif trouvé
 
-    if (years < 1 || startValue <= 0 || endValue <= 0) return 0;
+    const startValue = Number(startCandidate[metricKey]);
+    const years = Number(last.year) - Number(startCandidate.year);
 
-    return calculateCAGR(startValue, endValue, years);
+    if (years < 1) return 0;
+
+    return calculateCAGR(startValue, lastValue, years);
   };
 
   // 1. Calculer Croissance 5 Ans (CAGR)

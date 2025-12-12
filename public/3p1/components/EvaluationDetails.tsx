@@ -281,6 +281,14 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
     };
   }, [sector, info?.sector]);
 
+  // Helper pour calculer la médiane (plus robuste aux outliers pour contexte historique)
+  const calculateMedian = (values: number[]): number => {
+    if (values.length === 0) return 0;
+    const sorted = [...values].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+  };
+
   // Projections 5 ans pour le titre
   const title5YearProjections = useMemo(() => {
     if (!calculateHistoricalRanges) return null;
@@ -312,12 +320,15 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
 
   const formatRange = (range: Range | null, suffix: string = '') => {
     if (!range) return 'N/A';
-    return `${range.min.toFixed(1)} - ${range.max.toFixed(1)}${suffix} (moy: ${range.avg.toFixed(1)}${suffix})`;
+    // Utiliser "méd" au lieu de "moy" car nous utilisons maintenant la médiane pour l'historique
+    // Pour "5 ans", c'est la valeur cible (qui est souvent la moyenne 5 ans), mais l'étiquette médiane est acceptable ou on peut différencier
+    // Pour simplifier l'UI, on indique "moy/méd" ou juste l'abbréviation neutre
+    return `${range.min.toFixed(1)} - ${range.max.toFixed(1)}${suffix} (méd: ${range.avg.toFixed(1)}${suffix})`;
   };
 
   const formatGrowthRange = (range: Range | null) => {
     if (!range) return 'N/A';
-    return `${range.min.toFixed(1)}% - ${range.max.toFixed(1)}% (moy: ${range.avg.toFixed(1)}%)`;
+    return `${range.min.toFixed(1)}% - ${range.max.toFixed(1)}% (méd: ${range.avg.toFixed(1)}%)`;
   };
 
   // Composant pour afficher les intervalles de référence sous une métrique
