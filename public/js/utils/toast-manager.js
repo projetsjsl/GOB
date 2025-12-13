@@ -8,7 +8,11 @@
 class ToastManager {
     constructor() {
         this.container = null;
-        this.init();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.init());
+        } else {
+            this.init();
+        }
     }
 
     init() {
@@ -26,7 +30,12 @@ class ToastManager {
                 gap: 12px;
                 pointer-events: none;
             `;
-            document.body.appendChild(this.container);
+            if (document.body) {
+                document.body.appendChild(this.container);
+            } else {
+                // Fallback should not happen due to DOMContentLoaded check, but safety first
+                console.warn('ToastManager: document.body not ready');
+            }
         } else {
             this.container = document.getElementById('toast-container');
         }
@@ -105,7 +114,9 @@ class ToastManager {
                 .toast-gold { border-left: 4px solid #d08f23; }
                 .toast-gold .toast-icon { color: #d08f23; }
             `;
-            document.head.appendChild(style);
+            if (document.head) {
+                document.head.appendChild(style);
+            }
         }
     }
 

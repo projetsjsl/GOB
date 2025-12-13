@@ -2041,19 +2041,19 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         // Fonction pour sauvegarder la configuration de population
         const savePopulateConfig = async (tabName, config) => {
             try {
+                const bodyData = {
+                    message: `Sauvegarder la configuration de population pour l'onglet ${tabName}`,
+                    context: {
+                        action: 'save_config',
+                        tab_name: tabName,
+                        config: config
+                    }
+                };
+
                 const response = await fetch('/api/emma-agent', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: `Sauvegarder la configuration de population pour l'onglet ${tabName}`,
-                        context: {
-                            action: 'save_config',
-                            tab_name: tabName,
-                            config: config
-                        }
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyData)
                 });
 
                 if (response.ok) {
