@@ -22666,143 +22666,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             // -----------------------------------------------------------
 
-            return (
-                <div className="space-y-6">
-                    {/* Header Specifique Marchés */}
-                    <div className={`p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden transition-all duration-300 ${isDarkMode 
-                        ? 'bg-gradient-to-br from-gray-900 to-blue-900 border border-blue-900/30' 
-                        : 'bg-white shadow-xl border border-gray-100'}`}>
-                        
-                        <div className="relative z-10">
-                            <h2 className={`text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r ${isDarkMode ? 'from-blue-200 to-blue-400' : 'from-blue-600 to-blue-800'}`}>
-                                Analyse de Marché
-                            </h2>
-                            <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
-                                Vue d'ensemble des indices, devises et indicateurs économiques
-                            </p>
-                        </div>
-
-                         {/* Navigation Secondaire Marchés */}
-                        <div className="flex bg-gray-100/50 dark:bg-black/20 p-1.5 rounded-xl gap-1 relative z-10">
-                            {[
-                                { id: 'overview', label: 'Global', icon: 'iconoir-globe' },
-                                { id: 'quotes', label: 'Cotations', icon: 'iconoir-list' },
-                                { id: 'calendar', label: 'Calendrier Eco', icon: 'iconoir-calendar' },
-                                { id: 'forex', label: 'Forex', icon: 'iconoir-currency' },
-                                { id: 'stocks', label: 'Heatmaps', icon: 'iconoir-view-grid' }
-                            ].map(tab => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveSubTab(tab.id)}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
-                                        activeSubTab === tab.id
-                                            ? isDarkMode 
-                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' 
-                                                : 'bg-blue-500 text-white shadow-lg shadow-blue-200'
-                                            : isDarkMode
-                                                ? 'text-gray-400 hover:text-white hover:bg-white/5'
-                                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
-                                    }`}
-                                >
-                                    <i className={`${tab.icon} text-lg`}></i>
-                                    <span className="hidden md:inline">{tab.label}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Contenu des sous-onglets */}
-                    {activeSubTab === 'overview' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
-                             {/* Yield Curve Section (Existing) */}
-                            <div className={`p-6 rounded-2xl ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white shadow-sm border border-gray-100'}`}>
-                                <div className="flex items-center justify-between mb-6">
-                                    <div>
-                                        <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Courbe des Taux</h3>
-                                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Comparaison des rendements obligataires</p>
-                                    </div>
-                                    <select
-                                        value={selectedCountry}
-                                        onChange={(e) => setSelectedCountry(e.target.value)}
-                                        className={`px-3 py-1.5 rounded-lg text-sm font-medium outline-none transition-colors cursor-pointer ${
-                                            isDarkMode
-                                                ? 'bg-gray-700 text-white border-gray-600 focus:border-blue-500'
-                                                : 'bg-gray-100 text-gray-900 border-gray-200 focus:border-blue-500'
-                                        } border-2`}
-                                    >
-                                        <option value="both">🇺🇸 US & 🇨🇦 Canada</option>
-                                        <option value="us">🇺🇸 États-Unis</option>
-                                        <option value="canada">🇨🇦 Canada</option>
-                                    </select>
-                                </div>
-                                <div className="h-[300px] relative">
-                                    {yieldLoading && (
-                                        <div className="absolute inset-0 flex items-center justify-center z-10 bg-opacity-50 bg-black rounded-lg">
-                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                                        </div>
-                                    )}
-                                    <canvas ref={yieldChartRef}></canvas>
-                                </div>
-                            </div>
-                            
-                            <div className={`p-6 rounded-2xl flex flex-col items-center justify-center ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white shadow-sm border border-gray-100'}`}>
-                                <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Utilisez les onglets pour explorer les marchés (Cotations, Calendriers, Forex, Heatmaps).</p>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeSubTab === 'quotes' && (
-                        <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                            <div className="tradingview-widget-container" ref={tradingViewMarketQuotesRef}></div>
-                        </div>
-                    )}
-
-                    {activeSubTab === 'calendar' && (
-                        <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                            <div className="tradingview-widget-container" ref={tradingViewEventsRef}></div>
-                        </div>
-                    )}
-
-                    {activeSubTab === 'forex' && (
-                         <div className="space-y-6">
-                            <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                <h3 className="p-4 text-lg font-bold">Heat Map Forex</h3>
-                                <div className="tradingview-widget-container" ref={tradingViewForexRef}></div>
-                            </div>
-                            <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                <h3 className="p-4 text-lg font-bold">Cross Rates</h3>
-                                <div className="tradingview-widget-container" ref={tradingViewCrossRatesRef}></div>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeSubTab === 'stocks' && (
-                         <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'} min-h-[700px]`}>
-                             <div className="p-4 border-b border-gray-700 flex gap-4">
-                                <button 
-                                    onClick={() => setHeatmapSource('USA')}
-                                    className={`px-4 py-2 rounded-lg text-sm font-bold ${heatmapSource === 'USA' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}
-                                >
-                                    USA
-                                </button>
-                                <button 
-                                    onClick={() => setHeatmapSource('TSX')}
-                                    className={`px-4 py-2 rounded-lg text-sm font-bold ${heatmapSource === 'TSX' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}
-                                >
-                                    Canada (TSX)
-                                </button>
-                             </div>
-                             {heatmapSource === 'USA' && 
-                                <div className="tradingview-widget-container h-[600px]" ref={tradingViewHeatmapRef}></div>
-                             }
-                             {heatmapSource === 'TSX' && 
-                                <div className="tradingview-widget-container h-[600px]" ref={tradingViewHeatmapTSXRef}></div>
-                             }
-                        </div>
-                    )}
-                </div>
-            );
-        };
 
 
             // Listes de filtres
@@ -23041,579 +22904,715 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             return (
                 <div className="space-y-6">
-                    {/* Header */}
-                    <div className="flex justify-between items-center">
-                        <h2 className={`text-2xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📰 Marchés & Économie</h2>
-                        <div className="flex gap-2">
-                            {/* Toggle Français */}
-                            <button
-                                onClick={() => setLocalFrenchOnly(!localFrenchOnly)}
-                                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${localFrenchOnly
-                                    ? 'bg-blue-600 text-white'
-                                    : (isDarkMode
-                                        ? 'bg-gray-800 hover:bg-gray-700 text-white'
-                                        : 'bg-gray-200 hover:bg-gray-300 text-gray-900')
+                    {/* Header Specifique Marchés */}
+                    <div className={`p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden transition-all duration-300 ${isDarkMode 
+                        ? 'bg-gradient-to-br from-gray-900 to-blue-900 border border-blue-900/30' 
+                        : 'bg-white shadow-xl border border-gray-100'}`}>
+                        
+                        <div className="relative z-10">
+                            <h2 className={`text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r ${isDarkMode ? 'from-blue-200 to-blue-400' : 'from-blue-600 to-blue-800'}`}>
+                                Analyse de Marché
+                            </h2>
+                            <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+                                Vue d'ensemble des indices, devises et indicateurs économiques
+                            </p>
+                        </div>
+
+                         {/* Navigation Secondaire Marchés */}
+                        <div className="flex bg-gray-100/50 dark:bg-black/20 p-1.5 rounded-xl gap-1 relative z-10">
+                            {[
+                                { id: 'overview', label: 'Global', icon: 'iconoir-globe' },
+                                { id: 'quotes', label: 'Cotations', icon: 'iconoir-list' },
+                                { id: 'calendar', label: 'Calendrier Eco', icon: 'iconoir-calendar' },
+                                { id: 'forex', label: 'Forex', icon: 'iconoir-currency' },
+                                { id: 'stocks', label: 'Heatmaps', icon: 'iconoir-view-grid' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveSubTab(tab.id)}
+                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                                        activeSubTab === tab.id
+                                            ? isDarkMode 
+                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' 
+                                                : 'bg-blue-500 text-white shadow-lg shadow-blue-200'
+                                            : isDarkMode
+                                                ? 'text-gray-400 hover:text-white hover:bg-white/5'
+                                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
                                     }`}
-                            >
-                                🇫🇷 Français {localFrenchOnly && '✓'}
-                            </button>
-                            <button
-                                onClick={fetchNews}
-                                disabled={loading}
-                                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 ${isDarkMode
-                                    ? 'bg-gray-800 hover:bg-gray-700 text-white'
-                                    : 'bg-gray-700 hover:bg-gray-600 text-white'
-                                    }`}
-                            >
-                                {loading ? '⏳ Actualisation...' : '🔄 Actualiser'}
-                            </button>
+                                >
+                                    <i className={`${tab.icon} text-lg`}></i>
+                                    <span className="hidden md:inline">{tab.label}</span>
+                                </button>
+                            ))}
                         </div>
                     </div>
 
-                    {lastUpdate && (
-                        <p className="text-gray-400 text-sm">
-                            Dernière mise à jour: {new Date(lastUpdate).toLocaleString('fr-FR')}
-                        </p>
+                    {/* Contenu des sous-onglets */}
+                    {activeSubTab === 'overview' && (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
+                             {/* Yield Curve Section (Existing) */}
+                            <div className={`p-6 rounded-2xl ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white shadow-sm border border-gray-100'}`}>
+                                <div className="flex items-center justify-between mb-6">
+                                    <div>
+                                        <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Courbe des Taux</h3>
+                                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Comparaison des rendements obligataires</p>
+                                    </div>
+                                    <select
+                                        value={selectedCountry}
+                                        onChange={(e) => setSelectedCountry(e.target.value)}
+                                        className={`px-3 py-1.5 rounded-lg text-sm font-medium outline-none transition-colors cursor-pointer ${
+                                            isDarkMode
+                                                ? 'bg-gray-700 text-white border-gray-600 focus:border-blue-500'
+                                                : 'bg-gray-100 text-gray-900 border-gray-200 focus:border-blue-500'
+                                        } border-2`}
+                                    >
+                                        <option value="both">🇺🇸 US & 🇨🇦 Canada</option>
+                                        <option value="us">🇺🇸 États-Unis</option>
+                                        <option value="canada">🇨🇦 Canada</option>
+                                    </select>
+                                </div>
+                                <div className="h-[300px] relative">
+                                    {yieldLoading && (
+                                        <div className="absolute inset-0 flex items-center justify-center z-10 bg-opacity-50 bg-black rounded-lg">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                                        </div>
+                                    )}
+                                    <canvas ref={yieldChartRef}></canvas>
+                                </div>
+                            </div>
+                            
+                            <div className={`p-6 rounded-2xl flex flex-col items-center justify-center ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white shadow-sm border border-gray-100'}`}>
+                                <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Utilisez les onglets pour explorer les marchés (Cotations, Calendriers, Forex, Heatmaps).</p>
+                            </div>
+                        </div>
                     )}
 
-                    {/* ===== WIDGETS TRADING VIEW VISUELS ===== */}
-                    <div className="grid grid-cols-1 gap-6 mt-6">
-                        {/* Market Overview Widget */}
-                        <ExpandableComponent title="Vue d'ensemble des Marchés (Temps Réel)" icon="📊" isDarkMode={isDarkMode}>
-                            <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${isDarkMode
-                                ? 'bg-gray-800/50 border-blue-500/30'
-                                : 'bg-white border-blue-400/40'
-                                }`}>
-                                <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                                    <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                        📊 Vue d'ensemble des Marchés (Temps Réel)
-                                    </h3>
-                                    <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        Indices majeurs, Forex, Crypto - Données en direct
-                                    </p>
-                                </div>
-                                <div ref={marketOverviewRef} style={{ height: '400px' }}></div>
-                            </div>
-                        </ExpandableComponent>
-
-                        {/* Stock Heatmap Widget */}
-                        <ExpandableComponent title="Heatmap Boursière" icon="🔥" isDarkMode={isDarkMode}>
-                            <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${isDarkMode
-                                ? 'bg-gray-800/50 border-green-500/30'
-                                : 'bg-white border-green-400/40'
-                                }`}>
-                                <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                                    <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                        🔥 Heatmap Boursière
-                                    </h3>
-                                    <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        Visualisation des performances par secteur
-                                    </p>
-                                </div>
-                                <div ref={heatmapRef} style={{ height: '500px' }}></div>
-                            </div>
-                        </ExpandableComponent>
-
-                        {/* Screener Widget - Top Gainers/Losers */}
-                        <ExpandableComponent title="Screener - Top Gainers & Losers" icon="🚀" isDarkMode={isDarkMode}>
-                            <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${isDarkMode
-                                ? 'bg-gray-800/50 border-purple-500/30'
-                                : 'bg-white border-purple-400/40'
-                                }`}>
-                                <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                                    <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                        🚀 Screener - Top Gainers & Losers
-                                    </h3>
-                                    <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        Actions les plus performantes et en baisse
-                                    </p>
-                                </div>
-                                <div ref={screenerRef} style={{ height: '500px' }}></div>
-                            </div>
-                        </ExpandableComponent>
-                    </div>
-
-                    {/* Statistiques */}
-                    <div className={`p-4 rounded-xl transition-colors duration-300 ${isDarkMode
-                        ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
-                        : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
-                        }`}>
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <div className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                    {localFilteredNews.length}
-                                </div>
-                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                    Articles filtrés
-                                </div>
-                            </div>
-                            <LucideIcon name="Newspaper" className={`w-12 h-12 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`} />
+                    {activeSubTab === 'quotes' && (
+                        <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                            <div className="tradingview-widget-container" ref={tradingViewMarketQuotesRef}></div>
                         </div>
-                    </div>
+                    )}
 
-                    {/* Filtres */}
-                    <div className={`p-6 rounded-xl transition-colors duration-300 ${isDarkMode
-                        ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
-                        : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
-                        }`}>
-                        <h3 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                            🔍 Filtres
-                        </h3>
+                    {activeSubTab === 'calendar' && (
+                        <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                            <div className="tradingview-widget-container" ref={tradingViewEventsRef}></div>
+                        </div>
+                    )}
 
-                        {/* Filtre Source */}
-                        <div className="mb-4">
-                            <label className={`text-sm font-semibold mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                📰 Source
-                            </label>
-                            <div className="flex flex-wrap gap-2">
+                    {activeSubTab === 'forex' && (
+                         <div className="space-y-6">
+                            <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                <h3 className="p-4 text-lg font-bold">Heat Map Forex</h3>
+                                <div className="tradingview-widget-container" ref={tradingViewForexRef}></div>
+                            </div>
+                            <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                <h3 className="p-4 text-lg font-bold">Cross Rates</h3>
+                                <div className="tradingview-widget-container" ref={tradingViewCrossRatesRef}></div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeSubTab === 'stocks' && (
+                         <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'} min-h-[700px]`}>
+                             <div className="p-4 border-b border-gray-700 flex gap-4">
+                                <button 
+                                    onClick={() => setHeatmapSource('USA')}
+                                    className={`px-4 py-2 rounded-lg text-sm font-bold ${heatmapSource === 'USA' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}
+                                >
+                                    USA
+                                </button>
+                                <button 
+                                    onClick={() => setHeatmapSource('TSX')}
+                                    className={`px-4 py-2 rounded-lg text-sm font-bold ${heatmapSource === 'TSX' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}
+                                >
+                                    Canada (TSX)
+                                </button>
+                             </div>
+                             {heatmapSource === 'USA' && 
+                                <div className="tradingview-widget-container h-[600px]" ref={tradingViewHeatmapRef}></div>
+                             }
+                             {heatmapSource === 'TSX' && 
+                                <div className="tradingview-widget-container h-[600px]" ref={tradingViewHeatmapTSXRef}></div>
+                             }
+                        </div>
+                    )}
+                    {activeSubTab === 'overview' && (
+                    <div className="space-y-6">
+                        {/* Header */}
+                        <div className="flex justify-between items-center">
+                            <h2 className={`text-2xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>📰 Marchés & Économie</h2>
+                            <div className="flex gap-2">
+                                {/* Toggle Français */}
                                 <button
-                                    onClick={() => setSelectedSource('all')}
-                                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedSource === 'all'
+                                    onClick={() => setLocalFrenchOnly(!localFrenchOnly)}
+                                    className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${localFrenchOnly
                                         ? 'bg-blue-600 text-white'
-                                        : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                        : (isDarkMode
+                                            ? 'bg-gray-800 hover:bg-gray-700 text-white'
+                                            : 'bg-gray-200 hover:bg-gray-300 text-gray-900')
                                         }`}
                                 >
-                                    Toutes
+                                    🇫🇷 Français {localFrenchOnly && '✓'}
                                 </button>
-                                {sources.map(source => (
+                                <button
+                                    onClick={fetchNews}
+                                    disabled={loading}
+                                    className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 ${isDarkMode
+                                        ? 'bg-gray-800 hover:bg-gray-700 text-white'
+                                        : 'bg-gray-700 hover:bg-gray-600 text-white'
+                                        }`}
+                                >
+                                    {loading ? '⏳ Actualisation...' : '🔄 Actualiser'}
+                                </button>
+                            </div>
+                        </div>
+
+                        {lastUpdate && (
+                            <p className="text-gray-400 text-sm">
+                                Dernière mise à jour: {new Date(lastUpdate).toLocaleString('fr-FR')}
+                            </p>
+                        )}
+
+                        {/* ===== WIDGETS TRADING VIEW VISUELS ===== */}
+                        <div className="grid grid-cols-1 gap-6 mt-6">
+                            {/* Market Overview Widget */}
+                            <ExpandableComponent title="Vue d'ensemble des Marchés (Temps Réel)" icon="📊" isDarkMode={isDarkMode}>
+                                <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${isDarkMode
+                                    ? 'bg-gray-800/50 border-blue-500/30'
+                                    : 'bg-white border-blue-400/40'
+                                    }`}>
+                                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                        <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                            📊 Vue d'ensemble des Marchés (Temps Réel)
+                                        </h3>
+                                        <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            Indices majeurs, Forex, Crypto - Données en direct
+                                        </p>
+                                    </div>
+                                    <div ref={marketOverviewRef} style={{ height: '400px' }}></div>
+                                </div>
+                            </ExpandableComponent>
+
+                            {/* Stock Heatmap Widget */}
+                            <ExpandableComponent title="Heatmap Boursière" icon="🔥" isDarkMode={isDarkMode}>
+                                <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${isDarkMode
+                                    ? 'bg-gray-800/50 border-green-500/30'
+                                    : 'bg-white border-green-400/40'
+                                    }`}>
+                                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                        <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                            🔥 Heatmap Boursière
+                                        </h3>
+                                        <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            Visualisation des performances par secteur
+                                        </p>
+                                    </div>
+                                    <div ref={heatmapRef} style={{ height: '500px' }}></div>
+                                </div>
+                            </ExpandableComponent>
+
+                            {/* Screener Widget - Top Gainers/Losers */}
+                            <ExpandableComponent title="Screener - Top Gainers & Losers" icon="🚀" isDarkMode={isDarkMode}>
+                                <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${isDarkMode
+                                    ? 'bg-gray-800/50 border-purple-500/30'
+                                    : 'bg-white border-purple-400/40'
+                                    }`}>
+                                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                        <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                            🚀 Screener - Top Gainers & Losers
+                                        </h3>
+                                        <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            Actions les plus performantes et en baisse
+                                        </p>
+                                    </div>
+                                    <div ref={screenerRef} style={{ height: '500px' }}></div>
+                                </div>
+                            </ExpandableComponent>
+                        </div>
+
+                        {/* Statistiques */}
+                        <div className={`p-4 rounded-xl transition-colors duration-300 ${isDarkMode
+                            ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
+                            : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
+                            }`}>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        {localFilteredNews.length}
+                                    </div>
+                                    <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        Articles filtrés
+                                    </div>
+                                </div>
+                                <LucideIcon name="Newspaper" className={`w-12 h-12 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`} />
+                            </div>
+                        </div>
+
+                        {/* Filtres */}
+                        <div className={`p-6 rounded-xl transition-colors duration-300 ${isDarkMode
+                            ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
+                            : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
+                            }`}>
+                            <h3 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                🔍 Filtres
+                            </h3>
+
+                            {/* Filtre Source */}
+                            <div className="mb-4">
+                                <label className={`text-sm font-semibold mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    📰 Source
+                                </label>
+                                <div className="flex flex-wrap gap-2">
                                     <button
-                                        key={source}
-                                        onClick={() => setSelectedSource(source)}
-                                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedSource === source
+                                        onClick={() => setSelectedSource('all')}
+                                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedSource === 'all'
                                             ? 'bg-blue-600 text-white'
                                             : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
                                             }`}
                                     >
-                                        {source}
+                                        Toutes
                                     </button>
-                                ))}
+                                    {sources.map(source => (
+                                        <button
+                                            key={source}
+                                            onClick={() => setSelectedSource(source)}
+                                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedSource === source
+                                                ? 'bg-blue-600 text-white'
+                                                : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                                }`}
+                                        >
+                                            {source}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Filtre Marché */}
-                        <div className="mb-4">
-                            <label className={`text-sm font-semibold mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                🌍 Marché
-                            </label>
-                            <div className="flex flex-wrap gap-2">
-                                <button
-                                    onClick={() => setSelectedMarket('all')}
-                                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedMarket === 'all'
-                                        ? 'bg-green-600 text-white'
-                                        : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
-                                        }`}
-                                >
-                                    Tous
-                                </button>
-                                {markets.map(market => (
+                            {/* Filtre Marché */}
+                            <div className="mb-4">
+                                <label className={`text-sm font-semibold mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    🌍 Marché
+                                </label>
+                                <div className="flex flex-wrap gap-2">
                                     <button
-                                        key={market}
-                                        onClick={() => setSelectedMarket(market)}
-                                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedMarket === market
+                                        onClick={() => setSelectedMarket('all')}
+                                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedMarket === 'all'
                                             ? 'bg-green-600 text-white'
                                             : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
                                             }`}
                                     >
-                                        {market}
+                                        Tous
                                     </button>
-                                ))}
+                                    {markets.map(market => (
+                                        <button
+                                            key={market}
+                                            onClick={() => setSelectedMarket(market)}
+                                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedMarket === market
+                                                ? 'bg-green-600 text-white'
+                                                : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                                }`}
+                                        >
+                                            {market}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Filtre Thème */}
-                        <div>
-                            <label className={`text-sm font-semibold mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                🏷️ Thématique
-                            </label>
-                            <div className="flex flex-wrap gap-2">
-                                <button
-                                    onClick={() => setSelectedTheme('all')}
-                                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedTheme === 'all'
-                                        ? 'bg-purple-600 text-white'
-                                        : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
-                                        }`}
-                                >
-                                    Toutes
-                                </button>
-                                {themes.map(theme => (
+                            {/* Filtre Thème */}
+                            <div>
+                                <label className={`text-sm font-semibold mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    🏷️ Thématique
+                                </label>
+                                <div className="flex flex-wrap gap-2">
                                     <button
-                                        key={theme}
-                                        onClick={() => setSelectedTheme(theme)}
-                                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedTheme === theme
+                                        onClick={() => setSelectedTheme('all')}
+                                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedTheme === 'all'
                                             ? 'bg-purple-600 text-white'
                                             : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
                                             }`}
                                     >
-                                        {theme}
+                                        Toutes
                                     </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Message informatif pour les résultats approximatifs */}
-                        {isApproximateMatch && localFilteredNews.length > 0 && (
-                            <div className={`mt-4 p-4 rounded-lg border-2 ${isDarkMode
-                                ? 'bg-yellow-900/20 border-yellow-600/50 text-yellow-200'
-                                : 'bg-yellow-50 border-yellow-300 text-yellow-800'
-                                }`}>
-                                <div className="flex items-start gap-3">
-                                    <span className="text-xl">💡</span>
-                                    <div>
-                                        <p className="font-semibold mb-1">Résultats similaires affichés</p>
-                                        <p className="text-sm">
-                                            Aucun résultat exact trouvé pour les filtres sélectionnés. Nous affichons des articles similaires qui pourraient vous intéresser.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Liste des nouvelles */}
-                    <div className="space-y-4">
-                        {localFilteredNews.length === 0 ? (
-                            <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                <LucideIcon name="AlertCircle" className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                                <p className="text-lg font-semibold mb-2">
-                                    {localFrenchOnly ? 'Aucun article en français trouvé' : 'Aucune nouvelle disponible'}
-                                </p>
-                                <p className="text-sm">
-                                    {localFrenchOnly
-                                        ? 'Essayez de désactiver le filtre français ou actualisez les données'
-                                        : 'Cliquez sur Actualiser pour charger les dernières nouvelles'}
-                                </p>
-                            </div>
-                        ) : (
-                            localFilteredNews.map((article, index) => {
-                                const newsIconData = getNewsIcon(article.title, article.description, article.sentiment);
-                                const credibility = getSourceCredibility(article.source?.name);
-
-                                return (
-                                    <div
-                                        key={index}
-                                        className={`p-6 rounded-xl transition-all duration-300 hover:scale-[1.01] ${isDarkMode
-                                            ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 hover:border-gray-600'
-                                            : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200 hover:border-gray-300'
-                                            }`}
-                                    >
-                                        <div className="flex items-start gap-4">
-                                            {/* Icône */}
-                                            <div className={`p-3 rounded-full transition-colors duration-300 ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-200/60'
-                                                }`}>
-                                                <LucideIcon name={newsIconData.icon} className={`w-6 h-6 ${newsIconData.color}`} />
-                                            </div>
-
-                                            {/* Contenu */}
-                                            <div className="flex-1">
-                                                {/* Titre */}
-                                                <h3 className={`font-bold text-lg mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                                    }`}>
-                                                    {article.url ? (
-                                                        <a
-                                                            href={article.url}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className={`hover:underline transition-colors duration-300 ${isDarkMode
-                                                                ? 'text-blue-300 hover:text-blue-200'
-                                                                : 'text-blue-600 hover:text-blue-700'
-                                                                }`}
-                                                        >
-                                                            {cleanText(article.title)}
-                                                        </a>
-                                                    ) : (
-                                                        cleanText(article.title)
-                                                    )}
-                                                </h3>
-
-                                                {/* Description */}
-                                                <p className={`text-base mb-4 leading-relaxed transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                    }`}>
-                                                    {cleanText(article.description)}
-                                                </p>
-
-                                                {/* Métadonnées */}
-                                                <div className="flex items-center gap-4 flex-wrap">
-                                                    {/* Source avec badge de crédibilité */}
-                                                    <div className={`flex items-center gap-2 px-3 py-1 rounded-full transition-colors duration-300 ${credibility >= 100
-                                                        ? 'bg-purple-500/20 text-purple-500 border border-purple-500/30'
-                                                        : credibility >= 85
-                                                            ? 'bg-blue-500/20 text-blue-500 border border-blue-500/30'
-                                                            : credibility >= 75
-                                                                ? 'bg-green-500/20 text-green-500 border border-green-500/30'
-                                                                : (isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-200 text-gray-700')
-                                                        }`}>
-                                                        {credibility >= 100 && <span className="text-xs">⭐</span>}
-                                                        <span className="text-xs font-semibold">{article.source?.name || 'Source inconnue'}</span>
-                                                    </div>
-
-                                                    {/* Date */}
-                                                    <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                        {new Date(article.publishedAt || article.publishedDate).toLocaleString('fr-FR')}
-                                                    </span>
-
-                                                    {/* Badge français */}
-                                                    {isFrenchArticle(article) && (
-                                                        <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-500 border border-blue-500/30">
-                                                            🇫🇷 FR
-                                                        </span>
-                                                    )}
-
-                                                    {/* Bouton Résumé avec Emma */}
-                                                    {article.url && (
-                                                        <button
-                                                            onClick={() => summarizeWithEmma(article.url, article.title)}
-                                                            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${isDarkMode
-                                                                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white'
-                                                                : 'bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white'
-                                                                }`}
-                                                        >
-                                                            <span className="flex items-center gap-1">
-                                                                <LucideIcon name="Brain" className="w-3 h-3" />
-                                                                Résumé avec Emma
-                                                            </span>
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })
-                        )}
-                    </div>
-
-                    {/* ===== COURBE DES TAUX (YIELD CURVE) - INTÉGRÉE ===== */}
-                    <div className="mt-8 pt-8 border-t border-gray-700">
-                        {/* En-tête Courbe des Taux */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                            <div className="flex justify-between items-center mb-4">
-                                <div>
-                                    <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                        📈 Courbe des Taux (Yield Curve)
-                                    </h2>
-                                    <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        Visualisation des taux obligataires US Treasury et Canada par maturité
-                                    </p>
-                                </div>
-                                <div className="flex gap-3">
-                                    <select
-                                        value={selectedCountry}
-                                        onChange={(e) => setSelectedCountry(e.target.value)}
-                                        className={`px-4 py-2 rounded-lg border transition-colors duration-300 ${isDarkMode
-                                            ? 'bg-gray-700 border-gray-600 text-white'
-                                            : 'bg-white border-gray-300 text-gray-900'
-                                            }`}
-                                    >
-                                        <option value="both">US + Canada</option>
-                                        <option value="us">US uniquement</option>
-                                        <option value="canada">Canada uniquement</option>
-                                    </select>
-                                    <button
-                                        onClick={async () => {
-                                            setYieldLoading(true);
-                                            setYieldError(null);
-                                            try {
-                                                const response = await fetch(`/api/yield-curve?country=${selectedCountry}`);
-                                                if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
-                                                const data = await response.json();
-                                                setYieldData(data);
-                                                setYieldLoading(false);
-                                            } catch (err) {
-                                                setYieldError(err.message);
-                                                setYieldLoading(false);
-                                            }
-                                        }}
-                                        disabled={yieldLoading}
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
-                                    >
-                                        {yieldLoading ? '🔄 Chargement...' : '🔄 Actualiser'}
-                                    </button>
+                                    {themes.map(theme => (
+                                        <button
+                                            key={theme}
+                                            onClick={() => setSelectedTheme(theme)}
+                                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedTheme === theme
+                                                ? 'bg-purple-600 text-white'
+                                                : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                                }`}
+                                        >
+                                            {theme}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
 
-                            {/* Indicateur de récession (spread 10Y-2Y) */}
-                            {yieldData?.data?.us?.spread_10y_2y !== undefined && (
-                                <div className={`p-4 rounded-lg border-l-4 ${yieldData.data.us.inverted
-                                    ? 'bg-red-50 border-red-500 dark:bg-red-900/20'
-                                    : 'bg-green-50 border-green-500 dark:bg-green-900/20'
+                            {/* Message informatif pour les résultats approximatifs */}
+                            {isApproximateMatch && localFilteredNews.length > 0 && (
+                                <div className={`mt-4 p-4 rounded-lg border-2 ${isDarkMode
+                                    ? 'bg-yellow-900/20 border-yellow-600/50 text-yellow-200'
+                                    : 'bg-yellow-50 border-yellow-300 text-yellow-800'
                                     }`}>
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex items-start gap-3">
+                                        <span className="text-xl">💡</span>
                                         <div>
-                                            <h3 className={`font-bold ${yieldData.data.us.inverted
-                                                ? 'text-red-800 dark:text-red-300'
-                                                : 'text-green-800 dark:text-green-300'
-                                                }`}>
-                                                {yieldData.data.us.inverted ? '⚠️ Courbe Inversée' : '✅ Courbe Normale'}
-                                            </h3>
-                                            <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                                Spread 10Y-2Y: <strong>{yieldData.data.us.spread_10y_2y.toFixed(2)}%</strong>
+                                            <p className="font-semibold mb-1">Résultats similaires affichés</p>
+                                            <p className="text-sm">
+                                                Aucun résultat exact trouvé pour les filtres sélectionnés. Nous affichons des articles similaires qui pourraient vous intéresser.
                                             </p>
-                                        </div>
-                                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                            {yieldData.data.us.inverted
-                                                ? 'Indicateur historique de récession potentielle'
-                                                : 'Conditions économiques normales'}
                                         </div>
                                     </div>
                                 </div>
                             )}
                         </div>
 
-                        {/* Graphique et données Yield Curve */}
-                        {yieldLoading && (
-                            <div className={`p-12 rounded-lg text-center transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                                <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Chargement des données...</p>
-                            </div>
-                        )}
+                        {/* Liste des nouvelles */}
+                        <div className="space-y-4">
+                            {localFilteredNews.length === 0 ? (
+                                <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    <LucideIcon name="AlertCircle" className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                                    <p className="text-lg font-semibold mb-2">
+                                        {localFrenchOnly ? 'Aucun article en français trouvé' : 'Aucune nouvelle disponible'}
+                                    </p>
+                                    <p className="text-sm">
+                                        {localFrenchOnly
+                                            ? 'Essayez de désactiver le filtre français ou actualisez les données'
+                                            : 'Cliquez sur Actualiser pour charger les dernières nouvelles'}
+                                    </p>
+                                </div>
+                            ) : (
+                                localFilteredNews.map((article, index) => {
+                                    const newsIconData = getNewsIcon(article.title, article.description, article.sentiment);
+                                    const credibility = getSourceCredibility(article.source?.name);
 
-                        {yieldError && (
-                            <div className={`p-6 rounded-lg border-l-4 border-red-500 ${isDarkMode ? 'bg-red-900/20' : 'bg-red-50'}`}>
-                                <h3 className={`font-bold mb-2 ${isDarkMode ? 'text-red-300' : 'text-red-800'}`}>❌ Erreur</h3>
-                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>{yieldError}</p>
-                            </div>
-                        )}
+                                    return (
+                                        <div
+                                            key={index}
+                                            className={`p-6 rounded-xl transition-all duration-300 hover:scale-[1.01] ${isDarkMode
+                                                ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 hover:border-gray-600'
+                                                : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200 hover:border-gray-300'
+                                                }`}
+                                        >
+                                            <div className="flex items-start gap-4">
+                                                {/* Icône */}
+                                                <div className={`p-3 rounded-full transition-colors duration-300 ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-200/60'
+                                                    }`}>
+                                                    <LucideIcon name={newsIconData.icon} className={`w-6 h-6 ${newsIconData.color}`} />
+                                                </div>
 
-                        {!yieldLoading && !yieldError && yieldData && (
-                            <>
-                                {/* Graphique */}
-                                {(yieldData.data?.us?.rates?.length > 0 || yieldData.data?.canada?.rates?.length > 0) ? (
-                                    <div className={`p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                        <div style={{ height: '400px', position: 'relative' }}>
-                                            <canvas ref={yieldChartRef} style={{ width: '100%', height: '100%' }}></canvas>
+                                                {/* Contenu */}
+                                                <div className="flex-1">
+                                                    {/* Titre */}
+                                                    <h3 className={`font-bold text-lg mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
+                                                        }`}>
+                                                        {article.url ? (
+                                                            <a
+                                                                href={article.url}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className={`hover:underline transition-colors duration-300 ${isDarkMode
+                                                                    ? 'text-blue-300 hover:text-blue-200'
+                                                                    : 'text-blue-600 hover:text-blue-700'
+                                                                    }`}
+                                                            >
+                                                                {cleanText(article.title)}
+                                                            </a>
+                                                        ) : (
+                                                            cleanText(article.title)
+                                                        )}
+                                                    </h3>
+
+                                                    {/* Description */}
+                                                    <p className={`text-base mb-4 leading-relaxed transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                        }`}>
+                                                        {cleanText(article.description)}
+                                                    </p>
+
+                                                    {/* Métadonnées */}
+                                                    <div className="flex items-center gap-4 flex-wrap">
+                                                        {/* Source avec badge de crédibilité */}
+                                                        <div className={`flex items-center gap-2 px-3 py-1 rounded-full transition-colors duration-300 ${credibility >= 100
+                                                            ? 'bg-purple-500/20 text-purple-500 border border-purple-500/30'
+                                                            : credibility >= 85
+                                                                ? 'bg-blue-500/20 text-blue-500 border border-blue-500/30'
+                                                                : credibility >= 75
+                                                                    ? 'bg-green-500/20 text-green-500 border border-green-500/30'
+                                                                    : (isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-200 text-gray-700')
+                                                            }`}>
+                                                            {credibility >= 100 && <span className="text-xs">⭐</span>}
+                                                            <span className="text-xs font-semibold">{article.source?.name || 'Source inconnue'}</span>
+                                                        </div>
+
+                                                        {/* Date */}
+                                                        <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                            {new Date(article.publishedAt || article.publishedDate).toLocaleString('fr-FR')}
+                                                        </span>
+
+                                                        {/* Badge français */}
+                                                        {isFrenchArticle(article) && (
+                                                            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-500 border border-blue-500/30">
+                                                                🇫🇷 FR
+                                                            </span>
+                                                        )}
+
+                                                        {/* Bouton Résumé avec Emma */}
+                                                        {article.url && (
+                                                            <button
+                                                                onClick={() => summarizeWithEmma(article.url, article.title)}
+                                                                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${isDarkMode
+                                                                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white'
+                                                                    : 'bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white'
+                                                                    }`}
+                                                            >
+                                                                <span className="flex items-center gap-1">
+                                                                    <LucideIcon name="Brain" className="w-3 h-3" />
+                                                                    Résumé avec Emma
+                                                                </span>
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                ) : (
-                                    <div className={`p-6 rounded-lg border-l-4 border-yellow-500 ${isDarkMode ? 'bg-yellow-900/20' : 'bg-yellow-50'}`}>
-                                        <h3 className={`font-bold mb-2 ${isDarkMode ? 'text-yellow-300' : 'text-yellow-800'}`}>⚠️ Aucune donnée disponible</h3>
-                                        <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                                            Les données de yield curve ne sont pas disponibles. Vérifiez que la clé API FRED_API_KEY est configurée.
+                                    );
+                                })
+                            )}
+                        </div>
+
+                        {/* ===== COURBE DES TAUX (YIELD CURVE) - INTÉGRÉE ===== */}
+                        <div className="mt-8 pt-8 border-t border-gray-700">
+                            {/* En-tête Courbe des Taux */}
+                            <div className={`p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                <div className="flex justify-between items-center mb-4">
+                                    <div>
+                                        <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                            📈 Courbe des Taux (Yield Curve)
+                                        </h2>
+                                        <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            Visualisation des taux obligataires US Treasury et Canada par maturité
                                         </p>
                                     </div>
-                                )}
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                                    {yieldData.data.us && (() => {
-                                        const formatRate = (value) => (value === null || value === undefined ? '—' : Number(value).toFixed(2));
-                                        return (
-                                            <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <div className="flex items-center gap-2 font-semibold">
-                                                        <span>🇺🇸</span>
-                                                        <span>US Treasury</span>
-                                                    </div>
-                                                    <span className="text-xs opacity-70">{yieldData.data.us.date || '—'}</span>
-                                                </div>
-                                                {yieldData.data.us.rates?.length ? (
-                                                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                                                        {yieldData.data.us.rates.map(rate => (
-                                                            <div key={`us-${rate.maturity}`} className="flex items-center justify-between border-b border-dashed border-gray-600/30 pb-1">
-                                                                <span className="uppercase tracking-tight">{rate.maturity}</span>
-                                                                <span className="font-semibold">{formatRate(rate.rate)}%</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                ) : (
-                                                    <p className="text-sm opacity-70">Données non disponibles.</p>
-                                                )}
-                                            </div>
-                                        );
-                                    })()}
-                                    {yieldData.data.canada && (() => {
-                                        const formatRate = (value) => (value === null || value === undefined ? '—' : Number(value).toFixed(2));
-                                        return (
-                                            <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <div className="flex items-center gap-2 font-semibold">
-                                                        <span>🇨🇦</span>
-                                                        <span>Obligations Canada</span>
-                                                    </div>
-                                                    <span className="text-xs opacity-70">{yieldData.data.canada.date || '—'}</span>
-                                                </div>
-                                                {yieldData.data.canada.rates?.length ? (
-                                                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                                                        {yieldData.data.canada.rates.map(rate => (
-                                                            <div key={`ca-${rate.maturity}`} className="flex items-center justify-between border-b border-dashed border-gray-600/30 pb-1">
-                                                                <span className="uppercase tracking-tight">{rate.maturity}</span>
-                                                                <span className="font-semibold">{formatRate(rate.rate)}%</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                ) : (
-                                                    <p className="text-sm opacity-70">Données non disponibles.</p>
-                                                )}
-                                            </div>
-                                        );
-                                    })()}
+                                    <div className="flex gap-3">
+                                        <select
+                                            value={selectedCountry}
+                                            onChange={(e) => setSelectedCountry(e.target.value)}
+                                            className={`px-4 py-2 rounded-lg border transition-colors duration-300 ${isDarkMode
+                                                ? 'bg-gray-700 border-gray-600 text-white'
+                                                : 'bg-white border-gray-300 text-gray-900'
+                                                }`}
+                                        >
+                                            <option value="both">US + Canada</option>
+                                            <option value="us">US uniquement</option>
+                                            <option value="canada">Canada uniquement</option>
+                                        </select>
+                                        <button
+                                            onClick={async () => {
+                                                setYieldLoading(true);
+                                                setYieldError(null);
+                                                try {
+                                                    const response = await fetch(`/api/yield-curve?country=${selectedCountry}`);
+                                                    if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
+                                                    const data = await response.json();
+                                                    setYieldData(data);
+                                                    setYieldLoading(false);
+                                                } catch (err) {
+                                                    setYieldError(err.message);
+                                                    setYieldLoading(false);
+                                                }
+                                            }}
+                                            disabled={yieldLoading}
+                                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+                                        >
+                                            {yieldLoading ? '🔄 Chargement...' : '🔄 Actualiser'}
+                                        </button>
+                                    </div>
                                 </div>
 
-                                {/* Tableau des maturités */}
-                                {yieldData.data.us && yieldData.data.canada && (
-                                    <div className={`p-6 rounded-lg transition-colors duration-300 mt-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                        <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>📊 Tableau des Maturités</h3>
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full text-xs">
-                                                <thead>
-                                                    <tr className={`border-b-2 ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                                                        <th className={`px-3 py-2 text-left font-bold text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Maturité</th>
-                                                        <th className={`px-3 py-2 text-right font-bold text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>🇺🇸 US Treasury (%)</th>
-                                                        <th className={`px-3 py-2 text-right font-bold text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>🇨🇦 Canada Bonds (%)</th>
-                                                        <th className={`px-3 py-2 text-right font-bold text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Écart (bps)</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {(() => {
-                                                        const maturityToMonths = (maturity) => {
-                                                            if (maturity.includes('M')) return parseInt(maturity) || 0;
-                                                            if (maturity.includes('Y')) return (parseInt(maturity) || 0) * 12;
-                                                            return 0;
-                                                        };
-                                                        const maturities = new Set();
-                                                        yieldData.data.us.rates.forEach(r => maturities.add(r.maturity));
-                                                        yieldData.data.canada.rates.forEach(r => maturities.add(r.maturity));
-                                                        return Array.from(maturities)
-                                                            .sort((a, b) => maturityToMonths(a) - maturityToMonths(b))
-                                                            .map((maturity, idx) => {
-                                                                const usRate = yieldData.data.us.rates.find(r => r.maturity === maturity);
-                                                                const caRate = yieldData.data.canada.rates.find(r => r.maturity === maturity);
-                                                                const spread = usRate && caRate ? ((usRate.rate - caRate.rate) * 100).toFixed(0) : null;
-                                                                return (
-                                                                    <tr key={maturity} className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} ${idx % 2 === 0 ? (isDarkMode ? 'bg-gray-700/30' : 'bg-gray-50') : ''}`}>
-                                                                        <td className={`px-3 py-2 font-semibold text-xs ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{maturity}</td>
-                                                                        <td className={`px-3 py-2 text-right text-xs ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{usRate ? usRate.rate.toFixed(2) : '-'}</td>
-                                                                        <td className={`px-3 py-2 text-right text-xs ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>{caRate ? caRate.rate.toFixed(2) : '-'}</td>
-                                                                        <td className={`px-3 py-2 text-right font-mono text-xs ${spread > 0 ? (isDarkMode ? 'text-green-400' : 'text-green-600') : spread < 0 ? (isDarkMode ? 'text-red-400' : 'text-red-600') : (isDarkMode ? 'text-gray-400' : 'text-gray-600')}`}>
-                                                                            {spread !== null ? (spread > 0 ? '+' : '') + spread : '-'}
-                                                                        </td>
-                                                                    </tr>
-                                                                );
-                                                            });
-                                                    })()}
-                                                </tbody>
-                                            </table>
+                                {/* Indicateur de récession (spread 10Y-2Y) */}
+                                {yieldData?.data?.us?.spread_10y_2y !== undefined && (
+                                    <div className={`p-4 rounded-lg border-l-4 ${yieldData.data.us.inverted
+                                        ? 'bg-red-50 border-red-500 dark:bg-red-900/20'
+                                        : 'bg-green-50 border-green-500 dark:bg-green-900/20'
+                                        }`}>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h3 className={`font-bold ${yieldData.data.us.inverted
+                                                    ? 'text-red-800 dark:text-red-300'
+                                                    : 'text-green-800 dark:text-green-300'
+                                                    }`}>
+                                                    {yieldData.data.us.inverted ? '⚠️ Courbe Inversée' : '✅ Courbe Normale'}
+                                                </h3>
+                                                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                    Spread 10Y-2Y: <strong>{yieldData.data.us.spread_10y_2y.toFixed(2)}%</strong>
+                                                </p>
+                                            </div>
+                                            <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                {yieldData.data.us.inverted
+                                                    ? 'Indicateur historique de récession potentielle'
+                                                    : 'Conditions économiques normales'}
+                                            </div>
                                         </div>
                                     </div>
                                 )}
+                            </div>
 
-                                {/* Note explicative */}
-                                <div className={`p-4 rounded-lg mt-6 ${isDarkMode ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'}`}>
-                                    <h4 className={`font-bold mb-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-800'}`}>💡 À propos de la courbe des taux</h4>
-                                    <ul className={`text-sm space-y-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                        <li>• <strong>Courbe normale:</strong> Les taux longs sont supérieurs aux taux courts (économie saine)</li>
-                                        <li>• <strong>Courbe inversée:</strong> Les taux courts dépassent les taux longs (possibilité de récession)</li>
-                                        <li>• <strong>Spread 10Y-2Y:</strong> Indicateur clé surveillé par les économistes et investisseurs</li>
-                                        <li>• <strong>Sources:</strong> FRED (Federal Reserve Economic Data) et FMP (Financial Modeling Prep)</li>
-                                    </ul>
+                            {/* Graphique et données Yield Curve */}
+                            {yieldLoading && (
+                                <div className={`p-12 rounded-lg text-center transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                                    <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Chargement des données...</p>
                                 </div>
-                            </>
-                        )}
-                    </div>
+                            )}
 
-                    {/* ===== CALENDRIER ÉCONOMIQUE - INTÉGRÉ ===== */}
-                    <div className="mt-8 pt-8 border-t border-gray-700">
-                        <EconomicCalendarTab />
+                            {yieldError && (
+                                <div className={`p-6 rounded-lg border-l-4 border-red-500 ${isDarkMode ? 'bg-red-900/20' : 'bg-red-50'}`}>
+                                    <h3 className={`font-bold mb-2 ${isDarkMode ? 'text-red-300' : 'text-red-800'}`}>❌ Erreur</h3>
+                                    <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>{yieldError}</p>
+                                </div>
+                            )}
+
+                            {!yieldLoading && !yieldError && yieldData && (
+                                <>
+                                    {/* Graphique */}
+                                    {(yieldData.data?.us?.rates?.length > 0 || yieldData.data?.canada?.rates?.length > 0) ? (
+                                        <div className={`p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                            <div style={{ height: '400px', position: 'relative' }}>
+                                                <canvas ref={yieldChartRef} style={{ width: '100%', height: '100%' }}></canvas>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className={`p-6 rounded-lg border-l-4 border-yellow-500 ${isDarkMode ? 'bg-yellow-900/20' : 'bg-yellow-50'}`}>
+                                            <h3 className={`font-bold mb-2 ${isDarkMode ? 'text-yellow-300' : 'text-yellow-800'}`}>⚠️ Aucune donnée disponible</h3>
+                                            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
+                                                Les données de yield curve ne sont pas disponibles. Vérifiez que la clé API FRED_API_KEY est configurée.
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                                        {yieldData.data.us && (() => {
+                                            const formatRate = (value) => (value === null || value === undefined ? '—' : Number(value).toFixed(2));
+                                            return (
+                                                <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <div className="flex items-center gap-2 font-semibold">
+                                                            <span>🇺🇸</span>
+                                                            <span>US Treasury</span>
+                                                        </div>
+                                                        <span className="text-xs opacity-70">{yieldData.data.us.date || '—'}</span>
+                                                    </div>
+                                                    {yieldData.data.us.rates?.length ? (
+                                                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                                                            {yieldData.data.us.rates.map(rate => (
+                                                                <div key={`us-${rate.maturity}`} className="flex items-center justify-between border-b border-dashed border-gray-600/30 pb-1">
+                                                                    <span className="uppercase tracking-tight">{rate.maturity}</span>
+                                                                    <span className="font-semibold">{formatRate(rate.rate)}%</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-sm opacity-70">Données non disponibles.</p>
+                                                    )}
+                                                </div>
+                                            );
+                                        })()}
+                                        {yieldData.data.canada && (() => {
+                                            const formatRate = (value) => (value === null || value === undefined ? '—' : Number(value).toFixed(2));
+                                            return (
+                                                <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <div className="flex items-center gap-2 font-semibold">
+                                                            <span>🇨🇦</span>
+                                                            <span>Obligations Canada</span>
+                                                        </div>
+                                                        <span className="text-xs opacity-70">{yieldData.data.canada.date || '—'}</span>
+                                                    </div>
+                                                    {yieldData.data.canada.rates?.length ? (
+                                                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                                                            {yieldData.data.canada.rates.map(rate => (
+                                                                <div key={`ca-${rate.maturity}`} className="flex items-center justify-between border-b border-dashed border-gray-600/30 pb-1">
+                                                                    <span className="uppercase tracking-tight">{rate.maturity}</span>
+                                                                    <span className="font-semibold">{formatRate(rate.rate)}%</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-sm opacity-70">Données non disponibles.</p>
+                                                    )}
+                                                </div>
+                                            );
+                                        })()}
+                                    </div>
+
+                                    {/* Tableau des maturités */}
+                                    {yieldData.data.us && yieldData.data.canada && (
+                                        <div className={`p-6 rounded-lg transition-colors duration-300 mt-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                            <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>📊 Tableau des Maturités</h3>
+                                            <div className="overflow-x-auto">
+                                                <table className="w-full text-xs">
+                                                    <thead>
+                                                        <tr className={`border-b-2 ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                                            <th className={`px-3 py-2 text-left font-bold text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Maturité</th>
+                                                            <th className={`px-3 py-2 text-right font-bold text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>🇺🇸 US Treasury (%)</th>
+                                                            <th className={`px-3 py-2 text-right font-bold text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>🇨🇦 Canada Bonds (%)</th>
+                                                            <th className={`px-3 py-2 text-right font-bold text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Écart (bps)</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {(() => {
+                                                            const maturityToMonths = (maturity) => {
+                                                                if (maturity.includes('M')) return parseInt(maturity) || 0;
+                                                                if (maturity.includes('Y')) return (parseInt(maturity) || 0) * 12;
+                                                                return 0;
+                                                            };
+                                                            const maturities = new Set();
+                                                            yieldData.data.us.rates.forEach(r => maturities.add(r.maturity));
+                                                            yieldData.data.canada.rates.forEach(r => maturities.add(r.maturity));
+                                                            return Array.from(maturities)
+                                                                .sort((a, b) => maturityToMonths(a) - maturityToMonths(b))
+                                                                .map((maturity, idx) => {
+                                                                    const usRate = yieldData.data.us.rates.find(r => r.maturity === maturity);
+                                                                    const caRate = yieldData.data.canada.rates.find(r => r.maturity === maturity);
+                                                                    const spread = usRate && caRate ? ((usRate.rate - caRate.rate) * 100).toFixed(0) : null;
+                                                                    return (
+                                                                        <tr key={maturity} className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} ${idx % 2 === 0 ? (isDarkMode ? 'bg-gray-700/30' : 'bg-gray-50') : ''}`}>
+                                                                            <td className={`px-3 py-2 font-semibold text-xs ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{maturity}</td>
+                                                                            <td className={`px-3 py-2 text-right text-xs ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{usRate ? usRate.rate.toFixed(2) : '-'}</td>
+                                                                            <td className={`px-3 py-2 text-right text-xs ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>{caRate ? caRate.rate.toFixed(2) : '-'}</td>
+                                                                            <td className={`px-3 py-2 text-right font-mono text-xs ${spread > 0 ? (isDarkMode ? 'text-green-400' : 'text-green-600') : spread < 0 ? (isDarkMode ? 'text-red-400' : 'text-red-600') : (isDarkMode ? 'text-gray-400' : 'text-gray-600')}`}>
+                                                                                {spread !== null ? (spread > 0 ? '+' : '') + spread : '-'}
+                                                                            </td>
+                                                                        </tr>
+                                                                    );
+                                                                });
+                                                        })()}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Note explicative */}
+                                    <div className={`p-4 rounded-lg mt-6 ${isDarkMode ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'}`}>
+                                        <h4 className={`font-bold mb-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-800'}`}>💡 À propos de la courbe des taux</h4>
+                                        <ul className={`text-sm space-y-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                            <li>• <strong>Courbe normale:</strong> Les taux longs sont supérieurs aux taux courts (économie saine)</li>
+                                            <li>• <strong>Courbe inversée:</strong> Les taux courts dépassent les taux longs (possibilité de récession)</li>
+                                            <li>• <strong>Spread 10Y-2Y:</strong> Indicateur clé surveillé par les économistes et investisseurs</li>
+                                            <li>• <strong>Sources:</strong> FRED (Federal Reserve Economic Data) et FMP (Financial Modeling Prep)</li>
+                                        </ul>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        {/* ===== CALENDRIER ÉCONOMIQUE - INTÉGRÉ ===== */}
+                        <div className="mt-8 pt-8 border-t border-gray-700">
+                            <EconomicCalendarTab />
+                        </div>
                     </div>
+                    )}
                 </div>
             );
         };
@@ -25609,6 +25608,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 )}
             </div>
         );
+    };
     };
 
     // Fonction fallback SUPPRIMÉE - Plus de contenu demo
