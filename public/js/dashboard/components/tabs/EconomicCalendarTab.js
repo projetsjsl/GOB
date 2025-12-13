@@ -782,7 +782,7 @@ const EconomicCalendarTab = () => {
                                             </div>
                                         ))}
                                     </div>
-                                ))}
+                                ));
                             })()}
                             
                             {/* Message si des événements sont masqués */}

@@ -280,3 +280,6 @@ curl "https://gobapps.com/api/fmp-company-data?symbol=TECK.B"
 
 
 
+
+
+

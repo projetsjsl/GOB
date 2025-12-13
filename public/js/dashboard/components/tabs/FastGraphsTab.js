@@ -9,6 +9,7 @@
 
 const { useState, useEffect } = React;
 
+const FastGraphsTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
     const [autoLogin, setAutoLogin] = useState(() => {
         return localStorage.getItem('fastgraphs_autologin') === 'true';
     });
