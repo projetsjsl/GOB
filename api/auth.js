@@ -72,6 +72,30 @@ export default async function handler(req, res) {
 
     const { action, username, password, ...payload } = req.body;
 
+    // Helper to try fetching from multiple potential user tables
+    const findUserInTables = async (username) => {
+        const TABLES = ['users', 'user_profiles', 'profiles'];
+        for (const table of TABLES) {
+            const { data, error } = await supabase.from(table).select('*').eq('username', username).single();
+            if (data && !error) return { user: data, table };
+            if (error && error.code !== 'PGRST116' && error.code !== '42P01') { 
+                // 42P01 is "undefined_table", ignore it to try next
+                console.warn(`Error querying ${table}:`, error.message);
+            }
+        }
+        return { user: null, table: null };
+    };
+
+    // Helper to list users from the first available table
+    const listAllUsers = async () => {
+        const TABLES = ['users', 'user_profiles', 'profiles'];
+        for (const table of TABLES) {
+            const { data, error } = await supabase.from(table).select('*');
+            if (!error && data) return data;
+        }
+        return [];
+    };
+
     // ============================================================
     // ACTION: LOGIN
     // ============================================================
@@ -82,17 +106,10 @@ export default async function handler(req, res) {
 
       const normalizedUsername = username.toLowerCase().trim();
 
-      // Fetch user from DB
-      const { data: user, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('username', normalizedUsername)
-        .single();
+      // Fetch user from DB (using flexible table lookup)
+      const { user } = await findUserInTables(normalizedUsername);
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('DB Login Error:', error);
-        return res.status(500).json({ success: false, error: 'Erreur base de données' });
-      }
+      // 1. User found in DB
 
       // 1. User found in DB
       if (user) {
@@ -174,11 +191,7 @@ export default async function handler(req, res) {
     if (action === 'validate') {
        if (!username) return res.status(400).json({ success: false });
        
-       const { data: user } = await supabase
-         .from('users')
-         .select('*')
-         .eq('username', username)
-         .single();
+       const { user } = await findUserInTables(username);
          
        if (!user) return res.status(401).json({ success: false });
        return res.status(200).json({ success: true, user });
@@ -193,29 +206,7 @@ export default async function handler(req, res) {
     // ============================================================
     const { admin_username } = req.body;
     
-    // Helper to try fetching from multiple potential user tables
-    const findUserInTables = async (username) => {
-        const TABLES = ['users', 'user_profiles', 'profiles'];
-        for (const table of TABLES) {
-            const { data, error } = await supabase.from(table).select('*').eq('username', username).single();
-            if (data && !error) return { user: data, table };
-            if (error && error.code !== 'PGRST116' && error.code !== '42P01') { 
-                // 42P01 is "undefined_table", ignore it to try next
-                console.warn(`Error querying ${table}:`, error.message);
-            }
-        }
-        return { user: null, table: null };
-    };
-
-    // Helper to list users from the first available table
-    const listAllUsers = async () => {
-        const TABLES = ['users', 'user_profiles', 'profiles'];
-        for (const table of TABLES) {
-            const { data, error } = await supabase.from(table).select('*');
-            if (!error && data) return data;
-        }
-        return [];
-    };
+    // Helpers findUserInTables and listAllUsers moved to top
 
     // Helper to verify admin
     const verifyAdmin = async (adminName) => {
