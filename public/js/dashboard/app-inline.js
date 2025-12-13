@@ -17576,7 +17576,38 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // ============================================
         // Composant JLab unifié avec navigation interne
         const JLabUnifiedTab = () => {
-            const [jlabView, setJlabView] = useState('portfolio'); // 'portfolio', 'watchlist', '3pour1', 'advanced'
+            // ⚠️ IMPORTANT: on persiste la vue pour éviter les resets "aléatoires"
+            // (ex: remount du composant, refresh, ou re-render complet après chargement 3p1)
+            const allowedJlabViews = ['portfolio', 'watchlist', '3pour1', 'advanced'];
+            const [jlabView, setJlabView] = useState(() => {
+                try {
+                    const saved = localStorage.getItem('gob-jlab-view');
+                    return allowedJlabViews.includes(saved) ? saved : 'portfolio';
+                } catch (e) {
+                    return 'portfolio';
+                }
+            }); // 'portfolio', 'watchlist', '3pour1', 'advanced'
+
+            // Ne charger l'app 3p1 qu'après la 1ère ouverture, puis la garder montée
+            const [hasOpened3p1, setHasOpened3p1] = useState(() => {
+                // Si la vue sauvegardée est déjà 3pour1, on considère qu'il faut la monter tout de suite
+                return jlabView === '3pour1';
+            });
+
+            useEffect(() => {
+                try {
+                    localStorage.setItem('gob-jlab-view', jlabView);
+                } catch (e) {
+                    // ignore
+                }
+                if (jlabView === '3pour1') {
+                    setHasOpened3p1(true);
+                    // Petit "nudge" pour forcer les layouts (charts) à se recalculer après affichage
+                    setTimeout(() => {
+                        try { window.dispatchEvent(new Event('resize')); } catch (e) { /* ignore */ }
+                    }, 50);
+                }
+            }, [jlabView]);
 
             return (
                 <div className="w-full h-full">
@@ -17694,7 +17725,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     <div className="w-full h-full">
                         {jlabView === 'portfolio' && <StocksNewsTab tickerSource="portfolio" />}
                         {jlabView === 'watchlist' && <StocksNewsTab tickerSource="watchlist" />}
-                        {jlabView === '3pour1' && <FinanceProTab />}
+
+                        {/* 3pour1: garder le composant monté après 1ère ouverture pour éviter un retour "blank" */}
+                        {hasOpened3p1 && (
+                            <div className={jlabView === '3pour1' ? 'block' : 'hidden'}>
+                                <FinanceProTab />
+                            </div>
+                        )}
+
                         {jlabView === 'advanced' && (
                             window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab /> : <div className="text-white p-4">Chargement de l'analyse avancée...</div>
                         )}
