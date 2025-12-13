@@ -17612,7 +17612,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             return (
                 <div className="w-full h-full">
                     {/* Navigation interne JLab */}
-                    <div className={`mb-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                    {/* IMPORTANT: z-index élevé pour rester cliquable même si 3p1 ouvre un overlay (ex: Help/GuideDialog en fixed z-[10000]) */}
+                    <div className={`relative z-[10001] mb-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                         <div className="flex gap-2 overflow-x-auto pb-1">
                             <button
                                 onClick={() => setJlabView('portfolio')}
@@ -17727,7 +17728,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         {jlabView === 'watchlist' && <StocksNewsTab tickerSource="watchlist" />}
 
                         {/* 3pour1: garder le composant monté après 1ère ouverture pour éviter un retour "blank" */}
-                        {hasOpened3p1 && (
+                        {(jlabView === '3pour1' || hasOpened3p1) && (
                             <div className={jlabView === '3pour1' ? 'block' : 'hidden'}>
                                 <FinanceProTab />
                             </div>
