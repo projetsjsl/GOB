@@ -25609,7 +25609,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             </div>
         );
     };
-    };
+
 
     // Fonction fallback SUPPRIMÉE - Plus de contenu demo
 
@@ -25686,5 +25686,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // DOM déjà chargé, monter immédiatement
         mountApp();
     }
+}
 
 
