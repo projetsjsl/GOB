@@ -20528,750 +20528,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
 
         // ============================================================================
-        // COMPOSANT CALENDRIER ÉCONOMIQUE AMÉLIORÉ
-        // ============================================================================
-        const EconomicCalendarTab = () => {
-            // Initialize with fallback data so component is never blank
-            const [activeSubTab, setActiveSubTab] = useState('economic');
-            const [calendarData, setCalendarData] = useState([{
-                date: 'Mon Oct 16',
-                events: [
-                    {
-                        time: '12:55 PM',
-                        currency: 'USD',
-                        impact: 2,
-                        event: 'Fed Paulson Speech',
-                        actual: 'N/A',
-                        forecast: 'N/A',
-                        previous: 'N/A'
-                    },
-                    {
-                        time: '08:30 AM',
-                        currency: 'USD',
-                        impact: 3,
-                        event: 'NY Empire State Manufacturing Index',
-                        actual: '10.70',
-                        forecast: '-1.00',
-                        previous: '-8.70'
-                    }
-                ]
-            }]);
-            const [loading, setLoading] = useState(false);
-            const [error, setError] = useState(null);
-            const [isRefreshing, setIsRefreshing] = useState(false);
-
-            // Finviz-style filters
-            const [searchQuery, setSearchQuery] = useState('');
-            const [filterImpact, setFilterImpact] = useState('all'); // all, 1, 2, 3
-            const [filterCurrency, setFilterCurrency] = useState('all');
-            const [filterTicker, setFilterTicker] = useState('all'); // For earnings/dividends
-            const [filterTickerGroup, setFilterTickerGroup] = useState('all'); // all, team, watchlist, both
-            const [dateRange, setDateRange] = useState('week'); // today, week, month
-            const [filterLargeCapOnly, setFilterLargeCapOnly] = useState(true); // Par défaut activé pour earnings
-
-            // Liste des tickers Large Cap (S&P 500 principaux)
-            const largeCapTickers = [
-                'AAPL', 'MSFT', 'GOOGL', 'GOOG', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK.B', 'UNH',
-                'JNJ', 'V', 'XOM', 'WMT', 'JPM', 'MA', 'PG', 'CVX', 'HD', 'ABBV',
-                'MRK', 'PEP', 'COST', 'AVGO', 'ADBE', 'TMO', 'CSCO', 'ACN', 'DHR', 'NFLX',
-                'VZ', 'ABT', 'NKE', 'CMCSA', 'WFC', 'PM', 'TXN', 'LIN', 'NEE', 'DIS',
-                'HON', 'QCOM', 'UPS', 'IBM', 'RTX', 'AMGN', 'T', 'SPGI', 'INTU', 'DE',
-                'AMAT', 'LOW', 'SBUX', 'GS', 'CAT', 'AXP', 'BKNG', 'ADP', 'SYK', 'TJX',
-                'GE', 'ISRG', 'VRTX', 'ZTS', 'MU', 'FI', 'C', 'MDT', 'GILD', 'REGN',
-                'BLK', 'ETN', 'SHW', 'KLAC', 'WM', 'APH', 'LRCX', 'ADI', 'CDNS', 'SNPS'
-            ];
-
-            // Team and Watchlist tickers
-            const [teamTickers, setTeamTickers] = useState([]);
-            const [watchlistTickers, setWatchlistTickers] = useState([]);
-
-            // Helper function for fallback data
-            const getFallbackData = () => {
-                return [{
-                    date: 'Mon Oct 16',
-                    events: [
-                        {
-                            time: '12:55 PM',
-                            currency: 'USD',
-                            impact: 2,
-                            event: 'Fed Paulson Speech',
-                            actual: 'N/A',
-                            forecast: 'N/A',
-                            previous: 'N/A'
-                        },
-                        {
-                            time: '08:30 AM',
-                            currency: 'USD',
-                            impact: 3,
-                            event: 'NY Empire State Manufacturing Index',
-                            actual: '10.70',
-                            forecast: '-1.00',
-                            previous: '-8.70'
-                        }
-                    ]
-                }];
-            };
-
-            // Debug: Log du chargement du composant
-            console.log('📅 EconomicCalendarTab chargé');
-            console.log('📊 Données init:', calendarData);
-            console.log('🔧 État du composant:', { activeSubTab, loading, error });
-
-            // Load team and watchlist tickers once on mount
-            React.useEffect(() => {
-                const loadTickers = async () => {
-                    try {
-                        // Try to fetch from API first
-                        const response = await fetch('/api/tickers-config');
-                        const data = await response.json();
-
-                        if (data.success) {
-                            setTeamTickers(data.team_tickers || []);
-                            console.log(`✅ Team tickers loaded: ${data.team_tickers?.length || 0}`);
-                        }
-                    } catch (error) {
-                        console.error('❌ Error loading team tickers:', error);
-                    }
-
-                    try {
-                        // Load watchlist from Supabase
-                        const response = await fetch('/api/supabase-watchlist');
-                        const data = await response.json();
-
-                        if (data.tickers && Array.isArray(data.tickers)) {
-                            setWatchlistTickers(data.tickers);
-                            console.log(`✅ Watchlist tickers loaded: ${data.tickers.length}`);
-                        }
-                    } catch (error) {
-                        console.error('❌ Error loading watchlist tickers:', error);
-                        // Fallback to localStorage
-                        const savedWatchlist = localStorage.getItem('dans-watchlist');
-                        if (savedWatchlist) {
-                            const tickers = JSON.parse(savedWatchlist);
-                            setWatchlistTickers(tickers);
-                            console.log(`📦 Watchlist loaded from localStorage: ${tickers.length}`);
-                        }
-                    }
-                };
-
-                loadTickers();
-            }, []);
-
-            // Charger les données au changement d'onglet
-            React.useEffect(() => {
-                fetchCalendarData();
-                // Reset ticker filters when switching tabs
-                setFilterTicker('all');
-                setFilterTickerGroup('all');
-                // Activer le filtre Large Cap par défaut pour earnings uniquement
-                setFilterLargeCapOnly(activeSubTab === 'earnings');
-            }, [activeSubTab]);
-
-            const fetchCalendarData = async () => {
-                console.log('🔄 fetchCalendarData appelé pour:', activeSubTab);
-                setLoading(true);
-                setError(null);
-
-                try {
-                    if (activeSubTab === 'earnings') {
-                        // Connect to dedicated Earnings Calendar API with fallback chain
-                        const response = await fetch('/api/calendar-earnings');
-                        const result = await response.json();
-
-                        if (result.success && result.data) {
-                            setCalendarData(result.data);
-                            console.log(`✅ ${result.data.length} earnings calendar days loaded from ${result.source}`);
-                            if (result.fallback_tried) {
-                                console.log('⚠️ Fallback sources tried:', result.fallback_tried);
-                            }
-                        } else {
-                            setError('Aucune donnée d\'earnings disponible');
-                            setCalendarData(getFallbackData());
-                        }
-                    } else if (activeSubTab === 'economic') {
-                        // Connect to dedicated Economic Calendar API with fallback chain
-                        const response = await fetch('/api/calendar-economic');
-                        const result = await response.json();
-
-                        if (result.success && result.data) {
-                            setCalendarData(result.data);
-                            console.log(`✅ ${result.data.length} economic calendar days loaded from ${result.source}`);
-                            if (result.fallback_tried) {
-                                console.log('⚠️ Fallback sources tried:', result.fallback_tried);
-                            }
-                        } else {
-                            setError('Aucune donnée économique disponible');
-                            setCalendarData(getFallbackData());
-                        }
-                    } else if (activeSubTab === 'dividends') {
-                        // Connect to dedicated Dividends Calendar API
-                        const response = await fetch('/api/calendar-dividends');
-                        const result = await response.json();
-
-                        if (result.success && result.data) {
-                            setCalendarData(result.data);
-                            console.log(`✅ ${result.data.length} dividend events loaded from ${result.source}`);
-                            if (result.fallback_tried) {
-                                console.log('⚠️ Fallback sources tried:', result.fallback_tried);
-                            }
-                        } else {
-                            setError('Aucune donnée de dividendes disponible');
-                            setCalendarData(getFallbackData());
-                        }
-                    } else {
-                        setCalendarData(getFallbackData());
-                    }
-                } catch (err) {
-                    console.error('❌ Erreur fetchCalendarData:', err);
-                    setError(`Impossible de charger les données: ${err.message}`);
-                    setCalendarData(getFallbackData());
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            const handleRefresh = async () => {
-                console.log('🔄 Actualisation du calendrier...');
-                setIsRefreshing(true);
-                await fetchCalendarData();
-                setTimeout(() => setIsRefreshing(false), 1000);
-            };
-
-            const getImpactBars = (impact) => {
-                const bars = [];
-                const colors = ['bg-yellow-500', 'bg-green-500', 'bg-red-500'];
-                for (let i = 0; i < 3; i++) {
-                    bars.push(
-                        <div
-                            key={i}
-                            className={`w-3 h-5 rounded-sm ${i < impact ? colors[i] : 'bg-gray-600'} ${i < impact ? 'opacity-100' : 'opacity-30'
-                                }`}
-                        />
-                    );
-                }
-                return bars;
-            };
-
-            const getValueColor = (actual, forecast) => {
-                if (actual === 'N/A' || forecast === 'N/A') return 'text-gray-400';
-                const actualNum = parseFloat(actual);
-                const forecastNum = parseFloat(forecast);
-                if (actualNum > forecastNum) return 'text-green-400';
-                if (actualNum < forecastNum) return 'text-red-400';
-                return 'text-gray-400';
-            };
-
-            const getCurrencyFlag = (currency) => {
-                const flags = {
-                    'USD': '🇺🇸',
-                    'EUR': '🇪🇺',
-                    'GBP': '🇬🇧',
-                    'JPY': '🇯🇵',
-                    'CAD': '🇨🇦',
-                    'AUD': '🇦🇺',
-                    'CHF': '🇨🇭',
-                    'CNY': '🇨🇳',
-                    'NZD': '🇳🇿'
-                };
-                return flags[currency] || '🌍';
-            };
-
-            // Helper: Extract ticker symbol from event name (for earnings/dividends)
-            const extractTicker = (eventName) => {
-                // Look for ticker pattern: "AAPL Earnings" or "MSFT Dividend"
-                const match = eventName.match(/^([A-Z]{1,5})\s/);
-                return match ? match[1] : null;
-            };
-
-            // Helper: Determine event category for sorting
-            const getEventCategory = (event) => {
-                // Extract ticker if available (for earnings/dividends)
-                const ticker = extractTicker(event.event);
-
-                // 1. Tickers d'équipe (priorité la plus haute)
-                if (ticker && teamTickers.includes(ticker)) {
-                    return 1; // Team tickers
-                }
-
-                // 2. Données Canada (CAD currency ou ticker .TO)
-                if (event.currency === 'CAD' || (ticker && ticker.endsWith('.TO'))) {
-                    return 2; // Canada
-                }
-
-                // 3. Données US (USD currency et ticker US)
-                if (event.currency === 'USD' && (!ticker || !ticker.endsWith('.TO'))) {
-                    return 3; // US
-                }
-
-                // 4. Autres données
-                return 4; // Other
-            };
-
-            // Helper: Sort events within a day
-            const sortEvents = (events) => {
-                return [...events].sort((a, b) => {
-                    // First sort by category (team → Canada → US → other)
-                    const categoryA = getEventCategory(a);
-                    const categoryB = getEventCategory(b);
-                    if (categoryA !== categoryB) {
-                        return categoryA - categoryB;
-                    }
-
-                    // Within same category, sort by time
-                    const timeA = a.time || '';
-                    const timeB = b.time || '';
-                    return timeA.localeCompare(timeB);
-                });
-            };
-
-            // Filter calendar data based on user selections (Finviz-style)
-            const filteredCalendarData = (Array.isArray(calendarData) ? calendarData : []).map(day => {
-                const filteredEvents = (Array.isArray(day.events) ? day.events : []).filter(event => {
-                    // Search query filter
-                    if (searchQuery && !event.event.toLowerCase().includes(searchQuery.toLowerCase())) {
-                        return false;
-                    }
-
-                    // Impact filter
-                    if (filterImpact !== 'all' && event.impact !== parseInt(filterImpact)) {
-                        return false;
-                    }
-
-                    // Currency filter
-                    if (filterCurrency !== 'all' && event.currency !== filterCurrency) {
-                        return false;
-                    }
-
-                    // Ticker filter (for earnings/dividends only)
-                    if (filterTicker !== 'all' && (activeSubTab === 'earnings' || activeSubTab === 'dividends')) {
-                        const ticker = extractTicker(event.event);
-                        if (!ticker || ticker !== filterTicker) {
-                            return false;
-                        }
-                    }
-
-                    // Ticker Group filter (Team/Watchlist/Both)
-                    if (filterTickerGroup !== 'all' && (activeSubTab === 'earnings' || activeSubTab === 'dividends')) {
-                        const ticker = extractTicker(event.event);
-                        if (!ticker) return false;
-
-                        const inTeam = teamTickers.includes(ticker);
-                        const inWatchlist = watchlistTickers.includes(ticker);
-
-                        if (filterTickerGroup === 'team' && !inTeam) {
-                            return false;
-                        }
-                        if (filterTickerGroup === 'watchlist' && !inWatchlist) {
-                            return false;
-                        }
-                        if (filterTickerGroup === 'both' && !(inTeam || inWatchlist)) {
-                            return false;
-                        }
-                    }
-
-                    // Large Cap filter (for earnings only, enabled by default)
-                    if (filterLargeCapOnly && activeSubTab === 'earnings') {
-                        const ticker = extractTicker(event.event);
-                        if (!ticker) return false;
-                        if (!largeCapTickers.includes(ticker)) {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                });
-
-                // Sort events: Team tickers → Canada → US → Other
-                const sortedEvents = sortEvents(filteredEvents);
-
-                return { ...day, events: sortedEvents };
-            }).filter(day => day.events.length > 0); // Remove days with no events
-
-            // Get unique currencies from data for filter dropdown
-            const availableCurrencies = [...new Set(
-                (Array.isArray(calendarData) ? calendarData : []).flatMap(day =>
-                    (Array.isArray(day.events) ? day.events : []).map(e => e.currency || 'USD')
-                )
-            )].sort();
-
-            // Get unique tickers from data for filter dropdown (earnings/dividends only)
-            const availableTickers = (activeSubTab === 'earnings' || activeSubTab === 'dividends')
-                ? [...new Set(
-                    (Array.isArray(calendarData) ? calendarData : []).flatMap(day =>
-                        (Array.isArray(day.events) ? day.events : []).map(e => extractTicker(e.event)).filter(t => t !== null)
-                    )
-                )].sort()
-                : [];
-
-            return (
-                <div className={`${isDarkMode ? 'bg-gray-900 text-gray-200' : 'bg-white text-gray-900'} p-6`}>
-                    <div className="max-w-full">
-                        {/* Header */}
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                                <div className="text-2xl">📅</div>
-                                <h2 className="text-2xl font-bold">Calendrier financier</h2>
-                            </div>
-                            <button
-                                onClick={handleRefresh}
-                                disabled={loading || isRefreshing}
-                                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm ${loading || isRefreshing
-                                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                    : 'bg-gray-800 hover:bg-gray-700 text-white'
-                                    }`}
-                            >
-                                <div className={`w-4 h-4 ${loading || isRefreshing ? 'animate-spin' : ''}`}>
-                                    🔄
-                                </div>
-                                Actualiser
-                            </button>
-                        </div>
-
-                        {/* Finviz-Style Filter Bar */}
-                        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-4 mb-4`}>
-                            <div className={`grid grid-cols-1 gap-3 ${activeSubTab === 'earnings' || activeSubTab === 'dividends'
-                                ? 'md:grid-cols-6'
-                                : 'md:grid-cols-4'
-                                }`}>
-                                {/* Search Box */}
-                                <div className="col-span-1 md:col-span-2">
-                                    <input
-                                        type="text"
-                                        placeholder="🔍 Rechercher un événement..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className={`w-full px-3 py-2 rounded-md text-sm ${isDarkMode
-                                            ? 'bg-gray-700 text-white border-gray-600'
-                                            : 'bg-white text-gray-900 border-gray-300'
-                                            } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                                    />
-                                </div>
-
-                                {/* Ticker Group Filter - Only for Earnings/Dividends */}
-                                {(activeSubTab === 'earnings' || activeSubTab === 'dividends') && (
-                                    <div>
-                                        <select
-                                            value={filterTickerGroup}
-                                            onChange={(e) => {
-                                                setFilterTickerGroup(e.target.value);
-                                                // Reset individual ticker filter when changing group
-                                                if (e.target.value !== 'all') {
-                                                    setFilterTicker('all');
-                                                }
-                                            }}
-                                            className={`w-full px-3 py-2 rounded-md text-sm ${isDarkMode
-                                                ? 'bg-gray-700 text-white border-gray-600'
-                                                : 'bg-white text-gray-900 border-gray-300'
-                                                } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                                        >
-                                            <option value="all">Tous les titres</option>
-                                            <option value="team">👥 Équipe ({teamTickers.length})</option>
-                                            <option value="watchlist">⭐ Liste de suivi ({watchlistTickers.length})</option>
-                                            <option value="both">🎯 Équipe + Liste ({teamTickers.length + watchlistTickers.length})</option>
-                                        </select>
-                                    </div>
-                                )}
-
-                                {/* Ticker Filter - Only for Earnings/Dividends */}
-                                {(activeSubTab === 'earnings' || activeSubTab === 'dividends') && (
-                                    <div>
-                                        <select
-                                            value={filterTicker}
-                                            onChange={(e) => setFilterTicker(e.target.value)}
-                                            disabled={filterTickerGroup !== 'all'}
-                                            className={`w-full px-3 py-2 rounded-md text-sm ${isDarkMode
-                                                ? 'bg-gray-700 text-white border-gray-600'
-                                                : 'bg-white text-gray-900 border-gray-300'
-                                                } border focus:outline-none focus:ring-2 focus:ring-blue-500 ${filterTickerGroup !== 'all' ? 'opacity-50 cursor-not-allowed' : ''
-                                                }`}
-                                        >
-                                            <option value="all">Sélectionner un ticker ({availableTickers.length})</option>
-                                            {availableTickers.map(ticker => (
-                                                <option key={ticker} value={ticker}>
-                                                    {ticker}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                )}
-
-                                {/* Impact Filter */}
-                                <div>
-                                    <select
-                                        value={filterImpact}
-                                        onChange={(e) => setFilterImpact(e.target.value)}
-                                        className={`w-full px-3 py-2 rounded-md text-sm ${isDarkMode
-                                            ? 'bg-gray-700 text-white border-gray-600'
-                                            : 'bg-white text-gray-900 border-gray-300'
-                                            } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                                    >
-                                        <option value="all">Tous les impacts</option>
-                                        <option value="3">🔴 Impact élevé</option>
-                                        <option value="2">🟠 Impact moyen</option>
-                                        <option value="1">🟡 Impact faible</option>
-                                    </select>
-                                </div>
-
-                                {/* Currency Filter */}
-                                <div>
-                                    <select
-                                        value={filterCurrency}
-                                        onChange={(e) => setFilterCurrency(e.target.value)}
-                                        className={`w-full px-3 py-2 rounded-md text-sm ${isDarkMode
-                                            ? 'bg-gray-700 text-white border-gray-600'
-                                            : 'bg-white text-gray-900 border-gray-300'
-                                            } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                                    >
-                                        <option value="all">Toutes les devises</option>
-                                        {availableCurrencies.map(curr => (
-                                            <option key={curr} value={curr}>
-                                                {getCurrencyFlag(curr)} {curr}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                {/* Large Cap Filter - Only for Earnings */}
-                                {activeSubTab === 'earnings' && (
-                                    <div className="flex items-center">
-                                        <label className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm cursor-pointer transition-colors ${isDarkMode
-                                            ? filterLargeCapOnly ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                                            : filterLargeCapOnly ? 'bg-blue-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
-                                            } border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
-                                            <input
-                                                type="checkbox"
-                                                checked={filterLargeCapOnly}
-                                                onChange={(e) => setFilterLargeCapOnly(e.target.checked)}
-                                                className="w-4 h-4 cursor-pointer"
-                                            />
-                                            <span className="font-medium">Grandes capitalisations seulement</span>
-                                        </label>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Active Filters Display */}
-                            {(searchQuery || filterImpact !== 'all' || filterCurrency !== 'all' || filterTicker !== 'all' || filterTickerGroup !== 'all' || (activeSubTab === 'earnings' && filterLargeCapOnly)) && (
-                                <div className="flex flex-wrap gap-2 mt-3">
-                                    <span className="text-xs text-gray-400">Filtres actifs :</span>
-                                    {activeSubTab === 'earnings' && filterLargeCapOnly && (
-                                        <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
-                                            📊 Grandes capitalisations
-                                        </span>
-                                    )}
-                                    {searchQuery && (
-                                        <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-gray-900 text-gray-200' : 'bg-gray-700 text-gray-200'}`}>
-                                            Recherche : "{searchQuery}"
-                                        </span>
-                                    )}
-                                    {filterTickerGroup !== 'all' && (
-                                        <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-cyan-900 text-cyan-200' : 'bg-cyan-100 text-cyan-800'}`}>
-                                            {filterTickerGroup === 'team' ? '👥 Tickers équipe' :
-                                                filterTickerGroup === 'watchlist' ? '⭐ Tickers liste de suivi' :
-                                                    '🎯 Équipe + Liste de suivi'}
-                                        </span>
-                                    )}
-                                    {filterTicker !== 'all' && (
-                                        <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-purple-900 text-purple-200' : 'bg-purple-100 text-purple-800'}`}>
-                                            Ticker : {filterTicker}
-                                        </span>
-                                    )}
-                                    {filterImpact !== 'all' && (
-                                        <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800'}`}>
-                                            Impact : {filterImpact === '3' ? 'Élevé' : filterImpact === '2' ? 'Moyen' : 'Faible'}
-                                        </span>
-                                    )}
-                                    {filterCurrency !== 'all' && (
-                                        <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800'}`}>
-                                            Devise : {filterCurrency}
-                                        </span>
-                                    )}
-                                    <button
-                                        onClick={() => {
-                                            setSearchQuery('');
-                                            setFilterImpact('all');
-                                            setFilterCurrency('all');
-                                            setFilterTicker('all');
-                                            setFilterTickerGroup('all');
-                                            setFilterLargeCapOnly(activeSubTab === 'earnings'); // Réinitialiser à la valeur par défaut selon l'onglet
-                                        }}
-                                        className="text-xs text-red-400 hover:text-red-300 underline"
-                                    >
-                                        Réinitialiser
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Message d'erreur */}
-                        {error && (
-                            <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded-lg mb-4 text-sm">
-                                ⚠️ {error}
-                            </div>
-                        )}
-
-                        {/* Onglets internes */}
-                        <div className="flex gap-0 mb-4 border-b border-gray-700">
-                            <button
-                                onClick={() => setActiveSubTab('economic')}
-                                className={`px-4 py-2 font-medium transition-colors text-sm ${activeSubTab === 'economic'
-                                    ? 'bg-gray-800 text-white'
-                                    : `${isDarkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`
-                                    }`}
-                            >
-                                Économique
-                            </button>
-                            <button
-                                onClick={() => setActiveSubTab('earnings')}
-                                className={`px-4 py-2 font-medium transition-colors text-sm ${activeSubTab === 'earnings'
-                                    ? 'bg-gray-800 text-white'
-                                    : `${isDarkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`
-                                    }`}
-                            >
-                                Earnings
-                            </button>
-                            <button
-                                onClick={() => setActiveSubTab('dividends')}
-                                className={`px-4 py-2 font-medium transition-colors text-sm ${activeSubTab === 'dividends'
-                                    ? 'bg-gray-800 text-white'
-                                    : `${isDarkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`
-                                    }`}
-                            >
-                                Dividendes
-                            </button>
-                        </div>
-
-                        {/* Contenu */}
-                        {loading ? (
-                            <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-8 text-center`}>
-                                <div className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-3">🔄</div>
-                                <p className="text-gray-400 text-sm">Loading data...</p>
-                            </div>
-                        ) : filteredCalendarData.length === 0 ? (
-                            <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-8 text-center`}>
-                                <p className="text-gray-400 text-sm">
-                                    {calendarData.length === 0 ? 'No data available' : 'No events match your filters'}
-                                </p>
-                                {calendarData.length > 0 && (
-                                    <button
-                                        onClick={() => {
-                                            setSearchQuery('');
-                                            setFilterImpact('all');
-                                            setFilterCurrency('all');
-                                        }}
-                                        className="mt-3 text-blue-400 hover:text-blue-300 underline text-sm"
-                                    >
-                                        Clear filters
-                                    </button>
-                                )}
-                            </div>
-                        ) : (
-                            <ExpandableComponent title="Calendrier financier" icon="📅" isDarkMode={isDarkMode}>
-                                <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg overflow-hidden shadow-lg`}>
-                                    {filteredCalendarData.map((day, dayIndex) => (
-                                        <div key={dayIndex} className="border-b border-gray-700 last:border-b-0">
-                                            {/* Day Header */}
-                                            <div className={`${isDarkMode ? 'bg-gray-750' : 'bg-gray-200'} px-4 py-2 font-semibold text-sm`}>
-                                                {day.date}
-                                            </div>
-
-                                            {/* Column Headers - Finviz Style */}
-                                            {dayIndex === 0 && (
-                                                <div className={`grid grid-cols-[80px_1fr_80px_60px_90px_90px_90px] gap-3 px-4 py-3 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-300'
-                                                    } text-xs font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} border-b-2 ${isDarkMode ? 'border-gray-600' : 'border-gray-400'
-                                                    }`}>
-                                                    <div>TIME</div>
-                                                    <div>EVENT</div>
-                                                    <div>IMPACT</div>
-                                                    <div>FOR</div>
-                                                    <div className="text-center">ACTUAL</div>
-                                                    <div className="text-center">FORECAST</div>
-                                                    <div className="text-center">PREVIOUS</div>
-                                                </div>
-                                            )}
-
-                                            {/* Events - Finviz Style */}
-                                            {day.events.map((event, eventIndex) => (
-                                                <div
-                                                    key={eventIndex}
-                                                    className={`grid grid-cols-[80px_1fr_80px_60px_90px_90px_90px] gap-3 px-4 py-3 ${isDarkMode ? 'hover:bg-gray-750' : 'hover:bg-gray-200'
-                                                        } transition-colors border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-300'
-                                                        } last:border-b-0 items-center text-sm`}
-                                                >
-                                                    <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} font-mono text-xs`}>
-                                                        {event.time}
-                                                    </div>
-                                                    <div className="font-medium flex items-center gap-2" title={event.event}>
-                                                        <span className="text-lg">{getCurrencyFlag(event.currency)}</span>
-                                                        <span className={`${isDarkMode ? 'text-gray-200' : 'text-gray-800'} truncate`}>
-                                                            {event.event}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex gap-1">{getImpactBars(event.impact)}</div>
-                                                    <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} font-semibold text-xs`}>
-                                                        {event.currency}
-                                                    </div>
-                                                    <div className={`text-center font-bold ${getValueColor(event.actual, event.forecast)}`}>
-                                                        {event.actual}
-                                                    </div>
-                                                    <div className={`text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                        {event.forecast}
-                                                    </div>
-                                                    <div className={`text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                        {event.previous}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ))}
-                                </div>
-                            </ExpandableComponent>
-                        )}
-
-                        {/* Footer Info - Finviz Style */}
-                        <div className={`mt-4 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-4`}>
-                            <div className="flex flex-wrap items-center gap-4 text-xs">
-                                <div className="flex items-center gap-2">
-                                    <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        Showing {filteredCalendarData.reduce((acc, day) => acc + day.events.length, 0)} events
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}">Impact:</span>
-                                    <div className="flex items-center gap-4">
-                                        {/* Mobile Menu Button - Visible ONLY on mobile */}
-                                        <button
-                                            onClick={() => setMobileMenuOpen(true)}
-                                            className="md:hidden p-2 -ml-2 text-gray-400 hover:text-white"
-                                        >
-                                            <i className="iconoir-menu text-2xl"></i>
-                                        </button>
-
-                                        <div className="flex items-center gap-1">
-                                            <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
-                                            <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>High</span>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <div className="w-3 h-3 bg-green-500 rounded-sm"></div>
-                                        <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Medium</span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <div className="w-3 h-3 bg-yellow-500 rounded-sm"></div>
-                                        <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Low</span>
-                                    </div>
-                                </div>
-                                <div className={`ml-auto ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} text-xs italic`}>
-                                    Data powered by FMP API
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        // ============================================================================
         // COMPOSANT CALENDRIER INVESTING.COM
         // ============================================================================
         const InvestingCalendarTab = () => {
@@ -23093,6 +22349,169 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 return 0;
             };
 
+            // -----------------------------------------------------------
+            // MIGRATED WIDGETS FROM INVESTING CALENDAR
+            // -----------------------------------------------------------
+            const tradingViewForexRef = useRef(null);
+            const tradingViewCrossRatesRef = useRef(null);
+            const tradingViewEventsRef = useRef(null);
+            const tradingViewHeatmapRef = useRef(null);
+            const tradingViewHeatmapTSXRef = useRef(null);
+            const tradingViewMarketQuotesRef = useRef(null);
+            
+            // Sub-tabs for Markets Economy
+            const [activeSubTab, setActiveSubTab] = useState('overview');
+            // Sub-state for Heatmap source
+            const [heatmapSource, setHeatmapSource] = useState('USA');
+
+            // Charger le script TradingView Events (Economic Calendar)
+            useEffect(() => {
+                if (activeSubTab !== 'calendar' || !tradingViewEventsRef.current) return;
+                const container = tradingViewEventsRef.current;
+                container.innerHTML = '';
+                const widgetDiv = document.createElement('div');
+                widgetDiv.className = 'tradingview-widget-container__widget';
+                container.appendChild(widgetDiv);
+                const script = document.createElement('script');
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
+                script.async = true;
+                script.innerHTML = JSON.stringify({
+                    colorTheme: isDarkMode ? 'dark' : 'light',
+                    isTransparent: false,
+                    locale: 'fr',
+                    countryFilter: 'ar,au,br,ca,cn,fr,de,in,id,it,jp,kr,mx,ru,sa,za,tr,gb,us,eu',
+                    importanceFilter: '-1,0,1',
+                    width: '100%',
+                    height: 600
+                });
+                container.appendChild(script);
+                return () => { if (container) container.innerHTML = ''; };
+            }, [activeSubTab, isDarkMode]);
+
+             // Charger le script TradingView Forex Heat Map + Cross Rates
+            useEffect(() => {
+                if (activeSubTab !== 'forex') return;
+                
+                // Heat Map
+                if (tradingViewForexRef.current) {
+                    const container = tradingViewForexRef.current;
+                    container.innerHTML = '';
+                    const widgetDiv = document.createElement('div');
+                    widgetDiv.className = 'tradingview-widget-container__widget';
+                    container.appendChild(widgetDiv);
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        colorTheme: isDarkMode ? 'dark' : 'light',
+                        isTransparent: true,
+                        locale: 'fr',
+                        currencies: ['EUR', 'USD', 'JPY', 'GBP', 'CHF', 'AUD', 'CAD', 'CNY'],
+                        width: '100%',
+                        height: 500
+                    });
+                    container.appendChild(script);
+                }
+
+                // Cross Rates
+                if (tradingViewCrossRatesRef.current) {
+                    const container = tradingViewCrossRatesRef.current;
+                    container.innerHTML = '';
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-forex-cross-rates.js';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        colorTheme: isDarkMode ? 'dark' : 'light',
+                        isTransparent: false,
+                        locale: 'fr',
+                        currencies: ['EUR', 'USD', 'JPY', 'GBP', 'CHF', 'AUD', 'CAD', 'NZD', 'CNY'],
+                        width: '100%',
+                        height: 400
+                    });
+                    container.appendChild(script);
+                }
+            }, [activeSubTab, isDarkMode]);
+
+            // Charger le script TradingView Stock Heatmap (USA or TSX)
+            useEffect(() => {
+                if (activeSubTab !== 'stocks') return;
+                
+                const container = heatmapSource === 'USA' ? tradingViewHeatmapRef.current : tradingViewHeatmapTSXRef.current;
+                if (!container) return;
+
+                container.innerHTML = '';
+                const script = document.createElement('script');
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+                script.type = 'text/javascript';
+                script.async = true;
+                script.innerHTML = JSON.stringify({
+                    dataSource: heatmapSource === 'TSX' ? 'TSX' : 'AllUSA',
+                    blockSize: 'market_cap_basic',
+                    blockColor: 'change',
+                    grouping: 'sector',
+                    locale: 'fr',
+                    symbolUrl: '',
+                    colorTheme: isDarkMode ? 'dark' : 'light',
+                    hasTopBar: true,
+                    isDataSetEnabled: true,
+                    isZoomEnabled: true,
+                    hasSymbolTooltip: true,
+                    isMonoSize: false,
+                    width: '100%',
+                    height: 600
+                });
+                container.appendChild(script);
+                return () => { if (container) container.innerHTML = ''; };
+            }, [activeSubTab, isDarkMode, heatmapSource]);
+
+            // Charger Market Quotes
+            useEffect(() => {
+                if (activeSubTab !== 'quotes' || !tradingViewMarketQuotesRef.current) return;
+                const container = tradingViewMarketQuotesRef.current;
+                container.innerHTML = '';
+                const script = document.createElement('script');
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js';
+                script.type = 'text/javascript';
+                script.async = true;
+                script.innerHTML = JSON.stringify({
+                    colorTheme: isDarkMode ? 'dark' : 'light',
+                    locale: 'fr',
+                    width: '100%',
+                    height: 800,
+                    symbolsGroups: [
+                        {
+                            name: 'Indices',
+                            symbols: [
+                                { name: 'FOREXCOM:SPXUSD', displayName: 'S&P 500' },
+                                { name: 'FOREXCOM:NSXUSD', displayName: 'Nasdaq 100' },
+                                { name: 'FOREXCOM:DJI', displayName: 'Dow 30' },
+                                { name: 'TSX:TSX', displayName: 'TSX Composite' },
+                                { name: 'XETR:DAX', displayName: 'DAX Performance' },
+                                { name: 'INDEX:NKY', displayName: 'Nikkei 225' }
+                            ]
+                        },
+                        {
+                            name: 'Futures & Commodities',
+                            symbols: [
+                                { name: 'CME_MINI:ES1!', displayName: 'S&P 500 Futures' },
+                                { name: 'COMEX:GC1!', displayName: 'Gold' },
+                                { name: 'NYMEX:CL1!', displayName: 'Crude Oil' }
+                            ]
+                        },
+                        {
+                            name: 'Forex & Bonds',
+                            symbols: [
+                                { name: 'FX:EURUSD', displayName: 'EUR/USD' },
+                                { name: 'TVC:US10Y', displayName: 'US 10Y' },
+                                { name: 'TVC:CA10Y', displayName: 'CA 10Y' }
+                            ]
+                        }
+                    ]
+                });
+                container.appendChild(script);
+                return () => { if (container) container.innerHTML = ''; };
+            }, [activeSubTab, isDarkMode]);
+
             // Charger les données de yield curve au montage
             React.useEffect(() => {
                 const fetchYieldCurve = async () => {
@@ -23244,6 +22663,147 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     }
                 };
             }, [yieldData, isDarkMode]);
+
+            // -----------------------------------------------------------
+
+            return (
+                <div className="space-y-6">
+                    {/* Header Specifique Marchés */}
+                    <div className={`p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden transition-all duration-300 ${isDarkMode 
+                        ? 'bg-gradient-to-br from-gray-900 to-blue-900 border border-blue-900/30' 
+                        : 'bg-white shadow-xl border border-gray-100'}`}>
+                        
+                        <div className="relative z-10">
+                            <h2 className={`text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r ${isDarkMode ? 'from-blue-200 to-blue-400' : 'from-blue-600 to-blue-800'}`}>
+                                Analyse de Marché
+                            </h2>
+                            <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+                                Vue d'ensemble des indices, devises et indicateurs économiques
+                            </p>
+                        </div>
+
+                         {/* Navigation Secondaire Marchés */}
+                        <div className="flex bg-gray-100/50 dark:bg-black/20 p-1.5 rounded-xl gap-1 relative z-10">
+                            {[
+                                { id: 'overview', label: 'Global', icon: 'iconoir-globe' },
+                                { id: 'quotes', label: 'Cotations', icon: 'iconoir-list' },
+                                { id: 'calendar', label: 'Calendrier Eco', icon: 'iconoir-calendar' },
+                                { id: 'forex', label: 'Forex', icon: 'iconoir-currency' },
+                                { id: 'stocks', label: 'Heatmaps', icon: 'iconoir-view-grid' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveSubTab(tab.id)}
+                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                                        activeSubTab === tab.id
+                                            ? isDarkMode 
+                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' 
+                                                : 'bg-blue-500 text-white shadow-lg shadow-blue-200'
+                                            : isDarkMode
+                                                ? 'text-gray-400 hover:text-white hover:bg-white/5'
+                                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
+                                    }`}
+                                >
+                                    <i className={`${tab.icon} text-lg`}></i>
+                                    <span className="hidden md:inline">{tab.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Contenu des sous-onglets */}
+                    {activeSubTab === 'overview' && (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
+                             {/* Yield Curve Section (Existing) */}
+                            <div className={`p-6 rounded-2xl ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white shadow-sm border border-gray-100'}`}>
+                                <div className="flex items-center justify-between mb-6">
+                                    <div>
+                                        <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Courbe des Taux</h3>
+                                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Comparaison des rendements obligataires</p>
+                                    </div>
+                                    <select
+                                        value={selectedCountry}
+                                        onChange={(e) => setSelectedCountry(e.target.value)}
+                                        className={`px-3 py-1.5 rounded-lg text-sm font-medium outline-none transition-colors cursor-pointer ${
+                                            isDarkMode
+                                                ? 'bg-gray-700 text-white border-gray-600 focus:border-blue-500'
+                                                : 'bg-gray-100 text-gray-900 border-gray-200 focus:border-blue-500'
+                                        } border-2`}
+                                    >
+                                        <option value="both">🇺🇸 US & 🇨🇦 Canada</option>
+                                        <option value="us">🇺🇸 États-Unis</option>
+                                        <option value="canada">🇨🇦 Canada</option>
+                                    </select>
+                                </div>
+                                <div className="h-[300px] relative">
+                                    {yieldLoading && (
+                                        <div className="absolute inset-0 flex items-center justify-center z-10 bg-opacity-50 bg-black rounded-lg">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                                        </div>
+                                    )}
+                                    <canvas ref={yieldChartRef}></canvas>
+                                </div>
+                            </div>
+                            
+                            <div className={`p-6 rounded-2xl flex flex-col items-center justify-center ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white shadow-sm border border-gray-100'}`}>
+                                <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Utilisez les onglets pour explorer les marchés (Cotations, Calendriers, Forex, Heatmaps).</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeSubTab === 'quotes' && (
+                        <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                            <div className="tradingview-widget-container" ref={tradingViewMarketQuotesRef}></div>
+                        </div>
+                    )}
+
+                    {activeSubTab === 'calendar' && (
+                        <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                            <div className="tradingview-widget-container" ref={tradingViewEventsRef}></div>
+                        </div>
+                    )}
+
+                    {activeSubTab === 'forex' && (
+                         <div className="space-y-6">
+                            <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                <h3 className="p-4 text-lg font-bold">Heat Map Forex</h3>
+                                <div className="tradingview-widget-container" ref={tradingViewForexRef}></div>
+                            </div>
+                            <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                <h3 className="p-4 text-lg font-bold">Cross Rates</h3>
+                                <div className="tradingview-widget-container" ref={tradingViewCrossRatesRef}></div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeSubTab === 'stocks' && (
+                         <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'} min-h-[700px]`}>
+                             <div className="p-4 border-b border-gray-700 flex gap-4">
+                                <button 
+                                    onClick={() => setHeatmapSource('USA')}
+                                    className={`px-4 py-2 rounded-lg text-sm font-bold ${heatmapSource === 'USA' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}
+                                >
+                                    USA
+                                </button>
+                                <button 
+                                    onClick={() => setHeatmapSource('TSX')}
+                                    className={`px-4 py-2 rounded-lg text-sm font-bold ${heatmapSource === 'TSX' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}
+                                >
+                                    Canada (TSX)
+                                </button>
+                             </div>
+                             {heatmapSource === 'USA' && 
+                                <div className="tradingview-widget-container h-[600px]" ref={tradingViewHeatmapRef}></div>
+                             }
+                             {heatmapSource === 'TSX' && 
+                                <div className="tradingview-widget-container h-[600px]" ref={tradingViewHeatmapTSXRef}></div>
+                             }
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
 
             // Listes de filtres
             const sources = ['Bloomberg', 'Reuters', 'WSJ', 'CNBC', 'MarketWatch', 'La Presse', 'Les Affaires'];
@@ -24376,19 +23936,20 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // Configuration des onglets (sans "Plus" dans la liste principale - il sera ajouté dynamiquement)
         const allTabs = useMemo(() => [
             { id: 'markets-economy', label: 'Marchés', icon: 'iconoir-globe', component: MarketsEconomyTab },
+            { id: 'advanced-analysis', label: 'Titres', icon: 'iconoir-candlestick-chart', component: window.AdvancedAnalysisTab || (() => <div>Chargement...</div>) },
+            { id: 'ask-emma', label: 'AskEmma', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
+            { id: 'admin-jsla', label: 'Admin', icon: 'iconoir-settings', component: AdminJSLaiTab },
+            // Secondary / Optional Tabs
+            { id: 'emma-config', label: 'Config', icon: 'iconoir-tools', component: EmmaConfigTab },
             { id: 'intellistocks', label: 'JLab™', icon: 'iconoir-flask', component: JLabUnifiedTab },
             { id: 'groupchat', label: 'RobotWeb', icon: 'iconoir-robot', component: window.GroupChatTab || (() => <div>Chargement...</div>) },
-            { id: 'ask-emma', label: 'Emma', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
             { id: 'assistant-vocal', label: 'Assistant', icon: 'iconoir-microphone', component: VoiceAssistantTab },
             { id: 'finvox', label: 'FinVox', icon: 'iconoir-voice-circle', component: FinVoxTab },
             { id: 'emmaia', label: 'EmmAIA', icon: 'iconoir-brain', component: EmmAIATab },
             { id: 'fastgraphs', label: 'FastGraphs', icon: 'iconoir-graph-up', component: FastGraphsTab },
-            { id: 'admin-jsla', label: 'Admin', icon: 'iconoir-settings', component: AdminJSLaiTab },
             { id: 'scrapping-sa', label: 'Seeking', icon: 'iconoir-search', component: ScrappingSATab },
             { id: 'seeking-alpha', label: 'Stocks', icon: 'iconoir-graph-up', component: SeekingAlphaTab },
             { id: 'email-briefings', label: 'Emma', icon: 'iconoir-antenna-signal', component: EmailBriefingsTab },
-            { id: 'investing-calendar', label: 'Calendrier', icon: 'iconoir-calendar', component: InvestingCalendarTab },
-            { id: 'emma-config', label: 'Emma', icon: 'iconoir-settings', component: EmmaConfigTab }
         ], []);
 
         // Filter tabs based on Primary Navigation Config (visibility settings)
@@ -25298,13 +24859,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </span>
                                 </div>
 
-                                {/* Theme Selector */}
-                                {window.ThemeSelector && (
-                                    <window.ThemeSelector />
-                                )}
-                                {window.ThemeSelector && (
-                                    <ThemeSelector isDarkMode={isDarkMode} />
-                                )}
+                                {/* Theme Selector (Safe Render) */}
+                                {window.ThemeSelector && React.createElement(window.ThemeSelector, { isDarkMode: isDarkMode })}
 
 
                                 {/* Bouton de déconnexion - icône seulement */}

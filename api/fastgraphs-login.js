@@ -283,8 +283,19 @@ export default async function handler(req, res) {
     } catch (parseError) {
       console.warn('Erreur parsing body/query:', parseError.message);
     }
+
+    // Fallback to server-side environment variables if not provided in request
+    if (!email && process.env.FASTGRAPHS_EMAIL) {
+        console.log('Utilisation de l\'email FastGraphs défini dans les variables d\'environnement');
+        email = process.env.FASTGRAPHS_EMAIL;
+    }
     
-    const hasCredentials = email && password;
+    if (!password && process.env.FASTGRAPHS_PASSWORD) {
+        console.log('Utilisation du mot de passe FastGraphs défini dans les variables d\'environnement');
+        password = process.env.FASTGRAPHS_PASSWORD;
+    }
+    
+    const hasCredentials = !!(email && password);
     const debugMode = req.query?.debug === 'true' || req.body?.debug === true;
     
     // Vérifier les variables d'environnement requises

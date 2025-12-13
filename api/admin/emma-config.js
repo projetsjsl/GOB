@@ -4,7 +4,8 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { INTENT_PROMPTS } from '../../config/intent-prompts.js';
+// Dynamic import used later to prevent build/runtime crashes if path is issue
+// import { INTENT_PROMPTS } from '../../config/intent-prompts.js';
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
@@ -94,9 +95,19 @@ async function handleGet(req, res, section, key) {
         if (error) {
             console.error('Erreur Supabase:', error);
             // Fallback vers config par défaut
+            const defConfig = await getDefaultConfig(section, key);
             return res.status(200).json({
-                config: getDefaultConfig(section, key),
+                config: defConfig,
                 source: 'default_fallback'
+            });
+        }
+        
+        // Safety check for null data
+        if (!data) {
+             const defConfig = await getDefaultConfig(section, key);
+             return res.status(200).json({
+                config: defConfig,
+                source: 'default_fallback_null_data'
             });
         }
 
@@ -125,7 +136,11 @@ async function handleGet(req, res, section, key) {
                 parsedValue = item.value === true || item.value === 'true';
             }
 
-            config[category][item.key] = {
+            // Fix potential issue where 'category' variable might be undefined here if using item.section
+            // The original code used config[category][item.key] but 'category' is not defined in loop scope?
+            // It should be config[group][item.key]
+            
+            config[group][item.key] = {
                 value: parsedValue,
                 type: item.type || 'string',
                 description: item.description || '',
@@ -146,15 +161,28 @@ async function handleGet(req, res, section, key) {
                 }
             }
             // Fallback vers default si non trouvé
+            const defConfig = await getDefaultConfig(section, key);
             return res.status(200).json({
-                config: getDefaultConfig(section, key),
+                config: defConfig,
                 source: 'default_fallback'
             });
         }
 
         // Sinon, merger avec config par défaut pour sections manquantes
-        const defaultConfig = getDefaultConfig();
-        const mergedConfig = { ...defaultConfig, ...config };
+        const defaultConfig = await getDefaultConfig();
+        // Merge deep? Or just top level sections? 
+        // defaultConfig structure: { prompts: {...}, variables: {...} }
+        // config structure: { prompts: {...}, variables: {...} }
+        
+        const mergedConfig = { ...defaultConfig };
+        
+        // Merge database config on top
+        Object.keys(config).forEach(sec => {
+            if (!mergedConfig[sec]) {
+                mergedConfig[sec] = {};
+            }
+            mergedConfig[sec] = { ...mergedConfig[sec], ...config[sec] };
+        });
 
         return res.status(200).json({
             config: mergedConfig,
@@ -297,9 +325,17 @@ async function handleDelete(req, res, key) {
 /**
  * Configuration par défaut (depuis fichiers système)
  */
-function getDefaultConfig(section = null, key = null) {
+async function getDefaultConfig(section = null, key = null) {
     // Importer la config depuis les fichiers système
     // Note: En production, ces valeurs viennent de /config/emma-cfa-prompt.js et autres
+    
+    let INTENT_PROMPTS = {};
+    try {
+        const module = await import('../../config/intent-prompts.js');
+        INTENT_PROMPTS = module.INTENT_PROMPTS || {};
+    } catch (e) {
+        console.warn('Cannot load intent-prompts.js', e);
+    }
     
     const defaultConfig = {
         prompts: {

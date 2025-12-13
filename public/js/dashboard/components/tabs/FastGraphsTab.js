@@ -9,18 +9,22 @@
 
 const { useState, useEffect } = React;
 
-const FastGraphsTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [sessionUrl, setSessionUrl] = useState(null);
-    const [error, setError] = useState(null);
-    const [status, setStatus] = useState('idle'); // idle, loading, success, error
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [automationSteps, setAutomationSteps] = useState([]);
-    const [useCredentials, setUseCredentials] = useState(false);
+    const [autoLogin, setAutoLogin] = useState(() => {
+        return localStorage.getItem('fastgraphs_autologin') === 'true';
+    });
+    
+    // Sauvegarder la préférence
+    useEffect(() => {
+        localStorage.setItem('fastgraphs_autologin', autoLogin);
+    }, [autoLogin]);
 
-    const [debugMode, setDebugMode] = useState(false);
-    const [debugInfo, setDebugInfo] = useState(null);
+    // Déclenchement automatique
+    useEffect(() => {
+        if (autoLogin && status === 'idle' && !sessionUrl) {
+            console.log('🔄 FastGraphs: Auto-login déclenché');
+            handleLogin();
+        }
+    }, [autoLogin]); // Dépendance sur autoLogin et mount
 
     const handleLogin = async () => {
         setIsLoading(true);
@@ -30,9 +34,13 @@ const FastGraphsTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
         setDebugInfo(null);
 
         try {
-            const requestBody = useCredentials && email && password 
-                ? { email, password, debug: debugMode }
-                : { debug: debugMode };
+            // Utiliser les props ou l'état local, fallback sur variables d'environnement serveur
+            // Si useCredentials est true mais champs vides, on laisse le backend gérer avec process.env
+            const requestBody = { 
+                email: useCredentials ? email : undefined,
+                password: useCredentials ? password : undefined,
+                debug: debugMode 
+            };
 
             const response = await fetch('/api/fastgraphs-login', {
                 method: 'POST',
@@ -71,7 +79,13 @@ const FastGraphsTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                 
                 // Ouvrir la session dans un nouvel onglet
                 if (data.session.url) {
-                    window.open(data.session.url, '_blank');
+                    // Petit délai pour éviter le blocage popup si possible (bien que browser policy strict)
+                    setTimeout(() => {
+                         const newWindow = window.open(data.session.url, '_blank');
+                         if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                             setError("⚠️ La fenêtre popup a été bloquée. Veuillez autoriser les popups pour ce site.");
+                         }
+                    }, 100);
                 }
             } else {
                 throw new Error('Réponse inattendue du serveur');
@@ -166,6 +180,29 @@ const FastGraphsTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                     
                     {/* Options */}
                     <div className="mb-4 space-y-2">
+                        {/* Toggle Connexion Auto */}
+                        <label className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-700/30 transition-colors">
+                            <div className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={autoLogin}
+                                    onChange={(e) => setAutoLogin(e.target.checked)}
+                                    className="sr-only peer"
+                                />
+                                <div className={`w-11 h-6 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-800 ${
+                                    isDarkMode ? 'bg-gray-700 peer-checked:bg-blue-600' : 'bg-gray-200 peer-checked:bg-blue-600'
+                                } after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white`}></div>
+                            </div>
+                            <div>
+                                <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    Lancer automatiquement à l'ouverture
+                                </span>
+                                <p className="text-xs text-gray-400">
+                                    ⚠️ Requiert l'autorisation des popups dans votre navigateur
+                                </p>
+                            </div>
+                        </label>
+
                         <label className="flex items-center gap-2 cursor-pointer">
                             <input
                                 type="checkbox"
@@ -226,16 +263,16 @@ const FastGraphsTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                 />
                             </div>
                             <p className="text-xs text-gray-400">
-                                ⚠️ Vos identifiants sont envoyés de manière sécurisée et utilisés uniquement pour la connexion automatique
+                                ⚠️ Laissez vide pour utiliser les identifiants stockés sur le serveur (.env), ou remplissez pour surcharger temporairement.
                             </p>
                         </div>
                     )}
                     
                     <button
                         onClick={handleLogin}
-                        disabled={isLoading || (useCredentials && (!email || !password))}
+                        disabled={isLoading}
                         className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 flex items-center justify-center gap-3 ${
-                            isLoading || (useCredentials && (!email || !password))
+                            isLoading
                                 ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                                 : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
                         }`}
@@ -301,14 +338,17 @@ const FastGraphsTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                     {useCredentials ? (
                         <ol className="list-decimal list-inside space-y-2 text-gray-300">
                             <li>Cochez "Automatiser la connexion complète"</li>
-                            <li>Entrez votre email/username et mot de passe FastGraphs</li>
+                            <li>
+                                Si vous avez configuré vos identifiants dans le fichier .env (FASTGRAPHS_EMAIL / FASTGRAPHS_PASSWORD),
+                                laissez les champs vides. Sinon, entrez-les manuellement.
+                            </li>
                             <li>Cliquez sur "Connexion automatique complète"</li>
                             <li>Le système va automatiquement :
                                 <ul className="list-disc list-inside ml-4 mt-1 space-y-1">
                                     <li>Créer une session Browserbase</li>
                                     <li>Naviguer vers fastgraphs.com</li>
                                     <li>Cliquer sur "Log In"</li>
-                                    <li>Remplir vos identifiants</li>
+                                    <li>Remplir vos identifiants (env ou manuel)</li>
                                     <li>Soumettre le formulaire</li>
                                 </ul>
                             </li>

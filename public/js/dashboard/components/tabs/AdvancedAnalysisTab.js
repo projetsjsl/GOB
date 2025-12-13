@@ -246,9 +246,135 @@ const AdvancedAnalysisTab = () => {
         } finally {
             setLoadingAI(false);
         }
-    };
+    // ----------------------------------------------------------------------
+    // WIDGET INTEGRATION
+    // ----------------------------------------------------------------------
+    const chartContainerRef = React.useRef(null);
+    const financialsContainerRef = React.useRef(null);
+    const techAnalysisContainerRef = React.useRef(null);
+    const timelineContainerRef = React.useRef(null);
+    const profileContainerRef = React.useRef(null);
 
-    const isDarkMode = true; // Force dark mode for now or get from context
+    const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'chart', 'financials', 'analysis', 'timeline'
+
+    // 1. Advanced Chart Widget
+    useEffect(() => {
+        if (activeTab !== 'chart' || !chartContainerRef.current) return;
+        const container = chartContainerRef.current;
+        container.innerHTML = '';
+        const script = document.createElement('script');
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+        script.type = 'text/javascript';
+        script.async = true;
+        script.innerHTML = JSON.stringify({
+            allow_symbol_change: true,
+            calendar: false,
+            details: true,
+            hide_side_toolbar: false,
+            interval: 'D',
+            locale: 'fr',
+            save_image: true,
+            style: '1',
+            symbol: selectedStock,
+            theme: isDarkMode ? 'dark' : 'light',
+            timezone: 'America/Toronto',
+            backgroundColor: isDarkMode ? '#0F0F0F' : '#FFFFFF',
+            withdateranges: true,
+            width: '100%',
+            height: 700
+        });
+        container.appendChild(script);
+        return () => { if (container) container.innerHTML = ''; };
+    }, [activeTab, selectedStock, isDarkMode]);
+
+    // 2. Financials & Profile Widgets
+    useEffect(() => {
+        if (activeTab !== 'financials') return;
+        
+        // Financials
+        if (financialsContainerRef.current) {
+            const container = financialsContainerRef.current;
+            container.innerHTML = '';
+            const script = document.createElement('script');
+            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-financials.js';
+            script.type = 'text/javascript';
+            script.async = true;
+            script.innerHTML = JSON.stringify({
+                symbol: selectedStock,
+                colorTheme: isDarkMode ? 'dark' : 'light',
+                isTransparent: false,
+                displayMode: 'regular',
+                locale: 'fr',
+                width: '100%',
+                height: 500
+            });
+            container.appendChild(script);
+        }
+
+        // Profile
+        if (profileContainerRef.current) {
+            const container = profileContainerRef.current;
+            container.innerHTML = '';
+            const script = document.createElement('script');
+            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js';
+            script.type = 'text/javascript';
+            script.async = true;
+            script.innerHTML = JSON.stringify({
+                symbol: selectedStock,
+                colorTheme: isDarkMode ? 'dark' : 'light',
+                isTransparent: false,
+                locale: 'fr',
+                width: '100%',
+                height: 400
+            });
+            container.appendChild(script);
+        }
+    }, [activeTab, selectedStock, isDarkMode]);
+
+    // 3. Technical Analysis Widget
+    useEffect(() => {
+        if (activeTab !== 'analysis' || !techAnalysisContainerRef.current) return;
+        const container = techAnalysisContainerRef.current;
+        container.innerHTML = '';
+        const script = document.createElement('script');
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
+        script.type = 'text/javascript';
+        script.async = true;
+        script.innerHTML = JSON.stringify({
+            symbol: selectedStock,
+            colorTheme: isDarkMode ? 'dark' : 'light',
+            isTransparent: false,
+            locale: 'fr',
+            interval: '1D',
+            width: '100%',
+            height: 500
+        });
+        container.appendChild(script);
+        return () => { if (container) container.innerHTML = ''; };
+    }, [activeTab, selectedStock, isDarkMode]);
+
+    // 4. Timeline Widget
+    useEffect(() => {
+        if (activeTab !== 'timeline' || !timelineContainerRef.current) return;
+        const container = timelineContainerRef.current;
+        container.innerHTML = '';
+        const script = document.createElement('script');
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js';
+        script.type = 'text/javascript';
+        script.async = true;
+        script.innerHTML = JSON.stringify({
+            feedMode: 'symbol',
+            symbol: selectedStock,
+            colorTheme: isDarkMode ? 'dark' : 'light',
+            isTransparent: false,
+            displayMode: 'regular',
+            locale: 'fr',
+            width: '100%',
+            height: 600
+        });
+        container.appendChild(script);
+        return () => { if (container) container.innerHTML = ''; };
+    }, [activeTab, selectedStock, isDarkMode]);
 
     return (
         <div className={`min-h-screen p-6 ${isDarkMode ? 'bg-neutral-950 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
@@ -257,23 +383,47 @@ const AdvancedAnalysisTab = () => {
 
 
             {/* Header */}
-            <div className="mb-8 flex justify-between items-center">
+            <div className="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+                    <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
                         Analyse Financière Pro 🚀
                     </h1>
                     <p className="text-gray-400 text-sm mt-1">
-                        Outils avancés pour l'investisseur intelligent
+                        Plateforme unifiée d'analyse technique et fondamentale
                     </p>
                 </div>
 
-                {/* Stock Selector Dropdown */}
-                <div className="flex items-center gap-4">
-                    <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+                <div className="flex flex-col md:flex-row items-center gap-4 w-full lg:w-auto">
+                    {/* Navigation Tabs */}
+                    <div className="flex bg-gray-800 p-1 rounded-xl w-full md:w-auto overflow-x-auto">
+                        {[
+                            { id: 'dashboard', label: 'Dashboard', icon: 'iconoir-view-grid' },
+                            { id: 'chart', label: 'Graphique', icon: 'iconoir-candlestick-chart' },
+                            { id: 'financials', label: 'Finances', icon: 'iconoir-reports' },
+                            { id: 'analysis', label: 'Technique', icon: 'iconoir-stats-report' },
+                            { id: 'timeline', label: 'Timeline', icon: 'iconoir-calendar' }
+                        ].map(tab => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
+                                    activeTab === tab.id
+                                        ? 'bg-blue-600 text-white shadow-lg'
+                                        : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                                }`}
+                            >
+                                <i className={`${tab.icon} text-lg`}></i>
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Stock Selector */}
+                    <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden min-w-[150px]">
                         <select
                             value={selectedStock}
                             onChange={(e) => setSelectedStock(e.target.value)}
-                            className="bg-gray-800 text-white font-bold px-4 py-2 outline-none cursor-pointer hover:bg-gray-700 transition-colors"
+                            className="bg-gray-800 text-white font-bold px-4 py-2 outline-none cursor-pointer hover:bg-gray-700 transition-colors w-full"
                             disabled={loading}
                         >
                             {watchlistTickers.length > 0 ? (
@@ -285,208 +435,232 @@ const AdvancedAnalysisTab = () => {
                             )}
                         </select>
                     </div>
-
-                    {loading ? (
-                        <div className="text-gray-400 text-sm">⏳ Chargement...</div>
-                    ) : stockData ? (
-                        <div className="text-right">
-                            <div className="text-xl font-bold">${stockData.price?.toFixed(2) || '0.00'}</div>
-                            <div className={`text-sm ${stockData.changePercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                {stockData.changePercent >= 0 ? '+' : ''}{stockData.changePercent?.toFixed(2) || '0.00'}%
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="text-gray-500 text-sm">Sélectionnez un titre</div>
-                    )}
                 </div>
             </div>
 
-            {/* Main Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                {/* 1. Analyse Approfondie (Main Card) */}
-                <div
-                    onClick={() => setShowAnalysisModal(true)}
-                    className="col-span-1 md:col-span-2 lg:col-span-3 bg-gradient-to-br from-blue-900/40 to-indigo-900/40 border border-blue-500/30 rounded-xl p-6 cursor-pointer hover:border-blue-400 transition-all hover:shadow-lg hover:shadow-blue-500/10 group"
-                >
-                    <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 rounded-2xl bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <i className="iconoir-stats-report text-blue-400 text-3xl"></i>
+            {/* Main Content Area */}
+            {activeTab === 'dashboard' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+                    {/* 1. Analyse Approfondie (Main Card) */}
+                    <div
+                        onClick={() => setShowAnalysisModal(true)}
+                        className="col-span-1 md:col-span-2 lg:col-span-3 bg-gradient-to-br from-blue-900/40 to-indigo-900/40 border border-blue-500/30 rounded-xl p-6 cursor-pointer hover:border-blue-400 transition-all hover:shadow-lg hover:shadow-blue-500/10 group"
+                    >
+                        <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="w-16 h-16 rounded-2xl bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <i className="iconoir-stats-report text-blue-400 text-3xl"></i>
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white mb-1">Analyse Approfondie Complète</h3>
+                                    <p className="text-gray-400 text-sm max-w-xl">
+                                        Accédez au rapport complet : DCF, États Financiers, Ratios, et Analyse IA.
+                                        Le centre de commande pour vos décisions d'investissement.
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-white mb-1">Analyse Approfondie Complète</h3>
-                                <p className="text-gray-400 text-sm max-w-xl">
-                                    Accédez au rapport complet : DCF, États Financiers, Ratios, et Analyse IA.
-                                    Le centre de commande pour vos décisions d'investissement.
-                                </p>
+                            <div className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2">
+                                Ouvrir <i className="iconoir-arrow-right"></i>
                             </div>
                         </div>
-                        <div className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2">
-                            Ouvrir <i className="iconoir-arrow-right"></i>
+                    </div>
+
+                    {/* 2. Comparaison Multi-Titres */}
+                    <div
+                        onClick={() => setShowPeerComparison(true)}
+                        className="bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border border-emerald-700/30 rounded-xl p-6 cursor-pointer hover:border-emerald-500 transition-all hover:shadow-lg hover:shadow-emerald-500/10 group"
+                    >
+                        <div className="w-12 h-12 rounded-lg bg-emerald-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i className="iconoir-group text-emerald-400 text-2xl"></i>
+                        </div>
+                        <h3 className="text-lg font-bold text-white mb-2">Comparaison Pairs</h3>
+                        <p className="text-gray-400 text-sm">
+                            Comparez {selectedStock} avec ses concurrents directs sur plus de 10 métriques clés.
+                        </p>
+                    </div>
+
+                    {/* 3. Analyse de Scénarios */}
+                    <div
+                        onClick={() => setShowScenarioAnalysis(true)}
+                        className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 border border-purple-700/30 rounded-xl p-6 cursor-pointer hover:border-purple-500 transition-all hover:shadow-lg hover:shadow-purple-500/10 group"
+                    >
+                        <div className="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i className="iconoir-graph-up text-purple-400 text-2xl"></i>
+                        </div>
+                        <h3 className="text-lg font-bold text-white mb-2">Simulateur de Scénarios</h3>
+                        <p className="text-gray-400 text-sm">
+                            Modélisation DCF interactive. Testez vos hypothèses (Optimiste, Base, Pessimiste).
+                        </p>
+                    </div>
+
+                    {/* 4. Screener Avancé */}
+                    <div
+                        onClick={() => setShowAdvancedScreener(true)}
+                        className="bg-gradient-to-br from-orange-900/20 to-red-900/20 border border-orange-700/30 rounded-xl p-6 cursor-pointer hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/10 group"
+                    >
+                        <div className="w-12 h-12 rounded-lg bg-orange-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i className="iconoir-filter text-orange-400 text-2xl"></i>
+                        </div>
+                        <h3 className="text-lg font-bold text-white mb-2">Screener Avancé</h3>
+                        <p className="text-gray-400 text-sm">
+                            Trouvez les pépites du marché avec des filtres personnalisés et des préréglages.
+                        </p>
+                    </div>
+
+                    {/* 5. AI Stock Analysis */}
+                    <div
+                        onClick={() => setShowAIAnalysisModal(true)}
+                        className="bg-gradient-to-br from-violet-900/20 to-fuchsia-900/20 border border-violet-700/30 rounded-xl p-6 cursor-pointer hover:border-violet-500 transition-all hover:shadow-lg hover:shadow-violet-500/10 group"
+                    >
+                        <div className="w-12 h-12 rounded-lg bg-violet-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i className="iconoir-brain text-violet-400 text-2xl"></i>
+                        </div>
+                        <h3 className="text-lg font-bold text-white mb-2">AI Stock Analysis</h3>
+                        <p className="text-gray-400 text-sm">
+                            Analyse pilotée par IA : thèse d'investissement, risques, valorisation et recommandation.
+                        </p>
+                    </div>
+
+                    {/* 6. News & Sentiment */}
+                    <div
+                        onClick={() => setShowNewsModal(true)}
+                        className="bg-gradient-to-br from-amber-900/20 to-yellow-900/20 border border-amber-700/30 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all hover:shadow-lg hover:shadow-amber-500/10 group"
+                    >
+                        <div className="w-12 h-12 rounded-lg bg-amber-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i className="iconoir-newspaper text-amber-400 text-2xl"></i>
+                        </div>
+                        <h3 className="text-lg font-bold text-white mb-2">News & Sentiment</h3>
+                        <p className="text-gray-400 text-sm">
+                            Actualités en temps réel avec analyse de sentiment IA et impact sur le cours.
+                        </p>
+                    </div>
+
+                    {/* 7. Analyst Consensus */}
+                    <div
+                        onClick={() => setShowAnalystModal(true)}
+                        className="bg-gradient-to-br from-lime-900/20 to-green-900/20 border border-lime-700/30 rounded-xl p-6 cursor-pointer hover:border-lime-500 transition-all hover:shadow-lg hover:shadow-lime-500/10 group"
+                    >
+                        <div className="w-12 h-12 rounded-lg bg-lime-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i className="iconoir-community text-lime-400 text-2xl"></i>
+                        </div>
+                        <h3 className="text-lg font-bold text-white mb-2">Analyst Consensus</h3>
+                        <p className="text-gray-400 text-sm">
+                            Consensus des analystes : EPS, revenus, recommandations Buy/Hold/Sell.
+                        </p>
+                    </div>
+
+                    {/* 8. Earnings Calendar */}
+                    <div
+                        onClick={() => setShowEarningsModal(true)}
+                        className="bg-gradient-to-br from-rose-900/20 to-pink-900/20 border border-rose-700/30 rounded-xl p-6 cursor-pointer hover:border-rose-500 transition-all hover:shadow-lg hover:shadow-rose-500/10 group"
+                    >
+                        <div className="w-12 h-12 rounded-lg bg-rose-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i className="iconoir-calendar text-rose-400 text-2xl"></i>
+                        </div>
+                        <h3 className="text-lg font-bold text-white mb-2">Earnings Calendar</h3>
+                        <p className="text-gray-400 text-sm">
+                            Prochaine date d'earnings, estimations et historique des surprises.
+                        </p>
+                    </div>
+
+                    {/* 9. Economic Events */}
+                    <div
+                        onClick={() => setShowEconomicModal(true)}
+                        className="bg-gradient-to-br from-sky-900/20 to-indigo-900/20 border border-sky-700/30 rounded-xl p-6 cursor-pointer hover:border-sky-500 transition-all hover:shadow-lg hover:shadow-sky-500/10 group"
+                    >
+                        <div className="w-12 h-12 rounded-lg bg-sky-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i className="iconoir-globe text-sky-400 text-2xl"></i>
+                        </div>
+                        <h3 className="text-lg font-bold text-white mb-2">Economic Events</h3>
+                        <p className="text-gray-400 text-sm">
+                            Calendrier économique (7j) avec analyse d'impact sur vos titres.
+                        </p>
+                    </div>
+
+                    {/* 10. Watchlist Screener */}
+                    <div
+                        onClick={() => setShowWatchlistScreenerModal(true)}
+                        className="bg-gradient-to-br from-teal-900/20 to-cyan-900/20 border border-teal-700/30 rounded-xl p-6 cursor-pointer hover:border-teal-500 transition-all hover:shadow-lg hover:shadow-teal-500/10 group"
+                    >
+                        <div className="w-12 h-12 rounded-lg bg-teal-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i className="iconoir-search text-teal-400 text-2xl"></i>
+                        </div>
+                        <h3 className="text-lg font-bold text-white mb-2">Watchlist Screener</h3>
+                        <p className="text-gray-400 text-sm">
+                            Classement IA de votre watchlist avec scores de buy et opportunités.
+                        </p>
+                    </div>
+
+                    {/* 11. Export PDF */}
+                    <div
+                        onClick={async () => {
+                            if (stockData && window.PDFExporter) {
+                                await window.PDFExporter.generateAnalysisReport(selectedStock, {
+                                    currentPrice: stockData.price || 0,
+                                    fairValue: stockData.metrics?.dcf || stockData.metrics?.enterpriseValue || 0,
+                                    upside: stockData.metrics?.dcf ? ((stockData.metrics.dcf - stockData.price) / stockData.price * 100) : 0,
+                                    recommendation: 'BUY', // Could be calculated based on upside
+                                    metrics: stockData.metrics || {},
+                                    ratios: stockData.ratios || {},
+                                    profile: stockData.profile || {},
+                                    aiInsights: {
+                                        strengths: ['Strong Revenue Growth', 'High ROE'],
+                                        weaknesses: ['High Valuation']
+                                    }
+                                });
+                            } else {
+                                alert('Données non disponibles pour l\'export. Veuillez d\'abord charger les données du titre.');
+                            }
+                        }}
+                        className="bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border border-cyan-700/30 rounded-xl p-6 cursor-pointer hover:border-cyan-500 transition-all hover:shadow-lg hover:shadow-cyan-500/10 group"
+                    >
+                        <div className="w-12 h-12 rounded-lg bg-cyan-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i className="iconoir-page text-cyan-400 text-2xl"></i>
+                        </div>
+                        <h3 className="text-lg font-bold text-white mb-2">Export Rapport PDF</h3>
+                        <p className="text-gray-400 text-sm">
+                            Générez un rapport professionnel complet prêt à être partagé ou imprimé.
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {/* Chart View */}
+            {activeTab === 'chart' && (
+                <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 animate-fade-in">
+                    <div className="tradingview-widget-container h-[700px]" ref={chartContainerRef}></div>
+                </div>
+            )}
+
+            {/* Financials View */}
+            {activeTab === 'financials' && (
+                <div className="space-y-6 animate-fade-in">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-2 bg-gray-800 rounded-xl overflow-hidden border border-gray-700 h-[500px]">
+                            <div className="p-4 border-b border-gray-700 font-bold">États Financiers</div>
+                            <div className="tradingview-widget-container h-full" ref={financialsContainerRef}></div>
+                        </div>
+                        <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 h-[500px]">
+                            <div className="p-4 border-b border-gray-700 font-bold">Profil Société</div>
+                            <div className="tradingview-widget-container h-full" ref={profileContainerRef}></div>
                         </div>
                     </div>
                 </div>
+            )}
 
-                {/* 2. Comparaison Multi-Titres */}
-                <div
-                    onClick={() => setShowPeerComparison(true)}
-                    className="bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border border-emerald-700/30 rounded-xl p-6 cursor-pointer hover:border-emerald-500 transition-all hover:shadow-lg hover:shadow-emerald-500/10 group"
-                >
-                    <div className="w-12 h-12 rounded-lg bg-emerald-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-group text-emerald-400 text-2xl"></i>
-                    </div>
-                    <h3 className="text-lg font-bold text-white mb-2">Comparaison Pairs</h3>
-                    <p className="text-gray-400 text-sm">
-                        Comparez {selectedStock} avec ses concurrents directs sur plus de 10 métriques clés.
-                    </p>
+            {/* Technical Analysis View */}
+            {activeTab === 'analysis' && (
+                <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 animate-fade-in h-[600px]">
+                     <div className="tradingview-widget-container h-full" ref={techAnalysisContainerRef}></div>
                 </div>
+            )}
 
-                {/* 3. Analyse de Scénarios */}
-                <div
-                    onClick={() => setShowScenarioAnalysis(true)}
-                    className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 border border-purple-700/30 rounded-xl p-6 cursor-pointer hover:border-purple-500 transition-all hover:shadow-lg hover:shadow-purple-500/10 group"
-                >
-                    <div className="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-graph-up text-purple-400 text-2xl"></i>
-                    </div>
-                    <h3 className="text-lg font-bold text-white mb-2">Simulateur de Scénarios</h3>
-                    <p className="text-gray-400 text-sm">
-                        Modélisation DCF interactive. Testez vos hypothèses (Optimiste, Base, Pessimiste).
-                    </p>
+            {/* Timeline View */}
+            {activeTab === 'timeline' && (
+                <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 animate-fade-in h-[700px]">
+                     <div className="tradingview-widget-container h-full" ref={timelineContainerRef}></div>
                 </div>
-
-                {/* 4. Screener Avancé */}
-                <div
-                    onClick={() => setShowAdvancedScreener(true)}
-                    className="bg-gradient-to-br from-orange-900/20 to-red-900/20 border border-orange-700/30 rounded-xl p-6 cursor-pointer hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/10 group"
-                >
-                    <div className="w-12 h-12 rounded-lg bg-orange-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-filter text-orange-400 text-2xl"></i>
-                    </div>
-                    <h3 className="text-lg font-bold text-white mb-2">Screener Avancé</h3>
-                    <p className="text-gray-400 text-sm">
-                        Trouvez les pépites du marché avec des filtres personnalisés et des préréglages.
-                    </p>
-                </div>
-
-                {/* 5. AI Stock Analysis */}
-                <div
-                    onClick={() => setShowAIAnalysisModal(true)}
-                    className="bg-gradient-to-br from-violet-900/20 to-fuchsia-900/20 border border-violet-700/30 rounded-xl p-6 cursor-pointer hover:border-violet-500 transition-all hover:shadow-lg hover:shadow-violet-500/10 group"
-                >
-                    <div className="w-12 h-12 rounded-lg bg-violet-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-brain text-violet-400 text-2xl"></i>
-                    </div>
-                    <h3 className="text-lg font-bold text-white mb-2">AI Stock Analysis</h3>
-                    <p className="text-gray-400 text-sm">
-                        Analyse pilotée par IA : thèse d'investissement, risques, valorisation et recommandation.
-                    </p>
-                </div>
-
-                {/* 6. News & Sentiment */}
-                <div
-                    onClick={() => setShowNewsModal(true)}
-                    className="bg-gradient-to-br from-amber-900/20 to-yellow-900/20 border border-amber-700/30 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all hover:shadow-lg hover:shadow-amber-500/10 group"
-                >
-                    <div className="w-12 h-12 rounded-lg bg-amber-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-newspaper text-amber-400 text-2xl"></i>
-                    </div>
-                    <h3 className="text-lg font-bold text-white mb-2">News & Sentiment</h3>
-                    <p className="text-gray-400 text-sm">
-                        Actualités en temps réel avec analyse de sentiment IA et impact sur le cours.
-                    </p>
-                </div>
-
-                {/* 7. Analyst Consensus */}
-                <div
-                    onClick={() => setShowAnalystModal(true)}
-                    className="bg-gradient-to-br from-lime-900/20 to-green-900/20 border border-lime-700/30 rounded-xl p-6 cursor-pointer hover:border-lime-500 transition-all hover:shadow-lg hover:shadow-lime-500/10 group"
-                >
-                    <div className="w-12 h-12 rounded-lg bg-lime-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-community text-lime-400 text-2xl"></i>
-                    </div>
-                    <h3 className="text-lg font-bold text-white mb-2">Analyst Consensus</h3>
-                    <p className="text-gray-400 text-sm">
-                        Consensus des analystes : EPS, revenus, recommandations Buy/Hold/Sell.
-                    </p>
-                </div>
-
-                {/* 8. Earnings Calendar */}
-                <div
-                    onClick={() => setShowEarningsModal(true)}
-                    className="bg-gradient-to-br from-rose-900/20 to-pink-900/20 border border-rose-700/30 rounded-xl p-6 cursor-pointer hover:border-rose-500 transition-all hover:shadow-lg hover:shadow-rose-500/10 group"
-                >
-                    <div className="w-12 h-12 rounded-lg bg-rose-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-calendar text-rose-400 text-2xl"></i>
-                    </div>
-                    <h3 className="text-lg font-bold text-white mb-2">Earnings Calendar</h3>
-                    <p className="text-gray-400 text-sm">
-                        Prochaine date d'earnings, estimations et historique des surprises.
-                    </p>
-                </div>
-
-                {/* 9. Economic Events */}
-                <div
-                    onClick={() => setShowEconomicModal(true)}
-                    className="bg-gradient-to-br from-sky-900/20 to-indigo-900/20 border border-sky-700/30 rounded-xl p-6 cursor-pointer hover:border-sky-500 transition-all hover:shadow-lg hover:shadow-sky-500/10 group"
-                >
-                    <div className="w-12 h-12 rounded-lg bg-sky-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-globe text-sky-400 text-2xl"></i>
-                    </div>
-                    <h3 className="text-lg font-bold text-white mb-2">Economic Events</h3>
-                    <p className="text-gray-400 text-sm">
-                        Calendrier économique (7j) avec analyse d'impact sur vos titres.
-                    </p>
-                </div>
-
-                {/* 10. Watchlist Screener */}
-                <div
-                    onClick={() => setShowWatchlistScreenerModal(true)}
-                    className="bg-gradient-to-br from-teal-900/20 to-cyan-900/20 border border-teal-700/30 rounded-xl p-6 cursor-pointer hover:border-teal-500 transition-all hover:shadow-lg hover:shadow-teal-500/10 group"
-                >
-                    <div className="w-12 h-12 rounded-lg bg-teal-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-search text-teal-400 text-2xl"></i>
-                    </div>
-                    <h3 className="text-lg font-bold text-white mb-2">Watchlist Screener</h3>
-                    <p className="text-gray-400 text-sm">
-                        Classement IA de votre watchlist avec scores de buy et opportunités.
-                    </p>
-                </div>
-
-                {/* 11. Export PDF */}
-                <div
-                    onClick={async () => {
-                        if (stockData && window.PDFExporter) {
-                            await window.PDFExporter.generateAnalysisReport(selectedStock, {
-                                currentPrice: stockData.price || 0,
-                                fairValue: stockData.metrics?.dcf || stockData.metrics?.enterpriseValue || 0,
-                                upside: stockData.metrics?.dcf ? ((stockData.metrics.dcf - stockData.price) / stockData.price * 100) : 0,
-                                recommendation: 'BUY', // Could be calculated based on upside
-                                metrics: stockData.metrics || {},
-                                ratios: stockData.ratios || {},
-                                profile: stockData.profile || {},
-                                aiInsights: {
-                                    strengths: ['Strong Revenue Growth', 'High ROE'],
-                                    weaknesses: ['High Valuation']
-                                }
-                            });
-                        } else {
-                            alert('Données non disponibles pour l\'export. Veuillez d\'abord charger les données du titre.');
-                        }
-                    }}
-                    className="bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border border-cyan-700/30 rounded-xl p-6 cursor-pointer hover:border-cyan-500 transition-all hover:shadow-lg hover:shadow-cyan-500/10 group"
-                >
-                    <div className="w-12 h-12 rounded-lg bg-cyan-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-page text-cyan-400 text-2xl"></i>
-                    </div>
-                    <h3 className="text-lg font-bold text-white mb-2">Export Rapport PDF</h3>
-                    <p className="text-gray-400 text-sm">
-                        Générez un rapport professionnel complet prêt à être partagé ou imprimé.
-                    </p>
-                </div>
-
-            </div>
+            )}
 
             {/* Modals Rendering */}
             {showPeerComparison && window.PeerComparisonModal && (
