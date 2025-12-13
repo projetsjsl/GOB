@@ -14,6 +14,18 @@ const FastGraphsTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
         return localStorage.getItem('fastgraphs_autologin') === 'true';
     });
     
+    // Missing state definitions added
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [status, setStatus] = useState('idle'); // idle, loading, success, error
+    const [sessionUrl, setSessionUrl] = useState(null);
+    const [useCredentials, setUseCredentials] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [debugMode, setDebugMode] = useState(false);
+    const [automationSteps, setAutomationSteps] = useState([]);
+    const [debugInfo, setDebugInfo] = useState(null);
+    
     // Sauvegarder la préférence
     useEffect(() => {
         localStorage.setItem('fastgraphs_autologin', autoLogin);

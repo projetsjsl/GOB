@@ -3,7 +3,7 @@
 
 
 
-const EconomicCalendarTab = () => {
+const EconomicCalendarTab = ({ isDarkMode }) => {
     // Initialize with fallback data so component is never blank
     const [activeSubTab, setActiveSubTab] = useState('economic');
     const [calendarData, setCalendarData] = useState([{
