@@ -177,6 +177,21 @@
                     </label>
                 </div>
 
+                <!-- Champ mot de passe admin pour sauvegarde -->
+                <div class="mb-6 border-t border-gray-700 pt-4">
+                    <label class="block text-sm font-medium mb-2">
+                        <i class="iconoir-lock text-yellow-400"></i> Mot de passe admin requis pour sauvegarder
+                    </label>
+                    <input 
+                        type="password" 
+                        id="saveAdminPassword"
+                        required
+                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-green-400"
+                        placeholder="Entrez le mot de passe admin"
+                    />
+                    <p class="text-gray-400 text-xs mt-1">Le mot de passe est requis à chaque sauvegarde pour des raisons de sécurité</p>
+                </div>
+
                 <!-- Permissions par catégorie -->
                 <div class="mb-6">
                     <h4 class="text-lg font-semibold mb-4">Permissions des Composants</h4>
@@ -305,6 +320,7 @@
             document.getElementById('modalTitle').textContent = 'Nouveau Rôle';
             document.getElementById('roleForm').reset();
             document.getElementById('roleIdInput').value = '';
+            document.getElementById('saveAdminPassword').value = ''; // Réinitialiser le champ mot de passe
             renderComponentsList({});
             document.getElementById('roleModal').classList.remove('hidden');
         }
@@ -332,6 +348,7 @@
                     document.getElementById('displayNameInput').value = role.display_name;
                     document.getElementById('descriptionInput').value = role.description || '';
                     document.getElementById('isAdminInput').checked = role.is_admin || false;
+                    document.getElementById('saveAdminPassword').value = ''; // Réinitialiser le champ mot de passe
                     renderComponentsList(role.component_permissions || {});
                     document.getElementById('roleModal').classList.remove('hidden');
                 } else {
@@ -383,6 +400,14 @@
             const displayName = document.getElementById('displayNameInput').value;
             const description = document.getElementById('descriptionInput').value;
             const isAdmin = document.getElementById('isAdminInput').checked;
+            
+            // Demander le mot de passe admin à chaque sauvegarde
+            const savePassword = document.getElementById('saveAdminPassword').value;
+            if (!savePassword) {
+                showError('Veuillez entrer le mot de passe admin pour sauvegarder');
+                document.getElementById('saveAdminPassword').focus();
+                return;
+            }
 
             // Collecter les permissions
             const permissions = {};
@@ -397,7 +422,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         action: action,
-                        adminPassword: adminPassword,
+                        adminPassword: savePassword, // Utiliser le mot de passe saisi dans le formulaire
                         roleId: roleId || undefined,
                         roleName: roleName,
                         displayName: displayName,
@@ -410,14 +435,19 @@
                 const data = await response.json();
 
                 if (data.success) {
+                    // Réinitialiser le champ mot de passe
+                    document.getElementById('saveAdminPassword').value = '';
                     closeRoleModal();
                     loadRoles();
                     alert('Rôle enregistré avec succès!');
                 } else {
                     showError(data.error || 'Erreur lors de l\'enregistrement');
+                    // Réinitialiser le champ mot de passe en cas d'erreur
+                    document.getElementById('saveAdminPassword').value = '';
                 }
             } catch (error) {
                 showError('Erreur de connexion: ' + error.message);
+                document.getElementById('saveAdminPassword').value = '';
             }
         }
 
@@ -427,13 +457,19 @@
                 return;
             }
 
+            // Demander le mot de passe admin pour la suppression
+            const password = prompt('Veuillez entrer le mot de passe admin pour confirmer la suppression:');
+            if (!password) {
+                return; // Annuler si pas de mot de passe
+            }
+
             try {
                 const response = await fetch('/api/roles-config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         action: 'delete_role',
-                        adminPassword: adminPassword,
+                        adminPassword: password, // Utiliser le mot de passe saisi
                         roleId: roleId
                     })
                 });
@@ -461,13 +497,19 @@
                 return;
             }
 
+            // Demander le mot de passe admin pour l'assignation
+            const password = prompt('Veuillez entrer le mot de passe admin pour assigner le rôle:');
+            if (!password) {
+                return; // Annuler si pas de mot de passe
+            }
+
             try {
                 const response = await fetch('/api/roles-config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         action: 'assign_role',
-                        adminPassword: adminPassword,
+                        adminPassword: password, // Utiliser le mot de passe saisi
                         username: username,
                         role_id: roleId
                     })
@@ -499,6 +541,8 @@
         // Fermer le modal
         function closeRoleModal() {
             document.getElementById('roleModal').classList.add('hidden');
+            // Réinitialiser le champ mot de passe lors de la fermeture
+            document.getElementById('saveAdminPassword').value = '';
         }
 
         // Afficher une erreur
