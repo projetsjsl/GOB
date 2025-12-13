@@ -21228,9 +21228,19 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <span className="font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}">Impact:</span>
-                                    <div className="flex items-center gap-1">
-                                        <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
-                                        <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>High</span>
+                                    <div className="flex items-center gap-4">
+                                        {/* Mobile Menu Button - Visible ONLY on mobile */}
+                                        <button
+                                            onClick={() => setMobileMenuOpen(true)}
+                                            className="md:hidden p-2 -ml-2 text-gray-400 hover:text-white"
+                                        >
+                                            <i className="iconoir-menu text-2xl"></i>
+                                        </button>
+
+                                        <div className="flex items-center gap-1">
+                                            <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
+                                            <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>High</span>
+                                        </div>
                                     </div>
                                     <div className="flex items-center gap-1">
                                         <div className="w-3 h-3 bg-green-500 rounded-sm"></div>
@@ -24381,6 +24391,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
         // État pour gérer les onglets visibles et ceux dans "Plus"
         const [visibleTabs, setVisibleTabs] = useState(filteredAllTabs);
+        const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Mobile Menu State
 
         const [hiddenTabs, setHiddenTabs] = useState([]);
         const [showPlusMenu, setShowPlusMenu] = useState(false);
@@ -25334,7 +25345,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 {/* Bottom Navigation Bar - Tous les écrans */}
                 <nav 
                     ref={navRef}
-                    className={`fixed bottom-0 left-0 right-0 backdrop-blur-md transition-all duration-300 z-40 shadow-2xl ${isDarkMode
+                    className={`fixed bottom-0 left-0 right-0 backdrop-blur-md transition-all duration-300 z-40 shadow-2xl hidden md:block ${isDarkMode
                     ? 'bg-black/95 border-t border-green-500/20'
                     : 'bg-white/95 border-t-2 border-gray-200'
                         } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
@@ -25518,6 +25529,109 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         })}
                     </div>
                 </nav>
+
+                {/* Mobile Navigation Drawer */}
+                {mobileMenuOpen && (
+                    <div className="fixed inset-0 z-50 md:hidden font-sans">
+                        {/* Backdrop */}
+                        <div 
+                            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+                            onClick={() => setMobileMenuOpen(false)}
+                        ></div>
+                        
+                        {/* Drawer Panel */}
+                        <div 
+                            className={`absolute top-0 left-0 w-[85%] max-w-[320px] h-full shadow-2xl transition-transform duration-300 transform ${
+                                isDarkMode ? 'bg-gray-900 border-r border-gray-800' : 'bg-white border-r border-gray-200'
+                            }`}
+                        >
+                            {/* Header */}
+                            <div className={`p-5 flex items-center justify-between border-b ${
+                                isDarkMode ? 'border-gray-800' : 'border-gray-100'
+                            }`}>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center shadow-lg shadow-green-500/20 text-white">
+                                        <i className="iconoir-app-window text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 className={`font-bold text-lg leading-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                            Menu
+                                        </h3>
+                                        <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            Navigation Rapide
+                                        </p>
+                                    </div>
+                                </div>
+                                <button 
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className={`p-2 rounded-full transition-colors ${
+                                        isDarkMode ? 'hover:bg-gray-800 text-gray-400' : 'hover:bg-gray-100 text-gray-500'
+                                    }`}
+                                >
+                                    <i className="iconoir-cancel text-xl"></i>
+                                </button>
+                            </div>
+                            
+                            {/* Menu Items */}
+                            <div className="overflow-y-auto h-[calc(100vh-80px)] p-3 space-y-1 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+                                {filteredAllTabs.map(tab => {
+                                    const isActive = activeTab === tab.id;
+                                    const iconClass = tab.icon || getTabIcon(tab.id);
+                                    
+                                    return (
+                                        <button
+                                            key={tab.id}
+                                            onClick={() => {
+                                                handleTabChange(tab.id);
+                                                setMobileMenuOpen(false);
+                                            }}
+                                            className={`w-full text-left px-4 py-3.5 rounded-xl flex items-center gap-4 transition-all duration-200 group ${
+                                                isActive 
+                                                    ? (isDarkMode 
+                                                        ? 'bg-gradient-to-r from-green-500/20 to-transparent text-green-400 border-l-4 border-green-500' 
+                                                        : 'bg-green-50 text-green-700 border-l-4 border-green-600')
+                                                    : (isDarkMode 
+                                                        ? 'text-gray-400 hover:bg-gray-800/80 hover:text-gray-200' 
+                                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900')
+                                            }`}
+                                        >
+                                            <span className={`text-xl transition-transform duration-200 flex-shrink-0 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
+                                                <i className={iconClass}></i>
+                                            </span>
+                                            <span className={`font-medium truncate ${isActive ? 'font-bold' : ''}`}>
+                                                {tab.label}
+                                            </span>
+                                            
+                                            {isActive && (
+                                                <i className="iconoir-arrow-right ml-auto text-sm opacity-70"></i>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+
+                                <div className={`mt-6 pt-6 border-t ${isDarkMode ? 'border-gray-800' : 'border-gray-100'}`}>
+                                   <p className={`px-4 text-xs uppercase tracking-wider font-bold mb-3 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                       Préférences
+                                   </p>
+                                   {/* Theme Toggle in Menu */}
+                                   <button
+                                        onClick={toggleTheme}
+                                        className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-4 transition-colors ${
+                                            isDarkMode ? 'text-gray-400 hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-50'
+                                        }`}
+                                   >
+                                       <span className="text-xl">
+                                           {isDarkMode ? <i className="iconoir-sun-light"></i> : <i className="iconoir-half-moon"></i>}
+                                       </span>
+                                       <span className="font-medium">
+                                           Mode {isDarkMode ? 'Clair' : 'Sombre'}
+                                       </span>
+                                   </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
 
                 {/* Audio UI feedback (désactivé par défaut jusqu'au premier geste utilisateur) */}
