@@ -5,7 +5,7 @@
 const { useState, useEffect } = React;
 const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, AreaChart, Area } = window.Recharts || {};
 
-const AdvancedAnalysisTab = () => {
+const AdvancedAnalysisTab = ({ isDarkMode }) => {
     // Watchlist / Team tickers (loaded from Supabase)
     const [watchlistTickers, setWatchlistTickers] = useState([]);
     const [watchlistLoaded, setWatchlistLoaded] = useState(false);
