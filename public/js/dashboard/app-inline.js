@@ -1093,11 +1093,21 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                     'META': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/META.svg'
                 };
 
-                return defaultLogos[ticker] || `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${ticker}.svg`;
+                // Strip suffix for Seeking Alpha logos (e.g. MFC.TO -> MFC)
+                const cleanTicker = ticker.split('.')[0];
+                return defaultLogos[ticker] || `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${cleanTicker}.svg`;
             } catch (error) {
                 console.error(`Erreur extraction logo pour ${ticker}:`, error?.message || String(error));
                 return `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${ticker}.svg`;
             }
+        };
+
+        // Fonction helper pour l'erreur de chargement d'image
+        const handleImageError = (e) => {
+            e.target.onerror = null; // Prevent loop
+            e.target.style.display = 'none';
+            // Optional: set fallback
+            // e.target.src = 'path/to/fallback.png';
         };
 
         // Système de logs pour Admin JSLAI
@@ -16604,7 +16614,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                 src={getCompanyLogo(item.ticker)}
                                                                 alt={item.ticker}
                                                                 className="w-6 h-6 rounded flex-shrink-0"
-                                                                onError={(e) => e.target.style.display = 'none'}
+                                                                onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }}
                                                             />
                                                             <span className={`font-mono font-bold text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'} flex-shrink-0`}>
                                                                 {item.ticker}
@@ -16691,7 +16701,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                 src={getCompanyLogo(item.ticker)}
                                                                 alt={item.ticker}
                                                                 className="w-6 h-6 rounded flex-shrink-0"
-                                                                onError={(e) => e.target.style.display = 'none'}
+                                                                onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }}
                                                             />
                                                             <span className={`font-mono font-bold text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'} flex-shrink-0`}>
                                                                 {item.ticker}
@@ -16816,7 +16826,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         src={getCompanyLogo(item.ticker)}
                                                         alt={item.ticker}
                                                         className="w-8 h-8 rounded"
-                                                        onError={(e) => e.target.style.display = 'none'}
+                                                        onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }}
                                                     />
                                                     <span className={`font-mono font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                                         {item.ticker}
@@ -16949,7 +16959,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             src={getCompanyLogo(ticker)}
                                                             alt={ticker}
                                                             className="w-12 h-12 rounded-lg flex-shrink-0"
-                                                            onError={(e) => e.target.style.display = 'none'}
+                                                            onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }}
                                                         />
                                                         <div className="flex-1 min-w-0">
                                                             <div className={`font-mono font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -17033,7 +17043,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                 src={getCompanyLogo(ticker)}
                                                                 alt={ticker}
                                                                 className="w-14 h-14 rounded-xl flex-shrink-0"
-                                                                onError={(e) => e.target.style.display = 'none'}
+                                                                onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }}
                                                             />
                                                             <div className="flex-1 min-w-0">
                                                                 <div className={`font-mono font-bold text-xl ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -24377,7 +24387,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             { id: 'scrapping-sa', label: 'Seeking', icon: 'iconoir-search', component: ScrappingSATab },
             { id: 'seeking-alpha', label: 'Stocks', icon: 'iconoir-graph-up', component: SeekingAlphaTab },
             { id: 'email-briefings', label: 'Emma', icon: 'iconoir-antenna-signal', component: EmailBriefingsTab },
-            { id: 'investing-calendar', label: 'TESTS', icon: 'iconoir-calendar', component: InvestingCalendarTab },
+            { id: 'investing-calendar', label: 'Calendrier', icon: 'iconoir-calendar', component: InvestingCalendarTab },
             { id: 'emma-config', label: 'Emma', icon: 'iconoir-settings', component: EmmaConfigTab }
         ], []);
 

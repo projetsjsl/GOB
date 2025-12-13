@@ -612,12 +612,12 @@ const InvestingCalendarTab = () => {
                     <h2 className={`text-xl md:text-2xl lg:text-3xl font-bold mb-2 transition-colors duration-300 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                        🧪 TESTS JS - Widgets Financiers
+                        💰 Centre d'Analyse Financière
                     </h2>
                     <p className={`text-xs md:text-sm transition-colors duration-300 ${
                         isDarkMode ? 'text-blue-200' : 'text-blue-800'
                     }`}>
-                        Collection complète de 14 widgets TradingView et outils d'analyse financière organisés par catégorie
+                        Suite complète d'outils d'analyse de marché et calendriers économiques en temps réel
                     </p>
                 </div>
             </div>

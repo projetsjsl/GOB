@@ -128,6 +128,14 @@
     <!-- TradingView Lightweight Charts - Bibliothèque officielle pour graphiques personnalisés -->
     <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
     <!-- Note: CDN Tailwind utilisé intentionnellement pour ce fichier standalone -->
+    <script>
+        // Suppress Tailwind CDN warnings in production
+        const originalWarn = console.warn;
+        console.warn = function(...args) {
+            if (args[0] && typeof args[0] === 'string' && (args[0].includes('cdn.tailwindcss.com') || args[0].includes('production'))) return;
+            originalWarn.apply(console, args);
+        };
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Recharts pour IntelliStocks -->

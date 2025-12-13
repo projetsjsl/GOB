@@ -137,17 +137,21 @@ class ToastManager {
             </div>
         `;
 
-        this.container.appendChild(toast);
+        if (this.container) {
+            this.container.appendChild(toast);
+            
+            // Animate in
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
 
-        // Animate in
-        requestAnimationFrame(() => {
-            toast.classList.add('show');
-        });
-
-        // Auto dismiss
-        setTimeout(() => {
-            this.dismiss(toast);
-        }, duration);
+            // Auto dismiss
+            setTimeout(() => {
+                this.dismiss(toast);
+            }, duration);
+        } else {
+            console.warn('Toast container not initialized');
+        }
     }
 
     dismiss(toast) {
