@@ -1,11 +1,21 @@
 
 /**
  * Storage Utility for 3p1 Dashboard
- * Handles persistence of large datasets using IndexedDB with fallback to localStorage.
- * 
- * Why IndexedDB? 
- * localStorage is synchronous and limited to ~5MB.
- * IndexedDB is asynchronous and allows GBs of storage, essential for 800+ tickers.
+ *
+ * ⚠️ IMPORTANT (historique bug):
+ * - Une partie du code 3p1 écrivait encore dans `localStorage` directement,
+ *   tandis que la lecture était faite via IndexedDB (si disponible).
+ * - Résultat: la liste de tickers pouvait sembler "disparue" (lecture IDB vide
+ *   alors que les données existaient en localStorage).
+ *
+ * ✅ Solution:
+ * - Adapter hybride: lecture IDB → fallback localStorage → migration vers IDB.
+ * - Écriture best-effort dans IDB + localStorage (localStorage peut échouer
+ *   par quota, mais sert de compatibilité).
+ *
+ * Why IndexedDB?
+ * - localStorage est synchrone et limité (~5MB)
+ * - IndexedDB est asynchrone et peut stocker beaucoup plus (utile 800+ tickers)
  */
 
 const DB_NAME = '3p1_FinanceDB';
@@ -123,28 +133,133 @@ export const indexedDBAdapter: StorageAdapter = {
 // LocalStorage Fallback (Sync turned into Async for compatibility)
 export const localStorageAdapter: StorageAdapter = {
   getItem: async (key: string) => {
-    const val = localStorage.getItem(key);
     try {
+      if (typeof window === 'undefined' || !window.localStorage) return null;
+      const val = window.localStorage.getItem(key);
+      try {
         return val ? JSON.parse(val) : null;
-    } catch {
+      } catch {
         return val;
+      }
+    } catch (e) {
+      // Certains contextes (mode privé / politiques) peuvent bloquer localStorage
+      console.warn('localStorage Read Error, returning null', e);
+      return null;
     }
   },
   setItem: async (key: string, value: any) => {
-    localStorage.setItem(key, JSON.stringify(value));
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return;
+      window.localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+      console.warn('localStorage Write Error (quota/blocked)', e);
+    }
   },
   removeItem: async (key: string) => {
-    localStorage.removeItem(key);
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return;
+      window.localStorage.removeItem(key);
+    } catch (e) {
+      console.warn('localStorage Remove Error', e);
+    }
   },
   clear: async () => {
-    localStorage.clear();
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return;
+      window.localStorage.clear();
+    } catch (e) {
+      console.warn('localStorage Clear Error', e);
+    }
   },
   keys: async () => {
-      return Object.keys(localStorage);
+      try {
+        if (typeof window === 'undefined' || !window.localStorage) return [];
+        return Object.keys(window.localStorage);
+      } catch (e) {
+        console.warn('localStorage Keys Error', e);
+        return [];
+      }
   }
 };
 
-// Automatic switch: Use IndexedDB if available, else LocalStorage
-export const storage = typeof window !== 'undefined' && window.indexedDB 
-  ? indexedDBAdapter 
-  : localStorageAdapter;
+// ============================================
+// ADAPTER HYBRIDE: IDB → localStorage → migration
+// ============================================
+const hasIndexedDB = () => typeof window !== 'undefined' && !!window.indexedDB;
+
+export const storage: StorageAdapter = {
+  getItem: async (key: string) => {
+    // 1) Essayer IndexedDB si disponible
+    if (hasIndexedDB()) {
+      const idbVal = await indexedDBAdapter.getItem(key);
+      if (idbVal !== null && typeof idbVal !== 'undefined') return idbVal;
+
+      // 2) Fallback sur localStorage (compat/migration)
+      const lsVal = await localStorageAdapter.getItem(key);
+      if (lsVal !== null && typeof lsVal !== 'undefined') {
+        // 3) Migrer best-effort vers IDB pour les prochains chargements
+        try {
+          await indexedDBAdapter.setItem(key, lsVal);
+        } catch (e) {
+          console.warn('IDB migration failed (continuing with localStorage value)', e);
+        }
+        return lsVal;
+      }
+      return null;
+    }
+
+    // Pas d'IndexedDB: utiliser localStorage
+    return localStorageAdapter.getItem(key);
+  },
+
+  setItem: async (key: string, value: any) => {
+    // Best-effort: écrire dans IDB (si dispo) + localStorage (compat)
+    if (hasIndexedDB()) {
+      try {
+        await indexedDBAdapter.setItem(key, value);
+      } catch (e) {
+        console.warn('IDB Write Error (continuing with localStorage fallback)', e);
+      }
+    }
+    await localStorageAdapter.setItem(key, value);
+  },
+
+  removeItem: async (key: string) => {
+    if (hasIndexedDB()) {
+      try {
+        await indexedDBAdapter.removeItem(key);
+      } catch (e) {
+        console.warn('IDB Remove Error', e);
+      }
+    }
+    await localStorageAdapter.removeItem(key);
+  },
+
+  clear: async () => {
+    if (hasIndexedDB()) {
+      try {
+        await indexedDBAdapter.clear();
+      } catch (e) {
+        console.warn('IDB Clear Error', e);
+      }
+    }
+    await localStorageAdapter.clear();
+  },
+
+  keys: async () => {
+    const out = new Set<string>();
+    if (hasIndexedDB()) {
+      try {
+        (await indexedDBAdapter.keys()).forEach(k => out.add(k));
+      } catch (e) {
+        console.warn('IDB Keys Error', e);
+      }
+    }
+    try {
+      (await localStorageAdapter.keys()).forEach(k => out.add(k));
+    } catch (e) {
+      console.warn('localStorage Keys Error', e);
+    }
+    return Array.from(out);
+  }
+};
