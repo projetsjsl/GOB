@@ -25686,5 +25686,5 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // DOM déjà chargé, monter immédiatement
         mountApp();
     }
-}
+
 
