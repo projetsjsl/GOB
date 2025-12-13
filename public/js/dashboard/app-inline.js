@@ -24283,11 +24283,44 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         </div>
                     )}
                     {!isLoaded && !loadError && (
-                        <div className={`p-4 mb-4 rounded-lg border transition-colors duration-300 ${isDarkMode
-                            ? 'bg-gray-800 border-gray-700 text-gray-300'
-                            : 'bg-gray-100 border-gray-200 text-gray-600'
-                            }`}>
-                            <p className="text-sm">Chargement de l'application Analyse Financière Pro...</p>
+                        /* Skeleton UI Loading Screen - Matches 3p1 Dashboard Layout */
+                        <div className="absolute inset-0 bg-gray-50 dark:bg-gray-900 z-40 flex overflow-hidden">
+                            {/* Sidebar Skeleton */}
+                            <div className="hidden md:flex w-20 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex-col items-center py-6 space-y-6">
+                                {[1, 2, 3, 4, 5].map(i => (
+                                    <div key={i} className="w-10 h-10 rounded-xl bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+                                ))}
+                            </div>
+                            {/* Main Content Skeleton */}
+                            <div className="flex-1 flex flex-col h-full overflow-hidden">
+                                {/* Header Skeleton */}
+                                <div className="h-16 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center px-6 justify-between shrink-0">
+                                    <div className="w-48 h-6 rounded bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+                                    <div className="flex space-x-3">
+                                        <div className="w-24 h-9 rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+                                        <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+                                    </div>
+                                </div>
+                                {/* Dashboard Grid Skeleton */}
+                                <div className="flex-1 p-6 overflow-y-auto">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                        {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                                            <div key={i} className="h-64 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 space-y-4">
+                                                <div className="flex justify-between items-start">
+                                                    <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse"></div>
+                                                    <div className="w-8 h-4 rounded bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+                                                </div>
+                                                <div className="w-3/4 h-5 rounded bg-gray-200 dark:bg-gray-800 animate-pulse mt-2"></div>
+                                                <div className="w-full h-24 rounded-lg bg-gray-100 dark:bg-gray-800/50 animate-pulse"></div>
+                                                <div className="space-y-2 pt-2">
+                                                    <div className="w-full h-3 rounded bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+                                                    <div className="w-2/3 h-3 rounded bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )}
                     <div
@@ -25246,29 +25279,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                                 {/* Theme Selector */}
                                 {window.ThemeSelector && (
+                                    <window.ThemeSelector />
+                                )}
+                                {window.ThemeSelector && (
                                     <ThemeSelector isDarkMode={isDarkMode} />
                                 )}
 
-                                {/* Theme toggle - icône seulement */}
-                                <button
-                                    onClick={toggleTheme}
-                                    className="p-1.5 rounded-md transition-all duration-300 hover:scale-105 border"
-                                    style={{
-                                        background: `var(--theme-surface, ${isDarkMode ? '#1f2937' : '#ffffff'})`,
-                                        borderColor: `rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)`,
-                                        color: 'var(--theme-primary, #4ade80)',
-                                        borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.375rem'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.background = `var(--theme-surface-light, ${isDarkMode ? '#374151' : '#f9fafb'})`;
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.background = `var(--theme-surface, ${isDarkMode ? '#1f2937' : '#ffffff'})`;
-                                    }}
-                                    title={isDarkMode ? 'Mode Clair' : 'Mode Sombre'}
-                                >
-                                    <span className="text-sm">{isDarkMode ? '☀️' : '🌙'}</span>
-                                </button>
 
                                 {/* Bouton de déconnexion - icône seulement */}
                                 <button

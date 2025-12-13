@@ -20,7 +20,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@400;500;600;700;800;900&family=Georgia:wght@400;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@400;500;600;700;800;900&family=Georgia:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <!-- Avenir Pro 85 Heavy alternative: Montserrat Heavy (900) ou Avenir Next si disponible -->
     <style>
@@ -145,6 +145,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
     <!-- Roles & Permissions System -->
     <script src="/js/roles-permissions.js"></script>
+    <!-- Toast Notification Manager (Global) -->
+    <script src="/js/utils/toast-manager.js"></script>
 
     <!-- Script pour exposer les bibliothèques globalement -->
     <script>
@@ -225,13 +227,29 @@
         import { emmaConfig } from './emma-config.js';
         window.emmaConfig = emmaConfig;
         console.log('✅ Emma Config chargé:', window.emmaConfig ? 'OK' : 'ERREUR');
+
+        // Init Toast Helper Global
+        window.showToast = (msg, type = 'info') => {
+            if (window.Toast) window.Toast.show(msg, type);
+            else console.log('Toast:', msg);
+        };
+        // Welcome Toast
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if(window.showToast) window.showToast('Bienvenue sur votre Dashboard Premium', 'gold', 'JSLai Wealth');
+            }, 1000);
+        });
     </script>
 
     <!-- Styles Emma -->
     <link rel="stylesheet" href="emma-styles.css">
     <style>
         * {
-            font-family: 'Inter', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Plus Jakarta Sans', 'Inter', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6, .font-display {
+            font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
         }
 
         .tab-content {
@@ -908,6 +926,7 @@
     <!-- Announcement Bars System (Gemini-powered) -->
     <script type="text/babel" src="/js/dashboard/components/AnnouncementBar.js"></script>
     <script type="text/babel" src="/js/dashboard/components/AnnouncementBarManager.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/ThemeSelector.js"></script>
 
     <!-- Inline (legacy) bundle to preserve existing design -->
     <script type="text/babel" data-presets="react" src="/js/dashboard/app-inline.js"></script>
