@@ -23,88 +23,50 @@
      * Initialise la protection du dashboard
      */
     async init() {
-      console.log('🔐 Auth Guard: Vérification de l\'authentification...');
+      console.log('🔓 Auth Guard (TEST MODE): Bypassing authentication...');
+      
+      const MOCK_USER = {
+        id: 'mock-admin-test',
+        username: 'admin',
+        display_name: 'Admin Test',
+        role: 'admin',
+        permissions: {
+          view_dashboard: true,
+          view_emma: true,
+          save_conversations: true,
+          view_own_history: true,
+          view_all_history: true,
+          manage_users: true
+        },
+        last_login: new Date().toISOString()
+      };
 
-      // Vérifier si on est sur la page de login (ne pas rediriger)
-      if (window.location.pathname.includes('login.html')) {
-        console.log('📝 Page de login détectée - pas de vérification nécessaire');
-        return;
-      }
-
-      // Récupérer l'utilisateur depuis sessionStorage
-      // CRITIQUE: Utiliser le storage NATIF (pas le wrapper avec fallback mémoire)
-      // pour pouvoir lire les données après redirection depuis login.html
-      let userJson = null;
+      // Force inject mock user if not present
       try {
-        if (window.__nativeSessionStorage) {
-          userJson = window.__nativeSessionStorage.getItem(AUTH_STORAGE_KEY);
-        } else {
-          userJson = sessionStorage.getItem(AUTH_STORAGE_KEY);
+        const storage = window.__nativeSessionStorage || sessionStorage;
+        if (!storage.getItem(AUTH_STORAGE_KEY)) {
+             console.log('💉 Injecting mock admin session');
+             storage.setItem(AUTH_STORAGE_KEY, JSON.stringify(MOCK_USER));
         }
       } catch (e) {
-        console.error('❌ Impossible de lire sessionStorage:', e);
+        console.warn('⚠️ Storage error:', e);
       }
 
-      if (!userJson) {
-        console.warn('❌ Aucun utilisateur connecté - redirection vers login');
-        this.redirectToLogin();
-        return;
-      }
+      // Proceed as if authenticated
+      this.currentUser = MOCK_USER;
+      this.permissions = MOCK_USER.permissions;
 
-      try {
-        this.currentUser = JSON.parse(userJson);
-        this.permissions = this.currentUser.permissions;
-
-        // Valider la session auprès du serveur
-        const isValid = await this.validateSession();
-
-        if (!isValid) {
-          console.warn('❌ Session invalide - redirection vers login');
-          this.logout();
-          return;
-        }
-
-        console.log('✅ Utilisateur authentifié:', this.currentUser.display_name);
-        console.log('🔑 Permissions:', this.permissions);
-
-        // Afficher les infos utilisateur dans le dashboard
-        this.displayUserInfo();
-
-        // Créer le bouton de déconnexion
-        this.createLogoutButton();
-
-        // Appliquer les permissions Emma
-        this.applyEmmaPermissions();
-
-      } catch (error) {
-        console.error('❌ Erreur lors de la vérification de l\'authentification:', error);
-        this.redirectToLogin();
-      }
+      console.log('✅ Utilisateur authentifié (MOCK):', this.currentUser.display_name);
+      this.displayUserInfo();
+      this.createLogoutButton();
+      this.applyEmmaPermissions();
     }
 
     /**
-     * Valide la session auprès du serveur
+     * Valide la session auprès du serveur (Bypassed)
      */
     async validateSession() {
-      try {
-        const response = await fetch('/api/auth', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            action: 'validate',
-            username: this.currentUser.username
-          })
-        });
-
-        const data = await response.json();
-        return data.success;
-
-      } catch (error) {
-        console.error('Erreur validation session:', error);
-        return false;
-      }
+      return true; // Always return true for testing
     }
 
     /**
