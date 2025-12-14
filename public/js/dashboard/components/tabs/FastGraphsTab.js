@@ -287,7 +287,7 @@ const FastGraphsTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                 />
                             </div>
                             <p className="text-xs text-gray-400">
-                                ⚠️ Laissez vide pour utiliser les identifiants stockés sur le serveur (.env), ou remplissez pour surcharger temporairement.
+                                ⚠️ Laissez vide pour utiliser les identifiants stockés sur le serveur (.env : FASTGRAPHS_ID / FASTGRAPHS_PASS), ou remplissez pour surcharger temporairement.
                             </p>
                         </div>
                     )}
