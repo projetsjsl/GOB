@@ -21331,7 +21331,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             return (
                 <div className="space-y-3 md:space-y-6">
-                    <div className="bg-red-500 text-white p-4 font-bold text-center">DEBUG: TESTS TAB LOADED (Internal)</div>
+                    {/* En-tête principal TESTS JS */}
                     {/* En-tête principal TESTS JS */}
                     <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-r from-blue-900 to-purple-900' : 'bg-gradient-to-r from-blue-100 to-purple-100'
                         }`}>
@@ -21410,6 +21410,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </div>
 
                     {/* Widget TradingView Forex Heat Map */}
+                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: FOREX_HEATMAP</div>
                     <ExpandableComponent title="Forex Heat Map" icon="💱" isDarkMode={isDarkMode}>
                         <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                             <div className="mb-3 md:mb-6">
@@ -21430,6 +21431,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </ExpandableComponent>
 
                     {/* Widget TradingView Economic Calendar Events */}
+                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: ECONOMIC_CALENDAR_EVENTS_TV</div>
                     <ExpandableComponent title="Economic Calendar Events" icon="📅" isDarkMode={isDarkMode}>
                         <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                             <div className="mb-3 md:mb-6">
@@ -21450,6 +21452,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </ExpandableComponent>
 
                     {/* Widget TradingView Forex Cross Rates */}
+                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: FOREX_CROSS_RATES</div>
                     <ExpandableComponent title="Forex Cross Rates" icon="💱" isDarkMode={isDarkMode}>
                         <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                             <div className="mb-3 md:mb-6">
@@ -21483,6 +21486,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </div>
 
                     {/* Widget TradingView Stock Heatmap */}
+                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: STOCK_HEATMAP_USA</div>
                     <ExpandableComponent title="Stock Heatmap All USA" icon="🇺🇸" isDarkMode={isDarkMode}>
                         <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                             <div className="mb-3 md:mb-6">
@@ -21896,6 +21900,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-4">
 
                                 {/* 1. Symbol Info - PLEINE LARGEUR */}
+                                <div className="col-span-1 lg:col-span-2 bg-yellow-200 text-black text-xs font-mono p-1 font-bold border border-yellow-400">REF: SYMBOL_INFO</div>
                                 <ExpandableComponent title="Symbol Info" icon="📊" className="lg:col-span-2" isDarkMode={isDarkMode}>
                                     <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'}`}>
                                         <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -21908,6 +21913,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </ExpandableComponent>
 
                                 {/* 2. Advanced Chart - PLEINE LARGEUR */}
+                                <div className="col-span-1 lg:col-span-2 bg-yellow-200 text-black text-xs font-mono p-1 font-bold border border-yellow-400 mt-4">REF: ADVANCED_CHART_TV</div>
                                 <ExpandableComponent title={`${timelineSymbol.split(':')[1]} - Graphique Avancé`} icon="📊" className="lg:col-span-2" isDarkMode={isDarkMode}>
                                     <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'}`}>
                                         <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -21923,6 +21929,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </ExpandableComponent>
 
                                 {/* 3. Symbol Profile - 1 COLONNE */}
+                                <div className="bg-yellow-200 text-black text-xs font-mono p-1 font-bold border border-yellow-400 mt-4">REF: COMPANY_PROFILE</div>
                                 <ExpandableComponent title="Profil de l'Entreprise" icon="🏢" isDarkMode={isDarkMode}>
                                     <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'}`}>
                                         <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -21935,6 +21942,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </ExpandableComponent>
 
                                 {/* 4. Timeline - 1 COLONNE */}
+                                <div className="bg-yellow-200 text-black text-xs font-mono p-1 font-bold border border-yellow-400 mt-4">REF: TIMELINE_NEWS</div>
                                 <ExpandableComponent title="Timeline - Fil d'Actualité" icon="📰" isDarkMode={isDarkMode}>
                                     <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'}`}>
                                         <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -21947,6 +21955,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </ExpandableComponent>
 
                                 {/* 5. Financials - PLEINE LARGEUR */}
+                                <div className="col-span-1 lg:col-span-2 bg-yellow-200 text-black text-xs font-mono p-1 font-bold border border-yellow-400 mt-4">REF: FINANCIALS</div>
                                 <ExpandableComponent title="États Financiers" icon="💰" className="lg:col-span-2" isDarkMode={isDarkMode}>
                                     <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'}`}>
                                         <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -21959,6 +21968,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </ExpandableComponent>
 
                                 {/* 6. Technical Analysis - PLEINE LARGEUR */}
+                                <div className="col-span-1 lg:col-span-2 bg-yellow-200 text-black text-xs font-mono p-1 font-bold border border-yellow-400 mt-4">REF: TECHNICAL_ANALYSIS</div>
                                 <ExpandableComponent title="Analyse Technique" icon="📈" className="lg:col-span-2" isDarkMode={isDarkMode}>
                                     <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'}`}>
                                         <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -21975,6 +21985,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </div>
 
                     {/* Widget TradingView Screener (Non synchronisé - reste séparé) */}
+                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: SCREENER_TV</div>
                     <ExpandableComponent title="Screener de Titres" icon="🔍" isDarkMode={isDarkMode}>
                         <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                             <div className="mb-3 md:mb-6">
