@@ -1,28 +1,33 @@
-// Auto-converted from monolithic dashboard file
-// Component: StocksNewsTab
+const { useState, useEffect, useRef, useCallback } = React;
 
+const StocksNewsTab = (props) => {
+        // Récupère les données/handlers depuis la surface globale du dashboard avec fallback props
+        const dashboard = typeof window !== 'undefined' ? window.BetaCombinedDashboard || {} : {};
+        const isDarkMode = props.isDarkMode ?? dashboard.isDarkMode ?? true;
+        const tickers = (props.tickers && props.tickers.length > 0 ? props.tickers : dashboard.tickers) ?? [];
+        const stockData = (props.stockData && Object.keys(props.stockData).length > 0 ? props.stockData : dashboard.stockData) ?? {};
+        const newsData = (props.newsData && props.newsData.length > 0 ? props.newsData : dashboard.newsData) ?? [];
+        const tickerLatestNews = props.tickerLatestNews ?? dashboard.tickerLatestNews ?? {};
+        const tickerMoveReasons = props.tickerMoveReasons ?? dashboard.tickerMoveReasons ?? {};
+        const loading = props.loading ?? dashboard.loading ?? false;
+        const lastUpdate = props.lastUpdate ?? dashboard.lastUpdate ?? null;
+        const loadTickersFromSupabase = props.loadTickersFromSupabase || dashboard.loadTickersFromSupabase;
+        const fetchNews = props.fetchNews || dashboard.fetchNews;
+        const refreshAllStocks = props.refreshAllStocks || dashboard.refreshAllStocks;
+        const fetchLatestNewsForTickers = props.fetchLatestNewsForTickers || dashboard.fetchLatestNewsForTickers;
+        const setActiveTab = props.setActiveTab || dashboard.setActiveTab;
+        const setSelectedStock = props.setSelectedStock || dashboard.setSelectedStock;
+        const getCompanyLogo = props.getCompanyLogo
+            || (typeof window !== 'undefined' ? window.BetaCombinedDashboardData?.getCompanyLogo : undefined)
+            || dashboard.getCompanyLogo;
+        const cleanTextUtil = (typeof window !== 'undefined' ? window.DASHBOARD_UTILS?.cleanText : undefined) || ((text) => text || '');
+        const getNewsIconUtil = (typeof window !== 'undefined' ? window.DASHBOARD_UTILS?.getNewsIcon : undefined) || (() => ({ icon: 'Info', color: 'text-gray-400' }));
 
-
-
-const StocksNewsTab = () => {
-        // Récupère les données/handlers depuis la surface globale du dashboard
-        const isDarkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
-        const tickers = window.BetaCombinedDashboard?.tickers ?? [];
-        const stockData = window.BetaCombinedDashboard?.stockData ?? {};
-        const newsData = window.BetaCombinedDashboard?.newsData ?? [];
-        const tickerLatestNews = window.BetaCombinedDashboard?.tickerLatestNews ?? {};
-        const tickerMoveReasons = window.BetaCombinedDashboard?.tickerMoveReasons ?? {};
-        const loading = window.BetaCombinedDashboard?.loading ?? false;
-        const lastUpdate = window.BetaCombinedDashboard?.lastUpdate ?? null;
-        const loadTickersFromSupabase = window.BetaCombinedDashboard?.loadTickersFromSupabase;
-        const fetchNews = window.BetaCombinedDashboard?.fetchNews;
-        const refreshAllStocks = window.BetaCombinedDashboard?.refreshAllStocks;
-        const fetchLatestNewsForTickers = window.BetaCombinedDashboard?.fetchLatestNewsForTickers;
-        const setActiveTab = window.BetaCombinedDashboard?.setActiveTab;
-        const setSelectedStock = window.BetaCombinedDashboard?.setSelectedStock;
-        const getCompanyLogo = window.BetaCombinedDashboardData?.getCompanyLogo || window.BetaCombinedDashboard?.getCompanyLogo;
-        const cleanTextUtil = window.DASHBOARD_UTILS?.cleanText || ((text) => text || '');
-        const getNewsIconUtil = window.DASHBOARD_UTILS?.getNewsIcon || (() => ({ icon: 'Info', color: 'text-gray-400' }));
+        // Fix for undefined LucideIcon ensuring it resolves from props, window, or fallback
+        const LucideIcon = props.LucideIcon || 
+                          (typeof window !== 'undefined' ? window.LucideIcon : undefined) || 
+                          (typeof window !== 'undefined' ? window.DASHBOARD_UTILS?.LucideIcon : undefined) || 
+                          (({ name, className = '' }) => <span className={`icon-${name} ${className}`}></span>);
 
         // Safe async wrappers to avoid runtime errors if globals are missing
         const safeLoadTickers = typeof loadTickersFromSupabase === 'function' ? loadTickersFromSupabase : async () => {};
@@ -34,6 +39,111 @@ const StocksNewsTab = () => {
 
         const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
         const [expandedStock, setExpandedStock] = useState(null);
+
+        // Refs pour les widgets TradingView
+        const marketOverviewRef = useRef(null);
+        const heatmapRef = useRef(null);
+        const screenerRef = useRef(null);
+
+        // Charger les widgets TradingView
+        useEffect(() => {
+            // Market Overview Widget
+            if (marketOverviewRef.current) {
+                marketOverviewRef.current.innerHTML = '';
+                const script = document.createElement('script');
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
+                script.async = true;
+                script.innerHTML = JSON.stringify({
+                    "colorTheme": isDarkMode ? "dark" : "light",
+                    "dateRange": "1D",
+                    "showChart": true,
+                    "locale": "fr",
+                    "width": "100%",
+                    "height": "100%",
+                    "largeChartUrl": "",
+                    "isTransparent": false,
+                    "showSymbolLogo": true,
+                    "showFloatingTooltip": true,
+                    "tabs": [
+                        {
+                            "title": "Indices",
+                            "symbols": [
+                                {"s": "FOREXCOM:SPXUSD", "d": "S&P 500"},
+                                {"s": "FOREXCOM:NSXUSD", "d": "US 100"},
+                                {"s": "FOREXCOM:DJI", "d": "Dow 30"},
+                                {"s": "INDEX:NKY", "d": "Nikkei 225"},
+                                {"s": "INDEX:DEU40", "d": "DAX Index"},
+                                {"s": "FOREXCOM:UKXGBP", "d": "UK 100"}
+                            ]
+                        },
+                        {
+                            "title": "Forex",
+                            "symbols": [
+                                {"s": "FX:EURUSD", "d": "EUR/USD"},
+                                {"s": "FX:GBPUSD", "d": "GBP/USD"},
+                                {"s": "FX:USDJPY", "d": "USD/JPY"},
+                                {"s": "FX:USDCAD", "d": "USD/CAD"}
+                            ]
+                        },
+                        {
+                            "title": "Crypto",
+                            "symbols": [
+                                {"s": "BINANCE:BTCUSDT", "d": "Bitcoin"},
+                                {"s": "BINANCE:ETHUSDT", "d": "Ethereum"},
+                                {"s": "BINANCE:BNBUSDT", "d": "BNB"},
+                                {"s": "BINANCE:SOLUSDT", "d": "Solana"}
+                            ]
+                        }
+                    ]
+                });
+                marketOverviewRef.current.appendChild(script);
+            }
+
+            // Heatmap Widget
+            if (heatmapRef.current) {
+                heatmapRef.current.innerHTML = '';
+                const script = document.createElement('script');
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+                script.async = true;
+                script.innerHTML = JSON.stringify({
+                    "exchanges": [],
+                    "dataSource": "SPX500",
+                    "grouping": "sector",
+                    "blockSize": "market_cap_basic",
+                    "blockColor": "change",
+                    "locale": "fr",
+                    "symbolUrl": "",
+                    "colorTheme": isDarkMode ? "dark" : "light",
+                    "hasTopBar": true,
+                    "isDataSetEnabled": true,
+                    "isZoomEnabled": true,
+                    "hasSymbolTooltip": true,
+                    "width": "100%",
+                    "height": "100%"
+                });
+                heatmapRef.current.appendChild(script);
+            }
+
+            // Screener Widget
+            if (screenerRef.current) {
+                screenerRef.current.innerHTML = '';
+                const script = document.createElement('script');
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
+                script.async = true;
+                script.innerHTML = JSON.stringify({
+                    "width": "100%",
+                    "height": "100%",
+                    "defaultColumn": "overview",
+                    "defaultScreen": "most_capitalized",
+                    "market": "america",
+                    "showToolbar": true,
+                    "colorTheme": isDarkMode ? "dark" : "light",
+                    "locale": "fr",
+                    "isTransparent": false
+                });
+                screenerRef.current.appendChild(script);
+            }
+        }, [isDarkMode]);
 
         const renderMarketBadge = window.DASHBOARD_UTILS?.renderMarketBadge
             ? (type) => window.DASHBOARD_UTILS.renderMarketBadge(type, isDarkMode)
@@ -99,9 +209,6 @@ const StocksNewsTab = () => {
 
         return (
         <div className="space-y-6">
-
-
-
             {/* Message d'état si pas de données */}
             {tickers.length === 0 && (
                 <div className={`p-6 rounded-xl border-2 transition-colors duration-300 ${
@@ -197,6 +304,99 @@ const StocksNewsTab = () => {
                     Dernière mise à jour: {new Date(lastUpdate).toLocaleString('fr-FR')}
                 </p>
             )}
+
+            {/* ===== WIDGETS MARCHÉ (Teaching & TradingView) ===== */}
+            <div className="grid grid-cols-1 gap-6 mb-8">
+                {/* Market Overview Widget */}
+                <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                    isDarkMode
+                        ? 'bg-gray-800/50 border-blue-500/30'
+                        : 'bg-white border-blue-400/40'
+                }`}>
+                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                        <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>
+                            📊 Vue d'ensemble des Marchés (Temps Réel)
+                        </h3>
+                        <p className={`text-sm transition-colors duration-300 ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                            Indices majeurs, Forex, Crypto - Données en direct
+                        </p>
+                    </div>
+                    <div ref={marketOverviewRef} style={{height: '400px'}}></div>
+                </div>
+
+                {/* Investing.com Economic Calendar */}
+                <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                    isDarkMode
+                        ? 'bg-gray-800/50 border-orange-500/30'
+                        : 'bg-white border-orange-400/40'
+                }`}>
+                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                        <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>
+                            📅 Calendrier Économique (Investing.com)
+                        </h3>
+                        <p className={`text-sm transition-colors duration-300 ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                             Événements économiques majeurs à surveiller
+                        </p>
+                    </div>
+                    <div className="h-[500px] w-full relative">
+                        {/* Overlay to hide potential ads or header if needed, though sandbox helps */}
+                         <iframe
+                            src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&importance=1,2,3&features=datepicker,timezone,timeselector,filters&countries=6,5&calType=day&timeZone=8&lang=5&transparentBackground=1"
+                            width="100%"
+                            height="100%"
+                            frameBorder="0"
+                            allowTransparency="true"
+                            marginWidth="0"
+                            marginHeight="0"
+                            sandbox="allow-scripts allow-same-origin allow-forms"
+                            className="relative z-0"
+                            style={{ minWidth: '100%', background: 'transparent' }}
+                        />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Stock Heatmap Widget */}
+                    <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                        isDarkMode
+                            ? 'bg-gray-800/50 border-green-500/30'
+                            : 'bg-white border-green-400/40'
+                    }`}>
+                        <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                            <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>
+                                🔥 Heatmap Boursière
+                            </h3>
+                        </div>
+                        <div ref={heatmapRef} style={{height: '400px'}}></div>
+                    </div>
+
+                    {/* Screener Widget */}
+                    <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                        isDarkMode
+                            ? 'bg-gray-800/50 border-purple-500/30'
+                            : 'bg-white border-purple-400/40'
+                    }`}>
+                        <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                            <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>
+                                🚀 Screener
+                            </h3>
+                        </div>
+                        <div ref={screenerRef} style={{height: '400px'}}></div>
+                    </div>
+                </div>
+            </div>
 
             {/* TOP MOVERS - Vue rapide */}
             {tickers.length > 0 && (
@@ -1386,6 +1586,7 @@ const StocksNewsTab = () => {
                                                     ? 'bg-gradient-to-b from-gray-400 to-gray-600'
                                                     : 'bg-gradient-to-b from-red-400 to-red-600'
                                             }`}></div>
+                                            
                                             <div className="relative z-10">
                                                 {/* Source et crédibilité */}
                                                 <div className="flex items-center justify-between mb-4">
@@ -1494,4 +1695,8 @@ const StocksNewsTab = () => {
     );
 };
 
-window.StocksNewsTab = StocksNewsTab;
+if (typeof window !== 'undefined') {
+    window.StocksNewsTab = StocksNewsTab;
+}
+
+
