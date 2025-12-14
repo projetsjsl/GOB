@@ -3697,9 +3697,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             const finalSymbols = symbolsToDisplay.length > 0 
                 ? symbolsToDisplay 
                 : [
-                    { proName: 'SP:SPX', title: 'S&P 500' },
-                    { proName: 'DJ:DJI', title: 'Dow Jones' },
-                    { proName: 'NASDAQ:NDX', title: 'NASDAQ 100' }
+                    { proName: 'FOREXCOM:SPXUSD', title: 'S&P 500' },
+                    { proName: 'FOREXCOM:NSXUSD', title: 'NASDAQ 100' },
+                    { proName: 'FOREXCOM:DJI', title: 'Dow Jones' },
+                    { proName: 'OANDA:XAUUSD', title: 'Gold' },
+                    { proName: 'BITSTAMP:BTCUSD', title: 'Bitcoin' }
                 ];
 
             const script = document.createElement('script');
