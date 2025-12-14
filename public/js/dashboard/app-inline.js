@@ -21361,6 +21361,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </div>
 
                     {/* Calendrier Économique Investing.com */}
+                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: CALENDRIER_ECONOMIQUE_INVESTING</div>
                     <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                         <div className="mb-3 md:mb-6">
@@ -21517,6 +21518,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </ExpandableComponent>
 
                     {/* Widget TradingView Stock Heatmap TSX */}
+                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: STOCK_HEATMAP_TSX</div>
                     <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                         <div className="mb-3 md:mb-6">
@@ -21550,6 +21552,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </div>
 
                     {/* Widget TradingView Market Quotes */}
+                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: MARKET_QUOTES</div>
                     <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                         <div className="mb-3 md:mb-6">
@@ -21596,6 +21599,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </div>
 
                     {/* Widget FastGraphs */}
+                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: FASTGRAPHS</div>
                     <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                         <div className="mb-3 md:mb-6">
