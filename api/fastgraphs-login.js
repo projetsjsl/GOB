@@ -7,7 +7,17 @@
  * 3. Exécute les actions de login de manière fiable
  */
 
-import { chromium } from 'playwright-core';
+/**
+ * API Endpoint pour se connecter à FastGraphs.com via Playwright Core + Browserbase
+ * 
+ * Ce endpoint exécute un workflow automatisé robuste qui:
+ * 1. Crée une session Browserbase
+ * 2. Se connecte via Playwright (CDP)
+ * 3. Exécute les actions de login de manière fiable
+ */
+
+// Note: On utilise l'import dynamique pour éviter les crashs au démarrage si playwright-core a des soucis de dépendances
+// import { chromium } from 'playwright-core'; 
 
 export default async function handler(req, res) {
   // CORS headers
@@ -27,6 +37,17 @@ export default async function handler(req, res) {
   const automationSteps = [];
 
   try {
+    // Import dynamique pour la robustesse serverless
+    // Cela permet d'attraper les erreurs de chargement de module ici au lieu de crasher le process
+    let chromium;
+    try {
+        const playwright = await import('playwright-core');
+        chromium = playwright.chromium;
+    } catch (importError) {
+        console.error("CRITICAL: Failed to load playwright-core", importError);
+        throw new Error(`Module Playwright manquant ou incompatible: ${importError.message}`);
+    }
+
     // 1. Récupération des paramètres
     let email, password;
     try {
@@ -65,13 +86,14 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         projectId: browserbaseProjectId,
-        keepAlive: true // Garder la session active pour l'utilisateur
+        // Important: keepAlive true permet de laisser le navigateur ouvert pour l'utilisateur
+        keepAlive: true 
       }),
     });
 
     if (!sessionResponse.ok) {
         const errText = await sessionResponse.text();
-        throw new Error(`Erreur chréation session Browserbase: ${errText}`);
+        throw new Error(`Erreur création session Browserbase: ${errText}`);
     }
 
     const sessionData = await sessionResponse.json();
@@ -122,14 +144,17 @@ export default async function handler(req, res) {
              loginClicked = true;
         } catch (e) {
              automationSteps.push({ step: 'click_login', success: false, message: 'Bouton non trouvé' });
-             throw new Error('Impossible de trouver le bouton Log In');
+             // Ne pas throw ici, on laisse l'utilisateur voir la page
+             // throw new Error('Impossible de trouver le bouton Log In');
         }
     }
     
-    automationSteps.push({ step: 'click_login', success: true });
+    if (loginClicked) {
+        automationSteps.push({ step: 'click_login', success: true });
+    }
 
     // Remplissage du formulaire (si credentials présents)
-    if (hasCredentials) {
+    if (hasCredentials && loginClicked) {
         console.log('Tentative de remplissage des identifiants...');
         try {
             // Attendre que les champs soient visibles
@@ -144,12 +169,21 @@ export default async function handler(req, res) {
             automationSteps.push({ step: 'fill_credentials', success: true });
 
             // Soumettre
-            await page.click('button[type="submit"]'); // ou Enter sur le champ password
+            const submitButtons = ['button[type="submit"]', 'button:has-text("Login")', 'input[type="submit"]'];
+            let submitted = false;
+            for(const btn of submitButtons) {
+                if(await page.isVisible(btn)) {
+                    await page.click(btn);
+                    submitted = true;
+                    break; 
+                }
+            }
+            if(!submitted) await page.keyboard.press('Enter');
             
             automationSteps.push({ step: 'submit_form', success: true });
 
             // Attendre un peu pour confirmer le login (optionnel car on veut rendre la main vite)
-            await page.waitForTimeout(2000);
+            await page.waitForTimeout(1000);
 
         } catch (loginError) {
              console.error('Erreur remplissage:', loginError);
@@ -162,7 +196,11 @@ export default async function handler(req, res) {
     // Note: On ne ferme PAS le browser pour laisser la session active pour l'utilisateur
     // await browser.close(); 
     // Au lieu de ça, on se déconnecte juste du CDP côté serveur
-    await browser.close(); // close() sur connectOverCDP ferme la *connexion*, pas forcément le browser distant si keepAlive=true
+    try {
+        await browser.close(); // close() sur connectOverCDP ferme la *connexion*, pas forcément le browser distant si keepAlive=true
+    } catch(e) {
+        console.warn('Erreur fermeture connexion CDP:', e);
+    }
 
     return res.status(200).json({
       success: true,
@@ -181,14 +219,16 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Erreur API FastGraphs:', error);
     
-    // Nettoyage si crash
+    // Nettoyage si crash (si browser défini)
     if (browser) {
         try { await browser.close(); } catch(e) {}
     }
 
+    // Important: Toujours retourner JSON, jamais HTML
     return res.status(500).json({
       success: false,
-      error: error.message,
+      error: error.message || 'Erreur interne inconnue',
+      details: 'Une erreur est survenue lors de l\'automatisation.',
       automation: { steps: automationSteps },
       debugInfo: { stack: error.stack }
     });
