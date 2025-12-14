@@ -25483,6 +25483,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         isDarkMode={isDarkMode}
                         isProfessionalMode={isProfessionalMode}
                     />}
+                    {activeTab === 'tests-tab' && <InvestingCalendarTabInternal />}
                     {activeTab === 'admin-jsla' && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, {
                         emmaConnected: emmaConnected,
                         setEmmaConnected: setEmmaConnected,
