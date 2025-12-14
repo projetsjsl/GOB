@@ -20731,6 +20731,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // COMPOSANT CALENDRIER INVESTING.COM
         // ============================================================================
         const InvestingCalendarTabInternal = () => {
+            const { useState, useEffect, useRef } = React;
             // Refs pour les widgets TradingView
             const tradingViewForexRef = useRef(null);
             const tradingViewEventsRef = useRef(null);
