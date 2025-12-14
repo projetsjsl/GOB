@@ -27,6 +27,7 @@
     "body-parser": "^2.2.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "playwright-core": "^1.40.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "resend": "^3.0.0",
