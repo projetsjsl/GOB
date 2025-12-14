@@ -1878,7 +1878,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         {/* Zone de chat */}
                         <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
                             isDarkMode
-                                ? 'bg-gray-100 border-gray-300'
+                                ? 'bg-black border-gray-700'
                                 : 'bg-gray-50 border-gray-200'
                         }`}>
                             <div className="flex items-center gap-3 mb-4">
@@ -1899,7 +1899,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             <div className="relative">
                                 <div
                                     ref={chatContainerRef}
-                                    className="h-[500px] overflow-y-auto mb-4 p-4 rounded-lg transition-colors duration-300 bg-white"
+                                    className="h-[500px] overflow-y-auto mb-4 p-4 rounded-lg transition-colors duration-300"
+                                    style={{ backgroundColor: 'var(--theme-bg, white)' }}
                                 >
                                 {historyLoading ? (
                                     // Animation de chargement pendant la restauration de l'historique

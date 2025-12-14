@@ -2673,7 +2673,7 @@ CONTRAINTES:
                     <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
                         isDarkMode
                             ? 'bg-gray-900 border-gray-700'
-                            : 'bg-gray-50 border-gray-200'
+                            : 'bg-transparent border-gray-200'
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'

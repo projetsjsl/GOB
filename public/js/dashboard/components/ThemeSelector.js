@@ -69,7 +69,15 @@ const ThemeSelector = () => {
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-56 rounded-xl shadow-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 py-2 z-50 overflow-hidden animate-slide-down">
+                <div 
+                    className="fixed w-56 rounded-xl shadow-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 py-2 z-50 overflow-hidden animate-slide-down"
+                    style={{
+                        top: '80px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)'
+                    }}
+                >
                     <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-800 mb-1">
                         <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Mode</span>
                     </div>

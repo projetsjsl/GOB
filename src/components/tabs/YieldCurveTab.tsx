@@ -517,24 +517,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                                     </div>
                                 </div>
 
-                                {/* Note explicative */}
-                                <div className={`p-4 rounded-lg ${
-                                    darkMode ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'
-                                }`}>
-                                    <h4 className={`font-bold mb-2 ${
-                                        darkMode ? 'text-blue-300' : 'text-blue-800'
-                                    }`}>
-                                        💡 À propos de la courbe des taux
-                                    </h4>
-                                    <ul className={`text-sm space-y-1 ${
-                                        darkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                        <li>• <strong>Courbe normale:</strong> Les taux longs sont supérieurs aux taux courts (économie saine)</li>
-                                        <li>• <strong>Courbe inversée:</strong> Les taux courts dépassent les taux longs (possibilité de récession)</li>
-                                        <li>• <strong>Spread 10Y-2Y:</strong> Indicateur clé surveillé par les économistes et investisseurs</li>
-                                        <li>• <strong>Sources:</strong> FRED (Federal Reserve Economic Data) et FMP (Financial Modeling Prep)</li>
-                                    </ul>
-                                </div>
+                                {/* Note explicative - supprimée */}
                             </>
                         )}
                     </div>

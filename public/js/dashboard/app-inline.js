@@ -14349,7 +14349,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                     {/* Zone de chat */}
                     <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${isDarkMode
-                        ? 'bg-gray-100 border-gray-300'
+                        ? 'bg-black border-gray-700'
                         : 'bg-gray-50 border-gray-200'
                         }`}>
                         <div className="flex items-center gap-3 mb-4">
@@ -14370,7 +14370,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         <div className="relative">
                             <div
                                 ref={chatContainerRef}
-                                className="h-[500px] overflow-y-auto mb-4 p-4 rounded-lg transition-colors duration-300 bg-white"
+                                className="h-[500px] overflow-y-auto mb-4 p-4 rounded-lg transition-colors duration-300"
+                                style={{ backgroundColor: 'var(--theme-bg, white)' }}
                             >
                                 {historyLoading ? (
                                     // Animation de chargement pendant la restauration de l'historique
@@ -22481,21 +22482,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </div>
                             </ExpandableComponent>
 
-                            {/* Note explicative */}
-                            <div className={`p-4 rounded-lg ${darkMode ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'
-                                }`}>
-                                <h4 className={`font-bold mb-2 ${darkMode ? 'text-blue-300' : 'text-blue-800'
-                                    }`}>
-                                    💡 À propos de la courbe des taux
-                                </h4>
-                                <ul className={`text-sm space-y-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                    <li>• <strong>Courbe normale:</strong> Les taux longs sont supérieurs aux taux courts (économie saine)</li>
-                                    <li>• <strong>Courbe inversée:</strong> Les taux courts dépassent les taux longs (possibilité de récession)</li>
-                                    <li>• <strong>Spread 10Y-2Y:</strong> Indicateur clé surveillé par les économistes et investisseurs</li>
-                                    <li>• <strong>Sources:</strong> FRED (Federal Reserve Economic Data) et FMP (Financial Modeling Prep)</li>
-                                </ul>
-                            </div>
+                            {/* Note explicative - supprimée */}
                         </>
                     )}
                 </div>
@@ -23749,7 +23736,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         {yieldData.data.canada && (() => {
                                             const formatRate = (value) => (value === null || value === undefined ? '—' : Number(value).toFixed(2));
                                             return (
-                                                <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                                <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`} style={{ color: 'var(--theme-text)' }}>
                                                     <div className="flex items-center justify-between mb-2">
                                                         <div className="flex items-center gap-2 font-semibold">
                                                             <span>🇨🇦</span>
@@ -23822,16 +23809,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         </div>
                                     )}
 
-                                    {/* Note explicative */}
-                                    <div className={`p-4 rounded-lg mt-6 ${isDarkMode ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'}`}>
-                                        <h4 className={`font-bold mb-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-800'}`}>💡 À propos de la courbe des taux</h4>
-                                        <ul className={`text-sm space-y-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            <li>• <strong>Courbe normale:</strong> Les taux longs sont supérieurs aux taux courts (économie saine)</li>
-                                            <li>• <strong>Courbe inversée:</strong> Les taux courts dépassent les taux longs (possibilité de récession)</li>
-                                            <li>• <strong>Spread 10Y-2Y:</strong> Indicateur clé surveillé par les économistes et investisseurs</li>
-                                            <li>• <strong>Sources:</strong> FRED (Federal Reserve Economic Data) et FMP (Financial Modeling Prep)</li>
-                                        </ul>
-                                    </div>
+                                    {/* Note explicative - supprimée */}
                                 </>
                             )}
                         </div>
@@ -25146,7 +25124,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     : 'bg-white/95 border-t-2 border-gray-200'
                         } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
                 >
-                    <div className="flex items-center overflow-x-auto scrollbar-hide px-2 py-3 gap-1" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
+                    <div className="flex items-center overflow-x-auto scrollbar-hide px-2 py-3 gap-1 bg-white" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
                         {(window.RolesPermissions && window.userPermissions 
                             ? window.RolesPermissions.filterTabsByPermissions(tabs)
                             : tabs
