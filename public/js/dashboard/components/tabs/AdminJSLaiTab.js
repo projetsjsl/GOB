@@ -737,7 +737,12 @@ const AdminJSLaiTab = ({
                                                         />
                                                         <div className="flex items-center gap-2 flex-1 min-w-0">
                                                             {tab.icon && <i className={`${tab.icon} text-base`}></i>}
-                                                            <span className="text-sm font-medium truncate">{tab.label}</span>
+                                                            <div className="flex flex-col">
+                                                                <span className="text-sm font-medium truncate">{tab.label}</span>
+                                                                <span className={`text-[9px] font-mono truncate ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                                                    {tab.component?.name ? `${tab.component.name}.js` : tab.id + '.js'}
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                         {isAdmin && <span className="text-[10px] bg-gray-600 text-gray-300 px-1 rounded">Requis</span>}
                                                     </label>

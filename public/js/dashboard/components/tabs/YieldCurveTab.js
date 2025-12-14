@@ -331,37 +331,14 @@ const YieldCurveTab = () => {
 
             {!loading && !error && yieldData && (
                 <>
-                    {/* Graphique */}
-                    {(yieldData.data?.us?.rates?.length > 0 || yieldData.data?.canada?.rates?.length > 0) ? (
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
-                            darkMode ? 'bg-gray-800' : 'bg-white'
-                        }`}>
-                            <div style={{ height: '400px', position: 'relative' }}>
-                                <canvas ref={chartRef} style={{ width: '100%', height: '100%' }}></canvas>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className={`p-6 rounded-lg border-l-4 border-yellow-500 ${
-                            darkMode ? 'bg-yellow-900/20' : 'bg-yellow-50'
-                        }`}>
-                            <h3 className={`font-bold mb-2 ${
-                                darkMode ? 'text-yellow-300' : 'text-yellow-800'
-                            }`}>
-                                ⚠️ Aucune donnée disponible
-                            </h3>
-                            <p className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
-                                Les données de yield curve ne sont pas disponibles. Vérifiez que la clé API FRED_API_KEY est configurée dans les variables d'environnement Vercel.
-                            </p>
-                        </div>
-                    )}
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                    {/* Grid Cards (US / Canada) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         {yieldData.data.us && renderRateTable('US Treasury', yieldData.data.us, '🇺🇸')}
                         {yieldData.data.canada && renderRateTable('Obligations Canada', yieldData.data.canada, '🇨🇦')}
                     </div>
 
                     {/* Tableau des maturités */}
-                    <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                    <div className={`p-6 rounded-lg transition-colors duration-300 mb-6 ${
                         darkMode ? 'bg-gray-800' : 'bg-white'
                     }`}>
                         <h3 className={`text-xl font-bold mb-4 ${
@@ -414,6 +391,24 @@ const YieldCurveTab = () => {
                                         if (yieldData.data.canada) {
                                             yieldData.data.canada.rates.forEach(r => maturities.add(r.maturity));
                                         }
+
+                                        // Helper pour trier les maturités
+                                        const maturityToMonths = (m) => {
+                                            if (m === '1M') return 1;
+                                            if (m === '2M') return 2;
+                                            if (m === '3M') return 3;
+                                            if (m === '4M') return 4;
+                                            if (m === '6M') return 6;
+                                            if (m === '1Y') return 12;
+                                            if (m === '2Y') return 24;
+                                            if (m === '3Y') return 36;
+                                            if (m === '5Y') return 60;
+                                            if (m === '7Y') return 84;
+                                            if (m === '10Y') return 120;
+                                            if (m === '20Y') return 240;
+                                            if (m === '30Y') return 360;
+                                            return 999;
+                                        };
 
                                         return Array.from(maturities)
                                             .sort((a, b) => maturityToMonths(a) - maturityToMonths(b))
@@ -512,6 +507,30 @@ const YieldCurveTab = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Graphique */}
+                    {(yieldData.data?.us?.rates?.length > 0 || yieldData.data?.canada?.rates?.length > 0) ? (
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            darkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div style={{ height: '400px', position: 'relative' }}>
+                                <canvas ref={chartRef} style={{ width: '100%', height: '100%' }}></canvas>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className={`p-6 rounded-lg border-l-4 border-yellow-500 ${
+                            darkMode ? 'bg-yellow-900/20' : 'bg-yellow-50'
+                        }`}>
+                            <h3 className={`font-bold mb-2 ${
+                                darkMode ? 'text-yellow-300' : 'text-yellow-800'
+                            }`}>
+                                ⚠️ Aucune donnée disponible
+                            </h3>
+                            <p className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
+                                Les données de yield curve ne sont pas disponibles. Vérifiez que la clé API FRED_API_KEY est configurée dans les variables d'environnement Vercel.
+                            </p>
+                        </div>
+                    )}
 
                     {/* Note explicative */}
                     <div className={`p-4 rounded-lg ${
