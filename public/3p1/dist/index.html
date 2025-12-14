@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <title>Analyse Financière Pro</title>
+    <style>
+    </style>
+
+  <script type="importmap">
+{
+  "imports": {
+    "recharts": "https://aistudiocdn.com/recharts@^3.4.1",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "@heroicons/react/": "https://aistudiocdn.com/@heroicons/react@^2.2.0/"
+  }
+}
+</script>
+  <script type="module" crossorigin src="./assets/index.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index.css">
+</head>
+  <body class="bg-gray-50 text-slate-800 antialiased">
+    <div id="root"></div>
+  <!-- Redirection vers la version compilée -->
+  <script>
+    // Rediriger vers la version compilée si elle existe
+    if (window.location.pathname.includes('/3p1/index.html') && !window.location.pathname.includes('/dist/')) {
+      window.location.href = window.location.pathname.replace('/3p1/index.html', '/3p1/dist/index.html');
+    }
+  </script>
+  <!-- Entry point: Vite will replace this during build -->
+</body>
+</html>
