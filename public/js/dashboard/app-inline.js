@@ -17844,7 +17844,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 )}
                             </button>
                             <button
-                                onClick={() => setJlabView('3pour1')}
+                                onClick={() => window.location.href = '/3p1'}
                                 className={`px-6 py-3 font-semibold transition-all duration-300 whitespace-nowrap relative overflow-hidden rounded-t-lg group ${jlabView === '3pour1'
                                     ? isDarkMode
                                         ? 'text-white border-b-2 border-purple-400 shadow-lg shadow-purple-500/20'
@@ -17904,7 +17904,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     <div className="w-full h-full">
                         {jlabView === 'portfolio' && <StocksNewsTab tickerSource="portfolio" />}
                         {jlabView === 'watchlist' && <StocksNewsTab tickerSource="watchlist" />}
-                        {jlabView === '3pour1' && <FinanceProTab />}
+
                         {jlabView === 'advanced' && (
                             window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab /> : <div className="text-white p-4">Chargement de l'analyse avancée...</div>
                         )}
