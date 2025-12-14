@@ -17913,7 +17913,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         {jlabView === 'watchlist' && <StocksNewsTab tickerSource="watchlist" />}
 
                         {jlabView === 'advanced' && (
-                            window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab /> : <div className="text-white p-4">Chargement de l'analyse avancée...</div>
+                            window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab isDarkMode={isDarkMode} /> : <div className="text-white p-4">Chargement de l'analyse avancée...</div>
                         )}
                     </div>
                 </div>
@@ -24164,7 +24164,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // Configuration des onglets (sans "Plus" dans la liste principale - il sera ajouté dynamiquement)
         const allTabs = useMemo(() => [
             { id: 'markets-economy', label: 'Marchés', icon: 'iconoir-globe', component: MarketsEconomyTab },
-            { id: 'advanced-analysis', label: 'Titres', icon: 'iconoir-candlestick-chart', component: window.AdvancedAnalysisTab || (() => <div>Chargement...</div>) },
+            { id: 'advanced-analysis', label: 'Titres', icon: 'iconoir-candlestick-chart', component: (props) => window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab isDarkMode={isDarkMode} {...props} /> : <div>Chargement...</div> },
             { id: 'ask-emma', label: 'AskEmma', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
             { id: 'admin-jsla', label: 'Admin', icon: 'iconoir-settings', component: AdminJSLaiTab },
             // Secondary / Optional Tabs
