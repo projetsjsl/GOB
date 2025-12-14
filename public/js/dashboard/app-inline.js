@@ -21360,42 +21360,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         </div>
                     </div>
 
-                    {/* Calendrier Économique Investing.com */}
-                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: CALENDRIER_ECONOMIQUE_INVESTING</div>
-                    <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'
-                        }`}>
-                        <div className="mb-3 md:mb-6">
-                            <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>
-                                📊 Calendrier Économique
-                            </h2>
-                            <p className={`text-xs md:text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }`}>
-                                Calendrier économique complet avec événements majeurs et données en temps réel
-                            </p>
-                        </div>
 
-                        <div className="rounded-lg overflow-hidden relative h-[400px] md:h-[450px] lg:h-[500px]" style={{ background: 'transparent' }}>
-                            {/* Overlay pour masquer le logo (toute la largeur) */}
-                            <div
-                                className={`absolute top-0 left-0 z-10 ${isDarkMode ? 'bg-gray-800' : 'bg-white'
-                                    }`}
-                                style={{ width: '100%', height: '40px' }}
-                            />
-                            <iframe
-                                src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&importance=1,2,3&features=datepicker,timezone,timeselector,filters&countries=6,5&calType=day&timeZone=8&lang=5&transparentBackground=1"
-                                width="100%"
-                                height="100%"
-                                frameBorder="0"
-                                allowTransparency="true"
-                                marginWidth="0"
-                                marginHeight="0"
-                                sandbox="allow-scripts allow-same-origin allow-forms"
-                                className="relative z-0"
-                                style={{ minWidth: '100%', background: 'transparent' }}
-                            />
-                        </div>
-                    </div>
 
                     {/* ========================================== */}
                     {/* SECTION 2: 💱 MARCHÉS FOREX                */}
@@ -23214,7 +23179,36 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                     {activeSubTab === 'calendar' && (
                         <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                            <div className="tradingview-widget-container" ref={tradingViewEventsRef}></div>
+                            {/* Header */}
+                             <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    📊 Calendrier Économique (Investing.com)
+                                </h3>
+                                <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    Événements économiques majeurs et données en temps réel
+                                </p>
+                            </div>
+                            
+                            {/* Iframe Container */}
+                            <div className="rounded-lg overflow-hidden relative h-[800px]" style={{ background: 'transparent' }}>
+                                 {/* Overlay pour masquer le logo (toute la largeur) */}
+                                <div
+                                    className={`absolute top-0 left-0 z-10 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}
+                                    style={{ width: '100%', height: '40px' }}
+                                />
+                                <iframe
+                                    src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&importance=1,2,3&features=datepicker,timezone,timeselector,filters&countries=6,5&calType=day&timeZone=8&lang=5&transparentBackground=1"
+                                    width="100%"
+                                    height="100%"
+                                    frameBorder="0"
+                                    allowTransparency="true"
+                                    marginWidth="0"
+                                    marginHeight="0"
+                                    sandbox="allow-scripts allow-same-origin allow-forms"
+                                    className="relative z-0"
+                                    style={{ minWidth: '100%', background: 'transparent' }}
+                                />
+                            </div>
                         </div>
                     )}
 
