@@ -502,7 +502,7 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
       </div>
 
       <div className="mt-4 text-xs text-gray-500">
-        <p><strong>Titre Historique:</strong> Calculé à partir de vos données historiques récupérées par API ({data[0]?.year || 'N/A'} - {data[data.length - 1]?.year || 'N/A'})</p>
+        <p><strong>Titre Historique:</strong> Calculé à partir de vos données historiques récupérées par API ({data.length} années : {data[0]?.year || 'N/A'} - {data[data.length - 1]?.year || 'N/A'})</p>
         <p><strong>Secteur Typique:</strong> {isLoadingSector ? (
           <span className="text-blue-600">Chargement des données sectorielles depuis l'API...</span>
         ) : sectorDataFromAPI ? (

@@ -350,7 +350,23 @@ export default async function handler(req, res) {
         
         // RETRY STRATEGY: If full history failed or returned empty (common for heavy symbols on weak connections), try lighter fetch
         if (metricsData.length === 0) {
-            console.log(`⚠️ Retrying Key Metrics for ${usedSymbol} with limit=5 (fallback strategy)...`);
+            console.log(`⚠️ Retrying Key Metrics for ${usedSymbol} with limit=15 (intermediate fallback)...`);
+            try {
+                const retryRes = await fetch(`${FMP_BASE}/key-metrics/${usedSymbol}?period=annual&limit=15&apikey=${FMP_KEY}`);
+                if (retryRes.ok) {
+                    const retryJson = await retryRes.json();
+                    if (Array.isArray(retryJson) && retryJson.length > 0) {
+                        metricsData = retryJson;
+                        console.log(`✅ Recovered ${metricsData.length} records for ${usedSymbol} using limit=15`);
+                    }
+                }
+            } catch (e) {
+                console.warn(`❌ Intermediate retry failed for ${usedSymbol}:`, e.message);
+            }
+        }
+
+        if (metricsData.length === 0) {
+            console.log(`⚠️ Retrying Key Metrics for ${usedSymbol} with limit=5 (final fallback)...`);
             try {
                 const retryRes = await fetch(`${FMP_BASE}/key-metrics/${usedSymbol}?period=annual&limit=5&apikey=${FMP_KEY}`);
                 if (retryRes.ok) {
