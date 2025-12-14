@@ -169,16 +169,27 @@ const FastGraphsTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                     )}
 
                     {sessionUrl && (
-                        <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                            <p className="text-green-400 font-medium mb-2">✓ Session créée avec succès</p>
-                            <a 
-                                href={sessionUrl} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-blue-400 hover:text-blue-300 underline text-sm break-all"
-                            >
-                                {sessionUrl}
-                            </a>
+                        <div className="mt-4">
+                            <p className="text-green-400 font-medium mb-2">✓ Session active (Vue en direct)</p>
+                            <div className="w-full h-[600px] border border-gray-700 rounded-lg overflow-hidden bg-black relative">
+                                <iframe 
+                                    src={sessionUrl}
+                                    className="w-full h-full"
+                                    title="FastGraphs Remote Session"
+                                    allow="clipboard-read; clipboard-write; fullscreen"
+                                />
+                            </div>
+                            <div className="mt-2 text-right">
+                                <a 
+                                    href={sessionUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-blue-400 hover:text-blue-300 text-sm flex items-center justify-end gap-1"
+                                >
+                                    <span className="iconoir-open-new-window"></span>
+                                    Ouvrir dans une nouvelle fenêtre
+                                </a>
+                            </div>
                         </div>
                     )}
                 </div>

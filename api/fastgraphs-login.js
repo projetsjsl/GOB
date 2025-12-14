@@ -62,9 +62,9 @@ export default async function handler(req, res) {
       console.warn('Erreur parsing:', e);
     }
 
-    // Fallback variables d'environnement
-    if (!email && process.env.FASTGRAPHS_EMAIL) email = process.env.FASTGRAPHS_EMAIL;
-    if (!password && process.env.FASTGRAPHS_PASSWORD) password = process.env.FASTGRAPHS_PASSWORD;
+    // Fallback variables d'environnement (Support des deux formats)
+    if (!email) email = process.env.FASTGRAPHS_EMAIL || process.env.FASTGRAPHS_ID;
+    if (!password) password = process.env.FASTGRAPHS_PASSWORD || process.env.FASTGRAPHS_PASS;
     
     const hasCredentials = !!(email && password);
     const debugMode = req.query?.debug === 'true' || req.body?.debug === true;
