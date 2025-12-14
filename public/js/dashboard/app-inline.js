@@ -20730,7 +20730,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // ============================================================================
         // COMPOSANT CALENDRIER INVESTING.COM
         // ============================================================================
-        const InvestingCalendarTab = () => {
+        const InvestingCalendarTabInternal = () => {
             // Refs pour les widgets TradingView
             const tradingViewForexRef = useRef(null);
             const tradingViewEventsRef = useRef(null);
@@ -21328,6 +21328,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             return (
                 <div className="space-y-3 md:space-y-6">
+                    <div className="bg-red-500 text-white p-4 font-bold text-center">DEBUG: TESTS TAB LOADED (Internal)</div>
                     {/* En-tête principal TESTS JS */}
                     <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-r from-blue-900 to-purple-900' : 'bg-gradient-to-r from-blue-100 to-purple-100'
                         }`}>
@@ -24150,7 +24151,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             { id: 'seeking-alpha', label: 'Stocks', icon: 'iconoir-graph-up', component: SeekingAlphaTab },
             { id: 'finance-pro', label: 'Finance Pro (3p1)', icon: 'iconoir-pie-chart', component: FinanceProTab },
             { id: 'email-briefings', label: 'Emma', icon: 'iconoir-antenna-signal', component: EmailBriefingsTab },
-            { id: 'tests-tab', label: 'TESTS', icon: 'iconoir-test-tube', component: InvestingCalendarTab },
+            { id: 'tests-tab', label: 'TESTS', icon: 'iconoir-test-tube', component: InvestingCalendarTabInternal },
         ], []);
 
         // Filter tabs based on Primary Navigation Config (visibility settings)
