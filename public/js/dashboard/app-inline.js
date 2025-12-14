@@ -167,6 +167,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             'Minus': 'minus',
 
             // Graphiques & Finance
+            'PieChart': 'pie-chart',
             'BarChart3': 'stat-up',
             'Brain': 'brain',
             'TrendingUp': 'trending-up',
@@ -529,6 +530,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         { id: 'scrapping-sa', label: 'Scraping SA', icon: 'Database' },
         { id: 'dans-watchlist', label: 'Watchlist Dan', icon: 'Star' },
         { id: 'fastgraphs', label: 'FastGraphs', icon: 'BarChart3' },
+        { id: 'finance-pro', label: 'Finance Pro (3p1)', icon: 'PieChart' },
         { id: 'plus', label: 'Paramètres', icon: 'Settings' },
         { id: 'admin-jsla', label: 'Admin', icon: 'Shield' }
     ];
@@ -536,9 +538,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     // Default configuration for secondary navigation per tab
     // This defines which links show up when you are on a specific tab
     const DEFAULT_NAV_CONFIG = {
-        'intellistocks': ['ask-emma', 'markets-economy', 'plus'],
+        'intellistocks': ['ask-emma', 'markets-economy', 'finance-pro', 'plus'],
         'ask-emma': ['intellistocks', 'assistant-vocal', 'plus'],
-        'default': ['intellistocks', 'ask-emma', 'plus']
+        'default': ['intellistocks', 'ask-emma', 'finance-pro', 'plus']
     };
 
     // ============================================================================
@@ -15853,6 +15855,111 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
             const [expandedStock, setExpandedStock] = useState(null);
 
+            // Refs pour les widgets TradingView (Restored Features)
+            const marketOverviewRef = useRef(null);
+            const heatmapRef = useRef(null);
+            const screenerRef = useRef(null);
+
+            // Charger les widgets TradingView
+            useEffect(() => {
+                // Market Overview Widget
+                if (marketOverviewRef.current) {
+                    marketOverviewRef.current.innerHTML = '';
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        "colorTheme": isDarkMode ? "dark" : "light",
+                        "dateRange": "1D",
+                        "showChart": true,
+                        "locale": "fr",
+                        "width": "100%",
+                        "height": "100%",
+                        "largeChartUrl": "",
+                        "isTransparent": false,
+                        "showSymbolLogo": true,
+                        "showFloatingTooltip": true,
+                        "tabs": [
+                            {
+                                "title": "Indices",
+                                "symbols": [
+                                    {"s": "FOREXCOM:SPXUSD", "d": "S&P 500"},
+                                    {"s": "FOREXCOM:NSXUSD", "d": "US 100"},
+                                    {"s": "FOREXCOM:DJI", "d": "Dow 30"},
+                                    {"s": "INDEX:NKY", "d": "Nikkei 225"},
+                                    {"s": "INDEX:DEU40", "d": "DAX Index"},
+                                    {"s": "FOREXCOM:UKXGBP", "d": "UK 100"}
+                                ]
+                            },
+                            {
+                                "title": "Forex",
+                                "symbols": [
+                                    {"s": "FX:EURUSD", "d": "EUR/USD"},
+                                    {"s": "FX:GBPUSD", "d": "GBP/USD"},
+                                    {"s": "FX:USDJPY", "d": "USD/JPY"},
+                                    {"s": "FX:USDCAD", "d": "USD/CAD"}
+                                ]
+                            },
+                            {
+                                "title": "Crypto",
+                                "symbols": [
+                                    {"s": "BINANCE:BTCUSDT", "d": "Bitcoin"},
+                                    {"s": "BINANCE:ETHUSDT", "d": "Ethereum"},
+                                    {"s": "BINANCE:BNBUSDT", "d": "BNB"},
+                                    {"s": "BINANCE:SOLUSDT", "d": "Solana"}
+                                ]
+                            }
+                        ]
+                    });
+                    marketOverviewRef.current.appendChild(script);
+                }
+
+                // Heatmap Widget
+                if (heatmapRef.current) {
+                    heatmapRef.current.innerHTML = '';
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        "exchanges": [],
+                        "dataSource": "SPX500",
+                        "grouping": "sector",
+                        "blockSize": "market_cap_basic",
+                        "blockColor": "change",
+                        "locale": "fr",
+                        "symbolUrl": "",
+                        "colorTheme": isDarkMode ? "dark" : "light",
+                        "hasTopBar": true,
+                        "isDataSetEnabled": true,
+                        "isZoomEnabled": true,
+                        "hasSymbolTooltip": true,
+                        "width": "100%",
+                        "height": "100%"
+                    });
+                    heatmapRef.current.appendChild(script);
+                }
+
+                // Screener Widget
+                if (screenerRef.current) {
+                    screenerRef.current.innerHTML = '';
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        "width": "100%",
+                        "height": "100%",
+                        "defaultColumn": "overview",
+                        "defaultScreen": "most_capitalized",
+                        "market": "america",
+                        "showToolbar": true,
+                        "colorTheme": isDarkMode ? "dark" : "light",
+                        "locale": "fr",
+                        "isTransparent": false
+                    });
+                    screenerRef.current.appendChild(script);
+                }
+            }, [isDarkMode]);
+
             // États pour le screener (uniquement pour watchlist)
             const [showScreener, setShowScreener] = useState(false);
             const [loadingScreener, setLoadingScreener] = useState(false);
@@ -16539,6 +16646,99 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </p>
                         </div>
                     )}
+
+
+                    {/* ===== WIDGETS MARCHÉ (Restored Features) ===== */}
+                    <div className="grid grid-cols-1 gap-6 mb-8">
+                        {/* Market Overview Widget */}
+                        <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                            isDarkMode
+                                ? 'bg-gray-800/50 border-blue-500/30'
+                                : 'bg-white border-blue-400/40'
+                        }`}>
+                            <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    📊 Vue d'ensemble des Marchés (Temps Réel)
+                                </h3>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Indices majeurs, Forex, Crypto - Données en direct
+                                </p>
+                            </div>
+                            <div ref={marketOverviewRef} style={{height: '400px'}}></div>
+                        </div>
+
+                        {/* Investing.com Economic Calendar */}
+                        <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                            isDarkMode
+                                ? 'bg-gray-800/50 border-orange-500/30'
+                                : 'bg-white border-orange-400/40'
+                        }`}>
+                            <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    📅 Calendrier Économique (Investing.com)
+                                </h3>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                     Événements économiques majeurs à surveiller
+                                </p>
+                            </div>
+                            <div className="h-[500px] w-full relative">
+                                 <iframe
+                                    src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&importance=1,2,3&features=datepicker,timezone,timeselector,filters&countries=6,5&calType=day&timeZone=8&lang=5&transparentBackground=1"
+                                    width="100%"
+                                    height="100%"
+                                    frameBorder="0"
+                                    allowTransparency="true"
+                                    marginWidth="0"
+                                    marginHeight="0"
+                                    sandbox="allow-scripts allow-same-origin allow-forms"
+                                    className="relative z-0"
+                                    style={{ minWidth: '100%', background: 'transparent' }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Stock Heatmap Widget */}
+                            <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                                isDarkMode
+                                    ? 'bg-gray-800/50 border-green-500/30'
+                                    : 'bg-white border-green-400/40'
+                            }`}>
+                                <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                    <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>
+                                        🔥 Heatmap Boursière
+                                    </h3>
+                                </div>
+                                <div ref={heatmapRef} style={{height: '400px'}}></div>
+                            </div>
+
+                            {/* Screener Widget */}
+                            <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                                isDarkMode
+                                    ? 'bg-gray-800/50 border-purple-500/30'
+                                    : 'bg-white border-purple-400/40'
+                            }`}>
+                                <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                    <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>
+                                        🚀 Screener
+                                    </h3>
+                                </div>
+                                <div ref={screenerRef} style={{height: '400px'}}></div>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* TOP MOVERS - Vue rapide */}
                     {displayedTickers.length > 0 && (
@@ -23948,6 +24148,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             { id: 'fastgraphs', label: 'FastGraphs', icon: 'iconoir-graph-up', component: FastGraphsTab },
             { id: 'scrapping-sa', label: 'Seeking', icon: 'iconoir-search', component: ScrappingSATab },
             { id: 'seeking-alpha', label: 'Stocks', icon: 'iconoir-graph-up', component: SeekingAlphaTab },
+            { id: 'finance-pro', label: 'Finance Pro (3p1)', icon: 'iconoir-pie-chart', component: FinanceProTab },
             { id: 'email-briefings', label: 'Emma', icon: 'iconoir-antenna-signal', component: EmailBriefingsTab },
         ], []);
 
