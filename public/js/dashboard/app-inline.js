@@ -3591,61 +3591,61 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         }, [newsData]);
 
         // Liste exhaustive d'indices TradingView valides (accessible globalement)
+        // Ref: https://fr.tradingview.com/markets/indices/quotes-major/ & https://fr.tradingview.com/markets/futures/quotes-all/
         const getAllAvailableIndices = window.getAllAvailableIndices = () => {
             return {
                 'us': [
-                    { proName: 'SP:SPX', title: 'S&P 500', category: 'us' },
-                    { proName: 'DJ:DJI', title: 'Dow Jones', category: 'us' },
-                    { proName: 'NASDAQ:NDX', title: 'NASDAQ 100', category: 'us' },
-                    { proName: 'TVC:RUT', title: 'Russell 2000', category: 'us' },
+                    { proName: 'FOREXCOM:SPXUSD', title: 'S&P 500', category: 'us' },
+                    { proName: 'FOREXCOM:NSXUSD', title: 'NASDAQ 100', category: 'us' },
+                    { proName: 'FOREXCOM:DJI', title: 'Dow Jones', category: 'us' },
                     { proName: 'TVC:VIX', title: 'VIX', category: 'us' },
-                    { proName: 'NYSE:NYA', title: 'NYSE Composite', category: 'us' }
+                    { proName: 'TVC:DXY', title: 'US Dollar Index', category: 'us' }
+                ],
+                'futures': [
+                    { proName: 'CME_MINI:ES1!', title: 'E-Mini S&P 500', category: 'futures' },
+                    { proName: 'CME_MINI:NQ1!', title: 'E-Mini NASDAQ', category: 'futures' },
+                    { proName: 'CBOT_MINI:YM1!', title: 'E-Mini Dow', category: 'futures' },
+                    { proName: 'CME:6E1!', title: 'Euro FX Futures', category: 'futures' },
+                    { proName: 'CME:6C1!', title: 'CAD Futures', category: 'futures' }
                 ],
                 'canada': [
-                    { proName: 'TSX:OSPTX', title: 'S&P/TSX Composite', category: 'canada' },
-                    { proName: 'TSX:OSPTX60', title: 'S&P/TSX 60', category: 'canada' },
-                    { proName: 'TSXV:OSPVX', title: 'TSX Venture', category: 'canada' }
+                    { proName: 'TSX:TX60', title: 'S&P/TSX 60', category: 'canada' },
+                    { proName: 'TSE:XIU', title: 'iShares S&P/TSX 60', category: 'canada' }
                 ],
                 'europe': [
-                    { proName: 'LSE:UKX', title: 'FTSE 100', category: 'europe' },
                     { proName: 'XETR:DAX', title: 'DAX', category: 'europe' },
-                    { proName: 'EURONEXT:FCHI', title: 'CAC 40', category: 'europe' },
-                    { proName: 'BME:IBEX', title: 'IBEX 35', category: 'europe' },
-                    { proName: 'MIL:FTSEMIB', title: 'FTSE MIB', category: 'europe' },
-                    { proName: 'EURONEXT:AEX', title: 'AEX', category: 'europe' },
-                    { proName: 'SIX:SSMI', title: 'SMI', category: 'europe' },
-                    { proName: 'EURONEXT:PSI20', title: 'PSI 20', category: 'europe' },
-                    { proName: 'XETR:MDAX', title: 'MDAX', category: 'europe' }
+                    { proName: 'INDEX:FCHI', title: 'CAC 40', category: 'europe' },
+                    { proName: 'INDEX:UKX', title: 'FTSE 100', category: 'europe' },
+                    { proName: 'INDEX:STOXX50E', title: 'Euro Stoxx 50', category: 'europe' },
+                    { proName: 'SIX:SMI', title: 'Swiss SMI', category: 'europe' }
                 ],
                 'asia': [
-                    { proName: 'TVC:NK225', title: 'Nikkei 225', category: 'asia' },
-                    { proName: 'HKEX:HSI', title: 'Hang Seng', category: 'asia' },
-                    { proName: 'ASX:XJO', title: 'ASX 200', category: 'asia' },
-                    { proName: 'SSE:000001', title: 'SSE Composite', category: 'asia' },
-                    { proName: 'BSE:SENSEX', title: 'BSE Sensex', category: 'asia' },
-                    { proName: 'KRX:KOSPI', title: 'KOSPI', category: 'asia' },
-                    { proName: 'TVC:TWII', title: 'Taiwan Weighted', category: 'asia' }
+                    { proName: 'TVC:NI225', title: 'Nikkei 225', category: 'asia' },
+                    { proName: 'HSI:HSI', title: 'Hang Seng', category: 'asia' },
+                    { proName: 'SSE:000001', title: 'Shanghai Composite', category: 'asia' },
+                    { proName: 'KOSPI:KOSPI', title: 'KOSPI', category: 'asia' }
                 ],
                 'crypto': [
                     { proName: 'BITSTAMP:BTCUSD', title: 'Bitcoin', category: 'crypto' },
                     { proName: 'BITSTAMP:ETHUSD', title: 'Ethereum', category: 'crypto' },
-                    { proName: 'BINANCE:BNBUSD', title: 'BNB', category: 'crypto' },
-                    { proName: 'COINBASE:SOLUSD', title: 'Solana', category: 'crypto' },
-                    { proName: 'COINBASE:ADAUSD', title: 'Cardano', category: 'crypto' }
+                    { proName: 'BINANCE:SOLUSD', title: 'Solana', category: 'crypto' },
+                    { proName: 'BINANCE:XRPUSD', title: 'XRP', category: 'crypto' }
                 ],
                 'commodities': [
+                    { proName: 'OANDA:XAUUSD', title: 'Gold', category: 'commodities' },
+                    { proName: 'OANDA:XAGUSD', title: 'Silver', category: 'commodities' },
                     { proName: 'TVC:USOIL', title: 'WTI Crude Oil', category: 'commodities' },
-                    { proName: 'TVC:BRENT', title: 'Brent Crude', category: 'commodities' },
-                    { proName: 'TVC:XAUUSD', title: 'Gold', category: 'commodities' },
-                    { proName: 'TVC:XAGUSD', title: 'Silver', category: 'commodities' },
-                    { proName: 'TVC:XCUUSD', title: 'Copper', category: 'commodities' }
+                    { proName: 'TVC:UKOIL', title: 'Brent Crude', category: 'commodities' },
+                    { proName: 'COMEX:GC1!', title: 'Gold Futures', category: 'commodities' },
+                    { proName: 'NYMEX:CL1!', title: 'Oil Futures', category: 'commodities' }
                 ],
                 'forex': [
                     { proName: 'FX:EURUSD', title: 'EUR/USD', category: 'forex' },
                     { proName: 'FX:GBPUSD', title: 'GBP/USD', category: 'forex' },
                     { proName: 'FX:USDJPY', title: 'USD/JPY', category: 'forex' },
                     { proName: 'FX:USDCAD', title: 'USD/CAD', category: 'forex' },
-                    { proName: 'FX:AUDUSD', title: 'AUD/USD', category: 'forex' }
+                    { proName: 'FX:AUDUSD', title: 'AUD/USD', category: 'forex' },
+                    { proName: 'FX:USDCHF', title: 'USD/CHF', category: 'forex' }
                 ]
             };
         };
@@ -3660,15 +3660,20 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             } catch (e) {
                 console.warn('Erreur chargement indices:', e);
             }
-            // Par défaut: indices US principaux + crypto
+            // Par défaut: indices majeurs + futures + commodities + crypto (valides TradingView)
             return [
-                'SP:SPX',
-                'DJ:DJI',
-                'NASDAQ:NDX',
-                'TVC:RUT',
-                'TSX:OSPTX',
+                'FOREXCOM:SPXUSD',
+                'FOREXCOM:NSXUSD', 
+                'FOREXCOM:DJI',
+                'CME_MINI:ES1!',
+                'CME_MINI:NQ1!',
+                'TSX:TX60',
+                'OANDA:XAUUSD',
+                'TVC:USOIL',
                 'BITSTAMP:BTCUSD',
-                'BITSTAMP:ETHUSD'
+                'BITSTAMP:ETHUSD',
+                'FX:EURUSD',
+                'FX:USDCAD'
             ];
         });
 
