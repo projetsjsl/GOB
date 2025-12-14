@@ -11,6 +11,7 @@ import EmmaConfigTab from './tabs/EmmaConfigTab';
 import AskEmmaTab from './tabs/AskEmmaTab';
 import EmailBriefingsTab from './tabs/EmailBriefingsTab';
 import TestOnlyTab from './tabs/TestOnlyTab';
+import NouvellesTab from './tabs/NouvellesTab';
 import type { TabName, StockData, NewsArticle, SeekingAlphaData } from '../types';
 
 export const BetaCombinedDashboard: React.FC = () => {
@@ -453,6 +454,7 @@ export const BetaCombinedDashboard: React.FC = () => {
     const renderActiveTab = () => {
         switch (activeTab) {
             case 'stocks-news': return <StocksNewsTab {...tabProps} />;
+            case 'nouvelles': return <NouvellesTab {...tabProps} />;
             case 'intellistocks': return <IntelliStocksTab {...tabProps} />;
             case 'admin-jslai': return <AdminJSLaiTab {...tabProps} />;
             case 'ask-emma': return <AskEmmaTab {...tabProps} />;
@@ -486,6 +488,7 @@ export const BetaCombinedDashboard: React.FC = () => {
                 <div className="flex gap-2 overflow-x-auto">
                     {[
                         { id: 'stocks-news' as TabName, label: '📊 Stocks & News' },
+                        { id: 'nouvelles' as TabName, label: '📰 Nouvelles' },
                         { id: 'intellistocks' as TabName, label: '🧠 IntelliStocks' },
                         { id: 'email-briefings' as TabName, label: '📧 Briefings' },
                         { id: 'watchlist' as TabName, label: '⭐ Watchlist' },

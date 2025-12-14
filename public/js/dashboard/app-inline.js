@@ -23129,35 +23129,37 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {activeSubTab === 'overview' && (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
                              {/* Yield Curve Section (Existing) */}
-                            <div className={`p-6 rounded-2xl ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white shadow-sm border border-gray-100'}`}>
-                                <div className="flex items-center justify-between mb-6">
-                                    <div>
-                                        <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Courbe des Taux</h3>
-                                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Comparaison des rendements obligataires</p>
-                                    </div>
-                                    <select
-                                        value={selectedCountry}
-                                        onChange={(e) => setSelectedCountry(e.target.value)}
-                                        className={`px-3 py-1.5 rounded-lg text-sm font-medium outline-none transition-colors cursor-pointer ${
-                                            isDarkMode
-                                                ? 'bg-gray-700 text-white border-gray-600 focus:border-blue-500'
-                                                : 'bg-gray-100 text-gray-900 border-gray-200 focus:border-blue-500'
-                                        } border-2`}
-                                    >
-                                        <option value="both">🇺🇸 US & 🇨🇦 Canada</option>
-                                        <option value="us">🇺🇸 États-Unis</option>
-                                        <option value="canada">🇨🇦 Canada</option>
-                                    </select>
-                                </div>
-                                <div className="h-[300px] relative">
-                                    {yieldLoading && (
-                                        <div className="absolute inset-0 flex items-center justify-center z-10 bg-opacity-50 bg-black rounded-lg">
-                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                            <ExpandableComponent title="Courbe des Taux" icon="📈" isDarkMode={isDarkMode}>
+                                <div className={`p-6 rounded-2xl ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white shadow-sm border border-gray-100'}`}>
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div>
+                                            <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Courbe des Taux</h3>
+                                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Comparaison des rendements obligataires</p>
                                         </div>
-                                    )}
-                                    <canvas ref={yieldChartRef}></canvas>
+                                        <select
+                                            value={selectedCountry}
+                                            onChange={(e) => setSelectedCountry(e.target.value)}
+                                            className={`px-3 py-1.5 rounded-lg text-sm font-medium outline-none transition-colors cursor-pointer ${
+                                                isDarkMode
+                                                    ? 'bg-gray-700 text-white border-gray-600 focus:border-blue-500'
+                                                    : 'bg-gray-100 text-gray-900 border-gray-200 focus:border-blue-500'
+                                            } border-2`}
+                                        >
+                                            <option value="both">🇺🇸 US & 🇨🇦 Canada</option>
+                                            <option value="us">🇺🇸 États-Unis</option>
+                                            <option value="canada">🇨🇦 Canada</option>
+                                        </select>
+                                    </div>
+                                    <div className="h-[300px] relative">
+                                        {yieldLoading && (
+                                            <div className="absolute inset-0 flex items-center justify-center z-10 bg-opacity-50 bg-black rounded-lg">
+                                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                                            </div>
+                                        )}
+                                        <canvas ref={yieldChartRef}></canvas>
+                                    </div>
                                 </div>
-                            </div>
+                            </ExpandableComponent>
                             
                             <div className={`p-6 rounded-2xl flex flex-col items-center justify-center ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white shadow-sm border border-gray-100'}`}>
                                 <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Utilisez les onglets pour explorer les marchés (Cotations, Calendriers, Forex, Heatmaps).</p>
@@ -23166,91 +23168,103 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     )}
 
                     {activeSubTab === 'quotes' && (
-                        <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                            <div className="tradingview-widget-container" ref={tradingViewMarketQuotesRef}></div>
-                        </div>
+                        <ExpandableComponent title="Cotations du Marché" icon="📈" isDarkMode={isDarkMode}>
+                            <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                <div className="tradingview-widget-container" ref={tradingViewMarketQuotesRef}></div>
+                            </div>
+                        </ExpandableComponent>
                     )}
 
                     {activeSubTab === 'calendar' && (
                         <div className="space-y-6">
                             {/* Widget Investing.com (Moved here) */}
-                            <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                                    <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                        📊 Calendrier Économique (Investing.com)
-                                    </h3>
-                                    <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        Événements économiques majeurs et données en temps réel
-                                    </p>
+                            <ExpandableComponent title="Calendrier Économique (Investing.com)" icon="📊" isDarkMode={isDarkMode}>
+                                <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                        <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                            📊 Calendrier Économique (Investing.com)
+                                        </h3>
+                                        <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            Événements économiques majeurs et données en temps réel
+                                        </p>
+                                    </div>
+                                    <div className="rounded-lg overflow-hidden relative h-[800px]" style={{ background: 'transparent' }}>
+                                        <div
+                                            className={`absolute top-0 left-0 z-10 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}
+                                            style={{ width: '100%', height: '40px' }}
+                                        />
+                                        <iframe
+                                            src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&importance=1,2,3&features=datepicker,timezone,timeselector,filters&countries=6,5&calType=day&timeZone=8&lang=5&transparentBackground=1"
+                                            width="100%"
+                                            height="100%"
+                                            frameBorder="0"
+                                            allowTransparency="true"
+                                            marginWidth="0"
+                                            marginHeight="0"
+                                            sandbox="allow-scripts allow-same-origin allow-forms"
+                                            className="relative z-0"
+                                            style={{ minWidth: '100%', background: 'transparent' }}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="rounded-lg overflow-hidden relative h-[800px]" style={{ background: 'transparent' }}>
-                                    <div
-                                        className={`absolute top-0 left-0 z-10 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}
-                                        style={{ width: '100%', height: '40px' }}
-                                    />
-                                    <iframe
-                                        src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&importance=1,2,3&features=datepicker,timezone,timeselector,filters&countries=6,5&calType=day&timeZone=8&lang=5&transparentBackground=1"
-                                        width="100%"
-                                        height="100%"
-                                        frameBorder="0"
-                                        allowTransparency="true"
-                                        marginWidth="0"
-                                        marginHeight="0"
-                                        sandbox="allow-scripts allow-same-origin allow-forms"
-                                        className="relative z-0"
-                                        style={{ minWidth: '100%', background: 'transparent' }}
-                                    />
-                                </div>
-                            </div>
+                            </ExpandableComponent>
 
                             {/* Widget TradingView (Restored) */}
-                            <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                                    <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                        📅 Calendrier TradingView
-                                    </h3>
+                            <ExpandableComponent title="Calendrier TradingView" icon="📅" isDarkMode={isDarkMode}>
+                                <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                        <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                            📅 Calendrier TradingView
+                                        </h3>
+                                    </div>
+                                    <div className="tradingview-widget-container" ref={tradingViewEventsRef}></div>
                                 </div>
-                                <div className="tradingview-widget-container" ref={tradingViewEventsRef}></div>
-                            </div>
+                            </ExpandableComponent>
                         </div>
                     )}
 
                     {activeSubTab === 'forex' && (
                          <div className="space-y-6">
-                            <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                <h3 className="p-4 text-lg font-bold">Heat Map Forex</h3>
-                                <div className="tradingview-widget-container" ref={tradingViewForexRef}></div>
-                            </div>
-                            <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                <h3 className="p-4 text-lg font-bold">Cross Rates</h3>
-                                <div className="tradingview-widget-container" ref={tradingViewCrossRatesRef}></div>
-                            </div>
+                            <ExpandableComponent title="Heat Map Forex" icon="💱" isDarkMode={isDarkMode}>
+                                <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                    <h3 className="p-4 text-lg font-bold">Heat Map Forex</h3>
+                                    <div className="tradingview-widget-container" ref={tradingViewForexRef}></div>
+                                </div>
+                            </ExpandableComponent>
+                            <ExpandableComponent title="Cross Rates" icon="💱" isDarkMode={isDarkMode}>
+                                <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                    <h3 className="p-4 text-lg font-bold">Cross Rates</h3>
+                                    <div className="tradingview-widget-container" ref={tradingViewCrossRatesRef}></div>
+                                </div>
+                            </ExpandableComponent>
                         </div>
                     )}
 
                     {activeSubTab === 'stocks' && (
-                         <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'} min-h-[700px]`}>
-                             <div className="p-4 border-b border-gray-700 flex gap-4">
-                                <button 
-                                    onClick={() => setHeatmapSource('USA')}
-                                    className={`px-4 py-2 rounded-lg text-sm font-bold ${heatmapSource === 'USA' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}
-                                >
-                                    USA
-                                </button>
-                                <button 
-                                    onClick={() => setHeatmapSource('TSX')}
-                                    className={`px-4 py-2 rounded-lg text-sm font-bold ${heatmapSource === 'TSX' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}
-                                >
-                                    Canada (TSX)
-                                </button>
-                             </div>
-                             {heatmapSource === 'USA' && 
-                                <div className="tradingview-widget-container h-[600px]" ref={tradingViewHeatmapRef}></div>
-                             }
-                             {heatmapSource === 'TSX' && 
-                                <div className="tradingview-widget-container h-[600px]" ref={tradingViewHeatmapTSXRef}></div>
-                             }
-                        </div>
+                        <ExpandableComponent title="Stock Heatmaps" icon="🔥" isDarkMode={isDarkMode}>
+                            <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'} min-h-[700px]`}>
+                                <div className="p-4 border-b border-gray-700 flex gap-4">
+                                    <button 
+                                        onClick={() => setHeatmapSource('USA')}
+                                        className={`px-4 py-2 rounded-lg text-sm font-bold ${heatmapSource === 'USA' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}
+                                    >
+                                        USA
+                                    </button>
+                                    <button 
+                                        onClick={() => setHeatmapSource('TSX')}
+                                        className={`px-4 py-2 rounded-lg text-sm font-bold ${heatmapSource === 'TSX' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}
+                                    >
+                                        Canada (TSX)
+                                    </button>
+                                </div>
+                                {heatmapSource === 'USA' && 
+                                    <div className="tradingview-widget-container h-[600px]" ref={tradingViewHeatmapRef}></div>
+                                }
+                                {heatmapSource === 'TSX' && 
+                                    <div className="tradingview-widget-container h-[600px]" ref={tradingViewHeatmapTSXRef}></div>
+                                }
+                            </div>
+                        </ExpandableComponent>
                     )}
                     {activeSubTab === 'overview' && (
                     <div className="space-y-6">

@@ -68,6 +68,7 @@ export type TabName =
   | 'investing-calendar'
   | 'yield-curve'
   | 'markets-economy'
+  | 'nouvelles'
   | 'ask-emma'
   | 'emma-config'
   | 'testonly';
