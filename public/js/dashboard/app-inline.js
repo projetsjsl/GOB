@@ -24150,6 +24150,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             { id: 'seeking-alpha', label: 'Stocks', icon: 'iconoir-graph-up', component: SeekingAlphaTab },
             { id: 'finance-pro', label: 'Finance Pro (3p1)', icon: 'iconoir-pie-chart', component: FinanceProTab },
             { id: 'email-briefings', label: 'Emma', icon: 'iconoir-antenna-signal', component: EmailBriefingsTab },
+            { id: 'tests-tab', label: 'TESTS', icon: 'iconoir-test-tube', component: InvestingCalendarTab },
         ], []);
 
         // Filter tabs based on Primary Navigation Config (visibility settings)
