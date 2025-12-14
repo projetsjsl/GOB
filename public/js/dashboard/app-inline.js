@@ -674,6 +674,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             }
             return 'intellistocks';
         }); // Onglet par défaut: JLab™ (contient Titres & Nouvelles et Finance Pro)
+        const [navigationHistory, setNavigationHistory] = useState([]); // Historique de navigation pour le bouton Back
         const [tickers, setTickers] = useState([]);
         const [teamTickers, setTeamTickers] = useState([]);
         const [watchlistTickers, setWatchlistTickers] = useState([]);
@@ -1140,8 +1141,26 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         };
 
 
+        // Fonction pour revenir à l'onglet précédent (bouton Back)
+        const goBack = () => {
+            if (navigationHistory.length > 0) {
+                const newHistory = [...navigationHistory];
+                const previousTab = newHistory.pop();
+                setNavigationHistory(newHistory);
+                setActiveTab(previousTab);
+            }
+        };
+
         // Fonction pour gérer le changement d'onglet avec animations d'intro
         const handleTabChange = (tabId) => {
+            // Ajouter l'onglet actuel à l'historique (sauf si on va au même onglet)
+            if (tabId !== activeTab) {
+                setNavigationHistory(prev => {
+                    const newHistory = [...prev, activeTab];
+                    // Limiter l'historique à 50 entrées pour éviter les fuites mémoire
+                    return newHistory.slice(-50);
+                });
+            }
             setActiveTab(tabId);
 
             // Afficher intro Emma IA si c'est la première visite de cette page load
@@ -25131,6 +25150,26 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 <div className="tradingview-widget-container" ref={tickerTapeRef}>
                     <div className="tradingview-widget-container__widget"></div>
                 </div>
+
+                {/* Bouton Back flottant - Visible quand il y a un historique de navigation */}
+                {navigationHistory.length > 0 && !showLoadingScreen && (
+                    <button
+                        onClick={goBack}
+                        className={`fixed bottom-20 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full shadow-lg transition-all duration-300 hover:scale-105 group ${
+                            isDarkMode 
+                                ? 'bg-gray-800/95 hover:bg-gray-700 text-gray-200 border border-gray-600/50 hover:border-green-500/50' 
+                                : 'bg-white/95 hover:bg-gray-50 text-gray-700 border border-gray-200 hover:border-green-500/50'
+                        }`}
+                        style={{ backdropFilter: 'blur(8px)' }}
+                        title={`Retour (${navigationHistory.length} page${navigationHistory.length > 1 ? 's' : ''} en historique)`}
+                    >
+                        <i className={`iconoir-arrow-left text-lg transition-transform duration-200 group-hover:-translate-x-0.5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}></i>
+                        <span className="text-sm font-medium">Retour</span>
+                        <span className={`text-xs px-1.5 py-0.5 rounded-full ${isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-500'}`}>
+                            {navigationHistory.length}
+                        </span>
+                    </button>
+                )}
 
                 {/* Bottom Navigation Bar - Tous les écrans */}
                 <nav 
