@@ -363,7 +363,7 @@ const FastGraphsTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                         <ol className="list-decimal list-inside space-y-2 text-gray-300">
                             <li>Cochez "Automatiser la connexion complète"</li>
                             <li>
-                                Si vous avez configuré vos identifiants dans le fichier .env (FASTGRAPHS_EMAIL / FASTGRAPHS_PASSWORD),
+                                Si vous avez configuré vos identifiants dans le fichier .env (FASTGRAPHS_ID / FASTGRAPHS_PASS),
                                 laissez les champs vides. Sinon, entrez-les manuellement.
                             </li>
                             <li>Cliquez sur "Connexion automatique complète"</li>
