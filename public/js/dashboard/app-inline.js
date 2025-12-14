@@ -25482,6 +25482,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
 
                     {activeTab === 'markets-economy' && <MarketsEconomyTab />}
+                    {activeTab === 'advanced-analysis' && window.AdvancedAnalysisTab && <window.AdvancedAnalysisTab isDarkMode={isDarkMode} />}
                     {/* {activeTab === 'yield-curve' && <YieldCurveTab />} */} {/* Intégré dans Marchés & Économie */}
                     {activeTab === 'intellistocks' && <JLabUnifiedTab />}
                     {activeTab === 'groupchat' && window.GroupChatTab && React.createElement(window.GroupChatTab, { isDarkMode: isDarkMode, dashboardTab: activeTab, onDashboardTabChange: setActiveTab })}
