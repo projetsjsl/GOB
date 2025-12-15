@@ -18,6 +18,13 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         .online-dot { animation: pulse 2s infinite; }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-bounce-in { animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
         /* Inline editing styles */
         .editable { cursor: pointer; border-bottom: 1px dashed transparent; transition: all 0.2s; }
         .editable:hover { border-bottom-color: #3b82f6; background: rgba(59,130,246,0.05); }
@@ -727,6 +734,25 @@
                 });
             }, [tasks, searchTerm, filterStatus]);
 
+            // Notification Toast Component
+            const NotificationToast = ({ message, type, onClose }) => {
+                useEffect(() => {
+                    const timer = setTimeout(onClose, 3000);
+                    return () => clearTimeout(timer);
+                }, [onClose]);
+
+                return (
+                    <div className={`fixed bottom-6 right-6 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transform transition-all duration-300 z-50 animate-bounce-in ${type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
+                        <span className="text-2xl">{type === 'success' ? '✅' : '⚠️'}</span>
+                        <div>
+                            <h4 className="font-bold">{type === 'success' ? 'Succès' : 'Erreur'}</h4>
+                            <p className="text-sm opacity-90">{message}</p>
+                        </div>
+                        <button onClick={onClose} className="ml-2 opacity-70 hover:opacity-100"><Icons.X /></button>
+                    </div>
+                );
+            };
+
             const toggleTaskStatus = (taskId) => {
                 setTasks(tasks.map(task => {
                     if (task.id === taskId) {
@@ -734,15 +760,20 @@
                         const currentIndex = statuses.indexOf(task.status);
                         const newStatus = statuses[(currentIndex + 1) % statuses.length];
                         
-                        // Sauvegarder le statut dans employeeTasks pour persistance
-                        const originalTaskId = taskId.split('-')[1]; // Extraire l'ID de tâche original
-                        setEmployeeTasks(prev => ({
-                            ...prev,
+                        // Persist status
+                        const originalTaskId = parseInt(taskId.split('-')[1]);
+                        const updatedEmployeeTasks = {
+                            ...employeeTasks,
                             [selectedEmployee.id]: {
-                                ...prev[selectedEmployee.id],
+                                ...employeeTasks[selectedEmployee.id],
                                 [originalTaskId]: newStatus
                             }
-                        }));
+                        };
+                        setEmployeeTasks(updatedEmployeeTasks);
+                        saveToStorage(STORAGE_KEYS.employeeTasks, updatedEmployeeTasks);
+                        
+                        // Show tiny feedback? No, status change is visual enough, but maybe just auto-save feedback
+                        // showNotification('Statut mis à jour', 'success'); // Optional, might be noisy
                         
                         return { ...task, status: newStatus };
                     }
@@ -750,31 +781,56 @@
                 }));
             };
 
-            // Task CRUD functions
+            // Task CRUD functions with Persistence and Notification
             const updateTask = (taskId, field, value) => {
+                // Update local view first for optimisic UI
                 setTasks(tasks.map(t => t.id === taskId ? { ...t, [field]: value } : t));
+
+                // Update Source (TaskTemplates)
+                const originalTaskId = parseInt(taskId.split('-')[1]);
+                const updatedTemplates = taskTemplates.map(t => t.id === originalTaskId ? { ...t, [field]: value } : t);
+                setTaskTemplates(updatedTemplates);
+                saveToStorage(STORAGE_KEYS.taskTemplates, updatedTemplates);
+                
+                showNotification('Modification sauvegardée !', 'success');
             };
+
             const deleteTask = (taskId) => {
-                if (confirm('Supprimer cette tâche?')) setTasks(tasks.filter(t => t.id !== taskId));
+                const originalTaskId = parseInt(taskId.split('-')[1]);
+                const updatedTemplates = taskTemplates.filter(t => t.id !== originalTaskId);
+                setTaskTemplates(updatedTemplates);
+                saveToStorage(STORAGE_KEYS.taskTemplates, updatedTemplates);
+                showNotification('Tâche supprimée', 'success');
             };
+
             const addTask = (phaseId) => {
-                const newTask = {
-                    id: `${selectedEmployee.id}-new-${Date.now()}`,
+                const newId = Math.max(...taskTemplates.map(t => t.id), 0) + 1;
+                const newTaskTemplate = {
+                    id: newId,
                     phaseId,
                     title: 'Nouvelle tâche',
-                    description: '',
-                    status: 'pending',
+                    description: 'Description de la tâche...',
+                    assignedTo: [],
                     priority: 'medium',
-                    dueDate: new Date().toISOString().split('T')[0],
-                    assignedTo: []
+                    category: 'autre',
+                    dayOffset: 0
                 };
-                setTasks([...tasks, newTask]);
+                
+                const updatedTemplates = [...taskTemplates, newTaskTemplate];
+                setTaskTemplates(updatedTemplates);
+                saveToStorage(STORAGE_KEYS.taskTemplates, updatedTemplates);
+                showNotification('Nouvelle tâche ajoutée', 'success');
             };
 
             // Phase collapse state
             const [collapsedPhases, setCollapsedPhases] = useState({});
             const togglePhaseCollapse = (phaseId) => setCollapsedPhases(prev => ({ ...prev, [phaseId]: !prev[phaseId] }));
             const [showStats, setShowStats] = useState(true);
+            const [notification, setNotification] = useState(null); // { message, type }
+
+            const showNotification = (message, type = 'success') => {
+                setNotification({ message, type });
+            };
 
             const statusColors = { pending: 'bg-gray-100 text-gray-700', inProgress: 'bg-blue-100 text-blue-700', completed: 'bg-green-100 text-green-700' };
             const priorityColors = { low: 'bg-gray-100', medium: 'bg-yellow-100 text-yellow-700', high: 'bg-orange-100 text-orange-700' };
@@ -783,6 +839,7 @@
                 const [expanded, setExpanded] = useState(false);
                 const [editing, setEditing] = useState(null);
                 const [editValue, setEditValue] = useState('');
+                const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
                 const phase = phases.find(p => p.id === task.phaseId);
                 const assignedResources = resources.filter(r => task.assignedTo.includes(r.id));
                 const priorityBg = { low: '#10B981', medium: '#F59E0B', high: '#EF4444' };
@@ -822,7 +879,16 @@
                                 <button onClick={() => setExpanded(!expanded)} className="text-gray-400 hover:text-gray-600 p-1">
                                     <span className={`chevron-rotate ${expanded ? 'chevron-down' : 'chevron-right'}`}><Icons.ChevronDown /></span>
                                 </button>
-                                {onDelete && <button onClick={() => onDelete(task.id)} className="text-red-400 hover:text-red-600 p-1"><Icons.Trash /></button>}
+                                {onDelete && (
+                                    showDeleteConfirm ? (
+                                        <div className="flex items-center gap-2 animate-bounce-in">
+                                            <button onClick={() => onDelete(task.id)} className="text-white bg-red-500 hover:bg-red-600 px-2 py-0.5 rounded text-xs font-bold">Confirmer ?</button>
+                                            <button onClick={() => setShowDeleteConfirm(false)} className="text-gray-400 hover:text-gray-600"><Icons.X /></button>
+                                        </div>
+                                    ) : (
+                                        <button onClick={() => setShowDeleteConfirm(true)} className="text-red-400 hover:text-red-600 p-1"><Icons.Trash /></button>
+                                    )
+                                )}
                             </div>
                             
                             {/* Compact info row */}
@@ -857,7 +923,10 @@
             };
 
             return (
-                <div className="min-h-screen">
+                <div className="min-h-screen relative">
+                    {/* Toast Notification */}
+                    {notification && <NotificationToast message={notification.message} type={notification.type} onClose={() => setNotification(null)} />}
+                    
                     {/* Header avec sélecteur d'employé */}
                     <div className="gradient-bg text-white shadow-2xl">
                         <div className="max-w-7xl mx-auto px-6 py-4">
