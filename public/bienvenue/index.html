@@ -133,7 +133,10 @@
         const useSupabase = !!supabase;
 
         // Données initiales par défaut (VIDE pour migration DB)
-        const defaultEmployees = [];
+        const defaultEmployees = [
+            { id: 1, name: 'Caroline', role: 'Conseillère en gestion de patrimoine', email: 'caroline@gob.com', avatarUrl: '/images/emma-avatar-new.jpg', startDate: '2025-01-15' },
+            { id: 2, name: 'Emma RH', role: 'Responsable RH', email: 'emma@gob.com', avatarUrl: '/images/emma-avatar-new.jpg', startDate: '2024-01-01' }
+        ];
         const defaultResources = [];
         const defaultPhases = [];
         const defaultTaskTemplates = [];
@@ -148,6 +151,11 @@
             'admin': { name: 'Adjointe administrative', phases: [1, 2, 3] },
             'custom': { name: 'Personnalisé', phases: [1, 2, 3, 4] }
         };
+
+        // ... (Chatbot code) ...
+
+        // Login Component
+
 
         // Chatbot Emma RH
         // Chatbot Emma RH
@@ -652,6 +660,12 @@
             const [selectedEmp, setSelectedEmp] = useState(employees[0]?.id);
             const [password, setPassword] = useState('');
             const [error, setError] = useState('');
+
+            useEffect(() => {
+                if (employees.length > 0 && !selectedEmp) {
+                    setSelectedEmp(employees[0].id);
+                }
+            }, [employees, selectedEmp]);
 
             const handleLogin = (e) => {
                 e.preventDefault();
