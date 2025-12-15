@@ -10,8 +10,8 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="/bienvenue/caroline-plan-data.js"></script>
-    <script src="/bienvenue/email-template.js"></script>
+    <script src="./caroline-plan-data.js"></script>
+    <script src="./email-template.js"></script>
     <style>
         @media print {
             .no-print, button, .toolbar, .admin-panel, .save-indicator, .header-controls, .toggle-view { display: none !important; }
@@ -97,6 +97,7 @@
             Layers: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>),
             Eye: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>),
             Users: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>),
+            Copy: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>),
         };
 
         // Error Boundary Simple
@@ -184,23 +185,23 @@
         ];
 
         const defaultTaskTemplates = [
-            // Phase 1 - J1
-            { id: 1, phaseId: 1, title: 'Récupération du matériel informatique', description: 'Ordinateur, écran, périphériques', priority: 'high', category: 'matériel', dayOffset: 0, assignedTo: [3] },
-            { id: 2, phaseId: 1, title: 'Configuration des accès courriels', description: 'Outlook, Signature corporative', priority: 'high', category: 'technique', dayOffset: 0, assignedTo: [4] },
-            { id: 3, phaseId: 1, title: 'Visite des locaux', description: 'Présentation des bureaux et commodités', priority: 'low', category: 'social', dayOffset: 0, assignedTo: [3] },
+            // Phase 1 - Arrivée & Logistique
+            { id: 1, phaseId: 1, title: 'Récupération du matériel informatique', description: 'Récupérer l\'ordinateur portable, l\'écran et les périphériques au département TI (2e étage).', priority: 'high', category: 'matériel', dayOffset: 0, assignedTo: [3] },
+            { id: 2, phaseId: 1, title: 'Configuration des accès courriels', description: 'Configuration d\'Outlook, de la signature corporative et des accès aux calendriers partagés.', priority: 'high', category: 'technique', dayOffset: 0, assignedTo: [4] },
+            { id: 3, phaseId: 1, title: 'Visite des locaux et présentation', description: 'Tour complet des bureaux, localisation des issues de secours, cafétéria et présentation aux équipes présentes.', priority: 'low', category: 'social', dayOffset: 0, assignedTo: [3] },
             
             // Phase 1 - J2
-            { id: 4, phaseId: 1, title: 'Introduction à l\'équipe', description: 'Rencontre avec les collègues', priority: 'medium', category: 'social', dayOffset: 1, assignedTo: [1, 2] },
-            { id: 5, phaseId: 1, title: 'Configuration CRM', description: 'Accès et formation de base', priority: 'high', category: 'technique', dayOffset: 1, assignedTo: [4] },
+            { id: 4, phaseId: 1, title: 'Rencontre d\'introduction équipe', description: 'Rencontre informelle avec les membres de l\'équipe immédiate pour briser la glace.', priority: 'medium', category: 'social', dayOffset: 1, assignedTo: [1, 2] },
+            { id: 5, phaseId: 1, title: 'Formation CRM & Outils', description: 'Session de formation initiale sur le CRM, la gestion documentaire et les outils de communication.', priority: 'high', category: 'technique', dayOffset: 1, assignedTo: [4] },
 
             // Phase 2 - Formation
-            { id: 6, phaseId: 2, title: 'Formation Conformité', description: 'Modules obligatoires', priority: 'high', category: 'formation', dayOffset: 2, assignedTo: [3] },
-            { id: 7, phaseId: 2, title: 'Formation Produits', description: 'Vue d\'ensemble de la gamme', priority: 'medium', category: 'formation', dayOffset: 3, assignedTo: [1] },
-            { id: 8, phaseId: 2, title: 'Atelier Outils internes', description: 'Utilisation du dashboard', priority: 'medium', category: 'technique', dayOffset: 4, assignedTo: [4] },
+            { id: 6, phaseId: 2, title: 'Formation Conformité & Éthique', description: 'Compléter les modules obligatoires sur la conformité, le code d\'éthique et la sécurité de l\'information.', priority: 'high', category: 'formation', dayOffset: 2, assignedTo: [3] },
+            { id: 7, phaseId: 2, title: 'Formation Gamme de Produits', description: 'Vue d\'ensemble détaillée des produits et services offerts, avec focus sur les nouveautés.', priority: 'medium', category: 'formation', dayOffset: 3, assignedTo: [1] },
+            { id: 8, phaseId: 2, title: 'Atelier Tableaux de Bord', description: 'Formation pratique sur l\'utilisation et l\'interprétation des tableaux de bord de performance.', priority: 'medium', category: 'technique', dayOffset: 4, assignedTo: [4] },
 
             // Phase 3 - Immersion
-            { id: 9, phaseId: 3, title: 'Observation RDV Client', description: 'Accompagnement senior', priority: 'high', category: 'pratique', dayOffset: 8, assignedTo: [1] },
-            { id: 10, phaseId: 3, title: 'Premier dossier test', description: 'Simulation complète', priority: 'medium', category: 'pratique', dayOffset: 10, assignedTo: [2] }
+            { id: 9, phaseId: 3, title: 'Observation RDV Client (Senior)', description: 'Accompagnement d\'un conseiller senior lors d\'une rencontre client pour observation des bonnes pratiques.', priority: 'high', category: 'pratique', dayOffset: 8, assignedTo: [1] },
+            { id: 10, phaseId: 3, title: 'Simulation Dossier Client', description: 'Réalisation complète d\'un dossier client fictif pour valider l\'acquisition des compétences.', priority: 'medium', category: 'pratique', dayOffset: 10, assignedTo: [2] }
         ];
 
         // Catégories disponibles pour les tâches
@@ -502,6 +503,208 @@
             );
         };
 
+        // FONCTION D'ENVOI EMAIL VIA RESEND (Simulée ou API)
+        const sendEmailViaResend = async (employee, phases, tasks, resources) => {
+             const html = window.generateEmailHTML(employee, phases, tasks, resources);
+             // Ici, idéalement appel à un backend secure. Pour démo frontend-only:
+             const subject = `Plan d'Intégration - ${employee.name}`;
+             const to = prompt("Adresse email du destinataire :", "projetsjsl@gmail.com");
+             if (!to) return;
+             
+             // Simulation d'appel API
+             console.log("Envoi email vers", to, "Subject:", subject);
+             alert(`📧 Simulation: Email envoyé à ${to} via Resend ! \n(Nécessite un backend pour l'envoi réel)`);
+        };
+
+        // ADMIN PANEL COMPONENT (Top Level pour éviter re-render)
+        const AdminPanel = ({ 
+            employees, setEmployees, 
+            resources, setResources, 
+            phaseTemplates, setPhaseTemplates, 
+            taskTemplates, setTaskTemplates,
+            supabase, useSupabase, 
+            showNotification, uploadAvatar, onClose 
+        }) => {
+            const [activeTab, setActiveTab] = useState('employees');
+            const [newEmpName, setNewEmpName] = useState('');
+            const [newEmpRole, setNewEmpRole] = useState('');
+            const [newEmpEmail, setNewEmpEmail] = useState('');
+
+            // --- Logic Employés ---
+            const handleAddEmployee = async () => {
+                const newId = (Math.max(...employees.map(e => e.id), 0) || 0) + 1;
+                const newEmp = { 
+                    id: newId, 
+                    name: newEmpName || 'Nouvel Employé', 
+                    role: newEmpRole || 'Poste', 
+                    email: newEmpEmail, 
+                    startDate: new Date().toISOString().split('T')[0],
+                    avatarUrl: null
+                };
+                setEmployees([...employees, newEmp]);
+                setNewEmpName(''); setNewEmpRole(''); setNewEmpEmail('');
+                
+                if (useSupabase && supabase) {
+                    const { error } = await supabase.from('employees').insert([{ name: newEmp.name, role: newEmp.role, email: newEmp.email, start_date: newEmp.startDate }]);
+                    if (error) showNotification('Erreur DB', 'error');
+                }
+                showNotification('Employé ajouté', 'success');
+            };
+
+            const updateEmp = async (id, field, value) => {
+                setEmployees(prev => prev.map(e => e.id === id ? { ...e, [field]: value } : e));
+                if (useSupabase && supabase) {
+                    const col = field === 'startDate' ? 'start_date' : field === 'avatarUrl' ? 'avatar_url' : field;
+                    await supabase.from('employees').update({ [col]: value }).eq('id', id);
+                }
+            };
+
+            const duplicateEmp = (emp) => {
+                const newId = (Math.max(...employees.map(e => e.id), 0) || 0) + 1;
+                const copy = { ...emp, id: newId, name: `${emp.name} (Copie)` };
+                setEmployees([...employees, copy]);
+                if (useSupabase && supabase) {
+                     supabase.from('employees').insert([{ name: copy.name, role: copy.role, email: copy.email, start_date: copy.startDate }]);
+                }
+                showNotification('Employé dupliqué', 'success');
+            };
+
+            // --- Logic Resources ---
+            const [newResName, setNewResName] = useState('');
+            const handleAddResource = async () => {
+                const newId = (Math.max(...resources.map(r => r.id), 0) || 0) + 1;
+                const newRes = { id: newId, name: newResName || 'Ressource', role: 'Role', color: '#3B82F6', email: '', avatar: 'R' };
+                setResources([...resources, newRes]);
+                setNewResName('');
+                if (useSupabase && supabase) supabase.from('resources').insert([{ name: newRes.name, role: newRes.role, color: newRes.color }]);
+            };
+             const updateRes = async (id, field, value) => {
+                setResources(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r));
+                if (useSupabase && supabase) supabase.from('resources').update({ [field]: value }).eq('id', id);
+            };
+
+            // --- Logic Phases ---
+             const updatePhase = async (id, field, value) => {
+                setPhaseTemplates(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
+                if (useSupabase && supabase) {
+                     const col = field === 'startOffset' ? 'start_offset' : field;
+                     supabase.from('phases').update({ [col]: value }).eq('id', id);
+                }
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+                    <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+                        <div className="p-6 border-b flex justify-between items-center bg-gray-50">
+                             <h2 className="text-2xl font-bold flex items-center gap-2"><span className="bg-blue-100 p-2 rounded text-blue-600"><Icons.Settings /></span> Administration RH</h2>
+                             <div className="flex gap-2">
+                                <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full"><Icons.X /></button>
+                             </div>
+                        </div>
+                        <div className="flex border-b bg-white overflow-x-auto">
+                            {[
+                                { id: 'employees', icon: <Icons.Users />, label: 'Profils Employés' },
+                                { id: 'resources', icon: <Icons.User />, label: 'Ressources' },
+                                { id: 'phases', icon: <Icons.Layers />, label: 'Phases' },
+                                { id: 'tasks', icon: <Icons.List />, label: 'Modèles Tâches' }
+                            ].map(tab => (
+                                <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-4 py-3 font-bold text-sm flex items-center gap-2 transition-colors border-b-2 ${activeTab === tab.id ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:bg-gray-50'}`}>
+                                    {tab.icon} {tab.label}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+                            {activeTab === 'employees' && (
+                                <div className="space-y-6">
+                                    <div className="bg-white p-4 rounded-xl border shadow-sm flex gap-2 items-end">
+                                        <div className="flex-1 grid grid-cols-3 gap-2">
+                                            <div className="space-y-1"><label className="text-xs font-bold text-gray-500">Nom</label><input className="w-full p-2 border rounded" value={newEmpName} onChange={e => setNewEmpName(e.target.value)} placeholder="Ex: Julie Gagnon" /></div>
+                                            <div className="space-y-1"><label className="text-xs font-bold text-gray-500">Rôle</label><input className="w-full p-2 border rounded" value={newEmpRole} onChange={e => setNewEmpRole(e.target.value)} placeholder="Ex: Adjointe" /></div>
+                                            <div className="space-y-1"><label className="text-xs font-bold text-gray-500">Email</label><input className="w-full p-2 border rounded" value={newEmpEmail} onChange={e => setNewEmpEmail(e.target.value)} placeholder="julie@gob.com" /></div>
+                                        </div>
+                                        <button onClick={handleAddEmployee} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 h-[42px]"><Icons.Plus /> Ajouter</button>
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-3">
+                                        {employees.map(emp => (
+                                            <div key={emp.id} className="bg-white p-3 rounded-xl border flex items-center gap-3 shadow-sm hover:shadow-md transition-shadow">
+                                                <div className="relative group w-12 h-12">
+                                                    <img src={emp.avatarUrl || `https://ui-avatars.com/api/?name=${emp.name}&background=random`} className="w-12 h-12 rounded-full object-cover border" />
+                                                    <label className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center text-white text-[8px] opacity-0 group-hover:opacity-100 cursor-pointer pt-3">
+                                                        PHOTO
+                                                        <input type="file" className="hidden" accept="image/*" onChange={async(e) => { if(e.target.files[0]) { const url = await uploadAvatar(e.target.files[0]); if(url) updateEmp(emp.id, 'avatarUrl', url); } }} />
+                                                    </label>
+                                                </div>
+                                                <div className="flex-1 grid grid-cols-2 gap-2">
+                                                    <input className="font-bold border-b border-transparent hover:border-gray-200 focus:border-blue-500 outline-none" value={emp.name} onChange={e => updateEmp(emp.id, 'name', e.target.value)} />
+                                                    <input className="text-sm text-gray-500 border-b border-transparent hover:border-gray-200 focus:border-blue-500 outline-none" value={emp.role} onChange={e => updateEmp(emp.id, 'role', e.target.value)} />
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                     <input type="date" className="w-32 text-xs border rounded px-1 py-1" value={emp.startDate} onChange={e => updateEmp(emp.id, 'startDate', e.target.value)} />
+                                                     <button onClick={() => duplicateEmp(emp)} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded" title="Dupliquer"><Icons.Copy /></button>
+                                                     <button onClick={() => { if(confirm('Supprimer ?')) { setEmployees(employees.filter(e => e.id !== emp.id)); if(useSupabase && supabase) supabase.from('employees').delete().eq('id', emp.id); } }} className="p-1.5 text-red-500 hover:bg-red-50 rounded"><Icons.Trash /></button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            {activeTab === 'resources' && (
+                                <div className="space-y-6">
+                                    <div className="bg-white p-4 rounded-xl border shadow-sm flex gap-2">
+                                        <input className="flex-1 p-2 border rounded" placeholder="Nom de la ressource" value={newResName} onChange={e => setNewResName(e.target.value)} />
+                                        <button onClick={handleAddResource} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold"><Icons.Plus /> Ajouter</button>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        {resources.map(res => (
+                                            <div key={res.id} className="bg-white p-3 rounded-xl border flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm ring-1 ring-gray-100" style={{ backgroundColor: res.color }}>
+                                                    {res.name.charAt(0)}
+                                                </div>
+                                                <div className="flex-1 space-y-1">
+                                                    <input className="w-full font-bold text-sm border-b border-transparent focus:border-blue-500 outline-none" value={res.name} onChange={e => updateRes(res.id, 'name', e.target.value)} />
+                                                    <input className="w-full text-xs text-gray-500 border-b border-transparent focus:border-blue-500 outline-none" value={res.role} onChange={e => updateRes(res.id, 'role', e.target.value)} />
+                                                </div>
+                                                <input type="color" className="w-8 h-8 rounded cursor-pointer border-0 p-0" value={res.color} onChange={e => updateRes(res.id, 'color', e.target.value)} />
+                                                <button onClick={() => setResources(resources.filter(r => r.id !== res.id))} className="text-red-400 hover:text-red-600"><Icons.Trash /></button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                             {activeTab === 'phases' && (
+                                <div className="space-y-4">
+                                    {phaseTemplates.map(phase => (
+                                        <div key={phase.id} className="bg-white p-4 rounded-xl border-l-4 shadow-sm" style={{ borderLeftColor: phase.color }}>
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <input type="color" value={phase.color} onChange={e => updatePhase(phase.id, 'color', e.target.value)} className="w-6 h-6 rounded cursor-pointer border-0" />
+                                                <input className="flex-1 font-bold text-lg border-b border-transparent focus:border-blue-500 outline-none" value={phase.name} onChange={e => updatePhase(phase.id, 'name', e.target.value)} />
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                                <div>
+                                                    <label className="text-xs text-gray-500 font-bold uppercase">Durée (jours)</label>
+                                                    <input type="number" className="w-full p-1 border rounded" value={phase.duration} onChange={e => updatePhase(phase.id, 'duration', parseInt(e.target.value))} />
+                                                </div>
+                                                <div>
+                                                     <label className="text-xs text-gray-500 font-bold uppercase">Délicat (J+)</label>
+                                                     <input type="number" className="w-full p-1 border rounded" value={phase.startOffset} onChange={e => updatePhase(phase.id, 'startOffset', parseInt(e.target.value))} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                             {activeTab === 'tasks' && (
+                                <div className="text-center py-10 text-gray-400">
+                                    <Icons.List className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                                    <p>Les modèles de tâches se gèrent directement dans le tableau de bord principal pour plus de contexte.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         // Composant principal
         const OnboardingPlatform = () => {
              // États principaux
@@ -553,322 +756,6 @@
                 }
             };
 
-            // Gestionnaire de Profils (Remplaçant l'Import/Export)
-            const AdminPanel = () => {
-                const [activeTab, setActiveTab] = useState('profiles');
-                const [isUploading, setIsUploading] = useState(false);
-                const [showImportModal, setShowImportModal] = useState(false);
-
-                // Import/Export Logic
-                const exportConfig = () => {
-                    const config = { employees, resources, phaseTemplates, taskTemplates, exportedAt: new Date().toISOString() };
-                    const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a'); a.href = url; a.download = 'rh-config-' + new Date().toISOString().split('T')[0] + '.json'; a.click();
-                    showNotification('📥 Configuration exportée', 'success');
-                };
-
-                const importConfig = (e) => {
-                    const file = e.target.files[0]; if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        try {
-                            const config = JSON.parse(event.target.result);
-                            if (config.employees) setEmployees(config.employees);
-                            if (config.resources) setResources(config.resources);
-                            if (config.phaseTemplates) setPhaseTemplates(config.phaseTemplates);
-                            if (config.taskTemplates) setTaskTemplates(config.taskTemplates);
-                            showNotification('📤 Configuration importée', 'success');
-                            setShowImportModal(false);
-                        } catch (err) { showNotification('Erreur: fichier invalide', 'error'); }
-                    };
-                    reader.readAsText(file);
-                };
-                
-                // --- PROFILES LOGIC ---
-                const handleAvatarChange = async (e, empId) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    setIsUploading(true);
-                    const publicUrl = await uploadAvatar(file);
-                    setIsUploading(false);
-                    if (publicUrl) {
-                        setEmployees(employees.map(emp => emp.id === empId ? { ...emp, avatarUrl: publicUrl } : emp));
-                        const { error } = await supabase.from('employees').update({ avatar_url: publicUrl }).eq('id', empId);
-                        if(error) showNotification('Erreur sauvegarde DB', 'error');
-                        else showNotification('Photo mise à jour', 'success');
-                    }
-                };
-                
-                const updateProfile = async (id, field, value) => {
-                     setEmployees(employees.map(emp => emp.id === id ? { ...emp, [field]: value } : emp));
-                     if(useSupabase && supabase) {
-                         const dbField = field === 'avatarUrl' ? 'avatar_url' : field;
-                         await supabase.from('employees').update({ [dbField]: value }).eq('id', id);
-                     }
-                };
-
-                // --- RESOURCES LOGIC ---
-                const updateResource = async (id, field, value) => {
-                    setResources(resources.map(r => r.id === id ? { ...r, [field]: value } : r));
-                    if(useSupabase && supabase) {
-                        const dbField = field === 'avatar' ? 'avatar_initials' : field === 'displayOrder' ? 'display_order' : field;
-                        await supabase.from('resources').update({ [dbField]: value }).eq('id', id);
-                    }
-                };
-
-                const addResource = async () => {
-                    const newRes = { name: 'Nouvelle Ressource', role: 'Rôle', email: '', avatar_initials: 'NR', display_order: resources.length + 1 };
-                    const { data, error } = await supabase.from('resources').insert([newRes]).select();
-                    if(data) setResources([...resources, { ...data[0], avatar: data[0].avatar_initials, displayOrder: data[0].display_order }]);
-                };
-
-                const deleteResource = async (id) => {
-                    if(!confirm('Supprimer cette ressource ?')) return;
-                    setResources(resources.filter(r => r.id !== id));
-                    await supabase.from('resources').delete().eq('id', id);
-                };
-
-                // --- TASK TEMPLATES LOGIC ---
-                const updateTaskTemplate = async (id, field, value) => {
-                    setTaskTemplates(taskTemplates.map(t => t.id === id ? { ...t, [field]: value } : t));
-                    if(useSupabase && supabase) {
-                        const dbField = field === 'phaseId' ? 'phase_id' : field === 'assignedTo' ? 'assigned_to' : field === 'dayOffset' ? 'day_offset' : field;
-                        await supabase.from('task_templates').update({ [dbField]: value }).eq('id', id);
-                    }
-                };
-
-                const addTaskTemplate = async () => {
-                    const newTask = { 
-                        title: 'Nouvelle tâche', 
-                        description: '', 
-                        priority: 'medium', 
-                        category: 'administratif', 
-                        phase_id: 1, 
-                        day_offset: 0, 
-                        assigned_to: [] 
-                    };
-                    const { data, error } = await supabase.from('task_templates').insert([newTask]).select();
-                    if(data) {
-                        const createdTask = data[0];
-                        setTaskTemplates([...taskTemplates, { 
-                            ...createdTask, 
-                            phaseId: createdTask.phase_id, 
-                            dayOffset: createdTask.day_offset, 
-                            assignedTo: createdTask.assigned_to 
-                        }]);
-                        showNotification('Tâche ajoutée', 'success');
-                    } else {
-                        console.error(error);
-                        showNotification('Erreur ajout tâche', 'error');
-                    }
-                };
-
-                const deleteTaskTemplate = async (id) => {
-                    if(!confirm('Supprimer ce modèle de tâche ?')) return;
-                    setTaskTemplates(taskTemplates.filter(t => t.id !== id));
-                    await supabase.from('task_templates').delete().eq('id', id);
-                };
-
-                // --- PHASES LOGIC ---
-                const updatePhaseTemplate = async (id, field, value) => {
-                    setPhaseTemplates(phaseTemplates.map(p => p.id === id ? { ...p, [field]: value } : p));
-                    if(useSupabase && supabase) {
-                        const dbField = field === 'startOffset' ? 'start_offset' : field === 'displayOrder' ? 'display_order' : field;
-                        await supabase.from('phases').update({ [dbField]: value }).eq('id', id);
-                    }
-                };
-
-                const addPhase = async () => {
-                    const newPhase = { name: 'Nouvelle Phase', description: '', duration: 5, start_offset: 0, color: '#333333', display_order: phaseTemplates.length + 1 };
-                    const { data, error } = await supabase.from('phases').insert([newPhase]).select();
-                    if(data) setPhaseTemplates([...phaseTemplates, { ...data[0], startOffset: data[0].start_offset, displayOrder: data[0].display_order }]);
-                };
-
-                 const deletePhase = async (id) => {
-                    if(!confirm('Supprimer cette phase ?')) return;
-                    setPhaseTemplates(phaseTemplates.filter(p => p.id !== id));
-                    await supabase.from('phases').delete().eq('id', id);
-                };
-
-                return (
-                    <div className="bg-white p-6 rounded-xl shadow-lg border mb-8 min-h-[500px] relative">
-                        {/* Import Modal */}
-                        {showImportModal && (
-                            <div className="absolute inset-0 bg-white/95 z-50 flex items-center justify-center rounded-xl">
-                                <div className="bg-white border rounded-xl p-6 max-w-md shadow-2xl text-center">
-                                    <h3 className="text-lg font-bold mb-4">Importer une configuration</h3>
-                                    <p className="text-sm text-gray-500 mb-4">Sélectionnez un fichier .json exporté précédemment.</p>
-                                    <input type="file" accept=".json" onChange={importConfig} className="mb-4 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-                                    <button onClick={() => setShowImportModal(false)} className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Annuler</button>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="flex flex-col md:flex-row items-center justify-between mb-6 border-b pb-4 gap-4">
-                            <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto">
-                                <button onClick={() => setActiveTab('profiles')} className={`px-4 py-2 rounded-lg font-bold transition-colors whitespace-nowrap ${activeTab === 'profiles' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>👤 Profils Employés</button>
-                                <button onClick={() => setActiveTab('resources')} className={`px-4 py-2 rounded-lg font-bold transition-colors whitespace-nowrap ${activeTab === 'resources' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>👥 Ressources</button>
-                                <button onClick={() => setActiveTab('phases')} className={`px-4 py-2 rounded-lg font-bold transition-colors whitespace-nowrap ${activeTab === 'phases' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>📅 Phases</button>
-                                <button onClick={() => setActiveTab('tasks')} className={`px-4 py-2 rounded-lg font-bold transition-colors whitespace-nowrap ${activeTab === 'tasks' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>📋 Tâches (Modèles)</button>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button onClick={exportConfig} className="px-3 py-1.5 border border-gray-200 hover:bg-gray-50 rounded-lg text-sm flex items-center gap-1 text-gray-600"><Icons.Download /> Exporter JSON</button>
-                                <button onClick={() => setShowImportModal(true)} className="px-3 py-1.5 border border-gray-200 hover:bg-gray-50 rounded-lg text-sm flex items-center gap-1 text-gray-600"><Icons.Upload /> Importer JSON</button>
-                            </div>
-                        </div>
-
-                        {/* TAB: PROFILES */}
-                        {activeTab === 'profiles' && (
-                            <div className="space-y-4 animate-fade-in">
-                                {employees.map(emp => (
-                                    <div key={emp.id} className="border rounded-lg p-4 flex flex-col md:flex-row items-center gap-4 bg-gray-50">
-                                        <div className="relative group w-16 h-16 flex-shrink-0">
-                                            <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 border-2 border-gray-100">
-                                                {emp.avatarUrl ? <img src={emp.avatarUrl} className="w-full h-full object-cover" /> : <span className="flex items-center justify-center h-full text-xl text-gray-500 font-bold">{emp.name?.charAt(0)}</span>}
-                                            </div>
-                                            <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-full cursor-pointer transition-opacity">
-                                                <Icons.Plus className="text-white w-6 h-6" />
-                                                <input type="file" className="hidden" accept="image/*" onChange={(e) => handleAvatarChange(e, emp.id)} disabled={isUploading} />
-                                            </label>
-                                        </div>
-                                        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
-                                            <input type="text" value={emp.name} onChange={(e) => updateProfile(emp.id, 'name', e.target.value)} className="font-bold bg-transparent border-b focus:border-blue-500 outline-none" placeholder="Nom" />
-                                            <input type="text" value={emp.role} onChange={(e) => updateProfile(emp.id, 'role', e.target.value)} className="text-gray-600 bg-transparent border-b focus:border-blue-500 outline-none" placeholder="Rôle" />
-                                            <div className="flex items-center gap-2">
-                                                <input type="text" value={emp.password || ''} onChange={(e) => updateProfile(emp.id, 'password', e.target.value)} className="font-mono text-sm bg-white border rounded px-2 w-full" placeholder="Mot de passe" />
-                                                <button onClick={async () => {
-                                                    if (!confirm(`Cloner le profil de ${emp.name} ?`)) return;
-                                                    const newEmp = { 
-                                                        ...emp, 
-                                                        id: undefined, 
-                                                        name: `${emp.name} (Copie)`, 
-                                                        email: `copie-${Math.floor(Math.random()*1000)}@gob.com`,
-                                                        avatar_url: null 
-                                                    };
-                                                    delete newEmp.id;
-                                                    
-                                                    // Insert Employee
-                                                    const { data: empData, error } = await supabase.from('employees').insert([newEmp]).select();
-                                                    if (empData) {
-                                                        const createdEmp = empData[0];
-                                                        setEmployees([...employees, { ...createdEmp, avatarUrl: null, startDate: createdEmp.start_date }]);
-                                                        
-                                                        // Clone Tasks (if needed, here we just clone the profile as requested)
-                                                        showNotification('Employé cloné avec succès !', 'success');
-                                                    } else {
-                                                        console.error(error);
-                                                        showNotification('Erreur au clonage', 'error');
-                                                    }
-                                                }} className="p-2 text-indigo-500 hover:bg-white rounded-lg border border-transparent hover:border-gray-200" title="Cloner ce profil">
-                                                    <Icons.Users />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* TAB: RESOURCES */}
-                        {activeTab === 'resources' && (
-                            <div className="space-y-2 animate-fade-in">
-                                {resources.map(res => (
-                                    <div key={res.id} className="flex items-center gap-2 p-2 border rounded bg-gray-50 hover:bg-white transition-colors">
-                                        <span className="cursor-move text-gray-300"><Icons.GripVertical /></span>
-                                        <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">
-                                            {res.avatar || res.name.charAt(0)}
-                                        </div>
-                                        <input className="font-bold w-1/4 bg-transparent border-b border-dashed border-transparent hover:border-gray-300 focus:border-blue-500 outline-none" value={res.name} onChange={e => updateResource(res.id, 'name', e.target.value)} />
-                                        <input className="text-sm text-gray-500 w-1/4 bg-transparent border-b border-dashed border-transparent hover:border-gray-300 focus:border-blue-500 outline-none" value={res.role} onChange={e => updateResource(res.id, 'role', e.target.value)} />
-                                        <input className="text-sm text-gray-400 w-1/4 bg-transparent border-b border-dashed border-transparent hover:border-gray-300 focus:border-blue-500 outline-none" value={res.email} onChange={e => updateResource(res.id, 'email', e.target.value)} placeholder="Email..." />
-                                        <button onClick={() => deleteResource(res.id)} className="ml-auto text-red-300 hover:text-red-500"><Icons.Trash /></button>
-                                    </div>
-                                ))}
-                                <button onClick={addResource} className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-indigo-500 hover:text-indigo-600 font-bold flex items-center justify-center gap-2 transition-all">
-                                    <Icons.Plus /> Ajouter une ressource
-                                </button>
-                            </div>
-                        )}
-
-                        {/* TAB: PHASES */}
-                        {activeTab === 'phases' && (
-                            <div className="space-y-4 animate-fade-in">
-                                {phaseTemplates.map(phase => (
-                                    <div key={phase.id} className="border-l-4 rounded-r-lg p-4 bg-gray-50 shadow-sm" style={{ borderColor: phase.color }}>
-                                        <div className="flex items-center gap-4 mb-2">
-                                            <input type="color" value={phase.color} onChange={e => updatePhaseTemplate(phase.id, 'color', e.target.value)} className="w-8 h-8 rounded cursor-pointer border-none" />
-                                            <input className="text-lg font-bold flex-1 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 outline-none" value={phase.name} onChange={e => updatePhaseTemplate(phase.id, 'name', e.target.value)} />
-                                            <button onClick={() => deletePhase(phase.id)} className="text-red-300 hover:text-red-500"><Icons.Trash /></button>
-                                        </div>
-                                        <div className="grid grid-cols-3 gap-4 text-sm">
-                                            <div className="flex flex-col">
-                                                <label className="text-gray-400 text-xs uppercase">Description</label>
-                                                <input className="bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none" value={phase.description} onChange={e => updatePhaseTemplate(phase.id, 'description', e.target.value)} />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <label className="text-gray-400 text-xs uppercase">Durée (jours)</label>
-                                                <input type="number" className="bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none" value={phase.duration} onChange={e => updatePhaseTemplate(phase.id, 'duration', parseInt(e.target.value))} />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <label className="text-gray-400 text-xs uppercase">Décalage début (jours / J0)</label>
-                                                <input type="number" className="bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none" value={phase.startOffset} onChange={e => updatePhaseTemplate(phase.id, 'startOffset', parseInt(e.target.value))} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                                <button onClick={addPhase} className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-indigo-500 hover:text-indigo-600 font-bold flex items-center justify-center gap-2 transition-all">
-                                    <Icons.Plus /> Ajouter une phase
-                                </button>
-                            </div>
-                        )}
-
-                        {/* TAB: TASK TEMPLATES */}
-                        {activeTab === 'tasks' && (
-                            <div className="space-y-4 animate-fade-in">
-                                {taskTemplates.map(task => (
-                                    <div key={task.id} className="border rounded-lg p-4 bg-gray-50 flex flex-col gap-2">
-                                        <div className="flex items-center gap-3">
-                                            <input className="font-bold flex-1 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 outline-none" value={task.title} onChange={e => updateTaskTemplate(task.id, 'title', e.target.value)} />
-                                            <select 
-                                                value={task.priority} 
-                                                onChange={e => updateTaskTemplate(task.id, 'priority', e.target.value)}
-                                                className="text-xs border rounded p-1"
-                                            >
-                                                <option value="low">Basse</option>
-                                                <option value="medium">Moyenne</option>
-                                                <option value="high">Haute</option>
-                                            </select>
-                                            <button onClick={() => deleteTaskTemplate(task.id)} className="text-red-300 hover:text-red-500"><Icons.Trash /></button>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                            <input className="bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none w-full" value={task.description} onChange={e => updateTaskTemplate(task.id, 'description', e.target.value)} placeholder="Description..." />
-                                            <div className="flex items-center gap-2">
-                                                <label className="text-xs text-gray-400 whitespace-nowrap">Phase:</label>
-                                                <select 
-                                                    value={task.phaseId} 
-                                                    onChange={e => updateTaskTemplate(task.id, 'phaseId', parseInt(e.target.value))}
-                                                    className="flex-1 bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none text-xs"
-                                                >
-                                                    {phaseTemplates.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                                <button onClick={addTaskTemplate} className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-indigo-500 hover:text-indigo-600 font-bold flex items-center justify-center gap-2 transition-all">
-                                    <Icons.Plus /> Ajouter un modèle de tâche
-                                </button>
-                            </div>
-                        )}
-                        
-                        <div className="mt-8 pt-4 border-t flex justify-end">
-                            <p className="text-xs text-gray-400 italic">Toutes les modifications sont sauvegardées automatiquement en base de données.</p>
-                        </div>
-                    </div>
-                );
-            };
-
             // Chargement initial des données (Mise à jour pour V2 si possible)
             useEffect(() => {
                 const fetchData = async () => {
@@ -883,7 +770,7 @@
                              // Mapping snake_case -> camelCase
                              setEmployees(empData.map(e => ({
                                  ...e,
-                                 avatarUrl: e.avatar_url,
+                                 avatarUrl: e.avatar_url || (e.name.includes('Caroline') ? 'https://ui-avatars.com/api/?name=Caroline&background=EB4F27&color=fff&size=128' : null),
                                  startDate: e.start_date,
                              })));
                         }
@@ -1329,7 +1216,7 @@
                                             </span>
                                         ))}
                                      </div>
-                                     <div className="text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden md:block">
+                                     <div className="text-xs text-gray-600 font-medium whitespace-nowrap hidden md:block">
                                         {assignedResources.map(r => r.name).join(', ')}
                                      </div>
 
@@ -1640,6 +1527,10 @@
                             }} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg flex items-center gap-2 transition-colors" title="Copier pour Outlook/Gmail">
                                 <Icons.Send /> <span className="hidden md:inline">Copier l'email</span>
                             </button>
+
+                            <button onClick={() => sendEmailViaResend(selectedEmployee, phases, filteredTasks, resources)} className="p-2 text-green-600 hover:bg-green-50 rounded-lg flex items-center gap-2 transition-colors" title="Envoyer via Resend">
+                                <Icons.Send /> <span className="hidden md:inline">Envoyer (Resend)</span>
+                            </button>
                         </div>
 
                         {/* View Switcher Controls */}
@@ -1798,7 +1689,20 @@
                                         Administration RH
                                     </h2>
                                     
-                                    <AdminPanel />
+                                    <AdminPanel 
+                                        employees={employees}
+                                        setEmployees={setEmployees}
+                                        resources={resources}
+                                        setResources={setResources}
+                                        phaseTemplates={phaseTemplates}
+                                        setPhaseTemplates={setPhaseTemplates}
+                                        taskTemplates={taskTemplates}
+                                        setTaskTemplates={setTaskTemplates}
+                                        supabase={supabase}
+                                        useSupabase={useSupabase}
+                                        showNotification={showNotification}
+                                        uploadAvatar={uploadAvatar}
+                                    />
                                 </div>
                             </div>
                         </div>
