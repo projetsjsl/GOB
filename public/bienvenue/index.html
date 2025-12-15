@@ -691,9 +691,19 @@
         };
 
         // Composant principal
+        const OnboardingPlatform = () => {
+             // États principaux avec persistence
+            const [employees, setEmployees] = useState(() => loadFromStorage(STORAGE_KEYS.employees, defaultEmployees));
+            const [selectedEmployeeId, setSelectedEmployeeId] = useState(employees[0]?.id || 1);
+            const [resources, setResources] = useState(() => loadFromStorage(STORAGE_KEYS.resources, defaultResources));
+            const [phaseTemplates, setPhaseTemplates] = useState(() => loadFromStorage(STORAGE_KEYS.phases, defaultPhases));
+            const [taskTemplates, setTaskTemplates] = useState(() => loadFromStorage(STORAGE_KEYS.taskTemplates, defaultTaskTemplates));
+            const [employeeTasks, setEmployeeTasks] = useState(() => loadFromStorage(STORAGE_KEYS.employeeTasks, {}));
+            const [showAdmin, setShowAdmin] = useState(false);
+            const [isAuthenticated, setIsAuthenticated] = useState(false);
+            const [viewMode, setViewMode] = useState('list');
             const [searchTerm, setSearchTerm] = useState('');
             const [filterStatus, setFilterStatus] = useState('all');
-            // const [filterStatus, setFilterStatus] = useState('all'); // Removed duplicate
             const [saveIndicator, setSaveIndicator] = useState({ visible: false, message: '' });
 
             const triggerSaveIndicator = (msg = 'Sauvegarde...') => {
