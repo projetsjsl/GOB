@@ -896,7 +896,14 @@
 
             // NOTE: Auto-save effects removed in favor of direct DB updates in handler functions
 
-            const selectedEmployee = employees.find(e => e.id === selectedEmployeeId) || employees[0];
+            const selectedEmployee = employees.find(e => e.id === selectedEmployeeId) || employees[0] || { 
+                id: 0, 
+                name: 'Chargement...', 
+                role: '...', 
+                avatarUrl: null, 
+                startDate: new Date().toISOString().split('T')[0],
+                endDate: new Date().toISOString().split('T')[0]
+            };
 
             // Générer les phases et tâches pour l'employé sélectionné
             const phases = useMemo(() => {
