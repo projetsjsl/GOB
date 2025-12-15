@@ -810,20 +810,19 @@
             };
 
             // Gestionnaire de Profils (Remplaçant l'Import/Export)
-            const ProfileManager = () => {
+            const AdminPanel = () => {
+                const [activeTab, setActiveTab] = useState('profiles');
                 const [isUploading, setIsUploading] = useState(false);
                 
+                // --- PROFILES LOGIC ---
                 const handleAvatarChange = async (e, empId) => {
                     const file = e.target.files[0];
                     if (!file) return;
-
                     setIsUploading(true);
                     const publicUrl = await uploadAvatar(file);
                     setIsUploading(false);
-
                     if (publicUrl) {
                         setEmployees(employees.map(emp => emp.id === empId ? { ...emp, avatarUrl: publicUrl } : emp));
-                        // Persist
                         const { error } = await supabase.from('employees').update({ avatar_url: publicUrl }).eq('id', empId);
                         if(error) showNotification('Erreur sauvegarde DB', 'error');
                         else showNotification('Photo mise à jour', 'success');
@@ -832,75 +831,141 @@
                 
                 const updateProfile = async (id, field, value) => {
                      setEmployees(employees.map(emp => emp.id === id ? { ...emp, [field]: value } : emp));
-                     // Persist to Supabase
                      if(useSupabase && supabase) {
-                         const dbField = field === 'avatarUrl' ? 'avatar_url' : field; // mapping simple
+                         const dbField = field === 'avatarUrl' ? 'avatar_url' : field;
                          await supabase.from('employees').update({ [dbField]: value }).eq('id', id);
                      }
                 };
 
+                // --- RESOURCES LOGIC ---
+                const updateResource = async (id, field, value) => {
+                    setResources(resources.map(r => r.id === id ? { ...r, [field]: value } : r));
+                    if(useSupabase && supabase) {
+                        const dbField = field === 'avatar' ? 'avatar_initials' : field === 'displayOrder' ? 'display_order' : field;
+                        await supabase.from('resources').update({ [dbField]: value }).eq('id', id);
+                    }
+                };
+
+                const addResource = async () => {
+                    const newRes = { name: 'Nouvelle Ressource', role: 'Rôle', email: '', avatar_initials: 'NR', display_order: resources.length + 1 };
+                    const { data, error } = await supabase.from('resources').insert([newRes]).select();
+                    if(data) setResources([...resources, { ...data[0], avatar: data[0].avatar_initials, displayOrder: data[0].display_order }]);
+                };
+
+                const deleteResource = async (id) => {
+                    if(!confirm('Supprimer cette ressource ?')) return;
+                    setResources(resources.filter(r => r.id !== id));
+                    await supabase.from('resources').delete().eq('id', id);
+                };
+
+                // --- PHASES LOGIC ---
+                const updatePhaseTemplate = async (id, field, value) => {
+                    setPhaseTemplates(phaseTemplates.map(p => p.id === id ? { ...p, [field]: value } : p));
+                    if(useSupabase && supabase) {
+                        const dbField = field === 'startOffset' ? 'start_offset' : field === 'displayOrder' ? 'display_order' : field;
+                        await supabase.from('phases').update({ [dbField]: value }).eq('id', id);
+                    }
+                };
+
+                const addPhase = async () => {
+                    const newPhase = { name: 'Nouvelle Phase', description: '', duration: 5, start_offset: 0, color: '#333333', display_order: phaseTemplates.length + 1 };
+                    const { data, error } = await supabase.from('phases').insert([newPhase]).select();
+                    if(data) setPhaseTemplates([...phaseTemplates, { ...data[0], startOffset: data[0].start_offset, displayOrder: data[0].display_order }]);
+                };
+
+                 const deletePhase = async (id) => {
+                    if(!confirm('Supprimer cette phase ?')) return;
+                    setPhaseTemplates(phaseTemplates.filter(p => p.id !== id));
+                    await supabase.from('phases').delete().eq('id', id);
+                };
+
                 return (
-                    <div className="bg-white p-6 rounded-xl shadow-lg border mb-8">
-                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                             <Icons.User /> Gestion des Profils & Sécurité
-                        </h3>
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-1 gap-4">
+                    <div className="bg-white p-6 rounded-xl shadow-lg border mb-8 min-h-[500px]">
+                        <div className="flex items-center gap-4 mb-6 border-b pb-4 overflow-x-auto">
+                            <button onClick={() => setActiveTab('profiles')} className={`px-4 py-2 rounded-lg font-bold transition-colors ${activeTab === 'profiles' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>👤 Profils Employés</button>
+                            <button onClick={() => setActiveTab('resources')} className={`px-4 py-2 rounded-lg font-bold transition-colors ${activeTab === 'resources' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>👥 Ressources (Qui ?)</button>
+                            <button onClick={() => setActiveTab('phases')} className={`px-4 py-2 rounded-lg font-bold transition-colors ${activeTab === 'phases' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>📅 Phases (Quand ?)</button>
+                        </div>
+
+                        {/* TAB: PROFILES */}
+                        {activeTab === 'profiles' && (
+                            <div className="space-y-4 animate-fade-in">
                                 {employees.map(emp => (
-                                    <div key={emp.id} className="border rounded-lg p-4 flex flex-col md:flex-row items-start md:items-center gap-4 hover:bg-gray-50 transition-colors">
-                                        {/* Avatar Section */}
+                                    <div key={emp.id} className="border rounded-lg p-4 flex flex-col md:flex-row items-center gap-4 bg-gray-50">
                                         <div className="relative group w-16 h-16 flex-shrink-0">
-                                            <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 border-2 border-gray-100 shadow-sm">
+                                            <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 border-2 border-gray-100">
                                                 {emp.avatarUrl ? <img src={emp.avatarUrl} className="w-full h-full object-cover" /> : <span className="flex items-center justify-center h-full text-xl text-gray-500 font-bold">{emp.name?.charAt(0)}</span>}
                                             </div>
                                             <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-full cursor-pointer transition-opacity">
-                                                 <Icons.Plus className="text-white w-6 h-6" />
-                                                 <input type="file" className="hidden" accept="image/*" onChange={(e) => handleAvatarChange(e, emp.id)} disabled={isUploading} />
+                                                <Icons.Plus className="text-white w-6 h-6" />
+                                                <input type="file" className="hidden" accept="image/*" onChange={(e) => handleAvatarChange(e, emp.id)} disabled={isUploading} />
                                             </label>
                                         </div>
-                                        
-                                        {/* Info Section */}
-                                        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                                            <div>
-                                                <label className="text-xs font-bold text-gray-500 uppercase">Nom complet</label>
-                                                <input 
-                                                    type="text" 
-                                                    value={emp.name} 
-                                                    onChange={(e) => updateProfile(emp.id, 'name', e.target.value)}
-                                                    className="w-full font-bold text-gray-800 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 outline-none transition-colors"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-bold text-gray-500 uppercase">Rôle / Poste</label>
-                                                <input 
-                                                    type="text" 
-                                                    value={emp.role} 
-                                                    onChange={(e) => updateProfile(emp.id, 'role', e.target.value)}
-                                                    className="w-full text-gray-600 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 outline-none transition-colors"
-                                                />
-                                            </div>
-                                             <div>
-                                                <label className="text-xs font-bold text-gray-500 uppercase">Mot de passe</label>
-                                                <div className="flex items-center gap-2">
-                                                    <input 
-                                                        type="text" 
-                                                        value={emp.password || 'vip'} 
-                                                        onChange={(e) => updateProfile(emp.id, 'password', e.target.value)}
-                                                        className="w-full font-mono text-sm text-gray-600 bg-gray-100 rounded px-2 py-1 border-transparent focus:border-blue-500 outline-none transition-all"
-                                                    />
-                                                    <span className="text-xs text-gray-400 whitespace-nowrap">Visible Admin</span>
-                                                </div>
-                                            </div>
+                                        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+                                            <input type="text" value={emp.name} onChange={(e) => updateProfile(emp.id, 'name', e.target.value)} className="font-bold bg-transparent border-b focus:border-blue-500 outline-none" placeholder="Nom" />
+                                            <input type="text" value={emp.role} onChange={(e) => updateProfile(emp.id, 'role', e.target.value)} className="text-gray-600 bg-transparent border-b focus:border-blue-500 outline-none" placeholder="Rôle" />
+                                            <input type="text" value={emp.password || ''} onChange={(e) => updateProfile(emp.id, 'password', e.target.value)} className="font-mono text-sm bg-white border rounded px-2" placeholder="Mot de passe" />
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                            
-                            <div className="pt-4 border-t flex gap-2">
-                                <p className="text-sm text-gray-500 italic">
-                                    ℹ️ Les modifications sont sauvegardées automatiquement. Le mot de passe par défaut est 'vip'.
-                                </p>
+                        )}
+
+                        {/* TAB: RESOURCES */}
+                        {activeTab === 'resources' && (
+                            <div className="space-y-2 animate-fade-in">
+                                {resources.map(res => (
+                                    <div key={res.id} className="flex items-center gap-2 p-2 border rounded bg-gray-50 hover:bg-white transition-colors">
+                                        <span className="cursor-move text-gray-300"><Icons.GripVertical /></span>
+                                        <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">
+                                            {res.avatar || res.name.charAt(0)}
+                                        </div>
+                                        <input className="font-bold w-1/4 bg-transparent border-b border-dashed border-transparent hover:border-gray-300 focus:border-blue-500 outline-none" value={res.name} onChange={e => updateResource(res.id, 'name', e.target.value)} />
+                                        <input className="text-sm text-gray-500 w-1/4 bg-transparent border-b border-dashed border-transparent hover:border-gray-300 focus:border-blue-500 outline-none" value={res.role} onChange={e => updateResource(res.id, 'role', e.target.value)} />
+                                        <input className="text-sm text-gray-400 w-1/4 bg-transparent border-b border-dashed border-transparent hover:border-gray-300 focus:border-blue-500 outline-none" value={res.email} onChange={e => updateResource(res.id, 'email', e.target.value)} placeholder="Email..." />
+                                        <button onClick={() => deleteResource(res.id)} className="ml-auto text-red-300 hover:text-red-500"><Icons.Trash /></button>
+                                    </div>
+                                ))}
+                                <button onClick={addResource} className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-indigo-500 hover:text-indigo-600 font-bold flex items-center justify-center gap-2 transition-all">
+                                    <Icons.Plus /> Ajouter une ressource
+                                </button>
                             </div>
+                        )}
+
+                        {/* TAB: PHASES */}
+                        {activeTab === 'phases' && (
+                            <div className="space-y-4 animate-fade-in">
+                                {phaseTemplates.map(phase => (
+                                    <div key={phase.id} className="border-l-4 rounded-r-lg p-4 bg-gray-50 shadow-sm" style={{ borderColor: phase.color }}>
+                                        <div className="flex items-center gap-4 mb-2">
+                                            <input type="color" value={phase.color} onChange={e => updatePhaseTemplate(phase.id, 'color', e.target.value)} className="w-8 h-8 rounded cursor-pointer border-none" />
+                                            <input className="text-lg font-bold flex-1 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 outline-none" value={phase.name} onChange={e => updatePhaseTemplate(phase.id, 'name', e.target.value)} />
+                                            <button onClick={() => deletePhase(phase.id)} className="text-red-300 hover:text-red-500"><Icons.Trash /></button>
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-4 text-sm">
+                                            <div className="flex flex-col">
+                                                <label className="text-gray-400 text-xs uppercase">Description</label>
+                                                <input className="bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none" value={phase.description} onChange={e => updatePhaseTemplate(phase.id, 'description', e.target.value)} />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <label className="text-gray-400 text-xs uppercase">Durée (jours)</label>
+                                                <input type="number" className="bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none" value={phase.duration} onChange={e => updatePhaseTemplate(phase.id, 'duration', parseInt(e.target.value))} />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <label className="text-gray-400 text-xs uppercase">Décalage début (jours / J0)</label>
+                                                <input type="number" className="bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none" value={phase.startOffset} onChange={e => updatePhaseTemplate(phase.id, 'startOffset', parseInt(e.target.value))} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                                <button onClick={addPhase} className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-indigo-500 hover:text-indigo-600 font-bold flex items-center justify-center gap-2 transition-all">
+                                    <Icons.Plus /> Ajouter une phase
+                                </button>
+                            </div>
+                        )}
+                        
+                        <div className="mt-8 pt-4 border-t flex justify-end">
+                            <p className="text-xs text-gray-400 italic">Toutes les modifications sont sauvegardées automatiquement en base de données.</p>
                         </div>
                     </div>
                 );
@@ -1538,7 +1603,7 @@
                                     </div>
                                     <div>
                                         <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                                            Portail Emma RH - Client : GOB
+                                            Portail Emma RH
                                         </h1>
                                         <p className="text-xs text-gray-500">Portail officiel de gestion RH</p>
                                     </div>
@@ -1563,20 +1628,23 @@
                                           </p>
                                      </div>
 
-                                    <div className="hidden md:flex items-center gap-2 bg-gray-50 p-1.5 rounded-lg border">
-                                        <div className="w-8 h-8 rounded-full overflow-hidden border bg-white">
-                                            {selectedEmployee.avatarUrl ? <img src={selectedEmployee.avatarUrl} className="w-full h-full object-cover" /> : <span className="flex items-center justify-center h-full text-xs font-bold">{selectedEmployee.name?.charAt(0)}</span>}
+                                    <div className="hidden md:flex items-center gap-3 bg-white pl-2 pr-4 py-1.5 rounded-full border shadow-sm">
+                                        <div className="w-9 h-9 rounded-full overflow-hidden border border-gray-100">
+                                            {selectedEmployee.avatarUrl ? <img src={selectedEmployee.avatarUrl} className="w-full h-full object-cover" /> : <span className="flex items-center justify-center h-full text-sm font-bold bg-blue-50 text-blue-600">{selectedEmployee.name?.charAt(0)}</span>}
                                         </div>
-                                         <select 
-                                            value={selectedEmployeeId} 
-                                            onChange={(e) => setSelectedEmployeeId(parseInt(e.target.value))}
-                                            className="bg-transparent border-none text-sm font-bold text-gray-700 outline-none cursor-pointer focus:ring-0"
-                                        >
-                                            {employees.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
-                                        </select>
+                                        <div className="flex flex-col">
+                                             <span className="text-[10px] text-gray-400 font-medium leading-tight uppercase tracking-wider">Bonjour,</span>
+                                             <select 
+                                                value={selectedEmployeeId} 
+                                                onChange={(e) => setSelectedEmployeeId(parseInt(e.target.value))}
+                                                className="bg-transparent border-none p-0 text-sm font-bold text-gray-800 outline-none cursor-pointer focus:ring-0 leading-tight hover:text-blue-600 transition-colors w-full"
+                                            >
+                                                {employees.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
+                                            </select>
+                                        </div>
                                     </div>
 
-                                    <button onClick={() => setShowAdmin(true)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                    <button onClick={() => setShowAdmin(true)} className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-white hover:shadow-md rounded-full transition-all border border-transparent hover:border-gray-100">
                                         <Icons.Settings />
                                     </button>
                                 </div>
@@ -1741,7 +1809,7 @@
                     {/* Footer */}
                     <div className="bg-gray-900 text-white py-6 mt-12">
                         <div className="max-w-7xl mx-auto px-6 text-center">
-                            <p className="opacity-50 text-sm">© 2025 Groupe Ouellet Bolduc - Propulsé par JSLAI - Tous droits réservés.</p>
+                            <p className="opacity-50 text-sm">© 2025 - Propulsé par JSLAI - Tous droits réservés.</p>
                         </div>
                     </div>
 
@@ -1757,7 +1825,7 @@
                                         Administration RH
                                     </h2>
                                     
-                                    <ProfileManager />
+                                    <AdminPanel />
                                 </div>
                             </div>
                         </div>
