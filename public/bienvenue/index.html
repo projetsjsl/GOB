@@ -114,7 +114,7 @@
         // SUPABASE CONFIGURATION
         // ============================================
         // Config loaded from existing environment or hardcoded fallback found in repo
-        const SUPABASE_URL = 'https://gob-watchlist.supabase.co'; // Found in README
+        const SUPABASE_URL = 'https://boyuxgdplbpkknplxbxp.supabase.co'; // Found in README
         // Note: Ideally this key should be in an env var. For this standalone file, we use the anon key if available or prompt user.
         // Assuming the user has access or the key is injected.
         // If not, the app will prompt/fail gracefully.
@@ -124,7 +124,7 @@
         try {
             if (window.supabase) {
                 // If global supabase instance exists (from app-inline.js?)
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY || 'MISSING_KEY_PLEASE_CONFIGURE');
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             }
         } catch (e) {
             console.error("Supabase init error:", e);
@@ -134,8 +134,7 @@
 
         // Données initiales par défaut (VIDE pour migration DB)
         const defaultEmployees = [
-            { id: 1, name: 'Caroline', role: 'Conseillère en gestion de patrimoine', email: 'caroline@gob.com', avatarUrl: '/images/emma-avatar-new.jpg', startDate: '2025-01-15' },
-            { id: 2, name: 'Emma RH', role: 'Responsable RH', email: 'emma@gob.com', avatarUrl: '/images/emma-avatar-new.jpg', startDate: '2024-01-01' }
+            { id: 1, name: 'Caroline', role: 'Conseillère en gestion de patrimoine', email: 'caroline@gob.com', avatarUrl: '/images/emma-avatar-new.jpg', startDate: '2025-01-15' }
         ];
         const defaultResources = [];
         const defaultPhases = [];
