@@ -78,11 +78,11 @@
         // LOCALSTORAGE PERSISTENCE FUNCTIONS
         // ============================================
         const STORAGE_KEYS = {
-            employees: 'rh-platform-employees',
-            resources: 'rh-platform-resources',
-            phases: 'rh-platform-phases',
-            taskTemplates: 'rh-platform-taskTemplates',
-            employeeTasks: 'rh-platform-employeeTasks' // Progression par employé
+            employees: 'rh-platform-employees-v2',
+            resources: 'rh-platform-resources-v2',
+            phases: 'rh-platform-phases-v2',
+            taskTemplates: 'rh-platform-taskTemplates-v2',
+            employeeTasks: 'rh-platform-employeeTasks-v2' // Progression par employé
         };
 
         const saveToStorage = (key, data) => {
@@ -129,19 +129,44 @@
         ];
 
         const defaultPhases = [
-            { id: 1, name: 'Phase 1 : Orientation', startOffset: 0, duration: 5, description: 'Prise de connaissance des outils', color: '#3B82F6', order: 0 },
-            { id: 2, name: 'Phase 2 : Formation', startOffset: 0, duration: 5, description: 'Sessions intensives', color: '#8B5CF6', order: 1 },
-            { id: 3, name: 'Phase 3 : Pratique', startOffset: 7, duration: 12, description: 'Application des acquis', color: '#06B6D4', order: 2 },
-            { id: 4, name: 'Phase 4 : Autonomie', startOffset: 21, duration: 5, description: 'Finalisation', color: '#10B981', order: 3 }
+            { id: 1, name: 'Phase 1 : Arrivée et Orientation', startOffset: 0, duration: 5, description: 'Prise de connaissance et administratif', color: '#3B82F6', order: 0 },
+            { id: 2, name: 'Phase 2 : Semaine Intensive', startOffset: 0, duration: 5, description: 'Rencontres et immersion', color: '#8B5CF6', order: 1 },
+            { id: 3, name: 'Phase 3 : Consolidation et Pratique', startOffset: 7, duration: 10, description: 'Dossiers et terrain', color: '#06B6D4', order: 2 },
+            { id: 4, name: 'Phase 4 : Autonomisation', startOffset: 21, duration: 5, description: 'Autonomie complète', color: '#10B981', order: 3 }
         ];
 
         const defaultTaskTemplates = [
-            { id: 1, phaseId: 1, title: 'Confirmation accès email', description: 'Valider les accès email', assignedTo: [2], priority: 'high', category: 'administratif', dayOffset: 0 },
-            { id: 2, phaseId: 1, title: 'Prévoir accès systèmes', description: 'Coordonner avec IT', assignedTo: [3], priority: 'medium', category: 'technique', dayOffset: 0 },
-            { id: 3, phaseId: 1, title: 'Formation outils collaboratifs', description: 'Teams et serveur', assignedTo: [3, 6], priority: 'low', category: 'formation', dayOffset: 1 },
-            { id: 4, phaseId: 2, title: 'Rencontres intensives', description: 'Sessions avec intervenants clés', assignedTo: [1, 2, 3, 4], priority: 'medium', category: 'formation', dayOffset: 4 },
-            { id: 5, phaseId: 3, title: 'Début des activités', description: 'Commencer tâches principales', assignedTo: [7], priority: 'high', category: 'pratique', dayOffset: 11 },
-            { id: 6, phaseId: 4, title: 'Bilan intégration', description: 'Évaluation finale', assignedTo: [2], priority: 'medium', category: 'suivi', dayOffset: 25 }
+            // Phase 1 : Outils et Environnement
+            { id: 101, phaseId: 1, title: 'Valider adresse email', description: 'Confirmation adresse inchangée', assignedTo: [2, 6], priority: 'high', category: 'technique', dayOffset: 0 },
+            { id: 102, phaseId: 1, title: 'Accès systèmes et portable', description: 'Prévoir délais obtention', assignedTo: [6], priority: 'high', category: 'technique', dayOffset: 0 },
+            { id: 103, phaseId: 1, title: 'Formation outils essentiels', description: 'Teams, Serveur, Synchro (Avec Anne-Marie/Linda)', assignedTo: [3, 6], priority: 'high', category: 'formation', dayOffset: 1 },
+            
+            // Phase 1 : Administratif (Anne-Marie)
+            { id: 104, phaseId: 1, title: 'Rencontre processus admin', description: 'Comprendre processus internes', assignedTo: [3], priority: 'medium', category: 'administratif', dayOffset: 1 },
+            { id: 105, phaseId: 1, title: 'Coaching Super Lundi', description: 'Session planification financière', assignedTo: [3], priority: 'medium', category: 'formation', dayOffset: 2 },
+            { id: 106, phaseId: 1, title: 'Formation ouverture compte', description: 'Processus ouverture et mise à jour', assignedTo: [3], priority: 'medium', category: 'administratif', dayOffset: 2 },
+            
+            // Phase 1 : Planification (MH & JS)
+            { id: 107, phaseId: 1, title: 'Coaching Planification Fin.', description: 'Sessions avec Marie-Hélène', assignedTo: [4], priority: 'high', category: 'formation', dayOffset: 3 },
+            { id: 108, phaseId: 1, title: 'Documents Conformité', description: 'Lecture documents de Jean-Sébastien', assignedTo: [1], priority: 'high', category: 'administratif', dayOffset: 1 },
+            
+            // Phase 1 : Immersion (Jonathan/Hugo)
+            { id: 109, phaseId: 1, title: 'Rencontre clientèle clé', description: 'Validation avec Hugo', assignedTo: [5], priority: 'medium', category: 'pratique', dayOffset: 3 },
+            { id: 110, phaseId: 1, title: 'Briefing conseillers', description: 'Jonathan informe équipe', assignedTo: [2], priority: 'low', category: 'administratif', dayOffset: 0 },
+            
+            // Phase 2 : Semaine Intensive
+            { id: 201, phaseId: 2, title: 'Rencontres intensives', description: 'Tour des intervenants clés', assignedTo: [7], priority: 'high', category: 'formation', dayOffset: 0 },
+            { id: 202, phaseId: 2, title: 'Observation rencontres', description: 'Assister aux RV clients', assignedTo: [5, 7], priority: 'medium', category: 'pratique', dayOffset: 2 },
+            
+            // Phase 3 : Consolidation
+            { id: 301, phaseId: 3, title: 'Premier dossier PF', description: 'Préparation avec Marie-Hélène', assignedTo: [4], priority: 'high', category: 'pratique', dayOffset: 7 },
+            { id: 302, phaseId: 3, title: 'Pratique processus admin', description: 'Supervision par Anne-Marie', assignedTo: [3], priority: 'medium', category: 'pratique', dayOffset: 8 },
+            { id: 303, phaseId: 3, title: 'Entrevues clients', description: 'Réalisation ou assistance', assignedTo: [5], priority: 'medium', category: 'pratique', dayOffset: 9 },
+            
+            // Phase 4 : Autonomisation
+            { id: 401, phaseId: 4, title: 'Bilan intégration', description: 'Maîtrise outils et processus', assignedTo: [1, 2], priority: 'medium', category: 'suivi', dayOffset: 21 },
+            { id: 402, phaseId: 4, title: 'Autonomie dossier PF', description: 'Dossier réalisé seul', assignedTo: [4], priority: 'high', category: 'pratique', dayOffset: 22 },
+            { id: 403, phaseId: 4, title: 'Fin discussions équipe', description: 'Tours de table complétés', assignedTo: [2], priority: 'low', category: 'administratif', dayOffset: 24 }
         ];
 
         // Catégories disponibles pour les tâches
@@ -613,6 +638,10 @@
                                                     <span className="text-gray-500">Durée:</span>
                                                     <input type="number" value={phase.duration} onChange={e => updatePhase(phase.id, 'duration', parseInt(e.target.value) || 1)} className="w-12 px-1 py-0.5 border rounded text-center" min="1" />
                                                     <span className="text-gray-400">j</span>
+                                                </div>
+                                                <div className="flex items-center gap-1 text-sm">
+                                                    <span className="text-gray-500">Ordre:</span>
+                                                    <input type="number" value={phase.order || 0} onChange={e => updatePhase(phase.id, 'order', parseInt(e.target.value) || 0)} className="w-12 px-1 py-0.5 border rounded text-center" />
                                                 </div>
                                                 <span className="text-xs bg-gray-100 px-2 py-1 rounded">{taskTemplates.filter(t => t.phaseId === phase.id).length} tâches</span>
                                                 <button onClick={() => deletePhase(phase.id)} className="text-red-500 hover:bg-red-50 p-2 rounded"><Icons.Trash /></button>
