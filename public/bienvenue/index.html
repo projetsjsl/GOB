@@ -505,7 +505,15 @@
 
         // FONCTION D'ENVOI EMAIL VIA RESEND (Simulée ou API)
         const sendEmailViaResend = async (employee, phases, tasks, resources) => {
-             const html = window.generateEmailHTML(employee, phases, tasks, resources);
+             let html;
+             try {
+                if (typeof window.generateEmailHTML !== 'function') throw new Error("Le générateur d'email n'est pas chargé.");
+                html = window.generateEmailHTML(employee, phases, tasks, resources);
+             } catch (e) {
+                console.error("Erreur génération email:", e);
+                alert("Erreur: Le modèle d'email ne s'est pas chargé correctement. Rechargez la page.");
+                return;
+             }
              // Ici, idéalement appel à un backend secure. Pour démo frontend-only:
              const subject = `Plan d'Intégration - ${employee.name}`;
              const to = prompt("Adresse email du destinataire :", "projetsjsl@gmail.com");
@@ -693,10 +701,129 @@
                                     ))}
                                 </div>
                             )}
-                             {activeTab === 'tasks' && (
-                                <div className="text-center py-10 text-gray-400">
-                                    <Icons.List className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                                    <p>Les modèles de tâches se gèrent directement dans le tableau de bord principal pour plus de contexte.</p>
+                            {activeTab === 'tasks' && (
+                                <div className="space-y-6">
+                                    <div className="bg-white p-4 rounded-xl border shadow-sm flex gap-2 items-end">
+                                        <div className="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-2">
+                                            <div className="space-y-1"><label className="text-xs font-bold text-gray-500">Titre</label><input className="w-full p-2 border rounded" placeholder="Titre de la tâche" id="newTaskTitle" /></div>
+                                            <div className="space-y-1"><label className="text-xs font-bold text-gray-500">Phase</label>
+                                                <select className="w-full p-2 border rounded" id="newTaskPhase">
+                                                    {phaseTemplates.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="space-y-1"><label className="text-xs font-bold text-gray-500">Jour (J+)</label><input type="number" className="w-full p-2 border rounded" placeholder="0" id="newTaskDay" defaultValue="0" /></div>
+                                            <div className="space-y-1"><label className="text-xs font-bold text-gray-500">Catégorie</label>
+                                                <select className="w-full p-2 border rounded" id="newTaskCategory">
+                                                    <option value="administratif">Administratif</option>
+                                                    <option value="technique">Technique</option>
+                                                    <option value="formation">Formation</option>
+                                                    <option value="autre">Autre</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <button onClick={() => {
+                                            const title = document.getElementById('newTaskTitle').value;
+                                            const phaseId = parseInt(document.getElementById('newTaskPhase').value);
+                                            const dayOffset = parseInt(document.getElementById('newTaskDay').value);
+                                            const category = document.getElementById('newTaskCategory').value;
+                                            if(!title) return alert('Titre requis');
+                                            
+                                            const newId = (Math.max(...taskTemplates.map(t => t.id), 0) || 0) + 1;
+                                            const newTask = { id: newId, title, phaseId, dayOffset, category, assignedTo: [] };
+                                            setTaskTemplates([...taskTemplates, newTask]);
+                                            
+                                            if(useSupabase && supabase) {
+                                                supabase.from('task_templates').insert([{ title, phase_id: phaseId, day_offset: dayOffset, category }]).then(({error}) => {
+                                                    if(error) console.error(error);
+                                                });
+                                            }
+                                            document.getElementById('newTaskTitle').value = '';
+                                            showNotification('Tâche ajoutée', 'success');
+                                        }} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 h-[42px]"><Icons.Plus /> Ajouter</button>
+                                    </div>
+
+                                    <div className="flex gap-2 mb-4">
+                                        <div className="relative flex-1">
+                                            <Icons.Search className="absolute left-3 top-2.5 text-gray-400 w-4 h-4" />
+                                            <input 
+                                                className="w-full pl-9 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+                                                placeholder="Rechercher une tâche..." 
+                                                onChange={e => {
+                                                    const term = e.target.value.toLowerCase();
+                                                    document.querySelectorAll('tbody tr').forEach(row => {
+                                                        const text = row.innerText.toLowerCase();
+                                                        row.style.display = text.includes(term) ? '' : 'none';
+                                                    });
+                                                }}
+                                            />
+                                        </div>
+                                        <select className="p-2 border rounded-lg" onChange={e => {
+                                            const phase = e.target.value;
+                                            document.querySelectorAll('tbody tr').forEach(row => {
+                                                const phaseCell = row.querySelector('td:nth-child(2) select');
+                                                if (phase === 'all' || (phaseCell && phaseCell.value === phase)) {
+                                                    row.style.display = '';
+                                                } else {
+                                                    row.style.display = 'none';
+                                                }
+                                            });
+                                        }}>
+                                            <option value="all">Toutes les phases</option>
+                                            {phaseTemplates.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                        </select>
+                                    </div>
+
+                                    <div className="bg-white rounded-xl border overflow-hidden">
+                                        <table className="w-full text-sm text-left">
+                                            <thead className="bg-gray-50 text-gray-500 font-bold uppercase text-xs">
+                                                <tr>
+                                                    <th className="p-3">Titre</th>
+                                                    <th className="p-3">Phase</th>
+                                                    <th className="p-3">J+</th>
+                                                    <th className="p-3">Catégorie</th>
+                                                    <th className="p-3 text-right">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y">
+                                                {taskTemplates.map(task => (
+                                                    <tr key={task.id} className="hover:bg-gray-50">
+                                                        <td className="p-3"><input className="w-full bg-transparent border-none focus:ring-0 font-medium" value={task.title} onChange={e => {
+                                                            const newTitle = e.target.value;
+                                                            setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, title: newTitle } : t));
+                                                        }} onBlur={() => {
+                                                             if(useSupabase && supabase) supabase.from('task_templates').update({ title: task.title }).eq('id', task.id);
+                                                        }} /></td>
+                                                        <td className="p-3">
+                                                            <select className="bg-transparent border-none focus:ring-0 text-gray-600" value={task.phaseId} onChange={e => {
+                                                                const pid = parseInt(e.target.value);
+                                                                setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, phaseId: pid } : t));
+                                                                if(useSupabase && supabase) supabase.from('task_templates').update({ phase_id: pid }).eq('id', task.id);
+                                                            }}>
+                                                                {phaseTemplates.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                                            </select>
+                                                        </td>
+                                                        <td className="p-3 w-20"><input type="number" className="w-full bg-transparent border-none focus:ring-0" value={task.dayOffset} onChange={e => {
+                                                             const day = parseInt(e.target.value);
+                                                             setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, dayOffset: day } : t));
+                                                        }} onBlur={() => { if(useSupabase && supabase) supabase.from('task_templates').update({ day_offset: task.dayOffset }).eq('id', task.id); }} /></td>
+                                                        <td className="p-3">
+                                                            <span className={`px-2 py-1 rounded-full text-xs uppercase font-bold tracking-wider ${task.category === 'administratif' ? 'bg-purple-100 text-purple-600' : task.category === 'technique' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>
+                                                                {task.category || 'Standard'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="p-3 text-right">
+                                                            <button onClick={() => {
+                                                                if(confirm('Supprimer cette tâche ?')) {
+                                                                    setTaskTemplates(prev => prev.filter(t => t.id !== task.id));
+                                                                    if(useSupabase && supabase) supabase.from('task_templates').delete().eq('id', task.id);
+                                                                }
+                                                            }} className="p-1.5 text-red-500 hover:bg-red-50 rounded"><Icons.Trash /></button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             )}
                         </div>
