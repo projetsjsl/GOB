@@ -1529,7 +1529,7 @@
                             </button>
 
                             <button onClick={() => sendEmailViaResend(selectedEmployee, phases, filteredTasks, resources)} className="p-2 text-green-600 hover:bg-green-50 rounded-lg flex items-center gap-2 transition-colors" title="Envoyer via Resend">
-                                <Icons.Send /> <span className="hidden md:inline">Envoyer (Resend)</span>
+                                <Icons.Send /> <span className="font-bold">Envoyer (Resend)</span>
                             </button>
                         </div>
 
@@ -1679,33 +1679,21 @@
 
                     {/* Admin Panel Overlay */}
                     {showAdmin && (
-                        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-                            <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl relative">
-                                <button onClick={() => setShowAdmin(false)} className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"><Icons.X /></button>
-                                
-                                <div className="p-8">
-                                    <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-3">
-                                        <div className="bg-blue-600 text-white p-2 rounded-lg"><Icons.Settings /></div>
-                                        Administration RH
-                                    </h2>
-                                    
-                                    <AdminPanel 
-                                        employees={employees}
-                                        setEmployees={setEmployees}
-                                        resources={resources}
-                                        setResources={setResources}
-                                        phaseTemplates={phaseTemplates}
-                                        setPhaseTemplates={setPhaseTemplates}
-                                        taskTemplates={taskTemplates}
-                                        setTaskTemplates={setTaskTemplates}
-                                        supabase={supabase}
-                                        useSupabase={useSupabase}
-                                        showNotification={showNotification}
-                                        uploadAvatar={uploadAvatar}
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                        <AdminPanel 
+                            employees={employees}
+                            setEmployees={setEmployees}
+                            resources={resources}
+                            setResources={setResources}
+                            phaseTemplates={phaseTemplates}
+                            setPhaseTemplates={setPhaseTemplates}
+                            taskTemplates={taskTemplates}
+                            setTaskTemplates={setTaskTemplates}
+                            supabase={supabase}
+                            useSupabase={useSupabase}
+                            showNotification={showNotification}
+                            uploadAvatar={uploadAvatar}
+                            onClose={() => setShowAdmin(false)}
+                        />
                     )}
 
                     {/* Chatbot Emma */}
