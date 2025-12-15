@@ -776,6 +776,7 @@
             const [isLoading, setIsLoading] = useState(false);
             const [showAdmin, setShowAdmin] = useState(false);
             const [isAuthenticated, setIsAuthenticated] = useState(false);
+            const [viewMode, setViewMode] = useState('list');
             const [showEmailPreview, setShowEmailPreview] = useState(false);
             const [emailPreviewContent, setEmailPreviewContent] = useState('');
             const [searchTerm, setSearchTerm] = useState('');
@@ -905,7 +906,35 @@
                                         <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
                                             <input type="text" value={emp.name} onChange={(e) => updateProfile(emp.id, 'name', e.target.value)} className="font-bold bg-transparent border-b focus:border-blue-500 outline-none" placeholder="Nom" />
                                             <input type="text" value={emp.role} onChange={(e) => updateProfile(emp.id, 'role', e.target.value)} className="text-gray-600 bg-transparent border-b focus:border-blue-500 outline-none" placeholder="Rôle" />
-                                            <input type="text" value={emp.password || ''} onChange={(e) => updateProfile(emp.id, 'password', e.target.value)} className="font-mono text-sm bg-white border rounded px-2" placeholder="Mot de passe" />
+                                            <div className="flex items-center gap-2">
+                                                <input type="text" value={emp.password || ''} onChange={(e) => updateProfile(emp.id, 'password', e.target.value)} className="font-mono text-sm bg-white border rounded px-2 w-full" placeholder="Mot de passe" />
+                                                <button onClick={async () => {
+                                                    if (!confirm(`Cloner le profil de ${emp.name} ?`)) return;
+                                                    const newEmp = { 
+                                                        ...emp, 
+                                                        id: undefined, 
+                                                        name: `${emp.name} (Copie)`, 
+                                                        email: `copie-${Math.floor(Math.random()*1000)}@gob.com`,
+                                                        avatar_url: null 
+                                                    };
+                                                    delete newEmp.id;
+                                                    
+                                                    // Insert Employee
+                                                    const { data: empData, error } = await supabase.from('employees').insert([newEmp]).select();
+                                                    if (empData) {
+                                                        const createdEmp = empData[0];
+                                                        setEmployees([...employees, { ...createdEmp, avatarUrl: null, startDate: createdEmp.start_date }]);
+                                                        
+                                                        // Clone Tasks (if needed, here we just clone the profile as requested)
+                                                        showNotification('Employé cloné avec succès !', 'success');
+                                                    } else {
+                                                        console.error(error);
+                                                        showNotification('Erreur au clonage', 'error');
+                                                    }
+                                                }} className="p-2 text-indigo-500 hover:bg-white rounded-lg border border-transparent hover:border-gray-200" title="Cloner ce profil">
+                                                    <Icons.Users />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -961,6 +990,45 @@
                                 ))}
                                 <button onClick={addPhase} className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-indigo-500 hover:text-indigo-600 font-bold flex items-center justify-center gap-2 transition-all">
                                     <Icons.Plus /> Ajouter une phase
+                                </button>
+                            </div>
+                        )}
+
+                        {/* TAB: TASK TEMPLATES */}
+                        {activeTab === 'tasks' && (
+                            <div className="space-y-4 animate-fade-in">
+                                {taskTemplates.map(task => (
+                                    <div key={task.id} className="border rounded-lg p-4 bg-gray-50 flex flex-col gap-2">
+                                        <div className="flex items-center gap-3">
+                                            <input className="font-bold flex-1 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 outline-none" value={task.title} onChange={e => updateTaskTemplate(task.id, 'title', e.target.value)} />
+                                            <select 
+                                                value={task.priority} 
+                                                onChange={e => updateTaskTemplate(task.id, 'priority', e.target.value)}
+                                                className="text-xs border rounded p-1"
+                                            >
+                                                <option value="low">Basse</option>
+                                                <option value="medium">Moyenne</option>
+                                                <option value="high">Haute</option>
+                                            </select>
+                                            <button onClick={() => deleteTaskTemplate(task.id)} className="text-red-300 hover:text-red-500"><Icons.Trash /></button>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                            <input className="bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none w-full" value={task.description} onChange={e => updateTaskTemplate(task.id, 'description', e.target.value)} placeholder="Description..." />
+                                            <div className="flex items-center gap-2">
+                                                <label className="text-xs text-gray-400 whitespace-nowrap">Phase:</label>
+                                                <select 
+                                                    value={task.phaseId} 
+                                                    onChange={e => updateTaskTemplate(task.id, 'phaseId', parseInt(e.target.value))}
+                                                    className="flex-1 bg-transparent border-b border-gray-200 focus:border-blue-500 outline-none text-xs"
+                                                >
+                                                    {phaseTemplates.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                                <button onClick={addTaskTemplate} className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-indigo-500 hover:text-indigo-600 font-bold flex items-center justify-center gap-2 transition-all">
+                                    <Icons.Plus /> Ajouter un modèle de tâche
                                 </button>
                             </div>
                         )}
