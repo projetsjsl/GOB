@@ -971,30 +971,46 @@
                 endDate: new Date().toISOString().split('T')[0]
             };
 
+            // Helper pour sécuriser les dates
+            const getValidDate = (dateStr) => {
+                const d = new Date(dateStr);
+                return isNaN(d.getTime()) ? new Date() : d;
+            };
+
             // Générer les phases et tâches pour l'employé sélectionné
             const phases = useMemo(() => {
                 if (!selectedEmployee) return [];
-                const startDate = new Date(selectedEmployee.startDate);
-                return phaseTemplates.map(pt => ({
-                    ...pt,
-                    startDate: new Date(startDate.getTime() + pt.startOffset * 86400000).toISOString().split('T')[0],
-                    endDate: new Date(startDate.getTime() + (pt.startOffset + pt.duration) * 86400000).toISOString().split('T')[0]
-                }));
+                const startDate = getValidDate(selectedEmployee.startDate);
+                
+                return phaseTemplates.map(pt => {
+                    // Calcul sécurisé
+                    const startMs = startDate.getTime() + (pt.startOffset || 0) * 86400000;
+                    const endMs = startDate.getTime() + ((pt.startOffset || 0) + (pt.duration || 1)) * 86400000;
+                    
+                    return {
+                        ...pt,
+                        startDate: new Date(startMs).toISOString().split('T')[0],
+                        endDate: new Date(endMs).toISOString().split('T')[0]
+                    };
+                });
             }, [selectedEmployee, phaseTemplates]);
 
             const [tasks, setTasks] = useState([]);
 
             useEffect(() => {
                 if (!selectedEmployee) return;
-                const startDate = new Date(selectedEmployee.startDate);
+                const startDate = getValidDate(selectedEmployee.startDate);
+                
                 // Charger les statuts sauvegardés pour cet employé
                 const savedStatuses = employeeTasks[selectedEmployee.id] || {};
                 const generatedTasks = taskTemplates.map(tt => {
                     const taskKey = `${selectedEmployee.id}-${tt.id}`;
+                    const dueMs = startDate.getTime() + (tt.dayOffset || 0) * 86400000;
+                    
                     return {
                         ...tt,
                         id: taskKey,
-                        dueDate: new Date(startDate.getTime() + tt.dayOffset * 86400000).toISOString().split('T')[0],
+                        dueDate: new Date(dueMs).toISOString().split('T')[0],
                         status: savedStatuses[tt.id] || 'pending' // Charger le statut sauvegardé ou 'pending'
                     };
                 });
