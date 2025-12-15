@@ -193,8 +193,9 @@
         };
 
         // Chatbot Emma RH
+        // Chatbot Emma RH
         const EmmaChatbot = ({ employee, tasks, phases, resources }) => {
-            const [isOpen, setIsOpen] = useState(false);
+            const [isOpen, setIsOpen] = useState(true); // Auto-open on load
             const [messages, setMessages] = useState([
                 { from: 'emma', text: `Bonjour ! Je suis Emma, votre assistante RH virtuelle. 👋 Je suis là pour vous aider avec votre intégration. Comment puis-je vous aider aujourd'hui ?` }
             ]);
@@ -300,14 +301,22 @@
                 return `🤔 Je n'ai pas compris, mais je peux vous aider avec:\n\n• Vos **tâches** → "Quelle est ma prochaine tâche ?"\n• Votre **progression** → "Où en suis-je ?"\n• Vos **contacts** → "Qui peut m'aider ?"\n• Les **priorités** → "Quelles sont mes tâches urgentes ?"\n\nEssayez une de ces questions ! 😊`;
             };
 
-            const sendMessage = () => {
-                if (!input.trim()) return;
-                setMessages([...messages, { from: 'user', text: input }]);
+            const sendMessage = (text = input) => {
+                if (!text.trim()) return;
+                setMessages(prev => [...prev, { from: 'user', text: text }]);
                 setTimeout(() => {
-                    setMessages(prev => [...prev, { from: 'emma', text: getEmmaResponse(input) }]);
+                    setMessages(prev => [...prev, { from: 'emma', text: getEmmaResponse(text) }]);
                 }, 500);
                 setInput('');
             };
+
+            const suggestions = [
+                "Quelle est ma prochaine tâche ?",
+                "Où en suis-je dans ma progression ?",
+                "Qui sont mes contacts clés ?",
+                "Donne-moi un conseil !",
+                "Quelles sont mes priorités ?"
+            ];
 
             return (
                 <>
@@ -352,6 +361,22 @@
                                     </div>
                                 ))}
                                 <div ref={messagesEndRef} />
+                            </div>
+
+                            {/* Input */}
+                            <div className="p-3 border-t bg-white">
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={input}
+                                        onChange={(e) => setInput(e.target.value)}
+                            {/* Suggestions */}
+                            <div className="p-2 bg-gray-50 border-t border-gray-100 flex flex-wrap gap-2 justify-center">
+                                {suggestions.map((s, i) => (
+                                    <button key={i} onClick={() => sendMessage(s)} className="text-xs bg-white text-blue-600 border border-blue-200 px-3 py-1 rounded-full hover:bg-blue-50 transition-colors shadow-sm">
+                                        {s}
+                                    </button>
+                                ))}
                             </div>
 
                             {/* Input */}
