@@ -712,7 +712,7 @@
                             <div className="w-24 h-24 mx-auto mb-4 rounded-full border-4 border-white shadow-lg overflow-hidden relative">
                                 <img src="/images/emma-avatar-new.jpg" alt="Emma RH" className="w-full h-full object-cover" />
                             </div>
-                            <h1 className="text-2xl font-bold text-gray-800 mb-1">Portail RH client : GOB</h1>
+                            <h1 className="text-2xl font-bold text-gray-800 mb-1">Portail Emma RH</h1>
                             <p className="text-blue-500 font-medium">Bienvenue sur votre espace</p>
                         </div>
 
@@ -720,16 +720,21 @@
                         
                         <form onSubmit={handleLogin} className="space-y-5">
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Employé</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Sélectionnez votre profil</label>
                                 <div className="relative">
                                     <select 
-                                        value={selectedEmp}
+                                        value={selectedEmp} 
                                         onChange={(e) => setSelectedEmp(parseInt(e.target.value))}
-                                        className="w-full pl-4 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none transition-all"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none transition-all cursor-pointer font-bold text-gray-700"
+                                        disabled={employees.length === 0}
                                     >
-                                        {employees.map(e => <option key={e.id} value={e.id}>{e.name} - {e.role}</option>)}
+                                        {employees.length === 0 ? (
+                                            <option>Aucun compte (Veuillez initialiser la DB)</option>
+                                        ) : (
+                                            employees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}</option>)
+                                        )}
                                     </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                                         <Icons.ChevronDown />
                                     </div>
                                 </div>
