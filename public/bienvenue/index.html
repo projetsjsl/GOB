@@ -9,6 +9,8 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="/bienvenue/caroline-plan-data.js"></script>
+    <script src="/bienvenue/email-template.js"></script>
     <style>
         .gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #4338ca 100%); }
         .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); }
@@ -72,7 +74,8 @@
             { id: 4, name: 'Phase 4 : Autonomie', startOffset: 21, duration: 5, description: 'Finalisation', color: '#10B981' }
         ];
 
-        const defaultTaskTemplates = [
+        // Utiliser les données du plan Caroline si disponibles
+        const defaultTaskTemplates = window.carolinePlan?.taskTemplates || [
             { id: 1, phaseId: 1, title: 'Confirmation accès email', description: 'Valider les accès email', assignedTo: [2], priority: 'high', category: 'administratif', dayOffset: 0 },
             { id: 2, phaseId: 1, title: 'Prévoir accès systèmes', description: 'Coordonner avec IT', assignedTo: [3], priority: 'high', category: 'technique', dayOffset: 0 },
             { id: 3, phaseId: 1, title: 'Formation outils collaboratifs', description: 'Teams et serveur', assignedTo: [3, 6], priority: 'medium', category: 'formation', dayOffset: 1 },
@@ -551,6 +554,25 @@
                                 <option value="inProgress">En cours</option>
                                 <option value="completed">Complété</option>
                             </select>
+                            <button
+                                onClick={() => window.sendEmailPlan && window.sendEmailPlan(selectedEmployee, phases, tasks, resources)}
+                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                            >
+                                📧 Envoyer par email
+                            </button>
+                            <button
+                                onClick={() => {
+                                    const html = window.generateEmailHTML && window.generateEmailHTML(selectedEmployee, phases, tasks, resources);
+                                    if (html) {
+                                        const w = window.open('', '_blank');
+                                        w.document.write(html);
+                                        w.document.close();
+                                    }
+                                }}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                            >
+                                👁️ Aperçu
+                            </button>
                         </div>
 
                         {/* Phases et tâches */}
