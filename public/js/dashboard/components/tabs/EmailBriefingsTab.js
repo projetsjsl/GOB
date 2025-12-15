@@ -1552,7 +1552,179 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                     loadBriefingHistory();
                 }, []);
 
-                return (
+                // ============================================================================
+        // EMAIL HTML GENERATORS
+        // ============================================================================
+
+        const createMorningBriefingHTML = (analysis, data) => {
+            const expertModules = data.expert_modules || {};
+            return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emma En Direct · Matin</title>
+  <style>
+    body { font-family: 'Segoe UI', 'Arial', sans-serif; background: #f4f7fa; margin: 0; padding: 20px; color: #1f2937; }
+    .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .header { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; padding: 40px 30px; text-align: center; }
+    .content { padding: 35px; }
+    .section-title { color: #1e40af; font-size: 20px; font-weight: 700; border-bottom: 3px solid #1e40af; margin-bottom: 18px; padding-bottom: 10px; }
+    .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin: 20px 0; }
+    .metric-card { background: #f0f9ff; padding: 18px; border-radius: 8px; border-left: 5px solid #3b82f6; }
+    .positive { color: #10b981; } .negative { color: #ef4444; }
+    .analysis-content { background: #f8fafc; padding: 25px; border-radius: 10px; border-left: 5px solid #3b82f6; white-space: pre-wrap; line-height: 1.8; }
+    .footer { background: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📡 Emma En Direct · Matin</h1>
+      <p style="margin: 10px 0 0; opacity: 0.9;">L'analyse des marchés, sans filtre</p>
+      <p style="margin: 5px 0 0; font-size: 12px; opacity: 0.8;">${new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+    </div>
+    <div class="content">
+      <div class="section">
+        <div class="section-title">🤖 Analyse Emma</div>
+        <div class="analysis-content">${analysis}</div>
+      </div>
+      
+      <!-- Market Data Overview -->
+      ${data.asian_markets ? `
+      <div class="section">
+        <div class="section-title">🌏 Marchés Asiatiques</div>
+        <div class="metric-grid">
+          ${data.asian_markets.map(m => `
+            <div class="metric-card">
+              <div style="font-weight:bold; font-size:12px; text-transform:uppercase; color:#64748b;">${m.name}</div>
+              <div style="font-size:24px; font-weight:800; margin:5px 0;">${m.price?.toFixed(2) || 'N/A'}</div>
+              <div class="${m.change >= 0 ? 'positive' : 'negative'}" style="font-weight:600;">
+                ${m.change > 0 ? '+' : ''}${m.change?.toFixed(2)} (${m.changePct?.toFixed(2)}%)
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>` : ''}
+
+       <!-- Futures -->
+      ${data.futures ? `
+      <div class="section">
+        <div class="section-title">📈 Futures US</div>
+        <div class="metric-grid">
+          ${data.futures.map(f => `
+            <div class="metric-card">
+              <div style="font-weight:bold; font-size:12px; text-transform:uppercase; color:#64748b;">${f.name}</div>
+              <div style="font-size:24px; font-weight:800; margin:5px 0;">${f.price?.toFixed(2) || 'N/A'}</div>
+              <div class="${f.change >= 0 ? 'positive' : 'negative'}" style="font-weight:600;">
+                ${f.change > 0 ? '+' : ''}${f.change?.toFixed(2)} (${f.changePct?.toFixed(2)}%)
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>` : ''}
+
+      <div style="text-align:center; margin-top:30px;">
+        <a href="${typeof window !== 'undefined' ? window.location.origin : '#'}" style="display:inline-block; background:#1e40af; color:white; padding:12px 24px; text-decoration:none; border-radius:6px; font-weight:bold;">Accéder au Dashboard</a>
+      </div>
+    </div>
+    <div class="footer">
+      <p>⚠️ Analyse générée par IA à titre informatif uniquement.</p>
+      <p>© ${new Date().getFullYear()} JSL AI - Emma En Direct</p>
+    </div>
+  </div>
+</body>
+</html>`;
+        };
+
+        const createNoonBriefingHTML = (analysis, data) => {
+            return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Emma En Direct · Mi-Journée</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 20px; }
+    .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; }
+    .header { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 30px; text-align: center; }
+    .metric-card { background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 4px solid #f59e0b; margin-bottom: 10px; }
+    .positive { color: #10b981; } .negative { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header"><h1>⚡ Update Mi-Journée</h1></div>
+    <div style="padding:30px;">
+      ${data.us_markets ? `
+      <h3>📊 Marchés US</h3>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:10px;">
+        ${data.us_markets.map(m => `
+          <div class="metric-card">
+            <strong>${m.name}</strong><br>
+            <span style="font-size:20px;">${m.price?.toFixed(2)}</span><br>
+            <span class="${m.change >= 0 ? 'positive' : 'negative'}">${m.changePct?.toFixed(2)}%</span>
+          </div>
+        `).join('')}
+      </div>` : ''}
+      
+      <h3>🤖 Analyse IA</h3>
+      <div style="background:#f8f9fa; padding:20px; border-radius:6px; white-space:pre-wrap;">${analysis}</div>
+      
+      <div style="text-align:center; margin-top:20px;">
+         <a href="${typeof window !== 'undefined' ? window.location.origin : '#'}" style="background:#f59e0b; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">Dashboard</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+        };
+
+        const createEveningBriefingHTML = (analysis, data) => {
+            return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Emma En Direct · Clôture</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 20px; }
+    .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; }
+    .header { background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); color: white; padding: 30px; text-align: center; }
+    .metric-card { background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 4px solid #1e40af; }
+    .positive { color: #10b981; } .negative { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header"><h1>🌙 Rapport de Clôture</h1></div>
+    <div style="padding:30px;">
+      ${data.us_markets ? `
+      <h3>📊 Performance Finale</h3>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:10px;">
+        ${data.us_markets.map(m => `
+          <div class="metric-card">
+            <strong>${m.name}</strong><br>
+            <span style="font-size:20px;">${m.price?.toFixed(2)}</span><br>
+            <span class="${m.change >= 0 ? 'positive' : 'negative'}">${m.changePct?.toFixed(2)}%</span>
+          </div>
+        `).join('')}
+      </div>` : ''}
+      
+      <h3>🤖 Analyse Approfondie</h3>
+      <div style="background:#f8f9fa; padding:20px; border-radius:6px; white-space:pre-wrap;">${analysis}</div>
+
+      <div style="text-align:center; margin-top:20px;">
+         <a href="${typeof window !== 'undefined' ? window.location.origin : '#'}" style="background:#1e40af; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">Dashboard Complet</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+        };
+
+        return (
                     <div className="space-y-6">
 
 

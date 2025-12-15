@@ -125,9 +125,9 @@
 
         // Données initiales par défaut (hardcodées)
         const defaultEmployees = [
-            { id: 1, name: 'Caroline', role: 'Conseillère en gestion de patrimoine', startDate: '2025-01-06', endDate: '2025-01-31', template: 'patrimoine' },
-            { id: 2, name: 'Alexandre', role: 'Analyste financier', startDate: '2025-02-03', endDate: '2025-02-28', template: 'analyste' },
-            { id: 3, name: 'Sophie', role: 'Adjointe administrative', startDate: '2025-01-20', endDate: '2025-02-14', template: 'admin' }
+            { id: 1, name: 'Caroline', role: 'Conseillère en gestion de patrimoine', startDate: '2025-01-06', endDate: '2025-01-31', template: 'patrimoine', avatarUrl: '../images/caroline_avatar.jpg' },
+            { id: 2, name: 'Alexandre', role: 'Analyste financier', startDate: '2025-02-03', endDate: '2025-02-28', template: 'analyste', avatarUrl: '' },
+            { id: 3, name: 'Sophie', role: 'Adjointe administrative', startDate: '2025-01-20', endDate: '2025-02-14', template: 'admin', avatarUrl: '' }
         ];
 
         const defaultResources = [
@@ -381,7 +381,7 @@
             const [activeTab, setActiveTab] = useState('employees');
             const [editingItem, setEditingItem] = useState(null);
             const [newResource, setNewResource] = useState({ name: '', role: '', color: '#3B82F6' });
-            const [newEmployee, setNewEmployee] = useState({ name: '', role: '', startDate: '', endDate: '', template: 'custom' });
+            const [newEmployee, setNewEmployee] = useState({ name: '', role: '', startDate: '', endDate: '', template: 'custom', avatarUrl: '' });
             const [newTask, setNewTask] = useState({ title: '', description: '', phaseId: 1, assignedTo: [], priority: 'medium', category: 'administratif', dayOffset: 0 });
             const [newPhase, setNewPhase] = useState({ name: '', description: '', color: '#3B82F6', startOffset: 0, duration: 5 });
             const [showImportModal, setShowImportModal] = useState(false);
@@ -394,7 +394,7 @@
                 if (!newEmployee.name || !newEmployee.startDate) return;
                 const endDate = newEmployee.endDate || new Date(new Date(newEmployee.startDate).getTime() + 30*24*60*60*1000).toISOString().split('T')[0];
                 setEmployees([...employees, { ...newEmployee, endDate, id: Date.now() }]);
-                setNewEmployee({ name: '', role: '', startDate: '', endDate: '', template: 'custom' });
+                setNewEmployee({ name: '', role: '', startDate: '', endDate: '', template: 'custom', avatarUrl: '' });
                 showToast('✅ Employé ajouté');
             };
             const updateEmployee = (id, field, value) => {
@@ -534,15 +534,19 @@
                                         <input type="text" placeholder="Poste" value={newEmployee.role} onChange={e => setNewEmployee({...newEmployee, role: e.target.value})} className="px-3 py-2 border rounded-lg" />
                                         <input type="date" value={newEmployee.startDate} onChange={e => setNewEmployee({...newEmployee, startDate: e.target.value})} className="px-3 py-2 border rounded-lg" />
                                         <input type="date" value={newEmployee.endDate} onChange={e => setNewEmployee({...newEmployee, endDate: e.target.value})} className="px-3 py-2 border rounded-lg" placeholder="Fin (auto 30j)" />
+                                        <input type="text" placeholder="URL Avatar (optionnel)" value={newEmployee.avatarUrl} onChange={e => setNewEmployee({...newEmployee, avatarUrl: e.target.value})} className="px-3 py-2 border rounded-lg" />
                                         <button onClick={addEmployee} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-1"><Icons.Plus /> Ajouter</button>
                                     </div>
                                     <div className="space-y-2">
                                         {employees.map(emp => (
                                             <div key={emp.id} className="flex items-center gap-2 p-3 bg-white border rounded-lg hover:shadow-md transition-shadow">
+                                                <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex-shrink-0 border">
+                                                    {emp.avatarUrl ? <img src={emp.avatarUrl} className="w-full h-full object-cover" /> : <span className="w-full h-full flex items-center justify-center text-xs">{emp.name?.charAt(0)}</span>}
+                                                </div>
                                                 <input type="text" value={emp.name} onChange={e => updateEmployee(emp.id, 'name', e.target.value)} className="font-semibold bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1" />
                                                 <input type="text" value={emp.role} onChange={e => updateEmployee(emp.id, 'role', e.target.value)} className="text-gray-600 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1" />
                                                 <input type="date" value={emp.startDate} onChange={e => updateEmployee(emp.id, 'startDate', e.target.value)} className="text-sm bg-transparent border rounded px-2 py-1" />
-                                                <input type="date" value={emp.endDate || ''} onChange={e => updateEmployee(emp.id, 'endDate', e.target.value)} className="text-sm bg-transparent border rounded px-2 py-1" />
+                                                <input type="text" value={emp.avatarUrl || ''} placeholder="URL Avatar" onChange={e => updateEmployee(emp.id, 'avatarUrl', e.target.value)} className="text-xs bg-transparent border rounded px-2 py-1 w-24 truncate" />
                                                 <button onClick={() => duplicateEmployee(emp)} className="text-blue-500 hover:bg-blue-50 p-2 rounded" title="Dupliquer"><Icons.UserPlus /></button>
                                                 <button onClick={() => deleteEmployee(emp.id)} className="text-red-500 hover:bg-red-50 p-2 rounded" title="Supprimer"><Icons.Trash /></button>
                                             </div>
@@ -1155,8 +1159,12 @@
 
                             {/* Message de bienvenue avec avatar */}
                             <div className="mb-4 flex items-center gap-4">
-                                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-3xl border-2 border-white/40">
-                                    {selectedEmployee?.name?.charAt(0) || '?'}
+                                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-3xl border-2 border-white/40 overflow-hidden relative">
+                                    {selectedEmployee?.avatarUrl ? (
+                                        <img src={selectedEmployee.avatarUrl} alt={selectedEmployee.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span>{selectedEmployee?.name?.charAt(0) || '?'}</span>
+                                    )}
                                 </div>
                                 <div>
                                     <h1 className="text-3xl font-bold">👋 Bienvenue {selectedEmployee?.name} !</h1>
