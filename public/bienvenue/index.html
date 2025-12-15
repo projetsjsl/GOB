@@ -685,14 +685,41 @@
             const [viewMode, setViewMode] = useState('timeline');
             const [searchTerm, setSearchTerm] = useState('');
             const [filterStatus, setFilterStatus] = useState('all');
-            const [saveIndicator, setSaveIndicator] = useState('');
+            // const [filterStatus, setFilterStatus] = useState('all'); // Removed duplicate
+            const [saveIndicator, setSaveIndicator] = useState({ visible: false, message: '' });
 
-            // Auto-save vers localStorage à chaque modification
-            useEffect(() => { saveToStorage(STORAGE_KEYS.employees, employees); setSaveIndicator('✓'); setTimeout(() => setSaveIndicator(''), 1500); }, [employees]);
-            useEffect(() => { saveToStorage(STORAGE_KEYS.resources, resources); }, [resources]);
-            useEffect(() => { saveToStorage(STORAGE_KEYS.phases, phaseTemplates); }, [phaseTemplates]);
-            useEffect(() => { saveToStorage(STORAGE_KEYS.taskTemplates, taskTemplates); }, [taskTemplates]);
-            useEffect(() => { if (Object.keys(employeeTasks).length > 0) saveToStorage(STORAGE_KEYS.employeeTasks, employeeTasks); }, [employeeTasks]);
+            const triggerSaveIndicator = (msg = 'Sauvegarde...') => {
+                setSaveIndicator({ visible: true, message: msg });
+                setTimeout(() => setSaveIndicator({ visible: false, message: '' }), 2000);
+            };
+
+            // Auto-save vers localStorage à chaque modification avec indicateur visuel
+            useEffect(() => { 
+                saveToStorage(STORAGE_KEYS.employees, employees); 
+                if (employees.length) triggerSaveIndicator('Employés sauvegardés'); 
+            }, [employees]);
+            
+            useEffect(() => { 
+                saveToStorage(STORAGE_KEYS.resources, resources); 
+                if (resources.length) triggerSaveIndicator('Ressources sauvegardées');
+            }, [resources]);
+            
+            useEffect(() => { 
+                saveToStorage(STORAGE_KEYS.phases, phaseTemplates); 
+                if (phaseTemplates.length) triggerSaveIndicator('Phases sauvegardées');
+            }, [phaseTemplates]);
+            
+            useEffect(() => { 
+                saveToStorage(STORAGE_KEYS.taskTemplates, taskTemplates); 
+                if (taskTemplates.length) triggerSaveIndicator('Tâches sauvegardées');
+            }, [taskTemplates]);
+            
+            useEffect(() => { 
+                if (Object.keys(employeeTasks).length > 0) {
+                    saveToStorage(STORAGE_KEYS.employeeTasks, employeeTasks);
+                    triggerSaveIndicator('Progression sauvegardée');
+                }
+            }, [employeeTasks]);
 
             const selectedEmployee = employees.find(e => e.id === selectedEmployeeId) || employees[0];
 
@@ -1124,6 +1151,12 @@
 
             return (
                 <div className="min-h-screen relative">
+                    {/* Save Indicator (Bottom Left) */}
+                    <div className={`fixed bottom-6 left-6 bg-gray-900 text-white px-4 py-2 rounded-full shadow-lg z-50 transition-all duration-300 flex items-center gap-2 ${saveIndicator.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        <span className="text-sm font-medium">{saveIndicator.message}</span>
+                    </div>
+
                     {/* Toast Notification */}
                     {notification && <NotificationToast message={notification.message} type={notification.type} onClose={() => setNotification(null)} />}
                     
