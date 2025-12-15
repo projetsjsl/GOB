@@ -13,11 +13,33 @@
     <script src="/bienvenue/email-template.js"></script>
     <style>
         .gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #4338ca 100%); }
-        .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); }
+        .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
         .chat-bubble { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         .online-dot { animation: pulse 2s infinite; }
+        /* Inline editing styles */
+        .editable { cursor: pointer; border-bottom: 1px dashed transparent; transition: all 0.2s; }
+        .editable:hover { border-bottom-color: #3b82f6; background: rgba(59,130,246,0.05); }
+        .editable-input { background: white; border: 2px solid #3b82f6; border-radius: 4px; padding: 2px 6px; outline: none; }
+        /* Drag and drop styles */
+        .draggable { cursor: grab; }
+        .draggable:active { cursor: grabbing; }
+        .dragging { opacity: 0.5; transform: scale(1.02); }
+        .drag-over { border: 2px dashed #3b82f6 !important; background: rgba(59,130,246,0.1) !important; }
+        .drop-zone { transition: all 0.2s; }
+        /* Collapse styles */
+        .collapsible-content { overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.2s; }
+        .collapsed { max-height: 0 !important; opacity: 0; padding: 0 !important; }
+        .chevron-rotate { transition: transform 0.2s; }
+        .chevron-down { transform: rotate(0deg); }
+        .chevron-right { transform: rotate(-90deg); }
+        /* Visual enhancements */
+        .priority-indicator { width: 4px; border-radius: 4px; }
+        .progress-ring { transform: rotate(-90deg); }
+        .task-hover:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .add-btn { opacity: 0.6; transition: opacity 0.2s; }
+        .add-btn:hover { opacity: 1; }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -48,6 +70,8 @@
             Send: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>),
             UserPlus: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>),
             Edit: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>),
+            GripVertical: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg>),
+            Minus: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>),
         };
 
         // ============================================
@@ -113,11 +137,11 @@
 
         const defaultTaskTemplates = [
             { id: 1, phaseId: 1, title: 'Confirmation accès email', description: 'Valider les accès email', assignedTo: [2], priority: 'high', category: 'administratif', dayOffset: 0 },
-            { id: 2, phaseId: 1, title: 'Prévoir accès systèmes', description: 'Coordonner avec IT', assignedTo: [3], priority: 'high', category: 'technique', dayOffset: 0 },
-            { id: 3, phaseId: 1, title: 'Formation outils collaboratifs', description: 'Teams et serveur', assignedTo: [3, 6], priority: 'medium', category: 'formation', dayOffset: 1 },
-            { id: 4, phaseId: 2, title: 'Rencontres intensives', description: 'Sessions avec intervenants clés', assignedTo: [1, 2, 3, 4], priority: 'high', category: 'formation', dayOffset: 4 },
+            { id: 2, phaseId: 1, title: 'Prévoir accès systèmes', description: 'Coordonner avec IT', assignedTo: [3], priority: 'medium', category: 'technique', dayOffset: 0 },
+            { id: 3, phaseId: 1, title: 'Formation outils collaboratifs', description: 'Teams et serveur', assignedTo: [3, 6], priority: 'low', category: 'formation', dayOffset: 1 },
+            { id: 4, phaseId: 2, title: 'Rencontres intensives', description: 'Sessions avec intervenants clés', assignedTo: [1, 2, 3, 4], priority: 'medium', category: 'formation', dayOffset: 4 },
             { id: 5, phaseId: 3, title: 'Début des activités', description: 'Commencer tâches principales', assignedTo: [7], priority: 'high', category: 'pratique', dayOffset: 11 },
-            { id: 6, phaseId: 4, title: 'Bilan intégration', description: 'Évaluation finale', assignedTo: [2], priority: 'high', category: 'suivi', dayOffset: 25 }
+            { id: 6, phaseId: 4, title: 'Bilan intégration', description: 'Évaluation finale', assignedTo: [2], priority: 'medium', category: 'suivi', dayOffset: 25 }
         ];
 
         // Catégories disponibles pour les tâches
@@ -151,36 +175,92 @@
                 const pendingTasks = tasks.filter(t => t.status === 'pending');
                 const inProgressTasks = tasks.filter(t => t.status === 'inProgress');
                 const completedTasks = tasks.filter(t => t.status === 'completed');
+                const highPriorityTasks = pendingTasks.filter(t => t.priority === 'high');
                 const progress = tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
-
-                if (q.includes('tâche') || q.includes('faire') || q.includes('quoi')) {
-                    if (pendingTasks.length > 0) {
-                        const nextTask = pendingTasks[0];
-                        return `Votre prochaine tâche est : "${nextTask.title}". ${nextTask.description}. Cette tâche est de priorité ${nextTask.priority === 'high' ? 'haute' : nextTask.priority === 'medium' ? 'moyenne' : 'basse'}. 📋`;
+                const today = new Date().toISOString().split('T')[0];
+                const overdueTasks = pendingTasks.filter(t => t.dueDate < today);
+                
+                // Urgent/priority queries
+                if (q.includes('urgent') || q.includes('priorité') || q.includes('important')) {
+                    if (highPriorityTasks.length > 0) {
+                        return `🔥 Vous avez ${highPriorityTasks.length} tâche(s) haute priorité:\n${highPriorityTasks.slice(0,3).map(t => `• "${t.title}"`).join('\n')}\nJe vous conseille de commencer par celles-ci !`;
                     }
-                    return "Félicitations ! Vous avez complété toutes vos tâches ! 🎉";
+                    return "✨ Bonne nouvelle ! Aucune tâche urgente en ce moment. Continuez votre progression normale.";
                 }
-                if (q.includes('progress') || q.includes('avancement') || q.includes('où en suis')) {
-                    return `Votre progression est de ${progress}%. Vous avez complété ${completedTasks.length} tâches sur ${tasks.length}. ${inProgressTasks.length} tâche(s) sont en cours. Continuez comme ça ! 💪`;
+                
+                // Overdue tasks
+                if (q.includes('retard') || q.includes('overdue') || q.includes('délai')) {
+                    if (overdueTasks.length > 0) {
+                        return `⚠️ Attention ! ${overdueTasks.length} tâche(s) en retard:\n${overdueTasks.map(t => `• "${t.title}" (échéance: ${t.dueDate})`).join('\n')}\nBesoin d'aide pour les prioriser ?`;
+                    }
+                    return "🎉 Parfait ! Toutes vos tâches sont dans les temps. Excellent travail !";
                 }
-                if (q.includes('responsable') || q.includes('contact') || q.includes('qui')) {
-                    const resourceList = resources.map(r => `${r.name} (${r.role})`).join(', ');
-                    return `Voici vos contacts clés : ${resourceList}. N'hésitez pas à les contacter ! 📞`;
+                
+                // Task queries
+                if (q.includes('tâche') || q.includes('faire') || q.includes('quoi') || q.includes('suivant')) {
+                    if (pendingTasks.length > 0) {
+                        const nextTask = highPriorityTasks[0] || pendingTasks[0];
+                        const assignedNames = resources.filter(r => nextTask.assignedTo?.includes(r.id)).map(r => r.name).join(', ');
+                        return `📋 Prochaine tâche recommandée: "${nextTask.title}"\n\n📝 ${nextTask.description || 'Pas de description'}\n⏰ Échéance: ${nextTask.dueDate}\n${nextTask.priority === 'high' ? '🔥 Priorité haute' : nextTask.priority === 'medium' ? '⚡ Priorité moyenne' : '💤 Priorité basse'}${assignedNames ? `\n👤 Contact: ${assignedNames}` : ''}`;
+                    }
+                    return "🎉 Félicitations ! Vous avez complété toutes vos tâches ! Vous êtes un champion !";
                 }
-                if (q.includes('phase') || q.includes('étape')) {
-                    const currentPhase = phases[0];
-                    return `Vous êtes actuellement en ${currentPhase.name}. ${currentPhase.description}. Cette phase dure ${currentPhase.duration || 5} jours. 📅`;
+                
+                // Progress queries
+                if (q.includes('progress') || q.includes('avancement') || q.includes('où en suis') || q.includes('statut') || q.includes('status')) {
+                    let encouragement = progress >= 75 ? "🏆 Excellent travail !" : progress >= 50 ? "💪 Vous êtes à mi-chemin !" : progress >= 25 ? "🚀 Bon début !" : "🌱 C'est parti !";
+                    return `📊 **Votre progression: ${progress}%**\n\n✅ Complétées: ${completedTasks.length}\n▶️ En cours: ${inProgressTasks.length}\n⏳ En attente: ${pendingTasks.length}\n${highPriorityTasks.length > 0 ? `🔥 Priorité haute: ${highPriorityTasks.length}` : ''}\n\n${encouragement}`;
                 }
-                if (q.includes('aide') || q.includes('help') || q.includes('comment')) {
-                    return "Je peux vous aider avec : \n• Vos tâches (\"Quelle est ma prochaine tâche ?\")\n• Votre progression (\"Où en suis-je ?\")\n• Vos contacts (\"Qui sont mes responsables ?\")\n• Les phases (\"Quelle est ma phase actuelle ?\")";
+                
+                // Contact/resource queries
+                if (q.includes('responsable') || q.includes('contact') || q.includes('qui') || q.includes('aide') || q.includes('support')) {
+                    return `👥 **Vos contacts clés:**\n\n${resources.map(r => `• **${r.name}** - ${r.role}`).join('\n')}\n\nN'hésitez pas à les contacter pour toute question ! 📞`;
                 }
-                if (q.includes('bonjour') || q.includes('salut') || q.includes('hello')) {
-                    return `Bonjour ${employee.name} ! Comment puis-je vous aider aujourd'hui ? 😊`;
+                
+                // Phase queries
+                if (q.includes('phase') || q.includes('étape') || q.includes('calendrier')) {
+                    const phaseInfo = phases.map((p, i) => {
+                        const pTasks = tasks.filter(t => t.phaseId === p.id);
+                        const pCompleted = pTasks.filter(t => t.status === 'completed').length;
+                        return `${i === 0 ? '📍' : '📅'} **${p.name}**: ${pCompleted}/${pTasks.length} tâches (${p.startDate} → ${p.endDate})`;
+                    }).join('\n');
+                    return `📅 **Vos phases d'intégration:**\n\n${phaseInfo}`;
                 }
-                if (q.includes('merci')) {
-                    return "Avec plaisir ! Je suis là pour vous. N'hésitez pas si vous avez d'autres questions ! 🌟";
+                
+                // Tips
+                if (q.includes('conseil') || q.includes('astuce') || q.includes('tip')) {
+                    const tips = [
+                        "💡 Commencez par les tâches haute priorité pour éviter le stress !",
+                        "💡 N'hésitez pas à contacter vos responsables si vous êtes bloqué.",
+                        "💡 Prenez des notes pendant vos formations pour mieux retenir.",
+                        "💡 Faites des pauses régulières pour rester productif !",
+                        "💡 Posez des questions - il n'y a pas de question bête !"
+                    ];
+                    return tips[Math.floor(Math.random() * tips.length)];
                 }
-                return "Je ne suis pas sûre de comprendre. Essayez de me demander :\n• \"Quelle est ma prochaine tâche ?\"\n• \"Où en suis-je ?\"\n• \"Qui sont mes responsables ?\"";
+                
+                // Greetings
+                if (q.includes('bonjour') || q.includes('salut') || q.includes('hello') || q.includes('coucou')) {
+                    const greetings = [
+                        `Bonjour ${employee.name} ! 👋 Comment puis-je vous aider ?`,
+                        `Salut ${employee.name} ! 😊 Prêt(e) pour une journée productive ?`,
+                        `Hello ${employee.name} ! ✨ Que puis-je faire pour vous ?`
+                    ];
+                    return greetings[Math.floor(Math.random() * greetings.length)];
+                }
+                
+                // Thanks
+                if (q.includes('merci') || q.includes('thanks')) {
+                    return "Avec grand plaisir ! 🌟 Je suis toujours là pour vous aider. Bonne continuation !";
+                }
+                
+                // Help
+                if (q.includes('help') || q.includes('comment') || q.includes('capable') || q.includes('peux')) {
+                    return `🤖 **Je peux vous aider avec:**\n\n📋 "Quelle est ma prochaine tâche ?"\n📊 "Où en suis-je ?"\n🔥 "Quelles sont mes tâches urgentes ?"\n👥 "Qui sont mes contacts ?"\n📅 "Quelles sont mes phases ?"\n⚠️ "Ai-je des tâches en retard ?"\n💡 "Donne-moi un conseil"`;
+                }
+                
+                // Default - more helpful
+                return `🤔 Je n'ai pas compris, mais je peux vous aider avec:\n\n• Vos **tâches** → "Quelle est ma prochaine tâche ?"\n• Votre **progression** → "Où en suis-je ?"\n• Vos **contacts** → "Qui peut m'aider ?"\n• Les **priorités** → "Quelles sont mes tâches urgentes ?"\n\nEssayez une de ces questions ! 😊`;
             };
 
             const sendMessage = () => {
@@ -641,39 +721,108 @@
                 }));
             };
 
+            // Task CRUD functions
+            const updateTask = (taskId, field, value) => {
+                setTasks(tasks.map(t => t.id === taskId ? { ...t, [field]: value } : t));
+            };
+            const deleteTask = (taskId) => {
+                if (confirm('Supprimer cette tâche?')) setTasks(tasks.filter(t => t.id !== taskId));
+            };
+            const addTask = (phaseId) => {
+                const newTask = {
+                    id: `${selectedEmployee.id}-new-${Date.now()}`,
+                    phaseId,
+                    title: 'Nouvelle tâche',
+                    description: '',
+                    status: 'pending',
+                    priority: 'medium',
+                    dueDate: new Date().toISOString().split('T')[0],
+                    assignedTo: []
+                };
+                setTasks([...tasks, newTask]);
+            };
+
+            // Phase collapse state
+            const [collapsedPhases, setCollapsedPhases] = useState({});
+            const togglePhaseCollapse = (phaseId) => setCollapsedPhases(prev => ({ ...prev, [phaseId]: !prev[phaseId] }));
+            const [showStats, setShowStats] = useState(true);
+
             const statusColors = { pending: 'bg-gray-100 text-gray-700', inProgress: 'bg-blue-100 text-blue-700', completed: 'bg-green-100 text-green-700' };
             const priorityColors = { low: 'bg-gray-100', medium: 'bg-yellow-100 text-yellow-700', high: 'bg-orange-100 text-orange-700' };
 
-            const TaskCard = ({ task }) => {
+            const TaskCard = ({ task, onUpdate, onDelete }) => {
+                const [expanded, setExpanded] = useState(false);
+                const [editing, setEditing] = useState(null);
+                const [editValue, setEditValue] = useState('');
                 const phase = phases.find(p => p.id === task.phaseId);
                 const assignedResources = resources.filter(r => task.assignedTo.includes(r.id));
+                const priorityBg = { low: '#10B981', medium: '#F59E0B', high: '#EF4444' };
+                
+                const startEdit = (field, value) => { setEditing(field); setEditValue(value); };
+                const saveEdit = (field) => {
+                    if (onUpdate) onUpdate(task.id, field, editValue);
+                    setEditing(null);
+                };
+                const cyclePriority = () => {
+                    const priorities = ['low', 'medium', 'high'];
+                    const next = priorities[(priorities.indexOf(task.priority) + 1) % 3];
+                    if (onUpdate) onUpdate(task.id, 'priority', next);
+                };
+                
                 return (
-                    <div className="bg-white border-2 rounded-lg p-4 hover:shadow-lg transition-all mb-3">
-                        <div className="flex items-start justify-between mb-2">
-                            <div className="flex items-start gap-3 flex-1">
-                                <button onClick={() => toggleTaskStatus(task.id)} className="mt-1 hover:scale-110 transition-transform">
+                    <div 
+                        className="bg-white border-2 rounded-lg mb-3 task-hover transition-all flex overflow-hidden"
+                        draggable="true"
+                        onDragStart={(e) => e.dataTransfer.setData('taskId', task.id)}
+                    >
+                        {/* Priority indicator bar */}
+                        <div className="priority-indicator" style={{ backgroundColor: priorityBg[task.priority] }} onClick={cyclePriority} title="Cliquer pour changer la priorité"></div>
+                        
+                        <div className="flex-1 p-3">
+                            {/* Header row */}
+                            <div className="flex items-center gap-2">
+                                <span className="text-gray-300 draggable cursor-grab"><Icons.GripVertical /></span>
+                                <button onClick={() => toggleTaskStatus(task.id)} className="hover:scale-110 transition-transform">
                                     {task.status === 'completed' ? <span className="text-green-600"><Icons.CheckCircle /></span> : task.status === 'inProgress' ? <span className="text-blue-600"><Icons.Clock /></span> : <span className="text-gray-400"><Icons.Circle /></span>}
                                 </button>
-                                <div className="flex-1">
-                                    <h4 className={`font-semibold ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-900'}`}>{task.title}</h4>
-                                    <p className="text-sm text-gray-600 mt-1">{task.description}</p>
+                                {editing === 'title' ? (
+                                    <input autoFocus className="editable-input flex-1 font-semibold" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={() => saveEdit('title')} onKeyDown={e => e.key === 'Enter' && saveEdit('title')} />
+                                ) : (
+                                    <h4 onClick={() => startEdit('title', task.title)} className={`font-semibold flex-1 editable ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-900'}`}>{task.title}</h4>
+                                )}
+                                <button onClick={() => setExpanded(!expanded)} className="text-gray-400 hover:text-gray-600 p-1">
+                                    <span className={`chevron-rotate ${expanded ? 'chevron-down' : 'chevron-right'}`}><Icons.ChevronDown /></span>
+                                </button>
+                                {onDelete && <button onClick={() => onDelete(task.id)} className="text-red-400 hover:text-red-600 p-1"><Icons.Trash /></button>}
+                            </div>
+                            
+                            {/* Compact info row */}
+                            <div className="flex flex-wrap gap-2 mt-2 text-xs">
+                                <span className={`px-2 py-0.5 rounded-full ${statusColors[task.status]}`}>{task.status === 'pending' ? '⏳ Attente' : task.status === 'inProgress' ? '▶️ En cours' : '✅ Fait'}</span>
+                                <span className="px-2 py-0.5 rounded-full" style={{ backgroundColor: priorityBg[task.priority] + '20', color: priorityBg[task.priority] }}>{task.priority === 'high' ? '🔥 Haute' : task.priority === 'medium' ? '⚡ Moy' : '💤 Basse'}</span>
+                                {editing === 'dueDate' ? (
+                                    <input type="date" autoFocus className="editable-input text-xs" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={() => saveEdit('dueDate')} />
+                                ) : (
+                                    <span onClick={() => startEdit('dueDate', task.dueDate)} className="px-2 py-0.5 rounded-full bg-gray-100 editable">📅 {task.dueDate}</span>
+                                )}
+                                {assignedResources.slice(0,2).map(r => <span key={r.id} className="px-2 py-0.5 rounded-full" style={{ backgroundColor: r.color + '20', color: r.color }}>{r.name.split(' ')[0]}</span>)}
+                                {assignedResources.length > 2 && <span className="text-gray-500">+{assignedResources.length - 2}</span>}
+                            </div>
+                            
+                            {/* Expanded details */}
+                            <div className={`collapsible-content ${expanded ? '' : 'collapsed'}`} style={{ maxHeight: expanded ? '200px' : '0' }}>
+                                <div className="mt-3 pt-3 border-t space-y-2">
+                                    {editing === 'description' ? (
+                                        <textarea autoFocus className="editable-input w-full text-sm" rows="2" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={() => saveEdit('description')} />
+                                    ) : (
+                                        <p onClick={() => startEdit('description', task.description || '')} className="text-sm text-gray-600 editable">{task.description || 'Ajouter une description...'}</p>
+                                    )}
+                                    <div className="flex flex-wrap gap-1">
+                                        {assignedResources.map(r => <span key={r.id} className="text-xs px-2 py-1 rounded-full flex items-center gap-1" style={{ backgroundColor: r.color + '20', color: r.color }}><Icons.User />{r.name}</span>)}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="flex flex-wrap gap-2 mt-3">
-                            <span className={`text-xs px-2 py-1 rounded-full ${statusColors[task.status]}`}>{task.status === 'pending' ? 'En attente' : task.status === 'inProgress' ? 'En cours' : 'Complété'}</span>
-                            <span className={`text-xs px-2 py-1 rounded-full ${priorityColors[task.priority]}`}>{task.priority === 'high' ? 'Haute' : task.priority === 'medium' ? 'Moyenne' : 'Basse'}</span>
-                            <span className="text-xs px-2 py-1 rounded-full bg-gray-100">📅 {task.dueDate}</span>
-                        </div>
-                        {assignedResources.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-2">
-                                {assignedResources.map(r => (
-                                    <span key={r.id} className="text-xs px-2 py-1 rounded-full flex items-center gap-1" style={{ backgroundColor: r.color + '20', color: r.color }}>
-                                        <Icons.User />{r.name}
-                                    </span>
-                                ))}
-                            </div>
-                        )}
                     </div>
                 );
             };
@@ -682,7 +831,12 @@
                 <div className="min-h-screen">
                     {/* Header avec sélecteur d'employé */}
                     <div className="gradient-bg text-white shadow-2xl">
-                        <div className="max-w-7xl mx-auto px-6 py-6">
+                        <div className="max-w-7xl mx-auto px-6 py-4">
+                            {/* Portal title */}
+                            <div className="text-center pb-4 mb-4 border-b border-white/20">
+                                <p className="text-blue-200 text-sm">Portail du client</p>
+                                <h2 className="text-2xl font-bold">GOB</h2>
+                            </div>
                             {/* Sélecteur d'employé */}
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-4">
@@ -705,10 +859,15 @@
                                 </div>
                             </div>
 
-                            {/* Message de bienvenue */}
-                            <div className="mb-4">
-                                <h1 className="text-3xl font-bold">👋 Bienvenue {selectedEmployee?.name} !</h1>
-                                <p className="text-blue-200">Plateforme d'Intégration RH</p>
+                            {/* Message de bienvenue avec avatar */}
+                            <div className="mb-4 flex items-center gap-4">
+                                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-3xl border-2 border-white/40">
+                                    {selectedEmployee?.name?.charAt(0) || '?'}
+                                </div>
+                                <div>
+                                    <h1 className="text-3xl font-bold">👋 Bienvenue {selectedEmployee?.name} !</h1>
+                                    <p className="text-blue-200">Plateforme d'Intégration RH</p>
+                                </div>
                             </div>
 
                             {/* Info employé */}
@@ -723,13 +882,33 @@
                         </div>
                     </div>
 
-                    {/* Stats */}
+                    {/* Stats - Collapsible */}
                     <div className="max-w-7xl mx-auto px-6 -mt-4">
-                        <div className="grid grid-cols-4 gap-4">
-                            <div className="bg-white rounded-xl shadow-lg p-4 border-2"><div className="text-2xl font-bold">{stats.total}</div><div className="text-sm text-gray-600">Total</div></div>
-                            <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-green-200"><div className="text-2xl font-bold text-green-600">{stats.completed}</div><div className="text-sm text-gray-600">Complétées</div></div>
-                            <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-blue-200"><div className="text-2xl font-bold text-blue-600">{stats.inProgress}</div><div className="text-sm text-gray-600">En cours</div></div>
-                            <div className="bg-white rounded-xl shadow-lg p-4 border-2"><div className="text-2xl font-bold text-gray-600">{stats.pending}</div><div className="text-sm text-gray-600">En attente</div></div>
+                        <div className="flex items-center justify-between mb-2">
+                            <button onClick={() => setShowStats(!showStats)} className="text-gray-500 hover:text-gray-700 flex items-center gap-1 text-sm">
+                                <span className={`chevron-rotate ${showStats ? 'chevron-down' : 'chevron-right'}`}><Icons.ChevronDown /></span>
+                                {showStats ? 'Masquer les stats' : 'Afficher les stats'}
+                            </button>
+                        </div>
+                        <div className={`collapsible-content ${showStats ? '' : 'collapsed'}`} style={{ maxHeight: showStats ? '200px' : '0' }}>
+                            <div className="grid grid-cols-4 gap-4">
+                                <div className="bg-white rounded-xl shadow-lg p-4 border-2 flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-xl">📊</div>
+                                    <div><div className="text-2xl font-bold">{stats.total}</div><div className="text-sm text-gray-600">Total</div></div>
+                                </div>
+                                <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-green-200 flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-xl">✅</div>
+                                    <div><div className="text-2xl font-bold text-green-600">{stats.completed}</div><div className="text-sm text-gray-600">Complétées</div></div>
+                                </div>
+                                <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-blue-200 flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-xl">▶️</div>
+                                    <div><div className="text-2xl font-bold text-blue-600">{stats.inProgress}</div><div className="text-sm text-gray-600">En cours</div></div>
+                                </div>
+                                <div className="bg-white rounded-xl shadow-lg p-4 border-2 flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-xl">⏳</div>
+                                    <div><div className="text-2xl font-bold text-gray-600">{stats.pending}</div><div className="text-sm text-gray-600">En attente</div></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -772,22 +951,40 @@
                         <div className="space-y-6">
                             {phases.map(phase => {
                                 const phaseTasks = filteredTasks.filter(t => t.phaseId === phase.id);
+                                const completed = phaseTasks.filter(t => t.status === 'completed').length;
+                                const progress = phaseTasks.length > 0 ? (completed / phaseTasks.length) * 100 : 0;
+                                const isCollapsed = collapsedPhases[phase.id];
                                 return (
-                                    <div key={phase.id} className="bg-white rounded-xl shadow-sm border-2 overflow-hidden">
-                                        <div className="p-4" style={{ backgroundColor: phase.color + '15', borderLeft: `4px solid ${phase.color}` }}>
+                                    <div key={phase.id} className="bg-white rounded-xl shadow-sm border-2 overflow-hidden drop-zone"
+                                        onDragOver={(e) => e.preventDefault()}
+                                        onDrop={(e) => { e.preventDefault(); const taskId = e.dataTransfer.getData('taskId'); if (taskId) updateTask(taskId, 'phaseId', phase.id); }}
+                                    >
+                                        <div className="p-4 cursor-pointer" style={{ backgroundColor: phase.color + '15', borderLeft: `4px solid ${phase.color}` }} onClick={() => togglePhaseCollapse(phase.id)}>
                                             <div className="flex justify-between items-center">
-                                                <div>
-                                                    <h3 className="text-lg font-bold" style={{ color: phase.color }}>{phase.name}</h3>
-                                                    <p className="text-sm text-gray-600">{phase.description}</p>
-                                                    <p className="text-xs text-gray-500">{phase.startDate} → {phase.endDate}</p>
+                                                <div className="flex items-center gap-3">
+                                                    <span className={`chevron-rotate ${isCollapsed ? 'chevron-right' : 'chevron-down'}`} style={{ color: phase.color }}><Icons.ChevronDown /></span>
+                                                    <div>
+                                                        <h3 className="text-lg font-bold" style={{ color: phase.color }}>{phase.name}</h3>
+                                                        <p className="text-sm text-gray-600">{phase.description}</p>
+                                                    </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <div className="text-2xl font-bold" style={{ color: phase.color }}>{phaseTasks.filter(t => t.status === 'completed').length}/{phaseTasks.length}</div>
+                                                <div className="flex items-center gap-4">
+                                                    {/* Progress bar */}
+                                                    <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                        <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, backgroundColor: phase.color }}></div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <div className="text-xl font-bold" style={{ color: phase.color }}>{completed}/{phaseTasks.length}</div>
+                                                        <p className="text-xs text-gray-500">{phase.startDate} → {phase.endDate}</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="p-4 bg-gray-50">
-                                            {phaseTasks.length > 0 ? phaseTasks.map(task => <TaskCard key={task.id} task={task} />) : <p className="text-gray-500 text-center py-4">Aucune tâche</p>}
+                                        <div className={`collapsible-content bg-gray-50 ${isCollapsed ? 'collapsed' : ''}`} style={{ maxHeight: isCollapsed ? '0' : '2000px', padding: isCollapsed ? '0' : '1rem' }}>
+                                            {phaseTasks.length > 0 ? phaseTasks.map(task => <TaskCard key={task.id} task={task} onUpdate={updateTask} onDelete={deleteTask} />) : <p className="text-gray-500 text-center py-4">Aucune tâche</p>}
+                                            <button onClick={(e) => { e.stopPropagation(); addTask(phase.id); }} className="w-full mt-2 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors flex items-center justify-center gap-2 add-btn">
+                                                <Icons.Plus /> Ajouter une tâche
+                                            </button>
                                         </div>
                                     </div>
                                 );
@@ -801,6 +998,7 @@
                             <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4 mb-4 max-w-3xl mx-auto">
                                 <p className="text-yellow-300 font-semibold">⚠️ IMPORTANT : N'inscrivez aucune information confidentielle dans cette plateforme</p>
                             </div>
+                            <img src="/logojslaidark.jpg" alt="JSLAi" className="h-10 mx-auto mb-4 opacity-70" />
                             <p className="text-gray-400">Plateforme d'Intégration RH</p>
                         </div>
                     </div>
