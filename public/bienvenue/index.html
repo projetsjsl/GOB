@@ -13,8 +13,17 @@
     <script src="/bienvenue/caroline-plan-data.js"></script>
     <script src="/bienvenue/email-template.js"></script>
     <style>
+        @media print {
+            .no-print, button, .toolbar, .admin-panel, .save-indicator, .header-controls, .toggle-view { display: none !important; }
+            body { background: white; color: black; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .task-card { break-inside: avoid; border: 1px solid #ddd; box-shadow: none; margin-bottom: 10px; }
+            .phase-section { break-inside: avoid; page-break-after: auto; }
+            .app-container { max-width: 100%; margin: 0; padding: 0; }
+            ::-webkit-scrollbar { display: none; }
+            h1 { font-size: 24px; color: black; }
+        }
         .gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #4338ca 100%); }
-        .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        .glass { background: rgba(255, 255, 255, 0.1); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
         .chat-bubble { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
@@ -86,6 +95,8 @@
             Activity: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>),
             Columns: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"/></svg>),
             Layers: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>),
+            Eye: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>),
+            Users: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>),
         };
 
         // Error Boundary Simple
@@ -133,6 +144,30 @@
         const useSupabase = !!supabase;
 
         // Données initiales par défaut (VIDE pour migration DB)
+        const triggerConfetti = () => {
+            const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+            for (let i = 0; i < 150; i++) {
+                const el = document.createElement('div');
+                el.style.position = 'fixed';
+                el.style.left = Math.random() * 100 + 'vw';
+                el.style.top = '-20px';
+                el.style.width = Math.random() * 10 + 5 + 'px';
+                el.style.height = Math.random() * 10 + 5 + 'px';
+                el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                el.style.zIndex = '9999';
+                el.style.pointerEvents = 'none';
+                el.style.transition = `top ${Math.random() * 2 + 3}s ease-in, transform ${Math.random() * 2 + 3}s linear`;
+                document.body.appendChild(el);
+                
+                requestAnimationFrame(() => {
+                    el.style.top = '110vh';
+                    el.style.transform = `rotate(${Math.random() * 720}deg) translateX(${Math.random() * 100 - 50}px)`;
+                });
+                setTimeout(() => el.remove(), 5000);
+            }
+        };
+
         const defaultEmployees = [];
         const defaultResources = [
             { id: 1, name: 'Jean-Pierre Ouellet', role: 'Directeur', email: 'jpo@gob.com', avatar: 'JP' },
@@ -386,302 +421,6 @@
             );
         };
 
-        // Composant Admin Amélioré
-        const AdminPanel = ({ resources, setResources, taskTemplates, setTaskTemplates, phaseTemplates, setPhaseTemplates, employees, setEmployees, onClose }) => {
-            const [activeTab, setActiveTab] = useState('employees');
-            const [editingItem, setEditingItem] = useState(null);
-            const [newResource, setNewResource] = useState({ name: '', role: '', color: '#3B82F6' });
-            const [newEmployee, setNewEmployee] = useState({ name: '', role: '', startDate: '', endDate: '', template: 'custom', avatarUrl: '' });
-            const [newTask, setNewTask] = useState({ title: '', description: '', phaseId: 1, assignedTo: [], priority: 'medium', category: 'administratif', dayOffset: 0 });
-            const [newPhase, setNewPhase] = useState({ name: '', description: '', color: '#3B82F6', startOffset: 0, duration: 5 });
-            const [showImportModal, setShowImportModal] = useState(false);
-            const [toast, setToast] = useState('');
-
-            const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2000); };
-
-            // CRUD Employés
-            const addEmployee = () => {
-                if (!newEmployee.name || !newEmployee.startDate) return;
-                const endDate = newEmployee.endDate || new Date(new Date(newEmployee.startDate).getTime() + 30*24*60*60*1000).toISOString().split('T')[0];
-                setEmployees([...employees, { ...newEmployee, endDate, id: Date.now() }]);
-                setNewEmployee({ name: '', role: '', startDate: '', endDate: '', template: 'custom', avatarUrl: '' });
-                showToast('✅ Employé ajouté');
-            };
-            const updateEmployee = (id, field, value) => {
-                setEmployees(employees.map(e => e.id === id ? { ...e, [field]: value } : e));
-            };
-            const deleteEmployee = (id) => { if (confirm('Supprimer cet employé?')) { setEmployees(employees.filter(e => e.id !== id)); showToast('🗑️ Employé supprimé'); } };
-            const duplicateEmployee = (emp) => {
-                const newEmp = { ...emp, id: Date.now(), name: emp.name + ' (copie)', startDate: new Date().toISOString().split('T')[0], endDate: '' };
-                setEmployees([...employees, newEmp]);
-                showToast('📋 Employé dupliqué');
-            };
-
-            // CRUD Resources
-            const addResource = () => {
-                if (!newResource.name) return;
-                setResources([...resources, { ...newResource, id: Date.now(), order: resources.length }]);
-                setNewResource({ name: '', role: '', color: '#3B82F6' });
-                showToast('✅ Responsable ajouté');
-            };
-            const updateResource = (id, field, value) => {
-                setResources(resources.map(r => r.id === id ? { ...r, [field]: value } : r));
-            };
-            const deleteResource = (id) => { if (confirm('Supprimer ce responsable?')) { setResources(resources.filter(r => r.id !== id)); showToast('🗑️ Responsable supprimé'); } };
-
-            // CRUD Tasks
-            const addTaskTemplate = () => {
-                if (!newTask.title) return;
-                setTaskTemplates([...taskTemplates, { ...newTask, id: Date.now() }]);
-                setNewTask({ title: '', description: '', phaseId: 1, assignedTo: [], priority: 'medium', category: 'administratif', dayOffset: 0 });
-                showToast('✅ Tâche ajoutée');
-            };
-            const updateTask = (id, field, value) => {
-                setTaskTemplates(taskTemplates.map(t => t.id === id ? { ...t, [field]: value } : t));
-            };
-            const deleteTask = (id) => { if (confirm('Supprimer cette tâche?')) { setTaskTemplates(taskTemplates.filter(t => t.id !== id)); showToast('🗑️ Tâche supprimée'); } };
-
-            // CRUD Phases
-            const addPhase = () => {
-                if (!newPhase.name) return;
-                setPhaseTemplates([...phaseTemplates, { ...newPhase, id: Date.now(), order: phaseTemplates.length }]);
-                setNewPhase({ name: '', description: '', color: '#3B82F6', startOffset: 0, duration: 5 });
-                showToast('✅ Phase ajoutée');
-            };
-            const updatePhase = (id, field, value) => {
-                setPhaseTemplates(phaseTemplates.map(p => p.id === id ? { ...p, [field]: value } : p));
-            };
-            const deletePhase = (id) => {
-                const linkedTasks = taskTemplates.filter(t => t.phaseId === id);
-                if (linkedTasks.length > 0 && !confirm(`${linkedTasks.length} tâches sont liées à cette phase. Supprimer quand même?`)) return;
-                setPhaseTemplates(phaseTemplates.filter(p => p.id !== id));
-                showToast('🗑️ Phase supprimée');
-            };
-
-            // Import/Export
-            const exportConfig = () => {
-                const config = { employees, resources, phaseTemplates, taskTemplates, exportedAt: new Date().toISOString() };
-                const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.href = url; a.download = 'rh-config-' + new Date().toISOString().split('T')[0] + '.json'; a.click();
-                showToast('📥 Configuration exportée');
-            };
-            const importConfig = (e) => {
-                const file = e.target.files[0]; if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    try {
-                        const config = JSON.parse(event.target.result);
-                        if (config.employees) setEmployees(config.employees);
-                        if (config.resources) setResources(config.resources);
-                        if (config.phaseTemplates) setPhaseTemplates(config.phaseTemplates);
-                        if (config.taskTemplates) setTaskTemplates(config.taskTemplates);
-                        showToast('📤 Configuration importée');
-                        setShowImportModal(false);
-                    } catch (err) { alert('Erreur: fichier invalide'); }
-                };
-                reader.readAsText(file);
-            };
-
-            const toggleAssigned = (taskId, resourceId) => {
-                const task = taskTemplates.find(t => t.id === taskId);
-                const newAssigned = task.assignedTo.includes(resourceId) 
-                    ? task.assignedTo.filter(id => id !== resourceId) 
-                    : [...task.assignedTo, resourceId];
-                updateTask(taskId, 'assignedTo', newAssigned);
-            };
-
-            return (
-                <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
-                    {toast && <div className="fixed top-4 right-4 bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg z-50">{toast}</div>}
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
-                        {/* Header */}
-                        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 flex justify-between items-center">
-                            <div className="flex items-center gap-3">
-                                <Icons.Settings />
-                                <h2 className="text-xl font-bold">Administration</h2>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button onClick={exportConfig} className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-sm flex items-center gap-1"><Icons.Download /> Exporter</button>
-                                <button onClick={() => setShowImportModal(true)} className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-sm flex items-center gap-1"><Icons.Upload /> Importer</button>
-                                <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg"><Icons.X /></button>
-                            </div>
-                        </div>
-
-                        {/* Import Modal */}
-                        {showImportModal && (
-                            <div className="absolute inset-0 bg-black/50 z-50 flex items-center justify-center">
-                                <div className="bg-white rounded-xl p-6 max-w-md">
-                                    <h3 className="text-lg font-bold mb-4">Importer une configuration</h3>
-                                    <input type="file" accept=".json" onChange={importConfig} className="mb-4" />
-                                    <button onClick={() => setShowImportModal(false)} className="px-4 py-2 bg-gray-200 rounded-lg">Annuler</button>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Tabs */}
-                        <div className="flex border-b bg-gray-50 overflow-x-auto">
-                            {[
-                                { id: 'employees', label: '👥 Employés', count: employees.length },
-                                { id: 'resources', label: '👤 Responsables', count: resources.length },
-                                { id: 'tasks', label: '📋 Tâches', count: taskTemplates.length },
-                                { id: 'phases', label: '📅 Phases', count: phaseTemplates.length }
-                            ].map(tab => (
-                                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                                    className={`px-4 py-3 font-medium transition-colors whitespace-nowrap ${activeTab === tab.id ? 'bg-white border-b-2 border-purple-600 text-purple-600' : 'text-gray-600 hover:bg-gray-100'}`}>
-                                    {tab.label} <span className="ml-1 text-xs bg-gray-200 px-2 py-0.5 rounded-full">{tab.count}</span>
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 overflow-y-auto p-6">
-                            {/* EMPLOYÉS */}
-                            {activeTab === 'employees' && (
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-5 gap-2 p-4 bg-gray-50 rounded-lg">
-                                        <input type="text" placeholder="Nom" value={newEmployee.name} onChange={e => setNewEmployee({...newEmployee, name: e.target.value})} className="px-3 py-2 border rounded-lg" />
-                                        <input type="text" placeholder="Poste" value={newEmployee.role} onChange={e => setNewEmployee({...newEmployee, role: e.target.value})} className="px-3 py-2 border rounded-lg" />
-                                        <input type="date" value={newEmployee.startDate} onChange={e => setNewEmployee({...newEmployee, startDate: e.target.value})} className="px-3 py-2 border rounded-lg" />
-                                        <input type="date" value={newEmployee.endDate} onChange={e => setNewEmployee({...newEmployee, endDate: e.target.value})} className="px-3 py-2 border rounded-lg" placeholder="Fin (auto 30j)" />
-                                        <input type="text" placeholder="URL Avatar (optionnel)" value={newEmployee.avatarUrl} onChange={e => setNewEmployee({...newEmployee, avatarUrl: e.target.value})} className="px-3 py-2 border rounded-lg" />
-                                        <button onClick={addEmployee} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-1"><Icons.Plus /> Ajouter</button>
-                                    </div>
-                                    <div className="space-y-2">
-                                        {employees.map(emp => (
-                                            <div key={emp.id} className="flex items-center gap-2 p-3 bg-white border rounded-lg hover:shadow-md transition-shadow">
-                                                <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex-shrink-0 border">
-                                                    {emp.avatarUrl ? <img src={emp.avatarUrl} className="w-full h-full object-cover" /> : <span className="w-full h-full flex items-center justify-center text-xs">{emp.name?.charAt(0)}</span>}
-                                                </div>
-                                                <input type="text" value={emp.name} onChange={e => updateEmployee(emp.id, 'name', e.target.value)} className="font-semibold bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1" />
-                                                <input type="text" value={emp.role} onChange={e => updateEmployee(emp.id, 'role', e.target.value)} className="text-gray-600 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1" />
-                                                <input type="date" value={emp.startDate} onChange={e => updateEmployee(emp.id, 'startDate', e.target.value)} className="text-sm bg-transparent border rounded px-2 py-1" />
-                                                <input type="text" value={emp.avatarUrl || ''} placeholder="URL Avatar" onChange={e => updateEmployee(emp.id, 'avatarUrl', e.target.value)} className="text-xs bg-transparent border rounded px-2 py-1 w-24 truncate" />
-                                                <button onClick={() => duplicateEmployee(emp)} className="text-blue-500 hover:bg-blue-50 p-2 rounded" title="Dupliquer"><Icons.UserPlus /></button>
-                                                <button onClick={() => deleteEmployee(emp.id)} className="text-red-500 hover:bg-red-50 p-2 rounded" title="Supprimer"><Icons.Trash /></button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* RESPONSABLES */}
-                            {activeTab === 'resources' && (
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-2 p-4 bg-gray-50 rounded-lg">
-                                        <input type="text" placeholder="Nom" value={newResource.name} onChange={e => setNewResource({...newResource, name: e.target.value})} className="px-3 py-2 border rounded-lg" />
-                                        <input type="text" placeholder="Rôle" value={newResource.role} onChange={e => setNewResource({...newResource, role: e.target.value})} className="px-3 py-2 border rounded-lg" />
-                                        <div className="flex items-center gap-2"><input type="color" value={newResource.color} onChange={e => setNewResource({...newResource, color: e.target.value})} className="w-10 h-10 rounded cursor-pointer" /><span className="text-sm text-gray-500">Couleur</span></div>
-                                        <button onClick={addResource} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-1"><Icons.Plus /> Ajouter</button>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                        {resources.map(res => (
-                                            <div key={res.id} className="flex items-center gap-2 p-3 bg-white border rounded-lg" style={{ borderLeftWidth: '4px', borderLeftColor: res.color }}>
-                                                <input type="color" value={res.color} onChange={e => updateResource(res.id, 'color', e.target.value)} className="w-8 h-8 rounded cursor-pointer" />
-                                                <input type="text" value={res.name} onChange={e => updateResource(res.id, 'name', e.target.value)} className="font-semibold bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1" />
-                                                <input type="text" value={res.role} onChange={e => updateResource(res.id, 'role', e.target.value)} className="text-gray-600 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1" />
-                                                <button onClick={() => deleteResource(res.id)} className="text-red-500 hover:bg-red-50 p-2 rounded"><Icons.Trash /></button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* TÂCHES */}
-                            {activeTab === 'tasks' && (
-                                <div className="space-y-4">
-                                    <div className="p-4 bg-gray-50 rounded-lg space-y-3">
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                                            <input type="text" placeholder="Titre de la tâche" value={newTask.title} onChange={e => setNewTask({...newTask, title: e.target.value})} className="px-3 py-2 border rounded-lg" />
-                                            <input type="text" placeholder="Description" value={newTask.description} onChange={e => setNewTask({...newTask, description: e.target.value})} className="px-3 py-2 border rounded-lg" />
-                                            <select value={newTask.phaseId} onChange={e => setNewTask({...newTask, phaseId: parseInt(e.target.value)})} className="px-3 py-2 border rounded-lg">
-                                                {phaseTemplates.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                                            </select>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-                                            <select value={newTask.priority} onChange={e => setNewTask({...newTask, priority: e.target.value})} className="px-3 py-2 border rounded-lg">
-                                                <option value="low">Basse</option><option value="medium">Moyenne</option><option value="high">Haute</option>
-                                            </select>
-                                            <select value={newTask.category} onChange={e => setNewTask({...newTask, category: e.target.value})} className="px-3 py-2 border rounded-lg">
-                                                {taskCategories.map(c => <option key={c} value={c}>{c}</option>)}
-                                            </select>
-                                            <input type="number" placeholder="Jour offset" value={newTask.dayOffset} onChange={e => setNewTask({...newTask, dayOffset: parseInt(e.target.value) || 0})} className="px-3 py-2 border rounded-lg" min="0" />
-                                            <button onClick={addTaskTemplate} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-1"><Icons.Plus /> Ajouter</button>
-                                        </div>
-                                    </div>
-                                    {phaseTemplates.map(phase => (
-                                        <div key={phase.id} className="border rounded-lg overflow-hidden">
-                                            <div className="p-3 font-semibold" style={{ backgroundColor: phase.color + '20', borderLeft: `4px solid ${phase.color}` }}>{phase.name}</div>
-                                            <div className="p-2 space-y-2">
-                                                {taskTemplates.filter(t => t.phaseId === phase.id).map(task => (
-                                                    <div key={task.id} className="flex flex-wrap items-center gap-2 p-2 bg-white border rounded-lg text-sm">
-                                                        <input type="text" value={task.title} onChange={e => updateTask(task.id, 'title', e.target.value)} className="font-medium bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1 min-w-[150px]" />
-                                                        <select value={task.priority} onChange={e => updateTask(task.id, 'priority', e.target.value)} className="px-2 py-1 border rounded text-xs">
-                                                            <option value="low">Basse</option><option value="medium">Moy</option><option value="high">Haute</option>
-                                                        </select>
-                                                        <input type="number" value={task.dayOffset} onChange={e => updateTask(task.id, 'dayOffset', parseInt(e.target.value) || 0)} className="w-16 px-2 py-1 border rounded text-xs" min="0" title="Jour offset" />
-                                                        <div className="flex flex-wrap gap-1">
-                                                            {resources.map(r => (
-                                                                <button key={r.id} onClick={() => toggleAssigned(task.id, r.id)}
-                                                                    className={`px-2 py-0.5 rounded-full text-xs ${task.assignedTo.includes(r.id) ? 'text-white' : 'bg-gray-100'}`}
-                                                                    style={task.assignedTo.includes(r.id) ? { backgroundColor: r.color } : {}}>
-                                                                    {r.name.split(' ')[0]}
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                        <button onClick={() => deleteTask(task.id)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Icons.Trash /></button>
-                                                    </div>
-                                                ))}
-                                                {taskTemplates.filter(t => t.phaseId === phase.id).length === 0 && <p className="text-gray-400 text-sm text-center py-2">Aucune tâche</p>}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* PHASES */}
-                            {activeTab === 'phases' && (
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-6 gap-2 p-4 bg-gray-50 rounded-lg">
-                                        <input type="text" placeholder="Nom de la phase" value={newPhase.name} onChange={e => setNewPhase({...newPhase, name: e.target.value})} className="px-3 py-2 border rounded-lg md:col-span-2" />
-                                        <input type="text" placeholder="Description" value={newPhase.description} onChange={e => setNewPhase({...newPhase, description: e.target.value})} className="px-3 py-2 border rounded-lg" />
-                                        <input type="number" placeholder="Jour début" value={newPhase.startOffset} onChange={e => setNewPhase({...newPhase, startOffset: parseInt(e.target.value) || 0})} className="px-3 py-2 border rounded-lg" min="0" />
-                                        <input type="number" placeholder="Durée (jours)" value={newPhase.duration} onChange={e => setNewPhase({...newPhase, duration: parseInt(e.target.value) || 1})} className="px-3 py-2 border rounded-lg" min="1" />
-                                        <button onClick={addPhase} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-1"><Icons.Plus /> Ajouter</button>
-                                    </div>
-                                    <div className="space-y-2">
-                                        {phaseTemplates.sort((a, b) => (a.order || 0) - (b.order || 0)).map((phase, idx) => (
-                                            <div key={phase.id} className="flex items-center gap-2 p-4 bg-white border rounded-lg" style={{ borderLeftWidth: '4px', borderLeftColor: phase.color }}>
-                                                <span className="text-gray-400 font-mono text-sm w-6">{idx + 1}</span>
-                                                <input type="color" value={phase.color} onChange={e => updatePhase(phase.id, 'color', e.target.value)} className="w-8 h-8 rounded cursor-pointer" />
-                                                <input type="text" value={phase.name} onChange={e => updatePhase(phase.id, 'name', e.target.value)} className="font-semibold bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1" />
-                                                <input type="text" value={phase.description} onChange={e => updatePhase(phase.id, 'description', e.target.value)} className="text-gray-600 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1" />
-                                                <div className="flex items-center gap-1 text-sm">
-                                                    <span className="text-gray-500">Début:</span>
-                                                    <input type="number" value={phase.startOffset} onChange={e => updatePhase(phase.id, 'startOffset', parseInt(e.target.value) || 0)} className="w-12 px-1 py-0.5 border rounded text-center" min="0" />
-                                                </div>
-                                                <div className="flex items-center gap-1 text-sm">
-                                                    <span className="text-gray-500">Durée:</span>
-                                                    <input type="number" value={phase.duration} onChange={e => updatePhase(phase.id, 'duration', parseInt(e.target.value) || 1)} className="w-12 px-1 py-0.5 border rounded text-center" min="1" />
-                                                    <span className="text-gray-400">j</span>
-                                                </div>
-                                                <div className="flex items-center gap-1 text-sm">
-                                                    <span className="text-gray-500">Ordre:</span>
-                                                    <input type="number" value={phase.order || 0} onChange={e => updatePhase(phase.id, 'order', parseInt(e.target.value) || 0)} className="w-12 px-1 py-0.5 border rounded text-center" />
-                                                </div>
-                                                <span className="text-xs bg-gray-100 px-2 py-1 rounded">{taskTemplates.filter(t => t.phaseId === phase.id).length} tâches</span>
-                                                <button onClick={() => deletePhase(phase.id)} className="text-red-500 hover:bg-red-50 p-2 rounded"><Icons.Trash /></button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
         // Login Component
         const LoginScreen = ({ employees, onLogin }) => {
             const [selectedEmp, setSelectedEmp] = useState(employees[0]?.id);
@@ -781,12 +520,15 @@
             const [emailPreviewContent, setEmailPreviewContent] = useState('');
             const [searchTerm, setSearchTerm] = useState('');
             const [filterStatus, setFilterStatus] = useState('all');
+            const [showUrgent, setShowUrgent] = useState(false);
             const [saveIndicator, setSaveIndicator] = useState({ visible: false, message: '' });
 
             const triggerSaveIndicator = (msg = 'Sauvegarde...') => {
                 setSaveIndicator({ visible: true, message: msg });
                 setTimeout(() => setSaveIndicator({ visible: false, message: '' }), 2000);
             };
+
+            // ... (uploadAvatar omitted)
 
             // Fonction d'upload d'avatar (Supabase Storage)
             const uploadAvatar = async (file) => {
@@ -815,6 +557,33 @@
             const AdminPanel = () => {
                 const [activeTab, setActiveTab] = useState('profiles');
                 const [isUploading, setIsUploading] = useState(false);
+                const [showImportModal, setShowImportModal] = useState(false);
+
+                // Import/Export Logic
+                const exportConfig = () => {
+                    const config = { employees, resources, phaseTemplates, taskTemplates, exportedAt: new Date().toISOString() };
+                    const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a'); a.href = url; a.download = 'rh-config-' + new Date().toISOString().split('T')[0] + '.json'; a.click();
+                    showNotification('📥 Configuration exportée', 'success');
+                };
+
+                const importConfig = (e) => {
+                    const file = e.target.files[0]; if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const config = JSON.parse(event.target.result);
+                            if (config.employees) setEmployees(config.employees);
+                            if (config.resources) setResources(config.resources);
+                            if (config.phaseTemplates) setPhaseTemplates(config.phaseTemplates);
+                            if (config.taskTemplates) setTaskTemplates(config.taskTemplates);
+                            showNotification('📤 Configuration importée', 'success');
+                            setShowImportModal(false);
+                        } catch (err) { showNotification('Erreur: fichier invalide', 'error'); }
+                    };
+                    reader.readAsText(file);
+                };
                 
                 // --- PROFILES LOGIC ---
                 const handleAvatarChange = async (e, empId) => {
@@ -882,11 +651,30 @@
                 };
 
                 return (
-                    <div className="bg-white p-6 rounded-xl shadow-lg border mb-8 min-h-[500px]">
-                        <div className="flex items-center gap-4 mb-6 border-b pb-4 overflow-x-auto">
-                            <button onClick={() => setActiveTab('profiles')} className={`px-4 py-2 rounded-lg font-bold transition-colors ${activeTab === 'profiles' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>👤 Profils Employés</button>
-                            <button onClick={() => setActiveTab('resources')} className={`px-4 py-2 rounded-lg font-bold transition-colors ${activeTab === 'resources' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>👥 Ressources (Qui ?)</button>
-                            <button onClick={() => setActiveTab('phases')} className={`px-4 py-2 rounded-lg font-bold transition-colors ${activeTab === 'phases' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>📅 Phases (Quand ?)</button>
+                    <div className="bg-white p-6 rounded-xl shadow-lg border mb-8 min-h-[500px] relative">
+                        {/* Import Modal */}
+                        {showImportModal && (
+                            <div className="absolute inset-0 bg-white/95 z-50 flex items-center justify-center rounded-xl">
+                                <div className="bg-white border rounded-xl p-6 max-w-md shadow-2xl text-center">
+                                    <h3 className="text-lg font-bold mb-4">Importer une configuration</h3>
+                                    <p className="text-sm text-gray-500 mb-4">Sélectionnez un fichier .json exporté précédemment.</p>
+                                    <input type="file" accept=".json" onChange={importConfig} className="mb-4 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                                    <button onClick={() => setShowImportModal(false)} className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Annuler</button>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="flex flex-col md:flex-row items-center justify-between mb-6 border-b pb-4 gap-4">
+                            <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto">
+                                <button onClick={() => setActiveTab('profiles')} className={`px-4 py-2 rounded-lg font-bold transition-colors whitespace-nowrap ${activeTab === 'profiles' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>👤 Profils Employés</button>
+                                <button onClick={() => setActiveTab('resources')} className={`px-4 py-2 rounded-lg font-bold transition-colors whitespace-nowrap ${activeTab === 'resources' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>👥 Ressources</button>
+                                <button onClick={() => setActiveTab('phases')} className={`px-4 py-2 rounded-lg font-bold transition-colors whitespace-nowrap ${activeTab === 'phases' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>📅 Phases</button>
+                                <button onClick={() => setActiveTab('tasks')} className={`px-4 py-2 rounded-lg font-bold transition-colors whitespace-nowrap ${activeTab === 'tasks' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'}`}>📋 Tâches (Modèles)</button>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <button onClick={exportConfig} className="px-3 py-1.5 border border-gray-200 hover:bg-gray-50 rounded-lg text-sm flex items-center gap-1 text-gray-600"><Icons.Download /> Exporter JSON</button>
+                                <button onClick={() => setShowImportModal(true)} className="px-3 py-1.5 border border-gray-200 hover:bg-gray-50 rounded-lg text-sm flex items-center gap-1 text-gray-600"><Icons.Upload /> Importer JSON</button>
+                            </div>
                         </div>
 
                         {/* TAB: PROFILES */}
@@ -1183,13 +971,22 @@
                 return { total, completed, inProgress, pending, progress: total > 0 ? Math.round((completed / total) * 100) : 0 };
             }, [tasks]);
 
+            // Confetti Trigger
+            useEffect(() => {
+                if (stats.total > 0 && stats.completed === stats.total) {
+                    triggerConfetti();
+                    showNotification('🎉 Félicitations ! Parcours terminé !', 'success');
+                }
+            }, [stats.completed, stats.total]);
+
             const filteredTasks = useMemo(() => {
                 return tasks.filter(task => {
                     const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase());
                     const matchesStatus = filterStatus === 'all' || task.status === filterStatus;
-                    return matchesSearch && matchesStatus;
+                    const matchesUrgent = !showUrgent || task.priority === 'high';
+                    return matchesSearch && matchesStatus && matchesUrgent;
                 });
-            }, [tasks, searchTerm, filterStatus]);
+            }, [tasks, searchTerm, filterStatus, showUrgent]);
 
             // Notification Toast Component
             const NotificationToast = ({ message, type, onClose }) => {
@@ -1758,6 +1555,13 @@
                                 />
                             </div>
                             <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
+                                <button 
+                                    onClick={() => setShowUrgent(!showUrgent)}
+                                    className={`px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1 transition-all ${showUrgent ? 'bg-red-100 text-red-600 border border-red-200 shadow-inner' : 'bg-white border border-gray-200 text-gray-400 hover:border-red-200 hover:text-red-400'}`}
+                                >
+                                    🔥 Urgent
+                                </button>
+                                <div className="h-6 w-px bg-gray-300 mx-1"></div>
                                 {['all', 'pending', 'inProgress', 'completed'].map(status => (
                                     <button 
                                         key={status}
@@ -1884,7 +1688,13 @@
                                             </div>
                                             
                                             <div className={`collapsible-content bg-gray-50 ${isCollapsed ? 'collapsed' : ''}`} style={{ maxHeight: isCollapsed ? '0' : '2000px', padding: isCollapsed ? '0' : '1rem' }}>
-                                                {phaseTasks.length > 0 ? phaseTasks.map(task => <TaskCard key={task.id} task={task} onUpdate={updateTask} onDelete={deleteTask} />) : <p className="text-gray-500 text-center py-4">Aucune tâche</p>}
+                                                {phaseTasks.length > 0 ? phaseTasks.map(task => <TaskCard key={task.id} task={task} onUpdate={updateTask} onDelete={deleteTask} />) : (
+                                                    <div className="flex flex-col items-center justify-center py-8 text-gray-400">
+                                                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-2 text-2xl">💤</div>
+                                                        <p className="font-medium">Aucune tâche pour le moment</p>
+                                                        <p className="text-xs">Profitez-en pour prendre un café ☕</p>
+                                                    </div>
+                                                )}
                                                 <button onClick={(e) => { e.stopPropagation(); addTask(phase.id); }} className="w-full mt-2 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors flex items-center justify-center gap-2 add-btn">
                                                     <Icons.Plus /> Ajouter une tâche
                                                 </button>
