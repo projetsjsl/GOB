@@ -848,7 +848,10 @@
                     try {
                         let { data: empData, error } = await supabase.from('employees').select('*');
                         if (error) console.warn('Fallback V1 table', error);
-                        if (empData) setEmployees(empData);
+                        if (empData) {
+                             console.log(`✅ ${empData.length} employés récupérés.`);
+                             setEmployees(empData);
+                        }
 
                         const { data: resData } = await supabase.from('resources').select('*').order('display_order');
                         if (resData) setResources(resData);
@@ -1421,7 +1424,7 @@
                                     </div>
                                     <div>
                                         <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                                            Plateforme d'intégration Emma RH - JSLAI
+                                            Portail Emma RH - Client : GOB
                                         </h1>
                                         <p className="text-xs text-gray-500">Portail officiel de gestion RH</p>
                                     </div>
