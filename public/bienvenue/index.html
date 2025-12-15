@@ -10,360 +10,470 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #4338ca 100%);
-        }
-        .glass {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
+        .gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #4338ca 100%); }
+        .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); }
+        .chat-bubble { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .online-dot { animation: pulse 2s infinite; }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
     <div id="root"></div>
     
     <script type="text/babel">
-        const { useState, useMemo } = React;
+        const { useState, useMemo, useEffect, useRef } = React;
         
-        // Icônes SVG inline pour éviter les dépendances
+        // Icônes SVG
         const Icons = {
-            Calendar: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-            ),
-            CheckCircle: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-            ),
-            Circle: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                </svg>
-            ),
-            Clock: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-            ),
-            AlertCircle: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                </svg>
-            ),
-            User: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-            ),
-            Edit: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-            ),
-            Trash: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                </svg>
-            ),
-            ChevronDown: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-            ),
-            ChevronRight: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-            ),
-            Search: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-            ),
-            Download: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-            ),
-            Upload: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-            ),
-            Grid: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="14" width="7" height="7"></rect>
-                    <rect x="3" y="14" width="7" height="7"></rect>
-                </svg>
-            ),
-            List: () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="8" y1="6" x2="21" y2="6"></line>
-                    <line x1="8" y1="12" x2="21" y2="12"></line>
-                    <line x1="8" y1="18" x2="21" y2="18"></line>
-                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                </svg>
-            )
+            Calendar: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>),
+            CheckCircle: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>),
+            Circle: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/></svg>),
+            Clock: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>),
+            AlertCircle: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>),
+            User: () => (<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>),
+            Trash: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>),
+            ChevronDown: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>),
+            ChevronRight: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>),
+            Search: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>),
+            Download: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>),
+            Upload: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>),
+            Grid: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>),
+            Settings: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>),
+            Plus: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>),
+            MessageCircle: () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>),
+            X: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>),
+            Send: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>),
+            UserPlus: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>),
+            Edit: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>),
         };
 
-        const OnboardingPlatform = () => {
-            const [employee, setEmployee] = useState({
-                name: 'Nouvel employé',
-                role: 'Poste à définir',
-                startDate: '2025-01-06',
-                endDate: '2025-01-31'
-            });
+        // Données initiales par défaut
+        const defaultEmployees = [
+            { id: 1, name: 'Caroline', role: 'Conseillère en gestion de patrimoine', startDate: '2025-01-06', endDate: '2025-01-31' },
+            { id: 2, name: 'Alexandre', role: 'Analyste financier', startDate: '2025-02-03', endDate: '2025-02-28' },
+            { id: 3, name: 'Sophie', role: 'Adjointe administrative', startDate: '2025-01-20', endDate: '2025-02-14' }
+        ];
 
-            const [phases, setPhases] = useState([
-                {
-                    id: 1,
-                    name: 'Phase 1 : Arrivée et orientation',
-                    startDate: '2025-01-06',
-                    endDate: '2025-01-10',
-                    description: 'Prise de connaissance des outils et premiers contacts',
-                    color: '#3B82F6',
-                    expanded: true
-                },
-                {
-                    id: 2,
-                    name: 'Phase 2 : Première semaine complète',
-                    startDate: '2025-01-06',
-                    endDate: '2025-01-10',
-                    description: 'Rencontres intensives',
-                    color: '#8B5CF6',
-                    expanded: true
-                },
-                {
-                    id: 3,
-                    name: 'Phase 3 : Consolidation et pratique',
-                    startDate: '2025-01-13',
-                    endDate: '2025-01-24',
-                    description: 'Application des apprentissages',
-                    color: '#06B6D4',
-                    expanded: true
-                },
-                {
-                    id: 4,
-                    name: 'Phase 4 : Autonomisation complète',
-                    startDate: '2025-01-27',
-                    endDate: '2025-01-31',
-                    description: 'Finalisation de l\'intégration',
-                    color: '#10B981',
-                    expanded: true
+        const defaultResources = [
+            { id: 1, name: 'Jean-Sébastien', role: 'Planification financière', color: '#EF4444' },
+            { id: 2, name: 'Jonathan', role: 'Coordination', color: '#F59E0B' },
+            { id: 3, name: 'Anne-Marie', role: 'Administration', color: '#8B5CF6' },
+            { id: 4, name: 'Marie-Hélène', role: 'Coaching', color: '#EC4899' },
+            { id: 5, name: 'Hugo', role: 'Clientèle', color: '#06B6D4' },
+            { id: 6, name: 'Linda', role: 'Support technique', color: '#10B981' },
+            { id: 7, name: 'Équipe', role: 'Mentorat', color: '#6366F1' }
+        ];
+
+        const defaultPhases = [
+            { id: 1, name: 'Phase 1 : Orientation', startOffset: 0, duration: 5, description: 'Prise de connaissance des outils', color: '#3B82F6' },
+            { id: 2, name: 'Phase 2 : Formation', startOffset: 0, duration: 5, description: 'Sessions intensives', color: '#8B5CF6' },
+            { id: 3, name: 'Phase 3 : Pratique', startOffset: 7, duration: 12, description: 'Application des acquis', color: '#06B6D4' },
+            { id: 4, name: 'Phase 4 : Autonomie', startOffset: 21, duration: 5, description: 'Finalisation', color: '#10B981' }
+        ];
+
+        const defaultTaskTemplates = [
+            { id: 1, phaseId: 1, title: 'Confirmation accès email', description: 'Valider les accès email', assignedTo: [2], priority: 'high', category: 'administratif', dayOffset: 0 },
+            { id: 2, phaseId: 1, title: 'Prévoir accès systèmes', description: 'Coordonner avec IT', assignedTo: [3], priority: 'high', category: 'technique', dayOffset: 0 },
+            { id: 3, phaseId: 1, title: 'Formation outils collaboratifs', description: 'Teams et serveur', assignedTo: [3, 6], priority: 'medium', category: 'formation', dayOffset: 1 },
+            { id: 4, phaseId: 2, title: 'Rencontres intensives', description: 'Sessions avec intervenants clés', assignedTo: [1, 2, 3, 4], priority: 'high', category: 'formation', dayOffset: 4 },
+            { id: 5, phaseId: 3, title: 'Début des activités', description: 'Commencer tâches principales', assignedTo: [7], priority: 'high', category: 'pratique', dayOffset: 11 },
+            { id: 6, phaseId: 4, title: 'Bilan intégration', description: 'Évaluation finale', assignedTo: [2], priority: 'high', category: 'suivi', dayOffset: 25 }
+        ];
+
+        // Chatbot Emma RH
+        const EmmaChatbot = ({ employee, tasks, phases, resources }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            const [messages, setMessages] = useState([
+                { from: 'emma', text: `Bonjour ! Je suis Emma, votre assistante RH virtuelle. 👋 Je suis là pour vous aider avec votre intégration. Comment puis-je vous aider aujourd'hui ?` }
+            ]);
+            const [input, setInput] = useState('');
+            const messagesEndRef = useRef(null);
+
+            const scrollToBottom = () => {
+                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+            };
+
+            useEffect(() => { scrollToBottom(); }, [messages]);
+
+            const getEmmaResponse = (question) => {
+                const q = question.toLowerCase();
+                const pendingTasks = tasks.filter(t => t.status === 'pending');
+                const inProgressTasks = tasks.filter(t => t.status === 'inProgress');
+                const completedTasks = tasks.filter(t => t.status === 'completed');
+                const progress = tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
+
+                if (q.includes('tâche') || q.includes('faire') || q.includes('quoi')) {
+                    if (pendingTasks.length > 0) {
+                        const nextTask = pendingTasks[0];
+                        return `Votre prochaine tâche est : "${nextTask.title}". ${nextTask.description}. Cette tâche est de priorité ${nextTask.priority === 'high' ? 'haute' : nextTask.priority === 'medium' ? 'moyenne' : 'basse'}. 📋`;
+                    }
+                    return "Félicitations ! Vous avez complété toutes vos tâches ! 🎉";
                 }
-            ]);
+                if (q.includes('progress') || q.includes('avancement') || q.includes('où en suis')) {
+                    return `Votre progression est de ${progress}%. Vous avez complété ${completedTasks.length} tâches sur ${tasks.length}. ${inProgressTasks.length} tâche(s) sont en cours. Continuez comme ça ! 💪`;
+                }
+                if (q.includes('responsable') || q.includes('contact') || q.includes('qui')) {
+                    const resourceList = resources.map(r => `${r.name} (${r.role})`).join(', ');
+                    return `Voici vos contacts clés : ${resourceList}. N'hésitez pas à les contacter ! 📞`;
+                }
+                if (q.includes('phase') || q.includes('étape')) {
+                    const currentPhase = phases[0];
+                    return `Vous êtes actuellement en ${currentPhase.name}. ${currentPhase.description}. Cette phase dure ${currentPhase.duration || 5} jours. 📅`;
+                }
+                if (q.includes('aide') || q.includes('help') || q.includes('comment')) {
+                    return "Je peux vous aider avec : \n• Vos tâches (\"Quelle est ma prochaine tâche ?\")\n• Votre progression (\"Où en suis-je ?\")\n• Vos contacts (\"Qui sont mes responsables ?\")\n• Les phases (\"Quelle est ma phase actuelle ?\")";
+                }
+                if (q.includes('bonjour') || q.includes('salut') || q.includes('hello')) {
+                    return `Bonjour ${employee.name} ! Comment puis-je vous aider aujourd'hui ? 😊`;
+                }
+                if (q.includes('merci')) {
+                    return "Avec plaisir ! Je suis là pour vous. N'hésitez pas si vous avez d'autres questions ! 🌟";
+                }
+                return "Je ne suis pas sûre de comprendre. Essayez de me demander :\n• \"Quelle est ma prochaine tâche ?\"\n• \"Où en suis-je ?\"\n• \"Qui sont mes responsables ?\"";
+            };
 
-            const [resources, setResources] = useState([
-                { id: 1, name: 'Responsable 1', role: 'Formation', color: '#EF4444' },
-                { id: 2, name: 'Responsable 2', role: 'Coordination', color: '#F59E0B' },
-                { id: 3, name: 'Responsable 3', role: 'Administration', color: '#8B5CF6' },
-                { id: 4, name: 'Responsable 4', role: 'Coaching', color: '#EC4899' },
-                { id: 5, name: 'Responsable 5', role: 'Clientèle', color: '#06B6D4' },
-                { id: 6, name: 'Responsable 6', role: 'Support technique', color: '#10B981' },
-                { id: 7, name: 'Équipe', role: 'Mentorat', color: '#6366F1' }
-            ]);
+            const sendMessage = () => {
+                if (!input.trim()) return;
+                setMessages([...messages, { from: 'user', text: input }]);
+                setTimeout(() => {
+                    setMessages(prev => [...prev, { from: 'emma', text: getEmmaResponse(input) }]);
+                }, 500);
+                setInput('');
+            };
 
-            const [tasks, setTasks] = useState([
-                { id: 1, phaseId: 1, title: 'Confirmation adresse courriel', description: 'Valider les accès email', assignedTo: [2], status: 'pending', priority: 'high', dueDate: '2025-01-06', category: 'administratif' },
-                { id: 2, phaseId: 1, title: 'Prévoir accès systèmes', description: 'Coordonner avec IT pour accès', assignedTo: [3], status: 'pending', priority: 'high', dueDate: '2025-01-06', category: 'technique' },
-                { id: 3, phaseId: 1, title: 'Formation outils collaboratifs', description: 'Formation sur Teams et serveur', assignedTo: [3, 6], status: 'pending', priority: 'medium', dueDate: '2025-01-07', category: 'technique' },
-                { id: 4, phaseId: 1, title: 'Rencontre processus administratifs', description: 'Comprendre les processus internes', assignedTo: [3], status: 'pending', priority: 'high', dueDate: '2025-01-07', category: 'administratif' },
-                { id: 5, phaseId: 2, title: 'Rencontres intensives', description: 'Sessions avec tous les intervenants clés', assignedTo: [1, 2, 3, 4], status: 'pending', priority: 'high', dueDate: '2025-01-10', category: 'formation' },
-                { id: 6, phaseId: 2, title: 'Point de contrôle', description: 'Réévaluation et ajustements', assignedTo: [2], status: 'pending', priority: 'high', dueDate: '2025-01-10', category: 'suivi' },
-                { id: 7, phaseId: 3, title: 'Début des activités', description: 'Commencer les tâches principales', assignedTo: [7], status: 'pending', priority: 'high', dueDate: '2025-01-17', category: 'pratique' },
-                { id: 8, phaseId: 3, title: 'Appropriation outils', description: 'Maîtriser tous les outils de travail', assignedTo: [], status: 'pending', priority: 'medium', dueDate: '2025-01-24', category: 'auto-formation' },
-                { id: 9, phaseId: 4, title: 'Validation maîtrise', description: 'Confirmer l\'autonomie', assignedTo: [3, 6], status: 'pending', priority: 'medium', dueDate: '2025-01-30', category: 'validation' },
-                { id: 10, phaseId: 4, title: 'Bilan intégration', description: 'Évaluation finale de l\'intégration', assignedTo: [2], status: 'pending', priority: 'high', dueDate: '2025-01-31', category: 'suivi' }
-            ]);
+            return (
+                <>
+                    {/* Bouton flottant */}
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="fixed bottom-6 right-6 w-16 h-16 bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 transition-all z-50 flex items-center justify-center overflow-hidden border-4 border-white"
+                    >
+                        {isOpen ? (
+                            <span className="text-white"><Icons.X /></span>
+                        ) : (
+                            <img src="/bienvenue/emma-rh-avatar.jpg" alt="Emma RH" className="w-full h-full object-cover" />
+                        )}
+                        <span className="absolute top-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white online-dot"></span>
+                    </button>
 
+                    {/* Fenêtre de chat */}
+                    {isOpen && (
+                        <div className="fixed bottom-24 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden border-2 border-gray-200">
+                            {/* Header */}
+                            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex items-center gap-3">
+                                <div className="relative">
+                                    <img src="/bienvenue/emma-rh-avatar.jpg" alt="Emma RH" className="w-12 h-12 rounded-full object-cover border-2 border-white" />
+                                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+                                </div>
+                                <div>
+                                    <h3 className="font-bold">Emma RH</h3>
+                                    <p className="text-xs text-blue-200">🟢 En ligne - Assistante virtuelle</p>
+                                </div>
+                            </div>
+
+                            {/* Messages */}
+                            <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50">
+                                {messages.map((msg, i) => (
+                                    <div key={i} className={`chat-bubble flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                        {msg.from === 'emma' && (
+                                            <img src="/bienvenue/emma-rh-avatar.jpg" alt="Emma" className="w-8 h-8 rounded-full mr-2 object-cover" />
+                                        )}
+                                        <div className={`max-w-[75%] p-3 rounded-2xl ${msg.from === 'user' ? 'bg-blue-600 text-white rounded-br-sm' : 'bg-white text-gray-800 rounded-bl-sm shadow'}`}>
+                                            <p className="text-sm whitespace-pre-line">{msg.text}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                                <div ref={messagesEndRef} />
+                            </div>
+
+                            {/* Input */}
+                            <div className="p-3 border-t bg-white">
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={input}
+                                        onChange={(e) => setInput(e.target.value)}
+                                        onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                                        placeholder="Écrivez votre message..."
+                                        className="flex-1 px-4 py-2 border-2 border-gray-200 rounded-full focus:border-blue-500 focus:outline-none text-sm"
+                                    />
+                                    <button onClick={sendMessage} className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">
+                                        <Icons.Send />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </>
+            );
+        };
+
+        // Composant Admin
+        const AdminPanel = ({ resources, setResources, taskTemplates, setTaskTemplates, phaseTemplates, setPhaseTemplates, employees, setEmployees, onClose }) => {
+            const [activeTab, setActiveTab] = useState('employees');
+            const [newResource, setNewResource] = useState({ name: '', role: '', color: '#3B82F6' });
+            const [newEmployee, setNewEmployee] = useState({ name: '', role: '', startDate: '', endDate: '' });
+            const [newTask, setNewTask] = useState({ title: '', description: '', phaseId: 1, assignedTo: [], priority: 'medium', category: '', dayOffset: 0 });
+
+            const addResource = () => {
+                if (!newResource.name) return;
+                setResources([...resources, { ...newResource, id: Date.now() }]);
+                setNewResource({ name: '', role: '', color: '#3B82F6' });
+            };
+
+            const addEmployee = () => {
+                if (!newEmployee.name || !newEmployee.startDate) return;
+                setEmployees([...employees, { ...newEmployee, id: Date.now() }]);
+                setNewEmployee({ name: '', role: '', startDate: '', endDate: '' });
+            };
+
+            const addTaskTemplate = () => {
+                if (!newTask.title) return;
+                setTaskTemplates([...taskTemplates, { ...newTask, id: Date.now() }]);
+                setNewTask({ title: '', description: '', phaseId: 1, assignedTo: [], priority: 'medium', category: '', dayOffset: 0 });
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+                        {/* Header */}
+                        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 flex justify-between items-center">
+                            <div className="flex items-center gap-3">
+                                <Icons.Settings />
+                                <h2 className="text-xl font-bold">Administration</h2>
+                            </div>
+                            <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg"><Icons.X /></button>
+                        </div>
+
+                        {/* Tabs */}
+                        <div className="flex border-b bg-gray-50">
+                            {[
+                                { id: 'employees', label: '👥 Employés' },
+                                { id: 'resources', label: '👤 Responsables' },
+                                { id: 'tasks', label: '📋 Modèles de tâches' },
+                                { id: 'phases', label: '📅 Phases' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`px-6 py-3 font-medium transition-colors ${activeTab === tab.id ? 'bg-white border-b-2 border-purple-600 text-purple-600' : 'text-gray-600 hover:bg-gray-100'}`}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 overflow-y-auto p-6">
+                            {activeTab === 'employees' && (
+                                <div className="space-y-4">
+                                    <h3 className="font-bold text-lg mb-4">Gestion des employés</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 p-4 bg-gray-50 rounded-lg">
+                                        <input type="text" placeholder="Nom" value={newEmployee.name} onChange={e => setNewEmployee({...newEmployee, name: e.target.value})} className="px-3 py-2 border rounded-lg" />
+                                        <input type="text" placeholder="Poste" value={newEmployee.role} onChange={e => setNewEmployee({...newEmployee, role: e.target.value})} className="px-3 py-2 border rounded-lg" />
+                                        <input type="date" value={newEmployee.startDate} onChange={e => setNewEmployee({...newEmployee, startDate: e.target.value})} className="px-3 py-2 border rounded-lg" />
+                                        <button onClick={addEmployee} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-2">
+                                            <Icons.Plus /> Ajouter
+                                        </button>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {employees.map(emp => (
+                                            <div key={emp.id} className="flex items-center justify-between p-3 bg-white border rounded-lg">
+                                                <div>
+                                                    <span className="font-semibold">{emp.name}</span>
+                                                    <span className="text-gray-500 ml-2">- {emp.role}</span>
+                                                    <span className="text-sm text-gray-400 ml-2">({emp.startDate})</span>
+                                                </div>
+                                                <button onClick={() => setEmployees(employees.filter(e => e.id !== emp.id))} className="text-red-500 hover:bg-red-50 p-2 rounded">
+                                                    <Icons.Trash />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'resources' && (
+                                <div className="space-y-4">
+                                    <h3 className="font-bold text-lg mb-4">Gestion des responsables</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 p-4 bg-gray-50 rounded-lg">
+                                        <input type="text" placeholder="Nom" value={newResource.name} onChange={e => setNewResource({...newResource, name: e.target.value})} className="px-3 py-2 border rounded-lg" />
+                                        <input type="text" placeholder="Rôle" value={newResource.role} onChange={e => setNewResource({...newResource, role: e.target.value})} className="px-3 py-2 border rounded-lg" />
+                                        <input type="color" value={newResource.color} onChange={e => setNewResource({...newResource, color: e.target.value})} className="w-full h-10 rounded-lg cursor-pointer" />
+                                        <button onClick={addResource} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-2">
+                                            <Icons.Plus /> Ajouter
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                        {resources.map(res => (
+                                            <div key={res.id} className="flex items-center justify-between p-3 bg-white border rounded-lg">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: res.color }}></div>
+                                                    <span className="font-semibold">{res.name}</span>
+                                                    <span className="text-gray-500">({res.role})</span>
+                                                </div>
+                                                <button onClick={() => setResources(resources.filter(r => r.id !== res.id))} className="text-red-500 hover:bg-red-50 p-2 rounded">
+                                                    <Icons.Trash />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'tasks' && (
+                                <div className="space-y-4">
+                                    <h3 className="font-bold text-lg mb-4">Modèles de tâches</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-lg">
+                                        <input type="text" placeholder="Titre" value={newTask.title} onChange={e => setNewTask({...newTask, title: e.target.value})} className="px-3 py-2 border rounded-lg" />
+                                        <input type="text" placeholder="Description" value={newTask.description} onChange={e => setNewTask({...newTask, description: e.target.value})} className="px-3 py-2 border rounded-lg" />
+                                        <select value={newTask.priority} onChange={e => setNewTask({...newTask, priority: e.target.value})} className="px-3 py-2 border rounded-lg">
+                                            <option value="low">Basse</option>
+                                            <option value="medium">Moyenne</option>
+                                            <option value="high">Haute</option>
+                                        </select>
+                                    </div>
+                                    <button onClick={addTaskTemplate} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2">
+                                        <Icons.Plus /> Ajouter modèle
+                                    </button>
+                                    <div className="space-y-2">
+                                        {taskTemplates.map(task => (
+                                            <div key={task.id} className="flex items-center justify-between p-3 bg-white border rounded-lg">
+                                                <div>
+                                                    <span className="font-semibold">{task.title}</span>
+                                                    <span className="text-gray-500 ml-2">- {task.description}</span>
+                                                    <span className={`ml-2 px-2 py-1 text-xs rounded ${task.priority === 'high' ? 'bg-orange-100 text-orange-700' : task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100'}`}>
+                                                        {task.priority}
+                                                    </span>
+                                                </div>
+                                                <button onClick={() => setTaskTemplates(taskTemplates.filter(t => t.id !== task.id))} className="text-red-500 hover:bg-red-50 p-2 rounded">
+                                                    <Icons.Trash />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'phases' && (
+                                <div className="space-y-4">
+                                    <h3 className="font-bold text-lg mb-4">Phases d'intégration</h3>
+                                    <div className="space-y-2">
+                                        {phaseTemplates.map(phase => (
+                                            <div key={phase.id} className="flex items-center justify-between p-3 bg-white border rounded-lg" style={{ borderLeftWidth: '4px', borderLeftColor: phase.color }}>
+                                                <div>
+                                                    <span className="font-semibold">{phase.name}</span>
+                                                    <span className="text-gray-500 ml-2">- {phase.description}</span>
+                                                    <span className="text-sm text-gray-400 ml-2">(Durée: {phase.duration} jours)</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Composant principal
+        const OnboardingPlatform = () => {
+            const [employees, setEmployees] = useState(defaultEmployees);
+            const [selectedEmployeeId, setSelectedEmployeeId] = useState(1);
+            const [resources, setResources] = useState(defaultResources);
+            const [phaseTemplates, setPhaseTemplates] = useState(defaultPhases);
+            const [taskTemplates, setTaskTemplates] = useState(defaultTaskTemplates);
+            const [showAdmin, setShowAdmin] = useState(false);
             const [viewMode, setViewMode] = useState('timeline');
             const [searchTerm, setSearchTerm] = useState('');
             const [filterStatus, setFilterStatus] = useState('all');
-            const [filterPriority, setFilterPriority] = useState('all');
 
-            const statusColors = {
-                pending: 'bg-gray-100 text-gray-700 border-gray-300',
-                inProgress: 'bg-blue-100 text-blue-700 border-blue-300',
-                completed: 'bg-green-100 text-green-700 border-green-300',
-                blocked: 'bg-red-100 text-red-700 border-red-300'
-            };
+            const selectedEmployee = employees.find(e => e.id === selectedEmployeeId) || employees[0];
 
-            const priorityColors = {
-                low: 'bg-gray-100 text-gray-600',
-                medium: 'bg-yellow-100 text-yellow-700',
-                high: 'bg-orange-100 text-orange-700'
-            };
+            // Générer les phases et tâches pour l'employé sélectionné
+            const phases = useMemo(() => {
+                if (!selectedEmployee) return [];
+                const startDate = new Date(selectedEmployee.startDate);
+                return phaseTemplates.map(pt => ({
+                    ...pt,
+                    startDate: new Date(startDate.getTime() + pt.startOffset * 86400000).toISOString().split('T')[0],
+                    endDate: new Date(startDate.getTime() + (pt.startOffset + pt.duration) * 86400000).toISOString().split('T')[0],
+                    expanded: true
+                }));
+            }, [selectedEmployee, phaseTemplates]);
+
+            const [tasks, setTasks] = useState([]);
+
+            useEffect(() => {
+                if (!selectedEmployee) return;
+                const startDate = new Date(selectedEmployee.startDate);
+                const generatedTasks = taskTemplates.map(tt => ({
+                    ...tt,
+                    id: `${selectedEmployee.id}-${tt.id}`,
+                    dueDate: new Date(startDate.getTime() + tt.dayOffset * 86400000).toISOString().split('T')[0],
+                    status: 'pending'
+                }));
+                setTasks(generatedTasks);
+            }, [selectedEmployee, taskTemplates]);
 
             const stats = useMemo(() => {
                 const total = tasks.length;
                 const completed = tasks.filter(t => t.status === 'completed').length;
                 const inProgress = tasks.filter(t => t.status === 'inProgress').length;
                 const pending = tasks.filter(t => t.status === 'pending').length;
-                const blocked = tasks.filter(t => t.status === 'blocked').length;
-                
-                return {
-                    total,
-                    completed,
-                    inProgress,
-                    pending,
-                    blocked,
-                    progress: total > 0 ? Math.round((completed / total) * 100) : 0
-                };
+                return { total, completed, inProgress, pending, progress: total > 0 ? Math.round((completed / total) * 100) : 0 };
             }, [tasks]);
 
             const filteredTasks = useMemo(() => {
                 return tasks.filter(task => {
-                    const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                        task.description.toLowerCase().includes(searchTerm.toLowerCase());
+                    const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase());
                     const matchesStatus = filterStatus === 'all' || task.status === filterStatus;
-                    const matchesPriority = filterPriority === 'all' || task.priority === filterPriority;
-                    
-                    return matchesSearch && matchesStatus && matchesPriority;
+                    return matchesSearch && matchesStatus;
                 });
-            }, [tasks, searchTerm, filterStatus, filterPriority]);
+            }, [tasks, searchTerm, filterStatus]);
 
             const toggleTaskStatus = (taskId) => {
                 setTasks(tasks.map(task => {
                     if (task.id === taskId) {
                         const statuses = ['pending', 'inProgress', 'completed'];
                         const currentIndex = statuses.indexOf(task.status);
-                        const nextStatus = statuses[(currentIndex + 1) % statuses.length];
-                        return { ...task, status: nextStatus };
+                        return { ...task, status: statuses[(currentIndex + 1) % statuses.length] };
                     }
                     return task;
                 }));
             };
 
-            const deleteTask = (taskId) => {
-                if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche?')) {
-                    setTasks(tasks.filter(t => t.id !== taskId));
-                }
-            };
+            const statusColors = { pending: 'bg-gray-100 text-gray-700', inProgress: 'bg-blue-100 text-blue-700', completed: 'bg-green-100 text-green-700' };
+            const priorityColors = { low: 'bg-gray-100', medium: 'bg-yellow-100 text-yellow-700', high: 'bg-orange-100 text-orange-700' };
 
-            const togglePhaseExpanded = (phaseId) => {
-                setPhases(phases.map(p => 
-                    p.id === phaseId ? { ...p, expanded: !p.expanded } : p
-                ));
-            };
-
-            const exportData = () => {
-                const data = { employee, phases, resources, tasks };
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `plan-integration-${employee.name.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.json`;
-                a.click();
-            };
-
-            const importData = (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        try {
-                            const data = JSON.parse(e.target.result);
-                            if (data.employee) setEmployee(data.employee);
-                            if (data.phases) setPhases(data.phases);
-                            if (data.resources) setResources(data.resources);
-                            if (data.tasks) setTasks(data.tasks);
-                            alert('Données importées avec succès!');
-                        } catch (error) {
-                            alert('Erreur lors de l\'importation: ' + error.message);
-                        }
-                    };
-                    reader.readAsText(file);
-                }
-            };
-
-            const TaskCard = ({ task, compact = false }) => {
+            const TaskCard = ({ task }) => {
                 const phase = phases.find(p => p.id === task.phaseId);
                 const assignedResources = resources.filter(r => task.assignedTo.includes(r.id));
-
                 return (
-                    <div className={`bg-white border-2 rounded-lg p-4 hover:shadow-lg transition-all duration-200 ${compact ? 'mb-2' : 'mb-3'}`}>
+                    <div className="bg-white border-2 rounded-lg p-4 hover:shadow-lg transition-all mb-3">
                         <div className="flex items-start justify-between mb-2">
                             <div className="flex items-start gap-3 flex-1">
-                                <button
-                                    onClick={() => toggleTaskStatus(task.id)}
-                                    className="mt-1 hover:scale-110 transition-transform"
-                                >
-                                    {task.status === 'completed' ? (
-                                        <span className="text-green-600"><Icons.CheckCircle /></span>
-                                    ) : task.status === 'inProgress' ? (
-                                        <span className="text-blue-600"><Icons.Clock /></span>
-                                    ) : task.status === 'blocked' ? (
-                                        <span className="text-red-600"><Icons.AlertCircle /></span>
-                                    ) : (
-                                        <span className="text-gray-400"><Icons.Circle /></span>
-                                    )}
+                                <button onClick={() => toggleTaskStatus(task.id)} className="mt-1 hover:scale-110 transition-transform">
+                                    {task.status === 'completed' ? <span className="text-green-600"><Icons.CheckCircle /></span> : task.status === 'inProgress' ? <span className="text-blue-600"><Icons.Clock /></span> : <span className="text-gray-400"><Icons.Circle /></span>}
                                 </button>
                                 <div className="flex-1">
-                                    <h4 className={`font-semibold text-gray-900 ${task.status === 'completed' ? 'line-through text-gray-500' : ''}`}>
-                                        {task.title}
-                                    </h4>
-                                    {!compact && (
-                                        <p className="text-sm text-gray-600 mt-1">{task.description}</p>
-                                    )}
+                                    <h4 className={`font-semibold ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-900'}`}>{task.title}</h4>
+                                    <p className="text-sm text-gray-600 mt-1">{task.description}</p>
                                 </div>
                             </div>
-                            <div className="flex gap-1 ml-2">
-                                <button onClick={() => deleteTask(task.id)} className="p-1 hover:bg-red-50 rounded transition-colors">
-                                    <span className="text-red-600"><Icons.Trash /></span>
-                                </button>
-                            </div>
                         </div>
-
                         <div className="flex flex-wrap gap-2 mt-3">
-                            <span className={`text-xs px-2 py-1 rounded-full ${statusColors[task.status]} border`}>
-                                {task.status === 'pending' ? 'En attente' : 
-                                task.status === 'inProgress' ? 'En cours' : 
-                                task.status === 'completed' ? 'Complété' : 'Bloqué'}
-                            </span>
-                            <span className={`text-xs px-2 py-1 rounded-full ${priorityColors[task.priority]}`}>
-                                {task.priority === 'high' ? 'Haute' : task.priority === 'medium' ? 'Moyenne' : 'Basse'}
-                            </span>
-                            {phase && (
-                                <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: phase.color + '20', color: phase.color }}>
-                                    {phase.name.split(':')[0]}
-                                </span>
-                            )}
-                            <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">
-                                📅 {new Date(task.dueDate).toLocaleDateString('fr-CA')}
-                            </span>
+                            <span className={`text-xs px-2 py-1 rounded-full ${statusColors[task.status]}`}>{task.status === 'pending' ? 'En attente' : task.status === 'inProgress' ? 'En cours' : 'Complété'}</span>
+                            <span className={`text-xs px-2 py-1 rounded-full ${priorityColors[task.priority]}`}>{task.priority === 'high' ? 'Haute' : task.priority === 'medium' ? 'Moyenne' : 'Basse'}</span>
+                            <span className="text-xs px-2 py-1 rounded-full bg-gray-100">📅 {task.dueDate}</span>
                         </div>
-
                         {assignedResources.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-2">
-                                {assignedResources.map(resource => (
-                                    <span
-                                        key={resource.id}
-                                        className="text-xs px-2 py-1 rounded-full flex items-center gap-1"
-                                        style={{ backgroundColor: resource.color + '20', color: resource.color }}
-                                    >
-                                        <Icons.User />
-                                        {resource.name}
+                                {assignedResources.map(r => (
+                                    <span key={r.id} className="text-xs px-2 py-1 rounded-full flex items-center gap-1" style={{ backgroundColor: r.color + '20', color: r.color }}>
+                                        <Icons.User />{r.name}
                                     </span>
                                 ))}
                             </div>
@@ -372,244 +482,127 @@
                 );
             };
 
-            const TimelineView = () => (
-                <div className="space-y-6">
-                    {phases.map(phase => {
-                        const phaseTasks = filteredTasks.filter(t => t.phaseId === phase.id);
-                        
-                        return (
-                            <div key={phase.id} className="bg-white rounded-xl shadow-sm border-2 overflow-hidden">
-                                <div
-                                    className="p-4 cursor-pointer hover:opacity-90 transition-opacity"
-                                    style={{ backgroundColor: phase.color + '15', borderLeft: `4px solid ${phase.color}` }}
-                                    onClick={() => togglePhaseExpanded(phase.id)}
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            {phase.expanded ? <Icons.ChevronDown /> : <Icons.ChevronRight />}
-                                            <div>
-                                                <h3 className="text-lg font-bold" style={{ color: phase.color }}>{phase.name}</h3>
-                                                <p className="text-sm text-gray-600 mt-1">{phase.description}</p>
-                                                <p className="text-xs text-gray-500 mt-1">
-                                                    {new Date(phase.startDate).toLocaleDateString('fr-CA')} → {new Date(phase.endDate).toLocaleDateString('fr-CA')}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-2xl font-bold" style={{ color: phase.color }}>
-                                                {phaseTasks.filter(t => t.status === 'completed').length}/{phaseTasks.length}
-                                            </div>
-                                            <div className="text-xs text-gray-500">tâches complétées</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                {phase.expanded && (
-                                    <div className="p-4 bg-gray-50">
-                                        {phaseTasks.length > 0 ? (
-                                            phaseTasks.map(task => <TaskCard key={task.id} task={task} />)
-                                        ) : (
-                                            <p className="text-gray-500 text-center py-8">Aucune tâche dans cette phase</p>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
-                </div>
-            );
-
-            const KanbanView = () => {
-                const columns = [
-                    { id: 'pending', title: 'En attente', color: 'bg-gray-50' },
-                    { id: 'inProgress', title: 'En cours', color: 'bg-blue-50' },
-                    { id: 'completed', title: 'Complété', color: 'bg-green-50' },
-                    { id: 'blocked', title: 'Bloqué', color: 'bg-red-50' }
-                ];
-
-                return (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {columns.map(column => {
-                            const columnTasks = filteredTasks.filter(t => t.status === column.id);
-                            
-                            return (
-                                <div key={column.id} className={`${column.color} rounded-xl p-4 border-2`}>
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h3 className="font-bold text-lg">{column.title}</h3>
-                                        <span className="bg-white px-2 py-1 rounded-full text-sm font-semibold">
-                                            {columnTasks.length}
-                                        </span>
-                                    </div>
-                                    <div className="space-y-2">
-                                        {columnTasks.map(task => <TaskCard key={task.id} task={task} compact />)}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                );
-            };
-
             return (
                 <div className="min-h-screen">
-                    {/* Header */}
+                    {/* Header avec sélecteur d'employé */}
                     <div className="gradient-bg text-white shadow-2xl">
-                        <div className="max-w-7xl mx-auto px-6 py-8">
-                            <div className="flex items-center justify-between mb-6">
-                                <div>
-                                    <h1 className="text-4xl font-bold mb-2">Plateforme d'Intégration RH</h1>
-                                    <p className="text-blue-200 text-lg">Gestion complète de l'intégration des nouveaux employés</p>
+                        <div className="max-w-7xl mx-auto px-6 py-6">
+                            {/* Sélecteur d'employé */}
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-4">
+                                    <select
+                                        value={selectedEmployeeId}
+                                        onChange={(e) => setSelectedEmployeeId(parseInt(e.target.value))}
+                                        className="bg-white/20 text-white px-4 py-2 rounded-lg border border-white/30 focus:outline-none focus:border-white"
+                                    >
+                                        {employees.map(emp => (
+                                            <option key={emp.id} value={emp.id} className="text-gray-900">{emp.name}</option>
+                                        ))}
+                                    </select>
+                                    <button onClick={() => setShowAdmin(true)} className="bg-white/20 hover:bg-white/30 p-2 rounded-lg transition-colors">
+                                        <Icons.Settings />
+                                    </button>
                                 </div>
                                 <div className="text-right">
-                                    <div className="text-5xl font-bold mb-1">{stats.progress}%</div>
-                                    <div className="text-blue-200">Progression globale</div>
+                                    <div className="text-4xl font-bold">{stats.progress}%</div>
+                                    <div className="text-blue-200 text-sm">Progression</div>
                                 </div>
                             </div>
-                            
+
+                            {/* Message de bienvenue */}
+                            <div className="mb-4">
+                                <h1 className="text-3xl font-bold">👋 Bienvenue {selectedEmployee?.name} !</h1>
+                                <p className="text-blue-200">Plateforme d'Intégration RH</p>
+                            </div>
+
+                            {/* Info employé */}
                             <div className="glass rounded-xl p-4 border border-white/20">
-                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <div>
-                                        <div className="text-blue-200 text-sm mb-1">Employé</div>
-                                        <div className="font-semibold text-lg">{employee.name}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-blue-200 text-sm mb-1">Poste</div>
-                                        <div className="font-semibold">{employee.role}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-blue-200 text-sm mb-1">Début</div>
-                                        <div className="font-semibold">{new Date(employee.startDate).toLocaleDateString('fr-CA')}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-blue-200 text-sm mb-1">Fin prévue</div>
-                                        <div className="font-semibold">{new Date(employee.endDate).toLocaleDateString('fr-CA')}</div>
-                                    </div>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <div><div className="text-blue-200 text-xs">Poste</div><div className="font-semibold">{selectedEmployee?.role}</div></div>
+                                    <div><div className="text-blue-200 text-xs">Début</div><div className="font-semibold">{selectedEmployee?.startDate}</div></div>
+                                    <div><div className="text-blue-200 text-xs">Fin prévue</div><div className="font-semibold">{selectedEmployee?.endDate}</div></div>
+                                    <div><div className="text-blue-200 text-xs">Tâches</div><div className="font-semibold">{stats.completed}/{stats.total}</div></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Stats rapides */}
+                    {/* Stats */}
                     <div className="max-w-7xl mx-auto px-6 -mt-4">
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                            <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-gray-200">
-                                <div className="text-3xl font-bold text-gray-900">{stats.total}</div>
-                                <div className="text-sm text-gray-600">Total tâches</div>
-                            </div>
-                            <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-green-200">
-                                <div className="text-3xl font-bold text-green-600">{stats.completed}</div>
-                                <div className="text-sm text-gray-600">Complétées</div>
-                            </div>
-                            <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-blue-200">
-                                <div className="text-3xl font-bold text-blue-600">{stats.inProgress}</div>
-                                <div className="text-sm text-gray-600">En cours</div>
-                            </div>
-                            <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-gray-200">
-                                <div className="text-3xl font-bold text-gray-600">{stats.pending}</div>
-                                <div className="text-sm text-gray-600">En attente</div>
-                            </div>
-                            <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-red-200">
-                                <div className="text-3xl font-bold text-red-600">{stats.blocked}</div>
-                                <div className="text-sm text-gray-600">Bloquées</div>
-                            </div>
+                        <div className="grid grid-cols-4 gap-4">
+                            <div className="bg-white rounded-xl shadow-lg p-4 border-2"><div className="text-2xl font-bold">{stats.total}</div><div className="text-sm text-gray-600">Total</div></div>
+                            <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-green-200"><div className="text-2xl font-bold text-green-600">{stats.completed}</div><div className="text-sm text-gray-600">Complétées</div></div>
+                            <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-blue-200"><div className="text-2xl font-bold text-blue-600">{stats.inProgress}</div><div className="text-sm text-gray-600">En cours</div></div>
+                            <div className="bg-white rounded-xl shadow-lg p-4 border-2"><div className="text-2xl font-bold text-gray-600">{stats.pending}</div><div className="text-sm text-gray-600">En attente</div></div>
                         </div>
                     </div>
 
+                    {/* Contenu principal */}
                     <div className="max-w-7xl mx-auto px-6 py-8">
-                        {/* Barre d'outils */}
-                        <div className="bg-white rounded-xl shadow-lg p-4 mb-6 border-2">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <div className="lg:col-span-2">
-                                    <div className="relative">
-                                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                            <Icons.Search />
-                                        </span>
-                                        <input
-                                            type="text"
-                                            placeholder="Rechercher une tâche..."
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                            className="w-full pl-10 pr-4 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
-                                        />
-                                    </div>
-                                </div>
-
-                                <select
-                                    value={filterStatus}
-                                    onChange={(e) => setFilterStatus(e.target.value)}
-                                    className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
-                                >
-                                    <option value="all">Tous les statuts</option>
-                                    <option value="pending">En attente</option>
-                                    <option value="inProgress">En cours</option>
-                                    <option value="completed">Complété</option>
-                                    <option value="blocked">Bloqué</option>
-                                </select>
-
-                                <select
-                                    value={filterPriority}
-                                    onChange={(e) => setFilterPriority(e.target.value)}
-                                    className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
-                                >
-                                    <option value="all">Toutes priorités</option>
-                                    <option value="high">Haute</option>
-                                    <option value="medium">Moyenne</option>
-                                    <option value="low">Basse</option>
-                                </select>
+                        {/* Toolbar */}
+                        <div className="bg-white rounded-xl shadow-lg p-4 mb-6 border-2 flex flex-wrap gap-4 items-center">
+                            <div className="flex-1 min-w-[200px] relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><Icons.Search /></span>
+                                <input type="text" placeholder="Rechercher..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 border-2 rounded-lg focus:border-blue-500 focus:outline-none" />
                             </div>
-
-                            <div className="flex flex-wrap gap-3 mt-4">
-                                <div className="flex bg-gray-100 rounded-lg p-1">
-                                    <button
-                                        onClick={() => setViewMode('timeline')}
-                                        className={`px-4 py-2 rounded-lg transition-colors ${viewMode === 'timeline' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}
-                                    >
-                                        <Icons.Calendar />
-                                    </button>
-                                    <button
-                                        onClick={() => setViewMode('kanban')}
-                                        className={`px-4 py-2 rounded-lg transition-colors ${viewMode === 'kanban' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}
-                                    >
-                                        <Icons.Grid />
-                                    </button>
-                                </div>
-
-                                <button
-                                    onClick={exportData}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-                                >
-                                    <Icons.Download /> Exporter
-                                </button>
-
-                                <label className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 cursor-pointer">
-                                    <Icons.Upload /> Importer
-                                    <input type="file" accept=".json" onChange={importData} className="hidden" />
-                                </label>
-                            </div>
+                            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="px-4 py-2 border-2 rounded-lg">
+                                <option value="all">Tous</option>
+                                <option value="pending">En attente</option>
+                                <option value="inProgress">En cours</option>
+                                <option value="completed">Complété</option>
+                            </select>
                         </div>
 
-                        {/* Vue principale */}
-                        {viewMode === 'timeline' && <TimelineView />}
-                        {viewMode === 'kanban' && <KanbanView />}
+                        {/* Phases et tâches */}
+                        <div className="space-y-6">
+                            {phases.map(phase => {
+                                const phaseTasks = filteredTasks.filter(t => t.phaseId === phase.id);
+                                return (
+                                    <div key={phase.id} className="bg-white rounded-xl shadow-sm border-2 overflow-hidden">
+                                        <div className="p-4" style={{ backgroundColor: phase.color + '15', borderLeft: `4px solid ${phase.color}` }}>
+                                            <div className="flex justify-between items-center">
+                                                <div>
+                                                    <h3 className="text-lg font-bold" style={{ color: phase.color }}>{phase.name}</h3>
+                                                    <p className="text-sm text-gray-600">{phase.description}</p>
+                                                    <p className="text-xs text-gray-500">{phase.startDate} → {phase.endDate}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="text-2xl font-bold" style={{ color: phase.color }}>{phaseTasks.filter(t => t.status === 'completed').length}/{phaseTasks.length}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="p-4 bg-gray-50">
+                                            {phaseTasks.length > 0 ? phaseTasks.map(task => <TaskCard key={task.id} task={task} />) : <p className="text-gray-500 text-center py-4">Aucune tâche</p>}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
 
-                    {/* Footer avec avertissement */}
+                    {/* Footer */}
                     <div className="bg-gray-900 text-white py-6 mt-12">
                         <div className="max-w-7xl mx-auto px-6 text-center">
                             <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4 mb-4 max-w-3xl mx-auto">
-                                <p className="text-yellow-300 font-semibold flex items-center justify-center gap-2">
-                                    <span className="text-xl">⚠️</span>
-                                    IMPORTANT : N'inscrivez aucune information confidentielle dans cette plateforme
-                                </p>
+                                <p className="text-yellow-300 font-semibold">⚠️ IMPORTANT : N'inscrivez aucune information confidentielle dans cette plateforme</p>
                             </div>
-                            <p className="text-gray-400">
-                                Plateforme d'Intégration RH
-                            </p>
-                            <p className="text-gray-500 text-sm mt-2">
-                                Système de gestion complète pour l'intégration des nouveaux employés
-                            </p>
+                            <p className="text-gray-400">Plateforme d'Intégration RH</p>
                         </div>
                     </div>
+
+                    {/* Admin Panel */}
+                    {showAdmin && (
+                        <AdminPanel
+                            resources={resources} setResources={setResources}
+                            taskTemplates={taskTemplates} setTaskTemplates={setTaskTemplates}
+                            phaseTemplates={phaseTemplates} setPhaseTemplates={setPhaseTemplates}
+                            employees={employees} setEmployees={setEmployees}
+                            onClose={() => setShowAdmin(false)}
+                        />
+                    )}
+
+                    {/* Chatbot Emma */}
+                    <EmmaChatbot employee={selectedEmployee} tasks={tasks} phases={phases} resources={resources} />
                 </div>
             );
         };

@@ -197,6 +197,28 @@
     },
     {
       "source": "/bienvenue",
+      "has": [
+        {
+          "type": "host",
+          "value": "jslai.gobapps.com"
+        }
+      ],
+      "destination": "https://gobapps.com/bienvenue",
+      "permanent": false
+    },
+    {
+      "source": "/bienvenue/",
+      "has": [
+        {
+          "type": "host",
+          "value": "jslai.gobapps.com"
+        }
+      ],
+      "destination": "https://gobapps.com/bienvenue",
+      "permanent": false
+    },
+    {
+      "source": "/bienvenue",
       "destination": "/bienvenue/index.html",
       "permanent": false
     },
