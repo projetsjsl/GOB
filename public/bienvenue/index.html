@@ -629,6 +629,47 @@
                     await supabase.from('resources').delete().eq('id', id);
                 };
 
+                // --- TASK TEMPLATES LOGIC ---
+                const updateTaskTemplate = async (id, field, value) => {
+                    setTaskTemplates(taskTemplates.map(t => t.id === id ? { ...t, [field]: value } : t));
+                    if(useSupabase && supabase) {
+                        const dbField = field === 'phaseId' ? 'phase_id' : field === 'assignedTo' ? 'assigned_to' : field === 'dayOffset' ? 'day_offset' : field;
+                        await supabase.from('task_templates').update({ [dbField]: value }).eq('id', id);
+                    }
+                };
+
+                const addTaskTemplate = async () => {
+                    const newTask = { 
+                        title: 'Nouvelle tâche', 
+                        description: '', 
+                        priority: 'medium', 
+                        category: 'administratif', 
+                        phase_id: 1, 
+                        day_offset: 0, 
+                        assigned_to: [] 
+                    };
+                    const { data, error } = await supabase.from('task_templates').insert([newTask]).select();
+                    if(data) {
+                        const createdTask = data[0];
+                        setTaskTemplates([...taskTemplates, { 
+                            ...createdTask, 
+                            phaseId: createdTask.phase_id, 
+                            dayOffset: createdTask.day_offset, 
+                            assignedTo: createdTask.assigned_to 
+                        }]);
+                        showNotification('Tâche ajoutée', 'success');
+                    } else {
+                        console.error(error);
+                        showNotification('Erreur ajout tâche', 'error');
+                    }
+                };
+
+                const deleteTaskTemplate = async (id) => {
+                    if(!confirm('Supprimer ce modèle de tâche ?')) return;
+                    setTaskTemplates(taskTemplates.filter(t => t.id !== id));
+                    await supabase.from('task_templates').delete().eq('id', id);
+                };
+
                 // --- PHASES LOGIC ---
                 const updatePhaseTemplate = async (id, field, value) => {
                     setPhaseTemplates(phaseTemplates.map(p => p.id === id ? { ...p, [field]: value } : p));
