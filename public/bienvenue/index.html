@@ -79,6 +79,10 @@
             Edit: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>),
             GripVertical: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg>),
             Minus: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>),
+            Layout: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>),
+            List: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>),
+            Activity: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>),
+            Columns: () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"/></svg>),
         };
 
         // ============================================
@@ -314,7 +318,7 @@
                         {isOpen ? (
                             <span className="text-white"><Icons.X /></span>
                         ) : (
-                            <img src="/bienvenue/emma-rh-avatar.jpg" alt="Emma RH" className="w-full h-full object-cover" />
+                            <img src="../emma-avatar-gob-dark.jpg" alt="Emma RH" className="w-full h-full object-cover" />
                         )}
                         <span className="absolute top-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white online-dot"></span>
                     </button>
@@ -325,7 +329,7 @@
                             {/* Header */}
                             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex items-center gap-3">
                                 <div className="relative">
-                                    <img src="/bienvenue/emma-rh-avatar.jpg" alt="Emma RH" className="w-12 h-12 rounded-full object-cover border-2 border-white" />
+                                    <img src="../emma-avatar-gob-dark.jpg" alt="Emma RH" className="w-12 h-12 rounded-full object-cover border-2 border-white" />
                                     <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
                                 </div>
                                 <div>
@@ -822,11 +826,12 @@
                 showNotification('Nouvelle tâche ajoutée', 'success');
             };
 
-            // Phase collapse state
+            // Phase collapse and View Mode state
             const [collapsedPhases, setCollapsedPhases] = useState({});
             const togglePhaseCollapse = (phaseId) => setCollapsedPhases(prev => ({ ...prev, [phaseId]: !prev[phaseId] }));
             const [showStats, setShowStats] = useState(true);
-            const [notification, setNotification] = useState(null); // { message, type }
+            const [notification, setNotification] = useState(null);
+            const [dragging, setDragging] = useState(false); // State for drag feedback
 
             const showNotification = (message, type = 'success') => {
                 setNotification({ message, type });
@@ -846,20 +851,34 @@
                 
                 const startEdit = (field, value) => { setEditing(field); setEditValue(value); };
                 const saveEdit = (field) => {
-                    if (onUpdate) onUpdate(task.id, field, editValue);
+                    if (editValue !== task[field]) {
+                        onUpdate(task.id, field, editValue);
+                    }
                     setEditing(null);
                 };
-                const cyclePriority = () => {
+
+                // Multi-select logic for resources
+                const toggleResource = (resourceId) => {
+                    const current = task.assignedTo || [];
+                    const updated = current.includes(resourceId) 
+                        ? current.filter(id => id !== resourceId)
+                        : [...current, resourceId];
+                    onUpdate(task.id, 'assignedTo', updated);
+                };
+
+                const cyclePriority = (e) => {
+                    e.stopPropagation();
                     const priorities = ['low', 'medium', 'high'];
-                    const next = priorities[(priorities.indexOf(task.priority) + 1) % 3];
-                    if (onUpdate) onUpdate(task.id, 'priority', next);
+                    const currentIdx = priorities.indexOf(task.priority);
+                    onUpdate(task.id, 'priority', priorities[(currentIdx + 1) % 3]);
                 };
                 
                 return (
                     <div 
                         className="bg-white border-2 rounded-lg mb-3 task-hover transition-all flex overflow-hidden"
                         draggable="true"
-                        onDragStart={(e) => e.dataTransfer.setData('taskId', task.id)}
+                        onDragStart={(e) => { e.dataTransfer.setData('taskId', task.id); setDragging(true); }}
+                        onDragEnd={() => setDragging(false)}
                     >
                         {/* Priority indicator bar */}
                         <div className="priority-indicator" style={{ backgroundColor: priorityBg[task.priority] }} onClick={cyclePriority} title="Cliquer pour changer la priorité"></div>
@@ -891,31 +910,207 @@
                                 )}
                             </div>
                             
-                            {/* Compact info row */}
-                            <div className="flex flex-wrap gap-2 mt-2 text-xs">
+                                {/* Compact info row - Now with full edit capabilities */}
+                            <div className="flex flex-wrap gap-2 mt-2 text-xs items-center">
                                 <span className={`px-2 py-0.5 rounded-full ${statusColors[task.status]}`}>{task.status === 'pending' ? '⏳ Attente' : task.status === 'inProgress' ? '▶️ En cours' : '✅ Fait'}</span>
-                                <span className="px-2 py-0.5 rounded-full" style={{ backgroundColor: priorityBg[task.priority] + '20', color: priorityBg[task.priority] }}>{task.priority === 'high' ? '🔥 Haute' : task.priority === 'medium' ? '⚡ Moy' : '💤 Basse'}</span>
+                                {editing === 'priority' ? (
+                                    <select autoFocus className="editable-input text-xs" value={editValue} onChange={(e) => { onUpdate(task.id, 'priority', e.target.value); setEditing(null); }} onBlur={() => setEditing(null)}>
+                                        <option value="low">🟢 Basse</option>
+                                        <option value="medium">🟡 Moyenne</option>
+                                        <option value="high">🔴 Haute</option>
+                                    </select>
+                                ) : (
+                                    <span onClick={() => startEdit('priority', task.priority)} className="px-2 py-0.5 rounded-full editable flex items-center gap-1" style={{ backgroundColor: priorityBg[task.priority] + '20', color: priorityBg[task.priority] }}>
+                                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: priorityBg[task.priority] }}></span>
+                                        {task.priority === 'high' ? 'Haute' : task.priority === 'medium' ? 'Moyenne' : 'Basse'}
+                                    </span>
+                                )}
+                                
                                 {editing === 'dueDate' ? (
                                     <input type="date" autoFocus className="editable-input text-xs" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={() => saveEdit('dueDate')} />
                                 ) : (
-                                    <span onClick={() => startEdit('dueDate', task.dueDate)} className="px-2 py-0.5 rounded-full bg-gray-100 editable">📅 {task.dueDate}</span>
+                                    <span onClick={() => startEdit('dueDate', task.dueDate)} className={`px-2 py-0.5 rounded-full editable ${task.dueDate ? 'bg-gray-100' : 'bg-red-50 text-red-500 border border-red-200'}`}>
+                                        📅 {task.dueDate || 'Date à déterminer'}
+                                    </span>
                                 )}
-                                {assignedResources.slice(0,2).map(r => <span key={r.id} className="px-2 py-0.5 rounded-full" style={{ backgroundColor: r.color + '20', color: r.color }}>{r.name.split(' ')[0]}</span>)}
-                                {assignedResources.length > 2 && <span className="text-gray-500">+{assignedResources.length - 2}</span>}
+
+                                {/* Category Edit */}
+                                {editing === 'category' ? (
+                                    <select autoFocus className="editable-input text-xs" value={editValue} onChange={(e) => { onUpdate(task.id, 'category', e.target.value); setEditing(null); }} onBlur={() => setEditing(null)}>
+                                        <option value="administratif">Administratif</option>
+                                        <option value="technique">Technique</option>
+                                        <option value="formation">Formation</option>
+                                        <option value="autre">Autre</option>
+                                        <option value="">Non spécifié</option>
+                                    </select>
+                                ) : (
+                                    <span onClick={() => startEdit('category', task.category || '')} className={`px-2 py-0.5 rounded-full editable uppercase text-[10px] tracking-wider ${task.category ? 'bg-indigo-50 text-indigo-700' : 'bg-gray-100 text-gray-400 italic'}`}>
+                                        {task.category || 'NON SPÉCIFIÉ'}
+                                    </span>
+                                )}
+                                
+                                {/* Resource Quick Add/Remove */}
+                                <div className="relative group">
+                                     <div className="flex -space-x-1 cursor-pointer" onClick={() => setEditing(editing === 'resources' ? null : 'resources')}>
+                                        {assignedResources.length === 0 && <span className="px-2 py-0.5 rounded-full bg-gray-50 text-gray-400 border border-dashed border-gray-300 hover:border-blue-400 hover:text-blue-500">+ Resp</span>}
+                                        {assignedResources.slice(0,3).map(r => <span key={r.id} className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-white ring-2 ring-white" style={{ backgroundColor: r.color }} title={r.name}>{r.name.charAt(0)}</span>)}
+                                        {assignedResources.length > 3 && <span className="w-6 h-6 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-[10px] ring-2 ring-white">+{assignedResources.length - 3}</span>}
+                                     </div>
+                                     {editing === 'resources' && (
+                                         <div className="absolute top-full left-0 mt-1 bg-white shadow-xl rounded-lg p-2 border z-50 w-48 animate-bounce-in">
+                                             <div className="text-xs font-bold text-gray-400 mb-2 uppercase">Assigner :</div>
+                                             {resources.map(r => (
+                                                 <div key={r.id} onClick={() => toggleResource(r.id)} className={`flex items-center gap-2 p-1.5 rounded cursor-pointer hover:bg-gray-50 ${task.assignedTo.includes(r.id) ? 'bg-blue-50' : ''}`}>
+                                                     <div className="w-4 h-4 rounded-full border flex items-center justify-center text-white text-[8px]" style={{ backgroundColor: r.color }}>{task.assignedTo.includes(r.id) && <Icons.CheckCircle />}</div>
+                                                     <span className="text-sm">{r.name}</span>
+                                                 </div>
+                                             ))}
+                                             <div onClick={() => setEditing(null)} className="mt-2 text-center text-xs text-blue-500 cursor-pointer hover:underline">Fermer</div>
+                                         </div>
+                                     )}
+                                </div>
                             </div>
                             
                             {/* Expanded details */}
-                            <div className={`collapsible-content ${expanded ? '' : 'collapsed'}`} style={{ maxHeight: expanded ? '200px' : '0' }}>
+                            <div className={`collapsible-content ${expanded ? '' : 'collapsed'}`} style={{ maxHeight: expanded ? '500px' : '0' }}>
                                 <div className="mt-3 pt-3 border-t space-y-2">
                                     {editing === 'description' ? (
-                                        <textarea autoFocus className="editable-input w-full text-sm" rows="2" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={() => saveEdit('description')} />
+                                        <textarea autoFocus className="editable-input w-full text-sm" rows="3" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={() => saveEdit('description')} placeholder="Ajouter une description..." />
                                     ) : (
-                                        <p onClick={() => startEdit('description', task.description || '')} className="text-sm text-gray-600 editable">{task.description || 'Ajouter une description...'}</p>
+                                        <div onClick={() => startEdit('description', task.description || '')} className="text-sm text-gray-600 editable min-h-[40px] whitespace-pre-wrap">{task.description || 'Ajouter une description...'}</div>
                                     )}
-                                    <div className="flex flex-wrap gap-1">
-                                        {assignedResources.map(r => <span key={r.id} className="text-xs px-2 py-1 rounded-full flex items-center gap-1" style={{ backgroundColor: r.color + '20', color: r.color }}><Icons.User />{r.name}</span>)}
+                                    <div className="flex flex-wrap gap-1 mt-2">
+                                        {assignedResources.map(r => <span key={r.id} className="text-xs px-2 py-1 rounded-full flex items-center gap-1 border" style={{ backgroundColor: r.color + '10', borderColor: r.color + '30', color: r.color }}><Icons.User />{r.name}</span>)}
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            // KANBAN VIEW COMPONENT
+            const KanbanView = () => {
+                const columns = [
+                    { id: 'pending', title: 'À faire', icon: <Icons.Circle />, bg: 'bg-gray-50', border: 'border-gray-200' },
+                    { id: 'inProgress', title: 'En cours', icon: <Icons.Clock />, bg: 'bg-blue-50', border: 'border-blue-200' },
+                    { id: 'completed', title: 'Terminé', icon: <Icons.CheckCircle />, bg: 'bg-green-50', border: 'border-green-200' }
+                ];
+
+                const handleDrop = (e, status) => {
+                    const taskId = e.dataTransfer.getData('taskId');
+                    if (taskId) {
+                        const task = tasks.find(t => t.id === taskId);
+                        if (task && task.status !== status) {
+                             // Update status logic
+                             const originalTaskId = parseInt(taskId.split('-')[1]);
+                             const updatedEmployeeTasks = {
+                                ...employeeTasks,
+                                [selectedEmployee.id]: {
+                                    ...employeeTasks[selectedEmployee.id],
+                                    [originalTaskId]: status
+                                }
+                            };
+                            setEmployeeTasks(updatedEmployeeTasks);
+                            saveToStorage(STORAGE_KEYS.employeeTasks, updatedEmployeeTasks);
+                            setTasks(tasks.map(t => t.id === taskId ? { ...t, status } : t));
+                        }
+                    }
+                };
+
+                return (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full overflow-x-auto pb-4">
+                        {columns.map(col => (
+                            <div 
+                                key={col.id} 
+                                className={`rounded-xl ${col.bg} border-2 ${col.border} flex flex-col h-full min-h-[500px]`}
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={(e) => handleDrop(e, col.id)}
+                            >
+                                <div className="p-4 border-b border-white/50 flex items-center gap-2 font-bold text-gray-700 sticky top-0 bg-inherit z-10 rounded-t-xl backdrop-blur-sm">
+                                    {col.icon} {col.title}
+                                    <span className="ml-auto bg-white px-2 py-0.5 rounded-full text-xs shadow-sm">{filteredTasks.filter(t => t.status === col.id).length}</span>
+                                </div>
+                                <div className="p-4 space-y-3 flex-1 overflow-y-auto">
+                                    {filteredTasks.filter(t => t.status === col.id).map(task => (
+                                        <TaskCard key={task.id} task={task} onUpdate={updateTask} onDelete={deleteTask} />
+                                    ))}
+                                    {filteredTasks.filter(t => t.status === col.id).length === 0 && (
+                                        <div className="text-center text-gray-400 py-10 border-2 border-dashed border-gray-300 rounded-lg">
+                                            Aucune tâche
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                );
+            };
+
+            // GANTT VIEW COMPONENT
+            const GanttView = () => {
+                if (!selectedEmployee) return null;
+                const startDate = new Date(selectedEmployee.startDate);
+                const totalDuration = Math.max(...phases.map(p => p.startOffset + p.duration), 30); // Min 30 days
+                
+                return (
+                    <div className="bg-white rounded-xl shadow-lg border overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <div className="min-w-[800px] p-6">
+                                {/* Timeline Header */}
+                                <div className="flex border-b pb-2 mb-4">
+                                    <div className="w-48 font-bold text-gray-700">Tâche / Phase</div>
+                                    <div className="flex-1 relative h-6">
+                                        {[0, 10, 20, 30].map(d => (
+                                            <div key={d} className="absolute text-xs text-gray-400" style={{ left: `${(d / totalDuration) * 100}%` }}>J+{d}</div>
+                                        ))}
+                                    </div>
+                                </div>
+                                
+                                {/* Phases Rows */}
+                                {phases.map(phase => (
+                                    <div key={phase.id} className="mb-6">
+                                        {/* Phase Bar */}
+                                        <div className="flex items-center mb-2 group">
+                                            <div className="w-48 font-bold text-sm truncate pr-2" title={phase.name}>{phase.name}</div>
+                                            <div className="flex-1 relative h-6 bg-gray-100 rounded-full overflow-hidden">
+                                                <div 
+                                                    className="absolute h-full rounded-full opacity-30 transition-all group-hover:opacity-50"
+                                                    style={{ 
+                                                        left: `${(phase.startOffset / totalDuration) * 100}%`,
+                                                        width: `${(phase.duration / totalDuration) * 100}%`,
+                                                        backgroundColor: phase.color 
+                                                    }}
+                                                ></div>
+                                                <div className="absolute top-1 text-xs px-2 font-medium w-full text-center" style={{ left: `${(phase.startOffset / totalDuration) * 100}%` }}>
+                                                    {phase.duration} jours
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Tasks Rows */}
+                                        {filteredTasks.filter(t => t.phaseId === phase.id).map(task => {
+                                            const taskStart = task.dayOffset;
+                                            const taskDuration = 1; // Default 1 day visual
+                                            return (
+                                                <div key={task.id} className="flex items-center mb-1 hover:bg-gray-50 rounded">
+                                                    <div className="w-48 text-xs text-gray-600 truncate pl-4 pr-2">{task.title}</div>
+                                                    <div className="flex-1 relative h-5">
+                                                        <div 
+                                                            className={`absolute h-3 top-1 rounded-full ${statusColors[task.status] ? statusColors[task.status].split(' ')[0] : 'bg-gray-300'} border border-black/10 cursor-pointer hover:scale-105 transition-transform`}
+                                                            title={`${task.title} (J+${taskStart})`}
+                                                            style={{ 
+                                                                left: `${(taskStart / totalDuration) * 100}%`,
+                                                                width: `${Math.max((taskDuration / totalDuration) * 100, 1)}%`, // Min width
+                                                                minWidth: '8px'
+                                                            }}
+                                                        ></div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -1011,7 +1206,7 @@
                     </div>
 
                     {/* Contenu principal */}
-                    <div className="max-w-7xl mx-auto px-6 py-8">
+                    <div className="max-w-7xl mx-auto px-6 py-6 transition-all duration-300">
                         {/* Toolbar */}
                         <div className="bg-white rounded-xl shadow-lg p-4 mb-6 border-2 flex flex-wrap gap-4 items-center">
                             <div className="flex-1 min-w-[200px] relative">
@@ -1045,25 +1240,63 @@
                             </button>
                         </div>
 
-                        {/* Phases et tâches */}
-                        <div className="space-y-6">
-                            {phases.map(phase => {
-                                const phaseTasks = filteredTasks.filter(t => t.phaseId === phase.id);
-                                const completed = phaseTasks.filter(t => t.status === 'completed').length;
-                                const progress = phaseTasks.length > 0 ? (completed / phaseTasks.length) * 100 : 0;
-                                const isCollapsed = collapsedPhases[phase.id];
-                                return (
-                                    <div key={phase.id} className="bg-white rounded-xl shadow-sm border-2 overflow-hidden drop-zone"
-                                        onDragOver={(e) => e.preventDefault()}
-                                        onDrop={(e) => { e.preventDefault(); const taskId = e.dataTransfer.getData('taskId'); if (taskId) updateTask(taskId, 'phaseId', phase.id); }}
-                                    >
-                                        <div className="p-4 cursor-pointer" style={{ backgroundColor: phase.color + '15', borderLeft: `4px solid ${phase.color}` }} onClick={() => togglePhaseCollapse(phase.id)}>
-                                            <div className="flex justify-between items-center">
-                                                <div className="flex items-center gap-3">
-                                                    <span className={`chevron-rotate ${isCollapsed ? 'chevron-right' : 'chevron-down'}`} style={{ color: phase.color }}><Icons.ChevronDown /></span>
-                                                    <div>
-                                                        <h3 className="text-lg font-bold" style={{ color: phase.color }}>{phase.name}</h3>
-                                                        <p className="text-sm text-gray-600">{phase.description}</p>
+                        {/* View Switcher Controls */}
+                        <div className="flex justify-center mb-8">
+                             <div className="bg-white p-1 rounded-lg shadow-sm border inline-flex">
+                                <button onClick={() => setViewMode('list')} className={`px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium transition-colors ${viewMode === 'list' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}>
+                                    <Icons.List /> Liste
+                                </button>
+                                <button onClick={() => setViewMode('kanban')} className={`px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium transition-colors ${viewMode === 'kanban' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}>
+                                    <Icons.Columns /> Kanban
+                                </button>
+                                <button onClick={() => setViewMode('gantt')} className={`px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium transition-colors ${viewMode === 'gantt' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}>
+                                    <Icons.Activity /> Gantt
+                                </button>
+                             </div>
+                        </div>
+
+                        {/* VIEW CONTENT RENDER */}
+                        {viewMode === 'list' && (
+                            <div className="space-y-6">
+                                {phases.map((phase) => {
+                                    const phaseTasks = filteredTasks.filter(t => t.phaseId === phase.id);
+                                    const completed = phaseTasks.filter(t => t.status === 'completed').length;
+                                    const progress = phaseTasks.length > 0 ? Math.round((completed / phaseTasks.length) * 100) : 0;
+                                    const isCollapsed = collapsedPhases[phase.id];
+
+                                    return (
+                                        <div 
+                                            key={phase.id} 
+                                            className={`bg-white rounded-xl shadow-sm border transition-all duration-300 ${dragging ? 'opacity-50' : ''}`}
+                                            onDragOver={(e) => {
+                                                e.preventDefault();
+                                                e.currentTarget.classList.add('drop-zone');
+                                            }}
+                                            onDragLeave={(e) => {
+                                                e.currentTarget.classList.remove('drop-zone');
+                                            }}
+                                            onDrop={(e) => {
+                                                e.preventDefault();
+                                                e.currentTarget.classList.remove('drop-zone');
+                                                const taskId = e.dataTransfer.getData('taskId');
+                                                if (taskId) updateTask(taskId, 'phaseId', phase.id);
+                                            }}
+                                        >
+                                            <div 
+                                                className="p-4 border-b flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors rounded-t-xl"
+                                                onClick={() => togglePhaseCollapse(phase.id)}
+                                                style={{ borderLeft: `6px solid ${phase.color}` }}
+                                            >
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className={`transform transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}`}>
+                                                            <Icons.ChevronDown />
+                                                        </span>
+                                                        <h3 className="text-lg font-bold text-gray-800">{phase.name}</h3>
+                                                        {progress === 100 && <span className="text-green-500"><Icons.CheckCircle /></span>}
+                                                    </div>
+                                                    <div className="flex items-center gap-4 text-sm text-gray-500 ml-6">
+                                                        <p>{phase.description}</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-4">
@@ -1077,17 +1310,21 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            
+                                            <div className={`collapsible-content bg-gray-50 ${isCollapsed ? 'collapsed' : ''}`} style={{ maxHeight: isCollapsed ? '0' : '2000px', padding: isCollapsed ? '0' : '1rem' }}>
+                                                {phaseTasks.length > 0 ? phaseTasks.map(task => <TaskCard key={task.id} task={task} onUpdate={updateTask} onDelete={deleteTask} />) : <p className="text-gray-500 text-center py-4">Aucune tâche</p>}
+                                                <button onClick={(e) => { e.stopPropagation(); addTask(phase.id); }} className="w-full mt-2 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors flex items-center justify-center gap-2 add-btn">
+                                                    <Icons.Plus /> Ajouter une tâche
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div className={`collapsible-content bg-gray-50 ${isCollapsed ? 'collapsed' : ''}`} style={{ maxHeight: isCollapsed ? '0' : '2000px', padding: isCollapsed ? '0' : '1rem' }}>
-                                            {phaseTasks.length > 0 ? phaseTasks.map(task => <TaskCard key={task.id} task={task} onUpdate={updateTask} onDelete={deleteTask} />) : <p className="text-gray-500 text-center py-4">Aucune tâche</p>}
-                                            <button onClick={(e) => { e.stopPropagation(); addTask(phase.id); }} className="w-full mt-2 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors flex items-center justify-center gap-2 add-btn">
-                                                <Icons.Plus /> Ajouter une tâche
-                                            </button>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        {viewMode === 'kanban' && <KanbanView />}
+                        {viewMode === 'gantt' && <GanttView />}
                     </div>
 
                     {/* Footer */}
@@ -1096,7 +1333,7 @@
                             <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4 mb-4 max-w-3xl mx-auto">
                                 <p className="text-yellow-300 font-semibold">⚠️ IMPORTANT : N'inscrivez aucune information confidentielle dans cette plateforme</p>
                             </div>
-                            <img src="/logojslaidark.jpg" alt="JSLAi" className="h-10 mx-auto mb-4 opacity-70" />
+                            <img src="../logojslaidark.jpg" alt="JSLAi" className="h-10 mx-auto mb-4 opacity-70" />
                             <p className="text-gray-400">Plateforme d'Intégration RH</p>
                         </div>
                     </div>
