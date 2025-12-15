@@ -9,6 +9,7 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/bienvenue/caroline-plan-data.js"></script>
     <script src="/bienvenue/email-template.js"></script>
     <style>
@@ -87,99 +88,29 @@
         };
 
         // ============================================
-        // LOCALSTORAGE PERSISTENCE FUNCTIONS
+        // SUPABASE CONFIGURATION
         // ============================================
-        const STORAGE_KEYS = {
-            employees: 'rh-platform-employees-v2',
-            resources: 'rh-platform-resources-v2',
-            phases: 'rh-platform-phases-v2',
-            taskTemplates: 'rh-platform-taskTemplates-v2',
-            employeeTasks: 'rh-platform-employeeTasks-v2' // Progression par employé
-        };
-
-        const saveToStorage = (key, data) => {
-            try {
-                localStorage.setItem(key, JSON.stringify(data));
-                console.log(`✅ Sauvegardé: ${key}`, data.length || Object.keys(data).length, 'éléments');
-                return true;
-            } catch (e) {
-                console.error(`❌ Erreur sauvegarde ${key}:`, e);
-                return false;
+        // NOTE: Replace these with your actual Supabase URL and Key
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        
+        let supabase;
+        try {
+            if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             }
-        };
+        } catch (e) {
+            console.error("Supabase init error:", e);
+        }
 
-        const loadFromStorage = (key, defaultValue) => {
-            try {
-                const stored = localStorage.getItem(key);
-                if (stored) {
-                    const parsed = JSON.parse(stored);
-                    console.log(`📦 Chargé depuis localStorage: ${key}`, parsed.length || Object.keys(parsed).length, 'éléments');
-                    return parsed;
-                }
-            } catch (e) {
-                console.error(`❌ Erreur chargement ${key}:`, e);
-            }
-            console.log(`📝 Utilisation valeurs par défaut: ${key}`);
-            return defaultValue;
-        };
+        // Simuler le chargement si pas de Supabase (pour demo/fallback)
+        const useSupabase = SUPABASE_URL !== 'YOUR_SUPABASE_URL';
 
-        // Données initiales par défaut (hardcodées)
-        const defaultEmployees = [
-            { id: 1, name: 'Caroline', role: 'Conseillère en gestion de patrimoine', startDate: '2025-01-06', endDate: '2025-01-31', template: 'patrimoine', avatarUrl: '/images/caroline_avatar.jpg' },
-            { id: 2, name: 'Alexandre', role: 'Analyste financier', startDate: '2025-02-03', endDate: '2025-02-28', template: 'analyste', avatarUrl: '' },
-            { id: 3, name: 'Sophie', role: 'Adjointe administrative', startDate: '2025-01-20', endDate: '2025-02-14', template: 'admin', avatarUrl: '' }
-        ];
-
-        const defaultResources = [
-            { id: 1, name: 'Jean-Sébastien', role: 'Planification financière', color: '#EF4444', order: 0 },
-            { id: 2, name: 'Jonathan', role: 'Coordination', color: '#F59E0B', order: 1 },
-            { id: 3, name: 'Anne-Marie', role: 'Administration', color: '#8B5CF6', order: 2 },
-            { id: 4, name: 'Marie-Hélène', role: 'Coaching', color: '#EC4899', order: 3 },
-            { id: 5, name: 'Hugo', role: 'Clientèle', color: '#06B6D4', order: 4 },
-            { id: 6, name: 'Linda', role: 'Support technique', color: '#10B981', order: 5 },
-            { id: 7, name: 'Équipe', role: 'Mentorat', color: '#6366F1', order: 6 }
-        ];
-
-        const defaultPhases = [
-            { id: 1, name: 'Phase 1 : Arrivée et Orientation', startOffset: 0, duration: 5, description: 'Prise de connaissance et administratif', color: '#3B82F6', order: 0 },
-            { id: 2, name: 'Phase 2 : Semaine Intensive', startOffset: 0, duration: 5, description: 'Rencontres et immersion', color: '#8B5CF6', order: 1 },
-            { id: 3, name: 'Phase 3 : Consolidation et Pratique', startOffset: 7, duration: 10, description: 'Dossiers et terrain', color: '#06B6D4', order: 2 },
-            { id: 4, name: 'Phase 4 : Autonomisation', startOffset: 21, duration: 5, description: 'Autonomie complète', color: '#10B981', order: 3 }
-        ];
-
-        const defaultTaskTemplates = [
-            // Phase 1 : Outils et Environnement
-            { id: 101, phaseId: 1, title: 'Valider adresse email', description: 'Confirmation adresse inchangée', assignedTo: [2, 6], priority: 'high', category: 'technique', dayOffset: 0 },
-            { id: 102, phaseId: 1, title: 'Accès systèmes et portable', description: 'Prévoir délais obtention', assignedTo: [6], priority: 'high', category: 'technique', dayOffset: 0 },
-            { id: 103, phaseId: 1, title: 'Formation outils essentiels', description: 'Teams, Serveur, Synchro (Avec Anne-Marie/Linda)', assignedTo: [3, 6], priority: 'high', category: 'formation', dayOffset: 1 },
-            
-            // Phase 1 : Administratif (Anne-Marie)
-            { id: 104, phaseId: 1, title: 'Rencontre processus admin', description: 'Comprendre processus internes', assignedTo: [3], priority: 'medium', category: 'administratif', dayOffset: 1 },
-            { id: 105, phaseId: 1, title: 'Coaching Super Lundi', description: 'Session planification financière', assignedTo: [3], priority: 'medium', category: 'formation', dayOffset: 2 },
-            { id: 106, phaseId: 1, title: 'Formation ouverture compte', description: 'Processus ouverture et mise à jour', assignedTo: [3], priority: 'medium', category: 'administratif', dayOffset: 2 },
-            
-            // Phase 1 : Planification (MH & JS)
-            { id: 107, phaseId: 1, title: 'Coaching Planification Fin.', description: 'Sessions avec Marie-Hélène', assignedTo: [4], priority: 'high', category: 'formation', dayOffset: 3 },
-            { id: 108, phaseId: 1, title: 'Documents Conformité', description: 'Lecture documents de Jean-Sébastien', assignedTo: [1], priority: 'high', category: 'administratif', dayOffset: 1 },
-            
-            // Phase 1 : Immersion (Jonathan/Hugo)
-            { id: 109, phaseId: 1, title: 'Rencontre clientèle clé', description: 'Validation avec Hugo', assignedTo: [5], priority: 'medium', category: 'pratique', dayOffset: 3 },
-            { id: 110, phaseId: 1, title: 'Briefing conseillers', description: 'Jonathan informe équipe', assignedTo: [2], priority: 'low', category: 'administratif', dayOffset: 0 },
-            
-            // Phase 2 : Semaine Intensive
-            { id: 201, phaseId: 2, title: 'Rencontres intensives', description: 'Tour des intervenants clés', assignedTo: [7], priority: 'high', category: 'formation', dayOffset: 0 },
-            { id: 202, phaseId: 2, title: 'Observation rencontres', description: 'Assister aux RV clients', assignedTo: [5, 7], priority: 'medium', category: 'pratique', dayOffset: 2 },
-            
-            // Phase 3 : Consolidation
-            { id: 301, phaseId: 3, title: 'Premier dossier PF', description: 'Préparation avec Marie-Hélène', assignedTo: [4], priority: 'high', category: 'pratique', dayOffset: 7 },
-            { id: 302, phaseId: 3, title: 'Pratique processus admin', description: 'Supervision par Anne-Marie', assignedTo: [3], priority: 'medium', category: 'pratique', dayOffset: 8 },
-            { id: 303, phaseId: 3, title: 'Entrevues clients', description: 'Réalisation ou assistance', assignedTo: [5], priority: 'medium', category: 'pratique', dayOffset: 9 },
-            
-            // Phase 4 : Autonomisation
-            { id: 401, phaseId: 4, title: 'Bilan intégration', description: 'Maîtrise outils et processus', assignedTo: [1, 2], priority: 'medium', category: 'suivi', dayOffset: 21 },
-            { id: 402, phaseId: 4, title: 'Autonomie dossier PF', description: 'Dossier réalisé seul', assignedTo: [4], priority: 'high', category: 'pratique', dayOffset: 22 },
-            { id: 403, phaseId: 4, title: 'Fin discussions équipe', description: 'Tours de table complétés', assignedTo: [2], priority: 'low', category: 'administratif', dayOffset: 24 }
-        ];
+        // Données initiales par défaut (VIDE pour migration DB)
+        const defaultEmployees = [];
+        const defaultResources = [];
+        const defaultPhases = [];
+        const defaultTaskTemplates = [];
 
         // Catégories disponibles pour les tâches
         const taskCategories = ['administratif', 'technique', 'formation', 'pratique', 'suivi', 'autre'];
@@ -761,13 +692,15 @@
 
         // Composant principal
         const OnboardingPlatform = () => {
-             // États principaux avec persistence
-            const [employees, setEmployees] = useState(() => loadFromStorage(STORAGE_KEYS.employees, defaultEmployees));
-            const [selectedEmployeeId, setSelectedEmployeeId] = useState(employees[0]?.id || 1);
-            const [resources, setResources] = useState(() => loadFromStorage(STORAGE_KEYS.resources, defaultResources));
-            const [phaseTemplates, setPhaseTemplates] = useState(() => loadFromStorage(STORAGE_KEYS.phases, defaultPhases));
-            const [taskTemplates, setTaskTemplates] = useState(() => loadFromStorage(STORAGE_KEYS.taskTemplates, defaultTaskTemplates));
-            const [employeeTasks, setEmployeeTasks] = useState(() => loadFromStorage(STORAGE_KEYS.employeeTasks, {}));
+             // États principaux
+            const [employees, setEmployees] = useState(defaultEmployees);
+            const [selectedEmployeeId, setSelectedEmployeeId] = useState(1);
+            const [resources, setResources] = useState(defaultResources);
+            const [phaseTemplates, setPhaseTemplates] = useState(defaultPhases);
+            const [taskTemplates, setTaskTemplates] = useState(defaultTaskTemplates);
+            const [employeeTasks, setEmployeeTasks] = useState({});
+            
+            const [isLoading, setIsLoading] = useState(false);
             const [showAdmin, setShowAdmin] = useState(false);
             const [isAuthenticated, setIsAuthenticated] = useState(false);
             const [viewMode, setViewMode] = useState('list');
@@ -780,33 +713,46 @@
                 setTimeout(() => setSaveIndicator({ visible: false, message: '' }), 2000);
             };
 
-            // Auto-save vers localStorage à chaque modification avec indicateur visuel
-            useEffect(() => { 
-                saveToStorage(STORAGE_KEYS.employees, employees); 
-                if (employees.length) triggerSaveIndicator('Employés sauvegardés'); 
-            }, [employees]);
-            
-            useEffect(() => { 
-                saveToStorage(STORAGE_KEYS.resources, resources); 
-                if (resources.length) triggerSaveIndicator('Ressources sauvegardées');
-            }, [resources]);
-            
-            useEffect(() => { 
-                saveToStorage(STORAGE_KEYS.phases, phaseTemplates); 
-                if (phaseTemplates.length) triggerSaveIndicator('Phases sauvegardées');
-            }, [phaseTemplates]);
-            
-            useEffect(() => { 
-                saveToStorage(STORAGE_KEYS.taskTemplates, taskTemplates); 
-                if (taskTemplates.length) triggerSaveIndicator('Tâches sauvegardées');
-            }, [taskTemplates]);
-            
-            useEffect(() => { 
-                if (Object.keys(employeeTasks).length > 0) {
-                    saveToStorage(STORAGE_KEYS.employeeTasks, employeeTasks);
-                    triggerSaveIndicator('Progression sauvegardée');
-                }
-            }, [employeeTasks]);
+            // Chargement initial des données
+            useEffect(() => {
+                const fetchData = async () => {
+                    if (!useSupabase || !supabase) return;
+                    
+                    setIsLoading(true);
+                    try {
+                        const { data: empData } = await supabase.from('employees').select('*');
+                        if (empData) setEmployees(empData);
+
+                        const { data: resData } = await supabase.from('resources').select('*').order('display_order');
+                        if (resData) setResources(resData);
+
+                        const { data: phaseData } = await supabase.from('phases').select('*').order('display_order');
+                        if (phaseData) setPhaseTemplates(phaseData);
+
+                        const { data: taskData } = await supabase.from('task_templates').select('*');
+                        if (taskData) setTaskTemplates(taskData);
+
+                        const { data: empTaskData } = await supabase.from('employee_tasks').select('*');
+                        if (empTaskData) {
+                            // Convertir format plat (DB) vers format nested pour l'app
+                            const tasksMap = {};
+                            empTaskData.forEach(et => {
+                                if (!tasksMap[et.employee_id]) tasksMap[et.employee_id] = {};
+                                tasksMap[et.employee_id][et.task_template_id] = et.status;
+                            });
+                            setEmployeeTasks(tasksMap);
+                        }
+                    } catch (error) {
+                        console.error("Erreur chargement Supabase:", error);
+                    } finally {
+                        setIsLoading(false);
+                    }
+                };
+
+                fetchData();
+            }, []);
+
+            // NOTE: Auto-save effects removed in favor of direct DB updates in handler functions
 
             const selectedEmployee = employees.find(e => e.id === selectedEmployeeId) || employees[0];
 
@@ -817,8 +763,7 @@
                 return phaseTemplates.map(pt => ({
                     ...pt,
                     startDate: new Date(startDate.getTime() + pt.startOffset * 86400000).toISOString().split('T')[0],
-                    endDate: new Date(startDate.getTime() + (pt.startOffset + pt.duration) * 86400000).toISOString().split('T')[0],
-                    expanded: true
+                    endDate: new Date(startDate.getTime() + (pt.startOffset + pt.duration) * 86400000).toISOString().split('T')[0]
                 }));
             }, [selectedEmployee, phaseTemplates]);
 
@@ -876,64 +821,114 @@
                 );
             };
 
-            const toggleTaskStatus = (taskId) => {
-                setTasks(tasks.map(task => {
+            // Fonction utilitaire pour gestion erreurs Supabase
+            const handleSupabaseError = (error, context) => {
+                console.error(`Erreur Supabase (${context}):`, error);
+                showNotification(`Erreur sauvegarde (${context})`, 'error');
+            };
+
+            const toggleTaskStatus = async (taskId) => {
+                // Optimistic Update
+                let newStatus;
+                let originalTaskId;
+                
+                setTasks(prev => prev.map(task => {
                     if (task.id === taskId) {
                         const statuses = ['pending', 'inProgress', 'completed'];
                         const currentIndex = statuses.indexOf(task.status);
-                        const newStatus = statuses[(currentIndex + 1) % statuses.length];
-                        
-                        // Persist status
-                        const originalTaskId = parseInt(taskId.split('-')[1]);
-                        const updatedEmployeeTasks = {
-                            ...employeeTasks,
-                            [selectedEmployee.id]: {
-                                ...employeeTasks[selectedEmployee.id],
-                                [originalTaskId]: newStatus
-                            }
-                        };
-                        setEmployeeTasks(updatedEmployeeTasks);
-                        saveToStorage(STORAGE_KEYS.employeeTasks, updatedEmployeeTasks);
-                        
-                        // Show tiny feedback? No, status change is visual enough, but maybe just auto-save feedback
-                        // showNotification('Statut mis à jour', 'success'); // Optional, might be noisy
-                        
+                        newStatus = statuses[(currentIndex + 1) % statuses.length];
+                        originalTaskId = parseInt(taskId.split('-')[1]);
                         return { ...task, status: newStatus };
                     }
                     return task;
                 }));
+
+                // DB Update
+                if (useSupabase && supabase && originalTaskId) {
+                    try {
+                        const { error } = await supabase
+                            .from('employee_tasks')
+                            .upsert({ 
+                                employee_id: selectedEmployee.id, 
+                                task_template_id: originalTaskId, 
+                                status: newStatus,
+                                updated_at: new Date()
+                            }, { onConflict: 'employee_id, task_template_id' });
+                            
+                        if (error) throw error;
+                        
+                        // Update local map
+                        setEmployeeTasks(prev => ({
+                            ...prev,
+                            [selectedEmployee.id]: {
+                                ...prev[selectedEmployee.id],
+                                [originalTaskId]: newStatus
+                            }
+                        }));
+                    } catch (e) {
+                        handleSupabaseError(e, 'Status Update');
+                        // Revert optimistic update? (Simplified: warn user)
+                    }
+                }
             };
 
-            // Task CRUD functions with Persistence and Notification
-            const updateTask = (taskId, field, value) => {
-                // Update local view first for optimisic UI
-                setTasks(tasks.map(t => t.id === taskId ? { ...t, [field]: value } : t));
+            // Task CRUD functions with Supabase
+            const updateTask = async (taskId, field, value) => {
+                // Optimistic UI
+                setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: value } : t));
 
-                // Update Source (TaskTemplates)
                 const originalTaskId = parseInt(taskId.split('-')[1]);
                 const updatedTemplates = taskTemplates.map(t => t.id === originalTaskId ? { ...t, [field]: value } : t);
                 setTaskTemplates(updatedTemplates);
-                saveToStorage(STORAGE_KEYS.taskTemplates, updatedTemplates);
-                
-                showNotification('Modification sauvegardée !', 'success');
+
+                if (useSupabase && supabase) {
+                    try {
+                        // Special handling for JSON fields if needed, but Supabase handles standard types well
+                        const { error } = await supabase
+                            .from('task_templates')
+                            .update({ [field]: value })
+                            .eq('id', originalTaskId);
+                            
+                        if (error) throw error;
+                        showNotification('Modification sauvegardée !', 'success');
+                    } catch (e) {
+                         handleSupabaseError(e, 'Update Task');
+                    }
+                }
             };
 
-            const deleteTask = (taskId) => {
+            const deleteTask = async (taskId) => {
                 const originalTaskId = parseInt(taskId.split('-')[1]);
+                
+                // Optimistic
                 const updatedTemplates = taskTemplates.filter(t => t.id !== originalTaskId);
                 setTaskTemplates(updatedTemplates);
-                saveToStorage(STORAGE_KEYS.taskTemplates, updatedTemplates);
-                showNotification('Tâche supprimée', 'success');
+
+                if (useSupabase && supabase) {
+                    try {
+                        const { error } = await supabase
+                            .from('task_templates')
+                            .delete()
+                            .eq('id', originalTaskId);
+                            
+                        if (error) throw error;
+                        showNotification('Tâche supprimée', 'success');
+                    } catch (e) {
+                        handleSupabaseError(e, 'Delete Task');
+                        // Revert?
+                    }
+                }
             };
 
-            const addTask = (phaseId) => {
+            const addTask = async (phaseId) => {
+                // Generate ID (Temporary for optimistic, will be replaced by DB ID usually, but here we keep simplified logic)
                 const newId = Math.max(...taskTemplates.map(t => t.id), 0) + 1;
                 const newTaskTemplate = {
-                    id: newId,
+                    id: newId, // Note: In real app, let DB assign ID and reload
                     phaseId,
                     title: 'Nouvelle tâche',
                     description: 'Description de la tâche...',
-                    assignedTo: [],
+                    assignedTo: [], // Important: DB expects JSONB, make sure mapping handles this
                     priority: 'medium',
                     category: 'autre',
                     dayOffset: 0
@@ -941,8 +936,36 @@
                 
                 const updatedTemplates = [...taskTemplates, newTaskTemplate];
                 setTaskTemplates(updatedTemplates);
-                saveToStorage(STORAGE_KEYS.taskTemplates, updatedTemplates);
-                showNotification('Nouvelle tâche ajoutée', 'success');
+
+                if (useSupabase && supabase) {
+                   try {
+                        const { data, error } = await supabase
+                            .from('task_templates')
+                            .insert([{
+                                phase_id: phaseId,
+                                title: newTaskTemplate.title,
+                                description: newTaskTemplate.description,
+                                priority: newTaskTemplate.priority,
+                                category: newTaskTemplate.category,
+                                day_offset: 0,
+                                assigned_to: []
+                            }])
+                            .select();
+
+                        if (error) throw error;
+                        
+                        if (data && data[0]) {
+                            // Replace optimistic item with real DB item (mostly for ID)
+                            const realId = data[0].id;
+                            setTaskTemplates(prev => prev.map(t => t.id === newId ? { ...t, id: realId } : t));
+                        }
+                        showNotification('Nouvelle tâche ajoutée', 'success');
+                   } catch (e) {
+                       handleSupabaseError(e, 'Add Task');
+                   }
+                } else {
+                     showNotification('Nouvelle tâche ajoutée (Local)', 'success');
+                }
             };
 
             // Phase collapse and View Mode state
@@ -952,6 +975,7 @@
             const [notification, setNotification] = useState(null);
             const [dragging, setDragging] = useState(false); // State for drag feedback
 
+            // Helper to show notifications
             const showNotification = (message, type = 'success') => {
                 setNotification({ message, type });
             };
