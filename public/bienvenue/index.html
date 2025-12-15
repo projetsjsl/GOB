@@ -917,24 +917,48 @@
                         if (error) console.warn('Fallback V1 table', error);
                         if (empData) {
                              console.log(`✅ ${empData.length} employés récupérés.`);
-                             setEmployees(empData);
+                             // Mapping snake_case -> camelCase
+                             setEmployees(empData.map(e => ({
+                                 ...e,
+                                 avatarUrl: e.avatar_url,
+                                 startDate: e.start_date,
+                             })));
                         }
 
                         const { data: resData } = await supabase.from('resources').select('*').order('display_order');
-                        if (resData) setResources(resData);
+                        if (resData) {
+                            setResources(resData.map(r => ({
+                                ...r,
+                                avatar: r.avatar_initials, // Default data used 'avatar'
+                                displayOrder: r.display_order
+                            })));
+                        }
 
                         const { data: phaseData } = await supabase.from('phases').select('*').order('display_order');
-                        if (phaseData) setPhaseTemplates(phaseData);
+                        if (phaseData) {
+                            setPhaseTemplates(phaseData.map(p => ({
+                                ...p,
+                                startOffset: p.start_offset,
+                                displayOrder: p.display_order
+                            })));
+                        }
 
                         const { data: taskData } = await supabase.from('task_templates').select('*');
-                        if (taskData) setTaskTemplates(taskData);
+                        if (taskData) {
+                            setTaskTemplates(taskData.map(t => ({
+                                ...t,
+                                phaseId: t.phase_id,
+                                dayOffset: t.day_offset,
+                                assignedTo: t.assigned_to || []
+                            })));
+                        }
 
                         const { data: empTaskData } = await supabase.from('employee_tasks').select('*');
                         if (empTaskData) {
                             const tasksMap = {};
                             empTaskData.forEach(et => {
                                 if (!tasksMap[et.employee_id]) tasksMap[et.employee_id] = {};
-                                tasksMap[et.employee_id][et.task_template_id] = et.status;
+                                tasksMap[et.employee_id][et.template_id] = et.status; // DB tracks by template_id
                             });
                             setEmployeeTasks(tasksMap);
                         }
