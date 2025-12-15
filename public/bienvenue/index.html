@@ -133,12 +133,40 @@
         const useSupabase = !!supabase;
 
         // Données initiales par défaut (VIDE pour migration DB)
-        const defaultEmployees = [
-            { id: 1, name: 'Caroline', role: 'Conseillère en gestion de patrimoine', email: 'caroline@gob.com', avatarUrl: '/images/emma-avatar-new.jpg', startDate: '2025-01-15' }
+        const defaultEmployees = [];
+        const defaultResources = [
+            { id: 1, name: 'Jean-Pierre Ouellet', role: 'Directeur', email: 'jpo@gob.com', avatar: 'JP' },
+            { id: 2, name: 'Marc Bolduc', role: 'Directeur', email: 'mb@gob.com', avatar: 'MB' },
+            { id: 3, name: 'Emma', role: 'Responsable RH', email: 'emma@gob.com', avatar: 'EM' },
+            { id: 4, name: 'Support TI', role: 'Support Technique', email: 'ti@gob.com', avatar: 'TI' }
         ];
-        const defaultResources = [];
-        const defaultPhases = [];
-        const defaultTaskTemplates = [];
+
+        const defaultPhases = [
+            { id: 1, name: 'Phase 1 : Logistique & Installation', description: 'Configuration des accès et matériel', duration: 2, startOffset: 0, color: '#3B82F6', order: 1 },
+            { id: 2, name: 'Phase 2 : Formation de base', description: 'Découverte des outils et processus', duration: 5, startOffset: 2, color: '#10B981', order: 2 },
+            { id: 3, name: 'Phase 3 : Immersion terrain', description: 'Observation et premiers dossiers', duration: 10, startOffset: 7, color: '#8B5CF6', order: 3 },
+            { id: 4, name: 'Phase 4 : Autonomie supervisée', description: 'Gestion de dossiers avec validation', duration: 20, startOffset: 17, color: '#F59E0B', order: 4 }
+        ];
+
+        const defaultTaskTemplates = [
+            // Phase 1 - J1
+            { id: 1, phaseId: 1, title: 'Récupération du matériel informatique', description: 'Ordinateur, écran, périphériques', priority: 'high', category: 'matériel', dayOffset: 0, assignedTo: [3] },
+            { id: 2, phaseId: 1, title: 'Configuration des accès courriels', description: 'Outlook, Signature corporative', priority: 'high', category: 'technique', dayOffset: 0, assignedTo: [4] },
+            { id: 3, phaseId: 1, title: 'Visite des locaux', description: 'Présentation des bureaux et commodités', priority: 'low', category: 'social', dayOffset: 0, assignedTo: [3] },
+            
+            // Phase 1 - J2
+            { id: 4, phaseId: 1, title: 'Introduction à l\'équipe', description: 'Rencontre avec les collègues', priority: 'medium', category: 'social', dayOffset: 1, assignedTo: [1, 2] },
+            { id: 5, phaseId: 1, title: 'Configuration CRM', description: 'Accès et formation de base', priority: 'high', category: 'technique', dayOffset: 1, assignedTo: [4] },
+
+            // Phase 2 - Formation
+            { id: 6, phaseId: 2, title: 'Formation Conformité', description: 'Modules obligatoires', priority: 'high', category: 'formation', dayOffset: 2, assignedTo: [3] },
+            { id: 7, phaseId: 2, title: 'Formation Produits', description: 'Vue d\'ensemble de la gamme', priority: 'medium', category: 'formation', dayOffset: 3, assignedTo: [1] },
+            { id: 8, phaseId: 2, title: 'Atelier Outils internes', description: 'Utilisation du dashboard', priority: 'medium', category: 'technique', dayOffset: 4, assignedTo: [4] },
+
+            // Phase 3 - Immersion
+            { id: 9, phaseId: 3, title: 'Observation RDV Client', description: 'Accompagnement senior', priority: 'high', category: 'pratique', dayOffset: 8, assignedTo: [1] },
+            { id: 10, phaseId: 3, title: 'Premier dossier test', description: 'Simulation complète', priority: 'medium', category: 'pratique', dayOffset: 10, assignedTo: [2] }
+        ];
 
         // Catégories disponibles pour les tâches
         const taskCategories = ['administratif', 'technique', 'formation', 'pratique', 'suivi', 'autre'];
