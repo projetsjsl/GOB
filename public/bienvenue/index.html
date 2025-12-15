@@ -50,32 +50,68 @@
             Edit: () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>),
         };
 
-        // Données initiales par défaut
+        // ============================================
+        // LOCALSTORAGE PERSISTENCE FUNCTIONS
+        // ============================================
+        const STORAGE_KEYS = {
+            employees: 'rh-platform-employees',
+            resources: 'rh-platform-resources',
+            phases: 'rh-platform-phases',
+            taskTemplates: 'rh-platform-taskTemplates',
+            employeeTasks: 'rh-platform-employeeTasks' // Progression par employé
+        };
+
+        const saveToStorage = (key, data) => {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+                console.log(`✅ Sauvegardé: ${key}`, data.length || Object.keys(data).length, 'éléments');
+                return true;
+            } catch (e) {
+                console.error(`❌ Erreur sauvegarde ${key}:`, e);
+                return false;
+            }
+        };
+
+        const loadFromStorage = (key, defaultValue) => {
+            try {
+                const stored = localStorage.getItem(key);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    console.log(`📦 Chargé depuis localStorage: ${key}`, parsed.length || Object.keys(parsed).length, 'éléments');
+                    return parsed;
+                }
+            } catch (e) {
+                console.error(`❌ Erreur chargement ${key}:`, e);
+            }
+            console.log(`📝 Utilisation valeurs par défaut: ${key}`);
+            return defaultValue;
+        };
+
+        // Données initiales par défaut (hardcodées)
         const defaultEmployees = [
-            { id: 1, name: 'Caroline', role: 'Conseillère en gestion de patrimoine', startDate: '2025-01-06', endDate: '2025-01-31' },
-            { id: 2, name: 'Alexandre', role: 'Analyste financier', startDate: '2025-02-03', endDate: '2025-02-28' },
-            { id: 3, name: 'Sophie', role: 'Adjointe administrative', startDate: '2025-01-20', endDate: '2025-02-14' }
+            { id: 1, name: 'Caroline', role: 'Conseillère en gestion de patrimoine', startDate: '2025-01-06', endDate: '2025-01-31', template: 'patrimoine' },
+            { id: 2, name: 'Alexandre', role: 'Analyste financier', startDate: '2025-02-03', endDate: '2025-02-28', template: 'analyste' },
+            { id: 3, name: 'Sophie', role: 'Adjointe administrative', startDate: '2025-01-20', endDate: '2025-02-14', template: 'admin' }
         ];
 
         const defaultResources = [
-            { id: 1, name: 'Jean-Sébastien', role: 'Planification financière', color: '#EF4444' },
-            { id: 2, name: 'Jonathan', role: 'Coordination', color: '#F59E0B' },
-            { id: 3, name: 'Anne-Marie', role: 'Administration', color: '#8B5CF6' },
-            { id: 4, name: 'Marie-Hélène', role: 'Coaching', color: '#EC4899' },
-            { id: 5, name: 'Hugo', role: 'Clientèle', color: '#06B6D4' },
-            { id: 6, name: 'Linda', role: 'Support technique', color: '#10B981' },
-            { id: 7, name: 'Équipe', role: 'Mentorat', color: '#6366F1' }
+            { id: 1, name: 'Jean-Sébastien', role: 'Planification financière', color: '#EF4444', order: 0 },
+            { id: 2, name: 'Jonathan', role: 'Coordination', color: '#F59E0B', order: 1 },
+            { id: 3, name: 'Anne-Marie', role: 'Administration', color: '#8B5CF6', order: 2 },
+            { id: 4, name: 'Marie-Hélène', role: 'Coaching', color: '#EC4899', order: 3 },
+            { id: 5, name: 'Hugo', role: 'Clientèle', color: '#06B6D4', order: 4 },
+            { id: 6, name: 'Linda', role: 'Support technique', color: '#10B981', order: 5 },
+            { id: 7, name: 'Équipe', role: 'Mentorat', color: '#6366F1', order: 6 }
         ];
 
         const defaultPhases = [
-            { id: 1, name: 'Phase 1 : Orientation', startOffset: 0, duration: 5, description: 'Prise de connaissance des outils', color: '#3B82F6' },
-            { id: 2, name: 'Phase 2 : Formation', startOffset: 0, duration: 5, description: 'Sessions intensives', color: '#8B5CF6' },
-            { id: 3, name: 'Phase 3 : Pratique', startOffset: 7, duration: 12, description: 'Application des acquis', color: '#06B6D4' },
-            { id: 4, name: 'Phase 4 : Autonomie', startOffset: 21, duration: 5, description: 'Finalisation', color: '#10B981' }
+            { id: 1, name: 'Phase 1 : Orientation', startOffset: 0, duration: 5, description: 'Prise de connaissance des outils', color: '#3B82F6', order: 0 },
+            { id: 2, name: 'Phase 2 : Formation', startOffset: 0, duration: 5, description: 'Sessions intensives', color: '#8B5CF6', order: 1 },
+            { id: 3, name: 'Phase 3 : Pratique', startOffset: 7, duration: 12, description: 'Application des acquis', color: '#06B6D4', order: 2 },
+            { id: 4, name: 'Phase 4 : Autonomie', startOffset: 21, duration: 5, description: 'Finalisation', color: '#10B981', order: 3 }
         ];
 
-        // Utiliser les données du plan Caroline si disponibles
-        const defaultTaskTemplates = window.carolinePlan?.taskTemplates || [
+        const defaultTaskTemplates = [
             { id: 1, phaseId: 1, title: 'Confirmation accès email', description: 'Valider les accès email', assignedTo: [2], priority: 'high', category: 'administratif', dayOffset: 0 },
             { id: 2, phaseId: 1, title: 'Prévoir accès systèmes', description: 'Coordonner avec IT', assignedTo: [3], priority: 'high', category: 'technique', dayOffset: 0 },
             { id: 3, phaseId: 1, title: 'Formation outils collaboratifs', description: 'Teams et serveur', assignedTo: [3, 6], priority: 'medium', category: 'formation', dayOffset: 1 },
@@ -83,6 +119,17 @@
             { id: 5, phaseId: 3, title: 'Début des activités', description: 'Commencer tâches principales', assignedTo: [7], priority: 'high', category: 'pratique', dayOffset: 11 },
             { id: 6, phaseId: 4, title: 'Bilan intégration', description: 'Évaluation finale', assignedTo: [2], priority: 'high', category: 'suivi', dayOffset: 25 }
         ];
+
+        // Catégories disponibles pour les tâches
+        const taskCategories = ['administratif', 'technique', 'formation', 'pratique', 'suivi', 'autre'];
+
+        // Templates de rôle prédéfinis
+        const roleTemplates = {
+            'patrimoine': { name: 'Conseiller en gestion de patrimoine', phases: [1, 2, 3, 4] },
+            'analyste': { name: 'Analyste financier', phases: [1, 2, 3, 4] },
+            'admin': { name: 'Adjointe administrative', phases: [1, 2, 3] },
+            'custom': { name: 'Personnalisé', phases: [1, 2, 3, 4] }
+        };
 
         // Chatbot Emma RH
         const EmmaChatbot = ({ employee, tasks, phases, resources }) => {
@@ -212,164 +259,283 @@
             );
         };
 
-        // Composant Admin
+        // Composant Admin Amélioré
         const AdminPanel = ({ resources, setResources, taskTemplates, setTaskTemplates, phaseTemplates, setPhaseTemplates, employees, setEmployees, onClose }) => {
             const [activeTab, setActiveTab] = useState('employees');
+            const [editingItem, setEditingItem] = useState(null);
             const [newResource, setNewResource] = useState({ name: '', role: '', color: '#3B82F6' });
-            const [newEmployee, setNewEmployee] = useState({ name: '', role: '', startDate: '', endDate: '' });
-            const [newTask, setNewTask] = useState({ title: '', description: '', phaseId: 1, assignedTo: [], priority: 'medium', category: '', dayOffset: 0 });
+            const [newEmployee, setNewEmployee] = useState({ name: '', role: '', startDate: '', endDate: '', template: 'custom' });
+            const [newTask, setNewTask] = useState({ title: '', description: '', phaseId: 1, assignedTo: [], priority: 'medium', category: 'administratif', dayOffset: 0 });
+            const [newPhase, setNewPhase] = useState({ name: '', description: '', color: '#3B82F6', startOffset: 0, duration: 5 });
+            const [showImportModal, setShowImportModal] = useState(false);
+            const [toast, setToast] = useState('');
 
-            const addResource = () => {
-                if (!newResource.name) return;
-                setResources([...resources, { ...newResource, id: Date.now() }]);
-                setNewResource({ name: '', role: '', color: '#3B82F6' });
-            };
+            const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2000); };
 
+            // CRUD Employés
             const addEmployee = () => {
                 if (!newEmployee.name || !newEmployee.startDate) return;
-                setEmployees([...employees, { ...newEmployee, id: Date.now() }]);
-                setNewEmployee({ name: '', role: '', startDate: '', endDate: '' });
+                const endDate = newEmployee.endDate || new Date(new Date(newEmployee.startDate).getTime() + 30*24*60*60*1000).toISOString().split('T')[0];
+                setEmployees([...employees, { ...newEmployee, endDate, id: Date.now() }]);
+                setNewEmployee({ name: '', role: '', startDate: '', endDate: '', template: 'custom' });
+                showToast('✅ Employé ajouté');
+            };
+            const updateEmployee = (id, field, value) => {
+                setEmployees(employees.map(e => e.id === id ? { ...e, [field]: value } : e));
+            };
+            const deleteEmployee = (id) => { if (confirm('Supprimer cet employé?')) { setEmployees(employees.filter(e => e.id !== id)); showToast('🗑️ Employé supprimé'); } };
+            const duplicateEmployee = (emp) => {
+                const newEmp = { ...emp, id: Date.now(), name: emp.name + ' (copie)', startDate: new Date().toISOString().split('T')[0], endDate: '' };
+                setEmployees([...employees, newEmp]);
+                showToast('📋 Employé dupliqué');
             };
 
+            // CRUD Resources
+            const addResource = () => {
+                if (!newResource.name) return;
+                setResources([...resources, { ...newResource, id: Date.now(), order: resources.length }]);
+                setNewResource({ name: '', role: '', color: '#3B82F6' });
+                showToast('✅ Responsable ajouté');
+            };
+            const updateResource = (id, field, value) => {
+                setResources(resources.map(r => r.id === id ? { ...r, [field]: value } : r));
+            };
+            const deleteResource = (id) => { if (confirm('Supprimer ce responsable?')) { setResources(resources.filter(r => r.id !== id)); showToast('🗑️ Responsable supprimé'); } };
+
+            // CRUD Tasks
             const addTaskTemplate = () => {
                 if (!newTask.title) return;
                 setTaskTemplates([...taskTemplates, { ...newTask, id: Date.now() }]);
-                setNewTask({ title: '', description: '', phaseId: 1, assignedTo: [], priority: 'medium', category: '', dayOffset: 0 });
+                setNewTask({ title: '', description: '', phaseId: 1, assignedTo: [], priority: 'medium', category: 'administratif', dayOffset: 0 });
+                showToast('✅ Tâche ajoutée');
+            };
+            const updateTask = (id, field, value) => {
+                setTaskTemplates(taskTemplates.map(t => t.id === id ? { ...t, [field]: value } : t));
+            };
+            const deleteTask = (id) => { if (confirm('Supprimer cette tâche?')) { setTaskTemplates(taskTemplates.filter(t => t.id !== id)); showToast('🗑️ Tâche supprimée'); } };
+
+            // CRUD Phases
+            const addPhase = () => {
+                if (!newPhase.name) return;
+                setPhaseTemplates([...phaseTemplates, { ...newPhase, id: Date.now(), order: phaseTemplates.length }]);
+                setNewPhase({ name: '', description: '', color: '#3B82F6', startOffset: 0, duration: 5 });
+                showToast('✅ Phase ajoutée');
+            };
+            const updatePhase = (id, field, value) => {
+                setPhaseTemplates(phaseTemplates.map(p => p.id === id ? { ...p, [field]: value } : p));
+            };
+            const deletePhase = (id) => {
+                const linkedTasks = taskTemplates.filter(t => t.phaseId === id);
+                if (linkedTasks.length > 0 && !confirm(`${linkedTasks.length} tâches sont liées à cette phase. Supprimer quand même?`)) return;
+                setPhaseTemplates(phaseTemplates.filter(p => p.id !== id));
+                showToast('🗑️ Phase supprimée');
+            };
+
+            // Import/Export
+            const exportConfig = () => {
+                const config = { employees, resources, phaseTemplates, taskTemplates, exportedAt: new Date().toISOString() };
+                const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = 'rh-config-' + new Date().toISOString().split('T')[0] + '.json'; a.click();
+                showToast('📥 Configuration exportée');
+            };
+            const importConfig = (e) => {
+                const file = e.target.files[0]; if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const config = JSON.parse(event.target.result);
+                        if (config.employees) setEmployees(config.employees);
+                        if (config.resources) setResources(config.resources);
+                        if (config.phaseTemplates) setPhaseTemplates(config.phaseTemplates);
+                        if (config.taskTemplates) setTaskTemplates(config.taskTemplates);
+                        showToast('📤 Configuration importée');
+                        setShowImportModal(false);
+                    } catch (err) { alert('Erreur: fichier invalide'); }
+                };
+                reader.readAsText(file);
+            };
+
+            const toggleAssigned = (taskId, resourceId) => {
+                const task = taskTemplates.find(t => t.id === taskId);
+                const newAssigned = task.assignedTo.includes(resourceId) 
+                    ? task.assignedTo.filter(id => id !== resourceId) 
+                    : [...task.assignedTo, resourceId];
+                updateTask(taskId, 'assignedTo', newAssigned);
             };
 
             return (
                 <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+                    {toast && <div className="fixed top-4 right-4 bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg z-50">{toast}</div>}
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
                         {/* Header */}
                         <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 flex justify-between items-center">
                             <div className="flex items-center gap-3">
                                 <Icons.Settings />
                                 <h2 className="text-xl font-bold">Administration</h2>
                             </div>
-                            <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg"><Icons.X /></button>
+                            <div className="flex items-center gap-2">
+                                <button onClick={exportConfig} className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-sm flex items-center gap-1"><Icons.Download /> Exporter</button>
+                                <button onClick={() => setShowImportModal(true)} className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-sm flex items-center gap-1"><Icons.Upload /> Importer</button>
+                                <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg"><Icons.X /></button>
+                            </div>
                         </div>
 
+                        {/* Import Modal */}
+                        {showImportModal && (
+                            <div className="absolute inset-0 bg-black/50 z-50 flex items-center justify-center">
+                                <div className="bg-white rounded-xl p-6 max-w-md">
+                                    <h3 className="text-lg font-bold mb-4">Importer une configuration</h3>
+                                    <input type="file" accept=".json" onChange={importConfig} className="mb-4" />
+                                    <button onClick={() => setShowImportModal(false)} className="px-4 py-2 bg-gray-200 rounded-lg">Annuler</button>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Tabs */}
-                        <div className="flex border-b bg-gray-50">
+                        <div className="flex border-b bg-gray-50 overflow-x-auto">
                             {[
-                                { id: 'employees', label: '👥 Employés' },
-                                { id: 'resources', label: '👤 Responsables' },
-                                { id: 'tasks', label: '📋 Modèles de tâches' },
-                                { id: 'phases', label: '📅 Phases' }
+                                { id: 'employees', label: '👥 Employés', count: employees.length },
+                                { id: 'resources', label: '👤 Responsables', count: resources.length },
+                                { id: 'tasks', label: '📋 Tâches', count: taskTemplates.length },
+                                { id: 'phases', label: '📅 Phases', count: phaseTemplates.length }
                             ].map(tab => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`px-6 py-3 font-medium transition-colors ${activeTab === tab.id ? 'bg-white border-b-2 border-purple-600 text-purple-600' : 'text-gray-600 hover:bg-gray-100'}`}
-                                >
-                                    {tab.label}
+                                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                                    className={`px-4 py-3 font-medium transition-colors whitespace-nowrap ${activeTab === tab.id ? 'bg-white border-b-2 border-purple-600 text-purple-600' : 'text-gray-600 hover:bg-gray-100'}`}>
+                                    {tab.label} <span className="ml-1 text-xs bg-gray-200 px-2 py-0.5 rounded-full">{tab.count}</span>
                                 </button>
                             ))}
                         </div>
 
                         {/* Content */}
                         <div className="flex-1 overflow-y-auto p-6">
+                            {/* EMPLOYÉS */}
                             {activeTab === 'employees' && (
                                 <div className="space-y-4">
-                                    <h3 className="font-bold text-lg mb-4">Gestion des employés</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 p-4 bg-gray-50 rounded-lg">
+                                    <div className="grid grid-cols-1 md:grid-cols-5 gap-2 p-4 bg-gray-50 rounded-lg">
                                         <input type="text" placeholder="Nom" value={newEmployee.name} onChange={e => setNewEmployee({...newEmployee, name: e.target.value})} className="px-3 py-2 border rounded-lg" />
                                         <input type="text" placeholder="Poste" value={newEmployee.role} onChange={e => setNewEmployee({...newEmployee, role: e.target.value})} className="px-3 py-2 border rounded-lg" />
                                         <input type="date" value={newEmployee.startDate} onChange={e => setNewEmployee({...newEmployee, startDate: e.target.value})} className="px-3 py-2 border rounded-lg" />
-                                        <button onClick={addEmployee} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-2">
-                                            <Icons.Plus /> Ajouter
-                                        </button>
+                                        <input type="date" value={newEmployee.endDate} onChange={e => setNewEmployee({...newEmployee, endDate: e.target.value})} className="px-3 py-2 border rounded-lg" placeholder="Fin (auto 30j)" />
+                                        <button onClick={addEmployee} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-1"><Icons.Plus /> Ajouter</button>
                                     </div>
                                     <div className="space-y-2">
                                         {employees.map(emp => (
-                                            <div key={emp.id} className="flex items-center justify-between p-3 bg-white border rounded-lg">
-                                                <div>
-                                                    <span className="font-semibold">{emp.name}</span>
-                                                    <span className="text-gray-500 ml-2">- {emp.role}</span>
-                                                    <span className="text-sm text-gray-400 ml-2">({emp.startDate})</span>
-                                                </div>
-                                                <button onClick={() => setEmployees(employees.filter(e => e.id !== emp.id))} className="text-red-500 hover:bg-red-50 p-2 rounded">
-                                                    <Icons.Trash />
-                                                </button>
+                                            <div key={emp.id} className="flex items-center gap-2 p-3 bg-white border rounded-lg hover:shadow-md transition-shadow">
+                                                <input type="text" value={emp.name} onChange={e => updateEmployee(emp.id, 'name', e.target.value)} className="font-semibold bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1" />
+                                                <input type="text" value={emp.role} onChange={e => updateEmployee(emp.id, 'role', e.target.value)} className="text-gray-600 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1" />
+                                                <input type="date" value={emp.startDate} onChange={e => updateEmployee(emp.id, 'startDate', e.target.value)} className="text-sm bg-transparent border rounded px-2 py-1" />
+                                                <input type="date" value={emp.endDate || ''} onChange={e => updateEmployee(emp.id, 'endDate', e.target.value)} className="text-sm bg-transparent border rounded px-2 py-1" />
+                                                <button onClick={() => duplicateEmployee(emp)} className="text-blue-500 hover:bg-blue-50 p-2 rounded" title="Dupliquer"><Icons.UserPlus /></button>
+                                                <button onClick={() => deleteEmployee(emp.id)} className="text-red-500 hover:bg-red-50 p-2 rounded" title="Supprimer"><Icons.Trash /></button>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
                             )}
 
+                            {/* RESPONSABLES */}
                             {activeTab === 'resources' && (
                                 <div className="space-y-4">
-                                    <h3 className="font-bold text-lg mb-4">Gestion des responsables</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 p-4 bg-gray-50 rounded-lg">
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-2 p-4 bg-gray-50 rounded-lg">
                                         <input type="text" placeholder="Nom" value={newResource.name} onChange={e => setNewResource({...newResource, name: e.target.value})} className="px-3 py-2 border rounded-lg" />
                                         <input type="text" placeholder="Rôle" value={newResource.role} onChange={e => setNewResource({...newResource, role: e.target.value})} className="px-3 py-2 border rounded-lg" />
-                                        <input type="color" value={newResource.color} onChange={e => setNewResource({...newResource, color: e.target.value})} className="w-full h-10 rounded-lg cursor-pointer" />
-                                        <button onClick={addResource} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-2">
-                                            <Icons.Plus /> Ajouter
-                                        </button>
+                                        <div className="flex items-center gap-2"><input type="color" value={newResource.color} onChange={e => setNewResource({...newResource, color: e.target.value})} className="w-10 h-10 rounded cursor-pointer" /><span className="text-sm text-gray-500">Couleur</span></div>
+                                        <button onClick={addResource} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-1"><Icons.Plus /> Ajouter</button>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                         {resources.map(res => (
-                                            <div key={res.id} className="flex items-center justify-between p-3 bg-white border rounded-lg">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: res.color }}></div>
-                                                    <span className="font-semibold">{res.name}</span>
-                                                    <span className="text-gray-500">({res.role})</span>
-                                                </div>
-                                                <button onClick={() => setResources(resources.filter(r => r.id !== res.id))} className="text-red-500 hover:bg-red-50 p-2 rounded">
-                                                    <Icons.Trash />
-                                                </button>
+                                            <div key={res.id} className="flex items-center gap-2 p-3 bg-white border rounded-lg" style={{ borderLeftWidth: '4px', borderLeftColor: res.color }}>
+                                                <input type="color" value={res.color} onChange={e => updateResource(res.id, 'color', e.target.value)} className="w-8 h-8 rounded cursor-pointer" />
+                                                <input type="text" value={res.name} onChange={e => updateResource(res.id, 'name', e.target.value)} className="font-semibold bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1" />
+                                                <input type="text" value={res.role} onChange={e => updateResource(res.id, 'role', e.target.value)} className="text-gray-600 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1" />
+                                                <button onClick={() => deleteResource(res.id)} className="text-red-500 hover:bg-red-50 p-2 rounded"><Icons.Trash /></button>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
                             )}
 
+                            {/* TÂCHES */}
                             {activeTab === 'tasks' && (
                                 <div className="space-y-4">
-                                    <h3 className="font-bold text-lg mb-4">Modèles de tâches</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-lg">
-                                        <input type="text" placeholder="Titre" value={newTask.title} onChange={e => setNewTask({...newTask, title: e.target.value})} className="px-3 py-2 border rounded-lg" />
-                                        <input type="text" placeholder="Description" value={newTask.description} onChange={e => setNewTask({...newTask, description: e.target.value})} className="px-3 py-2 border rounded-lg" />
-                                        <select value={newTask.priority} onChange={e => setNewTask({...newTask, priority: e.target.value})} className="px-3 py-2 border rounded-lg">
-                                            <option value="low">Basse</option>
-                                            <option value="medium">Moyenne</option>
-                                            <option value="high">Haute</option>
-                                        </select>
+                                    <div className="p-4 bg-gray-50 rounded-lg space-y-3">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                            <input type="text" placeholder="Titre de la tâche" value={newTask.title} onChange={e => setNewTask({...newTask, title: e.target.value})} className="px-3 py-2 border rounded-lg" />
+                                            <input type="text" placeholder="Description" value={newTask.description} onChange={e => setNewTask({...newTask, description: e.target.value})} className="px-3 py-2 border rounded-lg" />
+                                            <select value={newTask.phaseId} onChange={e => setNewTask({...newTask, phaseId: parseInt(e.target.value)})} className="px-3 py-2 border rounded-lg">
+                                                {phaseTemplates.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                            </select>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+                                            <select value={newTask.priority} onChange={e => setNewTask({...newTask, priority: e.target.value})} className="px-3 py-2 border rounded-lg">
+                                                <option value="low">Basse</option><option value="medium">Moyenne</option><option value="high">Haute</option>
+                                            </select>
+                                            <select value={newTask.category} onChange={e => setNewTask({...newTask, category: e.target.value})} className="px-3 py-2 border rounded-lg">
+                                                {taskCategories.map(c => <option key={c} value={c}>{c}</option>)}
+                                            </select>
+                                            <input type="number" placeholder="Jour offset" value={newTask.dayOffset} onChange={e => setNewTask({...newTask, dayOffset: parseInt(e.target.value) || 0})} className="px-3 py-2 border rounded-lg" min="0" />
+                                            <button onClick={addTaskTemplate} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-1"><Icons.Plus /> Ajouter</button>
+                                        </div>
                                     </div>
-                                    <button onClick={addTaskTemplate} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2">
-                                        <Icons.Plus /> Ajouter modèle
-                                    </button>
-                                    <div className="space-y-2">
-                                        {taskTemplates.map(task => (
-                                            <div key={task.id} className="flex items-center justify-between p-3 bg-white border rounded-lg">
-                                                <div>
-                                                    <span className="font-semibold">{task.title}</span>
-                                                    <span className="text-gray-500 ml-2">- {task.description}</span>
-                                                    <span className={`ml-2 px-2 py-1 text-xs rounded ${task.priority === 'high' ? 'bg-orange-100 text-orange-700' : task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100'}`}>
-                                                        {task.priority}
-                                                    </span>
-                                                </div>
-                                                <button onClick={() => setTaskTemplates(taskTemplates.filter(t => t.id !== task.id))} className="text-red-500 hover:bg-red-50 p-2 rounded">
-                                                    <Icons.Trash />
-                                                </button>
+                                    {phaseTemplates.map(phase => (
+                                        <div key={phase.id} className="border rounded-lg overflow-hidden">
+                                            <div className="p-3 font-semibold" style={{ backgroundColor: phase.color + '20', borderLeft: `4px solid ${phase.color}` }}>{phase.name}</div>
+                                            <div className="p-2 space-y-2">
+                                                {taskTemplates.filter(t => t.phaseId === phase.id).map(task => (
+                                                    <div key={task.id} className="flex flex-wrap items-center gap-2 p-2 bg-white border rounded-lg text-sm">
+                                                        <input type="text" value={task.title} onChange={e => updateTask(task.id, 'title', e.target.value)} className="font-medium bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1 min-w-[150px]" />
+                                                        <select value={task.priority} onChange={e => updateTask(task.id, 'priority', e.target.value)} className="px-2 py-1 border rounded text-xs">
+                                                            <option value="low">Basse</option><option value="medium">Moy</option><option value="high">Haute</option>
+                                                        </select>
+                                                        <input type="number" value={task.dayOffset} onChange={e => updateTask(task.id, 'dayOffset', parseInt(e.target.value) || 0)} className="w-16 px-2 py-1 border rounded text-xs" min="0" title="Jour offset" />
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {resources.map(r => (
+                                                                <button key={r.id} onClick={() => toggleAssigned(task.id, r.id)}
+                                                                    className={`px-2 py-0.5 rounded-full text-xs ${task.assignedTo.includes(r.id) ? 'text-white' : 'bg-gray-100'}`}
+                                                                    style={task.assignedTo.includes(r.id) ? { backgroundColor: r.color } : {}}>
+                                                                    {r.name.split(' ')[0]}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                        <button onClick={() => deleteTask(task.id)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Icons.Trash /></button>
+                                                    </div>
+                                                ))}
+                                                {taskTemplates.filter(t => t.phaseId === phase.id).length === 0 && <p className="text-gray-400 text-sm text-center py-2">Aucune tâche</p>}
                                             </div>
-                                        ))}
-                                    </div>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
 
+                            {/* PHASES */}
                             {activeTab === 'phases' && (
                                 <div className="space-y-4">
-                                    <h3 className="font-bold text-lg mb-4">Phases d'intégration</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-6 gap-2 p-4 bg-gray-50 rounded-lg">
+                                        <input type="text" placeholder="Nom de la phase" value={newPhase.name} onChange={e => setNewPhase({...newPhase, name: e.target.value})} className="px-3 py-2 border rounded-lg md:col-span-2" />
+                                        <input type="text" placeholder="Description" value={newPhase.description} onChange={e => setNewPhase({...newPhase, description: e.target.value})} className="px-3 py-2 border rounded-lg" />
+                                        <input type="number" placeholder="Jour début" value={newPhase.startOffset} onChange={e => setNewPhase({...newPhase, startOffset: parseInt(e.target.value) || 0})} className="px-3 py-2 border rounded-lg" min="0" />
+                                        <input type="number" placeholder="Durée (jours)" value={newPhase.duration} onChange={e => setNewPhase({...newPhase, duration: parseInt(e.target.value) || 1})} className="px-3 py-2 border rounded-lg" min="1" />
+                                        <button onClick={addPhase} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-1"><Icons.Plus /> Ajouter</button>
+                                    </div>
                                     <div className="space-y-2">
-                                        {phaseTemplates.map(phase => (
-                                            <div key={phase.id} className="flex items-center justify-between p-3 bg-white border rounded-lg" style={{ borderLeftWidth: '4px', borderLeftColor: phase.color }}>
-                                                <div>
-                                                    <span className="font-semibold">{phase.name}</span>
-                                                    <span className="text-gray-500 ml-2">- {phase.description}</span>
-                                                    <span className="text-sm text-gray-400 ml-2">(Durée: {phase.duration} jours)</span>
+                                        {phaseTemplates.sort((a, b) => (a.order || 0) - (b.order || 0)).map((phase, idx) => (
+                                            <div key={phase.id} className="flex items-center gap-2 p-4 bg-white border rounded-lg" style={{ borderLeftWidth: '4px', borderLeftColor: phase.color }}>
+                                                <span className="text-gray-400 font-mono text-sm w-6">{idx + 1}</span>
+                                                <input type="color" value={phase.color} onChange={e => updatePhase(phase.id, 'color', e.target.value)} className="w-8 h-8 rounded cursor-pointer" />
+                                                <input type="text" value={phase.name} onChange={e => updatePhase(phase.id, 'name', e.target.value)} className="font-semibold bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1" />
+                                                <input type="text" value={phase.description} onChange={e => updatePhase(phase.id, 'description', e.target.value)} className="text-gray-600 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-purple-500 outline-none flex-1" />
+                                                <div className="flex items-center gap-1 text-sm">
+                                                    <span className="text-gray-500">Début:</span>
+                                                    <input type="number" value={phase.startOffset} onChange={e => updatePhase(phase.id, 'startOffset', parseInt(e.target.value) || 0)} className="w-12 px-1 py-0.5 border rounded text-center" min="0" />
                                                 </div>
+                                                <div className="flex items-center gap-1 text-sm">
+                                                    <span className="text-gray-500">Durée:</span>
+                                                    <input type="number" value={phase.duration} onChange={e => updatePhase(phase.id, 'duration', parseInt(e.target.value) || 1)} className="w-12 px-1 py-0.5 border rounded text-center" min="1" />
+                                                    <span className="text-gray-400">j</span>
+                                                </div>
+                                                <span className="text-xs bg-gray-100 px-2 py-1 rounded">{taskTemplates.filter(t => t.phaseId === phase.id).length} tâches</span>
+                                                <button onClick={() => deletePhase(phase.id)} className="text-red-500 hover:bg-red-50 p-2 rounded"><Icons.Trash /></button>
                                             </div>
                                         ))}
                                     </div>
@@ -383,15 +549,25 @@
 
         // Composant principal
         const OnboardingPlatform = () => {
-            const [employees, setEmployees] = useState(defaultEmployees);
+            // Charger depuis localStorage avec fallback vers valeurs par défaut
+            const [employees, setEmployees] = useState(() => loadFromStorage(STORAGE_KEYS.employees, defaultEmployees));
             const [selectedEmployeeId, setSelectedEmployeeId] = useState(1);
-            const [resources, setResources] = useState(defaultResources);
-            const [phaseTemplates, setPhaseTemplates] = useState(defaultPhases);
-            const [taskTemplates, setTaskTemplates] = useState(defaultTaskTemplates);
+            const [resources, setResources] = useState(() => loadFromStorage(STORAGE_KEYS.resources, defaultResources));
+            const [phaseTemplates, setPhaseTemplates] = useState(() => loadFromStorage(STORAGE_KEYS.phases, defaultPhases));
+            const [taskTemplates, setTaskTemplates] = useState(() => loadFromStorage(STORAGE_KEYS.taskTemplates, defaultTaskTemplates));
+            const [employeeTasks, setEmployeeTasks] = useState(() => loadFromStorage(STORAGE_KEYS.employeeTasks, {}));
             const [showAdmin, setShowAdmin] = useState(false);
             const [viewMode, setViewMode] = useState('timeline');
             const [searchTerm, setSearchTerm] = useState('');
             const [filterStatus, setFilterStatus] = useState('all');
+            const [saveIndicator, setSaveIndicator] = useState('');
+
+            // Auto-save vers localStorage à chaque modification
+            useEffect(() => { saveToStorage(STORAGE_KEYS.employees, employees); setSaveIndicator('✓'); setTimeout(() => setSaveIndicator(''), 1500); }, [employees]);
+            useEffect(() => { saveToStorage(STORAGE_KEYS.resources, resources); }, [resources]);
+            useEffect(() => { saveToStorage(STORAGE_KEYS.phases, phaseTemplates); }, [phaseTemplates]);
+            useEffect(() => { saveToStorage(STORAGE_KEYS.taskTemplates, taskTemplates); }, [taskTemplates]);
+            useEffect(() => { if (Object.keys(employeeTasks).length > 0) saveToStorage(STORAGE_KEYS.employeeTasks, employeeTasks); }, [employeeTasks]);
 
             const selectedEmployee = employees.find(e => e.id === selectedEmployeeId) || employees[0];
 
@@ -412,14 +588,19 @@
             useEffect(() => {
                 if (!selectedEmployee) return;
                 const startDate = new Date(selectedEmployee.startDate);
-                const generatedTasks = taskTemplates.map(tt => ({
-                    ...tt,
-                    id: `${selectedEmployee.id}-${tt.id}`,
-                    dueDate: new Date(startDate.getTime() + tt.dayOffset * 86400000).toISOString().split('T')[0],
-                    status: 'pending'
-                }));
+                // Charger les statuts sauvegardés pour cet employé
+                const savedStatuses = employeeTasks[selectedEmployee.id] || {};
+                const generatedTasks = taskTemplates.map(tt => {
+                    const taskKey = `${selectedEmployee.id}-${tt.id}`;
+                    return {
+                        ...tt,
+                        id: taskKey,
+                        dueDate: new Date(startDate.getTime() + tt.dayOffset * 86400000).toISOString().split('T')[0],
+                        status: savedStatuses[tt.id] || 'pending' // Charger le statut sauvegardé ou 'pending'
+                    };
+                });
                 setTasks(generatedTasks);
-            }, [selectedEmployee, taskTemplates]);
+            }, [selectedEmployee, taskTemplates, employeeTasks]);
 
             const stats = useMemo(() => {
                 const total = tasks.length;
@@ -442,7 +623,19 @@
                     if (task.id === taskId) {
                         const statuses = ['pending', 'inProgress', 'completed'];
                         const currentIndex = statuses.indexOf(task.status);
-                        return { ...task, status: statuses[(currentIndex + 1) % statuses.length] };
+                        const newStatus = statuses[(currentIndex + 1) % statuses.length];
+                        
+                        // Sauvegarder le statut dans employeeTasks pour persistance
+                        const originalTaskId = taskId.split('-')[1]; // Extraire l'ID de tâche original
+                        setEmployeeTasks(prev => ({
+                            ...prev,
+                            [selectedEmployee.id]: {
+                                ...prev[selectedEmployee.id],
+                                [originalTaskId]: newStatus
+                            }
+                        }));
+                        
+                        return { ...task, status: newStatus };
                     }
                     return task;
                 }));
