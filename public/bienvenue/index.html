@@ -1048,6 +1048,99 @@
                 fetchData();
             }, []);
 
+            // ============================================================================
+            // REAL-TIME SUBSCRIPTIONS - Live sync across all connected users
+            // ============================================================================
+            useEffect(() => {
+                if (!useSupabase || !supabase) return;
+                
+                console.log('📡 Setting up real-time subscriptions...');
+                
+                // Helper to map employee data from DB format
+                const mapEmployee = (e) => ({
+                    ...e,
+                    avatarUrl: e.avatar_url || (e.name?.includes('Caroline') ? '/images/caroline_avatar.jpg' : null),
+                    startDate: e.start_date,
+                });
+
+                // Subscribe to employees table changes
+                const employeesChannel = supabase
+                    .channel('realtime-employees')
+                    .on('postgres_changes', 
+                        { event: '*', schema: 'public', table: 'employees' },
+                        (payload) => {
+                            console.log('👥 Real-time employee change:', payload.eventType);
+                            if (payload.eventType === 'INSERT') {
+                                setEmployees(prev => [...prev, mapEmployee(payload.new)]);
+                                showNotification('Nouvel employé ajouté', 'success');
+                            } else if (payload.eventType === 'UPDATE') {
+                                setEmployees(prev => prev.map(e => 
+                                    e.id === payload.new.id ? mapEmployee(payload.new) : e
+                                ));
+                            } else if (payload.eventType === 'DELETE') {
+                                setEmployees(prev => prev.filter(e => e.id !== payload.old.id));
+                            }
+                        }
+                    )
+                    .subscribe((status) => {
+                        console.log('📡 Employees subscription:', status);
+                    });
+
+                // Subscribe to employee_tasks table changes
+                const tasksChannel = supabase
+                    .channel('realtime-tasks')
+                    .on('postgres_changes',
+                        { event: '*', schema: 'public', table: 'employee_tasks' },
+                        (payload) => {
+                            console.log('📋 Real-time task change:', payload.eventType);
+                            // Update the specific task status
+                            if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+                                const { employee_id, template_id, status } = payload.new;
+                                setEmployeeTasks(prev => ({
+                                    ...prev,
+                                    [employee_id]: {
+                                        ...prev[employee_id],
+                                        [template_id]: status
+                                    }
+                                }));
+                            }
+                        }
+                    )
+                    .subscribe((status) => {
+                        console.log('📡 Tasks subscription:', status);
+                    });
+
+                // Subscribe to resources table changes
+                const resourcesChannel = supabase
+                    .channel('realtime-resources')
+                    .on('postgres_changes',
+                        { event: '*', schema: 'public', table: 'resources' },
+                        async (payload) => {
+                            console.log('👤 Real-time resource change:', payload.eventType);
+                            // Refetch all resources to maintain order
+                            const { data } = await supabase.from('resources').select('*').order('display_order');
+                            if (data) {
+                                setResources(data.map(r => ({
+                                    ...r,
+                                    avatar: r.avatar_initials,
+                                    displayOrder: r.display_order
+                                })));
+                            }
+                        }
+                    )
+                    .subscribe((status) => {
+                        console.log('📡 Resources subscription:', status);
+                    });
+
+                // Cleanup subscriptions on unmount
+                return () => {
+                    console.log('🔌 Cleaning up real-time subscriptions');
+                    supabase.removeChannel(employeesChannel);
+                    supabase.removeChannel(tasksChannel);
+                    supabase.removeChannel(resourcesChannel);
+                };
+            }, [useSupabase]);
+
             // Mise à jour simplifiée des phases (accès direct DB)
             const updatePhaseDirect = async (id, field, value) => {
                  setPhaseTemplates(phases => phases.map(p => p.id === id ? { ...p, [field]: value } : p));
