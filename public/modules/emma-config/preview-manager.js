@@ -155,74 +155,74 @@ function wrapSmsPreview(data) {
 function getCurrentPromptDesign() {
     return {
         colors: {
-            primary: document.getElementById('designColorPrimary')?.value || '#6366f1',
-            primaryDark: document.getElementById('designColorPrimaryDark')?.value || '#4f46e5',
-            primaryLight: document.getElementById('designColorPrimaryLight')?.value || '#8b5cf6',
-            textDark: document.getElementById('designColorTextDark')?.value || '#1f2937',
-            textMuted: document.getElementById('designColorTextMuted')?.value || '#6b7280',
-            background: document.getElementById('designColorBackground')?.value || '#f9fafb',
-            border: document.getElementById('designColorBorder')?.value || '#e5e7eb',
-            link: document.getElementById('designColorLink')?.value || '#3b82f6',
-            button: document.getElementById('designColorButton')?.value || '#6366f1',
-            success: document.getElementById('designColorSuccess')?.value || '#10b981',
-            warning: document.getElementById('designColorWarning')?.value || '#f59e0b'
+            primary: document.getElementById('promptDesignColorPrimary')?.value || '#6366f1',
+            primaryDark: document.getElementById('promptDesignColorPrimaryDark')?.value || '#4f46e5',
+            primaryLight: document.getElementById('promptDesignColorPrimaryLight')?.value || '#8b5cf6',
+            textDark: document.getElementById('promptDesignColorTextDark')?.value || '#1f2937',
+            textMuted: document.getElementById('promptDesignColorTextMuted')?.value || '#6b7280',
+            background: document.getElementById('promptDesignColorBackground')?.value || '#f9fafb',
+            border: document.getElementById('promptDesignColorBorder')?.value || '#e5e7eb',
+            link: document.getElementById('promptDesignColorLink')?.value || '#3b82f6',
+            button: document.getElementById('promptDesignColorButton')?.value || '#6366f1',
+            success: document.getElementById('promptDesignColorSuccess')?.value || '#10b981',
+            warning: document.getElementById('promptDesignColorWarning')?.value || '#f59e0b'
         },
         branding: {
-            companyName: document.getElementById('designBrandingCompanyName')?.value || 'GOB Apps',
-            tagline: document.getElementById('designBrandingTagline')?.value || 'Emma IA - Votre assistante financière',
+            companyName: document.getElementById('promptDesignBrandingCompanyName')?.value || 'GOB Apps',
+            tagline: document.getElementById('promptDesignBrandingTagline')?.value || 'Emma IA - Votre assistante financière',
             avatar: {
-                url: document.getElementById('designBrandingAvatarUrl')?.value || '',
+                url: document.getElementById('promptDesignBrandingAvatarUrl')?.value || '',
                 alt: 'Emma IA',
                 size: 64
             },
             logo: {
-                url: document.getElementById('designBrandingLogoUrl')?.value || '',
+                url: document.getElementById('promptDesignBrandingLogoUrl')?.value || '',
                 alt: 'GOB Apps',
                 width: 120
             }
         },
         header: {
-            showAvatar: document.getElementById('designHeaderShowAvatar')?.checked ?? true,
-            showDate: document.getElementById('designHeaderShowDate')?.checked ?? true,
-            showEdition: document.getElementById('designHeaderShowEdition')?.checked ?? true,
-            emoji: document.getElementById('designEmojiHeader')?.value || '📊'
+            showAvatar: document.getElementById('promptDesignHeaderShowAvatar')?.checked ?? true,
+            showDate: document.getElementById('promptDesignHeaderShowDate')?.checked ?? true,
+            showEdition: document.getElementById('promptDesignHeaderShowEdition')?.checked ?? true,
+            emoji: document.getElementById('promptDesignEmojiHeader')?.value || '📊'
         },
         footer: {
-            showLogo: document.getElementById('designFooterShowLogo')?.checked ?? false,
-            showDisclaimer: document.getElementById('designFooterShowDisclaimer')?.checked ?? true,
+            showLogo: document.getElementById('promptDesignFooterShowLogo')?.checked ?? false,
+            showDisclaimer: document.getElementById('promptDesignFooterShowDisclaimer')?.checked ?? true,
             disclaimerText: 'Les informations fournies sont à titre indicatif et ne constituent pas des conseils financiers.',
-            copyrightText: document.getElementById('designFooterCopyright')?.value || '© 2025 GOB Apps - Tous droits réservés'
+            copyrightText: document.getElementById('promptDesignFooterCopyright')?.value || '© 2025 GOB Apps - Tous droits réservés'
         },
         sms: {
-            maxSegments: parseInt(document.getElementById('designSmsMaxSegments')?.value) || 10,
-            signature: document.getElementById('designSmsSignature')?.value || '- Emma IA',
-            alertThreshold: parseInt(document.getElementById('designSmsAlertThreshold')?.value) || 5
+            maxSegments: parseInt(document.getElementById('promptDesignSmsMaxSegments')?.value) || 10,
+            signature: document.getElementById('promptDesignSmsSignature')?.value || '- Emma IA',
+            alertThreshold: parseInt(document.getElementById('promptDesignSmsAlertThreshold')?.value) || 5
         },
         typography: {
-            fontFamily: document.getElementById('designTypoFontFamily')?.value || 'system-ui, -apple-system, sans-serif',
-            fontSize: parseInt(document.getElementById('designTypoFontSize')?.value) || 16,
-            lineHeight: parseFloat(document.getElementById('designTypoLineHeight')?.value) || 1.6
+            fontFamily: document.getElementById('promptDesignTypoFontFamily')?.value || 'system-ui, -apple-system, sans-serif',
+            fontSize: parseInt(document.getElementById('promptDesignTypoFontSize')?.value) || 16,
+            lineHeight: parseFloat(document.getElementById('promptDesignTypoLineHeight')?.value) || 1.6
         },
         layout: {
-            borderRadius: parseInt(document.getElementById('designLayoutBorderRadius')?.value) || 12,
-            containerWidth: parseInt(document.getElementById('designLayoutContainerWidth')?.value) || 600,
-            padding: document.getElementById('designLayoutPadding')?.value || 'normal',
-            shadow: document.getElementById('designLayoutShadow')?.value || 'medium'
+            borderRadius: parseInt(document.getElementById('promptDesignLayoutBorderRadius')?.value) || 12,
+            containerWidth: parseInt(document.getElementById('promptDesignLayoutContainerWidth')?.value) || 600,
+            padding: document.getElementById('promptDesignLayoutPadding')?.value || 'normal',
+            shadow: document.getElementById('promptDesignLayoutShadow')?.value || 'medium'
         },
         sections: {
-            showCallout: document.getElementById('designSectionsShowCallout')?.checked ?? false,
-            showSidebar: document.getElementById('designSectionsShowSidebar')?.checked ?? false,
-            showBadges: document.getElementById('designSectionsShowBadges')?.checked ?? true,
-            showDividers: document.getElementById('designSectionsShowDividers')?.checked ?? true,
+            showCallout: document.getElementById('promptDesignSectionsShowCallout')?.checked ?? false,
+            showSidebar: document.getElementById('promptDesignSectionsShowSidebar')?.checked ?? false,
+            showBadges: document.getElementById('promptDesignSectionsShowBadges')?.checked ?? true,
+            showDividers: document.getElementById('promptDesignSectionsShowDividers')?.checked ?? true,
             callout: {
-                backgroundColor: document.getElementById('designSectionsCalloutBg')?.value || '#dbeafe',
-                borderColor: document.getElementById('designSectionsCalloutBorder')?.value || '#3b82f6'
+                backgroundColor: document.getElementById('promptDesignSectionsCalloutBg')?.value || '#dbeafe',
+                borderColor: document.getElementById('promptDesignSectionsCalloutBorder')?.value || '#3b82f6'
             }
         },
         emojis: {
-            header: document.getElementById('designEmojiHeader')?.value || '📊',
-            success: document.getElementById('designEmojiSuccess')?.value || '✅',
-            alert: document.getElementById('designEmojiAlert')?.value || '⚠️'
+            header: document.getElementById('promptDesignEmojiHeader')?.value || '📊',
+            success: document.getElementById('promptDesignEmojiSuccess')?.value || '✅',
+            alert: document.getElementById('promptDesignEmojiAlert')?.value || '⚠️'
         }
     };
 }

@@ -8,6 +8,8 @@ import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon, E
 import { listSnapshots } from '../services/snapshotApi';
 import { SyncSelectionDialog } from './SyncSelectionDialog';
 import { GuideDialog } from './GuideDialog';
+import { StatusBadge } from './StatusBadge';
+import { logger } from '../utils/logger';
 
 interface KPIDashboardProps {
   profiles: AnalysisProfile[];
@@ -1214,8 +1216,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         {/* Filtres avec indicateurs visuels */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-2.5 md:gap-3 lg:gap-4">
           <div>
-            <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Rendement Total Projeté Minimum (%)\n\nFiltre les tickers avec un rendement total projeté supérieur ou égal à cette valeur.\n\nLe rendement total inclut:\n• Appréciation du prix (5 ans)\n• Dividendes cumulés (5 ans)\n\nPlage par défaut: -100% à +1000%">Rendement Min (%)</label>
+            <label htmlFor="filter-min-return" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Rendement Total Projeté Minimum (%)\n\nFiltre les tickers avec un rendement total projeté supérieur ou égal à cette valeur.\n\nLe rendement total inclut:\n• Appréciation du prix (5 ans)\n• Dividendes cumulés (5 ans)\n\nPlage par défaut: -100% à +1000%">Rendement Min (%)</label>
             <input
+              id="filter-min-return"
               type="number"
               value={filters.minReturn}
               onChange={(e) => setFilters({ ...filters, minReturn: parseFloat(e.target.value) || defaultFilterValues.minReturn })}
@@ -1228,8 +1231,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             />
           </div>
           <div>
-            <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Rendement Total Projeté Maximum (%)\n\nFiltre les tickers avec un rendement total projeté inférieur ou égal à cette valeur.\n\nLe rendement total inclut:\n• Appréciation du prix (5 ans)\n• Dividendes cumulés (5 ans)\n\nPlage par défaut: -100% à +1000%">Rendement Max (%)</label>
+            <label htmlFor="filter-max-return" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Rendement Total Projeté Maximum (%)\n\nFiltre les tickers avec un rendement total projeté inférieur ou égal à cette valeur.\n\nLe rendement total inclut:\n• Appréciation du prix (5 ans)\n• Dividendes cumulés (5 ans)\n\nPlage par défaut: -100% à +1000%">Rendement Max (%)</label>
             <input
+              id="filter-max-return"
               type="number"
               value={filters.maxReturn}
               onChange={(e) => setFilters({ ...filters, maxReturn: parseFloat(e.target.value) || defaultFilterValues.maxReturn })}
@@ -1242,8 +1246,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             />
           </div>
           <div>
-            <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="JPEGY Minimum\n\nFiltre les tickers avec un JPEGY supérieur ou égal à cette valeur.\n\nJPEGY = P/E ÷ (Croissance % + Yield %)\n\nPlage recommandée: 0.0 à 5.0\n\nPlus le JPEGY est bas, plus l'action est attractive.">JPEGY Min</label>
+            <label htmlFor="filter-min-jpegy" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="JPEGY Minimum\n\nFiltre les tickers avec un JPEGY supérieur ou égal à cette valeur.\n\nJPEGY = P/E ÷ (Croissance % + Yield %)\n\nPlage recommandée: 0.0 à 5.0\n\nPlus le JPEGY est bas, plus l'action est attractive.">JPEGY Min</label>
             <input
+              id="filter-min-jpegy"
               type="number"
               step="0.1"
               value={filters.minJPEGY}
@@ -1257,8 +1262,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             />
           </div>
           <div>
-            <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="JPEGY Maximum\n\nFiltre les tickers avec un JPEGY inférieur ou égal à cette valeur.\n\nJPEGY = P/E ÷ (Croissance % + Yield %)\n\nPlage recommandée: 0.0 à 5.0\n\nPlus le JPEGY est bas, plus l'action est attractive.">JPEGY Max</label>
+            <label htmlFor="filter-max-jpegy" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="JPEGY Maximum\n\nFiltre les tickers avec un JPEGY inférieur ou égal à cette valeur.\n\nJPEGY = P/E ÷ (Croissance % + Yield %)\n\nPlage recommandée: 0.0 à 5.0\n\nPlus le JPEGY est bas, plus l'action est attractive.">JPEGY Max</label>
             <input
+              id="filter-max-jpegy"
               type="number"
               step="0.1"
               value={filters.maxJPEGY}
@@ -1272,8 +1278,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             />
           </div>
           <div>
-            <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Filtre par Secteur\n\nFiltre les tickers par secteur d'activité.\n\nLaissez vide pour afficher tous les secteurs.\n\nLa recherche est insensible à la casse et cherche dans le nom du secteur.">Secteur</label>
+            <label htmlFor="filter-sector" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Filtre par Secteur\n\nFiltre les tickers par secteur d'activité.\n\nLaissez vide pour afficher tous les secteurs.\n\nLa recherche est insensible à la casse et cherche dans le nom du secteur.">Secteur</label>
             <input
+              id="filter-sector"
               type="text"
               value={filters.sector}
               onChange={(e) => setFilters({ ...filters, sector: e.target.value })}
@@ -1283,8 +1290,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             />
           </div>
           <div>
-            <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Filtre par Recommandation\n\nFiltre les tickers selon la recommandation calculée:\n\n• ACHAT: Prix actuel ≤ Limite d'achat\n• CONSERVER: Entre limite d'achat et vente\n• VENTE: Prix actuel ≥ Limite de vente\n\nSélectionnez 'Toutes' pour afficher toutes les recommandations.">Recommandation</label>
+            <label htmlFor="filter-recommendation" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Filtre par Recommandation\n\nFiltre les tickers selon la recommandation calculée:\n\n• ACHAT: Prix actuel ≤ Limite d'achat\n• CONSERVER: Entre limite d'achat et vente\n• VENTE: Prix actuel ≥ Limite de vente\n\nSélectionnez 'Toutes' pour afficher toutes les recommandations.">Recommandation</label>
             <select
+              id="filter-recommendation"
               value={filters.recommendation}
               onChange={(e) => setFilters({ ...filters, recommendation: e.target.value as any })}
               className="w-full px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 border border-gray-300 rounded text-xs sm:text-sm"
@@ -1297,7 +1305,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             </select>
           </div>
           <div className="relative">
-            <label className="flex text-[10px] sm:text-xs font-semibold text-gray-700 mb-1.5 sm:mb-2 items-center gap-1.5 sm:gap-2 cursor-help" title="Filtre par Source\n\nFiltre les tickers selon leur source:\n\n• ⭐ Portefeuille: Titres détenus actuellement\n• 👁️ Watchlist: Titres surveillés (non détenus)\n• Tous: Affiche les deux sources\n\nLe badge coloré indique le filtre actif.">
+            <label htmlFor="filter-source" className="flex text-[10px] sm:text-xs font-semibold text-gray-700 mb-1.5 sm:mb-2 items-center gap-1.5 sm:gap-2 cursor-help" title="Filtre par Source\n\nFiltre les tickers selon leur source:\n\n• ⭐ Portefeuille: Titres détenus actuellement\n• 👁️ Watchlist: Titres surveillés (non détenus)\n• Tous: Affiche les deux sources\n\nLe badge coloré indique le filtre actif.">
               <span className="truncate">Source</span>
               {filters.source !== 'all' && (
                 <span className={`px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-bold rounded-full flex items-center gap-0.5 sm:gap-1 flex-shrink-0 ${
@@ -1319,6 +1327,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             </label>
             <div className="relative">
               <select
+                id="filter-source"
                 value={filters.source}
                 onChange={(e) => setFilters({ ...filters, source: e.target.value as any })}
                 className={`w-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 border-2 rounded-lg text-xs sm:text-sm transition-all appearance-none ${
@@ -1379,8 +1388,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 md:gap-3">
             {/* Ratio 3:1 */}
             <div>
-              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Ratio 3:1 Min</label>
+              <label htmlFor="filter-ratio31-min" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Ratio 3:1 Min</label>
               <input
+                id="filter-ratio31-min"
                 type="number"
                 step="0.1"
                 value={filters.minRatio31}
@@ -1389,8 +1399,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               />
             </div>
             <div>
-              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Ratio 3:1 Max</label>
+              <label htmlFor="filter-ratio31-max" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Ratio 3:1 Max</label>
               <input
+                id="filter-ratio31-max"
                 type="number"
                 step="0.1"
                 value={filters.maxRatio31}
@@ -1401,8 +1412,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             
             {/* P/E */}
             <div>
-              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">P/E Min</label>
+              <label htmlFor="filter-pe-min" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">P/E Min</label>
               <input
+                id="filter-pe-min"
                 type="number"
                 step="0.1"
                 value={filters.minPE}
@@ -1411,8 +1423,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               />
             </div>
             <div>
-              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">P/E Max</label>
+              <label htmlFor="filter-pe-max" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">P/E Max</label>
               <input
+                id="filter-pe-max"
                 type="number"
                 step="0.1"
                 value={filters.maxPE}
@@ -1423,8 +1436,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             
             {/* Yield */}
             <div>
-              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Yield Min (%)</label>
+              <label htmlFor="filter-yield-min" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Yield Min (%)</label>
               <input
+                id="filter-yield-min"
                 type="number"
                 step="0.1"
                 value={filters.minYield}
@@ -1433,8 +1447,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               />
             </div>
             <div>
-              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Yield Max (%)</label>
+              <label htmlFor="filter-yield-max" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Yield Max (%)</label>
               <input
+                id="filter-yield-max"
                 type="number"
                 step="0.1"
                 value={filters.maxYield}
@@ -1445,8 +1460,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             
             {/* Volatilité */}
             <div>
-              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Volatilité Min (%)</label>
+              <label htmlFor="filter-volatility-min" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Volatilité Min (%)</label>
               <input
+                id="filter-volatility-min"
                 type="number"
                 step="0.1"
                 value={filters.minVolatility}
@@ -1455,8 +1471,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               />
             </div>
             <div>
-              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Volatilité Max (%)</label>
+              <label htmlFor="filter-volatility-max" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Volatilité Max (%)</label>
               <input
+                id="filter-volatility-max"
                 type="number"
                 step="0.1"
                 value={filters.maxVolatility}
@@ -1467,8 +1484,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             
             {/* Croissance */}
             <div>
-              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Croissance Min (%)</label>
+              <label htmlFor="filter-growth-min" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Croissance Min (%)</label>
               <input
+                id="filter-growth-min"
                 type="number"
                 step="0.1"
                 value={filters.minGrowth}
@@ -1477,8 +1495,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               />
             </div>
             <div>
-              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Croissance Max (%)</label>
+              <label htmlFor="filter-growth-max" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Croissance Max (%)</label>
               <input
+                id="filter-growth-max"
                 type="number"
                 step="0.1"
                 value={filters.maxGrowth}
@@ -1489,8 +1508,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             
             {/* Groupement */}
             <div>
-              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Grouper par</label>
+              <label htmlFor="filter-group-by" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Grouper par</label>
               <select
+                id="filter-group-by"
                 value={filters.groupBy}
                 onChange={(e) => setFilters({ ...filters, groupBy: e.target.value as any })}
                 className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs"
@@ -1743,7 +1763,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     ? "Afficher tous les tickers\n\nDésactive le filtre N/A pour voir tous les tickers.\n\nRaccourci: Ctrl+Shift+F" 
                     : "Afficher uniquement les N/A\n\nFiltre pour ne voir que les tickers avec des données invalides (N/A).\n\nUtile pour identifier rapidement les tickers nécessitant une synchronisation.\n\nRaccourci: Ctrl+Shift+F"}
                   aria-label={filters.showOnlyNA ? "Afficher tous les tickers" : "Afficher uniquement les tickers avec N/A"}
-                  aria-pressed={filters.showOnlyNA}
+                  aria-pressed={filters.showOnlyNA ? "true" : "false"}
                   tabIndex={0}
                 >
                   {filters.showOnlyNA ? 'Afficher Tous' : 'Afficher N/A'}
@@ -3418,14 +3438,20 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     )}
                   </td>
                   <td className="p-2 sm:p-3 text-center text-xs sm:text-sm">
-                    <span
-                      className={`px-2 py-1 rounded text-xs font-semibold ${
-                        metric.recommendation === 'ACHAT' || metric.recommendation === 'BUY' ? 'bg-green-100 text-green-800' :
-                        metric.recommendation === 'VENTE' || metric.recommendation === 'SELL' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {metric.recommendation}
+                    <span className="hidden sm:inline">
+                      <StatusBadge 
+                        type="recommendation" 
+                        value={metric.recommendation} 
+                        className="font-semibold"
+                      />
+                    </span>
+                    <span className="sm:hidden">
+                      <StatusBadge 
+                        type="recommendation" 
+                        value={metric.recommendation === 'ACHAT' || metric.recommendation === 'BUY' ? 'A' : 
+                               metric.recommendation === 'VENTE' || metric.recommendation === 'SELL' ? 'V' : 'C'} 
+                        className="font-semibold text-xs"
+                      />
                     </span>
                   </td>
                 </tr>

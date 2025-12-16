@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emma Config - Gestion Prompts & Variables</title>
     <!-- 🔇 INTERCEPTION CONSOLE ERRORS (extensions, etc.) -->
     <script>
         (function() {
@@ -49,9 +52,6 @@
         })();
     </script>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emma Config - Gestion Prompts & Variables</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -132,12 +132,12 @@
 
                 <!-- Recherche -->
                 <div class="mt-3">
-                    <input type="text" id="searchFilter" class="w-full text-xs px-2 py-1 border rounded" placeholder="🔍 Rechercher...">
+                    <input type="text" id="searchFilter" class="w-full text-xs px-2 py-1 border rounded" placeholder="🔍 Rechercher..." aria-label="Rechercher une configuration">
                 </div>
 
                 <!-- Filtres -->
                 <div class="mt-2 grid grid-cols-2 gap-2">
-                    <select id="sectionFilter" class="text-xs px-2 py-1 border rounded">
+                    <select id="sectionFilter" class="text-xs px-2 py-1 border rounded" aria-label="Filtrer par section">
                         <option value="">📂 Toutes sections</option>
                         <option value="prompts">📝 Prompts</option>
                         <option value="variables">⚙️ Variables</option>
@@ -145,7 +145,7 @@
                         <option value="routing">🧭 Routage</option>
                     </select>
 
-                    <select id="channelFilter" class="text-xs px-2 py-1 border rounded">
+                    <select id="channelFilter" class="text-xs px-2 py-1 border rounded" aria-label="Filtrer par canal">
                         <option value="">🌐 Tous canaux</option>
                         <option value="web">💬 Web</option>
                         <option value="sms">📱 SMS</option>
@@ -157,7 +157,7 @@
 
                 <!-- Tri -->
                 <div class="mt-2">
-                    <select id="sortFilter" class="w-full text-xs px-2 py-1 border rounded">
+                    <select id="sortFilter" class="w-full text-xs px-2 py-1 border rounded" aria-label="Trier les configurations">
                         <option value="name">🔤 Tri: Nom (A-Z)</option>
                         <option value="name-desc">🔤 Tri: Nom (Z-A)</option>
                         <option value="date">📅 Tri: Date (récent)</option>
@@ -445,23 +445,23 @@
                     <!-- Metadata -->
                     <div class="grid grid-cols-2 gap-4 mb-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
+                            <label for="editSection" class="block text-sm font-medium text-gray-700 mb-1">Section</label>
                             <input type="text" id="editSection" class="w-full px-3 py-2 border rounded-lg" readonly>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Clé</label>
+                            <label for="editKey" class="block text-sm font-medium text-gray-700 mb-1">Clé</label>
                             <input type="text" id="editKey" class="w-full px-3 py-2 border rounded-lg" readonly>
                         </div>
                     </div>
 
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <label for="editDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
                         <input type="text" id="editDescription" class="w-full px-3 py-2 border rounded-lg" placeholder="Description de la configuration">
                     </div>
 
                     <div class="grid grid-cols-4 gap-4 mb-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                            <label for="editType" class="block text-sm font-medium text-gray-700 mb-1">Type</label>
                             <select id="editType" class="w-full px-3 py-2 border rounded-lg">
                                 <option value="string">String</option>
                                 <option value="number">Number</option>
@@ -470,11 +470,11 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
+                            <label for="editCategory" class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
                             <input type="text" id="editCategory" class="w-full px-3 py-2 border rounded-lg" placeholder="prompt, variable, etc.">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Canal</label>
+                            <label for="editChannel" class="block text-sm font-medium text-gray-700 mb-1">Canal</label>
                             <select id="editChannel" class="w-full px-3 py-2 border rounded-lg">
                                 <option value="">Tous canaux</option>
                                 <option value="web">💬 Web</option>
@@ -485,7 +485,7 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Priorité</label>
+                            <label for="editPriority" class="block text-sm font-medium text-gray-700 mb-1">Priorité</label>
                             <input type="number" id="editPriority" class="w-full px-3 py-2 border rounded-lg" value="0">
                         </div>
                     </div>
@@ -561,24 +561,24 @@
                                 <h4 class="font-semibold text-gray-700 mb-2">🎨 Couleurs</h4>
                                 <div class="grid grid-cols-5 gap-3">
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Primary</label>
-                                        <input type="color" id="designColorPrimary" value="#6366f1" class="w-full h-10 rounded cursor-pointer">
+                                        <label for="promptDesignColorPrimary" class="block text-xs text-gray-600 mb-1">Primary</label>
+                                        <input type="color" id="promptDesignColorPrimary" value="#6366f1" class="w-full h-10 rounded cursor-pointer">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Primary Dark</label>
-                                        <input type="color" id="designColorPrimaryDark" value="#4f46e5" class="w-full h-10 rounded cursor-pointer">
+                                        <label for="promptDesignColorPrimaryDark" class="block text-xs text-gray-600 mb-1">Primary Dark</label>
+                                        <input type="color" id="promptDesignColorPrimaryDark" value="#4f46e5" class="w-full h-10 rounded cursor-pointer">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Primary Light</label>
-                                        <input type="color" id="designColorPrimaryLight" value="#8b5cf6" class="w-full h-10 rounded cursor-pointer">
+                                        <label for="promptDesignColorPrimaryLight" class="block text-xs text-gray-600 mb-1">Primary Light</label>
+                                        <input type="color" id="promptDesignColorPrimaryLight" value="#8b5cf6" class="w-full h-10 rounded cursor-pointer">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Text Dark</label>
-                                        <input type="color" id="designColorTextDark" value="#1f2937" class="w-full h-10 rounded cursor-pointer">
+                                        <label for="promptDesignColorTextDark" class="block text-xs text-gray-600 mb-1">Text Dark</label>
+                                        <input type="color" id="promptDesignColorTextDark" value="#1f2937" class="w-full h-10 rounded cursor-pointer">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Text Muted</label>
-                                        <input type="color" id="designColorTextMuted" value="#6b7280" class="w-full h-10 rounded cursor-pointer">
+                                        <label for="promptDesignColorTextMuted" class="block text-xs text-gray-600 mb-1">Text Muted</label>
+                                        <input type="color" id="promptDesignColorTextMuted" value="#6b7280" class="w-full h-10 rounded cursor-pointer">
                                     </div>
                                 </div>
                             </div>
@@ -588,20 +588,20 @@
                                 <h4 class="font-semibold text-gray-700 mb-2">🏷️ Branding</h4>
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Company Name</label>
-                                        <input type="text" id="designBrandingCompanyName" value="GOB Apps" class="w-full px-3 py-2 border rounded text-sm">
+                                        <label for="promptDesignBrandingCompanyName" class="block text-xs text-gray-600 mb-1">Company Name</label>
+                                        <input type="text" id="promptDesignBrandingCompanyName" value="GOB Apps" class="w-full px-3 py-2 border rounded text-sm">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Tagline</label>
-                                        <input type="text" id="designBrandingTagline" value="Emma IA - Votre assistante financière" class="w-full px-3 py-2 border rounded text-sm">
+                                        <label for="promptDesignBrandingTagline" class="block text-xs text-gray-600 mb-1">Tagline</label>
+                                        <input type="text" id="promptDesignBrandingTagline" value="Emma IA - Votre assistante financière" class="w-full px-3 py-2 border rounded text-sm">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Avatar URL</label>
-                                        <input type="url" id="designBrandingAvatarUrl" placeholder="https://..." class="w-full px-3 py-2 border rounded text-sm">
+                                        <label for="promptDesignBrandingAvatarUrl" class="block text-xs text-gray-600 mb-1">Avatar URL</label>
+                                        <input type="url" id="promptDesignBrandingAvatarUrl" placeholder="https://..." class="w-full px-3 py-2 border rounded text-sm">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Logo URL</label>
-                                        <input type="url" id="designBrandingLogoUrl" placeholder="https://..." class="w-full px-3 py-2 border rounded text-sm">
+                                        <label for="promptDesignBrandingLogoUrl" class="block text-xs text-gray-600 mb-1">Logo URL</label>
+                                        <input type="url" id="promptDesignBrandingLogoUrl" placeholder="https://..." class="w-full px-3 py-2 border rounded text-sm">
                                     </div>
                                 </div>
                             </div>
@@ -611,15 +611,15 @@
                                 <h4 class="font-semibold text-gray-700 mb-2">📋 Header</h4>
                                 <div class="flex gap-4 text-sm">
                                     <label class="flex items-center gap-2">
-                                        <input type="checkbox" id="designHeaderShowAvatar" checked class="rounded">
+                                        <input type="checkbox" id="promptDesignHeaderShowAvatar" checked class="rounded">
                                         <span>Show Avatar</span>
                                     </label>
                                     <label class="flex items-center gap-2">
-                                        <input type="checkbox" id="designHeaderShowDate" checked class="rounded">
+                                        <input type="checkbox" id="promptDesignHeaderShowDate" checked class="rounded">
                                         <span>Show Date</span>
                                     </label>
                                     <label class="flex items-center gap-2">
-                                        <input type="checkbox" id="designHeaderShowEdition" checked class="rounded">
+                                        <input type="checkbox" id="promptDesignHeaderShowEdition" checked class="rounded">
                                         <span>Show Edition</span>
                                     </label>
                                 </div>
@@ -631,17 +631,17 @@
                                 <div class="space-y-2">
                                     <div class="flex gap-4 text-sm">
                                         <label class="flex items-center gap-2">
-                                            <input type="checkbox" id="designFooterShowLogo" class="rounded">
+                                            <input type="checkbox" id="promptDesignFooterShowLogo" class="rounded">
                                             <span>Show Logo</span>
                                         </label>
                                         <label class="flex items-center gap-2">
-                                            <input type="checkbox" id="designFooterShowDisclaimer" checked class="rounded">
+                                            <input type="checkbox" id="promptDesignFooterShowDisclaimer" checked class="rounded">
                                             <span>Show Disclaimer</span>
                                         </label>
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Copyright Text</label>
-                                        <input type="text" id="designFooterCopyright" value="© 2025 GOB Apps - Tous droits réservés" class="w-full px-3 py-2 border rounded text-sm">
+                                        <label for="promptDesignFooterCopyright" class="block text-xs text-gray-600 mb-1">Copyright Text</label>
+                                        <input type="text" id="promptDesignFooterCopyright" value="© 2025 GOB Apps - Tous droits réservés" class="w-full px-3 py-2 border rounded text-sm">
                                     </div>
                                 </div>
                             </div>
@@ -651,16 +651,16 @@
                                 <h4 class="font-semibold text-gray-700 mb-2">📱 SMS Settings</h4>
                                 <div class="grid grid-cols-3 gap-3">
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Max Segments</label>
-                                        <input type="number" id="designSmsMaxSegments" value="10" min="1" max="20" class="w-full px-3 py-2 border rounded text-sm">
+                                        <label for="promptDesignSmsMaxSegments" class="block text-xs text-gray-600 mb-1">Max Segments</label>
+                                        <input type="number" id="promptDesignSmsMaxSegments" value="10" min="1" max="20" class="w-full px-3 py-2 border rounded text-sm">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Signature</label>
-                                        <input type="text" id="designSmsSignature" value="- Emma IA" class="w-full px-3 py-2 border rounded text-sm">
+                                        <label for="promptDesignSmsSignature" class="block text-xs text-gray-600 mb-1">Signature</label>
+                                        <input type="text" id="promptDesignSmsSignature" value="- Emma IA" class="w-full px-3 py-2 border rounded text-sm">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Alert Threshold</label>
-                                        <input type="number" id="designSmsAlertThreshold" value="5" min="1" max="10" class="w-full px-3 py-2 border rounded text-sm">
+                                        <label for="promptDesignSmsAlertThreshold" class="block text-xs text-gray-600 mb-1">Alert Threshold</label>
+                                        <input type="number" id="promptDesignSmsAlertThreshold" value="5" min="1" max="10" class="w-full px-3 py-2 border rounded text-sm">
                                         <p class="text-xs text-gray-500 mt-1">Segments avant alerte</p>
                                     </div>
                                 </div>
@@ -671,8 +671,8 @@
                                 <h4 class="font-semibold text-gray-700 mb-2">🔤 Typography</h4>
                                 <div class="grid grid-cols-3 gap-3">
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Font Family</label>
-                                        <select id="designTypoFontFamily" class="w-full px-3 py-2 border rounded text-sm">
+                                        <label for="promptDesignTypoFontFamily" class="block text-xs text-gray-600 mb-1">Font Family</label>
+                                        <select id="promptDesignTypoFontFamily" class="w-full px-3 py-2 border rounded text-sm">
                                             <option value="system-ui, -apple-system, sans-serif">System (default)</option>
                                             <option value="'Inter', sans-serif">Inter</option>
                                             <option value="'Roboto', sans-serif">Roboto</option>
@@ -682,13 +682,13 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Base Font Size</label>
-                                        <input type="number" id="designTypoFontSize" value="16" min="12" max="20" class="w-full px-3 py-2 border rounded text-sm">
+                                        <label for="promptDesignTypoFontSize" class="block text-xs text-gray-600 mb-1">Base Font Size</label>
+                                        <input type="number" id="promptDesignTypoFontSize" value="16" min="12" max="20" class="w-full px-3 py-2 border rounded text-sm">
                                         <p class="text-xs text-gray-500 mt-1">pixels</p>
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Line Height</label>
-                                        <input type="number" id="designTypoLineHeight" value="1.6" min="1.2" max="2.0" step="0.1" class="w-full px-3 py-2 border rounded text-sm">
+                                        <label for="promptDesignTypoLineHeight" class="block text-xs text-gray-600 mb-1">Line Height</label>
+                                        <input type="number" id="promptDesignTypoLineHeight" value="1.6" min="1.2" max="2.0" step="0.1" class="w-full px-3 py-2 border rounded text-sm">
                                     </div>
                                 </div>
                             </div>
@@ -698,26 +698,26 @@
                                 <h4 class="font-semibold text-gray-700 mb-2">📐 Layout & Spacing</h4>
                                 <div class="grid grid-cols-4 gap-3">
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Border Radius</label>
-                                        <input type="number" id="designLayoutBorderRadius" value="12" min="0" max="24" class="w-full px-3 py-2 border rounded text-sm">
+                                        <label for="promptDesignLayoutBorderRadius" class="block text-xs text-gray-600 mb-1">Border Radius</label>
+                                        <input type="number" id="promptDesignLayoutBorderRadius" value="12" min="0" max="24" class="w-full px-3 py-2 border rounded text-sm">
                                         <p class="text-xs text-gray-500 mt-1">px</p>
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Container Width</label>
-                                        <input type="number" id="designLayoutContainerWidth" value="600" min="480" max="800" step="20" class="w-full px-3 py-2 border rounded text-sm">
+                                        <label for="promptDesignLayoutContainerWidth" class="block text-xs text-gray-600 mb-1">Container Width</label>
+                                        <input type="number" id="promptDesignLayoutContainerWidth" value="600" min="480" max="800" step="20" class="w-full px-3 py-2 border rounded text-sm">
                                         <p class="text-xs text-gray-500 mt-1">px</p>
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Padding</label>
-                                        <select id="designLayoutPadding" class="w-full px-3 py-2 border rounded text-sm">
+                                        <label for="promptDesignLayoutPadding" class="block text-xs text-gray-600 mb-1">Padding</label>
+                                        <select id="promptDesignLayoutPadding" class="w-full px-3 py-2 border rounded text-sm">
                                             <option value="compact">Compact</option>
                                             <option value="normal" selected>Normal</option>
                                             <option value="spacious">Spacious</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Shadow</label>
-                                        <select id="designLayoutShadow" class="w-full px-3 py-2 border rounded text-sm">
+                                        <label for="promptDesignLayoutShadow" class="block text-xs text-gray-600 mb-1">Shadow</label>
+                                        <select id="promptDesignLayoutShadow" class="w-full px-3 py-2 border rounded text-sm">
                                             <option value="none">None</option>
                                             <option value="small">Small</option>
                                             <option value="medium" selected>Medium</option>
@@ -732,28 +732,28 @@
                                 <h4 class="font-semibold text-gray-700 mb-2">🌈 Advanced Colors</h4>
                                 <div class="grid grid-cols-6 gap-3">
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Background</label>
-                                        <input type="color" id="designColorBackground" value="#f9fafb" class="w-full h-10 rounded cursor-pointer">
+                                        <label for="promptDesignColorBackground" class="block text-xs text-gray-600 mb-1">Background</label>
+                                        <input type="color" id="promptDesignColorBackground" value="#f9fafb" class="w-full h-10 rounded cursor-pointer">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Border</label>
-                                        <input type="color" id="designColorBorder" value="#e5e7eb" class="w-full h-10 rounded cursor-pointer">
+                                        <label for="promptDesignColorBorder" class="block text-xs text-gray-600 mb-1">Border</label>
+                                        <input type="color" id="promptDesignColorBorder" value="#e5e7eb" class="w-full h-10 rounded cursor-pointer">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Link</label>
-                                        <input type="color" id="designColorLink" value="#3b82f6" class="w-full h-10 rounded cursor-pointer">
+                                        <label for="promptDesignColorLink" class="block text-xs text-gray-600 mb-1">Link</label>
+                                        <input type="color" id="promptDesignColorLink" value="#3b82f6" class="w-full h-10 rounded cursor-pointer">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Button</label>
-                                        <input type="color" id="designColorButton" value="#6366f1" class="w-full h-10 rounded cursor-pointer">
+                                        <label for="promptDesignColorButton" class="block text-xs text-gray-600 mb-1">Button</label>
+                                        <input type="color" id="promptDesignColorButton" value="#6366f1" class="w-full h-10 rounded cursor-pointer">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Success</label>
-                                        <input type="color" id="designColorSuccess" value="#10b981" class="w-full h-10 rounded cursor-pointer">
+                                        <label for="promptDesignColorSuccess" class="block text-xs text-gray-600 mb-1">Success</label>
+                                        <input type="color" id="promptDesignColorSuccess" value="#10b981" class="w-full h-10 rounded cursor-pointer">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Warning</label>
-                                        <input type="color" id="designColorWarning" value="#f59e0b" class="w-full h-10 rounded cursor-pointer">
+                                        <label for="promptDesignColorWarning" class="block text-xs text-gray-600 mb-1">Warning</label>
+                                        <input type="color" id="promptDesignColorWarning" value="#f59e0b" class="w-full h-10 rounded cursor-pointer">
                                     </div>
                                 </div>
                             </div>
@@ -764,30 +764,30 @@
                                 <div class="space-y-3">
                                     <div class="flex gap-4 text-sm">
                                         <label class="flex items-center gap-2">
-                                            <input type="checkbox" id="designSectionsShowCallout" class="rounded">
+                                            <input type="checkbox" id="promptDesignSectionsShowCallout" class="rounded">
                                             <span>Callout Box</span>
                                         </label>
                                         <label class="flex items-center gap-2">
-                                            <input type="checkbox" id="designSectionsShowSidebar" class="rounded">
+                                            <input type="checkbox" id="promptDesignSectionsShowSidebar" class="rounded">
                                             <span>Sidebar</span>
                                         </label>
                                         <label class="flex items-center gap-2">
-                                            <input type="checkbox" id="designSectionsShowBadges" checked class="rounded">
+                                            <input type="checkbox" id="promptDesignSectionsShowBadges" checked class="rounded">
                                             <span>Status Badges</span>
                                         </label>
                                         <label class="flex items-center gap-2">
-                                            <input type="checkbox" id="designSectionsShowDividers" checked class="rounded">
+                                            <input type="checkbox" id="promptDesignSectionsShowDividers" checked class="rounded">
                                             <span>Dividers</span>
                                         </label>
                                     </div>
                                     <div class="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label class="block text-xs text-gray-600 mb-1">Callout Background</label>
-                                            <input type="color" id="designSectionsCalloutBg" value="#dbeafe" class="w-full h-10 rounded cursor-pointer">
+                                            <label for="promptDesignSectionsCalloutBg" class="block text-xs text-gray-600 mb-1">Callout Background</label>
+                                            <input type="color" id="promptDesignSectionsCalloutBg" value="#dbeafe" class="w-full h-10 rounded cursor-pointer">
                                         </div>
                                         <div>
-                                            <label class="block text-xs text-gray-600 mb-1">Callout Border</label>
-                                            <input type="color" id="designSectionsCalloutBorder" value="#3b82f6" class="w-full h-10 rounded cursor-pointer">
+                                            <label for="promptDesignSectionsCalloutBorder" class="block text-xs text-gray-600 mb-1">Callout Border</label>
+                                            <input type="color" id="promptDesignSectionsCalloutBorder" value="#3b82f6" class="w-full h-10 rounded cursor-pointer">
                                         </div>
                                     </div>
                                 </div>
@@ -798,16 +798,16 @@
                                 <h4 class="font-semibold text-gray-700 mb-2">😊 Emojis & Icons</h4>
                                 <div class="grid grid-cols-3 gap-3">
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Header Emoji</label>
-                                        <input type="text" id="designEmojiHeader" value="📊" maxlength="2" class="w-full px-3 py-2 border rounded text-sm text-center text-2xl">
+                                        <label for="promptDesignEmojiHeader" class="block text-xs text-gray-600 mb-1">Header Emoji</label>
+                                        <input type="text" id="promptDesignEmojiHeader" value="📊" maxlength="2" class="w-full px-3 py-2 border rounded text-sm text-center text-2xl">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Success Emoji</label>
-                                        <input type="text" id="designEmojiSuccess" value="✅" maxlength="2" class="w-full px-3 py-2 border rounded text-sm text-center text-2xl">
+                                        <label for="promptDesignEmojiSuccess" class="block text-xs text-gray-600 mb-1">Success Emoji</label>
+                                        <input type="text" id="promptDesignEmojiSuccess" value="✅" maxlength="2" class="w-full px-3 py-2 border rounded text-sm text-center text-2xl">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-600 mb-1">Alert Emoji</label>
-                                        <input type="text" id="designEmojiAlert" value="⚠️" maxlength="2" class="w-full px-3 py-2 border rounded text-sm text-center text-2xl">
+                                        <label for="promptDesignEmojiAlert" class="block text-xs text-gray-600 mb-1">Alert Emoji</label>
+                                        <input type="text" id="promptDesignEmojiAlert" value="⚠️" maxlength="2" class="w-full px-3 py-2 border rounded text-sm text-center text-2xl">
                                     </div>
                                 </div>
                             </div>

@@ -1,3 +1,23 @@
+var _a2, _b;
+function _mergeNamespaces(n, m) {
+  for (var i = 0; i < m.length; i++) {
+    const e = m[i];
+    if (typeof e !== "string" && !Array.isArray(e)) {
+      for (const k2 in e) {
+        if (k2 !== "default" && !(k2 in n)) {
+          const d = Object.getOwnPropertyDescriptor(e, k2);
+          if (d) {
+            Object.defineProperty(n, k2, d.get ? d : {
+              enumerable: true,
+              get: () => e[k2]
+            });
+          }
+        }
+      }
+    }
+  }
+  return Object.freeze(Object.defineProperty(n, Symbol.toStringTag, { value: "Module" }));
+}
 (function polyfill() {
   const relList = document.createElement("link").relList;
   if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -38,6 +58,30 @@
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function getDefaultExportFromCjs(x2) {
   return x2 && x2.__esModule && Object.prototype.hasOwnProperty.call(x2, "default") ? x2["default"] : x2;
+}
+function getAugmentedNamespace(n) {
+  if (Object.prototype.hasOwnProperty.call(n, "__esModule")) return n;
+  var f = n.default;
+  if (typeof f == "function") {
+    var a2 = function a3() {
+      if (this instanceof a3) {
+        return Reflect.construct(f, arguments, this.constructor);
+      }
+      return f.apply(this, arguments);
+    };
+    a2.prototype = f.prototype;
+  } else a2 = {};
+  Object.defineProperty(a2, "__esModule", { value: true });
+  Object.keys(n).forEach(function(k2) {
+    var d = Object.getOwnPropertyDescriptor(n, k2);
+    Object.defineProperty(a2, k2, d.get ? d : {
+      enumerable: true,
+      get: function() {
+        return n[k2];
+      }
+    });
+  });
+  return a2;
 }
 var jsxRuntime = { exports: {} };
 var reactJsxRuntime_production_min = {};
@@ -9349,10 +9393,10 @@ function require_Hash() {
   hasRequired_Hash = 1;
   var hashClear = require_hashClear(), hashDelete = require_hashDelete(), hashGet = require_hashGet(), hashHas = require_hashHas(), hashSet = require_hashSet();
   function Hash(entries) {
-    var index = -1, length = entries == null ? 0 : entries.length;
+    var index2 = -1, length = entries == null ? 0 : entries.length;
     this.clear();
-    while (++index < length) {
-      var entry = entries[index];
+    while (++index2 < length) {
+      var entry = entries[index2];
       this.set(entry[0], entry[1]);
     }
   }
@@ -9414,15 +9458,15 @@ function require_listCacheDelete() {
   var arrayProto = Array.prototype;
   var splice = arrayProto.splice;
   function listCacheDelete(key) {
-    var data = this.__data__, index = assocIndexOf(data, key);
-    if (index < 0) {
+    var data = this.__data__, index2 = assocIndexOf(data, key);
+    if (index2 < 0) {
       return false;
     }
     var lastIndex = data.length - 1;
-    if (index == lastIndex) {
+    if (index2 == lastIndex) {
       data.pop();
     } else {
-      splice.call(data, index, 1);
+      splice.call(data, index2, 1);
     }
     --this.size;
     return true;
@@ -9437,8 +9481,8 @@ function require_listCacheGet() {
   hasRequired_listCacheGet = 1;
   var assocIndexOf = require_assocIndexOf();
   function listCacheGet(key) {
-    var data = this.__data__, index = assocIndexOf(data, key);
-    return index < 0 ? void 0 : data[index][1];
+    var data = this.__data__, index2 = assocIndexOf(data, key);
+    return index2 < 0 ? void 0 : data[index2][1];
   }
   _listCacheGet = listCacheGet;
   return _listCacheGet;
@@ -9462,12 +9506,12 @@ function require_listCacheSet() {
   hasRequired_listCacheSet = 1;
   var assocIndexOf = require_assocIndexOf();
   function listCacheSet(key, value) {
-    var data = this.__data__, index = assocIndexOf(data, key);
-    if (index < 0) {
+    var data = this.__data__, index2 = assocIndexOf(data, key);
+    if (index2 < 0) {
       ++this.size;
       data.push([key, value]);
     } else {
-      data[index][1] = value;
+      data[index2][1] = value;
     }
     return this;
   }
@@ -9481,10 +9525,10 @@ function require_ListCache() {
   hasRequired_ListCache = 1;
   var listCacheClear = require_listCacheClear(), listCacheDelete = require_listCacheDelete(), listCacheGet = require_listCacheGet(), listCacheHas = require_listCacheHas(), listCacheSet = require_listCacheSet();
   function ListCache(entries) {
-    var index = -1, length = entries == null ? 0 : entries.length;
+    var index2 = -1, length = entries == null ? 0 : entries.length;
     this.clear();
-    while (++index < length) {
-      var entry = entries[index];
+    while (++index2 < length) {
+      var entry = entries[index2];
       this.set(entry[0], entry[1]);
     }
   }
@@ -9608,10 +9652,10 @@ function require_MapCache() {
   hasRequired_MapCache = 1;
   var mapCacheClear = require_mapCacheClear(), mapCacheDelete = require_mapCacheDelete(), mapCacheGet = require_mapCacheGet(), mapCacheHas = require_mapCacheHas(), mapCacheSet = require_mapCacheSet();
   function MapCache(entries) {
-    var index = -1, length = entries == null ? 0 : entries.length;
+    var index2 = -1, length = entries == null ? 0 : entries.length;
     this.clear();
-    while (++index < length) {
-      var entry = entries[index];
+    while (++index2 < length) {
+      var entry = entries[index2];
       this.set(entry[0], entry[1]);
     }
   }
@@ -9697,9 +9741,9 @@ function require_arrayMap() {
   if (hasRequired_arrayMap) return _arrayMap;
   hasRequired_arrayMap = 1;
   function arrayMap(array2, iteratee) {
-    var index = -1, length = array2 == null ? 0 : array2.length, result = Array(length);
-    while (++index < length) {
-      result[index] = iteratee(array2[index], index, array2);
+    var index2 = -1, length = array2 == null ? 0 : array2.length, result = Array(length);
+    while (++index2 < length) {
+      result[index2] = iteratee(array2[index2], index2, array2);
     }
     return result;
   }
@@ -9780,11 +9824,11 @@ function require_baseGet() {
   var castPath = require_castPath(), toKey = require_toKey();
   function baseGet(object2, path) {
     path = castPath(path, object2);
-    var index = 0, length = path.length;
-    while (object2 != null && index < length) {
-      object2 = object2[toKey(path[index++])];
+    var index2 = 0, length = path.length;
+    while (object2 != null && index2 < length) {
+      object2 = object2[toKey(path[index2++])];
     }
-    return index && index == length ? object2 : void 0;
+    return index2 && index2 == length ? object2 : void 0;
   }
   _baseGet = baseGet;
   return _baseGet;
@@ -9803,7 +9847,7 @@ function requireGet() {
   return get_1;
 }
 var getExports = requireGet();
-const get = /* @__PURE__ */ getDefaultExportFromCjs(getExports);
+const get$1 = /* @__PURE__ */ getDefaultExportFromCjs(getExports);
 var isNil_1;
 var hasRequiredIsNil;
 function requireIsNil() {
@@ -10010,8 +10054,8 @@ var getPercentValue = function getPercentValue2(percent, totalValue) {
   }
   var value;
   if (isPercent(percent)) {
-    var index = percent.indexOf("%");
-    value = totalValue * parseFloat(percent.slice(0, index)) / 100;
+    var index2 = percent.indexOf("%");
+    value = totalValue * parseFloat(percent.slice(0, index2)) / 100;
   } else {
     value = +percent;
   }
@@ -10063,7 +10107,7 @@ function findEntryInArray(ary, specifiedKey, specifiedValue) {
     return null;
   }
   return ary.find(function(entry) {
-    return entry && (typeof specifiedKey === "function" ? specifiedKey(entry) : get(entry, specifiedKey)) === specifiedValue;
+    return entry && (typeof specifiedKey === "function" ? specifiedKey(entry) : get$1(entry, specifiedKey)) === specifiedValue;
   });
 }
 var getLinearRegression = function getLinearRegression2(data) {
@@ -10457,13 +10501,13 @@ var adaptEventHandlers = function adaptEventHandlers2(props, newHandler) {
   });
   return out;
 };
-var getEventHandlerOfChild = function getEventHandlerOfChild2(originalHandler, data, index) {
+var getEventHandlerOfChild = function getEventHandlerOfChild2(originalHandler, data, index2) {
   return function(e) {
-    originalHandler(data, index, e);
+    originalHandler(data, index2, e);
     return null;
   };
 };
-var adaptEventsOfChild = function adaptEventsOfChild2(props, data, index) {
+var adaptEventsOfChild = function adaptEventsOfChild2(props, data, index2) {
   if (!isObject(props) || _typeof$H(props) !== "object") {
     return null;
   }
@@ -10472,7 +10516,7 @@ var adaptEventsOfChild = function adaptEventsOfChild2(props, data, index) {
     var item = props[key];
     if (EventKeys.includes(key) && typeof item === "function") {
       if (!out) out = {};
-      out[key] = getEventHandlerOfChild(item, data, index);
+      out[key] = getEventHandlerOfChild(item, data, index2);
     }
   });
   return out;
@@ -10538,7 +10582,7 @@ var getDisplayName = function getDisplayName2(Comp) {
 };
 var lastChildren = null;
 var lastResult = null;
-var toArray = function toArray2(children) {
+var toArray$1 = function toArray(children) {
   if (children === lastChildren && Array.isArray(lastResult)) {
     return lastResult;
   }
@@ -10546,7 +10590,7 @@ var toArray = function toArray2(children) {
   reactExports.Children.forEach(children, function(child) {
     if (isNil(child)) return;
     if (reactIsExports.isFragment(child)) {
-      result = result.concat(toArray2(child.props.children));
+      result = result.concat(toArray(child.props.children));
     } else {
       result.push(child);
     }
@@ -10565,8 +10609,8 @@ function findAllByType(children, type) {
   } else {
     types = [getDisplayName(type)];
   }
-  toArray(children).forEach(function(child) {
-    var childType = get(child, "type.displayName") || get(child, "type.name");
+  toArray$1(children).forEach(function(child) {
+    var childType = get$1(child, "type.displayName") || get$1(child, "type.name");
     if (types.indexOf(childType) !== -1) {
       result.push(child);
     }
@@ -10666,14 +10710,14 @@ var isSingleChildEqual = function isSingleChildEqual2(nextChild, prevChild) {
 var renderByOrder = function renderByOrder2(children, renderMap) {
   var elements = [];
   var record = {};
-  toArray(children).forEach(function(child, index) {
+  toArray$1(children).forEach(function(child, index2) {
     if (isSvgElement(child)) {
       elements.push(child);
     } else if (child) {
       var displayName = getDisplayName(child.type);
       var _ref3 = renderMap[displayName] || {}, handler = _ref3.handler, once = _ref3.once;
       if (handler && (!once || !record[displayName])) {
-        var results = handler(child, displayName, index);
+        var results = handler(child, displayName, index2);
         elements.push(results);
         record[displayName] = true;
       }
@@ -10689,7 +10733,7 @@ var getReactEventByType = function getReactEventByType2(e) {
   return null;
 };
 var parseChildIndex = function parseChildIndex2(child, children) {
-  return toArray(children).indexOf(child);
+  return toArray$1(children).indexOf(child);
 };
 var _excluded$i = ["children", "width", "height", "viewBox", "className", "style", "title", "desc"];
 function _extends$t() {
@@ -10812,7 +10856,7 @@ function require_baseSlice() {
   if (hasRequired_baseSlice) return _baseSlice;
   hasRequired_baseSlice = 1;
   function baseSlice(array2, start, end) {
-    var index = -1, length = array2.length;
+    var index2 = -1, length = array2.length;
     if (start < 0) {
       start = -start > length ? 0 : length + start;
     }
@@ -10823,8 +10867,8 @@ function require_baseSlice() {
     length = start > end ? 0 : end - start >>> 0;
     start >>>= 0;
     var result = Array(length);
-    while (++index < length) {
-      result[index] = array2[index + start];
+    while (++index2 < length) {
+      result[index2] = array2[index2 + start];
     }
     return result;
   }
@@ -11351,7 +11395,7 @@ function Symbol$1(type, size) {
   };
   return symbol;
 }
-function noop() {
+function noop$2() {
 }
 function point$2(that, x2, y2) {
   that._context.bezierCurveTo(
@@ -11418,8 +11462,8 @@ function BasisClosed(context) {
   this._context = context;
 }
 BasisClosed.prototype = {
-  areaStart: noop,
-  areaEnd: noop,
+  areaStart: noop$2,
+  areaEnd: noop$2,
   lineStart: function() {
     this._x0 = this._x1 = this._x2 = this._x3 = this._x4 = this._y0 = this._y1 = this._y2 = this._y3 = this._y4 = NaN;
     this._point = 0;
@@ -11522,8 +11566,8 @@ function LinearClosed(context) {
   this._context = context;
 }
 LinearClosed.prototype = {
-  areaStart: noop,
-  areaEnd: noop,
+  areaStart: noop$2,
+  areaEnd: noop$2,
   lineStart: function() {
     this._point = 0;
   },
@@ -11846,7 +11890,7 @@ function _extends$r() {
   };
   return _extends$r.apply(this, arguments);
 }
-function ownKeys$B(e, r2) {
+function ownKeys$C(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -11859,9 +11903,9 @@ function ownKeys$B(e, r2) {
 function _objectSpread$B(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$B(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$C(Object(t), true).forEach(function(r3) {
       _defineProperty$E(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$B(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$C(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -12003,7 +12047,7 @@ function _extends$q() {
   };
   return _extends$q.apply(this, arguments);
 }
-function ownKeys$A(e, r2) {
+function ownKeys$B(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -12016,9 +12060,9 @@ function ownKeys$A(e, r2) {
 function _objectSpread$A(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$A(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$B(Object(t), true).forEach(function(r3) {
       _defineProperty$D(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$A(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$B(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -12386,10 +12430,10 @@ function require_SetCache() {
   hasRequired_SetCache = 1;
   var MapCache = require_MapCache(), setCacheAdd = require_setCacheAdd(), setCacheHas = require_setCacheHas();
   function SetCache(values) {
-    var index = -1, length = values == null ? 0 : values.length;
+    var index2 = -1, length = values == null ? 0 : values.length;
     this.__data__ = new MapCache();
-    while (++index < length) {
-      this.add(values[index]);
+    while (++index2 < length) {
+      this.add(values[index2]);
     }
   }
   SetCache.prototype.add = SetCache.prototype.push = setCacheAdd;
@@ -12403,9 +12447,9 @@ function require_arraySome() {
   if (hasRequired_arraySome) return _arraySome;
   hasRequired_arraySome = 1;
   function arraySome(array2, predicate) {
-    var index = -1, length = array2 == null ? 0 : array2.length;
-    while (++index < length) {
-      if (predicate(array2[index], index, array2)) {
+    var index2 = -1, length = array2 == null ? 0 : array2.length;
+    while (++index2 < length) {
+      if (predicate(array2[index2], index2, array2)) {
         return true;
       }
     }
@@ -12442,13 +12486,13 @@ function require_equalArrays() {
     if (arrStacked && othStacked) {
       return arrStacked == other && othStacked == array2;
     }
-    var index = -1, result = true, seen2 = bitmask & COMPARE_UNORDERED_FLAG ? new SetCache() : void 0;
+    var index2 = -1, result = true, seen2 = bitmask & COMPARE_UNORDERED_FLAG ? new SetCache() : void 0;
     stack.set(array2, other);
     stack.set(other, array2);
-    while (++index < arrLength) {
-      var arrValue = array2[index], othValue = other[index];
+    while (++index2 < arrLength) {
+      var arrValue = array2[index2], othValue = other[index2];
       if (customizer) {
-        var compared = isPartial ? customizer(othValue, arrValue, index, other, array2, stack) : customizer(arrValue, othValue, index, array2, other, stack);
+        var compared = isPartial ? customizer(othValue, arrValue, index2, other, array2, stack) : customizer(arrValue, othValue, index2, array2, other, stack);
       }
       if (compared !== void 0) {
         if (compared) {
@@ -12484,8 +12528,8 @@ function require_Uint8Array() {
   if (hasRequired_Uint8Array) return _Uint8Array;
   hasRequired_Uint8Array = 1;
   var root2 = require_root();
-  var Uint8Array = root2.Uint8Array;
-  _Uint8Array = Uint8Array;
+  var Uint8Array2 = root2.Uint8Array;
+  _Uint8Array = Uint8Array2;
   return _Uint8Array;
 }
 var _mapToArray;
@@ -12494,9 +12538,9 @@ function require_mapToArray() {
   if (hasRequired_mapToArray) return _mapToArray;
   hasRequired_mapToArray = 1;
   function mapToArray(map2) {
-    var index = -1, result = Array(map2.size);
+    var index2 = -1, result = Array(map2.size);
     map2.forEach(function(value, key) {
-      result[++index] = [key, value];
+      result[++index2] = [key, value];
     });
     return result;
   }
@@ -12509,9 +12553,9 @@ function require_setToArray() {
   if (hasRequired_setToArray) return _setToArray;
   hasRequired_setToArray = 1;
   function setToArray(set) {
-    var index = -1, result = Array(set.size);
+    var index2 = -1, result = Array(set.size);
     set.forEach(function(value) {
-      result[++index] = value;
+      result[++index2] = value;
     });
     return result;
   }
@@ -12523,7 +12567,7 @@ var hasRequired_equalByTag;
 function require_equalByTag() {
   if (hasRequired_equalByTag) return _equalByTag;
   hasRequired_equalByTag = 1;
-  var Symbol2 = require_Symbol(), Uint8Array = require_Uint8Array(), eq = requireEq(), equalArrays = require_equalArrays(), mapToArray = require_mapToArray(), setToArray = require_setToArray();
+  var Symbol2 = require_Symbol(), Uint8Array2 = require_Uint8Array(), eq = requireEq(), equalArrays = require_equalArrays(), mapToArray = require_mapToArray(), setToArray = require_setToArray();
   var COMPARE_PARTIAL_FLAG = 1, COMPARE_UNORDERED_FLAG = 2;
   var boolTag = "[object Boolean]", dateTag = "[object Date]", errorTag = "[object Error]", mapTag = "[object Map]", numberTag = "[object Number]", regexpTag = "[object RegExp]", setTag = "[object Set]", stringTag = "[object String]", symbolTag = "[object Symbol]";
   var arrayBufferTag = "[object ArrayBuffer]", dataViewTag = "[object DataView]";
@@ -12537,7 +12581,7 @@ function require_equalByTag() {
         object2 = object2.buffer;
         other = other.buffer;
       case arrayBufferTag:
-        if (object2.byteLength != other.byteLength || !equalFunc(new Uint8Array(object2), new Uint8Array(other))) {
+        if (object2.byteLength != other.byteLength || !equalFunc(new Uint8Array2(object2), new Uint8Array2(other))) {
           return false;
         }
         return true;
@@ -12583,9 +12627,9 @@ function require_arrayPush() {
   if (hasRequired_arrayPush) return _arrayPush;
   hasRequired_arrayPush = 1;
   function arrayPush(array2, values) {
-    var index = -1, length = values.length, offset = array2.length;
-    while (++index < length) {
-      array2[offset + index] = values[index];
+    var index2 = -1, length = values.length, offset = array2.length;
+    while (++index2 < length) {
+      array2[offset + index2] = values[index2];
     }
     return array2;
   }
@@ -12611,10 +12655,10 @@ function require_arrayFilter() {
   if (hasRequired_arrayFilter) return _arrayFilter;
   hasRequired_arrayFilter = 1;
   function arrayFilter(array2, predicate) {
-    var index = -1, length = array2 == null ? 0 : array2.length, resIndex = 0, result = [];
-    while (++index < length) {
-      var value = array2[index];
-      if (predicate(value, index, array2)) {
+    var index2 = -1, length = array2 == null ? 0 : array2.length, resIndex = 0, result = [];
+    while (++index2 < length) {
+      var value = array2[index2];
+      if (predicate(value, index2, array2)) {
         result[resIndex++] = value;
       }
     }
@@ -12661,9 +12705,9 @@ function require_baseTimes() {
   if (hasRequired_baseTimes) return _baseTimes;
   hasRequired_baseTimes = 1;
   function baseTimes(n, iteratee) {
-    var index = -1, result = Array(n);
-    while (++index < n) {
-      result[index] = iteratee(index);
+    var index2 = -1, result = Array(n);
+    while (++index2 < n) {
+      result[index2] = iteratee(index2);
     }
     return result;
   }
@@ -12722,8 +12766,8 @@ function requireIsBuffer() {
     var freeExports = exports$1 && !exports$1.nodeType && exports$1;
     var freeModule = freeExports && true && module && !module.nodeType && module;
     var moduleExports = freeModule && freeModule.exports === freeExports;
-    var Buffer = moduleExports ? root2.Buffer : void 0;
-    var nativeIsBuffer = Buffer ? Buffer.isBuffer : void 0;
+    var Buffer2 = moduleExports ? root2.Buffer : void 0;
+    var nativeIsBuffer = Buffer2 ? Buffer2.isBuffer : void 0;
     var isBuffer2 = nativeIsBuffer || stubFalse;
     module.exports = isBuffer2;
   })(isBuffer, isBuffer.exports);
@@ -12956,9 +13000,9 @@ function require_equalObjects() {
     if (objLength != othLength && !isPartial) {
       return false;
     }
-    var index = objLength;
-    while (index--) {
-      var key = objProps[index];
+    var index2 = objLength;
+    while (index2--) {
+      var key = objProps[index2];
       if (!(isPartial ? key in other : hasOwnProperty2.call(other, key))) {
         return false;
       }
@@ -12972,8 +13016,8 @@ function require_equalObjects() {
     stack.set(object2, other);
     stack.set(other, object2);
     var skipCtor = isPartial;
-    while (++index < objLength) {
-      key = objProps[index];
+    while (++index2 < objLength) {
+      key = objProps[index2];
       var objValue = object2[key], othValue = other[key];
       if (customizer) {
         var compared = isPartial ? customizer(othValue, objValue, key, other, object2, stack) : customizer(objValue, othValue, key, object2, other, stack);
@@ -13139,19 +13183,19 @@ function require_baseIsMatch() {
   var Stack = require_Stack(), baseIsEqual = require_baseIsEqual();
   var COMPARE_PARTIAL_FLAG = 1, COMPARE_UNORDERED_FLAG = 2;
   function baseIsMatch(object2, source, matchData, customizer) {
-    var index = matchData.length, length = index, noCustomizer = !customizer;
+    var index2 = matchData.length, length = index2, noCustomizer = !customizer;
     if (object2 == null) {
       return !length;
     }
     object2 = Object(object2);
-    while (index--) {
-      var data = matchData[index];
+    while (index2--) {
+      var data = matchData[index2];
       if (noCustomizer && data[2] ? data[1] !== object2[data[0]] : !(data[0] in object2)) {
         return false;
       }
     }
-    while (++index < length) {
-      data = matchData[index];
+    while (++index2 < length) {
+      data = matchData[index2];
       var key = data[0], objValue = object2[key], srcValue = data[1];
       if (noCustomizer && data[2]) {
         if (objValue === void 0 && !(key in object2)) {
@@ -13254,15 +13298,15 @@ function require_hasPath() {
   var castPath = require_castPath(), isArguments = requireIsArguments(), isArray2 = requireIsArray(), isIndex = require_isIndex(), isLength = requireIsLength(), toKey = require_toKey();
   function hasPath(object2, path, hasFunc) {
     path = castPath(path, object2);
-    var index = -1, length = path.length, result = false;
-    while (++index < length) {
-      var key = toKey(path[index]);
+    var index2 = -1, length = path.length, result = false;
+    while (++index2 < length) {
+      var key = toKey(path[index2]);
       if (!(result = object2 != null && hasFunc(object2, key))) {
         break;
       }
       object2 = object2[key];
     }
-    if (result || ++index != length) {
+    if (result || ++index2 != length) {
       return result;
     }
     length = object2 == null ? 0 : object2.length;
@@ -13379,10 +13423,10 @@ function require_baseFindIndex() {
   if (hasRequired_baseFindIndex) return _baseFindIndex;
   hasRequired_baseFindIndex = 1;
   function baseFindIndex(array2, predicate, fromIndex, fromRight) {
-    var length = array2.length, index = fromIndex + (fromRight ? 1 : -1);
-    while (fromRight ? index-- : ++index < length) {
-      if (predicate(array2[index], index, array2)) {
-        return index;
+    var length = array2.length, index2 = fromIndex + (fromRight ? 1 : -1);
+    while (fromRight ? index2-- : ++index2 < length) {
+      if (predicate(array2[index2], index2, array2)) {
+        return index2;
       }
     }
     return -1;
@@ -13407,10 +13451,10 @@ function require_strictIndexOf() {
   if (hasRequired_strictIndexOf) return _strictIndexOf;
   hasRequired_strictIndexOf = 1;
   function strictIndexOf(array2, value, fromIndex) {
-    var index = fromIndex - 1, length = array2.length;
-    while (++index < length) {
-      if (array2[index] === value) {
-        return index;
+    var index2 = fromIndex - 1, length = array2.length;
+    while (++index2 < length) {
+      if (array2[index2] === value) {
+        return index2;
       }
     }
     return -1;
@@ -13449,9 +13493,9 @@ function require_arrayIncludesWith() {
   if (hasRequired_arrayIncludesWith) return _arrayIncludesWith;
   hasRequired_arrayIncludesWith = 1;
   function arrayIncludesWith(array2, value, comparator) {
-    var index = -1, length = array2 == null ? 0 : array2.length;
-    while (++index < length) {
-      if (comparator(value, array2[index])) {
+    var index2 = -1, length = array2 == null ? 0 : array2.length;
+    while (++index2 < length) {
+      if (comparator(value, array2[index2])) {
         return true;
       }
     }
@@ -13491,7 +13535,7 @@ function require_baseUniq() {
   var SetCache = require_SetCache(), arrayIncludes = require_arrayIncludes(), arrayIncludesWith = require_arrayIncludesWith(), cacheHas = require_cacheHas(), createSet = require_createSet(), setToArray = require_setToArray();
   var LARGE_ARRAY_SIZE = 200;
   function baseUniq(array2, iteratee, comparator) {
-    var index = -1, includes = arrayIncludes, length = array2.length, isCommon = true, result = [], seen2 = result;
+    var index2 = -1, includes = arrayIncludes, length = array2.length, isCommon = true, result = [], seen2 = result;
     if (comparator) {
       isCommon = false;
       includes = arrayIncludesWith;
@@ -13507,8 +13551,8 @@ function require_baseUniq() {
       seen2 = iteratee ? [] : result;
     }
     outer:
-      while (++index < length) {
-        var value = array2[index], computed = iteratee ? iteratee(value) : value;
+      while (++index2 < length) {
+        var value = array2[index2], computed = iteratee ? iteratee(value) : value;
         value = comparator || value !== 0 ? value : 0;
         if (isCommon && computed === computed) {
           var seenIndex = seen2.length;
@@ -13565,7 +13609,7 @@ function _typeof$D(o) {
   }, _typeof$D(o);
 }
 var _excluded$f = ["ref"];
-function ownKeys$z(e, r2) {
+function ownKeys$A(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -13578,9 +13622,9 @@ function ownKeys$z(e, r2) {
 function _objectSpread$z(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$z(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$A(Object(t), true).forEach(function(r3) {
       _defineProperty$C(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$z(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$A(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -13888,11 +13932,11 @@ function require_baseFlatten() {
   hasRequired_baseFlatten = 1;
   var arrayPush = require_arrayPush(), isFlattenable = require_isFlattenable();
   function baseFlatten(array2, depth, predicate, isStrict, result) {
-    var index = -1, length = array2.length;
+    var index2 = -1, length = array2.length;
     predicate || (predicate = isFlattenable);
     result || (result = []);
-    while (++index < length) {
-      var value = array2[index];
+    while (++index2 < length) {
+      var value = array2[index2];
       if (depth > 0 && predicate(value)) {
         if (depth > 1) {
           baseFlatten(value, depth - 1, predicate, isStrict, result);
@@ -13915,9 +13959,9 @@ function require_createBaseFor() {
   hasRequired_createBaseFor = 1;
   function createBaseFor(fromRight) {
     return function(object2, iteratee, keysFunc) {
-      var index = -1, iterable = Object(object2), props = keysFunc(object2), length = props.length;
+      var index2 = -1, iterable = Object(object2), props = keysFunc(object2), length = props.length;
       while (length--) {
-        var key = props[fromRight ? length : ++index];
+        var key = props[fromRight ? length : ++index2];
         if (iteratee(iterable[key], key, iterable) === false) {
           break;
         }
@@ -13964,9 +14008,9 @@ function require_createBaseEach() {
       if (!isArrayLike(collection)) {
         return eachFunc(collection, iteratee);
       }
-      var length = collection.length, index = fromRight ? length : -1, iterable = Object(collection);
-      while (fromRight ? index-- : ++index < length) {
-        if (iteratee(iterable[index], index, iterable) === false) {
+      var length = collection.length, index2 = fromRight ? length : -1, iterable = Object(collection);
+      while (fromRight ? index2-- : ++index2 < length) {
+        if (iteratee(iterable[index2], index2, iterable) === false) {
           break;
         }
       }
@@ -13993,9 +14037,9 @@ function require_baseMap() {
   hasRequired_baseMap = 1;
   var baseEach = require_baseEach(), isArrayLike = requireIsArrayLike();
   function baseMap(collection, iteratee) {
-    var index = -1, result = isArrayLike(collection) ? Array(collection.length) : [];
+    var index2 = -1, result = isArrayLike(collection) ? Array(collection.length) : [];
     baseEach(collection, function(value, key, collection2) {
-      result[++index] = iteratee(value, key, collection2);
+      result[++index2] = iteratee(value, key, collection2);
     });
     return result;
   }
@@ -14047,14 +14091,14 @@ function require_compareMultiple() {
   hasRequired_compareMultiple = 1;
   var compareAscending = require_compareAscending();
   function compareMultiple(object2, other, orders) {
-    var index = -1, objCriteria = object2.criteria, othCriteria = other.criteria, length = objCriteria.length, ordersLength = orders.length;
-    while (++index < length) {
-      var result = compareAscending(objCriteria[index], othCriteria[index]);
+    var index2 = -1, objCriteria = object2.criteria, othCriteria = other.criteria, length = objCriteria.length, ordersLength = orders.length;
+    while (++index2 < length) {
+      var result = compareAscending(objCriteria[index2], othCriteria[index2]);
       if (result) {
-        if (index >= ordersLength) {
+        if (index2 >= ordersLength) {
           return result;
         }
-        var order = orders[index];
+        var order = orders[index2];
         return result * (order == "desc" ? -1 : 1);
       }
     }
@@ -14082,13 +14126,13 @@ function require_baseOrderBy() {
     } else {
       iteratees = [identity3];
     }
-    var index = -1;
+    var index2 = -1;
     iteratees = arrayMap(iteratees, baseUnary(baseIteratee));
     var result = baseMap(collection, function(value, key, collection2) {
       var criteria = arrayMap(iteratees, function(iteratee) {
         return iteratee(value);
       });
-      return { "criteria": criteria, "index": ++index, "value": value };
+      return { "criteria": criteria, "index": ++index2, "value": value };
     });
     return baseSortBy(result, function(object2, other) {
       return compareMultiple(object2, other, orders);
@@ -14128,14 +14172,14 @@ function require_overRest() {
   function overRest(func, start, transform) {
     start = nativeMax(start === void 0 ? func.length - 1 : start, 0);
     return function() {
-      var args = arguments, index = -1, length = nativeMax(args.length - start, 0), array2 = Array(length);
-      while (++index < length) {
-        array2[index] = args[start + index];
+      var args = arguments, index2 = -1, length = nativeMax(args.length - start, 0), array2 = Array(length);
+      while (++index2 < length) {
+        array2[index2] = args[start + index2];
       }
-      index = -1;
+      index2 = -1;
       var otherArgs = Array(start + 1);
-      while (++index < start) {
-        otherArgs[index] = args[index];
+      while (++index2 < start) {
+        otherArgs[index2] = args[index2];
       }
       otherArgs[start] = transform(array2);
       return apply(func, this, otherArgs);
@@ -14244,13 +14288,13 @@ function require_isIterateeCall() {
   if (hasRequired_isIterateeCall) return _isIterateeCall;
   hasRequired_isIterateeCall = 1;
   var eq = requireEq(), isArrayLike = requireIsArrayLike(), isIndex = require_isIndex(), isObject2 = requireIsObject();
-  function isIterateeCall(value, index, object2) {
+  function isIterateeCall(value, index2, object2) {
     if (!isObject2(object2)) {
       return false;
     }
-    var type = typeof index;
-    if (type == "number" ? isArrayLike(object2) && isIndex(index, object2.length) : type == "string" && index in object2) {
-      return eq(object2[index], value);
+    var type = typeof index2;
+    if (type == "number" ? isArrayLike(object2) && isIndex(index2, object2.length) : type == "string" && index2 in object2) {
+      return eq(object2[index2], value);
     }
     return false;
   }
@@ -14343,7 +14387,7 @@ function _iterableToArrayLimit$b(r2, l) {
 function _arrayWithHoles$c(arr) {
   if (Array.isArray(arr)) return arr;
 }
-function ownKeys$y(e, r2) {
+function ownKeys$z(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -14356,9 +14400,9 @@ function ownKeys$y(e, r2) {
 function _objectSpread$y(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$y(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$z(Object(t), true).forEach(function(r3) {
       _defineProperty$A(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$y(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$z(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -14596,7 +14640,7 @@ function _typeof$A(o) {
     return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
   }, _typeof$A(o);
 }
-function ownKeys$x(e, r2) {
+function ownKeys$y(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -14609,9 +14653,9 @@ function ownKeys$x(e, r2) {
 function _objectSpread$x(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$x(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$y(Object(t), true).forEach(function(r3) {
       _defineProperty$y(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$x(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$y(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -14843,7 +14887,7 @@ function _typeof$z(o) {
     return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
   }, _typeof$z(o);
 }
-function ownKeys$w(e, r2) {
+function ownKeys$x(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -14856,9 +14900,9 @@ function ownKeys$w(e, r2) {
 function _objectSpread$w(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$w(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$x(Object(t), true).forEach(function(r3) {
       _defineProperty$x(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$w(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$x(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -15060,10 +15104,10 @@ function require_trimmedEndIndex() {
   hasRequired_trimmedEndIndex = 1;
   var reWhitespace = /\s/;
   function trimmedEndIndex(string2) {
-    var index = string2.length;
-    while (index-- && reWhitespace.test(string2.charAt(index))) {
+    var index2 = string2.length;
+    while (index2-- && reWhitespace.test(string2.charAt(index2))) {
     }
-    return index;
+    return index2;
   }
   _trimmedEndIndex = trimmedEndIndex;
   return _trimmedEndIndex;
@@ -15092,7 +15136,7 @@ function requireToNumber() {
   var reIsBinary = /^0b[01]+$/i;
   var reIsOctal = /^0o[0-7]+$/i;
   var freeParseInt = parseInt;
-  function toNumber(value) {
+  function toNumber2(value) {
     if (typeof value == "number") {
       return value;
     }
@@ -15110,7 +15154,7 @@ function requireToNumber() {
     var isBinary = reIsBinary.test(value);
     return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
   }
-  toNumber_1 = toNumber;
+  toNumber_1 = toNumber2;
   return toNumber_1;
 }
 var debounce_1;
@@ -15118,7 +15162,7 @@ var hasRequiredDebounce;
 function requireDebounce() {
   if (hasRequiredDebounce) return debounce_1;
   hasRequiredDebounce = 1;
-  var isObject2 = requireIsObject(), now = requireNow(), toNumber = requireToNumber();
+  var isObject2 = requireIsObject(), now = requireNow(), toNumber2 = requireToNumber();
   var FUNC_ERROR_TEXT = "Expected a function";
   var nativeMax = Math.max, nativeMin = Math.min;
   function debounce(func, wait, options) {
@@ -15126,11 +15170,11 @@ function requireDebounce() {
     if (typeof func != "function") {
       throw new TypeError(FUNC_ERROR_TEXT);
     }
-    wait = toNumber(wait) || 0;
+    wait = toNumber2(wait) || 0;
     if (isObject2(options)) {
       leading = !!options.leading;
       maxing = "maxWait" in options;
-      maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
+      maxWait = maxing ? nativeMax(toNumber2(options.maxWait) || 0, wait) : maxWait;
       trailing = "trailing" in options ? !!options.trailing : trailing;
     }
     function invokeFunc(time2) {
@@ -15240,7 +15284,7 @@ function _typeof$y(o) {
     return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
   }, _typeof$y(o);
 }
-function ownKeys$v(e, r2) {
+function ownKeys$w(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -15253,9 +15297,9 @@ function ownKeys$v(e, r2) {
 function _objectSpread$v(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$v(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$w(Object(t), true).forEach(function(r3) {
       _defineProperty$w(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$v(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$w(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -15443,7 +15487,7 @@ function _typeof$x(o) {
     return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
   }, _typeof$x(o);
 }
-function ownKeys$u(e, r2) {
+function ownKeys$v(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -15456,9 +15500,9 @@ function ownKeys$u(e, r2) {
 function _objectSpread$u(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$u(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$v(Object(t), true).forEach(function(r3) {
       _defineProperty$v(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$u(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$v(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -15938,8 +15982,8 @@ var calculateWordsByLines = function calculateWordsByLines2(_ref2, initialWordsW
     return originalResult;
   }
   var suffix = "…";
-  var checkOverflow = function checkOverflow2(index) {
-    var tempText = text.slice(0, index);
+  var checkOverflow = function checkOverflow2(index2) {
+    var tempText = text.slice(0, index2);
     var words = calculateWordWidths({
       breakAll,
       style,
@@ -16052,11 +16096,11 @@ var Text = function Text2(_ref5) {
     className: clsx("recharts-text", className),
     textAnchor,
     fill: fill.includes("url") ? DEFAULT_FILL : fill
-  }), wordsByLines.map(function(line, index) {
+  }), wordsByLines.map(function(line, index2) {
     var words = line.words.join(breakAll ? "" : " ");
     return /* @__PURE__ */ React.createElement("tspan", {
       x: x2,
-      dy: index === 0 ? startDy : lineHeight,
+      dy: index2 === 0 ? startDy : lineHeight,
       key: words
     }, words);
   }));
@@ -16339,21 +16383,21 @@ function initInterpolator(domain, interpolator) {
 }
 const implicit = Symbol("implicit");
 function ordinal() {
-  var index = new InternMap(), domain = [], range3 = [], unknown = implicit;
+  var index2 = new InternMap(), domain = [], range3 = [], unknown = implicit;
   function scale(d) {
-    let i = index.get(d);
+    let i = index2.get(d);
     if (i === void 0) {
       if (unknown !== implicit) return unknown;
-      index.set(d, i = domain.push(d) - 1);
+      index2.set(d, i = domain.push(d) - 1);
     }
     return range3[i % range3.length];
   }
   scale.domain = function(_) {
     if (!arguments.length) return domain.slice();
-    domain = [], index = new InternMap();
+    domain = [], index2 = new InternMap();
     for (const value of _) {
-      if (index.has(value)) continue;
-      index.set(value, domain.push(value) - 1);
+      if (index2.has(value)) continue;
+      index2.set(value, domain.push(value) - 1);
     }
     return scale;
   };
@@ -16906,7 +16950,7 @@ function piecewise(interpolate$1, values) {
     return I[i2](t - i2);
   };
 }
-function constants(x2) {
+function constants$1(x2) {
   return function() {
     return x2;
   };
@@ -16921,7 +16965,7 @@ function identity$4(x2) {
 function normalize(a2, b) {
   return (b -= a2 = +a2) ? function(x2) {
     return (x2 - a2) / b;
-  } : constants(isNaN(b) ? NaN : 0.5);
+  } : constants$1(isNaN(b) ? NaN : 0.5);
 }
 function clamper(a2, b) {
   var t;
@@ -18712,9 +18756,9 @@ function require_baseExtremum() {
   hasRequired_baseExtremum = 1;
   var isSymbol = requireIsSymbol();
   function baseExtremum(array2, iteratee, comparator) {
-    var index = -1, length = array2.length;
-    while (++index < length) {
-      var value = array2[index], current = iteratee(value);
+    var index2 = -1, length = array2.length;
+    while (++index2 < length) {
+      var value = array2[index2], current = iteratee(value);
       if (current != null && (computed === void 0 ? current === current && !isSymbol(current) : comparator(current, computed))) {
         var computed = current, result = value;
       }
@@ -20306,7 +20350,7 @@ function _typeof$v(o) {
     return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
   }, _typeof$v(o);
 }
-function ownKeys$t(e, r2) {
+function ownKeys$u(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -20319,9 +20363,9 @@ function ownKeys$t(e, r2) {
 function _objectSpread$t(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$t(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$u(Object(t), true).forEach(function(r3) {
       _defineProperty$u(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$t(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$u(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -20400,7 +20444,7 @@ function _typeof$u(o) {
     return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
   }, _typeof$u(o);
 }
-function ownKeys$s(e, r2) {
+function ownKeys$t(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -20413,9 +20457,9 @@ function ownKeys$s(e, r2) {
 function _objectSpread$s(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$s(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$t(Object(t), true).forEach(function(r3) {
       _defineProperty$t(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$s(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$t(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -20474,7 +20518,7 @@ function getValueByDataKey(obj, dataKey, defaultValue) {
     return defaultValue;
   }
   if (isNumOrStr(dataKey)) {
-    return get(obj, dataKey, defaultValue);
+    return get$1(obj, dataKey, defaultValue);
   }
   if (isFunction(dataKey)) {
     return dataKey(obj);
@@ -20503,7 +20547,7 @@ var calculateActiveTickIndex = function calculateActiveTickIndex2(coordinate) {
   var ticks2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : [];
   var unsortedTicks = arguments.length > 2 ? arguments[2] : void 0;
   var axis = arguments.length > 3 ? arguments[3] : void 0;
-  var index = -1;
+  var index2 = -1;
   var len = (_ticks$length = ticks2 === null || ticks2 === void 0 ? void 0 : ticks2.length) !== null && _ticks$length !== void 0 ? _ticks$length : 0;
   if (len <= 1) {
     return 0;
@@ -20530,14 +20574,14 @@ var calculateActiveTickIndex = function calculateActiveTickIndex2(coordinate) {
         }
         var sameInterval = [Math.min(cur, (sameDirectionCoord + cur) / 2), Math.max(cur, (sameDirectionCoord + cur) / 2)];
         if (coordinate > sameInterval[0] && coordinate <= sameInterval[1] || coordinate >= diffInterval[0] && coordinate <= diffInterval[1]) {
-          index = unsortedTicks[i].index;
+          index2 = unsortedTicks[i].index;
           break;
         }
       } else {
         var minValue = Math.min(before, after);
         var maxValue = Math.max(before, after);
         if (coordinate > (minValue + cur) / 2 && coordinate <= (maxValue + cur) / 2) {
-          index = unsortedTicks[i].index;
+          index2 = unsortedTicks[i].index;
           break;
         }
       }
@@ -20545,12 +20589,12 @@ var calculateActiveTickIndex = function calculateActiveTickIndex2(coordinate) {
   } else {
     for (var _i = 0; _i < len; _i++) {
       if (_i === 0 && coordinate <= (ticks2[_i].coordinate + ticks2[_i + 1].coordinate) / 2 || _i > 0 && _i < len - 1 && coordinate > (ticks2[_i].coordinate + ticks2[_i - 1].coordinate) / 2 && coordinate <= (ticks2[_i].coordinate + ticks2[_i + 1].coordinate) / 2 || _i === len - 1 && coordinate > (ticks2[_i].coordinate + ticks2[_i - 1].coordinate) / 2) {
-        index = ticks2[_i].index;
+        index2 = ticks2[_i].index;
         break;
       }
     }
   }
-  return index;
+  return index2;
 };
 var getMainColorOfGraphicItem = function getMainColorOfGraphicItem2(item) {
   var _ref = item, displayName = _ref.type.displayName;
@@ -20835,11 +20879,11 @@ var getTicksOfAxis = function getTicksOfAxis2(axis, isGrid, isAll) {
     });
   }
   if (axis.isCategorical && axis.categoricalDomain) {
-    return axis.categoricalDomain.map(function(entry, index) {
+    return axis.categoricalDomain.map(function(entry, index2) {
       return {
         coordinate: scale(entry) + offset,
         value: entry,
-        index,
+        index: index2,
         offset
       };
     });
@@ -20853,11 +20897,11 @@ var getTicksOfAxis = function getTicksOfAxis2(axis, isGrid, isAll) {
       };
     });
   }
-  return scale.domain().map(function(entry, index) {
+  return scale.domain().map(function(entry, index2) {
     return {
       coordinate: scale(entry) + offset,
       value: duplicateDomain ? duplicateDomain[entry] : entry,
-      index,
+      index: index2,
       offset
     };
   });
@@ -21118,7 +21162,7 @@ var getTicksOfScale = function getTicksOfScale2(scale, opts) {
   return null;
 };
 function getCateCoordinateOfLine(_ref5) {
-  var axis = _ref5.axis, ticks2 = _ref5.ticks, bandSize = _ref5.bandSize, entry = _ref5.entry, index = _ref5.index, dataKey = _ref5.dataKey;
+  var axis = _ref5.axis, ticks2 = _ref5.ticks, bandSize = _ref5.bandSize, entry = _ref5.entry, index2 = _ref5.index, dataKey = _ref5.dataKey;
   if (axis.type === "category") {
     if (!axis.allowDuplicatedCategory && axis.dataKey && !isNil(entry[axis.dataKey])) {
       var matchedTick = findEntryInArray(ticks2, "value", entry[axis.dataKey]);
@@ -21126,17 +21170,17 @@ function getCateCoordinateOfLine(_ref5) {
         return matchedTick.coordinate + bandSize / 2;
       }
     }
-    return ticks2[index] ? ticks2[index].coordinate + bandSize / 2 : null;
+    return ticks2[index2] ? ticks2[index2].coordinate + bandSize / 2 : null;
   }
   var value = getValueByDataKey(entry, !isNil(dataKey) ? dataKey : axis.dataKey);
   return !isNil(value) ? axis.scale(value) : null;
 }
 var getCateCoordinateOfBar = function getCateCoordinateOfBar2(_ref6) {
-  var axis = _ref6.axis, ticks2 = _ref6.ticks, offset = _ref6.offset, bandSize = _ref6.bandSize, entry = _ref6.entry, index = _ref6.index;
+  var axis = _ref6.axis, ticks2 = _ref6.ticks, offset = _ref6.offset, bandSize = _ref6.bandSize, entry = _ref6.entry, index2 = _ref6.index;
   if (axis.type === "category") {
-    return ticks2[index] ? ticks2[index].coordinate + offset : null;
+    return ticks2[index2] ? ticks2[index2].coordinate + offset : null;
   }
-  var value = getValueByDataKey(entry, axis.dataKey, axis.domain[index]);
+  var value = getValueByDataKey(entry, axis.dataKey, axis.domain[index2]);
   return !isNil(value) ? axis.scale(value) - bandSize / 2 + offset : null;
 };
 var getBaseValueOfBar = function getBaseValueOfBar2(_ref7) {
@@ -21241,7 +21285,7 @@ var parseDomainOfCategoryAxis = function parseDomainOfCategoryAxis2(specifiedDom
   if (!specifiedDomain || !specifiedDomain.length) {
     return calculatedDomain;
   }
-  if (isEqual(specifiedDomain, get(axisChild, "type.defaultProps.domain"))) {
+  if (isEqual(specifiedDomain, get$1(axisChild, "type.defaultProps.domain"))) {
     return calculatedDomain;
   }
   return specifiedDomain;
@@ -21269,7 +21313,7 @@ function _typeof$t(o) {
     return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
   }, _typeof$t(o);
 }
-function ownKeys$r(e, r2) {
+function ownKeys$s(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -21282,9 +21326,9 @@ function ownKeys$r(e, r2) {
 function _objectSpread$r(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$r(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$s(Object(t), true).forEach(function(r3) {
       _defineProperty$s(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$r(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$s(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -21473,7 +21517,7 @@ function _objectWithoutPropertiesLoose$c(source, excluded) {
   }
   return target;
 }
-function ownKeys$q(e, r2) {
+function ownKeys$r(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -21486,9 +21530,9 @@ function ownKeys$q(e, r2) {
 function _objectSpread$q(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$q(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$r(Object(t), true).forEach(function(r3) {
       _defineProperty$r(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$q(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$r(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -21901,11 +21945,11 @@ var renderCallByParent$1 = function renderCallByParent(parentProps, viewBox) {
   }
   var children = parentProps.children;
   var parentViewBox = parseViewBox(parentProps);
-  var explicitChildren = findAllByType(children, Label).map(function(child, index) {
+  var explicitChildren = findAllByType(children, Label).map(function(child, index2) {
     return /* @__PURE__ */ reactExports.cloneElement(child, {
       viewBox: viewBox || parentViewBox,
       // eslint-disable-next-line react/no-array-index-key
-      key: "label-".concat(index)
+      key: "label-".concat(index2)
     });
   });
   if (!checkPropsLabel) {
@@ -21978,7 +22022,7 @@ function _extends$l() {
   };
   return _extends$l.apply(this, arguments);
 }
-function ownKeys$p(e, r2) {
+function ownKeys$q(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -21991,9 +22035,9 @@ function ownKeys$p(e, r2) {
 function _objectSpread$p(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$p(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$q(Object(t), true).forEach(function(r3) {
       _defineProperty$q(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$p(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$q(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -22060,10 +22104,10 @@ function LabelList(_ref) {
   }
   return /* @__PURE__ */ React.createElement(Layer, {
     className: "recharts-label-list"
-  }, data.map(function(entry, index) {
-    var value = isNil(dataKey) ? valueAccessor(entry, index) : getValueByDataKey(entry && entry.payload, dataKey);
+  }, data.map(function(entry, index2) {
+    var value = isNil(dataKey) ? valueAccessor(entry, index2) : getValueByDataKey(entry && entry.payload, dataKey);
     var idProps = isNil(id) ? {} : {
-      id: "".concat(id, "-").concat(index)
+      id: "".concat(id, "-").concat(index2)
     };
     return /* @__PURE__ */ React.createElement(Label, _extends$l({}, filterProps(entry, true), others, idProps, {
       parentViewBox: entry.parentViewBox,
@@ -22072,8 +22116,8 @@ function LabelList(_ref) {
       viewBox: Label.parseViewBox(isNil(clockWise) ? entry : _objectSpread$p(_objectSpread$p({}, entry), {}, {
         clockWise
       })),
-      key: "label-".concat(index),
-      index
+      key: "label-".concat(index2),
+      index: index2
     }));
   }));
 }
@@ -22110,11 +22154,11 @@ function renderCallByParent2(parentProps, data) {
     return null;
   }
   var children = parentProps.children;
-  var explicitChildren = findAllByType(children, LabelList).map(function(child, index) {
+  var explicitChildren = findAllByType(children, LabelList).map(function(child, index2) {
     return /* @__PURE__ */ reactExports.cloneElement(child, {
       data,
       // eslint-disable-next-line react/no-array-index-key
-      key: "labelList-".concat(index)
+      key: "labelList-".concat(index2)
     });
   });
   if (!checkPropsLabel) {
@@ -22146,7 +22190,7 @@ function _extends$k() {
   };
   return _extends$k.apply(this, arguments);
 }
-function ownKeys$o(e, r2) {
+function ownKeys$p(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -22159,9 +22203,9 @@ function ownKeys$o(e, r2) {
 function _objectSpread$o(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$o(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$p(Object(t), true).forEach(function(r3) {
       _defineProperty$p(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$o(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$p(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -22365,7 +22409,7 @@ function _extends$j() {
   };
   return _extends$j.apply(this, arguments);
 }
-function ownKeys$n(e, r2) {
+function ownKeys$o(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -22378,9 +22422,9 @@ function ownKeys$n(e, r2) {
 function _objectSpread$n(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$n(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$o(Object(t), true).forEach(function(r3) {
       _defineProperty$o(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$n(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$o(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -22454,9 +22498,9 @@ var getPath$1 = function getPath(_ref) {
     var formatBaseLine = connectNulls ? baseLine.filter(function(base) {
       return defined(base);
     }) : baseLine;
-    var areaPoints = formatPoints.map(function(entry, index) {
+    var areaPoints = formatPoints.map(function(entry, index2) {
       return _objectSpread$n(_objectSpread$n({}, entry), {}, {
-        base: formatBaseLine[index]
+        base: formatBaseLine[index2]
       });
     });
     if (layout === "vertical") {
@@ -22614,12 +22658,12 @@ var PREACT_OWNER = "__o";
 var REACT_OWNER = "_owner";
 var getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor, keys = Object.keys;
 function areArraysEqual(a2, b, state) {
-  var index = a2.length;
-  if (b.length !== index) {
+  var index2 = a2.length;
+  if (b.length !== index2) {
     return false;
   }
-  while (index-- > 0) {
-    if (!state.equals(a2[index], b[index], index, index, a2, b, state)) {
+  while (index2-- > 0) {
+    if (!state.equals(a2[index2], b[index2], index2, index2, a2, b, state)) {
       return false;
     }
   }
@@ -22646,7 +22690,7 @@ function areMapsEqual(a2, b, state) {
   var aIterable = a2.entries();
   var aResult;
   var bResult;
-  var index = 0;
+  var index2 = 0;
   while (aResult = aIterable.next()) {
     if (aResult.done) {
       break;
@@ -22664,7 +22708,7 @@ function areMapsEqual(a2, b, state) {
       }
       var aEntry = aResult.value;
       var bEntry = bResult.value;
-      if (state.equals(aEntry[0], bEntry[0], index, matchIndex, a2, b, state) && state.equals(aEntry[1], bEntry[1], aEntry[0], bEntry[0], a2, b, state)) {
+      if (state.equals(aEntry[0], bEntry[0], index2, matchIndex, a2, b, state) && state.equals(aEntry[1], bEntry[1], aEntry[0], bEntry[0], a2, b, state)) {
         hasMatch = matchedIndices[matchIndex] = true;
         break;
       }
@@ -22673,19 +22717,19 @@ function areMapsEqual(a2, b, state) {
     if (!hasMatch) {
       return false;
     }
-    index++;
+    index2++;
   }
   return true;
 }
 var areNumbersEqual = sameValueZeroEqual;
 function areObjectsEqual(a2, b, state) {
   var properties = keys(a2);
-  var index = properties.length;
-  if (keys(b).length !== index) {
+  var index2 = properties.length;
+  if (keys(b).length !== index2) {
     return false;
   }
-  while (index-- > 0) {
-    if (!isPropertyEqual(a2, b, state, properties[index])) {
+  while (index2-- > 0) {
+    if (!isPropertyEqual(a2, b, state, properties[index2])) {
       return false;
     }
   }
@@ -22693,15 +22737,15 @@ function areObjectsEqual(a2, b, state) {
 }
 function areObjectsEqualStrict(a2, b, state) {
   var properties = getStrictProperties(a2);
-  var index = properties.length;
-  if (getStrictProperties(b).length !== index) {
+  var index2 = properties.length;
+  if (getStrictProperties(b).length !== index2) {
     return false;
   }
   var property;
   var descriptorA;
   var descriptorB;
-  while (index-- > 0) {
-    property = properties[index];
+  while (index2-- > 0) {
+    property = properties[index2];
     if (!isPropertyEqual(a2, b, state, property)) {
       return false;
     }
@@ -22755,12 +22799,12 @@ function areSetsEqual(a2, b, state) {
   return true;
 }
 function areTypedArraysEqual(a2, b) {
-  var index = a2.length;
-  if (b.length !== index) {
+  var index2 = a2.length;
+  if (b.length !== index2) {
     return false;
   }
-  while (index-- > 0) {
-    if (a2[index] !== b[index]) {
+  while (index2-- > 0) {
+    if (a2[index2] !== b[index2]) {
       return false;
     }
   }
@@ -22790,8 +22834,8 @@ var isArray = Array.isArray;
 var isTypedArray = typeof ArrayBuffer !== "undefined" && typeof ArrayBuffer.isView === "function" ? ArrayBuffer.isView : null;
 var assign = Object.assign;
 var getTag = Object.prototype.toString.call.bind(Object.prototype.toString);
-function createEqualityComparator(_a) {
-  var areArraysEqual2 = _a.areArraysEqual, areDatesEqual2 = _a.areDatesEqual, areErrorsEqual2 = _a.areErrorsEqual, areFunctionsEqual2 = _a.areFunctionsEqual, areMapsEqual2 = _a.areMapsEqual, areNumbersEqual2 = _a.areNumbersEqual, areObjectsEqual2 = _a.areObjectsEqual, arePrimitiveWrappersEqual2 = _a.arePrimitiveWrappersEqual, areRegExpsEqual2 = _a.areRegExpsEqual, areSetsEqual2 = _a.areSetsEqual, areTypedArraysEqual2 = _a.areTypedArraysEqual, areUrlsEqual2 = _a.areUrlsEqual, unknownTagComparators = _a.unknownTagComparators;
+function createEqualityComparator(_a3) {
+  var areArraysEqual2 = _a3.areArraysEqual, areDatesEqual2 = _a3.areDatesEqual, areErrorsEqual2 = _a3.areErrorsEqual, areFunctionsEqual2 = _a3.areFunctionsEqual, areMapsEqual2 = _a3.areMapsEqual, areNumbersEqual2 = _a3.areNumbersEqual, areObjectsEqual2 = _a3.areObjectsEqual, arePrimitiveWrappersEqual2 = _a3.arePrimitiveWrappersEqual, areRegExpsEqual2 = _a3.areRegExpsEqual, areSetsEqual2 = _a3.areSetsEqual, areTypedArraysEqual2 = _a3.areTypedArraysEqual, areUrlsEqual2 = _a3.areUrlsEqual, unknownTagComparators = _a3.unknownTagComparators;
   return function comparator(a2, b, state) {
     if (a2 === b) {
       return true;
@@ -22880,8 +22924,8 @@ function createEqualityComparator(_a) {
     return false;
   };
 }
-function createEqualityComparatorConfig(_a) {
-  var circular = _a.circular, createCustomConfig = _a.createCustomConfig, strict = _a.strict;
+function createEqualityComparatorConfig(_a3) {
+  var circular = _a3.circular, createCustomConfig = _a3.createCustomConfig, strict = _a3.strict;
   var config2 = {
     areArraysEqual: strict ? areObjectsEqualStrict : areArraysEqual,
     areDatesEqual,
@@ -22919,11 +22963,11 @@ function createInternalEqualityComparator(compare) {
     return compare(a2, b, state);
   };
 }
-function createIsEqual(_a) {
-  var circular = _a.circular, comparator = _a.comparator, createState = _a.createState, equals = _a.equals, strict = _a.strict;
+function createIsEqual(_a3) {
+  var circular = _a3.circular, comparator = _a3.comparator, createState = _a3.createState, equals = _a3.equals, strict = _a3.strict;
   if (createState) {
     return function isEqual2(a2, b) {
-      var _a2 = createState(), _b = _a2.cache, cache = _b === void 0 ? circular ? /* @__PURE__ */ new WeakMap() : void 0 : _b, meta = _a2.meta;
+      var _a4 = createState(), _b2 = _a4.cache, cache = _b2 === void 0 ? circular ? /* @__PURE__ */ new WeakMap() : void 0 : _b2, meta = _a4.meta;
       return comparator(a2, b, {
         cache,
         equals,
@@ -22987,7 +23031,7 @@ function createCustomEqual(options) {
   if (options === void 0) {
     options = {};
   }
-  var _a = options.circular, circular = _a === void 0 ? false : _a, createCustomInternalComparator = options.createInternalComparator, createState = options.createState, _b = options.strict, strict = _b === void 0 ? false : _b;
+  var _a3 = options.circular, circular = _a3 === void 0 ? false : _a3, createCustomInternalComparator = options.createInternalComparator, createState = options.createState, _b2 = options.strict, strict = _b2 === void 0 ? false : _b2;
   var config2 = createEqualityComparatorConfig(options);
   var comparator = createEqualityComparator(config2);
   var equals = createCustomInternalComparator ? createCustomInternalComparator(comparator) : createInternalEqualityComparator(comparator);
@@ -23103,7 +23147,7 @@ function _typeof$n(o) {
     return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
   }, _typeof$n(o);
 }
-function ownKeys$m(e, r2) {
+function ownKeys$n(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -23116,9 +23160,9 @@ function ownKeys$m(e, r2) {
 function _objectSpread$m(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$m(Object(t), true).forEach(function(r22) {
+    r2 % 2 ? ownKeys$n(Object(t), true).forEach(function(r22) {
       _defineProperty$n(e, r22, t[r22]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$m(Object(t)).forEach(function(r22) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$n(Object(t)).forEach(function(r22) {
       Object.defineProperty(e, r22, Object.getOwnPropertyDescriptor(t, r22));
     });
   }
@@ -23394,7 +23438,7 @@ function _iterableToArray$4(iter) {
 function _arrayWithoutHoles$4(arr) {
   if (Array.isArray(arr)) return _arrayLikeToArray$7(arr);
 }
-function ownKeys$l(e, r2) {
+function ownKeys$m(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -23407,9 +23451,9 @@ function ownKeys$l(e, r2) {
 function _objectSpread$l(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$l(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$m(Object(t), true).forEach(function(r3) {
       _defineProperty$m(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$l(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$m(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -23636,7 +23680,7 @@ function _arrayLikeToArray$6(arr, len) {
   for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
   return arr2;
 }
-function ownKeys$k(e, r2) {
+function ownKeys$l(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -23649,9 +23693,9 @@ function ownKeys$k(e, r2) {
 function _objectSpread$k(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$k(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$l(Object(t), true).forEach(function(r3) {
       _defineProperty$l(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$k(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$l(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -23904,12 +23948,12 @@ var Animate = /* @__PURE__ */ (function(_PureComponent) {
       var _this3 = this;
       var steps = props.steps, begin = props.begin, onAnimationStart2 = props.onAnimationStart;
       var _steps$ = steps[0], initialStyle = _steps$.style, _steps$$duration = _steps$.duration, initialTime = _steps$$duration === void 0 ? 0 : _steps$$duration;
-      var addStyle = function addStyle2(sequence, nextItem, index) {
-        if (index === 0) {
+      var addStyle = function addStyle2(sequence, nextItem, index2) {
+        if (index2 === 0) {
           return sequence;
         }
         var duration = nextItem.duration, _nextItem$easing = nextItem.easing, easing = _nextItem$easing === void 0 ? "ease" : _nextItem$easing, style = nextItem.style, nextProperties = nextItem.properties, onAnimationEnd2 = nextItem.onAnimationEnd;
-        var preItem = index > 0 ? steps[index - 1] : nextItem;
+        var preItem = index2 > 0 ? steps[index2 - 1] : nextItem;
         var properties = nextProperties || Object.keys(style);
         if (typeof easing === "function" || easing === "spring") {
           return [].concat(_toConsumableArray$3(sequence), [_this3.runJSAnimation.bind(_this3, {
@@ -24097,7 +24141,7 @@ function _iterableToArrayLimit$3(r2, l) {
 function _arrayWithHoles$3(arr) {
   if (Array.isArray(arr)) return arr;
 }
-function ownKeys$j(e, r2) {
+function ownKeys$k(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -24110,9 +24154,9 @@ function ownKeys$j(e, r2) {
 function _objectSpread$j(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$j(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$k(Object(t), true).forEach(function(r3) {
       _defineProperty$k(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$j(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$k(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -24319,7 +24363,7 @@ function _extends$g() {
   };
   return _extends$g.apply(this, arguments);
 }
-function ownKeys$i(e, r2) {
+function ownKeys$j(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -24332,9 +24376,9 @@ function ownKeys$i(e, r2) {
 function _objectSpread$i(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$i(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$j(Object(t), true).forEach(function(r3) {
       _defineProperty$j(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$i(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$j(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -24447,7 +24491,7 @@ function requireIsPlainObject() {
   return isPlainObject_1;
 }
 var isPlainObjectExports = requireIsPlainObject();
-const isPlainObject = /* @__PURE__ */ getDefaultExportFromCjs(isPlainObjectExports);
+const isPlainObject$2 = /* @__PURE__ */ getDefaultExportFromCjs(isPlainObjectExports);
 var isBoolean_1;
 var hasRequiredIsBoolean;
 function requireIsBoolean() {
@@ -24526,7 +24570,7 @@ function _iterableToArrayLimit$2(r2, l) {
 function _arrayWithHoles$2(arr) {
   if (Array.isArray(arr)) return arr;
 }
-function ownKeys$h(e, r2) {
+function ownKeys$i(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -24539,9 +24583,9 @@ function ownKeys$h(e, r2) {
 function _objectSpread$h(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$h(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$i(Object(t), true).forEach(function(r3) {
       _defineProperty$i(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$h(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$i(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -24690,7 +24734,7 @@ function _objectWithoutPropertiesLoose$8(source, excluded) {
   }
   return target;
 }
-function ownKeys$g(e, r2) {
+function ownKeys$h(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -24703,9 +24747,9 @@ function ownKeys$g(e, r2) {
 function _objectSpread$g(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$g(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$h(Object(t), true).forEach(function(r3) {
       _defineProperty$h(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$g(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$h(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -24771,7 +24815,7 @@ function Shape(_ref2) {
     shape = /* @__PURE__ */ reactExports.cloneElement(option, _objectSpread$g(_objectSpread$g({}, props), getPropsFromShapeOption(option)));
   } else if (isFunction(option)) {
     shape = option(props);
-  } else if (isPlainObject(option) && !isBoolean(option)) {
+  } else if (isPlainObject$2(option) && !isBoolean(option)) {
     var nextProps = propTransformer(option, props);
     shape = /* @__PURE__ */ React.createElement(ShapeSelector, {
       shapeType,
@@ -24877,9 +24921,9 @@ function require_baseRange() {
   hasRequired_baseRange = 1;
   var nativeCeil = Math.ceil, nativeMax = Math.max;
   function baseRange(start, end, step, fromRight) {
-    var index = -1, length = nativeMax(nativeCeil((end - start) / (step || 1)), 0), result = Array(length);
+    var index2 = -1, length = nativeMax(nativeCeil((end - start) / (step || 1)), 0), result = Array(length);
     while (length--) {
-      result[fromRight ? length : ++index] = start;
+      result[fromRight ? length : ++index2] = start;
       start += step;
     }
     return result;
@@ -24892,13 +24936,13 @@ var hasRequiredToFinite;
 function requireToFinite() {
   if (hasRequiredToFinite) return toFinite_1;
   hasRequiredToFinite = 1;
-  var toNumber = requireToNumber();
+  var toNumber2 = requireToNumber();
   var INFINITY = 1 / 0, MAX_INTEGER = 17976931348623157e292;
   function toFinite(value) {
     if (!value) {
       return value === 0 ? value : 0;
     }
-    value = toNumber(value);
+    value = toNumber2(value);
     if (value === INFINITY || value === -INFINITY) {
       var sign2 = value < 0 ? -1 : 1;
       return sign2 * MAX_INTEGER;
@@ -24953,7 +24997,7 @@ function _typeof$g(o) {
     return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
   }, _typeof$g(o);
 }
-function ownKeys$f(e, r2) {
+function ownKeys$g(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -24966,9 +25010,9 @@ function ownKeys$f(e, r2) {
 function _objectSpread$f(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$f(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$g(Object(t), true).forEach(function(r3) {
       _defineProperty$g(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$f(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$g(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -25030,7 +25074,7 @@ function _extends$e() {
   };
   return _extends$e.apply(this, arguments);
 }
-function ownKeys$e(e, r2) {
+function ownKeys$f(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -25043,9 +25087,9 @@ function ownKeys$e(e, r2) {
 function _objectSpread$e(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$e(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$f(Object(t), true).forEach(function(r3) {
       _defineProperty$f(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$e(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$f(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -25259,10 +25303,10 @@ var Brush = /* @__PURE__ */ (function(_PureComponent) {
     }
   }, {
     key: "getTextOfTick",
-    value: function getTextOfTick(index) {
+    value: function getTextOfTick(index2) {
       var _this$props3 = this.props, data = _this$props3.data, tickFormatter = _this$props3.tickFormatter, dataKey = _this$props3.dataKey;
-      var text = getValueByDataKey(data[index], dataKey, index);
-      return isFunction(tickFormatter) ? tickFormatter(text, index) : text;
+      var text = getValueByDataKey(data[index2], dataKey, index2);
+      return isFunction(tickFormatter) ? tickFormatter(text, index2) : text;
     }
   }, {
     key: "attachDragEndListener",
@@ -25641,8 +25685,8 @@ function require_baseSome() {
   var baseEach = require_baseEach();
   function baseSome(collection, predicate) {
     var result;
-    baseEach(collection, function(value, index, collection2) {
-      result = predicate(value, index, collection2);
+    baseEach(collection, function(value, index2, collection2) {
+      result = predicate(value, index2, collection2);
       return !result;
     });
     return !!result;
@@ -25722,9 +25766,9 @@ function require_arrayEvery() {
   if (hasRequired_arrayEvery) return _arrayEvery;
   hasRequired_arrayEvery = 1;
   function arrayEvery(array2, predicate) {
-    var index = -1, length = array2 == null ? 0 : array2.length;
-    while (++index < length) {
-      if (!predicate(array2[index], index, array2)) {
+    var index2 = -1, length = array2 == null ? 0 : array2.length;
+    while (++index2 < length) {
+      if (!predicate(array2[index2], index2, array2)) {
         return false;
       }
     }
@@ -25741,8 +25785,8 @@ function require_baseEvery() {
   var baseEach = require_baseEach();
   function baseEvery(collection, predicate) {
     var result = true;
-    baseEach(collection, function(value, index, collection2) {
-      result = !!predicate(value, index, collection2);
+    baseEach(collection, function(value, index2, collection2) {
+      result = !!predicate(value, index2, collection2);
       return result;
     });
     return result;
@@ -25791,7 +25835,7 @@ function _extends$d() {
   };
   return _extends$d.apply(this, arguments);
 }
-function ownKeys$d(e, r2) {
+function ownKeys$e(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -25804,9 +25848,9 @@ function ownKeys$d(e, r2) {
 function _objectSpread$d(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$d(Object(t), true).forEach(function(r22) {
+    r2 % 2 ? ownKeys$e(Object(t), true).forEach(function(r22) {
       _defineProperty$e(e, r22, t[r22]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$d(Object(t)).forEach(function(r22) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$e(Object(t)).forEach(function(r22) {
       Object.defineProperty(e, r22, Object.getOwnPropertyDescriptor(t, r22));
     });
   }
@@ -25892,11 +25936,11 @@ function BarRectangle(props) {
 }
 var minPointSizeCallback = function minPointSizeCallback2(minPointSize) {
   var defaultValue = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : 0;
-  return function(value, index) {
+  return function(value, index2) {
     if (typeof minPointSize === "number") return minPointSize;
     var isValueNumber = typeof value === "number";
     if (isValueNumber) {
-      return minPointSize(value, index);
+      return minPointSize(value, index2);
     }
     !isValueNumber ? invariant() : void 0;
     return defaultValue;
@@ -25953,7 +25997,7 @@ function _extends$c() {
   };
   return _extends$c.apply(this, arguments);
 }
-function ownKeys$c(e, r2) {
+function ownKeys$d(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -25966,9 +26010,9 @@ function ownKeys$c(e, r2) {
 function _objectSpread$c(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$c(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$d(Object(t), true).forEach(function(r3) {
       _defineProperty$d(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$c(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$d(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -26144,8 +26188,8 @@ var Bar = /* @__PURE__ */ (function(_PureComponent) {
         onAnimationStart: this.handleAnimationStart
       }, function(_ref) {
         var t = _ref.t;
-        var stepData = data.map(function(entry, index) {
-          var prev = prevData && prevData[index];
+        var stepData = data.map(function(entry, index2) {
+          var prev = prevData && prevData[index2];
           if (prev) {
             var interpolatorX = interpolateNumber$2(prev.x, entry.x);
             var interpolatorY = interpolateNumber$2(prev.y, entry.y);
@@ -26326,17 +26370,17 @@ _defineProperty$d(Bar, "getComposedData", function(_ref2) {
     numericAxis
   });
   var cells = findAllByType(children, Cell);
-  var rects = displayedData.map(function(entry, index) {
+  var rects = displayedData.map(function(entry, index2) {
     var value, x2, y2, width, height, background;
     if (stackedData) {
-      value = truncateByDomain(stackedData[dataStartIndex + index], stackedDomain);
+      value = truncateByDomain(stackedData[dataStartIndex + index2], stackedDomain);
     } else {
       value = getValueByDataKey(entry, dataKey);
       if (!Array.isArray(value)) {
         value = [baseValue, value];
       }
     }
-    var minPointSize = minPointSizeCallback(minPointSizeProp, _Bar.defaultProps.minPointSize)(value[1], index);
+    var minPointSize = minPointSizeCallback(minPointSizeProp, _Bar.defaultProps.minPointSize)(value[1], index2);
     if (layout === "horizontal") {
       var _ref4;
       var _ref3 = [yAxis.scale(value[0]), yAxis.scale(value[1])], baseValueScale = _ref3[0], currentValueScale = _ref3[1];
@@ -26346,7 +26390,7 @@ _defineProperty$d(Bar, "getComposedData", function(_ref2) {
         bandSize,
         offset: pos.offset,
         entry,
-        index
+        index: index2
       });
       y2 = (_ref4 = currentValueScale !== null && currentValueScale !== void 0 ? currentValueScale : baseValueScale) !== null && _ref4 !== void 0 ? _ref4 : void 0;
       width = pos.size;
@@ -26372,7 +26416,7 @@ _defineProperty$d(Bar, "getComposedData", function(_ref2) {
         bandSize,
         offset: pos.offset,
         entry,
-        index
+        index: index2
       });
       width = _currentValueScale - _baseValueScale;
       height = pos.size;
@@ -26395,7 +26439,7 @@ _defineProperty$d(Bar, "getComposedData", function(_ref2) {
       value: stackedData ? value : value[1],
       payload: entry,
       background
-    }, cells && cells[index] && cells[index].props), {}, {
+    }, cells && cells[index2] && cells[index2].props), {}, {
       tooltipPayload: [getTooltipItem(item, entry)],
       tooltipPosition: {
         x: x2 + width / 2,
@@ -26436,7 +26480,7 @@ function _createClass$6(Constructor, protoProps, staticProps) {
   Object.defineProperty(Constructor, "prototype", { writable: false });
   return Constructor;
 }
-function ownKeys$b(e, r2) {
+function ownKeys$c(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -26449,9 +26493,9 @@ function ownKeys$b(e, r2) {
 function _objectSpread$b(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$b(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$c(Object(t), true).forEach(function(r3) {
       _defineProperty$c(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$b(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$c(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -26503,9 +26547,9 @@ var formatAxisMap = function formatAxisMap2(props, axisMap, offset, axisType, ch
       var diff = domain[1] - domain[0];
       var smallestDistanceBetweenValues = Infinity;
       var sortedValues = axis.categoricalDomain.sort();
-      sortedValues.forEach(function(value, index) {
-        if (index > 0) {
-          smallestDistanceBetweenValues = Math.min((value || 0) - (sortedValues[index - 1] || 0), smallestDistanceBetweenValues);
+      sortedValues.forEach(function(value, index2) {
+        if (index2 > 0) {
+          smallestDistanceBetweenValues = Math.min((value || 0) - (sortedValues[index2 - 1] || 0), smallestDistanceBetweenValues);
         }
       });
       if (Number.isFinite(smallestDistanceBetweenValues)) {
@@ -26710,8 +26754,8 @@ function require_createFind() {
           return iteratee(iterable[key], key, iterable);
         };
       }
-      var index = findIndexFunc(collection, predicate, fromIndex);
-      return index > -1 ? iterable[iteratee ? collection[index] : index] : void 0;
+      var index2 = findIndexFunc(collection, predicate, fromIndex);
+      return index2 > -1 ? iterable[iteratee ? collection[index2] : index2] : void 0;
     };
   }
   _createFind = createFind;
@@ -26742,11 +26786,11 @@ function requireFindIndex() {
     if (!length) {
       return -1;
     }
-    var index = fromIndex == null ? 0 : toInteger(fromIndex);
-    if (index < 0) {
-      index = nativeMax(length + index, 0);
+    var index2 = fromIndex == null ? 0 : toInteger(fromIndex);
+    if (index2 < 0) {
+      index2 = nativeMax(length + index2, 0);
     }
-    return baseFindIndex(array2, baseIteratee(predicate, 3), index);
+    return baseFindIndex(array2, baseIteratee(predicate, 3), index2);
   }
   findIndex_1 = findIndex;
   return findIndex_1;
@@ -26850,7 +26894,7 @@ function _typeof$b(o) {
     return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
   }, _typeof$b(o);
 }
-function ownKeys$a(e, r2) {
+function ownKeys$b(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -26863,9 +26907,9 @@ function ownKeys$a(e, r2) {
 function _objectSpread$a(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$a(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$b(Object(t), true).forEach(function(r3) {
       _defineProperty$b(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$a(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$b(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -27088,7 +27132,7 @@ function _extends$a() {
   };
   return _extends$a.apply(this, arguments);
 }
-function ownKeys$9(e, r2) {
+function ownKeys$a(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -27101,9 +27145,9 @@ function ownKeys$9(e, r2) {
 function _objectSpread$9(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$9(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$a(Object(t), true).forEach(function(r3) {
       _defineProperty$a(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$9(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$a(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -27228,7 +27272,7 @@ function _extends$9() {
   };
   return _extends$9.apply(this, arguments);
 }
-function ownKeys$8(e, r2) {
+function ownKeys$9(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -27241,9 +27285,9 @@ function ownKeys$8(e, r2) {
 function _objectSpread$8(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$8(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$9(Object(t), true).forEach(function(r3) {
       _defineProperty$9(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$8(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$9(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -27396,17 +27440,17 @@ function getNumberIntervalTicks(ticks2, interval) {
 function getEquidistantTicks(sign2, boundaries, getTickSize, ticks2, minTickGap) {
   var result = (ticks2 || []).slice();
   var initialStart = boundaries.start, end = boundaries.end;
-  var index = 0;
+  var index2 = 0;
   var stepsize = 1;
   var start = initialStart;
   var _loop = function _loop2() {
-    var entry = ticks2 === null || ticks2 === void 0 ? void 0 : ticks2[index];
+    var entry = ticks2 === null || ticks2 === void 0 ? void 0 : ticks2[index2];
     if (entry === void 0) {
       return {
         v: getEveryNthWithCondition(ticks2, stepsize)
       };
     }
-    var i = index;
+    var i = index2;
     var size;
     var getSize = function getSize2() {
       if (size === void 0) {
@@ -27415,15 +27459,15 @@ function getEquidistantTicks(sign2, boundaries, getTickSize, ticks2, minTickGap)
       return size;
     };
     var tickCoord = entry.coordinate;
-    var isShow = index === 0 || isVisible(sign2, tickCoord, getSize, start, end);
+    var isShow = index2 === 0 || isVisible(sign2, tickCoord, getSize, start, end);
     if (!isShow) {
-      index = 0;
+      index2 = 0;
       start = initialStart;
       stepsize += 1;
     }
     if (isShow) {
       start = tickCoord + sign2 * (getSize() / 2 + minTickGap);
-      index += stepsize;
+      index2 += stepsize;
     }
   }, _ret;
   while (stepsize <= result.length) {
@@ -27440,7 +27484,7 @@ function _typeof$8(o) {
     return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
   }, _typeof$8(o);
 }
-function ownKeys$7(e, r2) {
+function ownKeys$8(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -27453,9 +27497,9 @@ function ownKeys$7(e, r2) {
 function _objectSpread$7(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$7(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$8(Object(t), true).forEach(function(r3) {
       _defineProperty$8(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$7(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$8(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -27592,8 +27636,8 @@ function getTicks(props, fontSize, letterSpacing) {
     width: 0,
     height: 0
   };
-  var getTickSize = function getTickSize2(content, index) {
-    var value = isFunction(tickFormatter) ? tickFormatter(content.value, index) : content.value;
+  var getTickSize = function getTickSize2(content, index2) {
+    var value = isFunction(tickFormatter) ? tickFormatter(content.value, index2) : content.value;
     return sizeKey === "width" ? getAngledTickWidth(getStringSize(value, {
       fontSize,
       letterSpacing
@@ -27639,7 +27683,7 @@ function _extends$8() {
   };
   return _extends$8.apply(this, arguments);
 }
-function ownKeys$6(e, r2) {
+function ownKeys$7(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -27652,9 +27696,9 @@ function ownKeys$6(e, r2) {
 function _objectSpread$6(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$6(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$7(Object(t), true).forEach(function(r3) {
       _defineProperty$7(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$6(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$7(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -27929,7 +27973,7 @@ var CartesianAxis = /* @__PURE__ */ (function(_Component) {
         });
       }
       return /* @__PURE__ */ React.createElement("line", _extends$8({}, props, {
-        className: clsx("recharts-cartesian-axis-line", get(axisLine, "className"))
+        className: clsx("recharts-cartesian-axis-line", get$1(axisLine, "className"))
       }));
     }
   }, {
@@ -27973,7 +28017,7 @@ var CartesianAxis = /* @__PURE__ */ (function(_Component) {
             className: "recharts-cartesian-axis-tick",
             key: "tick-".concat(entry.value, "-").concat(entry.coordinate, "-").concat(entry.tickCoord)
           }, adaptEventsOfChild(_this2.props, entry, i)), tickLine && /* @__PURE__ */ React.createElement("line", _extends$8({}, tickLineProps, lineCoord, {
-            className: clsx("recharts-cartesian-axis-tick-line", get(tickLine, "className"))
+            className: clsx("recharts-cartesian-axis-tick-line", get$1(tickLine, "className"))
           })), tick && CartesianAxis2.renderTickItem(tick, tickProps, "".concat(isFunction(tickFormatter) ? tickFormatter(entry.value, i) : entry.value).concat(unit2 || "")));
         });
         return /* @__PURE__ */ React.createElement("g", {
@@ -28058,7 +28102,7 @@ function _typeof$6(o) {
     return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
   }, _typeof$6(o);
 }
-function ownKeys$5(e, r2) {
+function ownKeys$6(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -28071,9 +28115,9 @@ function ownKeys$5(e, r2) {
 function _objectSpread$5(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$5(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$6(Object(t), true).forEach(function(r3) {
       _defineProperty$6(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$5(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$6(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -28459,7 +28503,7 @@ function _extends$6() {
   };
   return _extends$6.apply(this, arguments);
 }
-function ownKeys$4(e, r2) {
+function ownKeys$5(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -28472,9 +28516,9 @@ function ownKeys$4(e, r2) {
 function _objectSpread$4(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$4(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$5(Object(t), true).forEach(function(r3) {
       _defineProperty$5(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$4(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$5(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -28799,8 +28843,8 @@ var Line = /* @__PURE__ */ (function(_PureComponent) {
         var t = _ref.t;
         if (prevPoints) {
           var prevPointsDiffFactor = prevPoints.length / points.length;
-          var stepData = points.map(function(entry, index) {
-            var prevPointIndex = Math.floor(index * prevPointsDiffFactor);
+          var stepData = points.map(function(entry, index2) {
+            var prevPointIndex = Math.floor(index2 * prevPointsDiffFactor);
             if (prevPoints[prevPointIndex]) {
               var prev = prevPoints[prevPointIndex];
               var interpolatorX = interpolateNumber$2(prev.x, entry.x);
@@ -28959,7 +29003,7 @@ _defineProperty$5(Line, "defaultProps", {
 _defineProperty$5(Line, "getComposedData", function(_ref4) {
   var props = _ref4.props, xAxis = _ref4.xAxis, yAxis = _ref4.yAxis, xAxisTicks = _ref4.xAxisTicks, yAxisTicks = _ref4.yAxisTicks, dataKey = _ref4.dataKey, bandSize = _ref4.bandSize, displayedData = _ref4.displayedData, offset = _ref4.offset;
   var layout = props.layout;
-  var points = displayedData.map(function(entry, index) {
+  var points = displayedData.map(function(entry, index2) {
     var value = getValueByDataKey(entry, dataKey);
     if (layout === "horizontal") {
       return {
@@ -28968,7 +29012,7 @@ _defineProperty$5(Line, "getComposedData", function(_ref4) {
           ticks: xAxisTicks,
           bandSize,
           entry,
-          index
+          index: index2
         }),
         y: isNil(value) ? null : yAxis.scale(value),
         value,
@@ -28982,7 +29026,7 @@ _defineProperty$5(Line, "getComposedData", function(_ref4) {
         ticks: yAxisTicks,
         bandSize,
         entry,
-        index
+        index: index2
       }),
       value,
       payload: entry
@@ -29044,7 +29088,7 @@ function _extends$5() {
   };
   return _extends$5.apply(this, arguments);
 }
-function ownKeys$3(e, r2) {
+function ownKeys$4(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -29057,9 +29101,9 @@ function ownKeys$3(e, r2) {
 function _objectSpread$3(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$3(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$4(Object(t), true).forEach(function(r3) {
       _defineProperty$4(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$3(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$4(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -29341,8 +29385,8 @@ var Area = /* @__PURE__ */ (function(_PureComponent) {
         var t = _ref.t;
         if (prevPoints) {
           var prevPointsDiffFactor = prevPoints.length / points.length;
-          var stepPoints = points.map(function(entry, index) {
-            var prevPointIndex = Math.floor(index * prevPointsDiffFactor);
+          var stepPoints = points.map(function(entry, index2) {
+            var prevPointIndex = Math.floor(index2 * prevPointsDiffFactor);
             if (prevPoints[prevPointIndex]) {
               var prev = prevPoints[prevPointIndex];
               var interpolatorX = interpolateNumber$2(prev.x, entry.x);
@@ -29362,8 +29406,8 @@ var Area = /* @__PURE__ */ (function(_PureComponent) {
             var _interpolator = interpolateNumber$2(prevBaseLine, 0);
             stepBaseLine = _interpolator(t);
           } else {
-            stepBaseLine = baseLine.map(function(entry, index) {
-              var prevPointIndex = Math.floor(index * prevPointsDiffFactor);
+            stepBaseLine = baseLine.map(function(entry, index2) {
+              var prevPointIndex = Math.floor(index2 * prevPointsDiffFactor);
               if (prevBaseLine[prevPointIndex]) {
                 var prev = prevBaseLine[prevPointIndex];
                 var interpolatorX = interpolateNumber$2(prev.x, entry.x);
@@ -29512,10 +29556,10 @@ _defineProperty$4(Area, "getComposedData", function(_ref4) {
   var baseValue = _Area.getBaseValue(props, item, xAxis, yAxis);
   var isHorizontalLayout = layout === "horizontal";
   var isRange = false;
-  var points = displayedData.map(function(entry, index) {
+  var points = displayedData.map(function(entry, index2) {
     var value;
     if (hasStack) {
-      value = stackedData[dataStartIndex + index];
+      value = stackedData[dataStartIndex + index2];
     } else {
       value = getValueByDataKey(entry, dataKey);
       if (!Array.isArray(value)) {
@@ -29532,7 +29576,7 @@ _defineProperty$4(Area, "getComposedData", function(_ref4) {
           ticks: xAxisTicks,
           bandSize,
           entry,
-          index
+          index: index2
         }),
         y: isBreakPoint ? null : yAxis.scale(value[1]),
         value,
@@ -29546,7 +29590,7 @@ _defineProperty$4(Area, "getComposedData", function(_ref4) {
         ticks: yAxisTicks,
         bandSize,
         entry,
-        index
+        index: index2
       }),
       value,
       payload: entry
@@ -29682,7 +29726,7 @@ function _extends$3() {
   };
   return _extends$3.apply(this, arguments);
 }
-function ownKeys$2(e, r2) {
+function ownKeys$3(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -29695,9 +29739,9 @@ function ownKeys$2(e, r2) {
 function _objectSpread$2(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$2(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$3(Object(t), true).forEach(function(r3) {
       _defineProperty$3(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$2(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$3(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -29865,8 +29909,8 @@ var Scatter = /* @__PURE__ */ (function(_PureComponent) {
         onAnimationStart: this.handleAnimationStart
       }, function(_ref) {
         var t = _ref.t;
-        var stepData = points.map(function(entry, index) {
-          var prev = prevPoints && prevPoints[index];
+        var stepData = points.map(function(entry, index2) {
+          var prev = prevPoints && prevPoints[index2];
           if (prev) {
             var interpolatorCx = interpolateNumber$2(prev.cx, entry.cx);
             var interpolatorCy = interpolateNumber$2(prev.cy, entry.cy);
@@ -30047,7 +30091,7 @@ _defineProperty$3(Scatter, "getComposedData", function(_ref2) {
   var defaultZ = defaultRangeZ && defaultRangeZ[0];
   var xBandSize = xAxis.scale.bandwidth ? xAxis.scale.bandwidth() : 0;
   var yBandSize = yAxis.scale.bandwidth ? yAxis.scale.bandwidth() : 0;
-  var points = displayedData.map(function(entry, index) {
+  var points = displayedData.map(function(entry, index2) {
     var x2 = getValueByDataKey(entry, xAxisDataKey);
     var y2 = getValueByDataKey(entry, yAxisDataKey);
     var z = !isNil(zAxisDataKey) && getValueByDataKey(entry, zAxisDataKey) || "-";
@@ -30081,7 +30125,7 @@ _defineProperty$3(Scatter, "getComposedData", function(_ref2) {
       ticks: xAxisTicks,
       bandSize: xBandSize,
       entry,
-      index,
+      index: index2,
       dataKey: xAxisDataKey
     });
     var cy = getCateCoordinateOfLine({
@@ -30089,7 +30133,7 @@ _defineProperty$3(Scatter, "getComposedData", function(_ref2) {
       ticks: yAxisTicks,
       bandSize: yBandSize,
       entry,
-      index,
+      index: index2,
       dataKey: yAxisDataKey
     });
     var size = z !== "-" ? zAxis.scale(z) : defaultZ;
@@ -30116,7 +30160,7 @@ _defineProperty$3(Scatter, "getComposedData", function(_ref2) {
         y: cy
       },
       payload: entry
-    }, cells && cells[index] && cells[index].props);
+    }, cells && cells[index2] && cells[index2].props);
   });
   return _objectSpread$2({
     points
@@ -30672,7 +30716,7 @@ function _typeof$1(o) {
     return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
   }, _typeof$1(o);
 }
-function ownKeys$1(e, r2) {
+function ownKeys$2(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -30685,9 +30729,9 @@ function ownKeys$1(e, r2) {
 function _objectSpread$1(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys$1(Object(t), true).forEach(function(r3) {
+    r2 % 2 ? ownKeys$2(Object(t), true).forEach(function(r3) {
       _defineProperty$1(e, r3, t[r3]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$1(Object(t)).forEach(function(r3) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$2(Object(t)).forEach(function(r3) {
       Object.defineProperty(e, r3, Object.getOwnPropertyDescriptor(t, r3));
     });
   }
@@ -30926,7 +30970,7 @@ function _arrayLikeToArray(arr, len) {
   for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
   return arr2;
 }
-function ownKeys(e, r2) {
+function ownKeys$1(e, r2) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
@@ -30939,9 +30983,9 @@ function ownKeys(e, r2) {
 function _objectSpread(e) {
   for (var r2 = 1; r2 < arguments.length; r2++) {
     var t = null != arguments[r2] ? arguments[r2] : {};
-    r2 % 2 ? ownKeys(Object(t), true).forEach(function(r22) {
+    r2 % 2 ? ownKeys$1(Object(t), true).forEach(function(r22) {
       _defineProperty(e, r22, t[r22]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function(r22) {
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$1(Object(t)).forEach(function(r22) {
       Object.defineProperty(e, r22, Object.getOwnPropertyDescriptor(t, r22));
     });
   }
@@ -31205,12 +31249,12 @@ var getAxisMapByItems = function getAxisMapByItems2(props, _ref3) {
   });
   var len = displayedData.length;
   var isCategorical = isCategoricalAxis(layout, axisType);
-  var index = -1;
+  var index2 = -1;
   return graphicalItems.reduce(function(result, child) {
     var axisId = child.props[axisIdKey];
     var originalDomain = getDefaultDomainByAxisType("number");
     if (!result[axisId]) {
-      index++;
+      index2++;
       var domain;
       if (isCategorical) {
         domain = range2(0, len);
@@ -31227,7 +31271,7 @@ var getAxisMapByItems = function getAxisMapByItems2(props, _ref3) {
         axisType
       }, Axis.defaultProps), {}, {
         hide: true,
-        orientation: get(ORIENT_MAP, "".concat(axisType, ".").concat(index % 2), null),
+        orientation: get$1(ORIENT_MAP, "".concat(axisType, ".").concat(index2 % 2), null),
         domain,
         originalDomain,
         isCategorical,
@@ -31359,7 +31403,7 @@ var calculateOffset = function calculateOffset2(_ref5, prevLegendBBox) {
     var entry = xAxisMap[id];
     var orientation = entry.orientation;
     if (!entry.mirror && !entry.hide) {
-      return _objectSpread(_objectSpread({}, result), {}, _defineProperty({}, orientation, get(result, "".concat(orientation)) + entry.height));
+      return _objectSpread(_objectSpread({}, result), {}, _defineProperty({}, orientation, get$1(result, "".concat(orientation)) + entry.height));
     }
     return result;
   }, {
@@ -31402,7 +31446,7 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
     var _getAxisNameByLayout = getAxisNameByLayout(layout), numericAxisName = _getAxisNameByLayout.numericAxisName, cateAxisName = _getAxisNameByLayout.cateAxisName;
     var hasBar = hasGraphicalBarItem(graphicalItems);
     var formattedItems = [];
-    graphicalItems.forEach(function(item, index) {
+    graphicalItems.forEach(function(item, index2) {
       var displayedData = getDisplayedData(props.data, {
         graphicalItems: [item],
         dataStartIndex,
@@ -31467,7 +31511,7 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
             dataStartIndex,
             dataEndIndex
           }))), {}, _defineProperty(_defineProperty(_defineProperty({
-            key: item.key || "item-".concat(index)
+            key: item.key || "item-".concat(index2)
           }, numericAxisName, axisObj[numericAxisName]), cateAxisName, axisObj[cateAxisName]), "animationId", updateId)),
           childIndex: parseChildIndex(item, props.children),
           item
@@ -31639,7 +31683,7 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
       });
       _defineProperty(_assertThisInitialized(_this), "handleOuterEvent", function(e) {
         var eventName = getReactEventByType(e);
-        var event = get(_this.props, "".concat(eventName));
+        var event = get$1(_this.props, "".concat(eventName));
         if (eventName && isFunction(event)) {
           var _mouse;
           var mouse;
@@ -31774,13 +31818,13 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
           tooltipEventType
         });
       });
-      _defineProperty(_assertThisInitialized(_this), "renderPolarAxis", function(element, displayName, index) {
-        var axisType = get(element, "type.axisType");
-        var axisMap = get(_this.state, "".concat(axisType, "Map"));
+      _defineProperty(_assertThisInitialized(_this), "renderPolarAxis", function(element, displayName, index2) {
+        var axisType = get$1(element, "type.axisType");
+        var axisMap = get$1(_this.state, "".concat(axisType, "Map"));
         var axisOption = axisMap && axisMap[element.props["".concat(axisType, "Id")]];
         return /* @__PURE__ */ reactExports.cloneElement(element, _objectSpread(_objectSpread({}, axisOption), {}, {
           className: clsx(axisType, axisOption.className),
-          key: element.key || "".concat(displayName, "-").concat(index),
+          key: element.key || "".concat(displayName, "-").concat(index2),
           ticks: getTicksOfAxis(axisOption, true)
         }));
       });
@@ -31863,7 +31907,7 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
           updateId: "brush-".concat(updateId)
         });
       });
-      _defineProperty(_assertThisInitialized(_this), "renderReferenceElement", function(element, displayName, index) {
+      _defineProperty(_assertThisInitialized(_this), "renderReferenceElement", function(element, displayName, index2) {
         if (!element) {
           return null;
         }
@@ -31871,7 +31915,7 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
         var _this$state7 = _this.state, xAxisMap = _this$state7.xAxisMap, yAxisMap = _this$state7.yAxisMap, offset = _this$state7.offset;
         var _element$props2 = element.props, xAxisId = _element$props2.xAxisId, yAxisId = _element$props2.yAxisId;
         return /* @__PURE__ */ reactExports.cloneElement(element, {
-          key: element.key || "".concat(displayName, "-").concat(index),
+          key: element.key || "".concat(displayName, "-").concat(index2),
           xAxis: xAxisMap[xAxisId],
           yAxis: yAxisMap[yAxisId],
           viewBox: {
@@ -31913,8 +31957,8 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
         }
         return result;
       });
-      _defineProperty(_assertThisInitialized(_this), "renderGraphicChild", function(element, displayName, index) {
-        var item = _this.filterFormatItem(element, displayName, index);
+      _defineProperty(_assertThisInitialized(_this), "renderGraphicChild", function(element, displayName, index2) {
+        var item = _this.filterFormatItem(element, displayName, index2);
         if (!item) {
           return null;
         }
@@ -31982,9 +32026,9 @@ var generateCategoricalChart = function generateCategoricalChart2(_ref6) {
         }
         return [graphicalItem, null];
       });
-      _defineProperty(_assertThisInitialized(_this), "renderCustomized", function(element, displayName, index) {
+      _defineProperty(_assertThisInitialized(_this), "renderCustomized", function(element, displayName, index2) {
         return /* @__PURE__ */ reactExports.cloneElement(element, _objectSpread(_objectSpread({
-          key: "recharts-customized-".concat(index)
+          key: "recharts-customized-".concat(index2)
         }, _this.props), _this.state));
       });
       _defineProperty(_assertThisInitialized(_this), "renderMap", {
@@ -32968,7 +33012,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
 ${searchTerm ? `(Filtrés sur "${searchTerm}")` : ""}`, children: filteredProfiles.length })
       ] }),
       filteredProfiles.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center text-slate-600 text-sm py-8 px-4", children: searchTerm ? "Aucun résultat" : "Commencez par ajouter un ticker" }) : filteredProfiles.map((profile) => {
-        var _a, _b;
+        var _a3, _b2;
         const { recommendation } = calculateRecommendation(profile.data, profile.assumptions);
         return /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "div",
@@ -32989,7 +33033,7 @@ Rouge = VENTE` }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   "img",
                   {
-                    src: profile.info.logo || (profile.info.logoSymbol || ((_a = profile.info.actualSymbol) == null ? void 0 : _a.replace(".TO", "").replace("-", ".")) || profile.info.preferredSymbol || profile.id ? `https://financialmodelingprep.com/image-stock/${profile.info.logoSymbol || ((_b = profile.info.actualSymbol) == null ? void 0 : _b.replace(".TO", "").replace("-", ".")) || profile.info.preferredSymbol || profile.id}.png` : ""),
+                    src: profile.info.logo || (profile.info.logoSymbol || ((_a3 = profile.info.actualSymbol) == null ? void 0 : _a3.replace(".TO", "").replace("-", ".")) || profile.info.preferredSymbol || profile.id ? `https://financialmodelingprep.com/image-stock/${profile.info.logoSymbol || ((_b2 = profile.info.actualSymbol) == null ? void 0 : _b2.replace(".TO", "").replace("-", ".")) || profile.info.preferredSymbol || profile.id}.png` : ""),
                     alt: profile.info.name,
                     className: "w-8 h-8 rounded object-cover flex-shrink-0 cursor-help",
                     title: `Logo de ${profile.info.name}
@@ -34182,7 +34226,7 @@ Basé sur ${validTargets.length} métrique(s) incluse(s).`, children: [
   ] });
 };
 const HistoricalRangesTable = ({ data, info, sector, assumptions }) => {
-  var _a, _b;
+  var _a3, _b2;
   const [sectorDataFromAPI, setSectorDataFromAPI] = reactExports.useState(null);
   const [isLoadingSector, setIsLoadingSector] = reactExports.useState(false);
   const [sectorError, setSectorError] = reactExports.useState(null);
@@ -34511,9 +34555,9 @@ const HistoricalRangesTable = ({ data, info, sector, assumptions }) => {
         " Calculé à partir de vos données historiques récupérées par API (",
         data.length,
         " années : ",
-        ((_a = data[0]) == null ? void 0 : _a.year) || "N/A",
+        ((_a3 = data[0]) == null ? void 0 : _a3.year) || "N/A",
         " - ",
-        ((_b = data[data.length - 1]) == null ? void 0 : _b.year) || "N/A",
+        ((_b2 = data[data.length - 1]) == null ? void 0 : _b2.year) || "N/A",
         ")"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
@@ -35592,8 +35636,8 @@ const TickerSearch = ({ onSelect, onClose }) => {
   const [selectedIndex, setSelectedIndex] = reactExports.useState(0);
   const inputRef = reactExports.useRef(null);
   reactExports.useEffect(() => {
-    var _a;
-    (_a = inputRef.current) == null ? void 0 : _a.focus();
+    var _a3;
+    (_a3 = inputRef.current) == null ? void 0 : _a3.focus();
   }, []);
   reactExports.useEffect(() => {
     const searchTickers = async () => {
@@ -35681,12 +35725,12 @@ const TickerSearch = ({ onSelect, onClose }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm", children: "Tapez pour rechercher des tickers" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs mt-1", children: "Ex: AAPL, Microsoft, Tesla..." })
       ] }),
-      results.map((result, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+      results.map((result, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
         {
           onClick: () => handleSelect(result.symbol),
-          className: `w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 ${index === selectedIndex ? "bg-blue-50" : ""}`,
-          onMouseEnter: () => setSelectedIndex(index),
+          className: `w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 ${index2 === selectedIndex ? "bg-blue-50" : ""}`,
+          onMouseEnter: () => setSelectedIndex(index2),
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
@@ -35698,7 +35742,7 @@ const TickerSearch = ({ onSelect, onClose }) => {
             result.currency && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-400 ml-4", children: result.currency })
           ] })
         },
-        result.symbol + index
+        result.symbol + index2
       ))
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 py-2 bg-gray-50 border-t border-gray-200 text-xs text-gray-500 flex items-center justify-between", children: [
@@ -36093,13 +36137,13 @@ class ErrorBoundary extends reactExports.Component {
     return { hasError: true, error };
   }
   componentDidCatch(error, errorInfo) {
-    var _a, _b;
+    var _a3, _b2;
     this.setState({ errorInfo });
     console.error("ErrorBoundary caught an error:", error, errorInfo);
-    (_b = (_a = this.props).onError) == null ? void 0 : _b.call(_a, error, errorInfo);
+    (_b2 = (_a3 = this.props).onError) == null ? void 0 : _b2.call(_a3, error, errorInfo);
   }
   render() {
-    var _a;
+    var _a3;
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;
@@ -36107,7 +36151,7 @@ class ErrorBoundary extends reactExports.Component {
       return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center p-8 bg-red-900/20 border border-red-500/30 rounded-lg", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-red-400 mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-12 h-12", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" }) }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-white mb-2", children: "Une erreur s'est produite" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-400 text-sm mb-4 text-center max-w-md", children: ((_a = this.state.error) == null ? void 0 : _a.message) || "Une erreur inattendue est survenue." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-400 text-sm mb-4 text-center max-w-md", children: ((_a3 = this.state.error) == null ? void 0 : _a3.message) || "Une erreur inattendue est survenue." }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "button",
           {
@@ -36487,22 +36531,22 @@ async function loadProfilesBatchFromSupabase(tickers) {
     (ticker2) => fetchMarketData(ticker2.toUpperCase())
   );
   const prices = await Promise.allSettled(pricePromises);
-  tickers.forEach((ticker2, index) => {
-    var _a, _b, _c;
+  tickers.forEach((ticker2, index2) => {
+    var _a3, _b2, _c;
     const upperTicker = ticker2.toUpperCase();
-    const snapshotResult = snapshots[index];
-    const priceResult = prices[index];
+    const snapshotResult = snapshots[index2];
+    const priceResult = prices[index2];
     if (snapshotResult.status === "fulfilled" && snapshotResult.value) {
       const snapshot = snapshotResult.value;
       const marketData = priceResult.status === "fulfilled" ? priceResult.value : null;
-      const currentPrice = ((marketData == null ? void 0 : marketData.currentPrice) || 0) > 0 ? marketData.currentPrice : ((_a = snapshot.assumptions) == null ? void 0 : _a.currentPrice) || 0;
+      const currentPrice = ((marketData == null ? void 0 : marketData.currentPrice) || 0) > 0 ? marketData.currentPrice : ((_a3 = snapshot.assumptions) == null ? void 0 : _a3.currentPrice) || 0;
       results[upperTicker] = {
         data: snapshot.annual_data || [],
         info: snapshot.company_info || {},
         currentPrice,
         assumptions: {
           ...snapshot.assumptions,
-          currentPrice: currentPrice > 0 ? currentPrice : ((_b = snapshot.assumptions) == null ? void 0 : _b.currentPrice) || 0
+          currentPrice: currentPrice > 0 ? currentPrice : ((_b2 = snapshot.assumptions) == null ? void 0 : _b2.currentPrice) || 0
         },
         source: "supabase"
       };
@@ -36627,6 +36671,12771 @@ const localStorageAdapter = {
   }
 };
 const storage = typeof window !== "undefined" && window.indexedDB ? indexedDBAdapter : localStorageAdapter;
+var main = {};
+var SupabaseClient$1 = {};
+var extendStatics = function(d, b) {
+  extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
+    d2.__proto__ = b2;
+  } || function(d2, b2) {
+    for (var p in b2) if (Object.prototype.hasOwnProperty.call(b2, p)) d2[p] = b2[p];
+  };
+  return extendStatics(d, b);
+};
+function __extends(d, b) {
+  if (typeof b !== "function" && b !== null)
+    throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+  extendStatics(d, b);
+  function __() {
+    this.constructor = d;
+  }
+  d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+var __assign = function() {
+  __assign = Object.assign || function __assign2(t) {
+    for (var s2, i = 1, n = arguments.length; i < n; i++) {
+      s2 = arguments[i];
+      for (var p in s2) if (Object.prototype.hasOwnProperty.call(s2, p)) t[p] = s2[p];
+    }
+    return t;
+  };
+  return __assign.apply(this, arguments);
+};
+function __rest(s2, e) {
+  var t = {};
+  for (var p in s2) if (Object.prototype.hasOwnProperty.call(s2, p) && e.indexOf(p) < 0)
+    t[p] = s2[p];
+  if (s2 != null && typeof Object.getOwnPropertySymbols === "function")
+    for (var i = 0, p = Object.getOwnPropertySymbols(s2); i < p.length; i++) {
+      if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s2, p[i]))
+        t[p[i]] = s2[p[i]];
+    }
+  return t;
+}
+function __decorate(decorators, target, key, desc) {
+  var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
+  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r2 = (c2 < 3 ? d(r2) : c2 > 3 ? d(target, key, r2) : d(target, key)) || r2;
+  return c2 > 3 && r2 && Object.defineProperty(target, key, r2), r2;
+}
+function __param(paramIndex, decorator) {
+  return function(target, key) {
+    decorator(target, key, paramIndex);
+  };
+}
+function __esDecorate(ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
+  function accept(f) {
+    if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected");
+    return f;
+  }
+  var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
+  var target = !descriptorIn && ctor ? contextIn["static"] ? ctor : ctor.prototype : null;
+  var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});
+  var _, done = false;
+  for (var i = decorators.length - 1; i >= 0; i--) {
+    var context = {};
+    for (var p in contextIn) context[p] = p === "access" ? {} : contextIn[p];
+    for (var p in contextIn.access) context.access[p] = contextIn.access[p];
+    context.addInitializer = function(f) {
+      if (done) throw new TypeError("Cannot add initializers after decoration has completed");
+      extraInitializers.push(accept(f || null));
+    };
+    var result = (0, decorators[i])(kind === "accessor" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);
+    if (kind === "accessor") {
+      if (result === void 0) continue;
+      if (result === null || typeof result !== "object") throw new TypeError("Object expected");
+      if (_ = accept(result.get)) descriptor.get = _;
+      if (_ = accept(result.set)) descriptor.set = _;
+      if (_ = accept(result.init)) initializers.unshift(_);
+    } else if (_ = accept(result)) {
+      if (kind === "field") initializers.unshift(_);
+      else descriptor[key] = _;
+    }
+  }
+  if (target) Object.defineProperty(target, contextIn.name, descriptor);
+  done = true;
+}
+function __runInitializers(thisArg, initializers, value) {
+  var useValue = arguments.length > 2;
+  for (var i = 0; i < initializers.length; i++) {
+    value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
+  }
+  return useValue ? value : void 0;
+}
+function __propKey(x2) {
+  return typeof x2 === "symbol" ? x2 : "".concat(x2);
+}
+function __setFunctionName(f, name, prefix2) {
+  if (typeof name === "symbol") name = name.description ? "[".concat(name.description, "]") : "";
+  return Object.defineProperty(f, "name", { configurable: true, value: prefix2 ? "".concat(prefix2, " ", name) : name });
+}
+function __metadata(metadataKey, metadataValue) {
+  if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
+}
+function __awaiter(thisArg, _arguments, P2, generator) {
+  function adopt(value) {
+    return value instanceof P2 ? value : new P2(function(resolve) {
+      resolve(value);
+    });
+  }
+  return new (P2 || (P2 = Promise))(function(resolve, reject) {
+    function fulfilled(value) {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+    function rejected(value) {
+      try {
+        step(generator["throw"](value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+    function step(result) {
+      result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+    }
+    step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
+}
+function __generator(thisArg, body) {
+  var _ = { label: 0, sent: function() {
+    if (t[0] & 1) throw t[1];
+    return t[1];
+  }, trys: [], ops: [] }, f, y2, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+  return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+    return this;
+  }), g;
+  function verb(n) {
+    return function(v) {
+      return step([n, v]);
+    };
+  }
+  function step(op) {
+    if (f) throw new TypeError("Generator is already executing.");
+    while (g && (g = 0, op[0] && (_ = 0)), _) try {
+      if (f = 1, y2 && (t = op[0] & 2 ? y2["return"] : op[0] ? y2["throw"] || ((t = y2["return"]) && t.call(y2), 0) : y2.next) && !(t = t.call(y2, op[1])).done) return t;
+      if (y2 = 0, t) op = [op[0] & 2, t.value];
+      switch (op[0]) {
+        case 0:
+        case 1:
+          t = op;
+          break;
+        case 4:
+          _.label++;
+          return { value: op[1], done: false };
+        case 5:
+          _.label++;
+          y2 = op[1];
+          op = [0];
+          continue;
+        case 7:
+          op = _.ops.pop();
+          _.trys.pop();
+          continue;
+        default:
+          if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+            _ = 0;
+            continue;
+          }
+          if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+            _.label = op[1];
+            break;
+          }
+          if (op[0] === 6 && _.label < t[1]) {
+            _.label = t[1];
+            t = op;
+            break;
+          }
+          if (t && _.label < t[2]) {
+            _.label = t[2];
+            _.ops.push(op);
+            break;
+          }
+          if (t[2]) _.ops.pop();
+          _.trys.pop();
+          continue;
+      }
+      op = body.call(thisArg, _);
+    } catch (e) {
+      op = [6, e];
+      y2 = 0;
+    } finally {
+      f = t = 0;
+    }
+    if (op[0] & 5) throw op[1];
+    return { value: op[0] ? op[1] : void 0, done: true };
+  }
+}
+var __createBinding = Object.create ? (function(o, m, k2, k22) {
+  if (k22 === void 0) k22 = k2;
+  var desc = Object.getOwnPropertyDescriptor(m, k2);
+  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+    desc = { enumerable: true, get: function() {
+      return m[k2];
+    } };
+  }
+  Object.defineProperty(o, k22, desc);
+}) : (function(o, m, k2, k22) {
+  if (k22 === void 0) k22 = k2;
+  o[k22] = m[k2];
+});
+function __exportStar(m, o) {
+  for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(o, p)) __createBinding(o, m, p);
+}
+function __values(o) {
+  var s2 = typeof Symbol === "function" && Symbol.iterator, m = s2 && o[s2], i = 0;
+  if (m) return m.call(o);
+  if (o && typeof o.length === "number") return {
+    next: function() {
+      if (o && i >= o.length) o = void 0;
+      return { value: o && o[i++], done: !o };
+    }
+  };
+  throw new TypeError(s2 ? "Object is not iterable." : "Symbol.iterator is not defined.");
+}
+function __read(o, n) {
+  var m = typeof Symbol === "function" && o[Symbol.iterator];
+  if (!m) return o;
+  var i = m.call(o), r2, ar = [], e;
+  try {
+    while ((n === void 0 || n-- > 0) && !(r2 = i.next()).done) ar.push(r2.value);
+  } catch (error) {
+    e = { error };
+  } finally {
+    try {
+      if (r2 && !r2.done && (m = i["return"])) m.call(i);
+    } finally {
+      if (e) throw e.error;
+    }
+  }
+  return ar;
+}
+function __spread() {
+  for (var ar = [], i = 0; i < arguments.length; i++)
+    ar = ar.concat(__read(arguments[i]));
+  return ar;
+}
+function __spreadArrays() {
+  for (var s2 = 0, i = 0, il = arguments.length; i < il; i++) s2 += arguments[i].length;
+  for (var r2 = Array(s2), k2 = 0, i = 0; i < il; i++)
+    for (var a2 = arguments[i], j = 0, jl = a2.length; j < jl; j++, k2++)
+      r2[k2] = a2[j];
+  return r2;
+}
+function __spreadArray(to, from, pack) {
+  if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+    if (ar || !(i in from)) {
+      if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+      ar[i] = from[i];
+    }
+  }
+  return to.concat(ar || Array.prototype.slice.call(from));
+}
+function __await(v) {
+  return this instanceof __await ? (this.v = v, this) : new __await(v);
+}
+function __asyncGenerator(thisArg, _arguments, generator) {
+  if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+  var g = generator.apply(thisArg, _arguments || []), i, q = [];
+  return i = Object.create((typeof AsyncIterator === "function" ? AsyncIterator : Object).prototype), verb("next"), verb("throw"), verb("return", awaitReturn), i[Symbol.asyncIterator] = function() {
+    return this;
+  }, i;
+  function awaitReturn(f) {
+    return function(v) {
+      return Promise.resolve(v).then(f, reject);
+    };
+  }
+  function verb(n, f) {
+    if (g[n]) {
+      i[n] = function(v) {
+        return new Promise(function(a2, b) {
+          q.push([n, v, a2, b]) > 1 || resume(n, v);
+        });
+      };
+      if (f) i[n] = f(i[n]);
+    }
+  }
+  function resume(n, v) {
+    try {
+      step(g[n](v));
+    } catch (e) {
+      settle(q[0][3], e);
+    }
+  }
+  function step(r2) {
+    r2.value instanceof __await ? Promise.resolve(r2.value.v).then(fulfill, reject) : settle(q[0][2], r2);
+  }
+  function fulfill(value) {
+    resume("next", value);
+  }
+  function reject(value) {
+    resume("throw", value);
+  }
+  function settle(f, v) {
+    if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]);
+  }
+}
+function __asyncDelegator(o) {
+  var i, p;
+  return i = {}, verb("next"), verb("throw", function(e) {
+    throw e;
+  }), verb("return"), i[Symbol.iterator] = function() {
+    return this;
+  }, i;
+  function verb(n, f) {
+    i[n] = o[n] ? function(v) {
+      return (p = !p) ? { value: __await(o[n](v)), done: false } : f ? f(v) : v;
+    } : f;
+  }
+}
+function __asyncValues(o) {
+  if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+  var m = o[Symbol.asyncIterator], i;
+  return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function() {
+    return this;
+  }, i);
+  function verb(n) {
+    i[n] = o[n] && function(v) {
+      return new Promise(function(resolve, reject) {
+        v = o[n](v), settle(resolve, reject, v.done, v.value);
+      });
+    };
+  }
+  function settle(resolve, reject, d, v) {
+    Promise.resolve(v).then(function(v2) {
+      resolve({ value: v2, done: d });
+    }, reject);
+  }
+}
+function __makeTemplateObject(cooked, raw) {
+  if (Object.defineProperty) {
+    Object.defineProperty(cooked, "raw", { value: raw });
+  } else {
+    cooked.raw = raw;
+  }
+  return cooked;
+}
+var __setModuleDefault = Object.create ? (function(o, v) {
+  Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+  o["default"] = v;
+};
+var ownKeys = function(o) {
+  ownKeys = Object.getOwnPropertyNames || function(o2) {
+    var ar = [];
+    for (var k2 in o2) if (Object.prototype.hasOwnProperty.call(o2, k2)) ar[ar.length] = k2;
+    return ar;
+  };
+  return ownKeys(o);
+};
+function __importStar(mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) {
+    for (var k2 = ownKeys(mod), i = 0; i < k2.length; i++) if (k2[i] !== "default") __createBinding(result, mod, k2[i]);
+  }
+  __setModuleDefault(result, mod);
+  return result;
+}
+function __importDefault(mod) {
+  return mod && mod.__esModule ? mod : { default: mod };
+}
+function __classPrivateFieldGet(receiver, state, kind, f) {
+  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+  return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+}
+function __classPrivateFieldSet(receiver, state, value, kind, f) {
+  if (kind === "m") throw new TypeError("Private method is not writable");
+  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+  return kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value), value;
+}
+function __classPrivateFieldIn(state, receiver) {
+  if (receiver === null || typeof receiver !== "object" && typeof receiver !== "function") throw new TypeError("Cannot use 'in' operator on non-object");
+  return typeof state === "function" ? receiver === state : state.has(receiver);
+}
+function __addDisposableResource(env, value, async) {
+  if (value !== null && value !== void 0) {
+    if (typeof value !== "object" && typeof value !== "function") throw new TypeError("Object expected.");
+    var dispose, inner;
+    if (async) {
+      if (!Symbol.asyncDispose) throw new TypeError("Symbol.asyncDispose is not defined.");
+      dispose = value[Symbol.asyncDispose];
+    }
+    if (dispose === void 0) {
+      if (!Symbol.dispose) throw new TypeError("Symbol.dispose is not defined.");
+      dispose = value[Symbol.dispose];
+      if (async) inner = dispose;
+    }
+    if (typeof dispose !== "function") throw new TypeError("Object not disposable.");
+    if (inner) dispose = function() {
+      try {
+        inner.call(this);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    };
+    env.stack.push({ value, dispose, async });
+  } else if (async) {
+    env.stack.push({ async: true });
+  }
+  return value;
+}
+var _SuppressedError = typeof SuppressedError === "function" ? SuppressedError : function(error, suppressed, message) {
+  var e = new Error(message);
+  return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+function __disposeResources(env) {
+  function fail(e) {
+    env.error = env.hasError ? new _SuppressedError(e, env.error, "An error was suppressed during disposal.") : e;
+    env.hasError = true;
+  }
+  var r2, s2 = 0;
+  function next() {
+    while (r2 = env.stack.pop()) {
+      try {
+        if (!r2.async && s2 === 1) return s2 = 0, env.stack.push(r2), Promise.resolve().then(next);
+        if (r2.dispose) {
+          var result = r2.dispose.call(r2.value);
+          if (r2.async) return s2 |= 2, Promise.resolve(result).then(next, function(e) {
+            fail(e);
+            return next();
+          });
+        } else s2 |= 1;
+      } catch (e) {
+        fail(e);
+      }
+    }
+    if (s2 === 1) return env.hasError ? Promise.reject(env.error) : Promise.resolve();
+    if (env.hasError) throw env.error;
+  }
+  return next();
+}
+function __rewriteRelativeImportExtension(path, preserveJsx) {
+  if (typeof path === "string" && /^\.\.?\//.test(path)) {
+    return path.replace(/\.(tsx)$|((?:\.d)?)((?:\.[^./]+?)?)\.([cm]?)ts$/i, function(m, tsx, d, ext, cm) {
+      return tsx ? preserveJsx ? ".jsx" : ".js" : d && (!ext || !cm) ? m : d + ext + "." + cm.toLowerCase() + "js";
+    });
+  }
+  return path;
+}
+const tslib_es6 = {
+  __extends,
+  __assign,
+  __rest,
+  __decorate,
+  __param,
+  __esDecorate,
+  __runInitializers,
+  __propKey,
+  __setFunctionName,
+  __metadata,
+  __awaiter,
+  __generator,
+  __createBinding,
+  __exportStar,
+  __values,
+  __read,
+  __spread,
+  __spreadArrays,
+  __spreadArray,
+  __await,
+  __asyncGenerator,
+  __asyncDelegator,
+  __asyncValues,
+  __makeTemplateObject,
+  __importStar,
+  __importDefault,
+  __classPrivateFieldGet,
+  __classPrivateFieldSet,
+  __classPrivateFieldIn,
+  __addDisposableResource,
+  __disposeResources,
+  __rewriteRelativeImportExtension
+};
+const tslib_es6$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  __addDisposableResource,
+  get __assign() {
+    return __assign;
+  },
+  __asyncDelegator,
+  __asyncGenerator,
+  __asyncValues,
+  __await,
+  __awaiter,
+  __classPrivateFieldGet,
+  __classPrivateFieldIn,
+  __classPrivateFieldSet,
+  __createBinding,
+  __decorate,
+  __disposeResources,
+  __esDecorate,
+  __exportStar,
+  __extends,
+  __generator,
+  __importDefault,
+  __importStar,
+  __makeTemplateObject,
+  __metadata,
+  __param,
+  __propKey,
+  __read,
+  __rest,
+  __rewriteRelativeImportExtension,
+  __runInitializers,
+  __setFunctionName,
+  __spread,
+  __spreadArray,
+  __spreadArrays,
+  __values,
+  default: tslib_es6
+}, Symbol.toStringTag, { value: "Module" }));
+const resolveFetch$3 = (customFetch) => {
+  if (customFetch) {
+    return (...args) => customFetch(...args);
+  }
+  return (...args) => fetch(...args);
+};
+let FunctionsError$1 = class FunctionsError extends Error {
+  constructor(message, name = "FunctionsError", context) {
+    super(message);
+    this.name = name;
+    this.context = context;
+  }
+};
+let FunctionsFetchError$1 = class FunctionsFetchError extends FunctionsError$1 {
+  constructor(context) {
+    super("Failed to send a request to the Edge Function", "FunctionsFetchError", context);
+  }
+};
+let FunctionsRelayError$1 = class FunctionsRelayError extends FunctionsError$1 {
+  constructor(context) {
+    super("Relay Error invoking the Edge Function", "FunctionsRelayError", context);
+  }
+};
+let FunctionsHttpError$1 = class FunctionsHttpError extends FunctionsError$1 {
+  constructor(context) {
+    super("Edge Function returned a non-2xx status code", "FunctionsHttpError", context);
+  }
+};
+var FunctionRegion$1;
+(function(FunctionRegion2) {
+  FunctionRegion2["Any"] = "any";
+  FunctionRegion2["ApNortheast1"] = "ap-northeast-1";
+  FunctionRegion2["ApNortheast2"] = "ap-northeast-2";
+  FunctionRegion2["ApSouth1"] = "ap-south-1";
+  FunctionRegion2["ApSoutheast1"] = "ap-southeast-1";
+  FunctionRegion2["ApSoutheast2"] = "ap-southeast-2";
+  FunctionRegion2["CaCentral1"] = "ca-central-1";
+  FunctionRegion2["EuCentral1"] = "eu-central-1";
+  FunctionRegion2["EuWest1"] = "eu-west-1";
+  FunctionRegion2["EuWest2"] = "eu-west-2";
+  FunctionRegion2["EuWest3"] = "eu-west-3";
+  FunctionRegion2["SaEast1"] = "sa-east-1";
+  FunctionRegion2["UsEast1"] = "us-east-1";
+  FunctionRegion2["UsWest1"] = "us-west-1";
+  FunctionRegion2["UsWest2"] = "us-west-2";
+})(FunctionRegion$1 || (FunctionRegion$1 = {}));
+class FunctionsClient {
+  /**
+   * Creates a new Functions client bound to an Edge Functions URL.
+   *
+   * @example
+   * ```ts
+   * import { FunctionsClient, FunctionRegion } from '@supabase/functions-js'
+   *
+   * const functions = new FunctionsClient('https://xyzcompany.supabase.co/functions/v1', {
+   *   headers: { apikey: 'public-anon-key' },
+   *   region: FunctionRegion.UsEast1,
+   * })
+   * ```
+   */
+  constructor(url, { headers = {}, customFetch, region = FunctionRegion$1.Any } = {}) {
+    this.url = url;
+    this.headers = headers;
+    this.region = region;
+    this.fetch = resolveFetch$3(customFetch);
+  }
+  /**
+   * Updates the authorization header
+   * @param token - the new jwt token sent in the authorisation header
+   * @example
+   * ```ts
+   * functions.setAuth(session.access_token)
+   * ```
+   */
+  setAuth(token) {
+    this.headers.Authorization = `Bearer ${token}`;
+  }
+  /**
+   * Invokes a function
+   * @param functionName - The name of the Function to invoke.
+   * @param options - Options for invoking the Function.
+   * @example
+   * ```ts
+   * const { data, error } = await functions.invoke('hello-world', {
+   *   body: { name: 'Ada' },
+   * })
+   * ```
+   */
+  invoke(functionName_1) {
+    return __awaiter(this, arguments, void 0, function* (functionName, options = {}) {
+      var _a3;
+      let timeoutId;
+      let timeoutController;
+      try {
+        const { headers, method, body: functionArgs, signal, timeout } = options;
+        let _headers = {};
+        let { region } = options;
+        if (!region) {
+          region = this.region;
+        }
+        const url = new URL(`${this.url}/${functionName}`);
+        if (region && region !== "any") {
+          _headers["x-region"] = region;
+          url.searchParams.set("forceFunctionRegion", region);
+        }
+        let body;
+        if (functionArgs && (headers && !Object.prototype.hasOwnProperty.call(headers, "Content-Type") || !headers)) {
+          if (typeof Blob !== "undefined" && functionArgs instanceof Blob || functionArgs instanceof ArrayBuffer) {
+            _headers["Content-Type"] = "application/octet-stream";
+            body = functionArgs;
+          } else if (typeof functionArgs === "string") {
+            _headers["Content-Type"] = "text/plain";
+            body = functionArgs;
+          } else if (typeof FormData !== "undefined" && functionArgs instanceof FormData) {
+            body = functionArgs;
+          } else {
+            _headers["Content-Type"] = "application/json";
+            body = JSON.stringify(functionArgs);
+          }
+        } else {
+          body = functionArgs;
+        }
+        let effectiveSignal = signal;
+        if (timeout) {
+          timeoutController = new AbortController();
+          timeoutId = setTimeout(() => timeoutController.abort(), timeout);
+          if (signal) {
+            effectiveSignal = timeoutController.signal;
+            signal.addEventListener("abort", () => timeoutController.abort());
+          } else {
+            effectiveSignal = timeoutController.signal;
+          }
+        }
+        const response = yield this.fetch(url.toString(), {
+          method: method || "POST",
+          // headers priority is (high to low):
+          // 1. invoke-level headers
+          // 2. client-level headers
+          // 3. default Content-Type header
+          headers: Object.assign(Object.assign(Object.assign({}, _headers), this.headers), headers),
+          body,
+          signal: effectiveSignal
+        }).catch((fetchError) => {
+          throw new FunctionsFetchError$1(fetchError);
+        });
+        const isRelayError = response.headers.get("x-relay-error");
+        if (isRelayError && isRelayError === "true") {
+          throw new FunctionsRelayError$1(response);
+        }
+        if (!response.ok) {
+          throw new FunctionsHttpError$1(response);
+        }
+        let responseType = ((_a3 = response.headers.get("Content-Type")) !== null && _a3 !== void 0 ? _a3 : "text/plain").split(";")[0].trim();
+        let data;
+        if (responseType === "application/json") {
+          data = yield response.json();
+        } else if (responseType === "application/octet-stream" || responseType === "application/pdf") {
+          data = yield response.blob();
+        } else if (responseType === "text/event-stream") {
+          data = response;
+        } else if (responseType === "multipart/form-data") {
+          data = yield response.formData();
+        } else {
+          data = yield response.text();
+        }
+        return { data, error: null, response };
+      } catch (error) {
+        return {
+          data: null,
+          error,
+          response: error instanceof FunctionsHttpError$1 || error instanceof FunctionsRelayError$1 ? error.context : void 0
+        };
+      } finally {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+      }
+    });
+  }
+}
+const module$4 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  get FunctionRegion() {
+    return FunctionRegion$1;
+  },
+  FunctionsClient,
+  FunctionsError: FunctionsError$1,
+  FunctionsFetchError: FunctionsFetchError$1,
+  FunctionsHttpError: FunctionsHttpError$1,
+  FunctionsRelayError: FunctionsRelayError$1
+}, Symbol.toStringTag, { value: "Module" }));
+const require$$3$1 = /* @__PURE__ */ getAugmentedNamespace(module$4);
+var cjs = {};
+const require$$0 = /* @__PURE__ */ getAugmentedNamespace(tslib_es6$1);
+var PostgrestClient = {};
+var PostgrestQueryBuilder = {};
+var PostgrestFilterBuilder = {};
+var PostgrestTransformBuilder = {};
+var PostgrestBuilder = {};
+var PostgrestError$1 = {};
+var hasRequiredPostgrestError;
+function requirePostgrestError() {
+  if (hasRequiredPostgrestError) return PostgrestError$1;
+  hasRequiredPostgrestError = 1;
+  Object.defineProperty(PostgrestError$1, "__esModule", { value: true });
+  class PostgrestError2 extends Error {
+    /**
+     * @example
+     * ```ts
+     * import PostgrestError from '@supabase/postgrest-js'
+     *
+     * throw new PostgrestError({
+     *   message: 'Row level security prevented the request',
+     *   details: 'RLS denied the insert',
+     *   hint: 'Check your policies',
+     *   code: 'PGRST301',
+     * })
+     * ```
+     */
+    constructor(context) {
+      super(context.message);
+      this.name = "PostgrestError";
+      this.details = context.details;
+      this.hint = context.hint;
+      this.code = context.code;
+    }
+  }
+  PostgrestError$1.default = PostgrestError2;
+  return PostgrestError$1;
+}
+var hasRequiredPostgrestBuilder;
+function requirePostgrestBuilder() {
+  if (hasRequiredPostgrestBuilder) return PostgrestBuilder;
+  hasRequiredPostgrestBuilder = 1;
+  Object.defineProperty(PostgrestBuilder, "__esModule", { value: true });
+  const tslib_1 = require$$0;
+  const PostgrestError_1 = tslib_1.__importDefault(requirePostgrestError());
+  let PostgrestBuilder$1 = class PostgrestBuilder {
+    /**
+     * Creates a builder configured for a specific PostgREST request.
+     *
+     * @example
+     * ```ts
+     * import PostgrestQueryBuilder from '@supabase/postgrest-js'
+     *
+     * const builder = new PostgrestQueryBuilder(
+     *   new URL('https://xyzcompany.supabase.co/rest/v1/users'),
+     *   { headers: new Headers({ apikey: 'public-anon-key' }) }
+     * )
+     * ```
+     */
+    constructor(builder) {
+      var _a3, _b2;
+      this.shouldThrowOnError = false;
+      this.method = builder.method;
+      this.url = builder.url;
+      this.headers = new Headers(builder.headers);
+      this.schema = builder.schema;
+      this.body = builder.body;
+      this.shouldThrowOnError = (_a3 = builder.shouldThrowOnError) !== null && _a3 !== void 0 ? _a3 : false;
+      this.signal = builder.signal;
+      this.isMaybeSingle = (_b2 = builder.isMaybeSingle) !== null && _b2 !== void 0 ? _b2 : false;
+      if (builder.fetch) {
+        this.fetch = builder.fetch;
+      } else {
+        this.fetch = fetch;
+      }
+    }
+    /**
+     * If there's an error with the query, throwOnError will reject the promise by
+     * throwing the error instead of returning it as part of a successful response.
+     *
+     * {@link https://github.com/supabase/supabase-js/issues/92}
+     */
+    throwOnError() {
+      this.shouldThrowOnError = true;
+      return this;
+    }
+    /**
+     * Set an HTTP header for the request.
+     */
+    setHeader(name, value) {
+      this.headers = new Headers(this.headers);
+      this.headers.set(name, value);
+      return this;
+    }
+    then(onfulfilled, onrejected) {
+      if (this.schema === void 0) ;
+      else if (["GET", "HEAD"].includes(this.method)) {
+        this.headers.set("Accept-Profile", this.schema);
+      } else {
+        this.headers.set("Content-Profile", this.schema);
+      }
+      if (this.method !== "GET" && this.method !== "HEAD") {
+        this.headers.set("Content-Type", "application/json");
+      }
+      const _fetch = this.fetch;
+      let res = _fetch(this.url.toString(), {
+        method: this.method,
+        headers: this.headers,
+        body: JSON.stringify(this.body),
+        signal: this.signal
+      }).then(async (res2) => {
+        var _a3, _b2, _c, _d;
+        let error = null;
+        let data = null;
+        let count = null;
+        let status = res2.status;
+        let statusText = res2.statusText;
+        if (res2.ok) {
+          if (this.method !== "HEAD") {
+            const body = await res2.text();
+            if (body === "") ;
+            else if (this.headers.get("Accept") === "text/csv") {
+              data = body;
+            } else if (this.headers.get("Accept") && ((_a3 = this.headers.get("Accept")) === null || _a3 === void 0 ? void 0 : _a3.includes("application/vnd.pgrst.plan+text"))) {
+              data = body;
+            } else {
+              data = JSON.parse(body);
+            }
+          }
+          const countHeader = (_b2 = this.headers.get("Prefer")) === null || _b2 === void 0 ? void 0 : _b2.match(/count=(exact|planned|estimated)/);
+          const contentRange = (_c = res2.headers.get("content-range")) === null || _c === void 0 ? void 0 : _c.split("/");
+          if (countHeader && contentRange && contentRange.length > 1) {
+            count = parseInt(contentRange[1]);
+          }
+          if (this.isMaybeSingle && this.method === "GET" && Array.isArray(data)) {
+            if (data.length > 1) {
+              error = {
+                // https://github.com/PostgREST/postgrest/blob/a867d79c42419af16c18c3fb019eba8df992626f/src/PostgREST/Error.hs#L553
+                code: "PGRST116",
+                details: `Results contain ${data.length} rows, application/vnd.pgrst.object+json requires 1 row`,
+                hint: null,
+                message: "JSON object requested, multiple (or no) rows returned"
+              };
+              data = null;
+              count = null;
+              status = 406;
+              statusText = "Not Acceptable";
+            } else if (data.length === 1) {
+              data = data[0];
+            } else {
+              data = null;
+            }
+          }
+        } else {
+          const body = await res2.text();
+          try {
+            error = JSON.parse(body);
+            if (Array.isArray(error) && res2.status === 404) {
+              data = [];
+              error = null;
+              status = 200;
+              statusText = "OK";
+            }
+          } catch (_e) {
+            if (res2.status === 404 && body === "") {
+              status = 204;
+              statusText = "No Content";
+            } else {
+              error = {
+                message: body
+              };
+            }
+          }
+          if (error && this.isMaybeSingle && ((_d = error === null || error === void 0 ? void 0 : error.details) === null || _d === void 0 ? void 0 : _d.includes("0 rows"))) {
+            error = null;
+            status = 200;
+            statusText = "OK";
+          }
+          if (error && this.shouldThrowOnError) {
+            throw new PostgrestError_1.default(error);
+          }
+        }
+        const postgrestResponse = {
+          error,
+          data,
+          count,
+          status,
+          statusText
+        };
+        return postgrestResponse;
+      });
+      if (!this.shouldThrowOnError) {
+        res = res.catch((fetchError) => {
+          var _a3, _b2, _c, _d, _e, _f;
+          let errorDetails = "";
+          const cause = fetchError === null || fetchError === void 0 ? void 0 : fetchError.cause;
+          if (cause) {
+            const causeMessage = (_a3 = cause === null || cause === void 0 ? void 0 : cause.message) !== null && _a3 !== void 0 ? _a3 : "";
+            const causeCode = (_b2 = cause === null || cause === void 0 ? void 0 : cause.code) !== null && _b2 !== void 0 ? _b2 : "";
+            errorDetails = `${(_c = fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) !== null && _c !== void 0 ? _c : "FetchError"}: ${fetchError === null || fetchError === void 0 ? void 0 : fetchError.message}`;
+            errorDetails += `
+
+Caused by: ${(_d = cause === null || cause === void 0 ? void 0 : cause.name) !== null && _d !== void 0 ? _d : "Error"}: ${causeMessage}`;
+            if (causeCode) {
+              errorDetails += ` (${causeCode})`;
+            }
+            if (cause === null || cause === void 0 ? void 0 : cause.stack) {
+              errorDetails += `
+${cause.stack}`;
+            }
+          } else {
+            errorDetails = (_e = fetchError === null || fetchError === void 0 ? void 0 : fetchError.stack) !== null && _e !== void 0 ? _e : "";
+          }
+          return {
+            error: {
+              message: `${(_f = fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) !== null && _f !== void 0 ? _f : "FetchError"}: ${fetchError === null || fetchError === void 0 ? void 0 : fetchError.message}`,
+              details: errorDetails,
+              hint: "",
+              code: ""
+            },
+            data: null,
+            count: null,
+            status: 0,
+            statusText: ""
+          };
+        });
+      }
+      return res.then(onfulfilled, onrejected);
+    }
+    /**
+     * Override the type of the returned `data`.
+     *
+     * @typeParam NewResult - The new result type to override with
+     * @deprecated Use overrideTypes<yourType, { merge: false }>() method at the end of your call chain instead
+     */
+    returns() {
+      return this;
+    }
+    /**
+     * Override the type of the returned `data` field in the response.
+     *
+     * @typeParam NewResult - The new type to cast the response data to
+     * @typeParam Options - Optional type configuration (defaults to { merge: true })
+     * @typeParam Options.merge - When true, merges the new type with existing return type. When false, replaces the existing types entirely (defaults to true)
+     * @example
+     * ```typescript
+     * // Merge with existing types (default behavior)
+     * const query = supabase
+     *   .from('users')
+     *   .select()
+     *   .overrideTypes<{ custom_field: string }>()
+     *
+     * // Replace existing types completely
+     * const replaceQuery = supabase
+     *   .from('users')
+     *   .select()
+     *   .overrideTypes<{ id: number; name: string }, { merge: false }>()
+     * ```
+     * @returns A PostgrestBuilder instance with the new type
+     */
+    overrideTypes() {
+      return this;
+    }
+  };
+  PostgrestBuilder.default = PostgrestBuilder$1;
+  return PostgrestBuilder;
+}
+var hasRequiredPostgrestTransformBuilder;
+function requirePostgrestTransformBuilder() {
+  if (hasRequiredPostgrestTransformBuilder) return PostgrestTransformBuilder;
+  hasRequiredPostgrestTransformBuilder = 1;
+  Object.defineProperty(PostgrestTransformBuilder, "__esModule", { value: true });
+  const tslib_1 = require$$0;
+  const PostgrestBuilder_1 = tslib_1.__importDefault(requirePostgrestBuilder());
+  let PostgrestTransformBuilder$1 = class PostgrestTransformBuilder extends PostgrestBuilder_1.default {
+    /**
+     * Perform a SELECT on the query result.
+     *
+     * By default, `.insert()`, `.update()`, `.upsert()`, and `.delete()` do not
+     * return modified rows. By calling this method, modified rows are returned in
+     * `data`.
+     *
+     * @param columns - The columns to retrieve, separated by commas
+     */
+    select(columns) {
+      let quoted = false;
+      const cleanedColumns = (columns !== null && columns !== void 0 ? columns : "*").split("").map((c2) => {
+        if (/\s/.test(c2) && !quoted) {
+          return "";
+        }
+        if (c2 === '"') {
+          quoted = !quoted;
+        }
+        return c2;
+      }).join("");
+      this.url.searchParams.set("select", cleanedColumns);
+      this.headers.append("Prefer", "return=representation");
+      return this;
+    }
+    /**
+     * Order the query result by `column`.
+     *
+     * You can call this method multiple times to order by multiple columns.
+     *
+     * You can order referenced tables, but it only affects the ordering of the
+     * parent table if you use `!inner` in the query.
+     *
+     * @param column - The column to order by
+     * @param options - Named parameters
+     * @param options.ascending - If `true`, the result will be in ascending order
+     * @param options.nullsFirst - If `true`, `null`s appear first. If `false`,
+     * `null`s appear last.
+     * @param options.referencedTable - Set this to order a referenced table by
+     * its columns
+     * @param options.foreignTable - Deprecated, use `options.referencedTable`
+     * instead
+     */
+    order(column, { ascending: ascending2 = true, nullsFirst, foreignTable, referencedTable = foreignTable } = {}) {
+      const key = referencedTable ? `${referencedTable}.order` : "order";
+      const existingOrder = this.url.searchParams.get(key);
+      this.url.searchParams.set(key, `${existingOrder ? `${existingOrder},` : ""}${column}.${ascending2 ? "asc" : "desc"}${nullsFirst === void 0 ? "" : nullsFirst ? ".nullsfirst" : ".nullslast"}`);
+      return this;
+    }
+    /**
+     * Limit the query result by `count`.
+     *
+     * @param count - The maximum number of rows to return
+     * @param options - Named parameters
+     * @param options.referencedTable - Set this to limit rows of referenced
+     * tables instead of the parent table
+     * @param options.foreignTable - Deprecated, use `options.referencedTable`
+     * instead
+     */
+    limit(count, { foreignTable, referencedTable = foreignTable } = {}) {
+      const key = typeof referencedTable === "undefined" ? "limit" : `${referencedTable}.limit`;
+      this.url.searchParams.set(key, `${count}`);
+      return this;
+    }
+    /**
+     * Limit the query result by starting at an offset `from` and ending at the offset `to`.
+     * Only records within this range are returned.
+     * This respects the query order and if there is no order clause the range could behave unexpectedly.
+     * The `from` and `to` values are 0-based and inclusive: `range(1, 3)` will include the second, third
+     * and fourth rows of the query.
+     *
+     * @param from - The starting index from which to limit the result
+     * @param to - The last index to which to limit the result
+     * @param options - Named parameters
+     * @param options.referencedTable - Set this to limit rows of referenced
+     * tables instead of the parent table
+     * @param options.foreignTable - Deprecated, use `options.referencedTable`
+     * instead
+     */
+    range(from, to, { foreignTable, referencedTable = foreignTable } = {}) {
+      const keyOffset = typeof referencedTable === "undefined" ? "offset" : `${referencedTable}.offset`;
+      const keyLimit = typeof referencedTable === "undefined" ? "limit" : `${referencedTable}.limit`;
+      this.url.searchParams.set(keyOffset, `${from}`);
+      this.url.searchParams.set(keyLimit, `${to - from + 1}`);
+      return this;
+    }
+    /**
+     * Set the AbortSignal for the fetch request.
+     *
+     * @param signal - The AbortSignal to use for the fetch request
+     */
+    abortSignal(signal) {
+      this.signal = signal;
+      return this;
+    }
+    /**
+     * Return `data` as a single object instead of an array of objects.
+     *
+     * Query result must be one row (e.g. using `.limit(1)`), otherwise this
+     * returns an error.
+     */
+    single() {
+      this.headers.set("Accept", "application/vnd.pgrst.object+json");
+      return this;
+    }
+    /**
+     * Return `data` as a single object instead of an array of objects.
+     *
+     * Query result must be zero or one row (e.g. using `.limit(1)`), otherwise
+     * this returns an error.
+     */
+    maybeSingle() {
+      if (this.method === "GET") {
+        this.headers.set("Accept", "application/json");
+      } else {
+        this.headers.set("Accept", "application/vnd.pgrst.object+json");
+      }
+      this.isMaybeSingle = true;
+      return this;
+    }
+    /**
+     * Return `data` as a string in CSV format.
+     */
+    csv() {
+      this.headers.set("Accept", "text/csv");
+      return this;
+    }
+    /**
+     * Return `data` as an object in [GeoJSON](https://geojson.org) format.
+     */
+    geojson() {
+      this.headers.set("Accept", "application/geo+json");
+      return this;
+    }
+    /**
+     * Return `data` as the EXPLAIN plan for the query.
+     *
+     * You need to enable the
+     * [db_plan_enabled](https://supabase.com/docs/guides/database/debugging-performance#enabling-explain)
+     * setting before using this method.
+     *
+     * @param options - Named parameters
+     *
+     * @param options.analyze - If `true`, the query will be executed and the
+     * actual run time will be returned
+     *
+     * @param options.verbose - If `true`, the query identifier will be returned
+     * and `data` will include the output columns of the query
+     *
+     * @param options.settings - If `true`, include information on configuration
+     * parameters that affect query planning
+     *
+     * @param options.buffers - If `true`, include information on buffer usage
+     *
+     * @param options.wal - If `true`, include information on WAL record generation
+     *
+     * @param options.format - The format of the output, can be `"text"` (default)
+     * or `"json"`
+     */
+    explain({ analyze = false, verbose = false, settings = false, buffers = false, wal = false, format: format2 = "text" } = {}) {
+      var _a3;
+      const options = [
+        analyze ? "analyze" : null,
+        verbose ? "verbose" : null,
+        settings ? "settings" : null,
+        buffers ? "buffers" : null,
+        wal ? "wal" : null
+      ].filter(Boolean).join("|");
+      const forMediatype = (_a3 = this.headers.get("Accept")) !== null && _a3 !== void 0 ? _a3 : "application/json";
+      this.headers.set("Accept", `application/vnd.pgrst.plan+${format2}; for="${forMediatype}"; options=${options};`);
+      if (format2 === "json") {
+        return this;
+      } else {
+        return this;
+      }
+    }
+    /**
+     * Rollback the query.
+     *
+     * `data` will still be returned, but the query is not committed.
+     */
+    rollback() {
+      this.headers.append("Prefer", "tx=rollback");
+      return this;
+    }
+    /**
+     * Override the type of the returned `data`.
+     *
+     * @typeParam NewResult - The new result type to override with
+     * @deprecated Use overrideTypes<yourType, { merge: false }>() method at the end of your call chain instead
+     */
+    returns() {
+      return this;
+    }
+    /**
+     * Set the maximum number of rows that can be affected by the query.
+     * Only available in PostgREST v13+ and only works with PATCH and DELETE methods.
+     *
+     * @param value - The maximum number of rows that can be affected
+     */
+    maxAffected(value) {
+      this.headers.append("Prefer", "handling=strict");
+      this.headers.append("Prefer", `max-affected=${value}`);
+      return this;
+    }
+  };
+  PostgrestTransformBuilder.default = PostgrestTransformBuilder$1;
+  return PostgrestTransformBuilder;
+}
+var hasRequiredPostgrestFilterBuilder;
+function requirePostgrestFilterBuilder() {
+  if (hasRequiredPostgrestFilterBuilder) return PostgrestFilterBuilder;
+  hasRequiredPostgrestFilterBuilder = 1;
+  Object.defineProperty(PostgrestFilterBuilder, "__esModule", { value: true });
+  const tslib_1 = require$$0;
+  const PostgrestTransformBuilder_1 = tslib_1.__importDefault(requirePostgrestTransformBuilder());
+  const PostgrestReservedCharsRegexp = new RegExp("[,()]");
+  let PostgrestFilterBuilder$1 = class PostgrestFilterBuilder extends PostgrestTransformBuilder_1.default {
+    /**
+     * Match only rows where `column` is equal to `value`.
+     *
+     * To check if the value of `column` is NULL, you should use `.is()` instead.
+     *
+     * @param column - The column to filter on
+     * @param value - The value to filter with
+     */
+    eq(column, value) {
+      this.url.searchParams.append(column, `eq.${value}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` is not equal to `value`.
+     *
+     * @param column - The column to filter on
+     * @param value - The value to filter with
+     */
+    neq(column, value) {
+      this.url.searchParams.append(column, `neq.${value}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` is greater than `value`.
+     *
+     * @param column - The column to filter on
+     * @param value - The value to filter with
+     */
+    gt(column, value) {
+      this.url.searchParams.append(column, `gt.${value}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` is greater than or equal to `value`.
+     *
+     * @param column - The column to filter on
+     * @param value - The value to filter with
+     */
+    gte(column, value) {
+      this.url.searchParams.append(column, `gte.${value}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` is less than `value`.
+     *
+     * @param column - The column to filter on
+     * @param value - The value to filter with
+     */
+    lt(column, value) {
+      this.url.searchParams.append(column, `lt.${value}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` is less than or equal to `value`.
+     *
+     * @param column - The column to filter on
+     * @param value - The value to filter with
+     */
+    lte(column, value) {
+      this.url.searchParams.append(column, `lte.${value}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` matches `pattern` case-sensitively.
+     *
+     * @param column - The column to filter on
+     * @param pattern - The pattern to match with
+     */
+    like(column, pattern) {
+      this.url.searchParams.append(column, `like.${pattern}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` matches all of `patterns` case-sensitively.
+     *
+     * @param column - The column to filter on
+     * @param patterns - The patterns to match with
+     */
+    likeAllOf(column, patterns) {
+      this.url.searchParams.append(column, `like(all).{${patterns.join(",")}}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` matches any of `patterns` case-sensitively.
+     *
+     * @param column - The column to filter on
+     * @param patterns - The patterns to match with
+     */
+    likeAnyOf(column, patterns) {
+      this.url.searchParams.append(column, `like(any).{${patterns.join(",")}}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` matches `pattern` case-insensitively.
+     *
+     * @param column - The column to filter on
+     * @param pattern - The pattern to match with
+     */
+    ilike(column, pattern) {
+      this.url.searchParams.append(column, `ilike.${pattern}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` matches all of `patterns` case-insensitively.
+     *
+     * @param column - The column to filter on
+     * @param patterns - The patterns to match with
+     */
+    ilikeAllOf(column, patterns) {
+      this.url.searchParams.append(column, `ilike(all).{${patterns.join(",")}}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` matches any of `patterns` case-insensitively.
+     *
+     * @param column - The column to filter on
+     * @param patterns - The patterns to match with
+     */
+    ilikeAnyOf(column, patterns) {
+      this.url.searchParams.append(column, `ilike(any).{${patterns.join(",")}}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` matches the PostgreSQL regex `pattern`
+     * case-sensitively (using the `~` operator).
+     *
+     * @param column - The column to filter on
+     * @param pattern - The PostgreSQL regular expression pattern to match with
+     */
+    regexMatch(column, pattern) {
+      this.url.searchParams.append(column, `match.${pattern}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` matches the PostgreSQL regex `pattern`
+     * case-insensitively (using the `~*` operator).
+     *
+     * @param column - The column to filter on
+     * @param pattern - The PostgreSQL regular expression pattern to match with
+     */
+    regexIMatch(column, pattern) {
+      this.url.searchParams.append(column, `imatch.${pattern}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` IS `value`.
+     *
+     * For non-boolean columns, this is only relevant for checking if the value of
+     * `column` is NULL by setting `value` to `null`.
+     *
+     * For boolean columns, you can also set `value` to `true` or `false` and it
+     * will behave the same way as `.eq()`.
+     *
+     * @param column - The column to filter on
+     * @param value - The value to filter with
+     */
+    is(column, value) {
+      this.url.searchParams.append(column, `is.${value}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` IS DISTINCT FROM `value`.
+     *
+     * Unlike `.neq()`, this treats `NULL` as a comparable value. Two `NULL` values
+     * are considered equal (not distinct), and comparing `NULL` with any non-NULL
+     * value returns true (distinct).
+     *
+     * @param column - The column to filter on
+     * @param value - The value to filter with
+     */
+    isDistinct(column, value) {
+      this.url.searchParams.append(column, `isdistinct.${value}`);
+      return this;
+    }
+    /**
+     * Match only rows where `column` is included in the `values` array.
+     *
+     * @param column - The column to filter on
+     * @param values - The values array to filter with
+     */
+    in(column, values) {
+      const cleanedValues = Array.from(new Set(values)).map((s2) => {
+        if (typeof s2 === "string" && PostgrestReservedCharsRegexp.test(s2))
+          return `"${s2}"`;
+        else
+          return `${s2}`;
+      }).join(",");
+      this.url.searchParams.append(column, `in.(${cleanedValues})`);
+      return this;
+    }
+    /**
+     * Only relevant for jsonb, array, and range columns. Match only rows where
+     * `column` contains every element appearing in `value`.
+     *
+     * @param column - The jsonb, array, or range column to filter on
+     * @param value - The jsonb, array, or range value to filter with
+     */
+    contains(column, value) {
+      if (typeof value === "string") {
+        this.url.searchParams.append(column, `cs.${value}`);
+      } else if (Array.isArray(value)) {
+        this.url.searchParams.append(column, `cs.{${value.join(",")}}`);
+      } else {
+        this.url.searchParams.append(column, `cs.${JSON.stringify(value)}`);
+      }
+      return this;
+    }
+    /**
+     * Only relevant for jsonb, array, and range columns. Match only rows where
+     * every element appearing in `column` is contained by `value`.
+     *
+     * @param column - The jsonb, array, or range column to filter on
+     * @param value - The jsonb, array, or range value to filter with
+     */
+    containedBy(column, value) {
+      if (typeof value === "string") {
+        this.url.searchParams.append(column, `cd.${value}`);
+      } else if (Array.isArray(value)) {
+        this.url.searchParams.append(column, `cd.{${value.join(",")}}`);
+      } else {
+        this.url.searchParams.append(column, `cd.${JSON.stringify(value)}`);
+      }
+      return this;
+    }
+    /**
+     * Only relevant for range columns. Match only rows where every element in
+     * `column` is greater than any element in `range`.
+     *
+     * @param column - The range column to filter on
+     * @param range - The range to filter with
+     */
+    rangeGt(column, range3) {
+      this.url.searchParams.append(column, `sr.${range3}`);
+      return this;
+    }
+    /**
+     * Only relevant for range columns. Match only rows where every element in
+     * `column` is either contained in `range` or greater than any element in
+     * `range`.
+     *
+     * @param column - The range column to filter on
+     * @param range - The range to filter with
+     */
+    rangeGte(column, range3) {
+      this.url.searchParams.append(column, `nxl.${range3}`);
+      return this;
+    }
+    /**
+     * Only relevant for range columns. Match only rows where every element in
+     * `column` is less than any element in `range`.
+     *
+     * @param column - The range column to filter on
+     * @param range - The range to filter with
+     */
+    rangeLt(column, range3) {
+      this.url.searchParams.append(column, `sl.${range3}`);
+      return this;
+    }
+    /**
+     * Only relevant for range columns. Match only rows where every element in
+     * `column` is either contained in `range` or less than any element in
+     * `range`.
+     *
+     * @param column - The range column to filter on
+     * @param range - The range to filter with
+     */
+    rangeLte(column, range3) {
+      this.url.searchParams.append(column, `nxr.${range3}`);
+      return this;
+    }
+    /**
+     * Only relevant for range columns. Match only rows where `column` is
+     * mutually exclusive to `range` and there can be no element between the two
+     * ranges.
+     *
+     * @param column - The range column to filter on
+     * @param range - The range to filter with
+     */
+    rangeAdjacent(column, range3) {
+      this.url.searchParams.append(column, `adj.${range3}`);
+      return this;
+    }
+    /**
+     * Only relevant for array and range columns. Match only rows where
+     * `column` and `value` have an element in common.
+     *
+     * @param column - The array or range column to filter on
+     * @param value - The array or range value to filter with
+     */
+    overlaps(column, value) {
+      if (typeof value === "string") {
+        this.url.searchParams.append(column, `ov.${value}`);
+      } else {
+        this.url.searchParams.append(column, `ov.{${value.join(",")}}`);
+      }
+      return this;
+    }
+    /**
+     * Only relevant for text and tsvector columns. Match only rows where
+     * `column` matches the query string in `query`.
+     *
+     * @param column - The text or tsvector column to filter on
+     * @param query - The query text to match with
+     * @param options - Named parameters
+     * @param options.config - The text search configuration to use
+     * @param options.type - Change how the `query` text is interpreted
+     */
+    textSearch(column, query, { config: config2, type } = {}) {
+      let typePart = "";
+      if (type === "plain") {
+        typePart = "pl";
+      } else if (type === "phrase") {
+        typePart = "ph";
+      } else if (type === "websearch") {
+        typePart = "w";
+      }
+      const configPart = config2 === void 0 ? "" : `(${config2})`;
+      this.url.searchParams.append(column, `${typePart}fts${configPart}.${query}`);
+      return this;
+    }
+    /**
+     * Match only rows where each column in `query` keys is equal to its
+     * associated value. Shorthand for multiple `.eq()`s.
+     *
+     * @param query - The object to filter with, with column names as keys mapped
+     * to their filter values
+     */
+    match(query) {
+      Object.entries(query).forEach(([column, value]) => {
+        this.url.searchParams.append(column, `eq.${value}`);
+      });
+      return this;
+    }
+    /**
+     * Match only rows which doesn't satisfy the filter.
+     *
+     * Unlike most filters, `opearator` and `value` are used as-is and need to
+     * follow [PostgREST
+     * syntax](https://postgrest.org/en/stable/api.html#operators). You also need
+     * to make sure they are properly sanitized.
+     *
+     * @param column - The column to filter on
+     * @param operator - The operator to be negated to filter with, following
+     * PostgREST syntax
+     * @param value - The value to filter with, following PostgREST syntax
+     */
+    not(column, operator, value) {
+      this.url.searchParams.append(column, `not.${operator}.${value}`);
+      return this;
+    }
+    /**
+     * Match only rows which satisfy at least one of the filters.
+     *
+     * Unlike most filters, `filters` is used as-is and needs to follow [PostgREST
+     * syntax](https://postgrest.org/en/stable/api.html#operators). You also need
+     * to make sure it's properly sanitized.
+     *
+     * It's currently not possible to do an `.or()` filter across multiple tables.
+     *
+     * @param filters - The filters to use, following PostgREST syntax
+     * @param options - Named parameters
+     * @param options.referencedTable - Set this to filter on referenced tables
+     * instead of the parent table
+     * @param options.foreignTable - Deprecated, use `referencedTable` instead
+     */
+    or(filters, { foreignTable, referencedTable = foreignTable } = {}) {
+      const key = referencedTable ? `${referencedTable}.or` : "or";
+      this.url.searchParams.append(key, `(${filters})`);
+      return this;
+    }
+    /**
+     * Match only rows which satisfy the filter. This is an escape hatch - you
+     * should use the specific filter methods wherever possible.
+     *
+     * Unlike most filters, `opearator` and `value` are used as-is and need to
+     * follow [PostgREST
+     * syntax](https://postgrest.org/en/stable/api.html#operators). You also need
+     * to make sure they are properly sanitized.
+     *
+     * @param column - The column to filter on
+     * @param operator - The operator to filter with, following PostgREST syntax
+     * @param value - The value to filter with, following PostgREST syntax
+     */
+    filter(column, operator, value) {
+      this.url.searchParams.append(column, `${operator}.${value}`);
+      return this;
+    }
+  };
+  PostgrestFilterBuilder.default = PostgrestFilterBuilder$1;
+  return PostgrestFilterBuilder;
+}
+var hasRequiredPostgrestQueryBuilder;
+function requirePostgrestQueryBuilder() {
+  if (hasRequiredPostgrestQueryBuilder) return PostgrestQueryBuilder;
+  hasRequiredPostgrestQueryBuilder = 1;
+  Object.defineProperty(PostgrestQueryBuilder, "__esModule", { value: true });
+  const tslib_1 = require$$0;
+  const PostgrestFilterBuilder_1 = tslib_1.__importDefault(requirePostgrestFilterBuilder());
+  let PostgrestQueryBuilder$1 = class PostgrestQueryBuilder {
+    /**
+     * Creates a query builder scoped to a Postgres table or view.
+     *
+     * @example
+     * ```ts
+     * import PostgrestQueryBuilder from '@supabase/postgrest-js'
+     *
+     * const query = new PostgrestQueryBuilder(
+     *   new URL('https://xyzcompany.supabase.co/rest/v1/users'),
+     *   { headers: { apikey: 'public-anon-key' } }
+     * )
+     * ```
+     */
+    constructor(url, { headers = {}, schema, fetch: fetch2 }) {
+      this.url = url;
+      this.headers = new Headers(headers);
+      this.schema = schema;
+      this.fetch = fetch2;
+    }
+    /**
+     * Perform a SELECT query on the table or view.
+     *
+     * @param columns - The columns to retrieve, separated by commas. Columns can be renamed when returned with `customName:columnName`
+     *
+     * @param options - Named parameters
+     *
+     * @param options.head - When set to `true`, `data` will not be returned.
+     * Useful if you only need the count.
+     *
+     * @param options.count - Count algorithm to use to count rows in the table or view.
+     *
+     * `"exact"`: Exact but slow count algorithm. Performs a `COUNT(*)` under the
+     * hood.
+     *
+     * `"planned"`: Approximated but fast count algorithm. Uses the Postgres
+     * statistics under the hood.
+     *
+     * `"estimated"`: Uses exact count for low numbers and planned count for high
+     * numbers.
+     */
+    select(columns, options) {
+      const { head: head2 = false, count } = options !== null && options !== void 0 ? options : {};
+      const method = head2 ? "HEAD" : "GET";
+      let quoted = false;
+      const cleanedColumns = (columns !== null && columns !== void 0 ? columns : "*").split("").map((c2) => {
+        if (/\s/.test(c2) && !quoted) {
+          return "";
+        }
+        if (c2 === '"') {
+          quoted = !quoted;
+        }
+        return c2;
+      }).join("");
+      this.url.searchParams.set("select", cleanedColumns);
+      if (count) {
+        this.headers.append("Prefer", `count=${count}`);
+      }
+      return new PostgrestFilterBuilder_1.default({
+        method,
+        url: this.url,
+        headers: this.headers,
+        schema: this.schema,
+        fetch: this.fetch
+      });
+    }
+    /**
+     * Perform an INSERT into the table or view.
+     *
+     * By default, inserted rows are not returned. To return it, chain the call
+     * with `.select()`.
+     *
+     * @param values - The values to insert. Pass an object to insert a single row
+     * or an array to insert multiple rows.
+     *
+     * @param options - Named parameters
+     *
+     * @param options.count - Count algorithm to use to count inserted rows.
+     *
+     * `"exact"`: Exact but slow count algorithm. Performs a `COUNT(*)` under the
+     * hood.
+     *
+     * `"planned"`: Approximated but fast count algorithm. Uses the Postgres
+     * statistics under the hood.
+     *
+     * `"estimated"`: Uses exact count for low numbers and planned count for high
+     * numbers.
+     *
+     * @param options.defaultToNull - Make missing fields default to `null`.
+     * Otherwise, use the default value for the column. Only applies for bulk
+     * inserts.
+     */
+    insert(values, { count, defaultToNull = true } = {}) {
+      var _a3;
+      const method = "POST";
+      if (count) {
+        this.headers.append("Prefer", `count=${count}`);
+      }
+      if (!defaultToNull) {
+        this.headers.append("Prefer", `missing=default`);
+      }
+      if (Array.isArray(values)) {
+        const columns = values.reduce((acc, x2) => acc.concat(Object.keys(x2)), []);
+        if (columns.length > 0) {
+          const uniqueColumns = [...new Set(columns)].map((column) => `"${column}"`);
+          this.url.searchParams.set("columns", uniqueColumns.join(","));
+        }
+      }
+      return new PostgrestFilterBuilder_1.default({
+        method,
+        url: this.url,
+        headers: this.headers,
+        schema: this.schema,
+        body: values,
+        fetch: (_a3 = this.fetch) !== null && _a3 !== void 0 ? _a3 : fetch
+      });
+    }
+    /**
+    * Perform an UPSERT on the table or view. Depending on the column(s) passed
+    * to `onConflict`, `.upsert()` allows you to perform the equivalent of
+    * `.insert()` if a row with the corresponding `onConflict` columns doesn't
+    * exist, or if it does exist, perform an alternative action depending on
+    * `ignoreDuplicates`.
+    *
+    * By default, upserted rows are not returned. To return it, chain the call
+    * with `.select()`.
+    *
+    * @param values - The values to upsert with. Pass an object to upsert a
+    * single row or an array to upsert multiple rows.
+    *
+    * @param options - Named parameters
+    *
+    * @param options.onConflict - Comma-separated UNIQUE column(s) to specify how
+    * duplicate rows are determined. Two rows are duplicates if all the
+    * `onConflict` columns are equal.
+    *
+    * @param options.ignoreDuplicates - If `true`, duplicate rows are ignored. If
+    * `false`, duplicate rows are merged with existing rows.
+    *
+    * @param options.count - Count algorithm to use to count upserted rows.
+    *
+    * `"exact"`: Exact but slow count algorithm. Performs a `COUNT(*)` under the
+    * hood.
+    *
+    * `"planned"`: Approximated but fast count algorithm. Uses the Postgres
+    * statistics under the hood.
+    *
+    * `"estimated"`: Uses exact count for low numbers and planned count for high
+    * numbers.
+    *
+    * @param options.defaultToNull - Make missing fields default to `null`.
+    * Otherwise, use the default value for the column. This only applies when
+    * inserting new rows, not when merging with existing rows under
+    * `ignoreDuplicates: false`. This also only applies when doing bulk upserts.
+    *
+    * @example Upsert a single row using a unique key
+    * ```ts
+    * // Upserting a single row, overwriting based on the 'username' unique column
+    * const { data, error } = await supabase
+    *   .from('users')
+    *   .upsert({ username: 'supabot' }, { onConflict: 'username' })
+    *
+    * // Example response:
+    * // {
+    * //   data: [
+    * //     { id: 4, message: 'bar', username: 'supabot' }
+    * //   ],
+    * //   error: null
+    * // }
+    * ```
+    *
+    * @example Upsert with conflict resolution and exact row counting
+    * ```ts
+    * // Upserting and returning exact count
+    * const { data, error, count } = await supabase
+    *   .from('users')
+    *   .upsert(
+    *     {
+    *       id: 3,
+    *       message: 'foo',
+    *       username: 'supabot'
+    *     },
+    *     {
+    *       onConflict: 'username',
+    *       count: 'exact'
+    *     }
+    *   )
+    *
+    * // Example response:
+    * // {
+    * //   data: [
+    * //     {
+    * //       id: 42,
+    * //       handle: "saoirse",
+    * //       display_name: "Saoirse"
+    * //     }
+    * //   ],
+    * //   count: 1,
+    * //   error: null
+    * // }
+    * ```
+    */
+    upsert(values, { onConflict, ignoreDuplicates = false, count, defaultToNull = true } = {}) {
+      var _a3;
+      const method = "POST";
+      this.headers.append("Prefer", `resolution=${ignoreDuplicates ? "ignore" : "merge"}-duplicates`);
+      if (onConflict !== void 0)
+        this.url.searchParams.set("on_conflict", onConflict);
+      if (count) {
+        this.headers.append("Prefer", `count=${count}`);
+      }
+      if (!defaultToNull) {
+        this.headers.append("Prefer", "missing=default");
+      }
+      if (Array.isArray(values)) {
+        const columns = values.reduce((acc, x2) => acc.concat(Object.keys(x2)), []);
+        if (columns.length > 0) {
+          const uniqueColumns = [...new Set(columns)].map((column) => `"${column}"`);
+          this.url.searchParams.set("columns", uniqueColumns.join(","));
+        }
+      }
+      return new PostgrestFilterBuilder_1.default({
+        method,
+        url: this.url,
+        headers: this.headers,
+        schema: this.schema,
+        body: values,
+        fetch: (_a3 = this.fetch) !== null && _a3 !== void 0 ? _a3 : fetch
+      });
+    }
+    /**
+     * Perform an UPDATE on the table or view.
+     *
+     * By default, updated rows are not returned. To return it, chain the call
+     * with `.select()` after filters.
+     *
+     * @param values - The values to update with
+     *
+     * @param options - Named parameters
+     *
+     * @param options.count - Count algorithm to use to count updated rows.
+     *
+     * `"exact"`: Exact but slow count algorithm. Performs a `COUNT(*)` under the
+     * hood.
+     *
+     * `"planned"`: Approximated but fast count algorithm. Uses the Postgres
+     * statistics under the hood.
+     *
+     * `"estimated"`: Uses exact count for low numbers and planned count for high
+     * numbers.
+     */
+    update(values, { count } = {}) {
+      var _a3;
+      const method = "PATCH";
+      if (count) {
+        this.headers.append("Prefer", `count=${count}`);
+      }
+      return new PostgrestFilterBuilder_1.default({
+        method,
+        url: this.url,
+        headers: this.headers,
+        schema: this.schema,
+        body: values,
+        fetch: (_a3 = this.fetch) !== null && _a3 !== void 0 ? _a3 : fetch
+      });
+    }
+    /**
+     * Perform a DELETE on the table or view.
+     *
+     * By default, deleted rows are not returned. To return it, chain the call
+     * with `.select()` after filters.
+     *
+     * @param options - Named parameters
+     *
+     * @param options.count - Count algorithm to use to count deleted rows.
+     *
+     * `"exact"`: Exact but slow count algorithm. Performs a `COUNT(*)` under the
+     * hood.
+     *
+     * `"planned"`: Approximated but fast count algorithm. Uses the Postgres
+     * statistics under the hood.
+     *
+     * `"estimated"`: Uses exact count for low numbers and planned count for high
+     * numbers.
+     */
+    delete({ count } = {}) {
+      var _a3;
+      const method = "DELETE";
+      if (count) {
+        this.headers.append("Prefer", `count=${count}`);
+      }
+      return new PostgrestFilterBuilder_1.default({
+        method,
+        url: this.url,
+        headers: this.headers,
+        schema: this.schema,
+        fetch: (_a3 = this.fetch) !== null && _a3 !== void 0 ? _a3 : fetch
+      });
+    }
+  };
+  PostgrestQueryBuilder.default = PostgrestQueryBuilder$1;
+  return PostgrestQueryBuilder;
+}
+var hasRequiredPostgrestClient;
+function requirePostgrestClient() {
+  if (hasRequiredPostgrestClient) return PostgrestClient;
+  hasRequiredPostgrestClient = 1;
+  Object.defineProperty(PostgrestClient, "__esModule", { value: true });
+  const tslib_1 = require$$0;
+  const PostgrestQueryBuilder_1 = tslib_1.__importDefault(requirePostgrestQueryBuilder());
+  const PostgrestFilterBuilder_1 = tslib_1.__importDefault(requirePostgrestFilterBuilder());
+  let PostgrestClient$1 = class PostgrestClient2 {
+    // TODO: Add back shouldThrowOnError once we figure out the typings
+    /**
+     * Creates a PostgREST client.
+     *
+     * @param url - URL of the PostgREST endpoint
+     * @param options - Named parameters
+     * @param options.headers - Custom headers
+     * @param options.schema - Postgres schema to switch to
+     * @param options.fetch - Custom fetch
+     * @example
+     * ```ts
+     * import PostgrestClient from '@supabase/postgrest-js'
+     *
+     * const postgrest = new PostgrestClient('https://xyzcompany.supabase.co/rest/v1', {
+     *   headers: { apikey: 'public-anon-key' },
+     *   schema: 'public',
+     * })
+     * ```
+     */
+    constructor(url, { headers = {}, schema, fetch: fetch2 } = {}) {
+      this.url = url;
+      this.headers = new Headers(headers);
+      this.schemaName = schema;
+      this.fetch = fetch2;
+    }
+    /**
+     * Perform a query on a table or a view.
+     *
+     * @param relation - The table or view name to query
+     */
+    from(relation) {
+      if (!relation || typeof relation !== "string" || relation.trim() === "") {
+        throw new Error("Invalid relation name: relation must be a non-empty string.");
+      }
+      const url = new URL(`${this.url}/${relation}`);
+      return new PostgrestQueryBuilder_1.default(url, {
+        headers: new Headers(this.headers),
+        schema: this.schemaName,
+        fetch: this.fetch
+      });
+    }
+    /**
+     * Select a schema to query or perform an function (rpc) call.
+     *
+     * The schema needs to be on the list of exposed schemas inside Supabase.
+     *
+     * @param schema - The schema to query
+     */
+    schema(schema) {
+      return new PostgrestClient2(this.url, {
+        headers: this.headers,
+        schema,
+        fetch: this.fetch
+      });
+    }
+    /**
+     * Perform a function call.
+     *
+     * @param fn - The function name to call
+     * @param args - The arguments to pass to the function call
+     * @param options - Named parameters
+     * @param options.head - When set to `true`, `data` will not be returned.
+     * Useful if you only need the count.
+     * @param options.get - When set to `true`, the function will be called with
+     * read-only access mode.
+     * @param options.count - Count algorithm to use to count rows returned by the
+     * function. Only applicable for [set-returning
+     * functions](https://www.postgresql.org/docs/current/functions-srf.html).
+     *
+     * `"exact"`: Exact but slow count algorithm. Performs a `COUNT(*)` under the
+     * hood.
+     *
+     * `"planned"`: Approximated but fast count algorithm. Uses the Postgres
+     * statistics under the hood.
+     *
+     * `"estimated"`: Uses exact count for low numbers and planned count for high
+     * numbers.
+     *
+     * @example
+     * ```ts
+     * // For cross-schema functions where type inference fails, use overrideTypes:
+     * const { data } = await supabase
+     *   .schema('schema_b')
+     *   .rpc('function_a', {})
+     *   .overrideTypes<{ id: string; user_id: string }[]>()
+     * ```
+     */
+    rpc(fn, args = {}, { head: head2 = false, get: get2 = false, count } = {}) {
+      var _a3;
+      let method;
+      const url = new URL(`${this.url}/rpc/${fn}`);
+      let body;
+      if (head2 || get2) {
+        method = head2 ? "HEAD" : "GET";
+        Object.entries(args).filter(([_, value]) => value !== void 0).map(([name, value]) => [name, Array.isArray(value) ? `{${value.join(",")}}` : `${value}`]).forEach(([name, value]) => {
+          url.searchParams.append(name, value);
+        });
+      } else {
+        method = "POST";
+        body = args;
+      }
+      const headers = new Headers(this.headers);
+      if (count) {
+        headers.set("Prefer", `count=${count}`);
+      }
+      return new PostgrestFilterBuilder_1.default({
+        method,
+        url,
+        headers,
+        schema: this.schemaName,
+        body,
+        fetch: (_a3 = this.fetch) !== null && _a3 !== void 0 ? _a3 : fetch
+      });
+    }
+  };
+  PostgrestClient.default = PostgrestClient$1;
+  return PostgrestClient;
+}
+var hasRequiredCjs;
+function requireCjs() {
+  if (hasRequiredCjs) return cjs;
+  hasRequiredCjs = 1;
+  Object.defineProperty(cjs, "__esModule", { value: true });
+  cjs.PostgrestError = cjs.PostgrestBuilder = cjs.PostgrestTransformBuilder = cjs.PostgrestFilterBuilder = cjs.PostgrestQueryBuilder = cjs.PostgrestClient = void 0;
+  const tslib_1 = require$$0;
+  const PostgrestClient_1 = tslib_1.__importDefault(requirePostgrestClient());
+  cjs.PostgrestClient = PostgrestClient_1.default;
+  const PostgrestQueryBuilder_1 = tslib_1.__importDefault(requirePostgrestQueryBuilder());
+  cjs.PostgrestQueryBuilder = PostgrestQueryBuilder_1.default;
+  const PostgrestFilterBuilder_1 = tslib_1.__importDefault(requirePostgrestFilterBuilder());
+  cjs.PostgrestFilterBuilder = PostgrestFilterBuilder_1.default;
+  const PostgrestTransformBuilder_1 = tslib_1.__importDefault(requirePostgrestTransformBuilder());
+  cjs.PostgrestTransformBuilder = PostgrestTransformBuilder_1.default;
+  const PostgrestBuilder_1 = tslib_1.__importDefault(requirePostgrestBuilder());
+  cjs.PostgrestBuilder = PostgrestBuilder_1.default;
+  const PostgrestError_1 = tslib_1.__importDefault(requirePostgrestError());
+  cjs.PostgrestError = PostgrestError_1.default;
+  cjs.default = {
+    PostgrestClient: PostgrestClient_1.default,
+    PostgrestQueryBuilder: PostgrestQueryBuilder_1.default,
+    PostgrestFilterBuilder: PostgrestFilterBuilder_1.default,
+    PostgrestTransformBuilder: PostgrestTransformBuilder_1.default,
+    PostgrestBuilder: PostgrestBuilder_1.default,
+    PostgrestError: PostgrestError_1.default
+  };
+  return cjs;
+}
+class WebSocketFactory {
+  /**
+   * Static-only utility – prevent instantiation.
+   */
+  constructor() {
+  }
+  static detectEnvironment() {
+    var _a3;
+    if (typeof WebSocket !== "undefined") {
+      return { type: "native", constructor: WebSocket };
+    }
+    if (typeof globalThis !== "undefined" && typeof globalThis.WebSocket !== "undefined") {
+      return { type: "native", constructor: globalThis.WebSocket };
+    }
+    if (typeof global !== "undefined" && typeof global.WebSocket !== "undefined") {
+      return { type: "native", constructor: global.WebSocket };
+    }
+    if (typeof globalThis !== "undefined" && typeof globalThis.WebSocketPair !== "undefined" && typeof globalThis.WebSocket === "undefined") {
+      return {
+        type: "cloudflare",
+        error: "Cloudflare Workers detected. WebSocket clients are not supported in Cloudflare Workers.",
+        workaround: "Use Cloudflare Workers WebSocket API for server-side WebSocket handling, or deploy to a different runtime."
+      };
+    }
+    if (typeof globalThis !== "undefined" && globalThis.EdgeRuntime || typeof navigator !== "undefined" && ((_a3 = navigator.userAgent) === null || _a3 === void 0 ? void 0 : _a3.includes("Vercel-Edge"))) {
+      return {
+        type: "unsupported",
+        error: "Edge runtime detected (Vercel Edge/Netlify Edge). WebSockets are not supported in edge functions.",
+        workaround: "Use serverless functions or a different deployment target for WebSocket functionality."
+      };
+    }
+    if (typeof process !== "undefined") {
+      const processVersions = process["versions"];
+      if (processVersions && processVersions["node"]) {
+        const versionString = processVersions["node"];
+        const nodeVersion = parseInt(versionString.replace(/^v/, "").split(".")[0]);
+        if (nodeVersion >= 22) {
+          if (typeof globalThis.WebSocket !== "undefined") {
+            return { type: "native", constructor: globalThis.WebSocket };
+          }
+          return {
+            type: "unsupported",
+            error: `Node.js ${nodeVersion} detected but native WebSocket not found.`,
+            workaround: "Provide a WebSocket implementation via the transport option."
+          };
+        }
+        return {
+          type: "unsupported",
+          error: `Node.js ${nodeVersion} detected without native WebSocket support.`,
+          workaround: 'For Node.js < 22, install "ws" package and provide it via the transport option:\nimport ws from "ws"\nnew RealtimeClient(url, { transport: ws })'
+        };
+      }
+    }
+    return {
+      type: "unsupported",
+      error: "Unknown JavaScript runtime without WebSocket support.",
+      workaround: "Ensure you're running in a supported environment (browser, Node.js, Deno) or provide a custom WebSocket implementation."
+    };
+  }
+  /**
+   * Returns the best available WebSocket constructor for the current runtime.
+   *
+   * @example
+   * ```ts
+   * const WS = WebSocketFactory.getWebSocketConstructor()
+   * const socket = new WS('wss://realtime.supabase.co/socket')
+   * ```
+   */
+  static getWebSocketConstructor() {
+    const env = this.detectEnvironment();
+    if (env.constructor) {
+      return env.constructor;
+    }
+    let errorMessage = env.error || "WebSocket not supported in this environment.";
+    if (env.workaround) {
+      errorMessage += `
+
+Suggested solution: ${env.workaround}`;
+    }
+    throw new Error(errorMessage);
+  }
+  /**
+   * Creates a WebSocket using the detected constructor.
+   *
+   * @example
+   * ```ts
+   * const socket = WebSocketFactory.createWebSocket('wss://realtime.supabase.co/socket')
+   * ```
+   */
+  static createWebSocket(url, protocols) {
+    const WS = this.getWebSocketConstructor();
+    return new WS(url, protocols);
+  }
+  /**
+   * Detects whether the runtime can establish WebSocket connections.
+   *
+   * @example
+   * ```ts
+   * if (!WebSocketFactory.isWebSocketSupported()) {
+   *   console.warn('Falling back to long polling')
+   * }
+   * ```
+   */
+  static isWebSocketSupported() {
+    try {
+      const env = this.detectEnvironment();
+      return env.type === "native" || env.type === "ws";
+    } catch (_a3) {
+      return false;
+    }
+  }
+}
+const version$3 = "2.87.1";
+const DEFAULT_VERSION = `realtime-js/${version$3}`;
+const VSN_1_0_0 = "1.0.0";
+const VSN_2_0_0 = "2.0.0";
+const DEFAULT_VSN = VSN_1_0_0;
+const DEFAULT_TIMEOUT = 1e4;
+const WS_CLOSE_NORMAL = 1e3;
+const MAX_PUSH_BUFFER_SIZE = 100;
+var SOCKET_STATES;
+(function(SOCKET_STATES2) {
+  SOCKET_STATES2[SOCKET_STATES2["connecting"] = 0] = "connecting";
+  SOCKET_STATES2[SOCKET_STATES2["open"] = 1] = "open";
+  SOCKET_STATES2[SOCKET_STATES2["closing"] = 2] = "closing";
+  SOCKET_STATES2[SOCKET_STATES2["closed"] = 3] = "closed";
+})(SOCKET_STATES || (SOCKET_STATES = {}));
+var CHANNEL_STATES;
+(function(CHANNEL_STATES2) {
+  CHANNEL_STATES2["closed"] = "closed";
+  CHANNEL_STATES2["errored"] = "errored";
+  CHANNEL_STATES2["joined"] = "joined";
+  CHANNEL_STATES2["joining"] = "joining";
+  CHANNEL_STATES2["leaving"] = "leaving";
+})(CHANNEL_STATES || (CHANNEL_STATES = {}));
+var CHANNEL_EVENTS;
+(function(CHANNEL_EVENTS2) {
+  CHANNEL_EVENTS2["close"] = "phx_close";
+  CHANNEL_EVENTS2["error"] = "phx_error";
+  CHANNEL_EVENTS2["join"] = "phx_join";
+  CHANNEL_EVENTS2["reply"] = "phx_reply";
+  CHANNEL_EVENTS2["leave"] = "phx_leave";
+  CHANNEL_EVENTS2["access_token"] = "access_token";
+})(CHANNEL_EVENTS || (CHANNEL_EVENTS = {}));
+var TRANSPORTS;
+(function(TRANSPORTS2) {
+  TRANSPORTS2["websocket"] = "websocket";
+})(TRANSPORTS || (TRANSPORTS = {}));
+var CONNECTION_STATE;
+(function(CONNECTION_STATE2) {
+  CONNECTION_STATE2["Connecting"] = "connecting";
+  CONNECTION_STATE2["Open"] = "open";
+  CONNECTION_STATE2["Closing"] = "closing";
+  CONNECTION_STATE2["Closed"] = "closed";
+})(CONNECTION_STATE || (CONNECTION_STATE = {}));
+class Serializer {
+  constructor(allowedMetadataKeys) {
+    this.HEADER_LENGTH = 1;
+    this.USER_BROADCAST_PUSH_META_LENGTH = 6;
+    this.KINDS = { userBroadcastPush: 3, userBroadcast: 4 };
+    this.BINARY_ENCODING = 0;
+    this.JSON_ENCODING = 1;
+    this.BROADCAST_EVENT = "broadcast";
+    this.allowedMetadataKeys = [];
+    this.allowedMetadataKeys = allowedMetadataKeys !== null && allowedMetadataKeys !== void 0 ? allowedMetadataKeys : [];
+  }
+  encode(msg, callback) {
+    if (msg.event === this.BROADCAST_EVENT && !(msg.payload instanceof ArrayBuffer) && typeof msg.payload.event === "string") {
+      return callback(this._binaryEncodeUserBroadcastPush(msg));
+    }
+    let payload = [msg.join_ref, msg.ref, msg.topic, msg.event, msg.payload];
+    return callback(JSON.stringify(payload));
+  }
+  _binaryEncodeUserBroadcastPush(message) {
+    var _a3;
+    if (this._isArrayBuffer((_a3 = message.payload) === null || _a3 === void 0 ? void 0 : _a3.payload)) {
+      return this._encodeBinaryUserBroadcastPush(message);
+    } else {
+      return this._encodeJsonUserBroadcastPush(message);
+    }
+  }
+  _encodeBinaryUserBroadcastPush(message) {
+    var _a3, _b2;
+    const userPayload = (_b2 = (_a3 = message.payload) === null || _a3 === void 0 ? void 0 : _a3.payload) !== null && _b2 !== void 0 ? _b2 : new ArrayBuffer(0);
+    return this._encodeUserBroadcastPush(message, this.BINARY_ENCODING, userPayload);
+  }
+  _encodeJsonUserBroadcastPush(message) {
+    var _a3, _b2;
+    const userPayload = (_b2 = (_a3 = message.payload) === null || _a3 === void 0 ? void 0 : _a3.payload) !== null && _b2 !== void 0 ? _b2 : {};
+    const encoder = new TextEncoder();
+    const encodedUserPayload = encoder.encode(JSON.stringify(userPayload)).buffer;
+    return this._encodeUserBroadcastPush(message, this.JSON_ENCODING, encodedUserPayload);
+  }
+  _encodeUserBroadcastPush(message, encodingType, encodedPayload) {
+    var _a3, _b2;
+    const topic = message.topic;
+    const ref = (_a3 = message.ref) !== null && _a3 !== void 0 ? _a3 : "";
+    const joinRef = (_b2 = message.join_ref) !== null && _b2 !== void 0 ? _b2 : "";
+    const userEvent = message.payload.event;
+    const rest = this.allowedMetadataKeys ? this._pick(message.payload, this.allowedMetadataKeys) : {};
+    const metadata = Object.keys(rest).length === 0 ? "" : JSON.stringify(rest);
+    if (joinRef.length > 255) {
+      throw new Error(`joinRef length ${joinRef.length} exceeds maximum of 255`);
+    }
+    if (ref.length > 255) {
+      throw new Error(`ref length ${ref.length} exceeds maximum of 255`);
+    }
+    if (topic.length > 255) {
+      throw new Error(`topic length ${topic.length} exceeds maximum of 255`);
+    }
+    if (userEvent.length > 255) {
+      throw new Error(`userEvent length ${userEvent.length} exceeds maximum of 255`);
+    }
+    if (metadata.length > 255) {
+      throw new Error(`metadata length ${metadata.length} exceeds maximum of 255`);
+    }
+    const metaLength = this.USER_BROADCAST_PUSH_META_LENGTH + joinRef.length + ref.length + topic.length + userEvent.length + metadata.length;
+    const header = new ArrayBuffer(this.HEADER_LENGTH + metaLength);
+    let view = new DataView(header);
+    let offset = 0;
+    view.setUint8(offset++, this.KINDS.userBroadcastPush);
+    view.setUint8(offset++, joinRef.length);
+    view.setUint8(offset++, ref.length);
+    view.setUint8(offset++, topic.length);
+    view.setUint8(offset++, userEvent.length);
+    view.setUint8(offset++, metadata.length);
+    view.setUint8(offset++, encodingType);
+    Array.from(joinRef, (char) => view.setUint8(offset++, char.charCodeAt(0)));
+    Array.from(ref, (char) => view.setUint8(offset++, char.charCodeAt(0)));
+    Array.from(topic, (char) => view.setUint8(offset++, char.charCodeAt(0)));
+    Array.from(userEvent, (char) => view.setUint8(offset++, char.charCodeAt(0)));
+    Array.from(metadata, (char) => view.setUint8(offset++, char.charCodeAt(0)));
+    var combined = new Uint8Array(header.byteLength + encodedPayload.byteLength);
+    combined.set(new Uint8Array(header), 0);
+    combined.set(new Uint8Array(encodedPayload), header.byteLength);
+    return combined.buffer;
+  }
+  decode(rawPayload, callback) {
+    if (this._isArrayBuffer(rawPayload)) {
+      let result = this._binaryDecode(rawPayload);
+      return callback(result);
+    }
+    if (typeof rawPayload === "string") {
+      const jsonPayload = JSON.parse(rawPayload);
+      const [join_ref, ref, topic, event, payload] = jsonPayload;
+      return callback({ join_ref, ref, topic, event, payload });
+    }
+    return callback({});
+  }
+  _binaryDecode(buffer) {
+    const view = new DataView(buffer);
+    const kind = view.getUint8(0);
+    const decoder = new TextDecoder();
+    switch (kind) {
+      case this.KINDS.userBroadcast:
+        return this._decodeUserBroadcast(buffer, view, decoder);
+    }
+  }
+  _decodeUserBroadcast(buffer, view, decoder) {
+    const topicSize = view.getUint8(1);
+    const userEventSize = view.getUint8(2);
+    const metadataSize = view.getUint8(3);
+    const payloadEncoding = view.getUint8(4);
+    let offset = this.HEADER_LENGTH + 4;
+    const topic = decoder.decode(buffer.slice(offset, offset + topicSize));
+    offset = offset + topicSize;
+    const userEvent = decoder.decode(buffer.slice(offset, offset + userEventSize));
+    offset = offset + userEventSize;
+    const metadata = decoder.decode(buffer.slice(offset, offset + metadataSize));
+    offset = offset + metadataSize;
+    const payload = buffer.slice(offset, buffer.byteLength);
+    const parsedPayload = payloadEncoding === this.JSON_ENCODING ? JSON.parse(decoder.decode(payload)) : payload;
+    const data = {
+      type: this.BROADCAST_EVENT,
+      event: userEvent,
+      payload: parsedPayload
+    };
+    if (metadataSize > 0) {
+      data["meta"] = JSON.parse(metadata);
+    }
+    return { join_ref: null, ref: null, topic, event: this.BROADCAST_EVENT, payload: data };
+  }
+  _isArrayBuffer(buffer) {
+    var _a3;
+    return buffer instanceof ArrayBuffer || ((_a3 = buffer === null || buffer === void 0 ? void 0 : buffer.constructor) === null || _a3 === void 0 ? void 0 : _a3.name) === "ArrayBuffer";
+  }
+  _pick(obj, keys2) {
+    if (!obj || typeof obj !== "object") {
+      return {};
+    }
+    return Object.fromEntries(Object.entries(obj).filter(([key]) => keys2.includes(key)));
+  }
+}
+class Timer {
+  constructor(callback, timerCalc) {
+    this.callback = callback;
+    this.timerCalc = timerCalc;
+    this.timer = void 0;
+    this.tries = 0;
+    this.callback = callback;
+    this.timerCalc = timerCalc;
+  }
+  reset() {
+    this.tries = 0;
+    clearTimeout(this.timer);
+    this.timer = void 0;
+  }
+  // Cancels any previous scheduleTimeout and schedules callback
+  scheduleTimeout() {
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => {
+      this.tries = this.tries + 1;
+      this.callback();
+    }, this.timerCalc(this.tries + 1));
+  }
+}
+var PostgresTypes;
+(function(PostgresTypes2) {
+  PostgresTypes2["abstime"] = "abstime";
+  PostgresTypes2["bool"] = "bool";
+  PostgresTypes2["date"] = "date";
+  PostgresTypes2["daterange"] = "daterange";
+  PostgresTypes2["float4"] = "float4";
+  PostgresTypes2["float8"] = "float8";
+  PostgresTypes2["int2"] = "int2";
+  PostgresTypes2["int4"] = "int4";
+  PostgresTypes2["int4range"] = "int4range";
+  PostgresTypes2["int8"] = "int8";
+  PostgresTypes2["int8range"] = "int8range";
+  PostgresTypes2["json"] = "json";
+  PostgresTypes2["jsonb"] = "jsonb";
+  PostgresTypes2["money"] = "money";
+  PostgresTypes2["numeric"] = "numeric";
+  PostgresTypes2["oid"] = "oid";
+  PostgresTypes2["reltime"] = "reltime";
+  PostgresTypes2["text"] = "text";
+  PostgresTypes2["time"] = "time";
+  PostgresTypes2["timestamp"] = "timestamp";
+  PostgresTypes2["timestamptz"] = "timestamptz";
+  PostgresTypes2["timetz"] = "timetz";
+  PostgresTypes2["tsrange"] = "tsrange";
+  PostgresTypes2["tstzrange"] = "tstzrange";
+})(PostgresTypes || (PostgresTypes = {}));
+const convertChangeData = (columns, record, options = {}) => {
+  var _a3;
+  const skipTypes = (_a3 = options.skipTypes) !== null && _a3 !== void 0 ? _a3 : [];
+  if (!record) {
+    return {};
+  }
+  return Object.keys(record).reduce((acc, rec_key) => {
+    acc[rec_key] = convertColumn(rec_key, columns, record, skipTypes);
+    return acc;
+  }, {});
+};
+const convertColumn = (columnName, columns, record, skipTypes) => {
+  const column = columns.find((x2) => x2.name === columnName);
+  const colType = column === null || column === void 0 ? void 0 : column.type;
+  const value = record[columnName];
+  if (colType && !skipTypes.includes(colType)) {
+    return convertCell(colType, value);
+  }
+  return noop$1(value);
+};
+const convertCell = (type, value) => {
+  if (type.charAt(0) === "_") {
+    const dataType = type.slice(1, type.length);
+    return toArray2(value, dataType);
+  }
+  switch (type) {
+    case PostgresTypes.bool:
+      return toBoolean(value);
+    case PostgresTypes.float4:
+    case PostgresTypes.float8:
+    case PostgresTypes.int2:
+    case PostgresTypes.int4:
+    case PostgresTypes.int8:
+    case PostgresTypes.numeric:
+    case PostgresTypes.oid:
+      return toNumber(value);
+    case PostgresTypes.json:
+    case PostgresTypes.jsonb:
+      return toJson(value);
+    case PostgresTypes.timestamp:
+      return toTimestampString(value);
+    // Format to be consistent with PostgREST
+    case PostgresTypes.abstime:
+    // To allow users to cast it based on Timezone
+    case PostgresTypes.date:
+    // To allow users to cast it based on Timezone
+    case PostgresTypes.daterange:
+    case PostgresTypes.int4range:
+    case PostgresTypes.int8range:
+    case PostgresTypes.money:
+    case PostgresTypes.reltime:
+    // To allow users to cast it based on Timezone
+    case PostgresTypes.text:
+    case PostgresTypes.time:
+    // To allow users to cast it based on Timezone
+    case PostgresTypes.timestamptz:
+    // To allow users to cast it based on Timezone
+    case PostgresTypes.timetz:
+    // To allow users to cast it based on Timezone
+    case PostgresTypes.tsrange:
+    case PostgresTypes.tstzrange:
+      return noop$1(value);
+    default:
+      return noop$1(value);
+  }
+};
+const noop$1 = (value) => {
+  return value;
+};
+const toBoolean = (value) => {
+  switch (value) {
+    case "t":
+      return true;
+    case "f":
+      return false;
+    default:
+      return value;
+  }
+};
+const toNumber = (value) => {
+  if (typeof value === "string") {
+    const parsedValue = parseFloat(value);
+    if (!Number.isNaN(parsedValue)) {
+      return parsedValue;
+    }
+  }
+  return value;
+};
+const toJson = (value) => {
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value);
+    } catch (error) {
+      console.log(`JSON parse error: ${error}`);
+      return value;
+    }
+  }
+  return value;
+};
+const toArray2 = (value, type) => {
+  if (typeof value !== "string") {
+    return value;
+  }
+  const lastIdx = value.length - 1;
+  const closeBrace = value[lastIdx];
+  const openBrace = value[0];
+  if (openBrace === "{" && closeBrace === "}") {
+    let arr;
+    const valTrim = value.slice(1, lastIdx);
+    try {
+      arr = JSON.parse("[" + valTrim + "]");
+    } catch (_) {
+      arr = valTrim ? valTrim.split(",") : [];
+    }
+    return arr.map((val) => convertCell(type, val));
+  }
+  return value;
+};
+const toTimestampString = (value) => {
+  if (typeof value === "string") {
+    return value.replace(" ", "T");
+  }
+  return value;
+};
+const httpEndpointURL = (socketUrl) => {
+  const wsUrl = new URL(socketUrl);
+  wsUrl.protocol = wsUrl.protocol.replace(/^ws/i, "http");
+  wsUrl.pathname = wsUrl.pathname.replace(/\/+$/, "").replace(/\/socket\/websocket$/i, "").replace(/\/socket$/i, "").replace(/\/websocket$/i, "");
+  if (wsUrl.pathname === "" || wsUrl.pathname === "/") {
+    wsUrl.pathname = "/api/broadcast";
+  } else {
+    wsUrl.pathname = wsUrl.pathname + "/api/broadcast";
+  }
+  return wsUrl.href;
+};
+class Push {
+  /**
+   * Initializes the Push
+   *
+   * @param channel The Channel
+   * @param event The event, for example `"phx_join"`
+   * @param payload The payload, for example `{user_id: 123}`
+   * @param timeout The push timeout in milliseconds
+   */
+  constructor(channel, event, payload = {}, timeout = DEFAULT_TIMEOUT) {
+    this.channel = channel;
+    this.event = event;
+    this.payload = payload;
+    this.timeout = timeout;
+    this.sent = false;
+    this.timeoutTimer = void 0;
+    this.ref = "";
+    this.receivedResp = null;
+    this.recHooks = [];
+    this.refEvent = null;
+  }
+  resend(timeout) {
+    this.timeout = timeout;
+    this._cancelRefEvent();
+    this.ref = "";
+    this.refEvent = null;
+    this.receivedResp = null;
+    this.sent = false;
+    this.send();
+  }
+  send() {
+    if (this._hasReceived("timeout")) {
+      return;
+    }
+    this.startTimeout();
+    this.sent = true;
+    this.channel.socket.push({
+      topic: this.channel.topic,
+      event: this.event,
+      payload: this.payload,
+      ref: this.ref,
+      join_ref: this.channel._joinRef()
+    });
+  }
+  updatePayload(payload) {
+    this.payload = Object.assign(Object.assign({}, this.payload), payload);
+  }
+  receive(status, callback) {
+    var _a3;
+    if (this._hasReceived(status)) {
+      callback((_a3 = this.receivedResp) === null || _a3 === void 0 ? void 0 : _a3.response);
+    }
+    this.recHooks.push({ status, callback });
+    return this;
+  }
+  startTimeout() {
+    if (this.timeoutTimer) {
+      return;
+    }
+    this.ref = this.channel.socket._makeRef();
+    this.refEvent = this.channel._replyEventName(this.ref);
+    const callback = (payload) => {
+      this._cancelRefEvent();
+      this._cancelTimeout();
+      this.receivedResp = payload;
+      this._matchReceive(payload);
+    };
+    this.channel._on(this.refEvent, {}, callback);
+    this.timeoutTimer = setTimeout(() => {
+      this.trigger("timeout", {});
+    }, this.timeout);
+  }
+  trigger(status, response) {
+    if (this.refEvent)
+      this.channel._trigger(this.refEvent, { status, response });
+  }
+  destroy() {
+    this._cancelRefEvent();
+    this._cancelTimeout();
+  }
+  _cancelRefEvent() {
+    if (!this.refEvent) {
+      return;
+    }
+    this.channel._off(this.refEvent, {});
+  }
+  _cancelTimeout() {
+    clearTimeout(this.timeoutTimer);
+    this.timeoutTimer = void 0;
+  }
+  _matchReceive({ status, response }) {
+    this.recHooks.filter((h) => h.status === status).forEach((h) => h.callback(response));
+  }
+  _hasReceived(status) {
+    return this.receivedResp && this.receivedResp.status === status;
+  }
+}
+var REALTIME_PRESENCE_LISTEN_EVENTS$1;
+(function(REALTIME_PRESENCE_LISTEN_EVENTS2) {
+  REALTIME_PRESENCE_LISTEN_EVENTS2["SYNC"] = "sync";
+  REALTIME_PRESENCE_LISTEN_EVENTS2["JOIN"] = "join";
+  REALTIME_PRESENCE_LISTEN_EVENTS2["LEAVE"] = "leave";
+})(REALTIME_PRESENCE_LISTEN_EVENTS$1 || (REALTIME_PRESENCE_LISTEN_EVENTS$1 = {}));
+let RealtimePresence$1 = class RealtimePresence {
+  /**
+   * Creates a Presence helper that keeps the local presence state in sync with the server.
+   *
+   * @param channel - The realtime channel to bind to.
+   * @param opts - Optional custom event names, e.g. `{ events: { state: 'state', diff: 'diff' } }`.
+   *
+   * @example
+   * ```ts
+   * const presence = new RealtimePresence(channel)
+   *
+   * channel.on('presence', ({ event, key }) => {
+   *   console.log(`Presence ${event} on ${key}`)
+   * })
+   * ```
+   */
+  constructor(channel, opts) {
+    this.channel = channel;
+    this.state = {};
+    this.pendingDiffs = [];
+    this.joinRef = null;
+    this.enabled = false;
+    this.caller = {
+      onJoin: () => {
+      },
+      onLeave: () => {
+      },
+      onSync: () => {
+      }
+    };
+    const events = (opts === null || opts === void 0 ? void 0 : opts.events) || {
+      state: "presence_state",
+      diff: "presence_diff"
+    };
+    this.channel._on(events.state, {}, (newState) => {
+      const { onJoin, onLeave, onSync } = this.caller;
+      this.joinRef = this.channel._joinRef();
+      this.state = RealtimePresence.syncState(this.state, newState, onJoin, onLeave);
+      this.pendingDiffs.forEach((diff) => {
+        this.state = RealtimePresence.syncDiff(this.state, diff, onJoin, onLeave);
+      });
+      this.pendingDiffs = [];
+      onSync();
+    });
+    this.channel._on(events.diff, {}, (diff) => {
+      const { onJoin, onLeave, onSync } = this.caller;
+      if (this.inPendingSyncState()) {
+        this.pendingDiffs.push(diff);
+      } else {
+        this.state = RealtimePresence.syncDiff(this.state, diff, onJoin, onLeave);
+        onSync();
+      }
+    });
+    this.onJoin((key, currentPresences, newPresences) => {
+      this.channel._trigger("presence", {
+        event: "join",
+        key,
+        currentPresences,
+        newPresences
+      });
+    });
+    this.onLeave((key, currentPresences, leftPresences) => {
+      this.channel._trigger("presence", {
+        event: "leave",
+        key,
+        currentPresences,
+        leftPresences
+      });
+    });
+    this.onSync(() => {
+      this.channel._trigger("presence", { event: "sync" });
+    });
+  }
+  /**
+   * Used to sync the list of presences on the server with the
+   * client's state.
+   *
+   * An optional `onJoin` and `onLeave` callback can be provided to
+   * react to changes in the client's local presences across
+   * disconnects and reconnects with the server.
+   *
+   * @internal
+   */
+  static syncState(currentState, newState, onJoin, onLeave) {
+    const state = this.cloneDeep(currentState);
+    const transformedState = this.transformState(newState);
+    const joins = {};
+    const leaves = {};
+    this.map(state, (key, presences) => {
+      if (!transformedState[key]) {
+        leaves[key] = presences;
+      }
+    });
+    this.map(transformedState, (key, newPresences) => {
+      const currentPresences = state[key];
+      if (currentPresences) {
+        const newPresenceRefs = newPresences.map((m) => m.presence_ref);
+        const curPresenceRefs = currentPresences.map((m) => m.presence_ref);
+        const joinedPresences = newPresences.filter((m) => curPresenceRefs.indexOf(m.presence_ref) < 0);
+        const leftPresences = currentPresences.filter((m) => newPresenceRefs.indexOf(m.presence_ref) < 0);
+        if (joinedPresences.length > 0) {
+          joins[key] = joinedPresences;
+        }
+        if (leftPresences.length > 0) {
+          leaves[key] = leftPresences;
+        }
+      } else {
+        joins[key] = newPresences;
+      }
+    });
+    return this.syncDiff(state, { joins, leaves }, onJoin, onLeave);
+  }
+  /**
+   * Used to sync a diff of presence join and leave events from the
+   * server, as they happen.
+   *
+   * Like `syncState`, `syncDiff` accepts optional `onJoin` and
+   * `onLeave` callbacks to react to a user joining or leaving from a
+   * device.
+   *
+   * @internal
+   */
+  static syncDiff(state, diff, onJoin, onLeave) {
+    const { joins, leaves } = {
+      joins: this.transformState(diff.joins),
+      leaves: this.transformState(diff.leaves)
+    };
+    if (!onJoin) {
+      onJoin = () => {
+      };
+    }
+    if (!onLeave) {
+      onLeave = () => {
+      };
+    }
+    this.map(joins, (key, newPresences) => {
+      var _a3;
+      const currentPresences = (_a3 = state[key]) !== null && _a3 !== void 0 ? _a3 : [];
+      state[key] = this.cloneDeep(newPresences);
+      if (currentPresences.length > 0) {
+        const joinedPresenceRefs = state[key].map((m) => m.presence_ref);
+        const curPresences = currentPresences.filter((m) => joinedPresenceRefs.indexOf(m.presence_ref) < 0);
+        state[key].unshift(...curPresences);
+      }
+      onJoin(key, currentPresences, newPresences);
+    });
+    this.map(leaves, (key, leftPresences) => {
+      let currentPresences = state[key];
+      if (!currentPresences)
+        return;
+      const presenceRefsToRemove = leftPresences.map((m) => m.presence_ref);
+      currentPresences = currentPresences.filter((m) => presenceRefsToRemove.indexOf(m.presence_ref) < 0);
+      state[key] = currentPresences;
+      onLeave(key, currentPresences, leftPresences);
+      if (currentPresences.length === 0)
+        delete state[key];
+    });
+    return state;
+  }
+  /** @internal */
+  static map(obj, func) {
+    return Object.getOwnPropertyNames(obj).map((key) => func(key, obj[key]));
+  }
+  /**
+   * Remove 'metas' key
+   * Change 'phx_ref' to 'presence_ref'
+   * Remove 'phx_ref' and 'phx_ref_prev'
+   *
+   * @example
+   * // returns {
+   *  abc123: [
+   *    { presence_ref: '2', user_id: 1 },
+   *    { presence_ref: '3', user_id: 2 }
+   *  ]
+   * }
+   * RealtimePresence.transformState({
+   *  abc123: {
+   *    metas: [
+   *      { phx_ref: '2', phx_ref_prev: '1' user_id: 1 },
+   *      { phx_ref: '3', user_id: 2 }
+   *    ]
+   *  }
+   * })
+   *
+   * @internal
+   */
+  static transformState(state) {
+    state = this.cloneDeep(state);
+    return Object.getOwnPropertyNames(state).reduce((newState, key) => {
+      const presences = state[key];
+      if ("metas" in presences) {
+        newState[key] = presences.metas.map((presence) => {
+          presence["presence_ref"] = presence["phx_ref"];
+          delete presence["phx_ref"];
+          delete presence["phx_ref_prev"];
+          return presence;
+        });
+      } else {
+        newState[key] = presences;
+      }
+      return newState;
+    }, {});
+  }
+  /** @internal */
+  static cloneDeep(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  }
+  /** @internal */
+  onJoin(callback) {
+    this.caller.onJoin = callback;
+  }
+  /** @internal */
+  onLeave(callback) {
+    this.caller.onLeave = callback;
+  }
+  /** @internal */
+  onSync(callback) {
+    this.caller.onSync = callback;
+  }
+  /** @internal */
+  inPendingSyncState() {
+    return !this.joinRef || this.joinRef !== this.channel._joinRef();
+  }
+};
+var REALTIME_POSTGRES_CHANGES_LISTEN_EVENT$1;
+(function(REALTIME_POSTGRES_CHANGES_LISTEN_EVENT2) {
+  REALTIME_POSTGRES_CHANGES_LISTEN_EVENT2["ALL"] = "*";
+  REALTIME_POSTGRES_CHANGES_LISTEN_EVENT2["INSERT"] = "INSERT";
+  REALTIME_POSTGRES_CHANGES_LISTEN_EVENT2["UPDATE"] = "UPDATE";
+  REALTIME_POSTGRES_CHANGES_LISTEN_EVENT2["DELETE"] = "DELETE";
+})(REALTIME_POSTGRES_CHANGES_LISTEN_EVENT$1 || (REALTIME_POSTGRES_CHANGES_LISTEN_EVENT$1 = {}));
+var REALTIME_LISTEN_TYPES$1;
+(function(REALTIME_LISTEN_TYPES2) {
+  REALTIME_LISTEN_TYPES2["BROADCAST"] = "broadcast";
+  REALTIME_LISTEN_TYPES2["PRESENCE"] = "presence";
+  REALTIME_LISTEN_TYPES2["POSTGRES_CHANGES"] = "postgres_changes";
+  REALTIME_LISTEN_TYPES2["SYSTEM"] = "system";
+})(REALTIME_LISTEN_TYPES$1 || (REALTIME_LISTEN_TYPES$1 = {}));
+var REALTIME_SUBSCRIBE_STATES$1;
+(function(REALTIME_SUBSCRIBE_STATES2) {
+  REALTIME_SUBSCRIBE_STATES2["SUBSCRIBED"] = "SUBSCRIBED";
+  REALTIME_SUBSCRIBE_STATES2["TIMED_OUT"] = "TIMED_OUT";
+  REALTIME_SUBSCRIBE_STATES2["CLOSED"] = "CLOSED";
+  REALTIME_SUBSCRIBE_STATES2["CHANNEL_ERROR"] = "CHANNEL_ERROR";
+})(REALTIME_SUBSCRIBE_STATES$1 || (REALTIME_SUBSCRIBE_STATES$1 = {}));
+const REALTIME_CHANNEL_STATES$1 = CHANNEL_STATES;
+let RealtimeChannel$1 = class RealtimeChannel {
+  /**
+   * Creates a channel that can broadcast messages, sync presence, and listen to Postgres changes.
+   *
+   * The topic determines which realtime stream you are subscribing to. Config options let you
+   * enable acknowledgement for broadcasts, presence tracking, or private channels.
+   *
+   * @example
+   * ```ts
+   * import RealtimeClient from '@supabase/realtime-js'
+   *
+   * const client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {
+   *   params: { apikey: 'public-anon-key' },
+   * })
+   * const channel = new RealtimeChannel('realtime:public:messages', { config: {} }, client)
+   * ```
+   */
+  constructor(topic, params = { config: {} }, socket) {
+    var _a3, _b2;
+    this.topic = topic;
+    this.params = params;
+    this.socket = socket;
+    this.bindings = {};
+    this.state = CHANNEL_STATES.closed;
+    this.joinedOnce = false;
+    this.pushBuffer = [];
+    this.subTopic = topic.replace(/^realtime:/i, "");
+    this.params.config = Object.assign({
+      broadcast: { ack: false, self: false },
+      presence: { key: "", enabled: false },
+      private: false
+    }, params.config);
+    this.timeout = this.socket.timeout;
+    this.joinPush = new Push(this, CHANNEL_EVENTS.join, this.params, this.timeout);
+    this.rejoinTimer = new Timer(() => this._rejoinUntilConnected(), this.socket.reconnectAfterMs);
+    this.joinPush.receive("ok", () => {
+      this.state = CHANNEL_STATES.joined;
+      this.rejoinTimer.reset();
+      this.pushBuffer.forEach((pushEvent) => pushEvent.send());
+      this.pushBuffer = [];
+    });
+    this._onClose(() => {
+      this.rejoinTimer.reset();
+      this.socket.log("channel", `close ${this.topic} ${this._joinRef()}`);
+      this.state = CHANNEL_STATES.closed;
+      this.socket._remove(this);
+    });
+    this._onError((reason) => {
+      if (this._isLeaving() || this._isClosed()) {
+        return;
+      }
+      this.socket.log("channel", `error ${this.topic}`, reason);
+      this.state = CHANNEL_STATES.errored;
+      this.rejoinTimer.scheduleTimeout();
+    });
+    this.joinPush.receive("timeout", () => {
+      if (!this._isJoining()) {
+        return;
+      }
+      this.socket.log("channel", `timeout ${this.topic}`, this.joinPush.timeout);
+      this.state = CHANNEL_STATES.errored;
+      this.rejoinTimer.scheduleTimeout();
+    });
+    this.joinPush.receive("error", (reason) => {
+      if (this._isLeaving() || this._isClosed()) {
+        return;
+      }
+      this.socket.log("channel", `error ${this.topic}`, reason);
+      this.state = CHANNEL_STATES.errored;
+      this.rejoinTimer.scheduleTimeout();
+    });
+    this._on(CHANNEL_EVENTS.reply, {}, (payload, ref) => {
+      this._trigger(this._replyEventName(ref), payload);
+    });
+    this.presence = new RealtimePresence$1(this);
+    this.broadcastEndpointURL = httpEndpointURL(this.socket.endPoint);
+    this.private = this.params.config.private || false;
+    if (!this.private && ((_b2 = (_a3 = this.params.config) === null || _a3 === void 0 ? void 0 : _a3.broadcast) === null || _b2 === void 0 ? void 0 : _b2.replay)) {
+      throw `tried to use replay on public channel '${this.topic}'. It must be a private channel.`;
+    }
+  }
+  /** Subscribe registers your client with the server */
+  subscribe(callback, timeout = this.timeout) {
+    var _a3, _b2, _c;
+    if (!this.socket.isConnected()) {
+      this.socket.connect();
+    }
+    if (this.state == CHANNEL_STATES.closed) {
+      const { config: { broadcast, presence, private: isPrivate } } = this.params;
+      const postgres_changes = (_b2 = (_a3 = this.bindings.postgres_changes) === null || _a3 === void 0 ? void 0 : _a3.map((r2) => r2.filter)) !== null && _b2 !== void 0 ? _b2 : [];
+      const presence_enabled = !!this.bindings[REALTIME_LISTEN_TYPES$1.PRESENCE] && this.bindings[REALTIME_LISTEN_TYPES$1.PRESENCE].length > 0 || ((_c = this.params.config.presence) === null || _c === void 0 ? void 0 : _c.enabled) === true;
+      const accessTokenPayload = {};
+      const config2 = {
+        broadcast,
+        presence: Object.assign(Object.assign({}, presence), { enabled: presence_enabled }),
+        postgres_changes,
+        private: isPrivate
+      };
+      if (this.socket.accessTokenValue) {
+        accessTokenPayload.access_token = this.socket.accessTokenValue;
+      }
+      this._onError((e) => callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES$1.CHANNEL_ERROR, e));
+      this._onClose(() => callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES$1.CLOSED));
+      this.updateJoinPayload(Object.assign({ config: config2 }, accessTokenPayload));
+      this.joinedOnce = true;
+      this._rejoin(timeout);
+      this.joinPush.receive("ok", async ({ postgres_changes: postgres_changes2 }) => {
+        var _a4;
+        if (!this.socket._isManualToken()) {
+          this.socket.setAuth();
+        }
+        if (postgres_changes2 === void 0) {
+          callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES$1.SUBSCRIBED);
+          return;
+        } else {
+          const clientPostgresBindings = this.bindings.postgres_changes;
+          const bindingsLen = (_a4 = clientPostgresBindings === null || clientPostgresBindings === void 0 ? void 0 : clientPostgresBindings.length) !== null && _a4 !== void 0 ? _a4 : 0;
+          const newPostgresBindings = [];
+          for (let i = 0; i < bindingsLen; i++) {
+            const clientPostgresBinding = clientPostgresBindings[i];
+            const { filter: { event, schema, table, filter } } = clientPostgresBinding;
+            const serverPostgresFilter = postgres_changes2 && postgres_changes2[i];
+            if (serverPostgresFilter && serverPostgresFilter.event === event && RealtimeChannel.isFilterValueEqual(serverPostgresFilter.schema, schema) && RealtimeChannel.isFilterValueEqual(serverPostgresFilter.table, table) && RealtimeChannel.isFilterValueEqual(serverPostgresFilter.filter, filter)) {
+              newPostgresBindings.push(Object.assign(Object.assign({}, clientPostgresBinding), { id: serverPostgresFilter.id }));
+            } else {
+              this.unsubscribe();
+              this.state = CHANNEL_STATES.errored;
+              callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES$1.CHANNEL_ERROR, new Error("mismatch between server and client bindings for postgres changes"));
+              return;
+            }
+          }
+          this.bindings.postgres_changes = newPostgresBindings;
+          callback && callback(REALTIME_SUBSCRIBE_STATES$1.SUBSCRIBED);
+          return;
+        }
+      }).receive("error", (error) => {
+        this.state = CHANNEL_STATES.errored;
+        callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES$1.CHANNEL_ERROR, new Error(JSON.stringify(Object.values(error).join(", ") || "error")));
+        return;
+      }).receive("timeout", () => {
+        callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES$1.TIMED_OUT);
+        return;
+      });
+    }
+    return this;
+  }
+  /**
+   * Returns the current presence state for this channel.
+   *
+   * The shape is a map keyed by presence key (for example a user id) where each entry contains the
+   * tracked metadata for that user.
+   */
+  presenceState() {
+    return this.presence.state;
+  }
+  /**
+   * Sends the supplied payload to the presence tracker so other subscribers can see that this
+   * client is online. Use `untrack` to stop broadcasting presence for the same key.
+   */
+  async track(payload, opts = {}) {
+    return await this.send({
+      type: "presence",
+      event: "track",
+      payload
+    }, opts.timeout || this.timeout);
+  }
+  /**
+   * Removes the current presence state for this client.
+   */
+  async untrack(opts = {}) {
+    return await this.send({
+      type: "presence",
+      event: "untrack"
+    }, opts);
+  }
+  on(type, filter, callback) {
+    if (this.state === CHANNEL_STATES.joined && type === REALTIME_LISTEN_TYPES$1.PRESENCE) {
+      this.socket.log("channel", `resubscribe to ${this.topic} due to change in presence callbacks on joined channel`);
+      this.unsubscribe().then(async () => await this.subscribe());
+    }
+    return this._on(type, filter, callback);
+  }
+  /**
+   * Sends a broadcast message explicitly via REST API.
+   *
+   * This method always uses the REST API endpoint regardless of WebSocket connection state.
+   * Useful when you want to guarantee REST delivery or when gradually migrating from implicit REST fallback.
+   *
+   * @param event The name of the broadcast event
+   * @param payload Payload to be sent (required)
+   * @param opts Options including timeout
+   * @returns Promise resolving to object with success status, and error details if failed
+   */
+  async httpSend(event, payload, opts = {}) {
+    var _a3;
+    const authorization = this.socket.accessTokenValue ? `Bearer ${this.socket.accessTokenValue}` : "";
+    if (payload === void 0 || payload === null) {
+      return Promise.reject("Payload is required for httpSend()");
+    }
+    const options = {
+      method: "POST",
+      headers: {
+        Authorization: authorization,
+        apikey: this.socket.apiKey ? this.socket.apiKey : "",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        messages: [
+          {
+            topic: this.subTopic,
+            event,
+            payload,
+            private: this.private
+          }
+        ]
+      })
+    };
+    const response = await this._fetchWithTimeout(this.broadcastEndpointURL, options, (_a3 = opts.timeout) !== null && _a3 !== void 0 ? _a3 : this.timeout);
+    if (response.status === 202) {
+      return { success: true };
+    }
+    let errorMessage = response.statusText;
+    try {
+      const errorBody = await response.json();
+      errorMessage = errorBody.error || errorBody.message || errorMessage;
+    } catch (_b2) {
+    }
+    return Promise.reject(new Error(errorMessage));
+  }
+  /**
+   * Sends a message into the channel.
+   *
+   * @param args Arguments to send to channel
+   * @param args.type The type of event to send
+   * @param args.event The name of the event being sent
+   * @param args.payload Payload to be sent
+   * @param opts Options to be used during the send process
+   */
+  async send(args, opts = {}) {
+    var _a3, _b2;
+    if (!this._canPush() && args.type === "broadcast") {
+      console.warn("Realtime send() is automatically falling back to REST API. This behavior will be deprecated in the future. Please use httpSend() explicitly for REST delivery.");
+      const { event, payload: endpoint_payload } = args;
+      const authorization = this.socket.accessTokenValue ? `Bearer ${this.socket.accessTokenValue}` : "";
+      const options = {
+        method: "POST",
+        headers: {
+          Authorization: authorization,
+          apikey: this.socket.apiKey ? this.socket.apiKey : "",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              topic: this.subTopic,
+              event,
+              payload: endpoint_payload,
+              private: this.private
+            }
+          ]
+        })
+      };
+      try {
+        const response = await this._fetchWithTimeout(this.broadcastEndpointURL, options, (_a3 = opts.timeout) !== null && _a3 !== void 0 ? _a3 : this.timeout);
+        await ((_b2 = response.body) === null || _b2 === void 0 ? void 0 : _b2.cancel());
+        return response.ok ? "ok" : "error";
+      } catch (error) {
+        if (error.name === "AbortError") {
+          return "timed out";
+        } else {
+          return "error";
+        }
+      }
+    } else {
+      return new Promise((resolve) => {
+        var _a4, _b3, _c;
+        const push = this._push(args.type, args, opts.timeout || this.timeout);
+        if (args.type === "broadcast" && !((_c = (_b3 = (_a4 = this.params) === null || _a4 === void 0 ? void 0 : _a4.config) === null || _b3 === void 0 ? void 0 : _b3.broadcast) === null || _c === void 0 ? void 0 : _c.ack)) {
+          resolve("ok");
+        }
+        push.receive("ok", () => resolve("ok"));
+        push.receive("error", () => resolve("error"));
+        push.receive("timeout", () => resolve("timed out"));
+      });
+    }
+  }
+  /**
+   * Updates the payload that will be sent the next time the channel joins (reconnects).
+   * Useful for rotating access tokens or updating config without re-creating the channel.
+   */
+  updateJoinPayload(payload) {
+    this.joinPush.updatePayload(payload);
+  }
+  /**
+   * Leaves the channel.
+   *
+   * Unsubscribes from server events, and instructs channel to terminate on server.
+   * Triggers onClose() hooks.
+   *
+   * To receive leave acknowledgements, use the a `receive` hook to bind to the server ack, ie:
+   * channel.unsubscribe().receive("ok", () => alert("left!") )
+   */
+  unsubscribe(timeout = this.timeout) {
+    this.state = CHANNEL_STATES.leaving;
+    const onClose = () => {
+      this.socket.log("channel", `leave ${this.topic}`);
+      this._trigger(CHANNEL_EVENTS.close, "leave", this._joinRef());
+    };
+    this.joinPush.destroy();
+    let leavePush = null;
+    return new Promise((resolve) => {
+      leavePush = new Push(this, CHANNEL_EVENTS.leave, {}, timeout);
+      leavePush.receive("ok", () => {
+        onClose();
+        resolve("ok");
+      }).receive("timeout", () => {
+        onClose();
+        resolve("timed out");
+      }).receive("error", () => {
+        resolve("error");
+      });
+      leavePush.send();
+      if (!this._canPush()) {
+        leavePush.trigger("ok", {});
+      }
+    }).finally(() => {
+      leavePush === null || leavePush === void 0 ? void 0 : leavePush.destroy();
+    });
+  }
+  /**
+   * Teardown the channel.
+   *
+   * Destroys and stops related timers.
+   */
+  teardown() {
+    this.pushBuffer.forEach((push) => push.destroy());
+    this.pushBuffer = [];
+    this.rejoinTimer.reset();
+    this.joinPush.destroy();
+    this.state = CHANNEL_STATES.closed;
+    this.bindings = {};
+  }
+  /** @internal */
+  async _fetchWithTimeout(url, options, timeout) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    const response = await this.socket.fetch(url, Object.assign(Object.assign({}, options), { signal: controller.signal }));
+    clearTimeout(id);
+    return response;
+  }
+  /** @internal */
+  _push(event, payload, timeout = this.timeout) {
+    if (!this.joinedOnce) {
+      throw `tried to push '${event}' to '${this.topic}' before joining. Use channel.subscribe() before pushing events`;
+    }
+    let pushEvent = new Push(this, event, payload, timeout);
+    if (this._canPush()) {
+      pushEvent.send();
+    } else {
+      this._addToPushBuffer(pushEvent);
+    }
+    return pushEvent;
+  }
+  /** @internal */
+  _addToPushBuffer(pushEvent) {
+    pushEvent.startTimeout();
+    this.pushBuffer.push(pushEvent);
+    if (this.pushBuffer.length > MAX_PUSH_BUFFER_SIZE) {
+      const removedPush = this.pushBuffer.shift();
+      if (removedPush) {
+        removedPush.destroy();
+        this.socket.log("channel", `discarded push due to buffer overflow: ${removedPush.event}`, removedPush.payload);
+      }
+    }
+  }
+  /**
+   * Overridable message hook
+   *
+   * Receives all events for specialized message handling before dispatching to the channel callbacks.
+   * Must return the payload, modified or unmodified.
+   *
+   * @internal
+   */
+  _onMessage(_event, payload, _ref) {
+    return payload;
+  }
+  /** @internal */
+  _isMember(topic) {
+    return this.topic === topic;
+  }
+  /** @internal */
+  _joinRef() {
+    return this.joinPush.ref;
+  }
+  /** @internal */
+  _trigger(type, payload, ref) {
+    var _a3, _b2;
+    const typeLower = type.toLocaleLowerCase();
+    const { close, error, leave, join } = CHANNEL_EVENTS;
+    const events = [close, error, leave, join];
+    if (ref && events.indexOf(typeLower) >= 0 && ref !== this._joinRef()) {
+      return;
+    }
+    let handledPayload = this._onMessage(typeLower, payload, ref);
+    if (payload && !handledPayload) {
+      throw "channel onMessage callbacks must return the payload, modified or unmodified";
+    }
+    if (["insert", "update", "delete"].includes(typeLower)) {
+      (_a3 = this.bindings.postgres_changes) === null || _a3 === void 0 ? void 0 : _a3.filter((bind) => {
+        var _a4, _b3, _c;
+        return ((_a4 = bind.filter) === null || _a4 === void 0 ? void 0 : _a4.event) === "*" || ((_c = (_b3 = bind.filter) === null || _b3 === void 0 ? void 0 : _b3.event) === null || _c === void 0 ? void 0 : _c.toLocaleLowerCase()) === typeLower;
+      }).map((bind) => bind.callback(handledPayload, ref));
+    } else {
+      (_b2 = this.bindings[typeLower]) === null || _b2 === void 0 ? void 0 : _b2.filter((bind) => {
+        var _a4, _b3, _c, _d, _e, _f;
+        if (["broadcast", "presence", "postgres_changes"].includes(typeLower)) {
+          if ("id" in bind) {
+            const bindId = bind.id;
+            const bindEvent = (_a4 = bind.filter) === null || _a4 === void 0 ? void 0 : _a4.event;
+            return bindId && ((_b3 = payload.ids) === null || _b3 === void 0 ? void 0 : _b3.includes(bindId)) && (bindEvent === "*" || (bindEvent === null || bindEvent === void 0 ? void 0 : bindEvent.toLocaleLowerCase()) === ((_c = payload.data) === null || _c === void 0 ? void 0 : _c.type.toLocaleLowerCase()));
+          } else {
+            const bindEvent = (_e = (_d = bind === null || bind === void 0 ? void 0 : bind.filter) === null || _d === void 0 ? void 0 : _d.event) === null || _e === void 0 ? void 0 : _e.toLocaleLowerCase();
+            return bindEvent === "*" || bindEvent === ((_f = payload === null || payload === void 0 ? void 0 : payload.event) === null || _f === void 0 ? void 0 : _f.toLocaleLowerCase());
+          }
+        } else {
+          return bind.type.toLocaleLowerCase() === typeLower;
+        }
+      }).map((bind) => {
+        if (typeof handledPayload === "object" && "ids" in handledPayload) {
+          const postgresChanges = handledPayload.data;
+          const { schema, table, commit_timestamp, type: type2, errors } = postgresChanges;
+          const enrichedPayload = {
+            schema,
+            table,
+            commit_timestamp,
+            eventType: type2,
+            new: {},
+            old: {},
+            errors
+          };
+          handledPayload = Object.assign(Object.assign({}, enrichedPayload), this._getPayloadRecords(postgresChanges));
+        }
+        bind.callback(handledPayload, ref);
+      });
+    }
+  }
+  /** @internal */
+  _isClosed() {
+    return this.state === CHANNEL_STATES.closed;
+  }
+  /** @internal */
+  _isJoined() {
+    return this.state === CHANNEL_STATES.joined;
+  }
+  /** @internal */
+  _isJoining() {
+    return this.state === CHANNEL_STATES.joining;
+  }
+  /** @internal */
+  _isLeaving() {
+    return this.state === CHANNEL_STATES.leaving;
+  }
+  /** @internal */
+  _replyEventName(ref) {
+    return `chan_reply_${ref}`;
+  }
+  /** @internal */
+  _on(type, filter, callback) {
+    const typeLower = type.toLocaleLowerCase();
+    const binding = {
+      type: typeLower,
+      filter,
+      callback
+    };
+    if (this.bindings[typeLower]) {
+      this.bindings[typeLower].push(binding);
+    } else {
+      this.bindings[typeLower] = [binding];
+    }
+    return this;
+  }
+  /** @internal */
+  _off(type, filter) {
+    const typeLower = type.toLocaleLowerCase();
+    if (this.bindings[typeLower]) {
+      this.bindings[typeLower] = this.bindings[typeLower].filter((bind) => {
+        var _a3;
+        return !(((_a3 = bind.type) === null || _a3 === void 0 ? void 0 : _a3.toLocaleLowerCase()) === typeLower && RealtimeChannel.isEqual(bind.filter, filter));
+      });
+    }
+    return this;
+  }
+  /** @internal */
+  static isEqual(obj1, obj2) {
+    if (Object.keys(obj1).length !== Object.keys(obj2).length) {
+      return false;
+    }
+    for (const k2 in obj1) {
+      if (obj1[k2] !== obj2[k2]) {
+        return false;
+      }
+    }
+    return true;
+  }
+  /**
+   * Compares two optional filter values for equality.
+   * Treats undefined, null, and empty string as equivalent empty values.
+   * @internal
+   */
+  static isFilterValueEqual(serverValue, clientValue) {
+    const normalizedServer = serverValue !== null && serverValue !== void 0 ? serverValue : void 0;
+    const normalizedClient = clientValue !== null && clientValue !== void 0 ? clientValue : void 0;
+    return normalizedServer === normalizedClient;
+  }
+  /** @internal */
+  _rejoinUntilConnected() {
+    this.rejoinTimer.scheduleTimeout();
+    if (this.socket.isConnected()) {
+      this._rejoin();
+    }
+  }
+  /**
+   * Registers a callback that will be executed when the channel closes.
+   *
+   * @internal
+   */
+  _onClose(callback) {
+    this._on(CHANNEL_EVENTS.close, {}, callback);
+  }
+  /**
+   * Registers a callback that will be executed when the channel encounteres an error.
+   *
+   * @internal
+   */
+  _onError(callback) {
+    this._on(CHANNEL_EVENTS.error, {}, (reason) => callback(reason));
+  }
+  /**
+   * Returns `true` if the socket is connected and the channel has been joined.
+   *
+   * @internal
+   */
+  _canPush() {
+    return this.socket.isConnected() && this._isJoined();
+  }
+  /** @internal */
+  _rejoin(timeout = this.timeout) {
+    if (this._isLeaving()) {
+      return;
+    }
+    this.socket._leaveOpenTopic(this.topic);
+    this.state = CHANNEL_STATES.joining;
+    this.joinPush.resend(timeout);
+  }
+  /** @internal */
+  _getPayloadRecords(payload) {
+    const records = {
+      new: {},
+      old: {}
+    };
+    if (payload.type === "INSERT" || payload.type === "UPDATE") {
+      records.new = convertChangeData(payload.columns, payload.record);
+    }
+    if (payload.type === "UPDATE" || payload.type === "DELETE") {
+      records.old = convertChangeData(payload.columns, payload.old_record);
+    }
+    return records;
+  }
+};
+const noop = () => {
+};
+const CONNECTION_TIMEOUTS = {
+  HEARTBEAT_INTERVAL: 25e3,
+  RECONNECT_DELAY: 10,
+  HEARTBEAT_TIMEOUT_FALLBACK: 100
+};
+const RECONNECT_INTERVALS = [1e3, 2e3, 5e3, 1e4];
+const DEFAULT_RECONNECT_FALLBACK = 1e4;
+const WORKER_SCRIPT = `
+  addEventListener("message", (e) => {
+    if (e.data.event === "start") {
+      setInterval(() => postMessage({ event: "keepAlive" }), e.data.interval);
+    }
+  });`;
+let RealtimeClient$1 = class RealtimeClient {
+  /**
+   * Initializes the Socket.
+   *
+   * @param endPoint The string WebSocket endpoint, ie, "ws://example.com/socket", "wss://example.com", "/socket" (inherited host & protocol)
+   * @param httpEndpoint The string HTTP endpoint, ie, "https://example.com", "/" (inherited host & protocol)
+   * @param options.transport The Websocket Transport, for example WebSocket. This can be a custom implementation
+   * @param options.timeout The default timeout in milliseconds to trigger push timeouts.
+   * @param options.params The optional params to pass when connecting.
+   * @param options.headers Deprecated: headers cannot be set on websocket connections and this option will be removed in the future.
+   * @param options.heartbeatIntervalMs The millisec interval to send a heartbeat message.
+   * @param options.heartbeatCallback The optional function to handle heartbeat status.
+   * @param options.logger The optional function for specialized logging, ie: logger: (kind, msg, data) => { console.log(`${kind}: ${msg}`, data) }
+   * @param options.logLevel Sets the log level for Realtime
+   * @param options.encode The function to encode outgoing messages. Defaults to JSON: (payload, callback) => callback(JSON.stringify(payload))
+   * @param options.decode The function to decode incoming messages. Defaults to Serializer's decode.
+   * @param options.reconnectAfterMs he optional function that returns the millsec reconnect interval. Defaults to stepped backoff off.
+   * @param options.worker Use Web Worker to set a side flow. Defaults to false.
+   * @param options.workerUrl The URL of the worker script. Defaults to https://realtime.supabase.com/worker.js that includes a heartbeat event call to keep the connection alive.
+   * @example
+   * ```ts
+   * import RealtimeClient from '@supabase/realtime-js'
+   *
+   * const client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {
+   *   params: { apikey: 'public-anon-key' },
+   * })
+   * client.connect()
+   * ```
+   */
+  constructor(endPoint, options) {
+    var _a3;
+    this.accessTokenValue = null;
+    this.apiKey = null;
+    this._manuallySetToken = false;
+    this.channels = new Array();
+    this.endPoint = "";
+    this.httpEndpoint = "";
+    this.headers = {};
+    this.params = {};
+    this.timeout = DEFAULT_TIMEOUT;
+    this.transport = null;
+    this.heartbeatIntervalMs = CONNECTION_TIMEOUTS.HEARTBEAT_INTERVAL;
+    this.heartbeatTimer = void 0;
+    this.pendingHeartbeatRef = null;
+    this.heartbeatCallback = noop;
+    this.ref = 0;
+    this.reconnectTimer = null;
+    this.vsn = DEFAULT_VSN;
+    this.logger = noop;
+    this.conn = null;
+    this.sendBuffer = [];
+    this.serializer = new Serializer();
+    this.stateChangeCallbacks = {
+      open: [],
+      close: [],
+      error: [],
+      message: []
+    };
+    this.accessToken = null;
+    this._connectionState = "disconnected";
+    this._wasManualDisconnect = false;
+    this._authPromise = null;
+    this._resolveFetch = (customFetch) => {
+      if (customFetch) {
+        return (...args) => customFetch(...args);
+      }
+      return (...args) => fetch(...args);
+    };
+    if (!((_a3 = options === null || options === void 0 ? void 0 : options.params) === null || _a3 === void 0 ? void 0 : _a3.apikey)) {
+      throw new Error("API key is required to connect to Realtime");
+    }
+    this.apiKey = options.params.apikey;
+    this.endPoint = `${endPoint}/${TRANSPORTS.websocket}`;
+    this.httpEndpoint = httpEndpointURL(endPoint);
+    this._initializeOptions(options);
+    this._setupReconnectionTimer();
+    this.fetch = this._resolveFetch(options === null || options === void 0 ? void 0 : options.fetch);
+  }
+  /**
+   * Connects the socket, unless already connected.
+   */
+  connect() {
+    if (this.isConnecting() || this.isDisconnecting() || this.conn !== null && this.isConnected()) {
+      return;
+    }
+    this._setConnectionState("connecting");
+    if (this.accessToken && !this._authPromise) {
+      this._setAuthSafely("connect");
+    }
+    if (this.transport) {
+      this.conn = new this.transport(this.endpointURL());
+    } else {
+      try {
+        this.conn = WebSocketFactory.createWebSocket(this.endpointURL());
+      } catch (error) {
+        this._setConnectionState("disconnected");
+        const errorMessage = error.message;
+        if (errorMessage.includes("Node.js")) {
+          throw new Error(`${errorMessage}
+
+To use Realtime in Node.js, you need to provide a WebSocket implementation:
+
+Option 1: Use Node.js 22+ which has native WebSocket support
+Option 2: Install and provide the "ws" package:
+
+  npm install ws
+
+  import ws from "ws"
+  const client = new RealtimeClient(url, {
+    ...options,
+    transport: ws
+  })`);
+        }
+        throw new Error(`WebSocket not available: ${errorMessage}`);
+      }
+    }
+    this._setupConnectionHandlers();
+  }
+  /**
+   * Returns the URL of the websocket.
+   * @returns string The URL of the websocket.
+   */
+  endpointURL() {
+    return this._appendParams(this.endPoint, Object.assign({}, this.params, { vsn: this.vsn }));
+  }
+  /**
+   * Disconnects the socket.
+   *
+   * @param code A numeric status code to send on disconnect.
+   * @param reason A custom reason for the disconnect.
+   */
+  disconnect(code, reason) {
+    if (this.isDisconnecting()) {
+      return;
+    }
+    this._setConnectionState("disconnecting", true);
+    if (this.conn) {
+      const fallbackTimer = setTimeout(() => {
+        this._setConnectionState("disconnected");
+      }, 100);
+      this.conn.onclose = () => {
+        clearTimeout(fallbackTimer);
+        this._setConnectionState("disconnected");
+      };
+      if (typeof this.conn.close === "function") {
+        if (code) {
+          this.conn.close(code, reason !== null && reason !== void 0 ? reason : "");
+        } else {
+          this.conn.close();
+        }
+      }
+      this._teardownConnection();
+    } else {
+      this._setConnectionState("disconnected");
+    }
+  }
+  /**
+   * Returns all created channels
+   */
+  getChannels() {
+    return this.channels;
+  }
+  /**
+   * Unsubscribes and removes a single channel
+   * @param channel A RealtimeChannel instance
+   */
+  async removeChannel(channel) {
+    const status = await channel.unsubscribe();
+    if (this.channels.length === 0) {
+      this.disconnect();
+    }
+    return status;
+  }
+  /**
+   * Unsubscribes and removes all channels
+   */
+  async removeAllChannels() {
+    const values_1 = await Promise.all(this.channels.map((channel) => channel.unsubscribe()));
+    this.channels = [];
+    this.disconnect();
+    return values_1;
+  }
+  /**
+   * Logs the message.
+   *
+   * For customized logging, `this.logger` can be overridden.
+   */
+  log(kind, msg, data) {
+    this.logger(kind, msg, data);
+  }
+  /**
+   * Returns the current state of the socket.
+   */
+  connectionState() {
+    switch (this.conn && this.conn.readyState) {
+      case SOCKET_STATES.connecting:
+        return CONNECTION_STATE.Connecting;
+      case SOCKET_STATES.open:
+        return CONNECTION_STATE.Open;
+      case SOCKET_STATES.closing:
+        return CONNECTION_STATE.Closing;
+      default:
+        return CONNECTION_STATE.Closed;
+    }
+  }
+  /**
+   * Returns `true` is the connection is open.
+   */
+  isConnected() {
+    return this.connectionState() === CONNECTION_STATE.Open;
+  }
+  /**
+   * Returns `true` if the connection is currently connecting.
+   */
+  isConnecting() {
+    return this._connectionState === "connecting";
+  }
+  /**
+   * Returns `true` if the connection is currently disconnecting.
+   */
+  isDisconnecting() {
+    return this._connectionState === "disconnecting";
+  }
+  /**
+   * Creates (or reuses) a {@link RealtimeChannel} for the provided topic.
+   *
+   * Topics are automatically prefixed with `realtime:` to match the Realtime service.
+   * If a channel with the same topic already exists it will be returned instead of creating
+   * a duplicate connection.
+   */
+  channel(topic, params = { config: {} }) {
+    const realtimeTopic = `realtime:${topic}`;
+    const exists = this.getChannels().find((c2) => c2.topic === realtimeTopic);
+    if (!exists) {
+      const chan = new RealtimeChannel$1(`realtime:${topic}`, params, this);
+      this.channels.push(chan);
+      return chan;
+    } else {
+      return exists;
+    }
+  }
+  /**
+   * Push out a message if the socket is connected.
+   *
+   * If the socket is not connected, the message gets enqueued within a local buffer, and sent out when a connection is next established.
+   */
+  push(data) {
+    const { topic, event, payload, ref } = data;
+    const callback = () => {
+      this.encode(data, (result) => {
+        var _a3;
+        (_a3 = this.conn) === null || _a3 === void 0 ? void 0 : _a3.send(result);
+      });
+    };
+    this.log("push", `${topic} ${event} (${ref})`, payload);
+    if (this.isConnected()) {
+      callback();
+    } else {
+      this.sendBuffer.push(callback);
+    }
+  }
+  /**
+   * Sets the JWT access token used for channel subscription authorization and Realtime RLS.
+   *
+   * If param is null it will use the `accessToken` callback function or the token set on the client.
+   *
+   * On callback used, it will set the value of the token internal to the client.
+   *
+   * When a token is explicitly provided, it will be preserved across channel operations
+   * (including removeChannel and resubscribe). The `accessToken` callback will not be
+   * invoked until `setAuth()` is called without arguments.
+   *
+   * @param token A JWT string to override the token set on the client.
+   *
+   * @example
+   * // Use a manual token (preserved across resubscribes, ignores accessToken callback)
+   * client.realtime.setAuth('my-custom-jwt')
+   *
+   * // Switch back to using the accessToken callback
+   * client.realtime.setAuth()
+   */
+  async setAuth(token = null) {
+    this._authPromise = this._performAuth(token);
+    try {
+      await this._authPromise;
+    } finally {
+      this._authPromise = null;
+    }
+  }
+  /**
+   * Returns true if the current access token was explicitly set via setAuth(token),
+   * false if it was obtained via the accessToken callback.
+   * @internal
+   */
+  _isManualToken() {
+    return this._manuallySetToken;
+  }
+  /**
+   * Sends a heartbeat message if the socket is connected.
+   */
+  async sendHeartbeat() {
+    var _a3;
+    if (!this.isConnected()) {
+      try {
+        this.heartbeatCallback("disconnected");
+      } catch (e) {
+        this.log("error", "error in heartbeat callback", e);
+      }
+      return;
+    }
+    if (this.pendingHeartbeatRef) {
+      this.pendingHeartbeatRef = null;
+      this.log("transport", "heartbeat timeout. Attempting to re-establish connection");
+      try {
+        this.heartbeatCallback("timeout");
+      } catch (e) {
+        this.log("error", "error in heartbeat callback", e);
+      }
+      this._wasManualDisconnect = false;
+      (_a3 = this.conn) === null || _a3 === void 0 ? void 0 : _a3.close(WS_CLOSE_NORMAL, "heartbeat timeout");
+      setTimeout(() => {
+        var _a4;
+        if (!this.isConnected()) {
+          (_a4 = this.reconnectTimer) === null || _a4 === void 0 ? void 0 : _a4.scheduleTimeout();
+        }
+      }, CONNECTION_TIMEOUTS.HEARTBEAT_TIMEOUT_FALLBACK);
+      return;
+    }
+    this.pendingHeartbeatRef = this._makeRef();
+    this.push({
+      topic: "phoenix",
+      event: "heartbeat",
+      payload: {},
+      ref: this.pendingHeartbeatRef
+    });
+    try {
+      this.heartbeatCallback("sent");
+    } catch (e) {
+      this.log("error", "error in heartbeat callback", e);
+    }
+    this._setAuthSafely("heartbeat");
+  }
+  /**
+   * Sets a callback that receives lifecycle events for internal heartbeat messages.
+   * Useful for instrumenting connection health (e.g. sent/ok/timeout/disconnected).
+   */
+  onHeartbeat(callback) {
+    this.heartbeatCallback = callback;
+  }
+  /**
+   * Flushes send buffer
+   */
+  flushSendBuffer() {
+    if (this.isConnected() && this.sendBuffer.length > 0) {
+      this.sendBuffer.forEach((callback) => callback());
+      this.sendBuffer = [];
+    }
+  }
+  /**
+   * Return the next message ref, accounting for overflows
+   *
+   * @internal
+   */
+  _makeRef() {
+    let newRef = this.ref + 1;
+    if (newRef === this.ref) {
+      this.ref = 0;
+    } else {
+      this.ref = newRef;
+    }
+    return this.ref.toString();
+  }
+  /**
+   * Unsubscribe from channels with the specified topic.
+   *
+   * @internal
+   */
+  _leaveOpenTopic(topic) {
+    let dupChannel = this.channels.find((c2) => c2.topic === topic && (c2._isJoined() || c2._isJoining()));
+    if (dupChannel) {
+      this.log("transport", `leaving duplicate topic "${topic}"`);
+      dupChannel.unsubscribe();
+    }
+  }
+  /**
+   * Removes a subscription from the socket.
+   *
+   * @param channel An open subscription.
+   *
+   * @internal
+   */
+  _remove(channel) {
+    this.channels = this.channels.filter((c2) => c2.topic !== channel.topic);
+  }
+  /** @internal */
+  _onConnMessage(rawMessage) {
+    this.decode(rawMessage.data, (msg) => {
+      if (msg.topic === "phoenix" && msg.event === "phx_reply") {
+        try {
+          this.heartbeatCallback(msg.payload.status === "ok" ? "ok" : "error");
+        } catch (e) {
+          this.log("error", "error in heartbeat callback", e);
+        }
+      }
+      if (msg.ref && msg.ref === this.pendingHeartbeatRef) {
+        this.pendingHeartbeatRef = null;
+      }
+      const { topic, event, payload, ref } = msg;
+      const refString = ref ? `(${ref})` : "";
+      const status = payload.status || "";
+      this.log("receive", `${status} ${topic} ${event} ${refString}`.trim(), payload);
+      this.channels.filter((channel) => channel._isMember(topic)).forEach((channel) => channel._trigger(event, payload, ref));
+      this._triggerStateCallbacks("message", msg);
+    });
+  }
+  /**
+   * Clear specific timer
+   * @internal
+   */
+  _clearTimer(timer) {
+    var _a3;
+    if (timer === "heartbeat" && this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = void 0;
+    } else if (timer === "reconnect") {
+      (_a3 = this.reconnectTimer) === null || _a3 === void 0 ? void 0 : _a3.reset();
+    }
+  }
+  /**
+   * Clear all timers
+   * @internal
+   */
+  _clearAllTimers() {
+    this._clearTimer("heartbeat");
+    this._clearTimer("reconnect");
+  }
+  /**
+   * Setup connection handlers for WebSocket events
+   * @internal
+   */
+  _setupConnectionHandlers() {
+    if (!this.conn)
+      return;
+    if ("binaryType" in this.conn) {
+      this.conn.binaryType = "arraybuffer";
+    }
+    this.conn.onopen = () => this._onConnOpen();
+    this.conn.onerror = (error) => this._onConnError(error);
+    this.conn.onmessage = (event) => this._onConnMessage(event);
+    this.conn.onclose = (event) => this._onConnClose(event);
+  }
+  /**
+   * Teardown connection and cleanup resources
+   * @internal
+   */
+  _teardownConnection() {
+    if (this.conn) {
+      if (this.conn.readyState === SOCKET_STATES.open || this.conn.readyState === SOCKET_STATES.connecting) {
+        try {
+          this.conn.close();
+        } catch (e) {
+          this.log("error", "Error closing connection", e);
+        }
+      }
+      this.conn.onopen = null;
+      this.conn.onerror = null;
+      this.conn.onmessage = null;
+      this.conn.onclose = null;
+      this.conn = null;
+    }
+    this._clearAllTimers();
+    this.channels.forEach((channel) => channel.teardown());
+  }
+  /** @internal */
+  _onConnOpen() {
+    this._setConnectionState("connected");
+    this.log("transport", `connected to ${this.endpointURL()}`);
+    const authPromise = this._authPromise || (this.accessToken && !this.accessTokenValue ? this.setAuth() : Promise.resolve());
+    authPromise.then(() => {
+      this.flushSendBuffer();
+    }).catch((e) => {
+      this.log("error", "error waiting for auth on connect", e);
+      this.flushSendBuffer();
+    });
+    this._clearTimer("reconnect");
+    if (!this.worker) {
+      this._startHeartbeat();
+    } else {
+      if (!this.workerRef) {
+        this._startWorkerHeartbeat();
+      }
+    }
+    this._triggerStateCallbacks("open");
+  }
+  /** @internal */
+  _startHeartbeat() {
+    this.heartbeatTimer && clearInterval(this.heartbeatTimer);
+    this.heartbeatTimer = setInterval(() => this.sendHeartbeat(), this.heartbeatIntervalMs);
+  }
+  /** @internal */
+  _startWorkerHeartbeat() {
+    if (this.workerUrl) {
+      this.log("worker", `starting worker for from ${this.workerUrl}`);
+    } else {
+      this.log("worker", `starting default worker`);
+    }
+    const objectUrl = this._workerObjectUrl(this.workerUrl);
+    this.workerRef = new Worker(objectUrl);
+    this.workerRef.onerror = (error) => {
+      this.log("worker", "worker error", error.message);
+      this.workerRef.terminate();
+    };
+    this.workerRef.onmessage = (event) => {
+      if (event.data.event === "keepAlive") {
+        this.sendHeartbeat();
+      }
+    };
+    this.workerRef.postMessage({
+      event: "start",
+      interval: this.heartbeatIntervalMs
+    });
+  }
+  /** @internal */
+  _onConnClose(event) {
+    var _a3;
+    this._setConnectionState("disconnected");
+    this.log("transport", "close", event);
+    this._triggerChanError();
+    this._clearTimer("heartbeat");
+    if (!this._wasManualDisconnect) {
+      (_a3 = this.reconnectTimer) === null || _a3 === void 0 ? void 0 : _a3.scheduleTimeout();
+    }
+    this._triggerStateCallbacks("close", event);
+  }
+  /** @internal */
+  _onConnError(error) {
+    this._setConnectionState("disconnected");
+    this.log("transport", `${error}`);
+    this._triggerChanError();
+    this._triggerStateCallbacks("error", error);
+  }
+  /** @internal */
+  _triggerChanError() {
+    this.channels.forEach((channel) => channel._trigger(CHANNEL_EVENTS.error));
+  }
+  /** @internal */
+  _appendParams(url, params) {
+    if (Object.keys(params).length === 0) {
+      return url;
+    }
+    const prefix2 = url.match(/\?/) ? "&" : "?";
+    const query = new URLSearchParams(params);
+    return `${url}${prefix2}${query}`;
+  }
+  _workerObjectUrl(url) {
+    let result_url;
+    if (url) {
+      result_url = url;
+    } else {
+      const blob = new Blob([WORKER_SCRIPT], { type: "application/javascript" });
+      result_url = URL.createObjectURL(blob);
+    }
+    return result_url;
+  }
+  /**
+   * Set connection state with proper state management
+   * @internal
+   */
+  _setConnectionState(state, manual = false) {
+    this._connectionState = state;
+    if (state === "connecting") {
+      this._wasManualDisconnect = false;
+    } else if (state === "disconnecting") {
+      this._wasManualDisconnect = manual;
+    }
+  }
+  /**
+   * Perform the actual auth operation
+   * @internal
+   */
+  async _performAuth(token = null) {
+    let tokenToSend;
+    let isManualToken = false;
+    if (token) {
+      tokenToSend = token;
+      isManualToken = true;
+    } else if (this.accessToken) {
+      try {
+        tokenToSend = await this.accessToken();
+      } catch (e) {
+        this.log("error", "Error fetching access token from callback", e);
+        tokenToSend = this.accessTokenValue;
+      }
+    } else {
+      tokenToSend = this.accessTokenValue;
+    }
+    if (isManualToken) {
+      this._manuallySetToken = true;
+    } else if (this.accessToken) {
+      this._manuallySetToken = false;
+    }
+    if (this.accessTokenValue != tokenToSend) {
+      this.accessTokenValue = tokenToSend;
+      this.channels.forEach((channel) => {
+        const payload = {
+          access_token: tokenToSend,
+          version: DEFAULT_VERSION
+        };
+        tokenToSend && channel.updateJoinPayload(payload);
+        if (channel.joinedOnce && channel._isJoined()) {
+          channel._push(CHANNEL_EVENTS.access_token, {
+            access_token: tokenToSend
+          });
+        }
+      });
+    }
+  }
+  /**
+   * Wait for any in-flight auth operations to complete
+   * @internal
+   */
+  async _waitForAuthIfNeeded() {
+    if (this._authPromise) {
+      await this._authPromise;
+    }
+  }
+  /**
+   * Safely call setAuth with standardized error handling
+   * @internal
+   */
+  _setAuthSafely(context = "general") {
+    if (!this._isManualToken()) {
+      this.setAuth().catch((e) => {
+        this.log("error", `Error setting auth in ${context}`, e);
+      });
+    }
+  }
+  /**
+   * Trigger state change callbacks with proper error handling
+   * @internal
+   */
+  _triggerStateCallbacks(event, data) {
+    try {
+      this.stateChangeCallbacks[event].forEach((callback) => {
+        try {
+          callback(data);
+        } catch (e) {
+          this.log("error", `error in ${event} callback`, e);
+        }
+      });
+    } catch (e) {
+      this.log("error", `error triggering ${event} callbacks`, e);
+    }
+  }
+  /**
+   * Setup reconnection timer with proper configuration
+   * @internal
+   */
+  _setupReconnectionTimer() {
+    this.reconnectTimer = new Timer(async () => {
+      setTimeout(async () => {
+        await this._waitForAuthIfNeeded();
+        if (!this.isConnected()) {
+          this.connect();
+        }
+      }, CONNECTION_TIMEOUTS.RECONNECT_DELAY);
+    }, this.reconnectAfterMs);
+  }
+  /**
+   * Initialize client options with defaults
+   * @internal
+   */
+  _initializeOptions(options) {
+    var _a3, _b2, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+    this.transport = (_a3 = options === null || options === void 0 ? void 0 : options.transport) !== null && _a3 !== void 0 ? _a3 : null;
+    this.timeout = (_b2 = options === null || options === void 0 ? void 0 : options.timeout) !== null && _b2 !== void 0 ? _b2 : DEFAULT_TIMEOUT;
+    this.heartbeatIntervalMs = (_c = options === null || options === void 0 ? void 0 : options.heartbeatIntervalMs) !== null && _c !== void 0 ? _c : CONNECTION_TIMEOUTS.HEARTBEAT_INTERVAL;
+    this.worker = (_d = options === null || options === void 0 ? void 0 : options.worker) !== null && _d !== void 0 ? _d : false;
+    this.accessToken = (_e = options === null || options === void 0 ? void 0 : options.accessToken) !== null && _e !== void 0 ? _e : null;
+    this.heartbeatCallback = (_f = options === null || options === void 0 ? void 0 : options.heartbeatCallback) !== null && _f !== void 0 ? _f : noop;
+    this.vsn = (_g = options === null || options === void 0 ? void 0 : options.vsn) !== null && _g !== void 0 ? _g : DEFAULT_VSN;
+    if (options === null || options === void 0 ? void 0 : options.params)
+      this.params = options.params;
+    if (options === null || options === void 0 ? void 0 : options.logger)
+      this.logger = options.logger;
+    if ((options === null || options === void 0 ? void 0 : options.logLevel) || (options === null || options === void 0 ? void 0 : options.log_level)) {
+      this.logLevel = options.logLevel || options.log_level;
+      this.params = Object.assign(Object.assign({}, this.params), { log_level: this.logLevel });
+    }
+    this.reconnectAfterMs = (_h = options === null || options === void 0 ? void 0 : options.reconnectAfterMs) !== null && _h !== void 0 ? _h : ((tries) => {
+      return RECONNECT_INTERVALS[tries - 1] || DEFAULT_RECONNECT_FALLBACK;
+    });
+    switch (this.vsn) {
+      case VSN_1_0_0:
+        this.encode = (_j = options === null || options === void 0 ? void 0 : options.encode) !== null && _j !== void 0 ? _j : ((payload, callback) => {
+          return callback(JSON.stringify(payload));
+        });
+        this.decode = (_k = options === null || options === void 0 ? void 0 : options.decode) !== null && _k !== void 0 ? _k : ((payload, callback) => {
+          return callback(JSON.parse(payload));
+        });
+        break;
+      case VSN_2_0_0:
+        this.encode = (_l = options === null || options === void 0 ? void 0 : options.encode) !== null && _l !== void 0 ? _l : this.serializer.encode.bind(this.serializer);
+        this.decode = (_m = options === null || options === void 0 ? void 0 : options.decode) !== null && _m !== void 0 ? _m : this.serializer.decode.bind(this.serializer);
+        break;
+      default:
+        throw new Error(`Unsupported serializer version: ${this.vsn}`);
+    }
+    if (this.worker) {
+      if (typeof window !== "undefined" && !window.Worker) {
+        throw new Error("Web Worker is not supported");
+      }
+      this.workerUrl = options === null || options === void 0 ? void 0 : options.workerUrl;
+    }
+  }
+};
+const module$3 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  REALTIME_CHANNEL_STATES: REALTIME_CHANNEL_STATES$1,
+  get REALTIME_LISTEN_TYPES() {
+    return REALTIME_LISTEN_TYPES$1;
+  },
+  get REALTIME_POSTGRES_CHANGES_LISTEN_EVENT() {
+    return REALTIME_POSTGRES_CHANGES_LISTEN_EVENT$1;
+  },
+  get REALTIME_PRESENCE_LISTEN_EVENTS() {
+    return REALTIME_PRESENCE_LISTEN_EVENTS$1;
+  },
+  get REALTIME_SUBSCRIBE_STATES() {
+    return REALTIME_SUBSCRIBE_STATES$1;
+  },
+  RealtimeChannel: RealtimeChannel$1,
+  RealtimeClient: RealtimeClient$1,
+  RealtimePresence: RealtimePresence$1,
+  WebSocketFactory
+}, Symbol.toStringTag, { value: "Module" }));
+const require$$4 = /* @__PURE__ */ getAugmentedNamespace(module$3);
+class StorageError extends Error {
+  constructor(message) {
+    super(message);
+    this.__isStorageError = true;
+    this.name = "StorageError";
+  }
+}
+function isStorageError(error) {
+  return typeof error === "object" && error !== null && "__isStorageError" in error;
+}
+class StorageApiError extends StorageError {
+  constructor(message, status, statusCode) {
+    super(message);
+    this.name = "StorageApiError";
+    this.status = status;
+    this.statusCode = statusCode;
+  }
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      status: this.status,
+      statusCode: this.statusCode
+    };
+  }
+}
+class StorageUnknownError extends StorageError {
+  constructor(message, originalError) {
+    super(message);
+    this.name = "StorageUnknownError";
+    this.originalError = originalError;
+  }
+}
+const resolveFetch$2 = (customFetch) => {
+  if (customFetch) {
+    return (...args) => customFetch(...args);
+  }
+  return (...args) => fetch(...args);
+};
+const resolveResponse$1 = () => {
+  return Response;
+};
+const recursiveToCamel = (item) => {
+  if (Array.isArray(item)) {
+    return item.map((el) => recursiveToCamel(el));
+  } else if (typeof item === "function" || item !== Object(item)) {
+    return item;
+  }
+  const result = {};
+  Object.entries(item).forEach(([key, value]) => {
+    const newKey = key.replace(/([-_][a-z])/gi, (c2) => c2.toUpperCase().replace(/[-_]/g, ""));
+    result[newKey] = recursiveToCamel(value);
+  });
+  return result;
+};
+const isPlainObject$1 = (value) => {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(value);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
+};
+const isValidBucketName = (bucketName) => {
+  if (!bucketName || typeof bucketName !== "string") {
+    return false;
+  }
+  if (bucketName.length === 0 || bucketName.length > 100) {
+    return false;
+  }
+  if (bucketName.trim() !== bucketName) {
+    return false;
+  }
+  if (bucketName.includes("/") || bucketName.includes("\\")) {
+    return false;
+  }
+  const bucketNameRegex = /^[\w!.\*'() &$@=;:+,?-]+$/;
+  return bucketNameRegex.test(bucketName);
+};
+const _getErrorMessage$2 = (err) => {
+  var _a3;
+  return err.msg || err.message || err.error_description || (typeof err.error === "string" ? err.error : (_a3 = err.error) === null || _a3 === void 0 ? void 0 : _a3.message) || JSON.stringify(err);
+};
+const handleError$2 = (error, reject, options) => __awaiter(void 0, void 0, void 0, function* () {
+  const Res = yield resolveResponse$1();
+  if (error instanceof Res && !(options === null || options === void 0 ? void 0 : options.noResolveJson)) {
+    error.json().then((err) => {
+      const status = error.status || 500;
+      const statusCode = (err === null || err === void 0 ? void 0 : err.statusCode) || status + "";
+      reject(new StorageApiError(_getErrorMessage$2(err), status, statusCode));
+    }).catch((err) => {
+      reject(new StorageUnknownError(_getErrorMessage$2(err), err));
+    });
+  } else {
+    reject(new StorageUnknownError(_getErrorMessage$2(error), error));
+  }
+});
+const _getRequestParams$2 = (method, options, parameters, body) => {
+  const params = { method, headers: (options === null || options === void 0 ? void 0 : options.headers) || {} };
+  if (method === "GET" || !body) {
+    return params;
+  }
+  if (isPlainObject$1(body)) {
+    params.headers = Object.assign({ "Content-Type": "application/json" }, options === null || options === void 0 ? void 0 : options.headers);
+    params.body = JSON.stringify(body);
+  } else {
+    params.body = body;
+  }
+  if (options === null || options === void 0 ? void 0 : options.duplex) {
+    params.duplex = options.duplex;
+  }
+  return Object.assign(Object.assign({}, params), parameters);
+};
+function _handleRequest$2(fetcher, method, url, options, parameters, body) {
+  return __awaiter(this, void 0, void 0, function* () {
+    return new Promise((resolve, reject) => {
+      fetcher(url, _getRequestParams$2(method, options, parameters, body)).then((result) => {
+        if (!result.ok)
+          throw result;
+        if (options === null || options === void 0 ? void 0 : options.noResolveJson)
+          return result;
+        return result.json();
+      }).then((data) => resolve(data)).catch((error) => handleError$2(error, reject, options));
+    });
+  });
+}
+function get(fetcher, url, options, parameters) {
+  return __awaiter(this, void 0, void 0, function* () {
+    return _handleRequest$2(fetcher, "GET", url, options, parameters);
+  });
+}
+function post$1(fetcher, url, body, options, parameters) {
+  return __awaiter(this, void 0, void 0, function* () {
+    return _handleRequest$2(fetcher, "POST", url, options, parameters, body);
+  });
+}
+function put(fetcher, url, body, options, parameters) {
+  return __awaiter(this, void 0, void 0, function* () {
+    return _handleRequest$2(fetcher, "PUT", url, options, parameters, body);
+  });
+}
+function head(fetcher, url, options, parameters) {
+  return __awaiter(this, void 0, void 0, function* () {
+    return _handleRequest$2(fetcher, "HEAD", url, Object.assign(Object.assign({}, options), { noResolveJson: true }), parameters);
+  });
+}
+function remove(fetcher, url, body, options, parameters) {
+  return __awaiter(this, void 0, void 0, function* () {
+    return _handleRequest$2(fetcher, "DELETE", url, options, parameters, body);
+  });
+}
+class StreamDownloadBuilder {
+  constructor(downloadFn, shouldThrowOnError) {
+    this.downloadFn = downloadFn;
+    this.shouldThrowOnError = shouldThrowOnError;
+  }
+  then(onfulfilled, onrejected) {
+    return this.execute().then(onfulfilled, onrejected);
+  }
+  execute() {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const result = yield this.downloadFn();
+        return {
+          data: result.body,
+          error: null
+        };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+}
+var _a;
+class BlobDownloadBuilder {
+  constructor(downloadFn, shouldThrowOnError) {
+    this.downloadFn = downloadFn;
+    this.shouldThrowOnError = shouldThrowOnError;
+    this[_a] = "BlobDownloadBuilder";
+    this.promise = null;
+  }
+  asStream() {
+    return new StreamDownloadBuilder(this.downloadFn, this.shouldThrowOnError);
+  }
+  then(onfulfilled, onrejected) {
+    return this.getPromise().then(onfulfilled, onrejected);
+  }
+  catch(onrejected) {
+    return this.getPromise().catch(onrejected);
+  }
+  finally(onfinally) {
+    return this.getPromise().finally(onfinally);
+  }
+  getPromise() {
+    if (!this.promise) {
+      this.promise = this.execute();
+    }
+    return this.promise;
+  }
+  execute() {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const result = yield this.downloadFn();
+        return {
+          data: yield result.blob(),
+          error: null
+        };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+}
+_a = Symbol.toStringTag;
+const DEFAULT_SEARCH_OPTIONS = {
+  limit: 100,
+  offset: 0,
+  sortBy: {
+    column: "name",
+    order: "asc"
+  }
+};
+const DEFAULT_FILE_OPTIONS = {
+  cacheControl: "3600",
+  contentType: "text/plain;charset=UTF-8",
+  upsert: false
+};
+class StorageFileApi {
+  constructor(url, headers = {}, bucketId, fetch2) {
+    this.shouldThrowOnError = false;
+    this.url = url;
+    this.headers = headers;
+    this.bucketId = bucketId;
+    this.fetch = resolveFetch$2(fetch2);
+  }
+  /**
+   * Enable throwing errors instead of returning them.
+   *
+   * @category File Buckets
+   */
+  throwOnError() {
+    this.shouldThrowOnError = true;
+    return this;
+  }
+  /**
+   * Uploads a file to an existing bucket or replaces an existing file at the specified path with a new one.
+   *
+   * @param method HTTP method.
+   * @param path The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+   * @param fileBody The body of the file to be stored in the bucket.
+   */
+  uploadOrUpdate(method, path, fileBody, fileOptions) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        let body;
+        const options = Object.assign(Object.assign({}, DEFAULT_FILE_OPTIONS), fileOptions);
+        let headers = Object.assign(Object.assign({}, this.headers), method === "POST" && { "x-upsert": String(options.upsert) });
+        const metadata = options.metadata;
+        if (typeof Blob !== "undefined" && fileBody instanceof Blob) {
+          body = new FormData();
+          body.append("cacheControl", options.cacheControl);
+          if (metadata) {
+            body.append("metadata", this.encodeMetadata(metadata));
+          }
+          body.append("", fileBody);
+        } else if (typeof FormData !== "undefined" && fileBody instanceof FormData) {
+          body = fileBody;
+          if (!body.has("cacheControl")) {
+            body.append("cacheControl", options.cacheControl);
+          }
+          if (metadata && !body.has("metadata")) {
+            body.append("metadata", this.encodeMetadata(metadata));
+          }
+        } else {
+          body = fileBody;
+          headers["cache-control"] = `max-age=${options.cacheControl}`;
+          headers["content-type"] = options.contentType;
+          if (metadata) {
+            headers["x-metadata"] = this.toBase64(this.encodeMetadata(metadata));
+          }
+          const isStream = typeof ReadableStream !== "undefined" && body instanceof ReadableStream || body && typeof body === "object" && "pipe" in body && typeof body.pipe === "function";
+          if (isStream && !options.duplex) {
+            options.duplex = "half";
+          }
+        }
+        if (fileOptions === null || fileOptions === void 0 ? void 0 : fileOptions.headers) {
+          headers = Object.assign(Object.assign({}, headers), fileOptions.headers);
+        }
+        const cleanPath = this._removeEmptyFolders(path);
+        const _path = this._getFinalPath(cleanPath);
+        const data = yield (method == "PUT" ? put : post$1)(this.fetch, `${this.url}/object/${_path}`, body, Object.assign({ headers }, (options === null || options === void 0 ? void 0 : options.duplex) ? { duplex: options.duplex } : {}));
+        return {
+          data: { path: cleanPath, id: data.Id, fullPath: data.Key },
+          error: null
+        };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * Uploads a file to an existing bucket.
+   *
+   * @category File Buckets
+   * @param path The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+   * @param fileBody The body of the file to be stored in the bucket.
+   * @param fileOptions Optional file upload options including cacheControl, contentType, upsert, and metadata.
+   * @returns Promise with response containing file path, id, and fullPath or error
+   *
+   * @example Upload file
+   * ```js
+   * const avatarFile = event.target.files[0]
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .upload('public/avatar1.png', avatarFile, {
+   *     cacheControl: '3600',
+   *     upsert: false
+   *   })
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": {
+   *     "path": "public/avatar1.png",
+   *     "fullPath": "avatars/public/avatar1.png"
+   *   },
+   *   "error": null
+   * }
+   * ```
+   *
+   * @example Upload file using `ArrayBuffer` from base64 file data
+   * ```js
+   * import { decode } from 'base64-arraybuffer'
+   *
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .upload('public/avatar1.png', decode('base64FileData'), {
+   *     contentType: 'image/png'
+   *   })
+   * ```
+   */
+  upload(path, fileBody, fileOptions) {
+    return __awaiter(this, void 0, void 0, function* () {
+      return this.uploadOrUpdate("POST", path, fileBody, fileOptions);
+    });
+  }
+  /**
+   * Upload a file with a token generated from `createSignedUploadUrl`.
+   *
+   * @category File Buckets
+   * @param path The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+   * @param token The token generated from `createSignedUploadUrl`
+   * @param fileBody The body of the file to be stored in the bucket.
+   * @param fileOptions HTTP headers (cacheControl, contentType, etc.).
+   * **Note:** The `upsert` option has no effect here. To enable upsert behavior,
+   * pass `{ upsert: true }` when calling `createSignedUploadUrl()` instead.
+   * @returns Promise with response containing file path and fullPath or error
+   *
+   * @example Upload to a signed URL
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .uploadToSignedUrl('folder/cat.jpg', 'token-from-createSignedUploadUrl', file)
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": {
+   *     "path": "folder/cat.jpg",
+   *     "fullPath": "avatars/folder/cat.jpg"
+   *   },
+   *   "error": null
+   * }
+   * ```
+   */
+  uploadToSignedUrl(path, token, fileBody, fileOptions) {
+    return __awaiter(this, void 0, void 0, function* () {
+      const cleanPath = this._removeEmptyFolders(path);
+      const _path = this._getFinalPath(cleanPath);
+      const url = new URL(this.url + `/object/upload/sign/${_path}`);
+      url.searchParams.set("token", token);
+      try {
+        let body;
+        const options = Object.assign({ upsert: DEFAULT_FILE_OPTIONS.upsert }, fileOptions);
+        const headers = Object.assign(Object.assign({}, this.headers), { "x-upsert": String(options.upsert) });
+        if (typeof Blob !== "undefined" && fileBody instanceof Blob) {
+          body = new FormData();
+          body.append("cacheControl", options.cacheControl);
+          body.append("", fileBody);
+        } else if (typeof FormData !== "undefined" && fileBody instanceof FormData) {
+          body = fileBody;
+          body.append("cacheControl", options.cacheControl);
+        } else {
+          body = fileBody;
+          headers["cache-control"] = `max-age=${options.cacheControl}`;
+          headers["content-type"] = options.contentType;
+        }
+        const data = yield put(this.fetch, url.toString(), body, { headers });
+        return {
+          data: { path: cleanPath, fullPath: data.Key },
+          error: null
+        };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * Creates a signed upload URL.
+   * Signed upload URLs can be used to upload files to the bucket without further authentication.
+   * They are valid for 2 hours.
+   *
+   * @category File Buckets
+   * @param path The file path, including the current file name. For example `folder/image.png`.
+   * @param options.upsert If set to true, allows the file to be overwritten if it already exists.
+   * @returns Promise with response containing signed upload URL, token, and path or error
+   *
+   * @example Create Signed Upload URL
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .createSignedUploadUrl('folder/cat.jpg')
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": {
+   *     "signedUrl": "https://example.supabase.co/storage/v1/object/upload/sign/avatars/folder/cat.jpg?token=<TOKEN>",
+   *     "path": "folder/cat.jpg",
+   *     "token": "<TOKEN>"
+   *   },
+   *   "error": null
+   * }
+   * ```
+   */
+  createSignedUploadUrl(path, options) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        let _path = this._getFinalPath(path);
+        const headers = Object.assign({}, this.headers);
+        if (options === null || options === void 0 ? void 0 : options.upsert) {
+          headers["x-upsert"] = "true";
+        }
+        const data = yield post$1(this.fetch, `${this.url}/object/upload/sign/${_path}`, {}, { headers });
+        const url = new URL(this.url + data.url);
+        const token = url.searchParams.get("token");
+        if (!token) {
+          throw new StorageError("No token returned by API");
+        }
+        return { data: { signedUrl: url.toString(), path, token }, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * Replaces an existing file at the specified path with a new one.
+   *
+   * @category File Buckets
+   * @param path The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to update.
+   * @param fileBody The body of the file to be stored in the bucket.
+   * @param fileOptions Optional file upload options including cacheControl, contentType, upsert, and metadata.
+   * @returns Promise with response containing file path, id, and fullPath or error
+   *
+   * @example Update file
+   * ```js
+   * const avatarFile = event.target.files[0]
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .update('public/avatar1.png', avatarFile, {
+   *     cacheControl: '3600',
+   *     upsert: true
+   *   })
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": {
+   *     "path": "public/avatar1.png",
+   *     "fullPath": "avatars/public/avatar1.png"
+   *   },
+   *   "error": null
+   * }
+   * ```
+   *
+   * @example Update file using `ArrayBuffer` from base64 file data
+   * ```js
+   * import {decode} from 'base64-arraybuffer'
+   *
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .update('public/avatar1.png', decode('base64FileData'), {
+   *     contentType: 'image/png'
+   *   })
+   * ```
+   */
+  update(path, fileBody, fileOptions) {
+    return __awaiter(this, void 0, void 0, function* () {
+      return this.uploadOrUpdate("PUT", path, fileBody, fileOptions);
+    });
+  }
+  /**
+   * Moves an existing file to a new path in the same bucket.
+   *
+   * @category File Buckets
+   * @param fromPath The original file path, including the current file name. For example `folder/image.png`.
+   * @param toPath The new file path, including the new file name. For example `folder/image-new.png`.
+   * @param options The destination options.
+   * @returns Promise with response containing success message or error
+   *
+   * @example Move file
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .move('public/avatar1.png', 'private/avatar2.png')
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": {
+   *     "message": "Successfully moved"
+   *   },
+   *   "error": null
+   * }
+   * ```
+   */
+  move(fromPath, toPath, options) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield post$1(this.fetch, `${this.url}/object/move`, {
+          bucketId: this.bucketId,
+          sourceKey: fromPath,
+          destinationKey: toPath,
+          destinationBucket: options === null || options === void 0 ? void 0 : options.destinationBucket
+        }, { headers: this.headers });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * Copies an existing file to a new path in the same bucket.
+   *
+   * @category File Buckets
+   * @param fromPath The original file path, including the current file name. For example `folder/image.png`.
+   * @param toPath The new file path, including the new file name. For example `folder/image-copy.png`.
+   * @param options The destination options.
+   * @returns Promise with response containing copied file path or error
+   *
+   * @example Copy file
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .copy('public/avatar1.png', 'private/avatar2.png')
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": {
+   *     "path": "avatars/private/avatar2.png"
+   *   },
+   *   "error": null
+   * }
+   * ```
+   */
+  copy(fromPath, toPath, options) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield post$1(this.fetch, `${this.url}/object/copy`, {
+          bucketId: this.bucketId,
+          sourceKey: fromPath,
+          destinationKey: toPath,
+          destinationBucket: options === null || options === void 0 ? void 0 : options.destinationBucket
+        }, { headers: this.headers });
+        return { data: { path: data.Key }, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * Creates a signed URL. Use a signed URL to share a file for a fixed amount of time.
+   *
+   * @category File Buckets
+   * @param path The file path, including the current file name. For example `folder/image.png`.
+   * @param expiresIn The number of seconds until the signed URL expires. For example, `60` for a URL which is valid for one minute.
+   * @param options.download triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
+   * @param options.transform Transform the asset before serving it to the client.
+   * @returns Promise with response containing signed URL or error
+   *
+   * @example Create Signed URL
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .createSignedUrl('folder/avatar1.png', 60)
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": {
+   *     "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
+   *   },
+   *   "error": null
+   * }
+   * ```
+   *
+   * @example Create a signed URL for an asset with transformations
+   * ```js
+   * const { data } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .createSignedUrl('folder/avatar1.png', 60, {
+   *     transform: {
+   *       width: 100,
+   *       height: 100,
+   *     }
+   *   })
+   * ```
+   *
+   * @example Create a signed URL which triggers the download of the asset
+   * ```js
+   * const { data } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .createSignedUrl('folder/avatar1.png', 60, {
+   *     download: true,
+   *   })
+   * ```
+   */
+  createSignedUrl(path, expiresIn, options) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        let _path = this._getFinalPath(path);
+        let data = yield post$1(this.fetch, `${this.url}/object/sign/${_path}`, Object.assign({ expiresIn }, (options === null || options === void 0 ? void 0 : options.transform) ? { transform: options.transform } : {}), { headers: this.headers });
+        const downloadQueryParam = (options === null || options === void 0 ? void 0 : options.download) ? `&download=${options.download === true ? "" : options.download}` : "";
+        const signedUrl = encodeURI(`${this.url}${data.signedURL}${downloadQueryParam}`);
+        data = { signedUrl };
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * Creates multiple signed URLs. Use a signed URL to share a file for a fixed amount of time.
+   *
+   * @category File Buckets
+   * @param paths The file paths to be downloaded, including the current file names. For example `['folder/image.png', 'folder2/image2.png']`.
+   * @param expiresIn The number of seconds until the signed URLs expire. For example, `60` for URLs which are valid for one minute.
+   * @param options.download triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
+   * @returns Promise with response containing array of objects with signedUrl, path, and error or error
+   *
+   * @example Create Signed URLs
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60)
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": [
+   *     {
+   *       "error": null,
+   *       "path": "folder/avatar1.png",
+   *       "signedURL": "/object/sign/avatars/folder/avatar1.png?token=<TOKEN>",
+   *       "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
+   *     },
+   *     {
+   *       "error": null,
+   *       "path": "folder/avatar2.png",
+   *       "signedURL": "/object/sign/avatars/folder/avatar2.png?token=<TOKEN>",
+   *       "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar2.png?token=<TOKEN>"
+   *     }
+   *   ],
+   *   "error": null
+   * }
+   * ```
+   */
+  createSignedUrls(paths, expiresIn, options) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield post$1(this.fetch, `${this.url}/object/sign/${this.bucketId}`, { expiresIn, paths }, { headers: this.headers });
+        const downloadQueryParam = (options === null || options === void 0 ? void 0 : options.download) ? `&download=${options.download === true ? "" : options.download}` : "";
+        return {
+          data: data.map((datum) => Object.assign(Object.assign({}, datum), { signedUrl: datum.signedURL ? encodeURI(`${this.url}${datum.signedURL}${downloadQueryParam}`) : null })),
+          error: null
+        };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * Downloads a file from a private bucket. For public buckets, make a request to the URL returned from `getPublicUrl` instead.
+   *
+   * @category File Buckets
+   * @param path The full path and file name of the file to be downloaded. For example `folder/image.png`.
+   * @param options.transform Transform the asset before serving it to the client.
+   * @returns BlobDownloadBuilder instance for downloading the file
+   *
+   * @example Download file
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .download('folder/avatar1.png')
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": <BLOB>,
+   *   "error": null
+   * }
+   * ```
+   *
+   * @example Download file with transformations
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .download('folder/avatar1.png', {
+   *     transform: {
+   *       width: 100,
+   *       height: 100,
+   *       quality: 80
+   *     }
+   *   })
+   * ```
+   */
+  download(path, options) {
+    const wantsTransformation = typeof (options === null || options === void 0 ? void 0 : options.transform) !== "undefined";
+    const renderPath = wantsTransformation ? "render/image/authenticated" : "object";
+    const transformationQuery = this.transformOptsToQueryString((options === null || options === void 0 ? void 0 : options.transform) || {});
+    const queryString = transformationQuery ? `?${transformationQuery}` : "";
+    const _path = this._getFinalPath(path);
+    const downloadFn = () => get(this.fetch, `${this.url}/${renderPath}/${_path}${queryString}`, {
+      headers: this.headers,
+      noResolveJson: true
+    });
+    return new BlobDownloadBuilder(downloadFn, this.shouldThrowOnError);
+  }
+  /**
+   * Retrieves the details of an existing file.
+   *
+   * @category File Buckets
+   * @param path The file path, including the file name. For example `folder/image.png`.
+   * @returns Promise with response containing file metadata or error
+   *
+   * @example Get file info
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .info('folder/avatar1.png')
+   * ```
+   */
+  info(path) {
+    return __awaiter(this, void 0, void 0, function* () {
+      const _path = this._getFinalPath(path);
+      try {
+        const data = yield get(this.fetch, `${this.url}/object/info/${_path}`, {
+          headers: this.headers
+        });
+        return { data: recursiveToCamel(data), error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * Checks the existence of a file.
+   *
+   * @category File Buckets
+   * @param path The file path, including the file name. For example `folder/image.png`.
+   * @returns Promise with response containing boolean indicating file existence or error
+   *
+   * @example Check file existence
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .exists('folder/avatar1.png')
+   * ```
+   */
+  exists(path) {
+    return __awaiter(this, void 0, void 0, function* () {
+      const _path = this._getFinalPath(path);
+      try {
+        yield head(this.fetch, `${this.url}/object/${_path}`, {
+          headers: this.headers
+        });
+        return { data: true, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error) && error instanceof StorageUnknownError) {
+          const originalError = error.originalError;
+          if ([400, 404].includes(originalError === null || originalError === void 0 ? void 0 : originalError.status)) {
+            return { data: false, error };
+          }
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * A simple convenience function to get the URL for an asset in a public bucket. If you do not want to use this function, you can construct the public URL by concatenating the bucket URL with the path to the asset.
+   * This function does not verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset.
+   *
+   * @category File Buckets
+   * @param path The path and name of the file to generate the public URL for. For example `folder/image.png`.
+   * @param options.download Triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
+   * @param options.transform Transform the asset before serving it to the client.
+   * @returns Object with public URL
+   *
+   * @example Returns the URL for an asset in a public bucket
+   * ```js
+   * const { data } = supabase
+   *   .storage
+   *   .from('public-bucket')
+   *   .getPublicUrl('folder/avatar1.png')
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": {
+   *     "publicUrl": "https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png"
+   *   }
+   * }
+   * ```
+   *
+   * @example Returns the URL for an asset in a public bucket with transformations
+   * ```js
+   * const { data } = supabase
+   *   .storage
+   *   .from('public-bucket')
+   *   .getPublicUrl('folder/avatar1.png', {
+   *     transform: {
+   *       width: 100,
+   *       height: 100,
+   *     }
+   *   })
+   * ```
+   *
+   * @example Returns the URL which triggers the download of an asset in a public bucket
+   * ```js
+   * const { data } = supabase
+   *   .storage
+   *   .from('public-bucket')
+   *   .getPublicUrl('folder/avatar1.png', {
+   *     download: true,
+   *   })
+   * ```
+   */
+  getPublicUrl(path, options) {
+    const _path = this._getFinalPath(path);
+    const _queryString = [];
+    const downloadQueryParam = (options === null || options === void 0 ? void 0 : options.download) ? `download=${options.download === true ? "" : options.download}` : "";
+    if (downloadQueryParam !== "") {
+      _queryString.push(downloadQueryParam);
+    }
+    const wantsTransformation = typeof (options === null || options === void 0 ? void 0 : options.transform) !== "undefined";
+    const renderPath = wantsTransformation ? "render/image" : "object";
+    const transformationQuery = this.transformOptsToQueryString((options === null || options === void 0 ? void 0 : options.transform) || {});
+    if (transformationQuery !== "") {
+      _queryString.push(transformationQuery);
+    }
+    let queryString = _queryString.join("&");
+    if (queryString !== "") {
+      queryString = `?${queryString}`;
+    }
+    return {
+      data: { publicUrl: encodeURI(`${this.url}/${renderPath}/public/${_path}${queryString}`) }
+    };
+  }
+  /**
+   * Deletes files within the same bucket
+   *
+   * @category File Buckets
+   * @param paths An array of files to delete, including the path and file name. For example [`'folder/image.png'`].
+   * @returns Promise with response containing array of deleted file objects or error
+   *
+   * @example Delete file
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .remove(['folder/avatar1.png'])
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": [],
+   *   "error": null
+   * }
+   * ```
+   */
+  remove(paths) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield remove(this.fetch, `${this.url}/object/${this.bucketId}`, { prefixes: paths }, { headers: this.headers });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * Get file metadata
+   * @param id the file id to retrieve metadata
+   */
+  // async getMetadata(
+  //   id: string
+  // ): Promise<
+  //   | {
+  //       data: Metadata
+  //       error: null
+  //     }
+  //   | {
+  //       data: null
+  //       error: StorageError
+  //     }
+  // > {
+  //   try {
+  //     const data = await get(this.fetch, `${this.url}/metadata/${id}`, { headers: this.headers })
+  //     return { data, error: null }
+  //   } catch (error) {
+  //     if (isStorageError(error)) {
+  //       return { data: null, error }
+  //     }
+  //     throw error
+  //   }
+  // }
+  /**
+   * Update file metadata
+   * @param id the file id to update metadata
+   * @param meta the new file metadata
+   */
+  // async updateMetadata(
+  //   id: string,
+  //   meta: Metadata
+  // ): Promise<
+  //   | {
+  //       data: Metadata
+  //       error: null
+  //     }
+  //   | {
+  //       data: null
+  //       error: StorageError
+  //     }
+  // > {
+  //   try {
+  //     const data = await post(
+  //       this.fetch,
+  //       `${this.url}/metadata/${id}`,
+  //       { ...meta },
+  //       { headers: this.headers }
+  //     )
+  //     return { data, error: null }
+  //   } catch (error) {
+  //     if (isStorageError(error)) {
+  //       return { data: null, error }
+  //     }
+  //     throw error
+  //   }
+  // }
+  /**
+   * Lists all the files and folders within a path of the bucket.
+   *
+   * @category File Buckets
+   * @param path The folder path.
+   * @param options Search options including limit (defaults to 100), offset, sortBy, and search
+   * @param parameters Optional fetch parameters including signal for cancellation
+   * @returns Promise with response containing array of files or error
+   *
+   * @example List files in a bucket
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .list('folder', {
+   *     limit: 100,
+   *     offset: 0,
+   *     sortBy: { column: 'name', order: 'asc' },
+   *   })
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": [
+   *     {
+   *       "name": "avatar1.png",
+   *       "id": "e668cf7f-821b-4a2f-9dce-7dfa5dd1cfd2",
+   *       "updated_at": "2024-05-22T23:06:05.580Z",
+   *       "created_at": "2024-05-22T23:04:34.443Z",
+   *       "last_accessed_at": "2024-05-22T23:04:34.443Z",
+   *       "metadata": {
+   *         "eTag": "\"c5e8c553235d9af30ef4f6e280790b92\"",
+   *         "size": 32175,
+   *         "mimetype": "image/png",
+   *         "cacheControl": "max-age=3600",
+   *         "lastModified": "2024-05-22T23:06:05.574Z",
+   *         "contentLength": 32175,
+   *         "httpStatusCode": 200
+   *       }
+   *     }
+   *   ],
+   *   "error": null
+   * }
+   * ```
+   *
+   * @example Search files in a bucket
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .from('avatars')
+   *   .list('folder', {
+   *     limit: 100,
+   *     offset: 0,
+   *     sortBy: { column: 'name', order: 'asc' },
+   *     search: 'jon'
+   *   })
+   * ```
+   */
+  list(path, options, parameters) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const body = Object.assign(Object.assign(Object.assign({}, DEFAULT_SEARCH_OPTIONS), options), { prefix: path || "" });
+        const data = yield post$1(this.fetch, `${this.url}/object/list/${this.bucketId}`, body, { headers: this.headers }, parameters);
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * @experimental this method signature might change in the future
+   *
+   * @category File Buckets
+   * @param options search options
+   * @param parameters
+   */
+  listV2(options, parameters) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const body = Object.assign({}, options);
+        const data = yield post$1(this.fetch, `${this.url}/object/list-v2/${this.bucketId}`, body, { headers: this.headers }, parameters);
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  encodeMetadata(metadata) {
+    return JSON.stringify(metadata);
+  }
+  toBase64(data) {
+    if (typeof Buffer !== "undefined") {
+      return Buffer.from(data).toString("base64");
+    }
+    return btoa(data);
+  }
+  _getFinalPath(path) {
+    return `${this.bucketId}/${path.replace(/^\/+/, "")}`;
+  }
+  _removeEmptyFolders(path) {
+    return path.replace(/^\/|\/$/g, "").replace(/\/+/g, "/");
+  }
+  transformOptsToQueryString(transform) {
+    const params = [];
+    if (transform.width) {
+      params.push(`width=${transform.width}`);
+    }
+    if (transform.height) {
+      params.push(`height=${transform.height}`);
+    }
+    if (transform.resize) {
+      params.push(`resize=${transform.resize}`);
+    }
+    if (transform.format) {
+      params.push(`format=${transform.format}`);
+    }
+    if (transform.quality) {
+      params.push(`quality=${transform.quality}`);
+    }
+    return params.join("&");
+  }
+}
+const version$2 = "2.87.1";
+const DEFAULT_HEADERS$2 = {
+  "X-Client-Info": `storage-js/${version$2}`
+};
+class StorageBucketApi {
+  constructor(url, headers = {}, fetch2, opts) {
+    this.shouldThrowOnError = false;
+    const baseUrl = new URL(url);
+    if (opts === null || opts === void 0 ? void 0 : opts.useNewHostname) {
+      const isSupabaseHost = /supabase\.(co|in|red)$/.test(baseUrl.hostname);
+      if (isSupabaseHost && !baseUrl.hostname.includes("storage.supabase.")) {
+        baseUrl.hostname = baseUrl.hostname.replace("supabase.", "storage.supabase.");
+      }
+    }
+    this.url = baseUrl.href.replace(/\/$/, "");
+    this.headers = Object.assign(Object.assign({}, DEFAULT_HEADERS$2), headers);
+    this.fetch = resolveFetch$2(fetch2);
+  }
+  /**
+   * Enable throwing errors instead of returning them.
+   *
+   * @category File Buckets
+   */
+  throwOnError() {
+    this.shouldThrowOnError = true;
+    return this;
+  }
+  /**
+   * Retrieves the details of all Storage buckets within an existing project.
+   *
+   * @category File Buckets
+   * @param options Query parameters for listing buckets
+   * @param options.limit Maximum number of buckets to return
+   * @param options.offset Number of buckets to skip
+   * @param options.sortColumn Column to sort by ('id', 'name', 'created_at', 'updated_at')
+   * @param options.sortOrder Sort order ('asc' or 'desc')
+   * @param options.search Search term to filter bucket names
+   * @returns Promise with response containing array of buckets or error
+   *
+   * @example List buckets
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .listBuckets()
+   * ```
+   *
+   * @example List buckets with options
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .listBuckets({
+   *     limit: 10,
+   *     offset: 0,
+   *     sortColumn: 'created_at',
+   *     sortOrder: 'desc',
+   *     search: 'prod'
+   *   })
+   * ```
+   */
+  listBuckets(options) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const queryString = this.listBucketOptionsToQueryString(options);
+        const data = yield get(this.fetch, `${this.url}/bucket${queryString}`, {
+          headers: this.headers
+        });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * Retrieves the details of an existing Storage bucket.
+   *
+   * @category File Buckets
+   * @param id The unique identifier of the bucket you would like to retrieve.
+   * @returns Promise with response containing bucket details or error
+   *
+   * @example Get bucket
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .getBucket('avatars')
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": {
+   *     "id": "avatars",
+   *     "name": "avatars",
+   *     "owner": "",
+   *     "public": false,
+   *     "file_size_limit": 1024,
+   *     "allowed_mime_types": [
+   *       "image/png"
+   *     ],
+   *     "created_at": "2024-05-22T22:26:05.100Z",
+   *     "updated_at": "2024-05-22T22:26:05.100Z"
+   *   },
+   *   "error": null
+   * }
+   * ```
+   */
+  getBucket(id) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield get(this.fetch, `${this.url}/bucket/${id}`, { headers: this.headers });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * Creates a new Storage bucket
+   *
+   * @category File Buckets
+   * @param id A unique identifier for the bucket you are creating.
+   * @param options.public The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations. By default, buckets are private.
+   * @param options.fileSizeLimit specifies the max file size in bytes that can be uploaded to this bucket.
+   * The global file size limit takes precedence over this value.
+   * The default value is null, which doesn't set a per bucket file size limit.
+   * @param options.allowedMimeTypes specifies the allowed mime types that this bucket can accept during upload.
+   * The default value is null, which allows files with all mime types to be uploaded.
+   * Each mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png.
+   * @param options.type (private-beta) specifies the bucket type. see `BucketType` for more details.
+   *   - default bucket type is `STANDARD`
+   * @returns Promise with response containing newly created bucket name or error
+   *
+   * @example Create bucket
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .createBucket('avatars', {
+   *     public: false,
+   *     allowedMimeTypes: ['image/png'],
+   *     fileSizeLimit: 1024
+   *   })
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": {
+   *     "name": "avatars"
+   *   },
+   *   "error": null
+   * }
+   * ```
+   */
+  createBucket(id_1) {
+    return __awaiter(this, arguments, void 0, function* (id, options = {
+      public: false
+    }) {
+      try {
+        const data = yield post$1(this.fetch, `${this.url}/bucket`, {
+          id,
+          name: id,
+          type: options.type,
+          public: options.public,
+          file_size_limit: options.fileSizeLimit,
+          allowed_mime_types: options.allowedMimeTypes
+        }, { headers: this.headers });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * Updates a Storage bucket
+   *
+   * @category File Buckets
+   * @param id A unique identifier for the bucket you are updating.
+   * @param options.public The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations.
+   * @param options.fileSizeLimit specifies the max file size in bytes that can be uploaded to this bucket.
+   * The global file size limit takes precedence over this value.
+   * The default value is null, which doesn't set a per bucket file size limit.
+   * @param options.allowedMimeTypes specifies the allowed mime types that this bucket can accept during upload.
+   * The default value is null, which allows files with all mime types to be uploaded.
+   * Each mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png.
+   * @returns Promise with response containing success message or error
+   *
+   * @example Update bucket
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .updateBucket('avatars', {
+   *     public: false,
+   *     allowedMimeTypes: ['image/png'],
+   *     fileSizeLimit: 1024
+   *   })
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": {
+   *     "message": "Successfully updated"
+   *   },
+   *   "error": null
+   * }
+   * ```
+   */
+  updateBucket(id, options) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield put(this.fetch, `${this.url}/bucket/${id}`, {
+          id,
+          name: id,
+          public: options.public,
+          file_size_limit: options.fileSizeLimit,
+          allowed_mime_types: options.allowedMimeTypes
+        }, { headers: this.headers });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * Removes all objects inside a single bucket.
+   *
+   * @category File Buckets
+   * @param id The unique identifier of the bucket you would like to empty.
+   * @returns Promise with success message or error
+   *
+   * @example Empty bucket
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .emptyBucket('avatars')
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": {
+   *     "message": "Successfully emptied"
+   *   },
+   *   "error": null
+   * }
+   * ```
+   */
+  emptyBucket(id) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield post$1(this.fetch, `${this.url}/bucket/${id}/empty`, {}, { headers: this.headers });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * Deletes an existing bucket. A bucket can't be deleted with existing objects inside it.
+   * You must first `empty()` the bucket.
+   *
+   * @category File Buckets
+   * @param id The unique identifier of the bucket you would like to delete.
+   * @returns Promise with success message or error
+   *
+   * @example Delete bucket
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .deleteBucket('avatars')
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": {
+   *     "message": "Successfully deleted"
+   *   },
+   *   "error": null
+   * }
+   * ```
+   */
+  deleteBucket(id) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield remove(this.fetch, `${this.url}/bucket/${id}`, {}, { headers: this.headers });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  listBucketOptionsToQueryString(options) {
+    const params = {};
+    if (options) {
+      if ("limit" in options) {
+        params.limit = String(options.limit);
+      }
+      if ("offset" in options) {
+        params.offset = String(options.offset);
+      }
+      if (options.search) {
+        params.search = options.search;
+      }
+      if (options.sortColumn) {
+        params.sortColumn = options.sortColumn;
+      }
+      if (options.sortOrder) {
+        params.sortOrder = options.sortOrder;
+      }
+    }
+    return Object.keys(params).length > 0 ? "?" + new URLSearchParams(params).toString() : "";
+  }
+}
+var IcebergError = class extends Error {
+  constructor(message, opts) {
+    var _a3;
+    super(message);
+    this.name = "IcebergError";
+    this.status = opts.status;
+    this.icebergType = opts.icebergType;
+    this.icebergCode = opts.icebergCode;
+    this.details = opts.details;
+    this.isCommitStateUnknown = opts.icebergType === "CommitStateUnknownException" || [500, 502, 504].includes(opts.status) && ((_a3 = opts.icebergType) == null ? void 0 : _a3.includes("CommitState")) === true;
+  }
+  /**
+   * Returns true if the error is a 404 Not Found error.
+   */
+  isNotFound() {
+    return this.status === 404;
+  }
+  /**
+   * Returns true if the error is a 409 Conflict error.
+   */
+  isConflict() {
+    return this.status === 409;
+  }
+  /**
+   * Returns true if the error is a 419 Authentication Timeout error.
+   */
+  isAuthenticationTimeout() {
+    return this.status === 419;
+  }
+};
+function buildUrl(baseUrl, path, query) {
+  const url = new URL(path, baseUrl);
+  if (query) {
+    for (const [key, value] of Object.entries(query)) {
+      if (value !== void 0) {
+        url.searchParams.set(key, value);
+      }
+    }
+  }
+  return url.toString();
+}
+async function buildAuthHeaders(auth) {
+  if (!auth || auth.type === "none") {
+    return {};
+  }
+  if (auth.type === "bearer") {
+    return { Authorization: `Bearer ${auth.token}` };
+  }
+  if (auth.type === "header") {
+    return { [auth.name]: auth.value };
+  }
+  if (auth.type === "custom") {
+    return await auth.getHeaders();
+  }
+  return {};
+}
+function createFetchClient(options) {
+  const fetchFn = options.fetchImpl ?? globalThis.fetch;
+  return {
+    async request({
+      method,
+      path,
+      query,
+      body,
+      headers
+    }) {
+      const url = buildUrl(options.baseUrl, path, query);
+      const authHeaders = await buildAuthHeaders(options.auth);
+      const res = await fetchFn(url, {
+        method,
+        headers: {
+          ...body ? { "Content-Type": "application/json" } : {},
+          ...authHeaders,
+          ...headers
+        },
+        body: body ? JSON.stringify(body) : void 0
+      });
+      const text = await res.text();
+      const isJson = (res.headers.get("content-type") || "").includes("application/json");
+      const data = isJson && text ? JSON.parse(text) : text;
+      if (!res.ok) {
+        const errBody = isJson ? data : void 0;
+        const errorDetail = errBody == null ? void 0 : errBody.error;
+        throw new IcebergError(
+          (errorDetail == null ? void 0 : errorDetail.message) ?? `Request failed with status ${res.status}`,
+          {
+            status: res.status,
+            icebergType: errorDetail == null ? void 0 : errorDetail.type,
+            icebergCode: errorDetail == null ? void 0 : errorDetail.code,
+            details: errBody
+          }
+        );
+      }
+      return { status: res.status, headers: res.headers, data };
+    }
+  };
+}
+function namespaceToPath(namespace) {
+  return namespace.join("");
+}
+var NamespaceOperations = class {
+  constructor(client2, prefix2 = "") {
+    this.client = client2;
+    this.prefix = prefix2;
+  }
+  async listNamespaces(parent) {
+    const query = parent ? { parent: namespaceToPath(parent.namespace) } : void 0;
+    const response = await this.client.request({
+      method: "GET",
+      path: `${this.prefix}/namespaces`,
+      query
+    });
+    return response.data.namespaces.map((ns) => ({ namespace: ns }));
+  }
+  async createNamespace(id, metadata) {
+    const request = {
+      namespace: id.namespace,
+      properties: metadata == null ? void 0 : metadata.properties
+    };
+    const response = await this.client.request({
+      method: "POST",
+      path: `${this.prefix}/namespaces`,
+      body: request
+    });
+    return response.data;
+  }
+  async dropNamespace(id) {
+    await this.client.request({
+      method: "DELETE",
+      path: `${this.prefix}/namespaces/${namespaceToPath(id.namespace)}`
+    });
+  }
+  async loadNamespaceMetadata(id) {
+    const response = await this.client.request({
+      method: "GET",
+      path: `${this.prefix}/namespaces/${namespaceToPath(id.namespace)}`
+    });
+    return {
+      properties: response.data.properties
+    };
+  }
+  async namespaceExists(id) {
+    try {
+      await this.client.request({
+        method: "HEAD",
+        path: `${this.prefix}/namespaces/${namespaceToPath(id.namespace)}`
+      });
+      return true;
+    } catch (error) {
+      if (error instanceof IcebergError && error.status === 404) {
+        return false;
+      }
+      throw error;
+    }
+  }
+  async createNamespaceIfNotExists(id, metadata) {
+    try {
+      return await this.createNamespace(id, metadata);
+    } catch (error) {
+      if (error instanceof IcebergError && error.status === 409) {
+        return;
+      }
+      throw error;
+    }
+  }
+};
+function namespaceToPath2(namespace) {
+  return namespace.join("");
+}
+var TableOperations = class {
+  constructor(client2, prefix2 = "", accessDelegation) {
+    this.client = client2;
+    this.prefix = prefix2;
+    this.accessDelegation = accessDelegation;
+  }
+  async listTables(namespace) {
+    const response = await this.client.request({
+      method: "GET",
+      path: `${this.prefix}/namespaces/${namespaceToPath2(namespace.namespace)}/tables`
+    });
+    return response.data.identifiers;
+  }
+  async createTable(namespace, request) {
+    const headers = {};
+    if (this.accessDelegation) {
+      headers["X-Iceberg-Access-Delegation"] = this.accessDelegation;
+    }
+    const response = await this.client.request({
+      method: "POST",
+      path: `${this.prefix}/namespaces/${namespaceToPath2(namespace.namespace)}/tables`,
+      body: request,
+      headers
+    });
+    return response.data.metadata;
+  }
+  async updateTable(id, request) {
+    const response = await this.client.request({
+      method: "POST",
+      path: `${this.prefix}/namespaces/${namespaceToPath2(id.namespace)}/tables/${id.name}`,
+      body: request
+    });
+    return {
+      "metadata-location": response.data["metadata-location"],
+      metadata: response.data.metadata
+    };
+  }
+  async dropTable(id, options) {
+    await this.client.request({
+      method: "DELETE",
+      path: `${this.prefix}/namespaces/${namespaceToPath2(id.namespace)}/tables/${id.name}`,
+      query: { purgeRequested: String((options == null ? void 0 : options.purge) ?? false) }
+    });
+  }
+  async loadTable(id) {
+    const headers = {};
+    if (this.accessDelegation) {
+      headers["X-Iceberg-Access-Delegation"] = this.accessDelegation;
+    }
+    const response = await this.client.request({
+      method: "GET",
+      path: `${this.prefix}/namespaces/${namespaceToPath2(id.namespace)}/tables/${id.name}`,
+      headers
+    });
+    return response.data.metadata;
+  }
+  async tableExists(id) {
+    const headers = {};
+    if (this.accessDelegation) {
+      headers["X-Iceberg-Access-Delegation"] = this.accessDelegation;
+    }
+    try {
+      await this.client.request({
+        method: "HEAD",
+        path: `${this.prefix}/namespaces/${namespaceToPath2(id.namespace)}/tables/${id.name}`,
+        headers
+      });
+      return true;
+    } catch (error) {
+      if (error instanceof IcebergError && error.status === 404) {
+        return false;
+      }
+      throw error;
+    }
+  }
+  async createTableIfNotExists(namespace, request) {
+    try {
+      return await this.createTable(namespace, request);
+    } catch (error) {
+      if (error instanceof IcebergError && error.status === 409) {
+        return await this.loadTable({ namespace: namespace.namespace, name: request.name });
+      }
+      throw error;
+    }
+  }
+};
+var IcebergRestCatalog = class {
+  /**
+   * Creates a new Iceberg REST Catalog client.
+   *
+   * @param options - Configuration options for the catalog client
+   */
+  constructor(options) {
+    var _a3;
+    let prefix2 = "v1";
+    if (options.catalogName) {
+      prefix2 += `/${options.catalogName}`;
+    }
+    const baseUrl = options.baseUrl.endsWith("/") ? options.baseUrl : `${options.baseUrl}/`;
+    this.client = createFetchClient({
+      baseUrl,
+      auth: options.auth,
+      fetchImpl: options.fetch
+    });
+    this.accessDelegation = (_a3 = options.accessDelegation) == null ? void 0 : _a3.join(",");
+    this.namespaceOps = new NamespaceOperations(this.client, prefix2);
+    this.tableOps = new TableOperations(this.client, prefix2, this.accessDelegation);
+  }
+  /**
+   * Lists all namespaces in the catalog.
+   *
+   * @param parent - Optional parent namespace to list children under
+   * @returns Array of namespace identifiers
+   *
+   * @example
+   * ```typescript
+   * // List all top-level namespaces
+   * const namespaces = await catalog.listNamespaces();
+   *
+   * // List namespaces under a parent
+   * const children = await catalog.listNamespaces({ namespace: ['analytics'] });
+   * ```
+   */
+  async listNamespaces(parent) {
+    return this.namespaceOps.listNamespaces(parent);
+  }
+  /**
+   * Creates a new namespace in the catalog.
+   *
+   * @param id - Namespace identifier to create
+   * @param metadata - Optional metadata properties for the namespace
+   * @returns Response containing the created namespace and its properties
+   *
+   * @example
+   * ```typescript
+   * const response = await catalog.createNamespace(
+   *   { namespace: ['analytics'] },
+   *   { properties: { owner: 'data-team' } }
+   * );
+   * console.log(response.namespace); // ['analytics']
+   * console.log(response.properties); // { owner: 'data-team', ... }
+   * ```
+   */
+  async createNamespace(id, metadata) {
+    return this.namespaceOps.createNamespace(id, metadata);
+  }
+  /**
+   * Drops a namespace from the catalog.
+   *
+   * The namespace must be empty (contain no tables) before it can be dropped.
+   *
+   * @param id - Namespace identifier to drop
+   *
+   * @example
+   * ```typescript
+   * await catalog.dropNamespace({ namespace: ['analytics'] });
+   * ```
+   */
+  async dropNamespace(id) {
+    await this.namespaceOps.dropNamespace(id);
+  }
+  /**
+   * Loads metadata for a namespace.
+   *
+   * @param id - Namespace identifier to load
+   * @returns Namespace metadata including properties
+   *
+   * @example
+   * ```typescript
+   * const metadata = await catalog.loadNamespaceMetadata({ namespace: ['analytics'] });
+   * console.log(metadata.properties);
+   * ```
+   */
+  async loadNamespaceMetadata(id) {
+    return this.namespaceOps.loadNamespaceMetadata(id);
+  }
+  /**
+   * Lists all tables in a namespace.
+   *
+   * @param namespace - Namespace identifier to list tables from
+   * @returns Array of table identifiers
+   *
+   * @example
+   * ```typescript
+   * const tables = await catalog.listTables({ namespace: ['analytics'] });
+   * console.log(tables); // [{ namespace: ['analytics'], name: 'events' }, ...]
+   * ```
+   */
+  async listTables(namespace) {
+    return this.tableOps.listTables(namespace);
+  }
+  /**
+   * Creates a new table in the catalog.
+   *
+   * @param namespace - Namespace to create the table in
+   * @param request - Table creation request including name, schema, partition spec, etc.
+   * @returns Table metadata for the created table
+   *
+   * @example
+   * ```typescript
+   * const metadata = await catalog.createTable(
+   *   { namespace: ['analytics'] },
+   *   {
+   *     name: 'events',
+   *     schema: {
+   *       type: 'struct',
+   *       fields: [
+   *         { id: 1, name: 'id', type: 'long', required: true },
+   *         { id: 2, name: 'timestamp', type: 'timestamp', required: true }
+   *       ],
+   *       'schema-id': 0
+   *     },
+   *     'partition-spec': {
+   *       'spec-id': 0,
+   *       fields: [
+   *         { source_id: 2, field_id: 1000, name: 'ts_day', transform: 'day' }
+   *       ]
+   *     }
+   *   }
+   * );
+   * ```
+   */
+  async createTable(namespace, request) {
+    return this.tableOps.createTable(namespace, request);
+  }
+  /**
+   * Updates an existing table's metadata.
+   *
+   * Can update the schema, partition spec, or properties of a table.
+   *
+   * @param id - Table identifier to update
+   * @param request - Update request with fields to modify
+   * @returns Response containing the metadata location and updated table metadata
+   *
+   * @example
+   * ```typescript
+   * const response = await catalog.updateTable(
+   *   { namespace: ['analytics'], name: 'events' },
+   *   {
+   *     properties: { 'read.split.target-size': '134217728' }
+   *   }
+   * );
+   * console.log(response['metadata-location']); // s3://...
+   * console.log(response.metadata); // TableMetadata object
+   * ```
+   */
+  async updateTable(id, request) {
+    return this.tableOps.updateTable(id, request);
+  }
+  /**
+   * Drops a table from the catalog.
+   *
+   * @param id - Table identifier to drop
+   *
+   * @example
+   * ```typescript
+   * await catalog.dropTable({ namespace: ['analytics'], name: 'events' });
+   * ```
+   */
+  async dropTable(id, options) {
+    await this.tableOps.dropTable(id, options);
+  }
+  /**
+   * Loads metadata for a table.
+   *
+   * @param id - Table identifier to load
+   * @returns Table metadata including schema, partition spec, location, etc.
+   *
+   * @example
+   * ```typescript
+   * const metadata = await catalog.loadTable({ namespace: ['analytics'], name: 'events' });
+   * console.log(metadata.schema);
+   * console.log(metadata.location);
+   * ```
+   */
+  async loadTable(id) {
+    return this.tableOps.loadTable(id);
+  }
+  /**
+   * Checks if a namespace exists in the catalog.
+   *
+   * @param id - Namespace identifier to check
+   * @returns True if the namespace exists, false otherwise
+   *
+   * @example
+   * ```typescript
+   * const exists = await catalog.namespaceExists({ namespace: ['analytics'] });
+   * console.log(exists); // true or false
+   * ```
+   */
+  async namespaceExists(id) {
+    return this.namespaceOps.namespaceExists(id);
+  }
+  /**
+   * Checks if a table exists in the catalog.
+   *
+   * @param id - Table identifier to check
+   * @returns True if the table exists, false otherwise
+   *
+   * @example
+   * ```typescript
+   * const exists = await catalog.tableExists({ namespace: ['analytics'], name: 'events' });
+   * console.log(exists); // true or false
+   * ```
+   */
+  async tableExists(id) {
+    return this.tableOps.tableExists(id);
+  }
+  /**
+   * Creates a namespace if it does not exist.
+   *
+   * If the namespace already exists, returns void. If created, returns the response.
+   *
+   * @param id - Namespace identifier to create
+   * @param metadata - Optional metadata properties for the namespace
+   * @returns Response containing the created namespace and its properties, or void if it already exists
+   *
+   * @example
+   * ```typescript
+   * const response = await catalog.createNamespaceIfNotExists(
+   *   { namespace: ['analytics'] },
+   *   { properties: { owner: 'data-team' } }
+   * );
+   * if (response) {
+   *   console.log('Created:', response.namespace);
+   * } else {
+   *   console.log('Already exists');
+   * }
+   * ```
+   */
+  async createNamespaceIfNotExists(id, metadata) {
+    return this.namespaceOps.createNamespaceIfNotExists(id, metadata);
+  }
+  /**
+   * Creates a table if it does not exist.
+   *
+   * If the table already exists, returns its metadata instead.
+   *
+   * @param namespace - Namespace to create the table in
+   * @param request - Table creation request including name, schema, partition spec, etc.
+   * @returns Table metadata for the created or existing table
+   *
+   * @example
+   * ```typescript
+   * const metadata = await catalog.createTableIfNotExists(
+   *   { namespace: ['analytics'] },
+   *   {
+   *     name: 'events',
+   *     schema: {
+   *       type: 'struct',
+   *       fields: [
+   *         { id: 1, name: 'id', type: 'long', required: true },
+   *         { id: 2, name: 'timestamp', type: 'timestamp', required: true }
+   *       ],
+   *       'schema-id': 0
+   *     }
+   *   }
+   * );
+   * ```
+   */
+  async createTableIfNotExists(namespace, request) {
+    return this.tableOps.createTableIfNotExists(namespace, request);
+  }
+};
+class StorageAnalyticsClient {
+  /**
+   * @alpha
+   *
+   * Creates a new StorageAnalyticsClient instance
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Analytics Buckets
+   * @param url - The base URL for the storage API
+   * @param headers - HTTP headers to include in requests
+   * @param fetch - Optional custom fetch implementation
+   *
+   * @example
+   * ```typescript
+   * const client = new StorageAnalyticsClient(url, headers)
+   * ```
+   */
+  constructor(url, headers = {}, fetch2) {
+    this.shouldThrowOnError = false;
+    this.url = url.replace(/\/$/, "");
+    this.headers = Object.assign(Object.assign({}, DEFAULT_HEADERS$2), headers);
+    this.fetch = resolveFetch$2(fetch2);
+  }
+  /**
+   * @alpha
+   *
+   * Enable throwing errors instead of returning them in the response
+   * When enabled, failed operations will throw instead of returning { data: null, error }
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Analytics Buckets
+   * @returns This instance for method chaining
+   */
+  throwOnError() {
+    this.shouldThrowOnError = true;
+    return this;
+  }
+  /**
+   * @alpha
+   *
+   * Creates a new analytics bucket using Iceberg tables
+   * Analytics buckets are optimized for analytical queries and data processing
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Analytics Buckets
+   * @param name A unique name for the bucket you are creating
+   * @returns Promise with response containing newly created analytics bucket or error
+   *
+   * @example Create analytics bucket
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .analytics
+   *   .createBucket('analytics-data')
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": {
+   *     "name": "analytics-data",
+   *     "type": "ANALYTICS",
+   *     "format": "iceberg",
+   *     "created_at": "2024-05-22T22:26:05.100Z",
+   *     "updated_at": "2024-05-22T22:26:05.100Z"
+   *   },
+   *   "error": null
+   * }
+   * ```
+   */
+  createBucket(name) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield post$1(this.fetch, `${this.url}/bucket`, { name }, { headers: this.headers });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * @alpha
+   *
+   * Retrieves the details of all Analytics Storage buckets within an existing project
+   * Only returns buckets of type 'ANALYTICS'
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Analytics Buckets
+   * @param options Query parameters for listing buckets
+   * @param options.limit Maximum number of buckets to return
+   * @param options.offset Number of buckets to skip
+   * @param options.sortColumn Column to sort by ('name', 'created_at', 'updated_at')
+   * @param options.sortOrder Sort order ('asc' or 'desc')
+   * @param options.search Search term to filter bucket names
+   * @returns Promise with response containing array of analytics buckets or error
+   *
+   * @example List analytics buckets
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .analytics
+   *   .listBuckets({
+   *     limit: 10,
+   *     offset: 0,
+   *     sortColumn: 'created_at',
+   *     sortOrder: 'desc'
+   *   })
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": [
+   *     {
+   *       "name": "analytics-data",
+   *       "type": "ANALYTICS",
+   *       "format": "iceberg",
+   *       "created_at": "2024-05-22T22:26:05.100Z",
+   *       "updated_at": "2024-05-22T22:26:05.100Z"
+   *     }
+   *   ],
+   *   "error": null
+   * }
+   * ```
+   */
+  listBuckets(options) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const queryParams = new URLSearchParams();
+        if ((options === null || options === void 0 ? void 0 : options.limit) !== void 0)
+          queryParams.set("limit", options.limit.toString());
+        if ((options === null || options === void 0 ? void 0 : options.offset) !== void 0)
+          queryParams.set("offset", options.offset.toString());
+        if (options === null || options === void 0 ? void 0 : options.sortColumn)
+          queryParams.set("sortColumn", options.sortColumn);
+        if (options === null || options === void 0 ? void 0 : options.sortOrder)
+          queryParams.set("sortOrder", options.sortOrder);
+        if (options === null || options === void 0 ? void 0 : options.search)
+          queryParams.set("search", options.search);
+        const queryString = queryParams.toString();
+        const url = queryString ? `${this.url}/bucket?${queryString}` : `${this.url}/bucket`;
+        const data = yield get(this.fetch, url, { headers: this.headers });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * @alpha
+   *
+   * Deletes an existing analytics bucket
+   * A bucket can't be deleted with existing objects inside it
+   * You must first empty the bucket before deletion
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Analytics Buckets
+   * @param bucketName The unique identifier of the bucket you would like to delete
+   * @returns Promise with response containing success message or error
+   *
+   * @example Delete analytics bucket
+   * ```js
+   * const { data, error } = await supabase
+   *   .storage
+   *   .analytics
+   *   .deleteBucket('analytics-data')
+   * ```
+   *
+   * Response:
+   * ```json
+   * {
+   *   "data": {
+   *     "message": "Successfully deleted"
+   *   },
+   *   "error": null
+   * }
+   * ```
+   */
+  deleteBucket(bucketName) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield remove(this.fetch, `${this.url}/bucket/${bucketName}`, {}, { headers: this.headers });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * @alpha
+   *
+   * Get an Iceberg REST Catalog client configured for a specific analytics bucket
+   * Use this to perform advanced table and namespace operations within the bucket
+   * The returned client provides full access to the Apache Iceberg REST Catalog API
+   * with the Supabase `{ data, error }` pattern for consistent error handling on all operations.
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Analytics Buckets
+   * @param bucketName - The name of the analytics bucket (warehouse) to connect to
+   * @returns The wrapped Iceberg catalog client
+   * @throws {StorageError} If the bucket name is invalid
+   *
+   * @example Get catalog and create table
+   * ```js
+   * // First, create an analytics bucket
+   * const { data: bucket, error: bucketError } = await supabase
+   *   .storage
+   *   .analytics
+   *   .createBucket('analytics-data')
+   *
+   * // Get the Iceberg catalog for that bucket
+   * const catalog = supabase.storage.analytics.from('analytics-data')
+   *
+   * // Create a namespace
+   * const { error: nsError } = await catalog.createNamespace({ namespace: ['default'] })
+   *
+   * // Create a table with schema
+   * const { data: tableMetadata, error: tableError } = await catalog.createTable(
+   *   { namespace: ['default'] },
+   *   {
+   *     name: 'events',
+   *     schema: {
+   *       type: 'struct',
+   *       fields: [
+   *         { id: 1, name: 'id', type: 'long', required: true },
+   *         { id: 2, name: 'timestamp', type: 'timestamp', required: true },
+   *         { id: 3, name: 'user_id', type: 'string', required: false }
+   *       ],
+   *       'schema-id': 0,
+   *       'identifier-field-ids': [1]
+   *     },
+   *     'partition-spec': {
+   *       'spec-id': 0,
+   *       fields: []
+   *     },
+   *     'write-order': {
+   *       'order-id': 0,
+   *       fields: []
+   *     },
+   *     properties: {
+   *       'write.format.default': 'parquet'
+   *     }
+   *   }
+   * )
+   * ```
+   *
+   * @example List tables in namespace
+   * ```js
+   * const catalog = supabase.storage.analytics.from('analytics-data')
+   *
+   * // List all tables in the default namespace
+   * const { data: tables, error: listError } = await catalog.listTables({ namespace: ['default'] })
+   * if (listError) {
+   *   if (listError.isNotFound()) {
+   *     console.log('Namespace not found')
+   *   }
+   *   return
+   * }
+   * console.log(tables) // [{ namespace: ['default'], name: 'events' }]
+   * ```
+   *
+   * @example Working with namespaces
+   * ```js
+   * const catalog = supabase.storage.analytics.from('analytics-data')
+   *
+   * // List all namespaces
+   * const { data: namespaces } = await catalog.listNamespaces()
+   *
+   * // Create namespace with properties
+   * await catalog.createNamespace(
+   *   { namespace: ['production'] },
+   *   { properties: { owner: 'data-team', env: 'prod' } }
+   * )
+   * ```
+   *
+   * @example Cleanup operations
+   * ```js
+   * const catalog = supabase.storage.analytics.from('analytics-data')
+   *
+   * // Drop table with purge option (removes all data)
+   * const { error: dropError } = await catalog.dropTable(
+   *   { namespace: ['default'], name: 'events' },
+   *   { purge: true }
+   * )
+   *
+   * if (dropError?.isNotFound()) {
+   *   console.log('Table does not exist')
+   * }
+   *
+   * // Drop namespace (must be empty)
+   * await catalog.dropNamespace({ namespace: ['default'] })
+   * ```
+   *
+   * @remarks
+   * This method provides a bridge between Supabase's bucket management and the standard
+   * Apache Iceberg REST Catalog API. The bucket name maps to the Iceberg warehouse parameter.
+   * All authentication and configuration is handled automatically using your Supabase credentials.
+   *
+   * **Error Handling**: Invalid bucket names throw immediately. All catalog
+   * operations return `{ data, error }` where errors are `IcebergError` instances from iceberg-js.
+   * Use helper methods like `error.isNotFound()` or check `error.status` for specific error handling.
+   * Use `.throwOnError()` on the analytics client if you prefer exceptions for catalog operations.
+   *
+   * **Cleanup Operations**: When using `dropTable`, the `purge: true` option permanently
+   * deletes all table data. Without it, the table is marked as deleted but data remains.
+   *
+   * **Library Dependency**: The returned catalog wraps `IcebergRestCatalog` from iceberg-js.
+   * For complete API documentation and advanced usage, refer to the
+   * [iceberg-js documentation](https://supabase.github.io/iceberg-js/).
+   */
+  from(bucketName) {
+    if (!isValidBucketName(bucketName)) {
+      throw new StorageError("Invalid bucket name: File, folder, and bucket names must follow AWS object key naming guidelines and should avoid the use of any other characters.");
+    }
+    const catalog = new IcebergRestCatalog({
+      baseUrl: this.url,
+      catalogName: bucketName,
+      // Maps to the warehouse parameter in Supabase's implementation
+      auth: {
+        type: "custom",
+        getHeaders: () => __awaiter(this, void 0, void 0, function* () {
+          return this.headers;
+        })
+      },
+      fetch: this.fetch
+    });
+    const shouldThrowOnError = this.shouldThrowOnError;
+    const wrappedCatalog = new Proxy(catalog, {
+      get(target, prop) {
+        const value = target[prop];
+        if (typeof value !== "function") {
+          return value;
+        }
+        return (...args) => __awaiter(this, void 0, void 0, function* () {
+          try {
+            const data = yield value.apply(target, args);
+            return { data, error: null };
+          } catch (error) {
+            if (shouldThrowOnError) {
+              throw error;
+            }
+            return { data: null, error };
+          }
+        });
+      }
+    });
+    return wrappedCatalog;
+  }
+}
+const DEFAULT_HEADERS$1 = {
+  "X-Client-Info": `storage-js/${version$2}`,
+  "Content-Type": "application/json"
+};
+class StorageVectorsError extends Error {
+  constructor(message) {
+    super(message);
+    this.__isStorageVectorsError = true;
+    this.name = "StorageVectorsError";
+  }
+}
+function isStorageVectorsError(error) {
+  return typeof error === "object" && error !== null && "__isStorageVectorsError" in error;
+}
+class StorageVectorsApiError extends StorageVectorsError {
+  constructor(message, status, statusCode) {
+    super(message);
+    this.name = "StorageVectorsApiError";
+    this.status = status;
+    this.statusCode = statusCode;
+  }
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      status: this.status,
+      statusCode: this.statusCode
+    };
+  }
+}
+class StorageVectorsUnknownError extends StorageVectorsError {
+  constructor(message, originalError) {
+    super(message);
+    this.name = "StorageVectorsUnknownError";
+    this.originalError = originalError;
+  }
+}
+var StorageVectorsErrorCode;
+(function(StorageVectorsErrorCode2) {
+  StorageVectorsErrorCode2["InternalError"] = "InternalError";
+  StorageVectorsErrorCode2["S3VectorConflictException"] = "S3VectorConflictException";
+  StorageVectorsErrorCode2["S3VectorNotFoundException"] = "S3VectorNotFoundException";
+  StorageVectorsErrorCode2["S3VectorBucketNotEmpty"] = "S3VectorBucketNotEmpty";
+  StorageVectorsErrorCode2["S3VectorMaxBucketsExceeded"] = "S3VectorMaxBucketsExceeded";
+  StorageVectorsErrorCode2["S3VectorMaxIndexesExceeded"] = "S3VectorMaxIndexesExceeded";
+})(StorageVectorsErrorCode || (StorageVectorsErrorCode = {}));
+const resolveFetch$1 = (customFetch) => {
+  if (customFetch) {
+    return (...args) => customFetch(...args);
+  }
+  return (...args) => fetch(...args);
+};
+const resolveResponse = () => {
+  return Response;
+};
+const isPlainObject = (value) => {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(value);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
+};
+const normalizeToFloat32 = (values) => {
+  return Array.from(new Float32Array(values));
+};
+const validateVectorDimension = (vector, expectedDimension) => {
+  if (expectedDimension !== void 0 && vector.float32.length !== expectedDimension) {
+    throw new Error(`Vector dimension mismatch: expected ${expectedDimension}, got ${vector.float32.length}`);
+  }
+};
+const _getErrorMessage$1 = (err) => err.msg || err.message || err.error_description || err.error || JSON.stringify(err);
+const handleError$1 = (error, reject, options) => __awaiter(void 0, void 0, void 0, function* () {
+  const isResponseLike = error && typeof error === "object" && "status" in error && "ok" in error && typeof error.status === "number";
+  if (isResponseLike && !(options === null || options === void 0 ? void 0 : options.noResolveJson)) {
+    const status = error.status || 500;
+    const responseError = error;
+    if (typeof responseError.json === "function") {
+      responseError.json().then((err) => {
+        const statusCode = (err === null || err === void 0 ? void 0 : err.statusCode) || (err === null || err === void 0 ? void 0 : err.code) || status + "";
+        reject(new StorageVectorsApiError(_getErrorMessage$1(err), status, statusCode));
+      }).catch(() => {
+        const statusCode = status + "";
+        const message = responseError.statusText || `HTTP ${status} error`;
+        reject(new StorageVectorsApiError(message, status, statusCode));
+      });
+    } else {
+      const statusCode = status + "";
+      const message = responseError.statusText || `HTTP ${status} error`;
+      reject(new StorageVectorsApiError(message, status, statusCode));
+    }
+  } else {
+    reject(new StorageVectorsUnknownError(_getErrorMessage$1(error), error));
+  }
+});
+const _getRequestParams$1 = (method, options, parameters, body) => {
+  const params = { method, headers: (options === null || options === void 0 ? void 0 : options.headers) || {} };
+  if (!body) {
+    return params;
+  }
+  if (isPlainObject(body)) {
+    params.headers = Object.assign({ "Content-Type": "application/json" }, options === null || options === void 0 ? void 0 : options.headers);
+    params.body = JSON.stringify(body);
+  } else {
+    params.body = body;
+  }
+  return Object.assign(Object.assign({}, params), parameters);
+};
+function _handleRequest$1(fetcher, method, url, options, parameters, body) {
+  return __awaiter(this, void 0, void 0, function* () {
+    return new Promise((resolve, reject) => {
+      fetcher(url, _getRequestParams$1(method, options, parameters, body)).then((result) => {
+        if (!result.ok)
+          throw result;
+        if (options === null || options === void 0 ? void 0 : options.noResolveJson)
+          return result;
+        const contentType = result.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          return {};
+        }
+        return result.json();
+      }).then((data) => resolve(data)).catch((error) => handleError$1(error, reject, options));
+    });
+  });
+}
+function post(fetcher, url, body, options, parameters) {
+  return __awaiter(this, void 0, void 0, function* () {
+    return _handleRequest$1(fetcher, "POST", url, options, parameters, body);
+  });
+}
+class VectorIndexApi {
+  /** Creates a new VectorIndexApi instance */
+  constructor(url, headers = {}, fetch2) {
+    this.shouldThrowOnError = false;
+    this.url = url.replace(/\/$/, "");
+    this.headers = Object.assign(Object.assign({}, DEFAULT_HEADERS$1), headers);
+    this.fetch = resolveFetch$1(fetch2);
+  }
+  /** Enable throwing errors instead of returning them in the response */
+  throwOnError() {
+    this.shouldThrowOnError = true;
+    return this;
+  }
+  /** Creates a new vector index within a bucket */
+  createIndex(options) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield post(this.fetch, `${this.url}/CreateIndex`, options, {
+          headers: this.headers
+        });
+        return { data: data || {}, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageVectorsError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /** Retrieves metadata for a specific vector index */
+  getIndex(vectorBucketName, indexName) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield post(this.fetch, `${this.url}/GetIndex`, { vectorBucketName, indexName }, { headers: this.headers });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageVectorsError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /** Lists vector indexes within a bucket with optional filtering and pagination */
+  listIndexes(options) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield post(this.fetch, `${this.url}/ListIndexes`, options, {
+          headers: this.headers
+        });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageVectorsError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /** Deletes a vector index and all its data */
+  deleteIndex(vectorBucketName, indexName) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield post(this.fetch, `${this.url}/DeleteIndex`, { vectorBucketName, indexName }, { headers: this.headers });
+        return { data: data || {}, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageVectorsError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+}
+class VectorDataApi {
+  /** Creates a new VectorDataApi instance */
+  constructor(url, headers = {}, fetch2) {
+    this.shouldThrowOnError = false;
+    this.url = url.replace(/\/$/, "");
+    this.headers = Object.assign(Object.assign({}, DEFAULT_HEADERS$1), headers);
+    this.fetch = resolveFetch$1(fetch2);
+  }
+  /** Enable throwing errors instead of returning them in the response */
+  throwOnError() {
+    this.shouldThrowOnError = true;
+    return this;
+  }
+  /** Inserts or updates vectors in batch (1-500 per request) */
+  putVectors(options) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        if (options.vectors.length < 1 || options.vectors.length > 500) {
+          throw new Error("Vector batch size must be between 1 and 500 items");
+        }
+        const data = yield post(this.fetch, `${this.url}/PutVectors`, options, {
+          headers: this.headers
+        });
+        return { data: data || {}, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageVectorsError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /** Retrieves vectors by their keys in batch */
+  getVectors(options) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield post(this.fetch, `${this.url}/GetVectors`, options, {
+          headers: this.headers
+        });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageVectorsError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /** Lists vectors in an index with pagination */
+  listVectors(options) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        if (options.segmentCount !== void 0) {
+          if (options.segmentCount < 1 || options.segmentCount > 16) {
+            throw new Error("segmentCount must be between 1 and 16");
+          }
+          if (options.segmentIndex !== void 0) {
+            if (options.segmentIndex < 0 || options.segmentIndex >= options.segmentCount) {
+              throw new Error(`segmentIndex must be between 0 and ${options.segmentCount - 1}`);
+            }
+          }
+        }
+        const data = yield post(this.fetch, `${this.url}/ListVectors`, options, {
+          headers: this.headers
+        });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageVectorsError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /** Queries for similar vectors using approximate nearest neighbor search */
+  queryVectors(options) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield post(this.fetch, `${this.url}/QueryVectors`, options, {
+          headers: this.headers
+        });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageVectorsError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /** Deletes vectors by their keys in batch (1-500 per request) */
+  deleteVectors(options) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        if (options.keys.length < 1 || options.keys.length > 500) {
+          throw new Error("Keys batch size must be between 1 and 500 items");
+        }
+        const data = yield post(this.fetch, `${this.url}/DeleteVectors`, options, {
+          headers: this.headers
+        });
+        return { data: data || {}, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageVectorsError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+}
+class VectorBucketApi {
+  /** Creates a new VectorBucketApi instance */
+  constructor(url, headers = {}, fetch2) {
+    this.shouldThrowOnError = false;
+    this.url = url.replace(/\/$/, "");
+    this.headers = Object.assign(Object.assign({}, DEFAULT_HEADERS$1), headers);
+    this.fetch = resolveFetch$1(fetch2);
+  }
+  /** Enable throwing errors instead of returning them in the response */
+  throwOnError() {
+    this.shouldThrowOnError = true;
+    return this;
+  }
+  /** Creates a new vector bucket */
+  createBucket(vectorBucketName) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield post(this.fetch, `${this.url}/CreateVectorBucket`, { vectorBucketName }, { headers: this.headers });
+        return { data: data || {}, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageVectorsError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /** Retrieves metadata for a specific vector bucket */
+  getBucket(vectorBucketName) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield post(this.fetch, `${this.url}/GetVectorBucket`, { vectorBucketName }, { headers: this.headers });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageVectorsError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /** Lists vector buckets with optional filtering and pagination */
+  listBuckets() {
+    return __awaiter(this, arguments, void 0, function* (options = {}) {
+      try {
+        const data = yield post(this.fetch, `${this.url}/ListVectorBuckets`, options, {
+          headers: this.headers
+        });
+        return { data, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageVectorsError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+  /** Deletes a vector bucket (must be empty first) */
+  deleteBucket(vectorBucketName) {
+    return __awaiter(this, void 0, void 0, function* () {
+      try {
+        const data = yield post(this.fetch, `${this.url}/DeleteVectorBucket`, { vectorBucketName }, { headers: this.headers });
+        return { data: data || {}, error: null };
+      } catch (error) {
+        if (this.shouldThrowOnError) {
+          throw error;
+        }
+        if (isStorageVectorsError(error)) {
+          return { data: null, error };
+        }
+        throw error;
+      }
+    });
+  }
+}
+class StorageVectorsClient extends VectorBucketApi {
+  /**
+   * @alpha
+   *
+   * Creates a StorageVectorsClient that can manage buckets, indexes, and vectors.
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param url - Base URL of the Storage Vectors REST API.
+   * @param options.headers - Optional headers (for example `Authorization`) applied to every request.
+   * @param options.fetch - Optional custom `fetch` implementation for non-browser runtimes.
+   *
+   * @example
+   * ```typescript
+   * const client = new StorageVectorsClient(url, options)
+   * ```
+   */
+  constructor(url, options = {}) {
+    super(url, options.headers || {}, options.fetch);
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Access operations for a specific vector bucket
+   * Returns a scoped client for index and vector operations within the bucket
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param vectorBucketName - Name of the vector bucket
+   * @returns Bucket-scoped client with index and vector operations
+   *
+   * @example
+   * ```typescript
+   * const bucket = supabase.storage.vectors.from('embeddings-prod')
+   * ```
+   */
+  from(vectorBucketName) {
+    return new VectorBucketScope(this.url, this.headers, vectorBucketName, this.fetch);
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Creates a new vector bucket
+   * Vector buckets are containers for vector indexes and their data
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param vectorBucketName - Unique name for the vector bucket
+   * @returns Promise with empty response on success or error
+   *
+   * @example
+   * ```typescript
+   * const { data, error } = await supabase
+   *   .storage
+   *   .vectors
+   *   .createBucket('embeddings-prod')
+   * ```
+   */
+  createBucket(vectorBucketName) {
+    const _super = Object.create(null, {
+      createBucket: { get: () => super.createBucket }
+    });
+    return __awaiter(this, void 0, void 0, function* () {
+      return _super.createBucket.call(this, vectorBucketName);
+    });
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Retrieves metadata for a specific vector bucket
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param vectorBucketName - Name of the vector bucket
+   * @returns Promise with bucket metadata or error
+   *
+   * @example
+   * ```typescript
+   * const { data, error } = await supabase
+   *   .storage
+   *   .vectors
+   *   .getBucket('embeddings-prod')
+   *
+   * console.log('Bucket created:', data?.vectorBucket.creationTime)
+   * ```
+   */
+  getBucket(vectorBucketName) {
+    const _super = Object.create(null, {
+      getBucket: { get: () => super.getBucket }
+    });
+    return __awaiter(this, void 0, void 0, function* () {
+      return _super.getBucket.call(this, vectorBucketName);
+    });
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Lists all vector buckets with optional filtering and pagination
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param options - Optional filters (prefix, maxResults, nextToken)
+   * @returns Promise with list of buckets or error
+   *
+   * @example
+   * ```typescript
+   * const { data, error } = await supabase
+   *   .storage
+   *   .vectors
+   *   .listBuckets({ prefix: 'embeddings-' })
+   *
+   * data?.vectorBuckets.forEach(bucket => {
+   *   console.log(bucket.vectorBucketName)
+   * })
+   * ```
+   */
+  listBuckets() {
+    const _super = Object.create(null, {
+      listBuckets: { get: () => super.listBuckets }
+    });
+    return __awaiter(this, arguments, void 0, function* (options = {}) {
+      return _super.listBuckets.call(this, options);
+    });
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Deletes a vector bucket (bucket must be empty)
+   * All indexes must be deleted before deleting the bucket
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param vectorBucketName - Name of the vector bucket to delete
+   * @returns Promise with empty response on success or error
+   *
+   * @example
+   * ```typescript
+   * const { data, error } = await supabase
+   *   .storage
+   *   .vectors
+   *   .deleteBucket('embeddings-old')
+   * ```
+   */
+  deleteBucket(vectorBucketName) {
+    const _super = Object.create(null, {
+      deleteBucket: { get: () => super.deleteBucket }
+    });
+    return __awaiter(this, void 0, void 0, function* () {
+      return _super.deleteBucket.call(this, vectorBucketName);
+    });
+  }
+}
+class VectorBucketScope extends VectorIndexApi {
+  /**
+   * @alpha
+   *
+   * Creates a helper that automatically scopes all index operations to the provided bucket.
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @example
+   * ```typescript
+   * const bucket = supabase.storage.vectors.from('embeddings-prod')
+   * ```
+   */
+  constructor(url, headers, vectorBucketName, fetch2) {
+    super(url, headers, fetch2);
+    this.vectorBucketName = vectorBucketName;
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Creates a new vector index in this bucket
+   * Convenience method that automatically includes the bucket name
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param options - Index configuration (vectorBucketName is automatically set)
+   * @returns Promise with empty response on success or error
+   *
+   * @example
+   * ```typescript
+   * const bucket = supabase.storage.vectors.from('embeddings-prod')
+   * await bucket.createIndex({
+   *   indexName: 'documents-openai',
+   *   dataType: 'float32',
+   *   dimension: 1536,
+   *   distanceMetric: 'cosine',
+   *   metadataConfiguration: {
+   *     nonFilterableMetadataKeys: ['raw_text']
+   *   }
+   * })
+   * ```
+   */
+  createIndex(options) {
+    const _super = Object.create(null, {
+      createIndex: { get: () => super.createIndex }
+    });
+    return __awaiter(this, void 0, void 0, function* () {
+      return _super.createIndex.call(this, Object.assign(Object.assign({}, options), { vectorBucketName: this.vectorBucketName }));
+    });
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Lists indexes in this bucket
+   * Convenience method that automatically includes the bucket name
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param options - Listing options (vectorBucketName is automatically set)
+   * @returns Promise with response containing indexes array and pagination token or error
+   *
+   * @example
+   * ```typescript
+   * const bucket = supabase.storage.vectors.from('embeddings-prod')
+   * const { data } = await bucket.listIndexes({ prefix: 'documents-' })
+   * ```
+   */
+  listIndexes() {
+    const _super = Object.create(null, {
+      listIndexes: { get: () => super.listIndexes }
+    });
+    return __awaiter(this, arguments, void 0, function* (options = {}) {
+      return _super.listIndexes.call(this, Object.assign(Object.assign({}, options), { vectorBucketName: this.vectorBucketName }));
+    });
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Retrieves metadata for a specific index in this bucket
+   * Convenience method that automatically includes the bucket name
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param indexName - Name of the index to retrieve
+   * @returns Promise with index metadata or error
+   *
+   * @example
+   * ```typescript
+   * const bucket = supabase.storage.vectors.from('embeddings-prod')
+   * const { data } = await bucket.getIndex('documents-openai')
+   * console.log('Dimension:', data?.index.dimension)
+   * ```
+   */
+  getIndex(indexName) {
+    const _super = Object.create(null, {
+      getIndex: { get: () => super.getIndex }
+    });
+    return __awaiter(this, void 0, void 0, function* () {
+      return _super.getIndex.call(this, this.vectorBucketName, indexName);
+    });
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Deletes an index from this bucket
+   * Convenience method that automatically includes the bucket name
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param indexName - Name of the index to delete
+   * @returns Promise with empty response on success or error
+   *
+   * @example
+   * ```typescript
+   * const bucket = supabase.storage.vectors.from('embeddings-prod')
+   * await bucket.deleteIndex('old-index')
+   * ```
+   */
+  deleteIndex(indexName) {
+    const _super = Object.create(null, {
+      deleteIndex: { get: () => super.deleteIndex }
+    });
+    return __awaiter(this, void 0, void 0, function* () {
+      return _super.deleteIndex.call(this, this.vectorBucketName, indexName);
+    });
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Access operations for a specific index within this bucket
+   * Returns a scoped client for vector data operations
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param indexName - Name of the index
+   * @returns Index-scoped client with vector data operations
+   *
+   * @example
+   * ```typescript
+   * const index = supabase.storage.vectors.from('embeddings-prod').index('documents-openai')
+   *
+   * // Insert vectors
+   * await index.putVectors({
+   *   vectors: [
+   *     { key: 'doc-1', data: { float32: [...] }, metadata: { title: 'Intro' } }
+   *   ]
+   * })
+   *
+   * // Query similar vectors
+   * const { data } = await index.queryVectors({
+   *   queryVector: { float32: [...] },
+   *   topK: 5
+   * })
+   * ```
+   */
+  index(indexName) {
+    return new VectorIndexScope(this.url, this.headers, this.vectorBucketName, indexName, this.fetch);
+  }
+}
+class VectorIndexScope extends VectorDataApi {
+  /**
+   *
+   * @alpha
+   *
+   * Creates a helper that automatically scopes all vector operations to the provided bucket/index names.
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @example
+   * ```typescript
+   * const index = supabase.storage.vectors.from('embeddings-prod').index('documents-openai')
+   * ```
+   */
+  constructor(url, headers, vectorBucketName, indexName, fetch2) {
+    super(url, headers, fetch2);
+    this.vectorBucketName = vectorBucketName;
+    this.indexName = indexName;
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Inserts or updates vectors in this index
+   * Convenience method that automatically includes bucket and index names
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param options - Vector insertion options (bucket and index names automatically set)
+   * @returns Promise with empty response on success or error
+   *
+   * @example
+   * ```typescript
+   * const index = supabase.storage.vectors.from('embeddings-prod').index('documents-openai')
+   * await index.putVectors({
+   *   vectors: [
+   *     {
+   *       key: 'doc-1',
+   *       data: { float32: [0.1, 0.2, ...] },
+   *       metadata: { title: 'Introduction', page: 1 }
+   *     }
+   *   ]
+   * })
+   * ```
+   */
+  putVectors(options) {
+    const _super = Object.create(null, {
+      putVectors: { get: () => super.putVectors }
+    });
+    return __awaiter(this, void 0, void 0, function* () {
+      return _super.putVectors.call(this, Object.assign(Object.assign({}, options), { vectorBucketName: this.vectorBucketName, indexName: this.indexName }));
+    });
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Retrieves vectors by keys from this index
+   * Convenience method that automatically includes bucket and index names
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param options - Vector retrieval options (bucket and index names automatically set)
+   * @returns Promise with response containing vectors array or error
+   *
+   * @example
+   * ```typescript
+   * const index = supabase.storage.vectors.from('embeddings-prod').index('documents-openai')
+   * const { data } = await index.getVectors({
+   *   keys: ['doc-1', 'doc-2'],
+   *   returnMetadata: true
+   * })
+   * ```
+   */
+  getVectors(options) {
+    const _super = Object.create(null, {
+      getVectors: { get: () => super.getVectors }
+    });
+    return __awaiter(this, void 0, void 0, function* () {
+      return _super.getVectors.call(this, Object.assign(Object.assign({}, options), { vectorBucketName: this.vectorBucketName, indexName: this.indexName }));
+    });
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Lists vectors in this index with pagination
+   * Convenience method that automatically includes bucket and index names
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param options - Listing options (bucket and index names automatically set)
+   * @returns Promise with response containing vectors array and pagination token or error
+   *
+   * @example
+   * ```typescript
+   * const index = supabase.storage.vectors.from('embeddings-prod').index('documents-openai')
+   * const { data } = await index.listVectors({
+   *   maxResults: 500,
+   *   returnMetadata: true
+   * })
+   * ```
+   */
+  listVectors() {
+    const _super = Object.create(null, {
+      listVectors: { get: () => super.listVectors }
+    });
+    return __awaiter(this, arguments, void 0, function* (options = {}) {
+      return _super.listVectors.call(this, Object.assign(Object.assign({}, options), { vectorBucketName: this.vectorBucketName, indexName: this.indexName }));
+    });
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Queries for similar vectors in this index
+   * Convenience method that automatically includes bucket and index names
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param options - Query options (bucket and index names automatically set)
+   * @returns Promise with response containing matches array of similar vectors ordered by distance or error
+   *
+   * @example
+   * ```typescript
+   * const index = supabase.storage.vectors.from('embeddings-prod').index('documents-openai')
+   * const { data } = await index.queryVectors({
+   *   queryVector: { float32: [0.1, 0.2, ...] },
+   *   topK: 5,
+   *   filter: { category: 'technical' },
+   *   returnDistance: true,
+   *   returnMetadata: true
+   * })
+   * ```
+   */
+  queryVectors(options) {
+    const _super = Object.create(null, {
+      queryVectors: { get: () => super.queryVectors }
+    });
+    return __awaiter(this, void 0, void 0, function* () {
+      return _super.queryVectors.call(this, Object.assign(Object.assign({}, options), { vectorBucketName: this.vectorBucketName, indexName: this.indexName }));
+    });
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Deletes vectors by keys from this index
+   * Convenience method that automatically includes bucket and index names
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @param options - Deletion options (bucket and index names automatically set)
+   * @returns Promise with empty response on success or error
+   *
+   * @example
+   * ```typescript
+   * const index = supabase.storage.vectors.from('embeddings-prod').index('documents-openai')
+   * await index.deleteVectors({
+   *   keys: ['doc-1', 'doc-2', 'doc-3']
+   * })
+   * ```
+   */
+  deleteVectors(options) {
+    const _super = Object.create(null, {
+      deleteVectors: { get: () => super.deleteVectors }
+    });
+    return __awaiter(this, void 0, void 0, function* () {
+      return _super.deleteVectors.call(this, Object.assign(Object.assign({}, options), { vectorBucketName: this.vectorBucketName, indexName: this.indexName }));
+    });
+  }
+}
+class StorageClient extends StorageBucketApi {
+  /**
+   * Creates a client for Storage buckets, files, analytics, and vectors.
+   *
+   * @category File Buckets
+   * @example
+   * ```ts
+   * import { StorageClient } from '@supabase/storage-js'
+   *
+   * const storage = new StorageClient('https://xyzcompany.supabase.co/storage/v1', {
+   *   apikey: 'public-anon-key',
+   * })
+   * const avatars = storage.from('avatars')
+   * ```
+   */
+  constructor(url, headers = {}, fetch2, opts) {
+    super(url, headers, fetch2, opts);
+  }
+  /**
+   * Perform file operation in a bucket.
+   *
+   * @category File Buckets
+   * @param id The bucket id to operate on.
+   *
+   * @example
+   * ```typescript
+   * const avatars = supabase.storage.from('avatars')
+   * ```
+   */
+  from(id) {
+    return new StorageFileApi(this.url, this.headers, id, this.fetch);
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Access vector storage operations.
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Vector Buckets
+   * @returns A StorageVectorsClient instance configured with the current storage settings.
+   */
+  get vectors() {
+    return new StorageVectorsClient(this.url + "/vector", {
+      headers: this.headers,
+      fetch: this.fetch
+    });
+  }
+  /**
+   *
+   * @alpha
+   *
+   * Access analytics storage operations using Iceberg tables.
+   *
+   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+   *
+   * @category Analytics Buckets
+   * @returns A StorageAnalyticsClient instance configured with the current storage settings.
+   */
+  get analytics() {
+    return new StorageAnalyticsClient(this.url + "/iceberg", this.headers, this.fetch);
+  }
+}
+const module$2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  StorageAnalyticsClient,
+  StorageApiError,
+  StorageClient,
+  StorageError,
+  StorageUnknownError,
+  StorageVectorsApiError,
+  StorageVectorsClient,
+  StorageVectorsError,
+  get StorageVectorsErrorCode() {
+    return StorageVectorsErrorCode;
+  },
+  StorageVectorsUnknownError,
+  VectorBucketApi,
+  VectorBucketScope,
+  VectorDataApi,
+  VectorIndexApi,
+  VectorIndexScope,
+  isPlainObject,
+  isStorageError,
+  isStorageVectorsError,
+  normalizeToFloat32,
+  resolveFetch: resolveFetch$1,
+  resolveResponse,
+  validateVectorDimension
+}, Symbol.toStringTag, { value: "Module" }));
+const require$$3 = /* @__PURE__ */ getAugmentedNamespace(module$2);
+var constants = {};
+var version$1 = {};
+var hasRequiredVersion;
+function requireVersion() {
+  if (hasRequiredVersion) return version$1;
+  hasRequiredVersion = 1;
+  Object.defineProperty(version$1, "__esModule", { value: true });
+  version$1.version = void 0;
+  version$1.version = "2.87.1";
+  return version$1;
+}
+var hasRequiredConstants;
+function requireConstants() {
+  if (hasRequiredConstants) return constants;
+  hasRequiredConstants = 1;
+  (function(exports$1) {
+    Object.defineProperty(exports$1, "__esModule", { value: true });
+    exports$1.DEFAULT_REALTIME_OPTIONS = exports$1.DEFAULT_AUTH_OPTIONS = exports$1.DEFAULT_DB_OPTIONS = exports$1.DEFAULT_GLOBAL_OPTIONS = exports$1.DEFAULT_HEADERS = void 0;
+    const version_1 = /* @__PURE__ */ requireVersion();
+    let JS_ENV = "";
+    if (typeof Deno !== "undefined") {
+      JS_ENV = "deno";
+    } else if (typeof document !== "undefined") {
+      JS_ENV = "web";
+    } else if (typeof navigator !== "undefined" && navigator.product === "ReactNative") {
+      JS_ENV = "react-native";
+    } else {
+      JS_ENV = "node";
+    }
+    exports$1.DEFAULT_HEADERS = { "X-Client-Info": `supabase-js-${JS_ENV}/${version_1.version}` };
+    exports$1.DEFAULT_GLOBAL_OPTIONS = {
+      headers: exports$1.DEFAULT_HEADERS
+    };
+    exports$1.DEFAULT_DB_OPTIONS = {
+      schema: "public"
+    };
+    exports$1.DEFAULT_AUTH_OPTIONS = {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true,
+      flowType: "implicit"
+    };
+    exports$1.DEFAULT_REALTIME_OPTIONS = {};
+  })(constants);
+  return constants;
+}
+var fetch$1 = {};
+var hasRequiredFetch;
+function requireFetch() {
+  if (hasRequiredFetch) return fetch$1;
+  hasRequiredFetch = 1;
+  (function(exports$1) {
+    Object.defineProperty(exports$1, "__esModule", { value: true });
+    exports$1.fetchWithAuth = exports$1.resolveHeadersConstructor = exports$1.resolveFetch = void 0;
+    const resolveFetch2 = (customFetch) => {
+      if (customFetch) {
+        return (...args) => customFetch(...args);
+      }
+      return (...args) => fetch(...args);
+    };
+    exports$1.resolveFetch = resolveFetch2;
+    const resolveHeadersConstructor = () => {
+      return Headers;
+    };
+    exports$1.resolveHeadersConstructor = resolveHeadersConstructor;
+    const fetchWithAuth = (supabaseKey, getAccessToken, customFetch) => {
+      const fetch2 = (0, exports$1.resolveFetch)(customFetch);
+      const HeadersConstructor = (0, exports$1.resolveHeadersConstructor)();
+      return async (input, init) => {
+        var _a3;
+        const accessToken = (_a3 = await getAccessToken()) !== null && _a3 !== void 0 ? _a3 : supabaseKey;
+        let headers = new HeadersConstructor(init === null || init === void 0 ? void 0 : init.headers);
+        if (!headers.has("apikey")) {
+          headers.set("apikey", supabaseKey);
+        }
+        if (!headers.has("Authorization")) {
+          headers.set("Authorization", `Bearer ${accessToken}`);
+        }
+        return fetch2(input, Object.assign(Object.assign({}, init), { headers }));
+      };
+    };
+    exports$1.fetchWithAuth = fetchWithAuth;
+  })(fetch$1);
+  return fetch$1;
+}
+var helpers = {};
+var hasRequiredHelpers;
+function requireHelpers() {
+  if (hasRequiredHelpers) return helpers;
+  hasRequiredHelpers = 1;
+  Object.defineProperty(helpers, "__esModule", { value: true });
+  helpers.isBrowser = void 0;
+  helpers.uuid = uuid;
+  helpers.ensureTrailingSlash = ensureTrailingSlash;
+  helpers.applySettingDefaults = applySettingDefaults;
+  helpers.validateSupabaseUrl = validateSupabaseUrl;
+  function uuid() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c2) {
+      var r2 = Math.random() * 16 | 0, v = c2 == "x" ? r2 : r2 & 3 | 8;
+      return v.toString(16);
+    });
+  }
+  function ensureTrailingSlash(url) {
+    return url.endsWith("/") ? url : url + "/";
+  }
+  const isBrowser2 = () => typeof window !== "undefined";
+  helpers.isBrowser = isBrowser2;
+  function applySettingDefaults(options, defaults2) {
+    var _a3, _b2;
+    const { db: dbOptions, auth: authOptions, realtime: realtimeOptions, global: globalOptions } = options;
+    const { db: DEFAULT_DB_OPTIONS, auth: DEFAULT_AUTH_OPTIONS, realtime: DEFAULT_REALTIME_OPTIONS, global: DEFAULT_GLOBAL_OPTIONS } = defaults2;
+    const result = {
+      db: Object.assign(Object.assign({}, DEFAULT_DB_OPTIONS), dbOptions),
+      auth: Object.assign(Object.assign({}, DEFAULT_AUTH_OPTIONS), authOptions),
+      realtime: Object.assign(Object.assign({}, DEFAULT_REALTIME_OPTIONS), realtimeOptions),
+      storage: {},
+      global: Object.assign(Object.assign(Object.assign({}, DEFAULT_GLOBAL_OPTIONS), globalOptions), { headers: Object.assign(Object.assign({}, (_a3 = DEFAULT_GLOBAL_OPTIONS === null || DEFAULT_GLOBAL_OPTIONS === void 0 ? void 0 : DEFAULT_GLOBAL_OPTIONS.headers) !== null && _a3 !== void 0 ? _a3 : {}), (_b2 = globalOptions === null || globalOptions === void 0 ? void 0 : globalOptions.headers) !== null && _b2 !== void 0 ? _b2 : {}) }),
+      accessToken: async () => ""
+    };
+    if (options.accessToken) {
+      result.accessToken = options.accessToken;
+    } else {
+      delete result.accessToken;
+    }
+    return result;
+  }
+  function validateSupabaseUrl(supabaseUrl) {
+    const trimmedUrl = supabaseUrl === null || supabaseUrl === void 0 ? void 0 : supabaseUrl.trim();
+    if (!trimmedUrl) {
+      throw new Error("supabaseUrl is required.");
+    }
+    if (!trimmedUrl.match(/^https?:\/\//i)) {
+      throw new Error("Invalid supabaseUrl: Must be a valid HTTP or HTTPS URL.");
+    }
+    try {
+      return new URL(ensureTrailingSlash(trimmedUrl));
+    } catch (_a3) {
+      throw Error("Invalid supabaseUrl: Provided URL is malformed.");
+    }
+  }
+  return helpers;
+}
+var SupabaseAuthClient = {};
+const version = "2.87.1";
+const AUTO_REFRESH_TICK_DURATION_MS = 30 * 1e3;
+const AUTO_REFRESH_TICK_THRESHOLD = 3;
+const EXPIRY_MARGIN_MS = AUTO_REFRESH_TICK_THRESHOLD * AUTO_REFRESH_TICK_DURATION_MS;
+const GOTRUE_URL = "http://localhost:9999";
+const STORAGE_KEY$1 = "supabase.auth.token";
+const DEFAULT_HEADERS = { "X-Client-Info": `gotrue-js/${version}` };
+const API_VERSION_HEADER_NAME = "X-Supabase-Api-Version";
+const API_VERSIONS = {
+  "2024-01-01": {
+    timestamp: Date.parse("2024-01-01T00:00:00.0Z"),
+    name: "2024-01-01"
+  }
+};
+const BASE64URL_REGEX = /^([a-z0-9_-]{4})*($|[a-z0-9_-]{3}$|[a-z0-9_-]{2}$)$/i;
+const JWKS_TTL = 10 * 60 * 1e3;
+let AuthError$1 = class AuthError extends Error {
+  constructor(message, status, code) {
+    super(message);
+    this.__isAuthError = true;
+    this.name = "AuthError";
+    this.status = status;
+    this.code = code;
+  }
+};
+function isAuthError$1(error) {
+  return typeof error === "object" && error !== null && "__isAuthError" in error;
+}
+let AuthApiError$1 = class AuthApiError extends AuthError$1 {
+  constructor(message, status, code) {
+    super(message, status, code);
+    this.name = "AuthApiError";
+    this.status = status;
+    this.code = code;
+  }
+};
+function isAuthApiError$1(error) {
+  return isAuthError$1(error) && error.name === "AuthApiError";
+}
+let AuthUnknownError$1 = class AuthUnknownError extends AuthError$1 {
+  constructor(message, originalError) {
+    super(message);
+    this.name = "AuthUnknownError";
+    this.originalError = originalError;
+  }
+};
+let CustomAuthError$1 = class CustomAuthError extends AuthError$1 {
+  constructor(message, name, status, code) {
+    super(message, status, code);
+    this.name = name;
+    this.status = status;
+  }
+};
+let AuthSessionMissingError$1 = class AuthSessionMissingError extends CustomAuthError$1 {
+  constructor() {
+    super("Auth session missing!", "AuthSessionMissingError", 400, void 0);
+  }
+};
+function isAuthSessionMissingError$1(error) {
+  return isAuthError$1(error) && error.name === "AuthSessionMissingError";
+}
+let AuthInvalidTokenResponseError$1 = class AuthInvalidTokenResponseError extends CustomAuthError$1 {
+  constructor() {
+    super("Auth session or user missing", "AuthInvalidTokenResponseError", 500, void 0);
+  }
+};
+let AuthInvalidCredentialsError$1 = class AuthInvalidCredentialsError extends CustomAuthError$1 {
+  constructor(message) {
+    super(message, "AuthInvalidCredentialsError", 400, void 0);
+  }
+};
+let AuthImplicitGrantRedirectError$1 = class AuthImplicitGrantRedirectError extends CustomAuthError$1 {
+  constructor(message, details = null) {
+    super(message, "AuthImplicitGrantRedirectError", 500, void 0);
+    this.details = null;
+    this.details = details;
+  }
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      status: this.status,
+      details: this.details
+    };
+  }
+};
+function isAuthImplicitGrantRedirectError$1(error) {
+  return isAuthError$1(error) && error.name === "AuthImplicitGrantRedirectError";
+}
+let AuthPKCEGrantCodeExchangeError$1 = class AuthPKCEGrantCodeExchangeError extends CustomAuthError$1 {
+  constructor(message, details = null) {
+    super(message, "AuthPKCEGrantCodeExchangeError", 500, void 0);
+    this.details = null;
+    this.details = details;
+  }
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      status: this.status,
+      details: this.details
+    };
+  }
+};
+let AuthRetryableFetchError$1 = class AuthRetryableFetchError extends CustomAuthError$1 {
+  constructor(message, status) {
+    super(message, "AuthRetryableFetchError", status, void 0);
+  }
+};
+function isAuthRetryableFetchError$1(error) {
+  return isAuthError$1(error) && error.name === "AuthRetryableFetchError";
+}
+let AuthWeakPasswordError$1 = class AuthWeakPasswordError extends CustomAuthError$1 {
+  constructor(message, status, reasons) {
+    super(message, "AuthWeakPasswordError", status, "weak_password");
+    this.reasons = reasons;
+  }
+};
+function isAuthWeakPasswordError$1(error) {
+  return isAuthError$1(error) && error.name === "AuthWeakPasswordError";
+}
+let AuthInvalidJwtError$1 = class AuthInvalidJwtError extends CustomAuthError$1 {
+  constructor(message) {
+    super(message, "AuthInvalidJwtError", 400, "invalid_jwt");
+  }
+};
+const TO_BASE64URL = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".split("");
+const IGNORE_BASE64URL = " 	\n\r=".split("");
+const FROM_BASE64URL = (() => {
+  const charMap = new Array(128);
+  for (let i = 0; i < charMap.length; i += 1) {
+    charMap[i] = -1;
+  }
+  for (let i = 0; i < IGNORE_BASE64URL.length; i += 1) {
+    charMap[IGNORE_BASE64URL[i].charCodeAt(0)] = -2;
+  }
+  for (let i = 0; i < TO_BASE64URL.length; i += 1) {
+    charMap[TO_BASE64URL[i].charCodeAt(0)] = i;
+  }
+  return charMap;
+})();
+function byteToBase64URL(byte, state, emit) {
+  if (byte !== null) {
+    state.queue = state.queue << 8 | byte;
+    state.queuedBits += 8;
+    while (state.queuedBits >= 6) {
+      const pos = state.queue >> state.queuedBits - 6 & 63;
+      emit(TO_BASE64URL[pos]);
+      state.queuedBits -= 6;
+    }
+  } else if (state.queuedBits > 0) {
+    state.queue = state.queue << 6 - state.queuedBits;
+    state.queuedBits = 6;
+    while (state.queuedBits >= 6) {
+      const pos = state.queue >> state.queuedBits - 6 & 63;
+      emit(TO_BASE64URL[pos]);
+      state.queuedBits -= 6;
+    }
+  }
+}
+function byteFromBase64URL(charCode, state, emit) {
+  const bits = FROM_BASE64URL[charCode];
+  if (bits > -1) {
+    state.queue = state.queue << 6 | bits;
+    state.queuedBits += 6;
+    while (state.queuedBits >= 8) {
+      emit(state.queue >> state.queuedBits - 8 & 255);
+      state.queuedBits -= 8;
+    }
+  } else if (bits === -2) {
+    return;
+  } else {
+    throw new Error(`Invalid Base64-URL character "${String.fromCharCode(charCode)}"`);
+  }
+}
+function stringFromBase64URL(str) {
+  const conv = [];
+  const utf8Emit = (codepoint) => {
+    conv.push(String.fromCodePoint(codepoint));
+  };
+  const utf8State = {
+    utf8seq: 0,
+    codepoint: 0
+  };
+  const b64State = { queue: 0, queuedBits: 0 };
+  const byteEmit = (byte) => {
+    stringFromUTF8(byte, utf8State, utf8Emit);
+  };
+  for (let i = 0; i < str.length; i += 1) {
+    byteFromBase64URL(str.charCodeAt(i), b64State, byteEmit);
+  }
+  return conv.join("");
+}
+function codepointToUTF8(codepoint, emit) {
+  if (codepoint <= 127) {
+    emit(codepoint);
+    return;
+  } else if (codepoint <= 2047) {
+    emit(192 | codepoint >> 6);
+    emit(128 | codepoint & 63);
+    return;
+  } else if (codepoint <= 65535) {
+    emit(224 | codepoint >> 12);
+    emit(128 | codepoint >> 6 & 63);
+    emit(128 | codepoint & 63);
+    return;
+  } else if (codepoint <= 1114111) {
+    emit(240 | codepoint >> 18);
+    emit(128 | codepoint >> 12 & 63);
+    emit(128 | codepoint >> 6 & 63);
+    emit(128 | codepoint & 63);
+    return;
+  }
+  throw new Error(`Unrecognized Unicode codepoint: ${codepoint.toString(16)}`);
+}
+function stringToUTF8(str, emit) {
+  for (let i = 0; i < str.length; i += 1) {
+    let codepoint = str.charCodeAt(i);
+    if (codepoint > 55295 && codepoint <= 56319) {
+      const highSurrogate = (codepoint - 55296) * 1024 & 65535;
+      const lowSurrogate = str.charCodeAt(i + 1) - 56320 & 65535;
+      codepoint = (lowSurrogate | highSurrogate) + 65536;
+      i += 1;
+    }
+    codepointToUTF8(codepoint, emit);
+  }
+}
+function stringFromUTF8(byte, state, emit) {
+  if (state.utf8seq === 0) {
+    if (byte <= 127) {
+      emit(byte);
+      return;
+    }
+    for (let leadingBit = 1; leadingBit < 6; leadingBit += 1) {
+      if ((byte >> 7 - leadingBit & 1) === 0) {
+        state.utf8seq = leadingBit;
+        break;
+      }
+    }
+    if (state.utf8seq === 2) {
+      state.codepoint = byte & 31;
+    } else if (state.utf8seq === 3) {
+      state.codepoint = byte & 15;
+    } else if (state.utf8seq === 4) {
+      state.codepoint = byte & 7;
+    } else {
+      throw new Error("Invalid UTF-8 sequence");
+    }
+    state.utf8seq -= 1;
+  } else if (state.utf8seq > 0) {
+    if (byte <= 127) {
+      throw new Error("Invalid UTF-8 sequence");
+    }
+    state.codepoint = state.codepoint << 6 | byte & 63;
+    state.utf8seq -= 1;
+    if (state.utf8seq === 0) {
+      emit(state.codepoint);
+    }
+  }
+}
+function base64UrlToUint8Array(str) {
+  const result = [];
+  const state = { queue: 0, queuedBits: 0 };
+  const onByte = (byte) => {
+    result.push(byte);
+  };
+  for (let i = 0; i < str.length; i += 1) {
+    byteFromBase64URL(str.charCodeAt(i), state, onByte);
+  }
+  return new Uint8Array(result);
+}
+function stringToUint8Array(str) {
+  const result = [];
+  stringToUTF8(str, (byte) => result.push(byte));
+  return new Uint8Array(result);
+}
+function bytesToBase64URL(bytes) {
+  const result = [];
+  const state = { queue: 0, queuedBits: 0 };
+  const onChar = (char) => {
+    result.push(char);
+  };
+  bytes.forEach((byte) => byteToBase64URL(byte, state, onChar));
+  byteToBase64URL(null, state, onChar);
+  return result.join("");
+}
+function expiresAt(expiresIn) {
+  const timeNow = Math.round(Date.now() / 1e3);
+  return timeNow + expiresIn;
+}
+function generateCallbackId() {
+  return Symbol("auth-callback");
+}
+const isBrowser = () => typeof window !== "undefined" && typeof document !== "undefined";
+const localStorageWriteTests = {
+  tested: false,
+  writable: false
+};
+const supportsLocalStorage = () => {
+  if (!isBrowser()) {
+    return false;
+  }
+  try {
+    if (typeof globalThis.localStorage !== "object") {
+      return false;
+    }
+  } catch (e) {
+    return false;
+  }
+  if (localStorageWriteTests.tested) {
+    return localStorageWriteTests.writable;
+  }
+  const randomKey = `lswt-${Math.random()}${Math.random()}`;
+  try {
+    globalThis.localStorage.setItem(randomKey, randomKey);
+    globalThis.localStorage.removeItem(randomKey);
+    localStorageWriteTests.tested = true;
+    localStorageWriteTests.writable = true;
+  } catch (e) {
+    localStorageWriteTests.tested = true;
+    localStorageWriteTests.writable = false;
+  }
+  return localStorageWriteTests.writable;
+};
+function parseParametersFromURL(href) {
+  const result = {};
+  const url = new URL(href);
+  if (url.hash && url.hash[0] === "#") {
+    try {
+      const hashSearchParams = new URLSearchParams(url.hash.substring(1));
+      hashSearchParams.forEach((value, key) => {
+        result[key] = value;
+      });
+    } catch (e) {
+    }
+  }
+  url.searchParams.forEach((value, key) => {
+    result[key] = value;
+  });
+  return result;
+}
+const resolveFetch = (customFetch) => {
+  if (customFetch) {
+    return (...args) => customFetch(...args);
+  }
+  return (...args) => fetch(...args);
+};
+const looksLikeFetchResponse = (maybeResponse) => {
+  return typeof maybeResponse === "object" && maybeResponse !== null && "status" in maybeResponse && "ok" in maybeResponse && "json" in maybeResponse && typeof maybeResponse.json === "function";
+};
+const setItemAsync = async (storage2, key, data) => {
+  await storage2.setItem(key, JSON.stringify(data));
+};
+const getItemAsync = async (storage2, key) => {
+  const value = await storage2.getItem(key);
+  if (!value) {
+    return null;
+  }
+  try {
+    return JSON.parse(value);
+  } catch (_a3) {
+    return value;
+  }
+};
+const removeItemAsync = async (storage2, key) => {
+  await storage2.removeItem(key);
+};
+class Deferred {
+  constructor() {
+    this.promise = new Deferred.promiseConstructor((res, rej) => {
+      this.resolve = res;
+      this.reject = rej;
+    });
+  }
+}
+Deferred.promiseConstructor = Promise;
+function decodeJWT(token) {
+  const parts = token.split(".");
+  if (parts.length !== 3) {
+    throw new AuthInvalidJwtError$1("Invalid JWT structure");
+  }
+  for (let i = 0; i < parts.length; i++) {
+    if (!BASE64URL_REGEX.test(parts[i])) {
+      throw new AuthInvalidJwtError$1("JWT not in base64url format");
+    }
+  }
+  const data = {
+    // using base64url lib
+    header: JSON.parse(stringFromBase64URL(parts[0])),
+    payload: JSON.parse(stringFromBase64URL(parts[1])),
+    signature: base64UrlToUint8Array(parts[2]),
+    raw: {
+      header: parts[0],
+      payload: parts[1]
+    }
+  };
+  return data;
+}
+async function sleep(time2) {
+  return await new Promise((accept) => {
+    setTimeout(() => accept(null), time2);
+  });
+}
+function retryable(fn, isRetryable) {
+  const promise = new Promise((accept, reject) => {
+    (async () => {
+      for (let attempt = 0; attempt < Infinity; attempt++) {
+        try {
+          const result = await fn(attempt);
+          if (!isRetryable(attempt, null, result)) {
+            accept(result);
+            return;
+          }
+        } catch (e) {
+          if (!isRetryable(attempt, e)) {
+            reject(e);
+            return;
+          }
+        }
+      }
+    })();
+  });
+  return promise;
+}
+function dec2hex(dec) {
+  return ("0" + dec.toString(16)).substr(-2);
+}
+function generatePKCEVerifier() {
+  const verifierLength = 56;
+  const array2 = new Uint32Array(verifierLength);
+  if (typeof crypto === "undefined") {
+    const charSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+    const charSetLen = charSet.length;
+    let verifier = "";
+    for (let i = 0; i < verifierLength; i++) {
+      verifier += charSet.charAt(Math.floor(Math.random() * charSetLen));
+    }
+    return verifier;
+  }
+  crypto.getRandomValues(array2);
+  return Array.from(array2, dec2hex).join("");
+}
+async function sha256(randomString) {
+  const encoder = new TextEncoder();
+  const encodedData = encoder.encode(randomString);
+  const hash = await crypto.subtle.digest("SHA-256", encodedData);
+  const bytes = new Uint8Array(hash);
+  return Array.from(bytes).map((c2) => String.fromCharCode(c2)).join("");
+}
+async function generatePKCEChallenge(verifier) {
+  const hasCryptoSupport = typeof crypto !== "undefined" && typeof crypto.subtle !== "undefined" && typeof TextEncoder !== "undefined";
+  if (!hasCryptoSupport) {
+    console.warn("WebCrypto API is not supported. Code challenge method will default to use plain instead of sha256.");
+    return verifier;
+  }
+  const hashed = await sha256(verifier);
+  return btoa(hashed).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+async function getCodeChallengeAndMethod(storage2, storageKey, isPasswordRecovery = false) {
+  const codeVerifier = generatePKCEVerifier();
+  let storedCodeVerifier = codeVerifier;
+  if (isPasswordRecovery) {
+    storedCodeVerifier += "/PASSWORD_RECOVERY";
+  }
+  await setItemAsync(storage2, `${storageKey}-code-verifier`, storedCodeVerifier);
+  const codeChallenge = await generatePKCEChallenge(codeVerifier);
+  const codeChallengeMethod = codeVerifier === codeChallenge ? "plain" : "s256";
+  return [codeChallenge, codeChallengeMethod];
+}
+const API_VERSION_REGEX = /^2[0-9]{3}-(0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-9]|3[0-1])$/i;
+function parseResponseAPIVersion(response) {
+  const apiVersion = response.headers.get(API_VERSION_HEADER_NAME);
+  if (!apiVersion) {
+    return null;
+  }
+  if (!apiVersion.match(API_VERSION_REGEX)) {
+    return null;
+  }
+  try {
+    const date2 = /* @__PURE__ */ new Date(`${apiVersion}T00:00:00.0Z`);
+    return date2;
+  } catch (e) {
+    return null;
+  }
+}
+function validateExp(exp2) {
+  if (!exp2) {
+    throw new Error("Missing exp claim");
+  }
+  const timeNow = Math.floor(Date.now() / 1e3);
+  if (exp2 <= timeNow) {
+    throw new Error("JWT has expired");
+  }
+}
+function getAlgorithm(alg) {
+  switch (alg) {
+    case "RS256":
+      return {
+        name: "RSASSA-PKCS1-v1_5",
+        hash: { name: "SHA-256" }
+      };
+    case "ES256":
+      return {
+        name: "ECDSA",
+        namedCurve: "P-256",
+        hash: { name: "SHA-256" }
+      };
+    default:
+      throw new Error("Invalid alg claim");
+  }
+}
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+function validateUUID(str) {
+  if (!UUID_REGEX.test(str)) {
+    throw new Error("@supabase/auth-js: Expected parameter to be UUID but is not");
+  }
+}
+function userNotAvailableProxy() {
+  const proxyTarget = {};
+  return new Proxy(proxyTarget, {
+    get: (target, prop) => {
+      if (prop === "__isUserNotAvailableProxy") {
+        return true;
+      }
+      if (typeof prop === "symbol") {
+        const sProp = prop.toString();
+        if (sProp === "Symbol(Symbol.toPrimitive)" || sProp === "Symbol(Symbol.toStringTag)" || sProp === "Symbol(util.inspect.custom)") {
+          return void 0;
+        }
+      }
+      throw new Error(`@supabase/auth-js: client was created with userStorage option and there was no user stored in the user storage. Accessing the "${prop}" property of the session object is not supported. Please use getUser() instead.`);
+    },
+    set: (_target, prop) => {
+      throw new Error(`@supabase/auth-js: client was created with userStorage option and there was no user stored in the user storage. Setting the "${prop}" property of the session object is not supported. Please use getUser() to fetch a user object you can manipulate.`);
+    },
+    deleteProperty: (_target, prop) => {
+      throw new Error(`@supabase/auth-js: client was created with userStorage option and there was no user stored in the user storage. Deleting the "${prop}" property of the session object is not supported. Please use getUser() to fetch a user object you can manipulate.`);
+    }
+  });
+}
+function insecureUserWarningProxy(user, suppressWarningRef) {
+  return new Proxy(user, {
+    get: (target, prop, receiver) => {
+      if (prop === "__isInsecureUserWarningProxy") {
+        return true;
+      }
+      if (typeof prop === "symbol") {
+        const sProp = prop.toString();
+        if (sProp === "Symbol(Symbol.toPrimitive)" || sProp === "Symbol(Symbol.toStringTag)" || sProp === "Symbol(util.inspect.custom)" || sProp === "Symbol(nodejs.util.inspect.custom)") {
+          return Reflect.get(target, prop, receiver);
+        }
+      }
+      if (!suppressWarningRef.value && typeof prop === "string") {
+        console.warn("Using the user object as returned from supabase.auth.getSession() or from some supabase.auth.onAuthStateChange() events could be insecure! This value comes directly from the storage medium (usually cookies on the server) and may not be authentic. Use supabase.auth.getUser() instead which authenticates the data by contacting the Supabase Auth server.");
+        suppressWarningRef.value = true;
+      }
+      return Reflect.get(target, prop, receiver);
+    }
+  });
+}
+function deepClone(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+const _getErrorMessage = (err) => err.msg || err.message || err.error_description || err.error || JSON.stringify(err);
+const NETWORK_ERROR_CODES = [502, 503, 504];
+async function handleError(error) {
+  var _a3;
+  if (!looksLikeFetchResponse(error)) {
+    throw new AuthRetryableFetchError$1(_getErrorMessage(error), 0);
+  }
+  if (NETWORK_ERROR_CODES.includes(error.status)) {
+    throw new AuthRetryableFetchError$1(_getErrorMessage(error), error.status);
+  }
+  let data;
+  try {
+    data = await error.json();
+  } catch (e) {
+    throw new AuthUnknownError$1(_getErrorMessage(e), e);
+  }
+  let errorCode = void 0;
+  const responseAPIVersion = parseResponseAPIVersion(error);
+  if (responseAPIVersion && responseAPIVersion.getTime() >= API_VERSIONS["2024-01-01"].timestamp && typeof data === "object" && data && typeof data.code === "string") {
+    errorCode = data.code;
+  } else if (typeof data === "object" && data && typeof data.error_code === "string") {
+    errorCode = data.error_code;
+  }
+  if (!errorCode) {
+    if (typeof data === "object" && data && typeof data.weak_password === "object" && data.weak_password && Array.isArray(data.weak_password.reasons) && data.weak_password.reasons.length && data.weak_password.reasons.reduce((a2, i) => a2 && typeof i === "string", true)) {
+      throw new AuthWeakPasswordError$1(_getErrorMessage(data), error.status, data.weak_password.reasons);
+    }
+  } else if (errorCode === "weak_password") {
+    throw new AuthWeakPasswordError$1(_getErrorMessage(data), error.status, ((_a3 = data.weak_password) === null || _a3 === void 0 ? void 0 : _a3.reasons) || []);
+  } else if (errorCode === "session_not_found") {
+    throw new AuthSessionMissingError$1();
+  }
+  throw new AuthApiError$1(_getErrorMessage(data), error.status || 500, errorCode);
+}
+const _getRequestParams = (method, options, parameters, body) => {
+  const params = { method, headers: (options === null || options === void 0 ? void 0 : options.headers) || {} };
+  if (method === "GET") {
+    return params;
+  }
+  params.headers = Object.assign({ "Content-Type": "application/json;charset=UTF-8" }, options === null || options === void 0 ? void 0 : options.headers);
+  params.body = JSON.stringify(body);
+  return Object.assign(Object.assign({}, params), parameters);
+};
+async function _request(fetcher, method, url, options) {
+  var _a3;
+  const headers = Object.assign({}, options === null || options === void 0 ? void 0 : options.headers);
+  if (!headers[API_VERSION_HEADER_NAME]) {
+    headers[API_VERSION_HEADER_NAME] = API_VERSIONS["2024-01-01"].name;
+  }
+  if (options === null || options === void 0 ? void 0 : options.jwt) {
+    headers["Authorization"] = `Bearer ${options.jwt}`;
+  }
+  const qs = (_a3 = options === null || options === void 0 ? void 0 : options.query) !== null && _a3 !== void 0 ? _a3 : {};
+  if (options === null || options === void 0 ? void 0 : options.redirectTo) {
+    qs["redirect_to"] = options.redirectTo;
+  }
+  const queryString = Object.keys(qs).length ? "?" + new URLSearchParams(qs).toString() : "";
+  const data = await _handleRequest(fetcher, method, url + queryString, {
+    headers,
+    noResolveJson: options === null || options === void 0 ? void 0 : options.noResolveJson
+  }, {}, options === null || options === void 0 ? void 0 : options.body);
+  return (options === null || options === void 0 ? void 0 : options.xform) ? options === null || options === void 0 ? void 0 : options.xform(data) : { data: Object.assign({}, data), error: null };
+}
+async function _handleRequest(fetcher, method, url, options, parameters, body) {
+  const requestParams = _getRequestParams(method, options, parameters, body);
+  let result;
+  try {
+    result = await fetcher(url, Object.assign({}, requestParams));
+  } catch (e) {
+    console.error(e);
+    throw new AuthRetryableFetchError$1(_getErrorMessage(e), 0);
+  }
+  if (!result.ok) {
+    await handleError(result);
+  }
+  if (options === null || options === void 0 ? void 0 : options.noResolveJson) {
+    return result;
+  }
+  try {
+    return await result.json();
+  } catch (e) {
+    await handleError(e);
+  }
+}
+function _sessionResponse(data) {
+  var _a3;
+  let session = null;
+  if (hasSession(data)) {
+    session = Object.assign({}, data);
+    if (!data.expires_at) {
+      session.expires_at = expiresAt(data.expires_in);
+    }
+  }
+  const user = (_a3 = data.user) !== null && _a3 !== void 0 ? _a3 : data;
+  return { data: { session, user }, error: null };
+}
+function _sessionResponsePassword(data) {
+  const response = _sessionResponse(data);
+  if (!response.error && data.weak_password && typeof data.weak_password === "object" && Array.isArray(data.weak_password.reasons) && data.weak_password.reasons.length && data.weak_password.message && typeof data.weak_password.message === "string" && data.weak_password.reasons.reduce((a2, i) => a2 && typeof i === "string", true)) {
+    response.data.weak_password = data.weak_password;
+  }
+  return response;
+}
+function _userResponse(data) {
+  var _a3;
+  const user = (_a3 = data.user) !== null && _a3 !== void 0 ? _a3 : data;
+  return { data: { user }, error: null };
+}
+function _ssoResponse(data) {
+  return { data, error: null };
+}
+function _generateLinkResponse(data) {
+  const { action_link, email_otp, hashed_token, redirect_to, verification_type } = data, rest = __rest(data, ["action_link", "email_otp", "hashed_token", "redirect_to", "verification_type"]);
+  const properties = {
+    action_link,
+    email_otp,
+    hashed_token,
+    redirect_to,
+    verification_type
+  };
+  const user = Object.assign({}, rest);
+  return {
+    data: {
+      properties,
+      user
+    },
+    error: null
+  };
+}
+function _noResolveJsonResponse(data) {
+  return data;
+}
+function hasSession(data) {
+  return data.access_token && data.refresh_token && data.expires_in;
+}
+const SIGN_OUT_SCOPES$1 = ["global", "local", "others"];
+let GoTrueAdminApi$1 = class GoTrueAdminApi {
+  /**
+   * Creates an admin API client that can be used to manage users and OAuth clients.
+   *
+   * @example
+   * ```ts
+   * import { GoTrueAdminApi } from '@supabase/auth-js'
+   *
+   * const admin = new GoTrueAdminApi({
+   *   url: 'https://xyzcompany.supabase.co/auth/v1',
+   *   headers: { Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}` },
+   * })
+   * ```
+   */
+  constructor({ url = "", headers = {}, fetch: fetch2 }) {
+    this.url = url;
+    this.headers = headers;
+    this.fetch = resolveFetch(fetch2);
+    this.mfa = {
+      listFactors: this._listFactors.bind(this),
+      deleteFactor: this._deleteFactor.bind(this)
+    };
+    this.oauth = {
+      listClients: this._listOAuthClients.bind(this),
+      createClient: this._createOAuthClient.bind(this),
+      getClient: this._getOAuthClient.bind(this),
+      updateClient: this._updateOAuthClient.bind(this),
+      deleteClient: this._deleteOAuthClient.bind(this),
+      regenerateClientSecret: this._regenerateOAuthClientSecret.bind(this)
+    };
+  }
+  /**
+   * Removes a logged-in session.
+   * @param jwt A valid, logged-in JWT.
+   * @param scope The logout sope.
+   */
+  async signOut(jwt, scope = SIGN_OUT_SCOPES$1[0]) {
+    if (SIGN_OUT_SCOPES$1.indexOf(scope) < 0) {
+      throw new Error(`@supabase/auth-js: Parameter scope must be one of ${SIGN_OUT_SCOPES$1.join(", ")}`);
+    }
+    try {
+      await _request(this.fetch, "POST", `${this.url}/logout?scope=${scope}`, {
+        headers: this.headers,
+        jwt,
+        noResolveJson: true
+      });
+      return { data: null, error: null };
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: null, error };
+      }
+      throw error;
+    }
+  }
+  /**
+   * Sends an invite link to an email address.
+   * @param email The email address of the user.
+   * @param options Additional options to be included when inviting.
+   */
+  async inviteUserByEmail(email, options = {}) {
+    try {
+      return await _request(this.fetch, "POST", `${this.url}/invite`, {
+        body: { email, data: options.data },
+        headers: this.headers,
+        redirectTo: options.redirectTo,
+        xform: _userResponse
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: { user: null }, error };
+      }
+      throw error;
+    }
+  }
+  /**
+   * Generates email links and OTPs to be sent via a custom email provider.
+   * @param email The user's email.
+   * @param options.password User password. For signup only.
+   * @param options.data Optional user metadata. For signup only.
+   * @param options.redirectTo The redirect url which should be appended to the generated link
+   */
+  async generateLink(params) {
+    try {
+      const { options } = params, rest = __rest(params, ["options"]);
+      const body = Object.assign(Object.assign({}, rest), options);
+      if ("newEmail" in rest) {
+        body.new_email = rest === null || rest === void 0 ? void 0 : rest.newEmail;
+        delete body["newEmail"];
+      }
+      return await _request(this.fetch, "POST", `${this.url}/admin/generate_link`, {
+        body,
+        headers: this.headers,
+        xform: _generateLinkResponse,
+        redirectTo: options === null || options === void 0 ? void 0 : options.redirectTo
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return {
+          data: {
+            properties: null,
+            user: null
+          },
+          error
+        };
+      }
+      throw error;
+    }
+  }
+  // User Admin API
+  /**
+   * Creates a new user.
+   * This function should only be called on a server. Never expose your `service_role` key in the browser.
+   */
+  async createUser(attributes) {
+    try {
+      return await _request(this.fetch, "POST", `${this.url}/admin/users`, {
+        body: attributes,
+        headers: this.headers,
+        xform: _userResponse
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: { user: null }, error };
+      }
+      throw error;
+    }
+  }
+  /**
+   * Get a list of users.
+   *
+   * This function should only be called on a server. Never expose your `service_role` key in the browser.
+   * @param params An object which supports `page` and `perPage` as numbers, to alter the paginated results.
+   */
+  async listUsers(params) {
+    var _a3, _b2, _c, _d, _e, _f, _g;
+    try {
+      const pagination = { nextPage: null, lastPage: 0, total: 0 };
+      const response = await _request(this.fetch, "GET", `${this.url}/admin/users`, {
+        headers: this.headers,
+        noResolveJson: true,
+        query: {
+          page: (_b2 = (_a3 = params === null || params === void 0 ? void 0 : params.page) === null || _a3 === void 0 ? void 0 : _a3.toString()) !== null && _b2 !== void 0 ? _b2 : "",
+          per_page: (_d = (_c = params === null || params === void 0 ? void 0 : params.perPage) === null || _c === void 0 ? void 0 : _c.toString()) !== null && _d !== void 0 ? _d : ""
+        },
+        xform: _noResolveJsonResponse
+      });
+      if (response.error)
+        throw response.error;
+      const users = await response.json();
+      const total = (_e = response.headers.get("x-total-count")) !== null && _e !== void 0 ? _e : 0;
+      const links = (_g = (_f = response.headers.get("link")) === null || _f === void 0 ? void 0 : _f.split(",")) !== null && _g !== void 0 ? _g : [];
+      if (links.length > 0) {
+        links.forEach((link) => {
+          const page = parseInt(link.split(";")[0].split("=")[1].substring(0, 1));
+          const rel = JSON.parse(link.split(";")[1].split("=")[1]);
+          pagination[`${rel}Page`] = page;
+        });
+        pagination.total = parseInt(total);
+      }
+      return { data: Object.assign(Object.assign({}, users), pagination), error: null };
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: { users: [] }, error };
+      }
+      throw error;
+    }
+  }
+  /**
+   * Get user by id.
+   *
+   * @param uid The user's unique identifier
+   *
+   * This function should only be called on a server. Never expose your `service_role` key in the browser.
+   */
+  async getUserById(uid) {
+    validateUUID(uid);
+    try {
+      return await _request(this.fetch, "GET", `${this.url}/admin/users/${uid}`, {
+        headers: this.headers,
+        xform: _userResponse
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: { user: null }, error };
+      }
+      throw error;
+    }
+  }
+  /**
+   * Updates the user data.
+   *
+   * @param attributes The data you want to update.
+   *
+   * This function should only be called on a server. Never expose your `service_role` key in the browser.
+   */
+  async updateUserById(uid, attributes) {
+    validateUUID(uid);
+    try {
+      return await _request(this.fetch, "PUT", `${this.url}/admin/users/${uid}`, {
+        body: attributes,
+        headers: this.headers,
+        xform: _userResponse
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: { user: null }, error };
+      }
+      throw error;
+    }
+  }
+  /**
+   * Delete a user. Requires a `service_role` key.
+   *
+   * @param id The user id you want to remove.
+   * @param shouldSoftDelete If true, then the user will be soft-deleted from the auth schema. Soft deletion allows user identification from the hashed user ID but is not reversible.
+   * Defaults to false for backward compatibility.
+   *
+   * This function should only be called on a server. Never expose your `service_role` key in the browser.
+   */
+  async deleteUser(id, shouldSoftDelete = false) {
+    validateUUID(id);
+    try {
+      return await _request(this.fetch, "DELETE", `${this.url}/admin/users/${id}`, {
+        headers: this.headers,
+        body: {
+          should_soft_delete: shouldSoftDelete
+        },
+        xform: _userResponse
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: { user: null }, error };
+      }
+      throw error;
+    }
+  }
+  async _listFactors(params) {
+    validateUUID(params.userId);
+    try {
+      const { data, error } = await _request(this.fetch, "GET", `${this.url}/admin/users/${params.userId}/factors`, {
+        headers: this.headers,
+        xform: (factors) => {
+          return { data: { factors }, error: null };
+        }
+      });
+      return { data, error };
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: null, error };
+      }
+      throw error;
+    }
+  }
+  async _deleteFactor(params) {
+    validateUUID(params.userId);
+    validateUUID(params.id);
+    try {
+      const data = await _request(this.fetch, "DELETE", `${this.url}/admin/users/${params.userId}/factors/${params.id}`, {
+        headers: this.headers
+      });
+      return { data, error: null };
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: null, error };
+      }
+      throw error;
+    }
+  }
+  /**
+   * Lists all OAuth clients with optional pagination.
+   * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+   *
+   * This function should only be called on a server. Never expose your `service_role` key in the browser.
+   */
+  async _listOAuthClients(params) {
+    var _a3, _b2, _c, _d, _e, _f, _g;
+    try {
+      const pagination = { nextPage: null, lastPage: 0, total: 0 };
+      const response = await _request(this.fetch, "GET", `${this.url}/admin/oauth/clients`, {
+        headers: this.headers,
+        noResolveJson: true,
+        query: {
+          page: (_b2 = (_a3 = params === null || params === void 0 ? void 0 : params.page) === null || _a3 === void 0 ? void 0 : _a3.toString()) !== null && _b2 !== void 0 ? _b2 : "",
+          per_page: (_d = (_c = params === null || params === void 0 ? void 0 : params.perPage) === null || _c === void 0 ? void 0 : _c.toString()) !== null && _d !== void 0 ? _d : ""
+        },
+        xform: _noResolveJsonResponse
+      });
+      if (response.error)
+        throw response.error;
+      const clients = await response.json();
+      const total = (_e = response.headers.get("x-total-count")) !== null && _e !== void 0 ? _e : 0;
+      const links = (_g = (_f = response.headers.get("link")) === null || _f === void 0 ? void 0 : _f.split(",")) !== null && _g !== void 0 ? _g : [];
+      if (links.length > 0) {
+        links.forEach((link) => {
+          const page = parseInt(link.split(";")[0].split("=")[1].substring(0, 1));
+          const rel = JSON.parse(link.split(";")[1].split("=")[1]);
+          pagination[`${rel}Page`] = page;
+        });
+        pagination.total = parseInt(total);
+      }
+      return { data: Object.assign(Object.assign({}, clients), pagination), error: null };
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: { clients: [] }, error };
+      }
+      throw error;
+    }
+  }
+  /**
+   * Creates a new OAuth client.
+   * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+   *
+   * This function should only be called on a server. Never expose your `service_role` key in the browser.
+   */
+  async _createOAuthClient(params) {
+    try {
+      return await _request(this.fetch, "POST", `${this.url}/admin/oauth/clients`, {
+        body: params,
+        headers: this.headers,
+        xform: (client2) => {
+          return { data: client2, error: null };
+        }
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: null, error };
+      }
+      throw error;
+    }
+  }
+  /**
+   * Gets details of a specific OAuth client.
+   * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+   *
+   * This function should only be called on a server. Never expose your `service_role` key in the browser.
+   */
+  async _getOAuthClient(clientId) {
+    try {
+      return await _request(this.fetch, "GET", `${this.url}/admin/oauth/clients/${clientId}`, {
+        headers: this.headers,
+        xform: (client2) => {
+          return { data: client2, error: null };
+        }
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: null, error };
+      }
+      throw error;
+    }
+  }
+  /**
+   * Updates an existing OAuth client.
+   * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+   *
+   * This function should only be called on a server. Never expose your `service_role` key in the browser.
+   */
+  async _updateOAuthClient(clientId, params) {
+    try {
+      return await _request(this.fetch, "PUT", `${this.url}/admin/oauth/clients/${clientId}`, {
+        body: params,
+        headers: this.headers,
+        xform: (client2) => {
+          return { data: client2, error: null };
+        }
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: null, error };
+      }
+      throw error;
+    }
+  }
+  /**
+   * Deletes an OAuth client.
+   * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+   *
+   * This function should only be called on a server. Never expose your `service_role` key in the browser.
+   */
+  async _deleteOAuthClient(clientId) {
+    try {
+      await _request(this.fetch, "DELETE", `${this.url}/admin/oauth/clients/${clientId}`, {
+        headers: this.headers,
+        noResolveJson: true
+      });
+      return { data: null, error: null };
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: null, error };
+      }
+      throw error;
+    }
+  }
+  /**
+   * Regenerates the secret for an OAuth client.
+   * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+   *
+   * This function should only be called on a server. Never expose your `service_role` key in the browser.
+   */
+  async _regenerateOAuthClientSecret(clientId) {
+    try {
+      return await _request(this.fetch, "POST", `${this.url}/admin/oauth/clients/${clientId}/regenerate_secret`, {
+        headers: this.headers,
+        xform: (client2) => {
+          return { data: client2, error: null };
+        }
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: null, error };
+      }
+      throw error;
+    }
+  }
+};
+function memoryLocalStorageAdapter(store = {}) {
+  return {
+    getItem: (key) => {
+      return store[key] || null;
+    },
+    setItem: (key, value) => {
+      store[key] = value;
+    },
+    removeItem: (key) => {
+      delete store[key];
+    }
+  };
+}
+const internals = {
+  /**
+   * @experimental
+   */
+  debug: !!(globalThis && supportsLocalStorage() && globalThis.localStorage && globalThis.localStorage.getItem("supabase.gotrue-js.locks.debug") === "true")
+};
+class LockAcquireTimeoutError extends Error {
+  constructor(message) {
+    super(message);
+    this.isAcquireTimeout = true;
+  }
+}
+let NavigatorLockAcquireTimeoutError$1 = class NavigatorLockAcquireTimeoutError extends LockAcquireTimeoutError {
+};
+class ProcessLockAcquireTimeoutError extends LockAcquireTimeoutError {
+}
+async function navigatorLock$1(name, acquireTimeout, fn) {
+  if (internals.debug) {
+    console.log("@supabase/gotrue-js: navigatorLock: acquire lock", name, acquireTimeout);
+  }
+  const abortController = new globalThis.AbortController();
+  if (acquireTimeout > 0) {
+    setTimeout(() => {
+      abortController.abort();
+      if (internals.debug) {
+        console.log("@supabase/gotrue-js: navigatorLock acquire timed out", name);
+      }
+    }, acquireTimeout);
+  }
+  return await Promise.resolve().then(() => globalThis.navigator.locks.request(name, acquireTimeout === 0 ? {
+    mode: "exclusive",
+    ifAvailable: true
+  } : {
+    mode: "exclusive",
+    signal: abortController.signal
+  }, async (lock) => {
+    if (lock) {
+      if (internals.debug) {
+        console.log("@supabase/gotrue-js: navigatorLock: acquired", name, lock.name);
+      }
+      try {
+        return await fn();
+      } finally {
+        if (internals.debug) {
+          console.log("@supabase/gotrue-js: navigatorLock: released", name, lock.name);
+        }
+      }
+    } else {
+      if (acquireTimeout === 0) {
+        if (internals.debug) {
+          console.log("@supabase/gotrue-js: navigatorLock: not immediately available", name);
+        }
+        throw new NavigatorLockAcquireTimeoutError$1(`Acquiring an exclusive Navigator LockManager lock "${name}" immediately failed`);
+      } else {
+        if (internals.debug) {
+          try {
+            const result = await globalThis.navigator.locks.query();
+            console.log("@supabase/gotrue-js: Navigator LockManager state", JSON.stringify(result, null, "  "));
+          } catch (e) {
+            console.warn("@supabase/gotrue-js: Error when querying Navigator LockManager state", e);
+          }
+        }
+        console.warn("@supabase/gotrue-js: Navigator LockManager returned a null lock when using #request without ifAvailable set to true, it appears this browser is not following the LockManager spec https://developer.mozilla.org/en-US/docs/Web/API/LockManager/request");
+        return await fn();
+      }
+    }
+  }));
+}
+const PROCESS_LOCKS = {};
+async function processLock$1(name, acquireTimeout, fn) {
+  var _a3;
+  const previousOperation = (_a3 = PROCESS_LOCKS[name]) !== null && _a3 !== void 0 ? _a3 : Promise.resolve();
+  const currentOperation = Promise.race([
+    previousOperation.catch(() => {
+      return null;
+    }),
+    acquireTimeout >= 0 ? new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new ProcessLockAcquireTimeoutError(`Acquring process lock with name "${name}" timed out`));
+      }, acquireTimeout);
+    }) : null
+  ].filter((x2) => x2)).catch((e) => {
+    if (e && e.isAcquireTimeout) {
+      throw e;
+    }
+    return null;
+  }).then(async () => {
+    return await fn();
+  });
+  PROCESS_LOCKS[name] = currentOperation.catch(async (e) => {
+    if (e && e.isAcquireTimeout) {
+      await previousOperation;
+      return null;
+    }
+    throw e;
+  });
+  return await currentOperation;
+}
+function polyfillGlobalThis() {
+  if (typeof globalThis === "object")
+    return;
+  try {
+    Object.defineProperty(Object.prototype, "__magic__", {
+      get: function() {
+        return this;
+      },
+      configurable: true
+    });
+    __magic__.globalThis = __magic__;
+    delete Object.prototype.__magic__;
+  } catch (e) {
+    if (typeof self !== "undefined") {
+      self.globalThis = self;
+    }
+  }
+}
+function getAddress(address) {
+  if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
+    throw new Error(`@supabase/auth-js: Address "${address}" is invalid.`);
+  }
+  return address.toLowerCase();
+}
+function fromHex(hex2) {
+  return parseInt(hex2, 16);
+}
+function toHex(value) {
+  const bytes = new TextEncoder().encode(value);
+  const hex2 = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+  return "0x" + hex2;
+}
+function createSiweMessage(parameters) {
+  var _a3;
+  const { chainId, domain, expirationTime, issuedAt = /* @__PURE__ */ new Date(), nonce, notBefore, requestId, resources, scheme, uri, version: version2 } = parameters;
+  {
+    if (!Number.isInteger(chainId))
+      throw new Error(`@supabase/auth-js: Invalid SIWE message field "chainId". Chain ID must be a EIP-155 chain ID. Provided value: ${chainId}`);
+    if (!domain)
+      throw new Error(`@supabase/auth-js: Invalid SIWE message field "domain". Domain must be provided.`);
+    if (nonce && nonce.length < 8)
+      throw new Error(`@supabase/auth-js: Invalid SIWE message field "nonce". Nonce must be at least 8 characters. Provided value: ${nonce}`);
+    if (!uri)
+      throw new Error(`@supabase/auth-js: Invalid SIWE message field "uri". URI must be provided.`);
+    if (version2 !== "1")
+      throw new Error(`@supabase/auth-js: Invalid SIWE message field "version". Version must be '1'. Provided value: ${version2}`);
+    if ((_a3 = parameters.statement) === null || _a3 === void 0 ? void 0 : _a3.includes("\n"))
+      throw new Error(`@supabase/auth-js: Invalid SIWE message field "statement". Statement must not include '\\n'. Provided value: ${parameters.statement}`);
+  }
+  const address = getAddress(parameters.address);
+  const origin = scheme ? `${scheme}://${domain}` : domain;
+  const statement = parameters.statement ? `${parameters.statement}
+` : "";
+  const prefix2 = `${origin} wants you to sign in with your Ethereum account:
+${address}
+
+${statement}`;
+  let suffix = `URI: ${uri}
+Version: ${version2}
+Chain ID: ${chainId}${nonce ? `
+Nonce: ${nonce}` : ""}
+Issued At: ${issuedAt.toISOString()}`;
+  if (expirationTime)
+    suffix += `
+Expiration Time: ${expirationTime.toISOString()}`;
+  if (notBefore)
+    suffix += `
+Not Before: ${notBefore.toISOString()}`;
+  if (requestId)
+    suffix += `
+Request ID: ${requestId}`;
+  if (resources) {
+    let content = "\nResources:";
+    for (const resource of resources) {
+      if (!resource || typeof resource !== "string")
+        throw new Error(`@supabase/auth-js: Invalid SIWE message field "resources". Every resource must be a valid string. Provided value: ${resource}`);
+      content += `
+- ${resource}`;
+    }
+    suffix += content;
+  }
+  return `${prefix2}
+${suffix}`;
+}
+class WebAuthnError extends Error {
+  constructor({ message, code, cause, name }) {
+    var _a3;
+    super(message, { cause });
+    this.__isWebAuthnError = true;
+    this.name = (_a3 = name !== null && name !== void 0 ? name : cause instanceof Error ? cause.name : void 0) !== null && _a3 !== void 0 ? _a3 : "Unknown Error";
+    this.code = code;
+  }
+}
+class WebAuthnUnknownError extends WebAuthnError {
+  constructor(message, originalError) {
+    super({
+      code: "ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY",
+      cause: originalError,
+      message
+    });
+    this.name = "WebAuthnUnknownError";
+    this.originalError = originalError;
+  }
+}
+function identifyRegistrationError({ error, options }) {
+  var _a3, _b2, _c;
+  const { publicKey } = options;
+  if (!publicKey) {
+    throw Error("options was missing required publicKey property");
+  }
+  if (error.name === "AbortError") {
+    if (options.signal instanceof AbortSignal) {
+      return new WebAuthnError({
+        message: "Registration ceremony was sent an abort signal",
+        code: "ERROR_CEREMONY_ABORTED",
+        cause: error
+      });
+    }
+  } else if (error.name === "ConstraintError") {
+    if (((_a3 = publicKey.authenticatorSelection) === null || _a3 === void 0 ? void 0 : _a3.requireResidentKey) === true) {
+      return new WebAuthnError({
+        message: "Discoverable credentials were required but no available authenticator supported it",
+        code: "ERROR_AUTHENTICATOR_MISSING_DISCOVERABLE_CREDENTIAL_SUPPORT",
+        cause: error
+      });
+    } else if (
+      // @ts-ignore: `mediation` doesn't yet exist on CredentialCreationOptions but it's possible as of Sept 2024
+      options.mediation === "conditional" && ((_b2 = publicKey.authenticatorSelection) === null || _b2 === void 0 ? void 0 : _b2.userVerification) === "required"
+    ) {
+      return new WebAuthnError({
+        message: "User verification was required during automatic registration but it could not be performed",
+        code: "ERROR_AUTO_REGISTER_USER_VERIFICATION_FAILURE",
+        cause: error
+      });
+    } else if (((_c = publicKey.authenticatorSelection) === null || _c === void 0 ? void 0 : _c.userVerification) === "required") {
+      return new WebAuthnError({
+        message: "User verification was required but no available authenticator supported it",
+        code: "ERROR_AUTHENTICATOR_MISSING_USER_VERIFICATION_SUPPORT",
+        cause: error
+      });
+    }
+  } else if (error.name === "InvalidStateError") {
+    return new WebAuthnError({
+      message: "The authenticator was previously registered",
+      code: "ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED",
+      cause: error
+    });
+  } else if (error.name === "NotAllowedError") {
+    return new WebAuthnError({
+      message: error.message,
+      code: "ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY",
+      cause: error
+    });
+  } else if (error.name === "NotSupportedError") {
+    const validPubKeyCredParams = publicKey.pubKeyCredParams.filter((param) => param.type === "public-key");
+    if (validPubKeyCredParams.length === 0) {
+      return new WebAuthnError({
+        message: 'No entry in pubKeyCredParams was of type "public-key"',
+        code: "ERROR_MALFORMED_PUBKEYCREDPARAMS",
+        cause: error
+      });
+    }
+    return new WebAuthnError({
+      message: "No available authenticator supported any of the specified pubKeyCredParams algorithms",
+      code: "ERROR_AUTHENTICATOR_NO_SUPPORTED_PUBKEYCREDPARAMS_ALG",
+      cause: error
+    });
+  } else if (error.name === "SecurityError") {
+    const effectiveDomain = window.location.hostname;
+    if (!isValidDomain(effectiveDomain)) {
+      return new WebAuthnError({
+        message: `${window.location.hostname} is an invalid domain`,
+        code: "ERROR_INVALID_DOMAIN",
+        cause: error
+      });
+    } else if (publicKey.rp.id !== effectiveDomain) {
+      return new WebAuthnError({
+        message: `The RP ID "${publicKey.rp.id}" is invalid for this domain`,
+        code: "ERROR_INVALID_RP_ID",
+        cause: error
+      });
+    }
+  } else if (error.name === "TypeError") {
+    if (publicKey.user.id.byteLength < 1 || publicKey.user.id.byteLength > 64) {
+      return new WebAuthnError({
+        message: "User ID was not between 1 and 64 characters",
+        code: "ERROR_INVALID_USER_ID_LENGTH",
+        cause: error
+      });
+    }
+  } else if (error.name === "UnknownError") {
+    return new WebAuthnError({
+      message: "The authenticator was unable to process the specified options, or could not create a new credential",
+      code: "ERROR_AUTHENTICATOR_GENERAL_ERROR",
+      cause: error
+    });
+  }
+  return new WebAuthnError({
+    message: "a Non-Webauthn related error has occurred",
+    code: "ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY",
+    cause: error
+  });
+}
+function identifyAuthenticationError({ error, options }) {
+  const { publicKey } = options;
+  if (!publicKey) {
+    throw Error("options was missing required publicKey property");
+  }
+  if (error.name === "AbortError") {
+    if (options.signal instanceof AbortSignal) {
+      return new WebAuthnError({
+        message: "Authentication ceremony was sent an abort signal",
+        code: "ERROR_CEREMONY_ABORTED",
+        cause: error
+      });
+    }
+  } else if (error.name === "NotAllowedError") {
+    return new WebAuthnError({
+      message: error.message,
+      code: "ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY",
+      cause: error
+    });
+  } else if (error.name === "SecurityError") {
+    const effectiveDomain = window.location.hostname;
+    if (!isValidDomain(effectiveDomain)) {
+      return new WebAuthnError({
+        message: `${window.location.hostname} is an invalid domain`,
+        code: "ERROR_INVALID_DOMAIN",
+        cause: error
+      });
+    } else if (publicKey.rpId !== effectiveDomain) {
+      return new WebAuthnError({
+        message: `The RP ID "${publicKey.rpId}" is invalid for this domain`,
+        code: "ERROR_INVALID_RP_ID",
+        cause: error
+      });
+    }
+  } else if (error.name === "UnknownError") {
+    return new WebAuthnError({
+      message: "The authenticator was unable to process the specified options, or could not create a new assertion signature",
+      code: "ERROR_AUTHENTICATOR_GENERAL_ERROR",
+      cause: error
+    });
+  }
+  return new WebAuthnError({
+    message: "a Non-Webauthn related error has occurred",
+    code: "ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY",
+    cause: error
+  });
+}
+class WebAuthnAbortService {
+  /**
+   * Create an abort signal for a new WebAuthn operation.
+   * Automatically cancels any existing operation.
+   *
+   * @returns {AbortSignal} Signal to pass to navigator.credentials.create() or .get()
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal MDN - AbortSignal}
+   */
+  createNewAbortSignal() {
+    if (this.controller) {
+      const abortError = new Error("Cancelling existing WebAuthn API call for new one");
+      abortError.name = "AbortError";
+      this.controller.abort(abortError);
+    }
+    const newController = new AbortController();
+    this.controller = newController;
+    return newController.signal;
+  }
+  /**
+   * Manually cancel the current WebAuthn operation.
+   * Useful for cleaning up when user cancels or navigates away.
+   *
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort MDN - AbortController.abort}
+   */
+  cancelCeremony() {
+    if (this.controller) {
+      const abortError = new Error("Manually cancelling existing WebAuthn API call");
+      abortError.name = "AbortError";
+      this.controller.abort(abortError);
+      this.controller = void 0;
+    }
+  }
+}
+const webAuthnAbortService = new WebAuthnAbortService();
+function deserializeCredentialCreationOptions(options) {
+  if (!options) {
+    throw new Error("Credential creation options are required");
+  }
+  if (typeof PublicKeyCredential !== "undefined" && "parseCreationOptionsFromJSON" in PublicKeyCredential && typeof PublicKeyCredential.parseCreationOptionsFromJSON === "function") {
+    return PublicKeyCredential.parseCreationOptionsFromJSON(
+      /** we assert the options here as typescript still doesn't know about future webauthn types */
+      options
+    );
+  }
+  const { challenge: challengeStr, user: userOpts, excludeCredentials } = options, restOptions = __rest(
+    options,
+    ["challenge", "user", "excludeCredentials"]
+  );
+  const challenge = base64UrlToUint8Array(challengeStr).buffer;
+  const user = Object.assign(Object.assign({}, userOpts), { id: base64UrlToUint8Array(userOpts.id).buffer });
+  const result = Object.assign(Object.assign({}, restOptions), {
+    challenge,
+    user
+  });
+  if (excludeCredentials && excludeCredentials.length > 0) {
+    result.excludeCredentials = new Array(excludeCredentials.length);
+    for (let i = 0; i < excludeCredentials.length; i++) {
+      const cred = excludeCredentials[i];
+      result.excludeCredentials[i] = Object.assign(Object.assign({}, cred), {
+        id: base64UrlToUint8Array(cred.id).buffer,
+        type: cred.type || "public-key",
+        // Cast transports to handle future transport types like "cable"
+        transports: cred.transports
+      });
+    }
+  }
+  return result;
+}
+function deserializeCredentialRequestOptions(options) {
+  if (!options) {
+    throw new Error("Credential request options are required");
+  }
+  if (typeof PublicKeyCredential !== "undefined" && "parseRequestOptionsFromJSON" in PublicKeyCredential && typeof PublicKeyCredential.parseRequestOptionsFromJSON === "function") {
+    return PublicKeyCredential.parseRequestOptionsFromJSON(options);
+  }
+  const { challenge: challengeStr, allowCredentials } = options, restOptions = __rest(
+    options,
+    ["challenge", "allowCredentials"]
+  );
+  const challenge = base64UrlToUint8Array(challengeStr).buffer;
+  const result = Object.assign(Object.assign({}, restOptions), { challenge });
+  if (allowCredentials && allowCredentials.length > 0) {
+    result.allowCredentials = new Array(allowCredentials.length);
+    for (let i = 0; i < allowCredentials.length; i++) {
+      const cred = allowCredentials[i];
+      result.allowCredentials[i] = Object.assign(Object.assign({}, cred), {
+        id: base64UrlToUint8Array(cred.id).buffer,
+        type: cred.type || "public-key",
+        // Cast transports to handle future transport types like "cable"
+        transports: cred.transports
+      });
+    }
+  }
+  return result;
+}
+function serializeCredentialCreationResponse(credential) {
+  var _a3;
+  if ("toJSON" in credential && typeof credential.toJSON === "function") {
+    return credential.toJSON();
+  }
+  const credentialWithAttachment = credential;
+  return {
+    id: credential.id,
+    rawId: credential.id,
+    response: {
+      attestationObject: bytesToBase64URL(new Uint8Array(credential.response.attestationObject)),
+      clientDataJSON: bytesToBase64URL(new Uint8Array(credential.response.clientDataJSON))
+    },
+    type: "public-key",
+    clientExtensionResults: credential.getClientExtensionResults(),
+    // Convert null to undefined and cast to AuthenticatorAttachment type
+    authenticatorAttachment: (_a3 = credentialWithAttachment.authenticatorAttachment) !== null && _a3 !== void 0 ? _a3 : void 0
+  };
+}
+function serializeCredentialRequestResponse(credential) {
+  var _a3;
+  if ("toJSON" in credential && typeof credential.toJSON === "function") {
+    return credential.toJSON();
+  }
+  const credentialWithAttachment = credential;
+  const clientExtensionResults = credential.getClientExtensionResults();
+  const assertionResponse = credential.response;
+  return {
+    id: credential.id,
+    rawId: credential.id,
+    // W3C spec expects rawId to match id for JSON format
+    response: {
+      authenticatorData: bytesToBase64URL(new Uint8Array(assertionResponse.authenticatorData)),
+      clientDataJSON: bytesToBase64URL(new Uint8Array(assertionResponse.clientDataJSON)),
+      signature: bytesToBase64URL(new Uint8Array(assertionResponse.signature)),
+      userHandle: assertionResponse.userHandle ? bytesToBase64URL(new Uint8Array(assertionResponse.userHandle)) : void 0
+    },
+    type: "public-key",
+    clientExtensionResults,
+    // Convert null to undefined and cast to AuthenticatorAttachment type
+    authenticatorAttachment: (_a3 = credentialWithAttachment.authenticatorAttachment) !== null && _a3 !== void 0 ? _a3 : void 0
+  };
+}
+function isValidDomain(hostname) {
+  return (
+    // Consider localhost valid as well since it's okay wrt Secure Contexts
+    hostname === "localhost" || /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i.test(hostname)
+  );
+}
+function browserSupportsWebAuthn() {
+  var _a3, _b2;
+  return !!(isBrowser() && "PublicKeyCredential" in window && window.PublicKeyCredential && "credentials" in navigator && typeof ((_a3 = navigator === null || navigator === void 0 ? void 0 : navigator.credentials) === null || _a3 === void 0 ? void 0 : _a3.create) === "function" && typeof ((_b2 = navigator === null || navigator === void 0 ? void 0 : navigator.credentials) === null || _b2 === void 0 ? void 0 : _b2.get) === "function");
+}
+async function createCredential(options) {
+  try {
+    const response = await navigator.credentials.create(
+      /** we assert the type here until typescript types are updated */
+      options
+    );
+    if (!response) {
+      return {
+        data: null,
+        error: new WebAuthnUnknownError("Empty credential response", response)
+      };
+    }
+    if (!(response instanceof PublicKeyCredential)) {
+      return {
+        data: null,
+        error: new WebAuthnUnknownError("Browser returned unexpected credential type", response)
+      };
+    }
+    return { data: response, error: null };
+  } catch (err) {
+    return {
+      data: null,
+      error: identifyRegistrationError({
+        error: err,
+        options
+      })
+    };
+  }
+}
+async function getCredential(options) {
+  try {
+    const response = await navigator.credentials.get(
+      /** we assert the type here until typescript types are updated */
+      options
+    );
+    if (!response) {
+      return {
+        data: null,
+        error: new WebAuthnUnknownError("Empty credential response", response)
+      };
+    }
+    if (!(response instanceof PublicKeyCredential)) {
+      return {
+        data: null,
+        error: new WebAuthnUnknownError("Browser returned unexpected credential type", response)
+      };
+    }
+    return { data: response, error: null };
+  } catch (err) {
+    return {
+      data: null,
+      error: identifyAuthenticationError({
+        error: err,
+        options
+      })
+    };
+  }
+}
+const DEFAULT_CREATION_OPTIONS = {
+  hints: ["security-key"],
+  authenticatorSelection: {
+    authenticatorAttachment: "cross-platform",
+    requireResidentKey: false,
+    /** set to preferred because older yubikeys don't have PIN/Biometric */
+    userVerification: "preferred",
+    residentKey: "discouraged"
+  },
+  attestation: "direct"
+};
+const DEFAULT_REQUEST_OPTIONS = {
+  /** set to preferred because older yubikeys don't have PIN/Biometric */
+  userVerification: "preferred",
+  hints: ["security-key"],
+  attestation: "direct"
+};
+function deepMerge(...sources) {
+  const isObject2 = (val) => val !== null && typeof val === "object" && !Array.isArray(val);
+  const isArrayBufferLike = (val) => val instanceof ArrayBuffer || ArrayBuffer.isView(val);
+  const result = {};
+  for (const source of sources) {
+    if (!source)
+      continue;
+    for (const key in source) {
+      const value = source[key];
+      if (value === void 0)
+        continue;
+      if (Array.isArray(value)) {
+        result[key] = value;
+      } else if (isArrayBufferLike(value)) {
+        result[key] = value;
+      } else if (isObject2(value)) {
+        const existing = result[key];
+        if (isObject2(existing)) {
+          result[key] = deepMerge(existing, value);
+        } else {
+          result[key] = deepMerge(value);
+        }
+      } else {
+        result[key] = value;
+      }
+    }
+  }
+  return result;
+}
+function mergeCredentialCreationOptions(baseOptions, overrides) {
+  return deepMerge(DEFAULT_CREATION_OPTIONS, baseOptions, overrides || {});
+}
+function mergeCredentialRequestOptions(baseOptions, overrides) {
+  return deepMerge(DEFAULT_REQUEST_OPTIONS, baseOptions, overrides || {});
+}
+class WebAuthnApi {
+  constructor(client2) {
+    this.client = client2;
+    this.enroll = this._enroll.bind(this);
+    this.challenge = this._challenge.bind(this);
+    this.verify = this._verify.bind(this);
+    this.authenticate = this._authenticate.bind(this);
+    this.register = this._register.bind(this);
+  }
+  /**
+   * Enroll a new WebAuthn factor.
+   * Creates an unverified WebAuthn factor that must be verified with a credential.
+   *
+   * @experimental This method is experimental and may change in future releases
+   * @param {Omit<MFAEnrollWebauthnParams, 'factorType'>} params - Enrollment parameters (friendlyName required)
+   * @returns {Promise<AuthMFAEnrollWebauthnResponse>} Enrolled factor details or error
+   * @see {@link https://w3c.github.io/webauthn/#sctn-registering-a-new-credential W3C WebAuthn Spec - Registering a New Credential}
+   */
+  async _enroll(params) {
+    return this.client.mfa.enroll(Object.assign(Object.assign({}, params), { factorType: "webauthn" }));
+  }
+  /**
+   * Challenge for WebAuthn credential creation or authentication.
+   * Combines server challenge with browser credential operations.
+   * Handles both registration (create) and authentication (request) flows.
+   *
+   * @experimental This method is experimental and may change in future releases
+   * @param {MFAChallengeWebauthnParams & { friendlyName?: string; signal?: AbortSignal }} params - Challenge parameters including factorId
+   * @param {Object} overrides - Allows you to override the parameters passed to navigator.credentials
+   * @param {PublicKeyCredentialCreationOptionsFuture} overrides.create - Override options for credential creation
+   * @param {PublicKeyCredentialRequestOptionsFuture} overrides.request - Override options for credential request
+   * @returns {Promise<RequestResult>} Challenge response with credential or error
+   * @see {@link https://w3c.github.io/webauthn/#sctn-credential-creation W3C WebAuthn Spec - Credential Creation}
+   * @see {@link https://w3c.github.io/webauthn/#sctn-verifying-assertion W3C WebAuthn Spec - Verifying Assertion}
+   */
+  async _challenge({ factorId, webauthn, friendlyName, signal }, overrides) {
+    try {
+      const { data: challengeResponse, error: challengeError } = await this.client.mfa.challenge({
+        factorId,
+        webauthn
+      });
+      if (!challengeResponse) {
+        return { data: null, error: challengeError };
+      }
+      const abortSignal = signal !== null && signal !== void 0 ? signal : webAuthnAbortService.createNewAbortSignal();
+      if (challengeResponse.webauthn.type === "create") {
+        const { user } = challengeResponse.webauthn.credential_options.publicKey;
+        if (!user.name) {
+          user.name = `${user.id}:${friendlyName}`;
+        }
+        if (!user.displayName) {
+          user.displayName = user.name;
+        }
+      }
+      switch (challengeResponse.webauthn.type) {
+        case "create": {
+          const options = mergeCredentialCreationOptions(challengeResponse.webauthn.credential_options.publicKey, overrides === null || overrides === void 0 ? void 0 : overrides.create);
+          const { data, error } = await createCredential({
+            publicKey: options,
+            signal: abortSignal
+          });
+          if (data) {
+            return {
+              data: {
+                factorId,
+                challengeId: challengeResponse.id,
+                webauthn: {
+                  type: challengeResponse.webauthn.type,
+                  credential_response: data
+                }
+              },
+              error: null
+            };
+          }
+          return { data: null, error };
+        }
+        case "request": {
+          const options = mergeCredentialRequestOptions(challengeResponse.webauthn.credential_options.publicKey, overrides === null || overrides === void 0 ? void 0 : overrides.request);
+          const { data, error } = await getCredential(Object.assign(Object.assign({}, challengeResponse.webauthn.credential_options), { publicKey: options, signal: abortSignal }));
+          if (data) {
+            return {
+              data: {
+                factorId,
+                challengeId: challengeResponse.id,
+                webauthn: {
+                  type: challengeResponse.webauthn.type,
+                  credential_response: data
+                }
+              },
+              error: null
+            };
+          }
+          return { data: null, error };
+        }
+      }
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: null, error };
+      }
+      return {
+        data: null,
+        error: new AuthUnknownError$1("Unexpected error in challenge", error)
+      };
+    }
+  }
+  /**
+   * Verify a WebAuthn credential with the server.
+   * Completes the WebAuthn ceremony by sending the credential to the server for verification.
+   *
+   * @experimental This method is experimental and may change in future releases
+   * @param {Object} params - Verification parameters
+   * @param {string} params.challengeId - ID of the challenge being verified
+   * @param {string} params.factorId - ID of the WebAuthn factor
+   * @param {MFAVerifyWebauthnParams<T>['webauthn']} params.webauthn - WebAuthn credential response
+   * @returns {Promise<AuthMFAVerifyResponse>} Verification result with session or error
+   * @see {@link https://w3c.github.io/webauthn/#sctn-verifying-assertion W3C WebAuthn Spec - Verifying an Authentication Assertion}
+   * */
+  async _verify({ challengeId, factorId, webauthn }) {
+    return this.client.mfa.verify({
+      factorId,
+      challengeId,
+      webauthn
+    });
+  }
+  /**
+   * Complete WebAuthn authentication flow.
+   * Performs challenge and verification in a single operation for existing credentials.
+   *
+   * @experimental This method is experimental and may change in future releases
+   * @param {Object} params - Authentication parameters
+   * @param {string} params.factorId - ID of the WebAuthn factor to authenticate with
+   * @param {Object} params.webauthn - WebAuthn configuration
+   * @param {string} params.webauthn.rpId - Relying Party ID (defaults to current hostname)
+   * @param {string[]} params.webauthn.rpOrigins - Allowed origins (defaults to current origin)
+   * @param {AbortSignal} params.webauthn.signal - Optional abort signal
+   * @param {PublicKeyCredentialRequestOptionsFuture} overrides - Override options for navigator.credentials.get
+   * @returns {Promise<RequestResult<AuthMFAVerifyResponseData, WebAuthnError | AuthError>>} Authentication result
+   * @see {@link https://w3c.github.io/webauthn/#sctn-authentication W3C WebAuthn Spec - Authentication Ceremony}
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialRequestOptions MDN - PublicKeyCredentialRequestOptions}
+   */
+  async _authenticate({ factorId, webauthn: { rpId = typeof window !== "undefined" ? window.location.hostname : void 0, rpOrigins = typeof window !== "undefined" ? [window.location.origin] : void 0, signal } = {} }, overrides) {
+    if (!rpId) {
+      return {
+        data: null,
+        error: new AuthError$1("rpId is required for WebAuthn authentication")
+      };
+    }
+    try {
+      if (!browserSupportsWebAuthn()) {
+        return {
+          data: null,
+          error: new AuthUnknownError$1("Browser does not support WebAuthn", null)
+        };
+      }
+      const { data: challengeResponse, error: challengeError } = await this.challenge({
+        factorId,
+        webauthn: { rpId, rpOrigins },
+        signal
+      }, { request: overrides });
+      if (!challengeResponse) {
+        return { data: null, error: challengeError };
+      }
+      const { webauthn } = challengeResponse;
+      return this._verify({
+        factorId,
+        challengeId: challengeResponse.challengeId,
+        webauthn: {
+          type: webauthn.type,
+          rpId,
+          rpOrigins,
+          credential_response: webauthn.credential_response
+        }
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: null, error };
+      }
+      return {
+        data: null,
+        error: new AuthUnknownError$1("Unexpected error in authenticate", error)
+      };
+    }
+  }
+  /**
+   * Complete WebAuthn registration flow.
+   * Performs enrollment, challenge, and verification in a single operation for new credentials.
+   *
+   * @experimental This method is experimental and may change in future releases
+   * @param {Object} params - Registration parameters
+   * @param {string} params.friendlyName - User-friendly name for the credential
+   * @param {string} params.rpId - Relying Party ID (defaults to current hostname)
+   * @param {string[]} params.rpOrigins - Allowed origins (defaults to current origin)
+   * @param {AbortSignal} params.signal - Optional abort signal
+   * @param {PublicKeyCredentialCreationOptionsFuture} overrides - Override options for navigator.credentials.create
+   * @returns {Promise<RequestResult<AuthMFAVerifyResponseData, WebAuthnError | AuthError>>} Registration result
+   * @see {@link https://w3c.github.io/webauthn/#sctn-registering-a-new-credential W3C WebAuthn Spec - Registration Ceremony}
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialCreationOptions MDN - PublicKeyCredentialCreationOptions}
+   */
+  async _register({ friendlyName, webauthn: { rpId = typeof window !== "undefined" ? window.location.hostname : void 0, rpOrigins = typeof window !== "undefined" ? [window.location.origin] : void 0, signal } = {} }, overrides) {
+    if (!rpId) {
+      return {
+        data: null,
+        error: new AuthError$1("rpId is required for WebAuthn registration")
+      };
+    }
+    try {
+      if (!browserSupportsWebAuthn()) {
+        return {
+          data: null,
+          error: new AuthUnknownError$1("Browser does not support WebAuthn", null)
+        };
+      }
+      const { data: factor, error: enrollError } = await this._enroll({
+        friendlyName
+      });
+      if (!factor) {
+        await this.client.mfa.listFactors().then((factors) => {
+          var _a3;
+          return (_a3 = factors.data) === null || _a3 === void 0 ? void 0 : _a3.all.find((v) => v.factor_type === "webauthn" && v.friendly_name === friendlyName && v.status !== "unverified");
+        }).then((factor2) => factor2 ? this.client.mfa.unenroll({ factorId: factor2 === null || factor2 === void 0 ? void 0 : factor2.id }) : void 0);
+        return { data: null, error: enrollError };
+      }
+      const { data: challengeResponse, error: challengeError } = await this._challenge({
+        factorId: factor.id,
+        friendlyName: factor.friendly_name,
+        webauthn: { rpId, rpOrigins },
+        signal
+      }, {
+        create: overrides
+      });
+      if (!challengeResponse) {
+        return { data: null, error: challengeError };
+      }
+      return this._verify({
+        factorId: factor.id,
+        challengeId: challengeResponse.challengeId,
+        webauthn: {
+          rpId,
+          rpOrigins,
+          type: challengeResponse.webauthn.type,
+          credential_response: challengeResponse.webauthn.credential_response
+        }
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return { data: null, error };
+      }
+      return {
+        data: null,
+        error: new AuthUnknownError$1("Unexpected error in register", error)
+      };
+    }
+  }
+}
+polyfillGlobalThis();
+const DEFAULT_OPTIONS = {
+  url: GOTRUE_URL,
+  storageKey: STORAGE_KEY$1,
+  autoRefreshToken: true,
+  persistSession: true,
+  detectSessionInUrl: true,
+  headers: DEFAULT_HEADERS,
+  flowType: "implicit",
+  debug: false,
+  hasCustomAuthorizationHeader: false,
+  throwOnError: false
+};
+async function lockNoOp(name, acquireTimeout, fn) {
+  return await fn();
+}
+const GLOBAL_JWKS = {};
+let GoTrueClient$1 = class GoTrueClient {
+  /**
+   * The JWKS used for verifying asymmetric JWTs
+   */
+  get jwks() {
+    var _a3, _b2;
+    return (_b2 = (_a3 = GLOBAL_JWKS[this.storageKey]) === null || _a3 === void 0 ? void 0 : _a3.jwks) !== null && _b2 !== void 0 ? _b2 : { keys: [] };
+  }
+  set jwks(value) {
+    GLOBAL_JWKS[this.storageKey] = Object.assign(Object.assign({}, GLOBAL_JWKS[this.storageKey]), { jwks: value });
+  }
+  get jwks_cached_at() {
+    var _a3, _b2;
+    return (_b2 = (_a3 = GLOBAL_JWKS[this.storageKey]) === null || _a3 === void 0 ? void 0 : _a3.cachedAt) !== null && _b2 !== void 0 ? _b2 : Number.MIN_SAFE_INTEGER;
+  }
+  set jwks_cached_at(value) {
+    GLOBAL_JWKS[this.storageKey] = Object.assign(Object.assign({}, GLOBAL_JWKS[this.storageKey]), { cachedAt: value });
+  }
+  /**
+   * Create a new client for use in the browser.
+   *
+   * @example
+   * ```ts
+   * import { GoTrueClient } from '@supabase/auth-js'
+   *
+   * const auth = new GoTrueClient({
+   *   url: 'https://xyzcompany.supabase.co/auth/v1',
+   *   headers: { apikey: 'public-anon-key' },
+   *   storageKey: 'supabase-auth',
+   * })
+   * ```
+   */
+  constructor(options) {
+    var _a3, _b2, _c;
+    this.userStorage = null;
+    this.memoryStorage = null;
+    this.stateChangeEmitters = /* @__PURE__ */ new Map();
+    this.autoRefreshTicker = null;
+    this.visibilityChangedCallback = null;
+    this.refreshingDeferred = null;
+    this.initializePromise = null;
+    this.detectSessionInUrl = true;
+    this.hasCustomAuthorizationHeader = false;
+    this.suppressGetSessionWarning = false;
+    this.lockAcquired = false;
+    this.pendingInLock = [];
+    this.broadcastChannel = null;
+    this.logger = console.log;
+    const settings = Object.assign(Object.assign({}, DEFAULT_OPTIONS), options);
+    this.storageKey = settings.storageKey;
+    this.instanceID = (_a3 = GoTrueClient.nextInstanceID[this.storageKey]) !== null && _a3 !== void 0 ? _a3 : 0;
+    GoTrueClient.nextInstanceID[this.storageKey] = this.instanceID + 1;
+    this.logDebugMessages = !!settings.debug;
+    if (typeof settings.debug === "function") {
+      this.logger = settings.debug;
+    }
+    if (this.instanceID > 0 && isBrowser()) {
+      const message = `${this._logPrefix()} Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.`;
+      console.warn(message);
+      if (this.logDebugMessages) {
+        console.trace(message);
+      }
+    }
+    this.persistSession = settings.persistSession;
+    this.autoRefreshToken = settings.autoRefreshToken;
+    this.admin = new GoTrueAdminApi$1({
+      url: settings.url,
+      headers: settings.headers,
+      fetch: settings.fetch
+    });
+    this.url = settings.url;
+    this.headers = settings.headers;
+    this.fetch = resolveFetch(settings.fetch);
+    this.lock = settings.lock || lockNoOp;
+    this.detectSessionInUrl = settings.detectSessionInUrl;
+    this.flowType = settings.flowType;
+    this.hasCustomAuthorizationHeader = settings.hasCustomAuthorizationHeader;
+    this.throwOnError = settings.throwOnError;
+    if (settings.lock) {
+      this.lock = settings.lock;
+    } else if (this.persistSession && isBrowser() && ((_b2 = globalThis === null || globalThis === void 0 ? void 0 : globalThis.navigator) === null || _b2 === void 0 ? void 0 : _b2.locks)) {
+      this.lock = navigatorLock$1;
+    } else {
+      this.lock = lockNoOp;
+    }
+    if (!this.jwks) {
+      this.jwks = { keys: [] };
+      this.jwks_cached_at = Number.MIN_SAFE_INTEGER;
+    }
+    this.mfa = {
+      verify: this._verify.bind(this),
+      enroll: this._enroll.bind(this),
+      unenroll: this._unenroll.bind(this),
+      challenge: this._challenge.bind(this),
+      listFactors: this._listFactors.bind(this),
+      challengeAndVerify: this._challengeAndVerify.bind(this),
+      getAuthenticatorAssuranceLevel: this._getAuthenticatorAssuranceLevel.bind(this),
+      webauthn: new WebAuthnApi(this)
+    };
+    this.oauth = {
+      getAuthorizationDetails: this._getAuthorizationDetails.bind(this),
+      approveAuthorization: this._approveAuthorization.bind(this),
+      denyAuthorization: this._denyAuthorization.bind(this),
+      listGrants: this._listOAuthGrants.bind(this),
+      revokeGrant: this._revokeOAuthGrant.bind(this)
+    };
+    if (this.persistSession) {
+      if (settings.storage) {
+        this.storage = settings.storage;
+      } else {
+        if (supportsLocalStorage()) {
+          this.storage = globalThis.localStorage;
+        } else {
+          this.memoryStorage = {};
+          this.storage = memoryLocalStorageAdapter(this.memoryStorage);
+        }
+      }
+      if (settings.userStorage) {
+        this.userStorage = settings.userStorage;
+      }
+    } else {
+      this.memoryStorage = {};
+      this.storage = memoryLocalStorageAdapter(this.memoryStorage);
+    }
+    if (isBrowser() && globalThis.BroadcastChannel && this.persistSession && this.storageKey) {
+      try {
+        this.broadcastChannel = new globalThis.BroadcastChannel(this.storageKey);
+      } catch (e) {
+        console.error("Failed to create a new BroadcastChannel, multi-tab state changes will not be available", e);
+      }
+      (_c = this.broadcastChannel) === null || _c === void 0 ? void 0 : _c.addEventListener("message", async (event) => {
+        this._debug("received broadcast notification from other tab or client", event);
+        await this._notifyAllSubscribers(event.data.event, event.data.session, false);
+      });
+    }
+    this.initialize();
+  }
+  /**
+   * Returns whether error throwing mode is enabled for this client.
+   */
+  isThrowOnErrorEnabled() {
+    return this.throwOnError;
+  }
+  /**
+   * Centralizes return handling with optional error throwing. When `throwOnError` is enabled
+   * and the provided result contains a non-nullish error, the error is thrown instead of
+   * being returned. This ensures consistent behavior across all public API methods.
+   */
+  _returnResult(result) {
+    if (this.throwOnError && result && result.error) {
+      throw result.error;
+    }
+    return result;
+  }
+  _logPrefix() {
+    return `GoTrueClient@${this.storageKey}:${this.instanceID} (${version}) ${(/* @__PURE__ */ new Date()).toISOString()}`;
+  }
+  _debug(...args) {
+    if (this.logDebugMessages) {
+      this.logger(this._logPrefix(), ...args);
+    }
+    return this;
+  }
+  /**
+   * Initializes the client session either from the url or from storage.
+   * This method is automatically called when instantiating the client, but should also be called
+   * manually when checking for an error from an auth redirect (oauth, magiclink, password recovery, etc).
+   */
+  async initialize() {
+    if (this.initializePromise) {
+      return await this.initializePromise;
+    }
+    this.initializePromise = (async () => {
+      return await this._acquireLock(-1, async () => {
+        return await this._initialize();
+      });
+    })();
+    return await this.initializePromise;
+  }
+  /**
+   * IMPORTANT:
+   * 1. Never throw in this method, as it is called from the constructor
+   * 2. Never return a session from this method as it would be cached over
+   *    the whole lifetime of the client
+   */
+  async _initialize() {
+    var _a3;
+    try {
+      let params = {};
+      let callbackUrlType = "none";
+      if (isBrowser()) {
+        params = parseParametersFromURL(window.location.href);
+        if (this._isImplicitGrantCallback(params)) {
+          callbackUrlType = "implicit";
+        } else if (await this._isPKCECallback(params)) {
+          callbackUrlType = "pkce";
+        }
+      }
+      if (isBrowser() && this.detectSessionInUrl && callbackUrlType !== "none") {
+        const { data, error } = await this._getSessionFromURL(params, callbackUrlType);
+        if (error) {
+          this._debug("#_initialize()", "error detecting session from URL", error);
+          if (isAuthImplicitGrantRedirectError$1(error)) {
+            const errorCode = (_a3 = error.details) === null || _a3 === void 0 ? void 0 : _a3.code;
+            if (errorCode === "identity_already_exists" || errorCode === "identity_not_found" || errorCode === "single_identity_not_deletable") {
+              return { error };
+            }
+          }
+          await this._removeSession();
+          return { error };
+        }
+        const { session, redirectType } = data;
+        this._debug("#_initialize()", "detected session in URL", session, "redirect type", redirectType);
+        await this._saveSession(session);
+        setTimeout(async () => {
+          if (redirectType === "recovery") {
+            await this._notifyAllSubscribers("PASSWORD_RECOVERY", session);
+          } else {
+            await this._notifyAllSubscribers("SIGNED_IN", session);
+          }
+        }, 0);
+        return { error: null };
+      }
+      await this._recoverAndRefresh();
+      return { error: null };
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ error });
+      }
+      return this._returnResult({
+        error: new AuthUnknownError$1("Unexpected error during initialization", error)
+      });
+    } finally {
+      await this._handleVisibilityChange();
+      this._debug("#_initialize()", "end");
+    }
+  }
+  /**
+   * Creates a new anonymous user.
+   *
+   * @returns A session where the is_anonymous claim in the access token JWT set to true
+   */
+  async signInAnonymously(credentials) {
+    var _a3, _b2, _c;
+    try {
+      const res = await _request(this.fetch, "POST", `${this.url}/signup`, {
+        headers: this.headers,
+        body: {
+          data: (_b2 = (_a3 = credentials === null || credentials === void 0 ? void 0 : credentials.options) === null || _a3 === void 0 ? void 0 : _a3.data) !== null && _b2 !== void 0 ? _b2 : {},
+          gotrue_meta_security: { captcha_token: (_c = credentials === null || credentials === void 0 ? void 0 : credentials.options) === null || _c === void 0 ? void 0 : _c.captchaToken }
+        },
+        xform: _sessionResponse
+      });
+      const { data, error } = res;
+      if (error || !data) {
+        return this._returnResult({ data: { user: null, session: null }, error });
+      }
+      const session = data.session;
+      const user = data.user;
+      if (data.session) {
+        await this._saveSession(data.session);
+        await this._notifyAllSubscribers("SIGNED_IN", session);
+      }
+      return this._returnResult({ data: { user, session }, error: null });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { user: null, session: null }, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Creates a new user.
+   *
+   * Be aware that if a user account exists in the system you may get back an
+   * error message that attempts to hide this information from the user.
+   * This method has support for PKCE via email signups. The PKCE flow cannot be used when autoconfirm is enabled.
+   *
+   * @returns A logged-in session if the server has "autoconfirm" ON
+   * @returns A user if the server has "autoconfirm" OFF
+   */
+  async signUp(credentials) {
+    var _a3, _b2, _c;
+    try {
+      let res;
+      if ("email" in credentials) {
+        const { email, password, options } = credentials;
+        let codeChallenge = null;
+        let codeChallengeMethod = null;
+        if (this.flowType === "pkce") {
+          ;
+          [codeChallenge, codeChallengeMethod] = await getCodeChallengeAndMethod(this.storage, this.storageKey);
+        }
+        res = await _request(this.fetch, "POST", `${this.url}/signup`, {
+          headers: this.headers,
+          redirectTo: options === null || options === void 0 ? void 0 : options.emailRedirectTo,
+          body: {
+            email,
+            password,
+            data: (_a3 = options === null || options === void 0 ? void 0 : options.data) !== null && _a3 !== void 0 ? _a3 : {},
+            gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken },
+            code_challenge: codeChallenge,
+            code_challenge_method: codeChallengeMethod
+          },
+          xform: _sessionResponse
+        });
+      } else if ("phone" in credentials) {
+        const { phone, password, options } = credentials;
+        res = await _request(this.fetch, "POST", `${this.url}/signup`, {
+          headers: this.headers,
+          body: {
+            phone,
+            password,
+            data: (_b2 = options === null || options === void 0 ? void 0 : options.data) !== null && _b2 !== void 0 ? _b2 : {},
+            channel: (_c = options === null || options === void 0 ? void 0 : options.channel) !== null && _c !== void 0 ? _c : "sms",
+            gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken }
+          },
+          xform: _sessionResponse
+        });
+      } else {
+        throw new AuthInvalidCredentialsError$1("You must provide either an email or phone number and a password");
+      }
+      const { data, error } = res;
+      if (error || !data) {
+        await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
+        return this._returnResult({ data: { user: null, session: null }, error });
+      }
+      const session = data.session;
+      const user = data.user;
+      if (data.session) {
+        await this._saveSession(data.session);
+        await this._notifyAllSubscribers("SIGNED_IN", session);
+      }
+      return this._returnResult({ data: { user, session }, error: null });
+    } catch (error) {
+      await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { user: null, session: null }, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Log in an existing user with an email and password or phone and password.
+   *
+   * Be aware that you may get back an error message that will not distinguish
+   * between the cases where the account does not exist or that the
+   * email/phone and password combination is wrong or that the account can only
+   * be accessed via social login.
+   */
+  async signInWithPassword(credentials) {
+    try {
+      let res;
+      if ("email" in credentials) {
+        const { email, password, options } = credentials;
+        res = await _request(this.fetch, "POST", `${this.url}/token?grant_type=password`, {
+          headers: this.headers,
+          body: {
+            email,
+            password,
+            gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken }
+          },
+          xform: _sessionResponsePassword
+        });
+      } else if ("phone" in credentials) {
+        const { phone, password, options } = credentials;
+        res = await _request(this.fetch, "POST", `${this.url}/token?grant_type=password`, {
+          headers: this.headers,
+          body: {
+            phone,
+            password,
+            gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken }
+          },
+          xform: _sessionResponsePassword
+        });
+      } else {
+        throw new AuthInvalidCredentialsError$1("You must provide either an email or phone number and a password");
+      }
+      const { data, error } = res;
+      if (error) {
+        return this._returnResult({ data: { user: null, session: null }, error });
+      } else if (!data || !data.session || !data.user) {
+        const invalidTokenError = new AuthInvalidTokenResponseError$1();
+        return this._returnResult({ data: { user: null, session: null }, error: invalidTokenError });
+      }
+      if (data.session) {
+        await this._saveSession(data.session);
+        await this._notifyAllSubscribers("SIGNED_IN", data.session);
+      }
+      return this._returnResult({
+        data: Object.assign({ user: data.user, session: data.session }, data.weak_password ? { weakPassword: data.weak_password } : null),
+        error
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { user: null, session: null }, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Log in an existing user via a third-party provider.
+   * This method supports the PKCE flow.
+   */
+  async signInWithOAuth(credentials) {
+    var _a3, _b2, _c, _d;
+    return await this._handleProviderSignIn(credentials.provider, {
+      redirectTo: (_a3 = credentials.options) === null || _a3 === void 0 ? void 0 : _a3.redirectTo,
+      scopes: (_b2 = credentials.options) === null || _b2 === void 0 ? void 0 : _b2.scopes,
+      queryParams: (_c = credentials.options) === null || _c === void 0 ? void 0 : _c.queryParams,
+      skipBrowserRedirect: (_d = credentials.options) === null || _d === void 0 ? void 0 : _d.skipBrowserRedirect
+    });
+  }
+  /**
+   * Log in an existing user by exchanging an Auth Code issued during the PKCE flow.
+   */
+  async exchangeCodeForSession(authCode) {
+    await this.initializePromise;
+    return this._acquireLock(-1, async () => {
+      return this._exchangeCodeForSession(authCode);
+    });
+  }
+  /**
+   * Signs in a user by verifying a message signed by the user's private key.
+   * Supports Ethereum (via Sign-In-With-Ethereum) & Solana (Sign-In-With-Solana) standards,
+   * both of which derive from the EIP-4361 standard
+   * With slight variation on Solana's side.
+   * @reference https://eips.ethereum.org/EIPS/eip-4361
+   */
+  async signInWithWeb3(credentials) {
+    const { chain } = credentials;
+    switch (chain) {
+      case "ethereum":
+        return await this.signInWithEthereum(credentials);
+      case "solana":
+        return await this.signInWithSolana(credentials);
+      default:
+        throw new Error(`@supabase/auth-js: Unsupported chain "${chain}"`);
+    }
+  }
+  async signInWithEthereum(credentials) {
+    var _a3, _b2, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+    let message;
+    let signature;
+    if ("message" in credentials) {
+      message = credentials.message;
+      signature = credentials.signature;
+    } else {
+      const { chain, wallet, statement, options } = credentials;
+      let resolvedWallet;
+      if (!isBrowser()) {
+        if (typeof wallet !== "object" || !(options === null || options === void 0 ? void 0 : options.url)) {
+          throw new Error("@supabase/auth-js: Both wallet and url must be specified in non-browser environments.");
+        }
+        resolvedWallet = wallet;
+      } else if (typeof wallet === "object") {
+        resolvedWallet = wallet;
+      } else {
+        const windowAny = window;
+        if ("ethereum" in windowAny && typeof windowAny.ethereum === "object" && "request" in windowAny.ethereum && typeof windowAny.ethereum.request === "function") {
+          resolvedWallet = windowAny.ethereum;
+        } else {
+          throw new Error(`@supabase/auth-js: No compatible Ethereum wallet interface on the window object (window.ethereum) detected. Make sure the user already has a wallet installed and connected for this app. Prefer passing the wallet interface object directly to signInWithWeb3({ chain: 'ethereum', wallet: resolvedUserWallet }) instead.`);
+        }
+      }
+      const url = new URL((_a3 = options === null || options === void 0 ? void 0 : options.url) !== null && _a3 !== void 0 ? _a3 : window.location.href);
+      const accounts = await resolvedWallet.request({
+        method: "eth_requestAccounts"
+      }).then((accs) => accs).catch(() => {
+        throw new Error(`@supabase/auth-js: Wallet method eth_requestAccounts is missing or invalid`);
+      });
+      if (!accounts || accounts.length === 0) {
+        throw new Error(`@supabase/auth-js: No accounts available. Please ensure the wallet is connected.`);
+      }
+      const address = getAddress(accounts[0]);
+      let chainId = (_b2 = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _b2 === void 0 ? void 0 : _b2.chainId;
+      if (!chainId) {
+        const chainIdHex = await resolvedWallet.request({
+          method: "eth_chainId"
+        });
+        chainId = fromHex(chainIdHex);
+      }
+      const siweMessage = {
+        domain: url.host,
+        address,
+        statement,
+        uri: url.href,
+        version: "1",
+        chainId,
+        nonce: (_c = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _c === void 0 ? void 0 : _c.nonce,
+        issuedAt: (_e = (_d = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _d === void 0 ? void 0 : _d.issuedAt) !== null && _e !== void 0 ? _e : /* @__PURE__ */ new Date(),
+        expirationTime: (_f = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _f === void 0 ? void 0 : _f.expirationTime,
+        notBefore: (_g = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _g === void 0 ? void 0 : _g.notBefore,
+        requestId: (_h = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _h === void 0 ? void 0 : _h.requestId,
+        resources: (_j = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _j === void 0 ? void 0 : _j.resources
+      };
+      message = createSiweMessage(siweMessage);
+      signature = await resolvedWallet.request({
+        method: "personal_sign",
+        params: [toHex(message), address]
+      });
+    }
+    try {
+      const { data, error } = await _request(this.fetch, "POST", `${this.url}/token?grant_type=web3`, {
+        headers: this.headers,
+        body: Object.assign({
+          chain: "ethereum",
+          message,
+          signature
+        }, ((_k = credentials.options) === null || _k === void 0 ? void 0 : _k.captchaToken) ? { gotrue_meta_security: { captcha_token: (_l = credentials.options) === null || _l === void 0 ? void 0 : _l.captchaToken } } : null),
+        xform: _sessionResponse
+      });
+      if (error) {
+        throw error;
+      }
+      if (!data || !data.session || !data.user) {
+        const invalidTokenError = new AuthInvalidTokenResponseError$1();
+        return this._returnResult({ data: { user: null, session: null }, error: invalidTokenError });
+      }
+      if (data.session) {
+        await this._saveSession(data.session);
+        await this._notifyAllSubscribers("SIGNED_IN", data.session);
+      }
+      return this._returnResult({ data: Object.assign({}, data), error });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { user: null, session: null }, error });
+      }
+      throw error;
+    }
+  }
+  async signInWithSolana(credentials) {
+    var _a3, _b2, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+    let message;
+    let signature;
+    if ("message" in credentials) {
+      message = credentials.message;
+      signature = credentials.signature;
+    } else {
+      const { chain, wallet, statement, options } = credentials;
+      let resolvedWallet;
+      if (!isBrowser()) {
+        if (typeof wallet !== "object" || !(options === null || options === void 0 ? void 0 : options.url)) {
+          throw new Error("@supabase/auth-js: Both wallet and url must be specified in non-browser environments.");
+        }
+        resolvedWallet = wallet;
+      } else if (typeof wallet === "object") {
+        resolvedWallet = wallet;
+      } else {
+        const windowAny = window;
+        if ("solana" in windowAny && typeof windowAny.solana === "object" && ("signIn" in windowAny.solana && typeof windowAny.solana.signIn === "function" || "signMessage" in windowAny.solana && typeof windowAny.solana.signMessage === "function")) {
+          resolvedWallet = windowAny.solana;
+        } else {
+          throw new Error(`@supabase/auth-js: No compatible Solana wallet interface on the window object (window.solana) detected. Make sure the user already has a wallet installed and connected for this app. Prefer passing the wallet interface object directly to signInWithWeb3({ chain: 'solana', wallet: resolvedUserWallet }) instead.`);
+        }
+      }
+      const url = new URL((_a3 = options === null || options === void 0 ? void 0 : options.url) !== null && _a3 !== void 0 ? _a3 : window.location.href);
+      if ("signIn" in resolvedWallet && resolvedWallet.signIn) {
+        const output = await resolvedWallet.signIn(Object.assign(Object.assign(Object.assign({ issuedAt: (/* @__PURE__ */ new Date()).toISOString() }, options === null || options === void 0 ? void 0 : options.signInWithSolana), {
+          // non-overridable properties
+          version: "1",
+          domain: url.host,
+          uri: url.href
+        }), statement ? { statement } : null));
+        let outputToProcess;
+        if (Array.isArray(output) && output[0] && typeof output[0] === "object") {
+          outputToProcess = output[0];
+        } else if (output && typeof output === "object" && "signedMessage" in output && "signature" in output) {
+          outputToProcess = output;
+        } else {
+          throw new Error("@supabase/auth-js: Wallet method signIn() returned unrecognized value");
+        }
+        if ("signedMessage" in outputToProcess && "signature" in outputToProcess && (typeof outputToProcess.signedMessage === "string" || outputToProcess.signedMessage instanceof Uint8Array) && outputToProcess.signature instanceof Uint8Array) {
+          message = typeof outputToProcess.signedMessage === "string" ? outputToProcess.signedMessage : new TextDecoder().decode(outputToProcess.signedMessage);
+          signature = outputToProcess.signature;
+        } else {
+          throw new Error("@supabase/auth-js: Wallet method signIn() API returned object without signedMessage and signature fields");
+        }
+      } else {
+        if (!("signMessage" in resolvedWallet) || typeof resolvedWallet.signMessage !== "function" || !("publicKey" in resolvedWallet) || typeof resolvedWallet !== "object" || !resolvedWallet.publicKey || !("toBase58" in resolvedWallet.publicKey) || typeof resolvedWallet.publicKey.toBase58 !== "function") {
+          throw new Error("@supabase/auth-js: Wallet does not have a compatible signMessage() and publicKey.toBase58() API");
+        }
+        message = [
+          `${url.host} wants you to sign in with your Solana account:`,
+          resolvedWallet.publicKey.toBase58(),
+          ...statement ? ["", statement, ""] : [""],
+          "Version: 1",
+          `URI: ${url.href}`,
+          `Issued At: ${(_c = (_b2 = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _b2 === void 0 ? void 0 : _b2.issuedAt) !== null && _c !== void 0 ? _c : (/* @__PURE__ */ new Date()).toISOString()}`,
+          ...((_d = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _d === void 0 ? void 0 : _d.notBefore) ? [`Not Before: ${options.signInWithSolana.notBefore}`] : [],
+          ...((_e = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _e === void 0 ? void 0 : _e.expirationTime) ? [`Expiration Time: ${options.signInWithSolana.expirationTime}`] : [],
+          ...((_f = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _f === void 0 ? void 0 : _f.chainId) ? [`Chain ID: ${options.signInWithSolana.chainId}`] : [],
+          ...((_g = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _g === void 0 ? void 0 : _g.nonce) ? [`Nonce: ${options.signInWithSolana.nonce}`] : [],
+          ...((_h = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _h === void 0 ? void 0 : _h.requestId) ? [`Request ID: ${options.signInWithSolana.requestId}`] : [],
+          ...((_k = (_j = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _j === void 0 ? void 0 : _j.resources) === null || _k === void 0 ? void 0 : _k.length) ? [
+            "Resources",
+            ...options.signInWithSolana.resources.map((resource) => `- ${resource}`)
+          ] : []
+        ].join("\n");
+        const maybeSignature = await resolvedWallet.signMessage(new TextEncoder().encode(message), "utf8");
+        if (!maybeSignature || !(maybeSignature instanceof Uint8Array)) {
+          throw new Error("@supabase/auth-js: Wallet signMessage() API returned an recognized value");
+        }
+        signature = maybeSignature;
+      }
+    }
+    try {
+      const { data, error } = await _request(this.fetch, "POST", `${this.url}/token?grant_type=web3`, {
+        headers: this.headers,
+        body: Object.assign({ chain: "solana", message, signature: bytesToBase64URL(signature) }, ((_l = credentials.options) === null || _l === void 0 ? void 0 : _l.captchaToken) ? { gotrue_meta_security: { captcha_token: (_m = credentials.options) === null || _m === void 0 ? void 0 : _m.captchaToken } } : null),
+        xform: _sessionResponse
+      });
+      if (error) {
+        throw error;
+      }
+      if (!data || !data.session || !data.user) {
+        const invalidTokenError = new AuthInvalidTokenResponseError$1();
+        return this._returnResult({ data: { user: null, session: null }, error: invalidTokenError });
+      }
+      if (data.session) {
+        await this._saveSession(data.session);
+        await this._notifyAllSubscribers("SIGNED_IN", data.session);
+      }
+      return this._returnResult({ data: Object.assign({}, data), error });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { user: null, session: null }, error });
+      }
+      throw error;
+    }
+  }
+  async _exchangeCodeForSession(authCode) {
+    const storageItem = await getItemAsync(this.storage, `${this.storageKey}-code-verifier`);
+    const [codeVerifier, redirectType] = (storageItem !== null && storageItem !== void 0 ? storageItem : "").split("/");
+    try {
+      const { data, error } = await _request(this.fetch, "POST", `${this.url}/token?grant_type=pkce`, {
+        headers: this.headers,
+        body: {
+          auth_code: authCode,
+          code_verifier: codeVerifier
+        },
+        xform: _sessionResponse
+      });
+      await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
+      if (error) {
+        throw error;
+      }
+      if (!data || !data.session || !data.user) {
+        const invalidTokenError = new AuthInvalidTokenResponseError$1();
+        return this._returnResult({
+          data: { user: null, session: null, redirectType: null },
+          error: invalidTokenError
+        });
+      }
+      if (data.session) {
+        await this._saveSession(data.session);
+        await this._notifyAllSubscribers("SIGNED_IN", data.session);
+      }
+      return this._returnResult({ data: Object.assign(Object.assign({}, data), { redirectType: redirectType !== null && redirectType !== void 0 ? redirectType : null }), error });
+    } catch (error) {
+      await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
+      if (isAuthError$1(error)) {
+        return this._returnResult({
+          data: { user: null, session: null, redirectType: null },
+          error
+        });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Allows signing in with an OIDC ID token. The authentication provider used
+   * should be enabled and configured.
+   */
+  async signInWithIdToken(credentials) {
+    try {
+      const { options, provider, token, access_token, nonce } = credentials;
+      const res = await _request(this.fetch, "POST", `${this.url}/token?grant_type=id_token`, {
+        headers: this.headers,
+        body: {
+          provider,
+          id_token: token,
+          access_token,
+          nonce,
+          gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken }
+        },
+        xform: _sessionResponse
+      });
+      const { data, error } = res;
+      if (error) {
+        return this._returnResult({ data: { user: null, session: null }, error });
+      } else if (!data || !data.session || !data.user) {
+        const invalidTokenError = new AuthInvalidTokenResponseError$1();
+        return this._returnResult({ data: { user: null, session: null }, error: invalidTokenError });
+      }
+      if (data.session) {
+        await this._saveSession(data.session);
+        await this._notifyAllSubscribers("SIGNED_IN", data.session);
+      }
+      return this._returnResult({ data, error });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { user: null, session: null }, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Log in a user using magiclink or a one-time password (OTP).
+   *
+   * If the `{{ .ConfirmationURL }}` variable is specified in the email template, a magiclink will be sent.
+   * If the `{{ .Token }}` variable is specified in the email template, an OTP will be sent.
+   * If you're using phone sign-ins, only an OTP will be sent. You won't be able to send a magiclink for phone sign-ins.
+   *
+   * Be aware that you may get back an error message that will not distinguish
+   * between the cases where the account does not exist or, that the account
+   * can only be accessed via social login.
+   *
+   * Do note that you will need to configure a Whatsapp sender on Twilio
+   * if you are using phone sign in with the 'whatsapp' channel. The whatsapp
+   * channel is not supported on other providers
+   * at this time.
+   * This method supports PKCE when an email is passed.
+   */
+  async signInWithOtp(credentials) {
+    var _a3, _b2, _c, _d, _e;
+    try {
+      if ("email" in credentials) {
+        const { email, options } = credentials;
+        let codeChallenge = null;
+        let codeChallengeMethod = null;
+        if (this.flowType === "pkce") {
+          ;
+          [codeChallenge, codeChallengeMethod] = await getCodeChallengeAndMethod(this.storage, this.storageKey);
+        }
+        const { error } = await _request(this.fetch, "POST", `${this.url}/otp`, {
+          headers: this.headers,
+          body: {
+            email,
+            data: (_a3 = options === null || options === void 0 ? void 0 : options.data) !== null && _a3 !== void 0 ? _a3 : {},
+            create_user: (_b2 = options === null || options === void 0 ? void 0 : options.shouldCreateUser) !== null && _b2 !== void 0 ? _b2 : true,
+            gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken },
+            code_challenge: codeChallenge,
+            code_challenge_method: codeChallengeMethod
+          },
+          redirectTo: options === null || options === void 0 ? void 0 : options.emailRedirectTo
+        });
+        return this._returnResult({ data: { user: null, session: null }, error });
+      }
+      if ("phone" in credentials) {
+        const { phone, options } = credentials;
+        const { data, error } = await _request(this.fetch, "POST", `${this.url}/otp`, {
+          headers: this.headers,
+          body: {
+            phone,
+            data: (_c = options === null || options === void 0 ? void 0 : options.data) !== null && _c !== void 0 ? _c : {},
+            create_user: (_d = options === null || options === void 0 ? void 0 : options.shouldCreateUser) !== null && _d !== void 0 ? _d : true,
+            gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken },
+            channel: (_e = options === null || options === void 0 ? void 0 : options.channel) !== null && _e !== void 0 ? _e : "sms"
+          }
+        });
+        return this._returnResult({
+          data: { user: null, session: null, messageId: data === null || data === void 0 ? void 0 : data.message_id },
+          error
+        });
+      }
+      throw new AuthInvalidCredentialsError$1("You must provide either an email or phone number.");
+    } catch (error) {
+      await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { user: null, session: null }, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Log in a user given a User supplied OTP or TokenHash received through mobile or email.
+   */
+  async verifyOtp(params) {
+    var _a3, _b2;
+    try {
+      let redirectTo = void 0;
+      let captchaToken = void 0;
+      if ("options" in params) {
+        redirectTo = (_a3 = params.options) === null || _a3 === void 0 ? void 0 : _a3.redirectTo;
+        captchaToken = (_b2 = params.options) === null || _b2 === void 0 ? void 0 : _b2.captchaToken;
+      }
+      const { data, error } = await _request(this.fetch, "POST", `${this.url}/verify`, {
+        headers: this.headers,
+        body: Object.assign(Object.assign({}, params), { gotrue_meta_security: { captcha_token: captchaToken } }),
+        redirectTo,
+        xform: _sessionResponse
+      });
+      if (error) {
+        throw error;
+      }
+      if (!data) {
+        const tokenVerificationError = new Error("An error occurred on token verification.");
+        throw tokenVerificationError;
+      }
+      const session = data.session;
+      const user = data.user;
+      if (session === null || session === void 0 ? void 0 : session.access_token) {
+        await this._saveSession(session);
+        await this._notifyAllSubscribers(params.type == "recovery" ? "PASSWORD_RECOVERY" : "SIGNED_IN", session);
+      }
+      return this._returnResult({ data: { user, session }, error: null });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { user: null, session: null }, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Attempts a single-sign on using an enterprise Identity Provider. A
+   * successful SSO attempt will redirect the current page to the identity
+   * provider authorization page. The redirect URL is implementation and SSO
+   * protocol specific.
+   *
+   * You can use it by providing a SSO domain. Typically you can extract this
+   * domain by asking users for their email address. If this domain is
+   * registered on the Auth instance the redirect will use that organization's
+   * currently active SSO Identity Provider for the login.
+   *
+   * If you have built an organization-specific login page, you can use the
+   * organization's SSO Identity Provider UUID directly instead.
+   */
+  async signInWithSSO(params) {
+    var _a3, _b2, _c, _d, _e;
+    try {
+      let codeChallenge = null;
+      let codeChallengeMethod = null;
+      if (this.flowType === "pkce") {
+        ;
+        [codeChallenge, codeChallengeMethod] = await getCodeChallengeAndMethod(this.storage, this.storageKey);
+      }
+      const result = await _request(this.fetch, "POST", `${this.url}/sso`, {
+        body: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, "providerId" in params ? { provider_id: params.providerId } : null), "domain" in params ? { domain: params.domain } : null), { redirect_to: (_b2 = (_a3 = params.options) === null || _a3 === void 0 ? void 0 : _a3.redirectTo) !== null && _b2 !== void 0 ? _b2 : void 0 }), ((_c = params === null || params === void 0 ? void 0 : params.options) === null || _c === void 0 ? void 0 : _c.captchaToken) ? { gotrue_meta_security: { captcha_token: params.options.captchaToken } } : null), { skip_http_redirect: true, code_challenge: codeChallenge, code_challenge_method: codeChallengeMethod }),
+        headers: this.headers,
+        xform: _ssoResponse
+      });
+      if (((_d = result.data) === null || _d === void 0 ? void 0 : _d.url) && isBrowser() && !((_e = params.options) === null || _e === void 0 ? void 0 : _e.skipBrowserRedirect)) {
+        window.location.assign(result.data.url);
+      }
+      return this._returnResult(result);
+    } catch (error) {
+      await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: null, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Sends a reauthentication OTP to the user's email or phone number.
+   * Requires the user to be signed-in.
+   */
+  async reauthenticate() {
+    await this.initializePromise;
+    return await this._acquireLock(-1, async () => {
+      return await this._reauthenticate();
+    });
+  }
+  async _reauthenticate() {
+    try {
+      return await this._useSession(async (result) => {
+        const { data: { session }, error: sessionError } = result;
+        if (sessionError)
+          throw sessionError;
+        if (!session)
+          throw new AuthSessionMissingError$1();
+        const { error } = await _request(this.fetch, "GET", `${this.url}/reauthenticate`, {
+          headers: this.headers,
+          jwt: session.access_token
+        });
+        return this._returnResult({ data: { user: null, session: null }, error });
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { user: null, session: null }, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Resends an existing signup confirmation email, email change email, SMS OTP or phone change OTP.
+   */
+  async resend(credentials) {
+    try {
+      const endpoint = `${this.url}/resend`;
+      if ("email" in credentials) {
+        const { email, type, options } = credentials;
+        const { error } = await _request(this.fetch, "POST", endpoint, {
+          headers: this.headers,
+          body: {
+            email,
+            type,
+            gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken }
+          },
+          redirectTo: options === null || options === void 0 ? void 0 : options.emailRedirectTo
+        });
+        return this._returnResult({ data: { user: null, session: null }, error });
+      } else if ("phone" in credentials) {
+        const { phone, type, options } = credentials;
+        const { data, error } = await _request(this.fetch, "POST", endpoint, {
+          headers: this.headers,
+          body: {
+            phone,
+            type,
+            gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken }
+          }
+        });
+        return this._returnResult({
+          data: { user: null, session: null, messageId: data === null || data === void 0 ? void 0 : data.message_id },
+          error
+        });
+      }
+      throw new AuthInvalidCredentialsError$1("You must provide either an email or phone number and a type");
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { user: null, session: null }, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Returns the session, refreshing it if necessary.
+   *
+   * The session returned can be null if the session is not detected which can happen in the event a user is not signed-in or has logged out.
+   *
+   * **IMPORTANT:** This method loads values directly from the storage attached
+   * to the client. If that storage is based on request cookies for example,
+   * the values in it may not be authentic and therefore it's strongly advised
+   * against using this method and its results in such circumstances. A warning
+   * will be emitted if this is detected. Use {@link #getUser()} instead.
+   */
+  async getSession() {
+    await this.initializePromise;
+    const result = await this._acquireLock(-1, async () => {
+      return this._useSession(async (result2) => {
+        return result2;
+      });
+    });
+    return result;
+  }
+  /**
+   * Acquires a global lock based on the storage key.
+   */
+  async _acquireLock(acquireTimeout, fn) {
+    this._debug("#_acquireLock", "begin", acquireTimeout);
+    try {
+      if (this.lockAcquired) {
+        const last2 = this.pendingInLock.length ? this.pendingInLock[this.pendingInLock.length - 1] : Promise.resolve();
+        const result = (async () => {
+          await last2;
+          return await fn();
+        })();
+        this.pendingInLock.push((async () => {
+          try {
+            await result;
+          } catch (e) {
+          }
+        })());
+        return result;
+      }
+      return await this.lock(`lock:${this.storageKey}`, acquireTimeout, async () => {
+        this._debug("#_acquireLock", "lock acquired for storage key", this.storageKey);
+        try {
+          this.lockAcquired = true;
+          const result = fn();
+          this.pendingInLock.push((async () => {
+            try {
+              await result;
+            } catch (e) {
+            }
+          })());
+          await result;
+          while (this.pendingInLock.length) {
+            const waitOn = [...this.pendingInLock];
+            await Promise.all(waitOn);
+            this.pendingInLock.splice(0, waitOn.length);
+          }
+          return await result;
+        } finally {
+          this._debug("#_acquireLock", "lock released for storage key", this.storageKey);
+          this.lockAcquired = false;
+        }
+      });
+    } finally {
+      this._debug("#_acquireLock", "end");
+    }
+  }
+  /**
+   * Use instead of {@link #getSession} inside the library. It is
+   * semantically usually what you want, as getting a session involves some
+   * processing afterwards that requires only one client operating on the
+   * session at once across multiple tabs or processes.
+   */
+  async _useSession(fn) {
+    this._debug("#_useSession", "begin");
+    try {
+      const result = await this.__loadSession();
+      return await fn(result);
+    } finally {
+      this._debug("#_useSession", "end");
+    }
+  }
+  /**
+   * NEVER USE DIRECTLY!
+   *
+   * Always use {@link #_useSession}.
+   */
+  async __loadSession() {
+    this._debug("#__loadSession()", "begin");
+    if (!this.lockAcquired) {
+      this._debug("#__loadSession()", "used outside of an acquired lock!", new Error().stack);
+    }
+    try {
+      let currentSession = null;
+      const maybeSession = await getItemAsync(this.storage, this.storageKey);
+      this._debug("#getSession()", "session from storage", maybeSession);
+      if (maybeSession !== null) {
+        if (this._isValidSession(maybeSession)) {
+          currentSession = maybeSession;
+        } else {
+          this._debug("#getSession()", "session from storage is not valid");
+          await this._removeSession();
+        }
+      }
+      if (!currentSession) {
+        return { data: { session: null }, error: null };
+      }
+      const hasExpired = currentSession.expires_at ? currentSession.expires_at * 1e3 - Date.now() < EXPIRY_MARGIN_MS : false;
+      this._debug("#__loadSession()", `session has${hasExpired ? "" : " not"} expired`, "expires_at", currentSession.expires_at);
+      if (!hasExpired) {
+        if (this.userStorage) {
+          const maybeUser = await getItemAsync(this.userStorage, this.storageKey + "-user");
+          if (maybeUser === null || maybeUser === void 0 ? void 0 : maybeUser.user) {
+            currentSession.user = maybeUser.user;
+          } else {
+            currentSession.user = userNotAvailableProxy();
+          }
+        }
+        if (this.storage.isServer && currentSession.user && !currentSession.user.__isUserNotAvailableProxy) {
+          const suppressWarningRef = { value: this.suppressGetSessionWarning };
+          currentSession.user = insecureUserWarningProxy(currentSession.user, suppressWarningRef);
+          if (suppressWarningRef.value) {
+            this.suppressGetSessionWarning = true;
+          }
+        }
+        return { data: { session: currentSession }, error: null };
+      }
+      const { data: session, error } = await this._callRefreshToken(currentSession.refresh_token);
+      if (error) {
+        return this._returnResult({ data: { session: null }, error });
+      }
+      return this._returnResult({ data: { session }, error: null });
+    } finally {
+      this._debug("#__loadSession()", "end");
+    }
+  }
+  /**
+   * Gets the current user details if there is an existing session. This method
+   * performs a network request to the Supabase Auth server, so the returned
+   * value is authentic and can be used to base authorization rules on.
+   *
+   * @param jwt Takes in an optional access token JWT. If no JWT is provided, the JWT from the current session is used.
+   */
+  async getUser(jwt) {
+    if (jwt) {
+      return await this._getUser(jwt);
+    }
+    await this.initializePromise;
+    const result = await this._acquireLock(-1, async () => {
+      return await this._getUser();
+    });
+    if (result.data.user) {
+      this.suppressGetSessionWarning = true;
+    }
+    return result;
+  }
+  async _getUser(jwt) {
+    try {
+      if (jwt) {
+        return await _request(this.fetch, "GET", `${this.url}/user`, {
+          headers: this.headers,
+          jwt,
+          xform: _userResponse
+        });
+      }
+      return await this._useSession(async (result) => {
+        var _a3, _b2, _c;
+        const { data, error } = result;
+        if (error) {
+          throw error;
+        }
+        if (!((_a3 = data.session) === null || _a3 === void 0 ? void 0 : _a3.access_token) && !this.hasCustomAuthorizationHeader) {
+          return { data: { user: null }, error: new AuthSessionMissingError$1() };
+        }
+        return await _request(this.fetch, "GET", `${this.url}/user`, {
+          headers: this.headers,
+          jwt: (_c = (_b2 = data.session) === null || _b2 === void 0 ? void 0 : _b2.access_token) !== null && _c !== void 0 ? _c : void 0,
+          xform: _userResponse
+        });
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        if (isAuthSessionMissingError$1(error)) {
+          await this._removeSession();
+          await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
+        }
+        return this._returnResult({ data: { user: null }, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Updates user data for a logged in user.
+   */
+  async updateUser(attributes, options = {}) {
+    await this.initializePromise;
+    return await this._acquireLock(-1, async () => {
+      return await this._updateUser(attributes, options);
+    });
+  }
+  async _updateUser(attributes, options = {}) {
+    try {
+      return await this._useSession(async (result) => {
+        const { data: sessionData, error: sessionError } = result;
+        if (sessionError) {
+          throw sessionError;
+        }
+        if (!sessionData.session) {
+          throw new AuthSessionMissingError$1();
+        }
+        const session = sessionData.session;
+        let codeChallenge = null;
+        let codeChallengeMethod = null;
+        if (this.flowType === "pkce" && attributes.email != null) {
+          ;
+          [codeChallenge, codeChallengeMethod] = await getCodeChallengeAndMethod(this.storage, this.storageKey);
+        }
+        const { data, error: userError } = await _request(this.fetch, "PUT", `${this.url}/user`, {
+          headers: this.headers,
+          redirectTo: options === null || options === void 0 ? void 0 : options.emailRedirectTo,
+          body: Object.assign(Object.assign({}, attributes), { code_challenge: codeChallenge, code_challenge_method: codeChallengeMethod }),
+          jwt: session.access_token,
+          xform: _userResponse
+        });
+        if (userError) {
+          throw userError;
+        }
+        session.user = data.user;
+        await this._saveSession(session);
+        await this._notifyAllSubscribers("USER_UPDATED", session);
+        return this._returnResult({ data: { user: session.user }, error: null });
+      });
+    } catch (error) {
+      await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { user: null }, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Sets the session data from the current session. If the current session is expired, setSession will take care of refreshing it to obtain a new session.
+   * If the refresh token or access token in the current session is invalid, an error will be thrown.
+   * @param currentSession The current session that minimally contains an access token and refresh token.
+   */
+  async setSession(currentSession) {
+    await this.initializePromise;
+    return await this._acquireLock(-1, async () => {
+      return await this._setSession(currentSession);
+    });
+  }
+  async _setSession(currentSession) {
+    try {
+      if (!currentSession.access_token || !currentSession.refresh_token) {
+        throw new AuthSessionMissingError$1();
+      }
+      const timeNow = Date.now() / 1e3;
+      let expiresAt2 = timeNow;
+      let hasExpired = true;
+      let session = null;
+      const { payload } = decodeJWT(currentSession.access_token);
+      if (payload.exp) {
+        expiresAt2 = payload.exp;
+        hasExpired = expiresAt2 <= timeNow;
+      }
+      if (hasExpired) {
+        const { data: refreshedSession, error } = await this._callRefreshToken(currentSession.refresh_token);
+        if (error) {
+          return this._returnResult({ data: { user: null, session: null }, error });
+        }
+        if (!refreshedSession) {
+          return { data: { user: null, session: null }, error: null };
+        }
+        session = refreshedSession;
+      } else {
+        const { data, error } = await this._getUser(currentSession.access_token);
+        if (error) {
+          throw error;
+        }
+        session = {
+          access_token: currentSession.access_token,
+          refresh_token: currentSession.refresh_token,
+          user: data.user,
+          token_type: "bearer",
+          expires_in: expiresAt2 - timeNow,
+          expires_at: expiresAt2
+        };
+        await this._saveSession(session);
+        await this._notifyAllSubscribers("SIGNED_IN", session);
+      }
+      return this._returnResult({ data: { user: session.user, session }, error: null });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { session: null, user: null }, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Returns a new session, regardless of expiry status.
+   * Takes in an optional current session. If not passed in, then refreshSession() will attempt to retrieve it from getSession().
+   * If the current session's refresh token is invalid, an error will be thrown.
+   * @param currentSession The current session. If passed in, it must contain a refresh token.
+   */
+  async refreshSession(currentSession) {
+    await this.initializePromise;
+    return await this._acquireLock(-1, async () => {
+      return await this._refreshSession(currentSession);
+    });
+  }
+  async _refreshSession(currentSession) {
+    try {
+      return await this._useSession(async (result) => {
+        var _a3;
+        if (!currentSession) {
+          const { data, error: error2 } = result;
+          if (error2) {
+            throw error2;
+          }
+          currentSession = (_a3 = data.session) !== null && _a3 !== void 0 ? _a3 : void 0;
+        }
+        if (!(currentSession === null || currentSession === void 0 ? void 0 : currentSession.refresh_token)) {
+          throw new AuthSessionMissingError$1();
+        }
+        const { data: session, error } = await this._callRefreshToken(currentSession.refresh_token);
+        if (error) {
+          return this._returnResult({ data: { user: null, session: null }, error });
+        }
+        if (!session) {
+          return this._returnResult({ data: { user: null, session: null }, error: null });
+        }
+        return this._returnResult({ data: { user: session.user, session }, error: null });
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { user: null, session: null }, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Gets the session data from a URL string
+   */
+  async _getSessionFromURL(params, callbackUrlType) {
+    try {
+      if (!isBrowser())
+        throw new AuthImplicitGrantRedirectError$1("No browser detected.");
+      if (params.error || params.error_description || params.error_code) {
+        throw new AuthImplicitGrantRedirectError$1(params.error_description || "Error in URL with unspecified error_description", {
+          error: params.error || "unspecified_error",
+          code: params.error_code || "unspecified_code"
+        });
+      }
+      switch (callbackUrlType) {
+        case "implicit":
+          if (this.flowType === "pkce") {
+            throw new AuthPKCEGrantCodeExchangeError$1("Not a valid PKCE flow url.");
+          }
+          break;
+        case "pkce":
+          if (this.flowType === "implicit") {
+            throw new AuthImplicitGrantRedirectError$1("Not a valid implicit grant flow url.");
+          }
+          break;
+        default:
+      }
+      if (callbackUrlType === "pkce") {
+        this._debug("#_initialize()", "begin", "is PKCE flow", true);
+        if (!params.code)
+          throw new AuthPKCEGrantCodeExchangeError$1("No code detected.");
+        const { data: data2, error: error2 } = await this._exchangeCodeForSession(params.code);
+        if (error2)
+          throw error2;
+        const url = new URL(window.location.href);
+        url.searchParams.delete("code");
+        window.history.replaceState(window.history.state, "", url.toString());
+        return { data: { session: data2.session, redirectType: null }, error: null };
+      }
+      const { provider_token, provider_refresh_token, access_token, refresh_token, expires_in, expires_at, token_type } = params;
+      if (!access_token || !expires_in || !refresh_token || !token_type) {
+        throw new AuthImplicitGrantRedirectError$1("No session defined in URL");
+      }
+      const timeNow = Math.round(Date.now() / 1e3);
+      const expiresIn = parseInt(expires_in);
+      let expiresAt2 = timeNow + expiresIn;
+      if (expires_at) {
+        expiresAt2 = parseInt(expires_at);
+      }
+      const actuallyExpiresIn = expiresAt2 - timeNow;
+      if (actuallyExpiresIn * 1e3 <= AUTO_REFRESH_TICK_DURATION_MS) {
+        console.warn(`@supabase/gotrue-js: Session as retrieved from URL expires in ${actuallyExpiresIn}s, should have been closer to ${expiresIn}s`);
+      }
+      const issuedAt = expiresAt2 - expiresIn;
+      if (timeNow - issuedAt >= 120) {
+        console.warn("@supabase/gotrue-js: Session as retrieved from URL was issued over 120s ago, URL could be stale", issuedAt, expiresAt2, timeNow);
+      } else if (timeNow - issuedAt < 0) {
+        console.warn("@supabase/gotrue-js: Session as retrieved from URL was issued in the future? Check the device clock for skew", issuedAt, expiresAt2, timeNow);
+      }
+      const { data, error } = await this._getUser(access_token);
+      if (error)
+        throw error;
+      const session = {
+        provider_token,
+        provider_refresh_token,
+        access_token,
+        expires_in: expiresIn,
+        expires_at: expiresAt2,
+        refresh_token,
+        token_type,
+        user: data.user
+      };
+      window.location.hash = "";
+      this._debug("#_getSessionFromURL()", "clearing window.location.hash");
+      return this._returnResult({ data: { session, redirectType: params.type }, error: null });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { session: null, redirectType: null }, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Checks if the current URL contains parameters given by an implicit oauth grant flow (https://www.rfc-editor.org/rfc/rfc6749.html#section-4.2)
+   */
+  _isImplicitGrantCallback(params) {
+    return Boolean(params.access_token || params.error_description);
+  }
+  /**
+   * Checks if the current URL and backing storage contain parameters given by a PKCE flow
+   */
+  async _isPKCECallback(params) {
+    const currentStorageContent = await getItemAsync(this.storage, `${this.storageKey}-code-verifier`);
+    return !!(params.code && currentStorageContent);
+  }
+  /**
+   * Inside a browser context, `signOut()` will remove the logged in user from the browser session and log them out - removing all items from localstorage and then trigger a `"SIGNED_OUT"` event.
+   *
+   * For server-side management, you can revoke all refresh tokens for a user by passing a user's JWT through to `auth.api.signOut(JWT: string)`.
+   * There is no way to revoke a user's access token jwt until it expires. It is recommended to set a shorter expiry on the jwt for this reason.
+   *
+   * If using `others` scope, no `SIGNED_OUT` event is fired!
+   */
+  async signOut(options = { scope: "global" }) {
+    await this.initializePromise;
+    return await this._acquireLock(-1, async () => {
+      return await this._signOut(options);
+    });
+  }
+  async _signOut({ scope } = { scope: "global" }) {
+    return await this._useSession(async (result) => {
+      var _a3;
+      const { data, error: sessionError } = result;
+      if (sessionError) {
+        return this._returnResult({ error: sessionError });
+      }
+      const accessToken = (_a3 = data.session) === null || _a3 === void 0 ? void 0 : _a3.access_token;
+      if (accessToken) {
+        const { error } = await this.admin.signOut(accessToken, scope);
+        if (error) {
+          if (!(isAuthApiError$1(error) && (error.status === 404 || error.status === 401 || error.status === 403))) {
+            return this._returnResult({ error });
+          }
+        }
+      }
+      if (scope !== "others") {
+        await this._removeSession();
+        await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
+      }
+      return this._returnResult({ error: null });
+    });
+  }
+  onAuthStateChange(callback) {
+    const id = generateCallbackId();
+    const subscription = {
+      id,
+      callback,
+      unsubscribe: () => {
+        this._debug("#unsubscribe()", "state change callback with id removed", id);
+        this.stateChangeEmitters.delete(id);
+      }
+    };
+    this._debug("#onAuthStateChange()", "registered callback with id", id);
+    this.stateChangeEmitters.set(id, subscription);
+    (async () => {
+      await this.initializePromise;
+      await this._acquireLock(-1, async () => {
+        this._emitInitialSession(id);
+      });
+    })();
+    return { data: { subscription } };
+  }
+  async _emitInitialSession(id) {
+    return await this._useSession(async (result) => {
+      var _a3, _b2;
+      try {
+        const { data: { session }, error } = result;
+        if (error)
+          throw error;
+        await ((_a3 = this.stateChangeEmitters.get(id)) === null || _a3 === void 0 ? void 0 : _a3.callback("INITIAL_SESSION", session));
+        this._debug("INITIAL_SESSION", "callback id", id, "session", session);
+      } catch (err) {
+        await ((_b2 = this.stateChangeEmitters.get(id)) === null || _b2 === void 0 ? void 0 : _b2.callback("INITIAL_SESSION", null));
+        this._debug("INITIAL_SESSION", "callback id", id, "error", err);
+        console.error(err);
+      }
+    });
+  }
+  /**
+   * Sends a password reset request to an email address. This method supports the PKCE flow.
+   *
+   * @param email The email address of the user.
+   * @param options.redirectTo The URL to send the user to after they click the password reset link.
+   * @param options.captchaToken Verification token received when the user completes the captcha on the site.
+   */
+  async resetPasswordForEmail(email, options = {}) {
+    let codeChallenge = null;
+    let codeChallengeMethod = null;
+    if (this.flowType === "pkce") {
+      [codeChallenge, codeChallengeMethod] = await getCodeChallengeAndMethod(
+        this.storage,
+        this.storageKey,
+        true
+        // isPasswordRecovery
+      );
+    }
+    try {
+      return await _request(this.fetch, "POST", `${this.url}/recover`, {
+        body: {
+          email,
+          code_challenge: codeChallenge,
+          code_challenge_method: codeChallengeMethod,
+          gotrue_meta_security: { captcha_token: options.captchaToken }
+        },
+        headers: this.headers,
+        redirectTo: options.redirectTo
+      });
+    } catch (error) {
+      await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: null, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Gets all the identities linked to a user.
+   */
+  async getUserIdentities() {
+    var _a3;
+    try {
+      const { data, error } = await this.getUser();
+      if (error)
+        throw error;
+      return this._returnResult({ data: { identities: (_a3 = data.user.identities) !== null && _a3 !== void 0 ? _a3 : [] }, error: null });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: null, error });
+      }
+      throw error;
+    }
+  }
+  async linkIdentity(credentials) {
+    if ("token" in credentials) {
+      return this.linkIdentityIdToken(credentials);
+    }
+    return this.linkIdentityOAuth(credentials);
+  }
+  async linkIdentityOAuth(credentials) {
+    var _a3;
+    try {
+      const { data, error } = await this._useSession(async (result) => {
+        var _a4, _b2, _c, _d, _e;
+        const { data: data2, error: error2 } = result;
+        if (error2)
+          throw error2;
+        const url = await this._getUrlForProvider(`${this.url}/user/identities/authorize`, credentials.provider, {
+          redirectTo: (_a4 = credentials.options) === null || _a4 === void 0 ? void 0 : _a4.redirectTo,
+          scopes: (_b2 = credentials.options) === null || _b2 === void 0 ? void 0 : _b2.scopes,
+          queryParams: (_c = credentials.options) === null || _c === void 0 ? void 0 : _c.queryParams,
+          skipBrowserRedirect: true
+        });
+        return await _request(this.fetch, "GET", url, {
+          headers: this.headers,
+          jwt: (_e = (_d = data2.session) === null || _d === void 0 ? void 0 : _d.access_token) !== null && _e !== void 0 ? _e : void 0
+        });
+      });
+      if (error)
+        throw error;
+      if (isBrowser() && !((_a3 = credentials.options) === null || _a3 === void 0 ? void 0 : _a3.skipBrowserRedirect)) {
+        window.location.assign(data === null || data === void 0 ? void 0 : data.url);
+      }
+      return this._returnResult({
+        data: { provider: credentials.provider, url: data === null || data === void 0 ? void 0 : data.url },
+        error: null
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { provider: credentials.provider, url: null }, error });
+      }
+      throw error;
+    }
+  }
+  async linkIdentityIdToken(credentials) {
+    return await this._useSession(async (result) => {
+      var _a3;
+      try {
+        const { error: sessionError, data: { session } } = result;
+        if (sessionError)
+          throw sessionError;
+        const { options, provider, token, access_token, nonce } = credentials;
+        const res = await _request(this.fetch, "POST", `${this.url}/token?grant_type=id_token`, {
+          headers: this.headers,
+          jwt: (_a3 = session === null || session === void 0 ? void 0 : session.access_token) !== null && _a3 !== void 0 ? _a3 : void 0,
+          body: {
+            provider,
+            id_token: token,
+            access_token,
+            nonce,
+            link_identity: true,
+            gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken }
+          },
+          xform: _sessionResponse
+        });
+        const { data, error } = res;
+        if (error) {
+          return this._returnResult({ data: { user: null, session: null }, error });
+        } else if (!data || !data.session || !data.user) {
+          return this._returnResult({
+            data: { user: null, session: null },
+            error: new AuthInvalidTokenResponseError$1()
+          });
+        }
+        if (data.session) {
+          await this._saveSession(data.session);
+          await this._notifyAllSubscribers("USER_UPDATED", data.session);
+        }
+        return this._returnResult({ data, error });
+      } catch (error) {
+        await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
+        if (isAuthError$1(error)) {
+          return this._returnResult({ data: { user: null, session: null }, error });
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * Unlinks an identity from a user by deleting it. The user will no longer be able to sign in with that identity once it's unlinked.
+   */
+  async unlinkIdentity(identity3) {
+    try {
+      return await this._useSession(async (result) => {
+        var _a3, _b2;
+        const { data, error } = result;
+        if (error) {
+          throw error;
+        }
+        return await _request(this.fetch, "DELETE", `${this.url}/user/identities/${identity3.identity_id}`, {
+          headers: this.headers,
+          jwt: (_b2 = (_a3 = data.session) === null || _a3 === void 0 ? void 0 : _a3.access_token) !== null && _b2 !== void 0 ? _b2 : void 0
+        });
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: null, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Generates a new JWT.
+   * @param refreshToken A valid refresh token that was returned on login.
+   */
+  async _refreshAccessToken(refreshToken) {
+    const debugName = `#_refreshAccessToken(${refreshToken.substring(0, 5)}...)`;
+    this._debug(debugName, "begin");
+    try {
+      const startedAt = Date.now();
+      return await retryable(async (attempt) => {
+        if (attempt > 0) {
+          await sleep(200 * Math.pow(2, attempt - 1));
+        }
+        this._debug(debugName, "refreshing attempt", attempt);
+        return await _request(this.fetch, "POST", `${this.url}/token?grant_type=refresh_token`, {
+          body: { refresh_token: refreshToken },
+          headers: this.headers,
+          xform: _sessionResponse
+        });
+      }, (attempt, error) => {
+        const nextBackOffInterval = 200 * Math.pow(2, attempt);
+        return error && isAuthRetryableFetchError$1(error) && // retryable only if the request can be sent before the backoff overflows the tick duration
+        Date.now() + nextBackOffInterval - startedAt < AUTO_REFRESH_TICK_DURATION_MS;
+      });
+    } catch (error) {
+      this._debug(debugName, "error", error);
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: { session: null, user: null }, error });
+      }
+      throw error;
+    } finally {
+      this._debug(debugName, "end");
+    }
+  }
+  _isValidSession(maybeSession) {
+    const isValidSession = typeof maybeSession === "object" && maybeSession !== null && "access_token" in maybeSession && "refresh_token" in maybeSession && "expires_at" in maybeSession;
+    return isValidSession;
+  }
+  async _handleProviderSignIn(provider, options) {
+    const url = await this._getUrlForProvider(`${this.url}/authorize`, provider, {
+      redirectTo: options.redirectTo,
+      scopes: options.scopes,
+      queryParams: options.queryParams
+    });
+    this._debug("#_handleProviderSignIn()", "provider", provider, "options", options, "url", url);
+    if (isBrowser() && !options.skipBrowserRedirect) {
+      window.location.assign(url);
+    }
+    return { data: { provider, url }, error: null };
+  }
+  /**
+   * Recovers the session from LocalStorage and refreshes the token
+   * Note: this method is async to accommodate for AsyncStorage e.g. in React native.
+   */
+  async _recoverAndRefresh() {
+    var _a3, _b2;
+    const debugName = "#_recoverAndRefresh()";
+    this._debug(debugName, "begin");
+    try {
+      const currentSession = await getItemAsync(this.storage, this.storageKey);
+      if (currentSession && this.userStorage) {
+        let maybeUser = await getItemAsync(this.userStorage, this.storageKey + "-user");
+        if (!this.storage.isServer && Object.is(this.storage, this.userStorage) && !maybeUser) {
+          maybeUser = { user: currentSession.user };
+          await setItemAsync(this.userStorage, this.storageKey + "-user", maybeUser);
+        }
+        currentSession.user = (_a3 = maybeUser === null || maybeUser === void 0 ? void 0 : maybeUser.user) !== null && _a3 !== void 0 ? _a3 : userNotAvailableProxy();
+      } else if (currentSession && !currentSession.user) {
+        if (!currentSession.user) {
+          const separateUser = await getItemAsync(this.storage, this.storageKey + "-user");
+          if (separateUser && (separateUser === null || separateUser === void 0 ? void 0 : separateUser.user)) {
+            currentSession.user = separateUser.user;
+            await removeItemAsync(this.storage, this.storageKey + "-user");
+            await setItemAsync(this.storage, this.storageKey, currentSession);
+          } else {
+            currentSession.user = userNotAvailableProxy();
+          }
+        }
+      }
+      this._debug(debugName, "session from storage", currentSession);
+      if (!this._isValidSession(currentSession)) {
+        this._debug(debugName, "session is not valid");
+        if (currentSession !== null) {
+          await this._removeSession();
+        }
+        return;
+      }
+      const expiresWithMargin = ((_b2 = currentSession.expires_at) !== null && _b2 !== void 0 ? _b2 : Infinity) * 1e3 - Date.now() < EXPIRY_MARGIN_MS;
+      this._debug(debugName, `session has${expiresWithMargin ? "" : " not"} expired with margin of ${EXPIRY_MARGIN_MS}s`);
+      if (expiresWithMargin) {
+        if (this.autoRefreshToken && currentSession.refresh_token) {
+          const { error } = await this._callRefreshToken(currentSession.refresh_token);
+          if (error) {
+            console.error(error);
+            if (!isAuthRetryableFetchError$1(error)) {
+              this._debug(debugName, "refresh failed with a non-retryable error, removing the session", error);
+              await this._removeSession();
+            }
+          }
+        }
+      } else if (currentSession.user && currentSession.user.__isUserNotAvailableProxy === true) {
+        try {
+          const { data, error: userError } = await this._getUser(currentSession.access_token);
+          if (!userError && (data === null || data === void 0 ? void 0 : data.user)) {
+            currentSession.user = data.user;
+            await this._saveSession(currentSession);
+            await this._notifyAllSubscribers("SIGNED_IN", currentSession);
+          } else {
+            this._debug(debugName, "could not get user data, skipping SIGNED_IN notification");
+          }
+        } catch (getUserError) {
+          console.error("Error getting user data:", getUserError);
+          this._debug(debugName, "error getting user data, skipping SIGNED_IN notification", getUserError);
+        }
+      } else {
+        await this._notifyAllSubscribers("SIGNED_IN", currentSession);
+      }
+    } catch (err) {
+      this._debug(debugName, "error", err);
+      console.error(err);
+      return;
+    } finally {
+      this._debug(debugName, "end");
+    }
+  }
+  async _callRefreshToken(refreshToken) {
+    var _a3, _b2;
+    if (!refreshToken) {
+      throw new AuthSessionMissingError$1();
+    }
+    if (this.refreshingDeferred) {
+      return this.refreshingDeferred.promise;
+    }
+    const debugName = `#_callRefreshToken(${refreshToken.substring(0, 5)}...)`;
+    this._debug(debugName, "begin");
+    try {
+      this.refreshingDeferred = new Deferred();
+      const { data, error } = await this._refreshAccessToken(refreshToken);
+      if (error)
+        throw error;
+      if (!data.session)
+        throw new AuthSessionMissingError$1();
+      await this._saveSession(data.session);
+      await this._notifyAllSubscribers("TOKEN_REFRESHED", data.session);
+      const result = { data: data.session, error: null };
+      this.refreshingDeferred.resolve(result);
+      return result;
+    } catch (error) {
+      this._debug(debugName, "error", error);
+      if (isAuthError$1(error)) {
+        const result = { data: null, error };
+        if (!isAuthRetryableFetchError$1(error)) {
+          await this._removeSession();
+        }
+        (_a3 = this.refreshingDeferred) === null || _a3 === void 0 ? void 0 : _a3.resolve(result);
+        return result;
+      }
+      (_b2 = this.refreshingDeferred) === null || _b2 === void 0 ? void 0 : _b2.reject(error);
+      throw error;
+    } finally {
+      this.refreshingDeferred = null;
+      this._debug(debugName, "end");
+    }
+  }
+  async _notifyAllSubscribers(event, session, broadcast = true) {
+    const debugName = `#_notifyAllSubscribers(${event})`;
+    this._debug(debugName, "begin", session, `broadcast = ${broadcast}`);
+    try {
+      if (this.broadcastChannel && broadcast) {
+        this.broadcastChannel.postMessage({ event, session });
+      }
+      const errors = [];
+      const promises = Array.from(this.stateChangeEmitters.values()).map(async (x2) => {
+        try {
+          await x2.callback(event, session);
+        } catch (e) {
+          errors.push(e);
+        }
+      });
+      await Promise.all(promises);
+      if (errors.length > 0) {
+        for (let i = 0; i < errors.length; i += 1) {
+          console.error(errors[i]);
+        }
+        throw errors[0];
+      }
+    } finally {
+      this._debug(debugName, "end");
+    }
+  }
+  /**
+   * set currentSession and currentUser
+   * process to _startAutoRefreshToken if possible
+   */
+  async _saveSession(session) {
+    this._debug("#_saveSession()", session);
+    this.suppressGetSessionWarning = true;
+    await removeItemAsync(this.storage, `${this.storageKey}-code-verifier`);
+    const sessionToProcess = Object.assign({}, session);
+    const userIsProxy = sessionToProcess.user && sessionToProcess.user.__isUserNotAvailableProxy === true;
+    if (this.userStorage) {
+      if (!userIsProxy && sessionToProcess.user) {
+        await setItemAsync(this.userStorage, this.storageKey + "-user", {
+          user: sessionToProcess.user
+        });
+      }
+      const mainSessionData = Object.assign({}, sessionToProcess);
+      delete mainSessionData.user;
+      const clonedMainSessionData = deepClone(mainSessionData);
+      await setItemAsync(this.storage, this.storageKey, clonedMainSessionData);
+    } else {
+      const clonedSession = deepClone(sessionToProcess);
+      await setItemAsync(this.storage, this.storageKey, clonedSession);
+    }
+  }
+  async _removeSession() {
+    this._debug("#_removeSession()");
+    this.suppressGetSessionWarning = false;
+    await removeItemAsync(this.storage, this.storageKey);
+    await removeItemAsync(this.storage, this.storageKey + "-code-verifier");
+    await removeItemAsync(this.storage, this.storageKey + "-user");
+    if (this.userStorage) {
+      await removeItemAsync(this.userStorage, this.storageKey + "-user");
+    }
+    await this._notifyAllSubscribers("SIGNED_OUT", null);
+  }
+  /**
+   * Removes any registered visibilitychange callback.
+   *
+   * {@see #startAutoRefresh}
+   * {@see #stopAutoRefresh}
+   */
+  _removeVisibilityChangedCallback() {
+    this._debug("#_removeVisibilityChangedCallback()");
+    const callback = this.visibilityChangedCallback;
+    this.visibilityChangedCallback = null;
+    try {
+      if (callback && isBrowser() && (window === null || window === void 0 ? void 0 : window.removeEventListener)) {
+        window.removeEventListener("visibilitychange", callback);
+      }
+    } catch (e) {
+      console.error("removing visibilitychange callback failed", e);
+    }
+  }
+  /**
+   * This is the private implementation of {@link #startAutoRefresh}. Use this
+   * within the library.
+   */
+  async _startAutoRefresh() {
+    await this._stopAutoRefresh();
+    this._debug("#_startAutoRefresh()");
+    const ticker2 = setInterval(() => this._autoRefreshTokenTick(), AUTO_REFRESH_TICK_DURATION_MS);
+    this.autoRefreshTicker = ticker2;
+    if (ticker2 && typeof ticker2 === "object" && typeof ticker2.unref === "function") {
+      ticker2.unref();
+    } else if (typeof Deno !== "undefined" && typeof Deno.unrefTimer === "function") {
+      Deno.unrefTimer(ticker2);
+    }
+    setTimeout(async () => {
+      await this.initializePromise;
+      await this._autoRefreshTokenTick();
+    }, 0);
+  }
+  /**
+   * This is the private implementation of {@link #stopAutoRefresh}. Use this
+   * within the library.
+   */
+  async _stopAutoRefresh() {
+    this._debug("#_stopAutoRefresh()");
+    const ticker2 = this.autoRefreshTicker;
+    this.autoRefreshTicker = null;
+    if (ticker2) {
+      clearInterval(ticker2);
+    }
+  }
+  /**
+   * Starts an auto-refresh process in the background. The session is checked
+   * every few seconds. Close to the time of expiration a process is started to
+   * refresh the session. If refreshing fails it will be retried for as long as
+   * necessary.
+   *
+   * If you set the {@link GoTrueClientOptions#autoRefreshToken} you don't need
+   * to call this function, it will be called for you.
+   *
+   * On browsers the refresh process works only when the tab/window is in the
+   * foreground to conserve resources as well as prevent race conditions and
+   * flooding auth with requests. If you call this method any managed
+   * visibility change callback will be removed and you must manage visibility
+   * changes on your own.
+   *
+   * On non-browser platforms the refresh process works *continuously* in the
+   * background, which may not be desirable. You should hook into your
+   * platform's foreground indication mechanism and call these methods
+   * appropriately to conserve resources.
+   *
+   * {@see #stopAutoRefresh}
+   */
+  async startAutoRefresh() {
+    this._removeVisibilityChangedCallback();
+    await this._startAutoRefresh();
+  }
+  /**
+   * Stops an active auto refresh process running in the background (if any).
+   *
+   * If you call this method any managed visibility change callback will be
+   * removed and you must manage visibility changes on your own.
+   *
+   * See {@link #startAutoRefresh} for more details.
+   */
+  async stopAutoRefresh() {
+    this._removeVisibilityChangedCallback();
+    await this._stopAutoRefresh();
+  }
+  /**
+   * Runs the auto refresh token tick.
+   */
+  async _autoRefreshTokenTick() {
+    this._debug("#_autoRefreshTokenTick()", "begin");
+    try {
+      await this._acquireLock(0, async () => {
+        try {
+          const now = Date.now();
+          try {
+            return await this._useSession(async (result) => {
+              const { data: { session } } = result;
+              if (!session || !session.refresh_token || !session.expires_at) {
+                this._debug("#_autoRefreshTokenTick()", "no session");
+                return;
+              }
+              const expiresInTicks = Math.floor((session.expires_at * 1e3 - now) / AUTO_REFRESH_TICK_DURATION_MS);
+              this._debug("#_autoRefreshTokenTick()", `access token expires in ${expiresInTicks} ticks, a tick lasts ${AUTO_REFRESH_TICK_DURATION_MS}ms, refresh threshold is ${AUTO_REFRESH_TICK_THRESHOLD} ticks`);
+              if (expiresInTicks <= AUTO_REFRESH_TICK_THRESHOLD) {
+                await this._callRefreshToken(session.refresh_token);
+              }
+            });
+          } catch (e) {
+            console.error("Auto refresh tick failed with error. This is likely a transient error.", e);
+          }
+        } finally {
+          this._debug("#_autoRefreshTokenTick()", "end");
+        }
+      });
+    } catch (e) {
+      if (e.isAcquireTimeout || e instanceof LockAcquireTimeoutError) {
+        this._debug("auto refresh token tick lock not available");
+      } else {
+        throw e;
+      }
+    }
+  }
+  /**
+   * Registers callbacks on the browser / platform, which in-turn run
+   * algorithms when the browser window/tab are in foreground. On non-browser
+   * platforms it assumes always foreground.
+   */
+  async _handleVisibilityChange() {
+    this._debug("#_handleVisibilityChange()");
+    if (!isBrowser() || !(window === null || window === void 0 ? void 0 : window.addEventListener)) {
+      if (this.autoRefreshToken) {
+        this.startAutoRefresh();
+      }
+      return false;
+    }
+    try {
+      this.visibilityChangedCallback = async () => await this._onVisibilityChanged(false);
+      window === null || window === void 0 ? void 0 : window.addEventListener("visibilitychange", this.visibilityChangedCallback);
+      await this._onVisibilityChanged(true);
+    } catch (error) {
+      console.error("_handleVisibilityChange", error);
+    }
+  }
+  /**
+   * Callback registered with `window.addEventListener('visibilitychange')`.
+   */
+  async _onVisibilityChanged(calledFromInitialize) {
+    const methodName = `#_onVisibilityChanged(${calledFromInitialize})`;
+    this._debug(methodName, "visibilityState", document.visibilityState);
+    if (document.visibilityState === "visible") {
+      if (this.autoRefreshToken) {
+        this._startAutoRefresh();
+      }
+      if (!calledFromInitialize) {
+        await this.initializePromise;
+        await this._acquireLock(-1, async () => {
+          if (document.visibilityState !== "visible") {
+            this._debug(methodName, "acquired the lock to recover the session, but the browser visibilityState is no longer visible, aborting");
+            return;
+          }
+          await this._recoverAndRefresh();
+        });
+      }
+    } else if (document.visibilityState === "hidden") {
+      if (this.autoRefreshToken) {
+        this._stopAutoRefresh();
+      }
+    }
+  }
+  /**
+   * Generates the relevant login URL for a third-party provider.
+   * @param options.redirectTo A URL or mobile address to send the user to after they are confirmed.
+   * @param options.scopes A space-separated list of scopes granted to the OAuth application.
+   * @param options.queryParams An object of key-value pairs containing query parameters granted to the OAuth application.
+   */
+  async _getUrlForProvider(url, provider, options) {
+    const urlParams = [`provider=${encodeURIComponent(provider)}`];
+    if (options === null || options === void 0 ? void 0 : options.redirectTo) {
+      urlParams.push(`redirect_to=${encodeURIComponent(options.redirectTo)}`);
+    }
+    if (options === null || options === void 0 ? void 0 : options.scopes) {
+      urlParams.push(`scopes=${encodeURIComponent(options.scopes)}`);
+    }
+    if (this.flowType === "pkce") {
+      const [codeChallenge, codeChallengeMethod] = await getCodeChallengeAndMethod(this.storage, this.storageKey);
+      const flowParams = new URLSearchParams({
+        code_challenge: `${encodeURIComponent(codeChallenge)}`,
+        code_challenge_method: `${encodeURIComponent(codeChallengeMethod)}`
+      });
+      urlParams.push(flowParams.toString());
+    }
+    if (options === null || options === void 0 ? void 0 : options.queryParams) {
+      const query = new URLSearchParams(options.queryParams);
+      urlParams.push(query.toString());
+    }
+    if (options === null || options === void 0 ? void 0 : options.skipBrowserRedirect) {
+      urlParams.push(`skip_http_redirect=${options.skipBrowserRedirect}`);
+    }
+    return `${url}?${urlParams.join("&")}`;
+  }
+  async _unenroll(params) {
+    try {
+      return await this._useSession(async (result) => {
+        var _a3;
+        const { data: sessionData, error: sessionError } = result;
+        if (sessionError) {
+          return this._returnResult({ data: null, error: sessionError });
+        }
+        return await _request(this.fetch, "DELETE", `${this.url}/factors/${params.factorId}`, {
+          headers: this.headers,
+          jwt: (_a3 = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a3 === void 0 ? void 0 : _a3.access_token
+        });
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: null, error });
+      }
+      throw error;
+    }
+  }
+  async _enroll(params) {
+    try {
+      return await this._useSession(async (result) => {
+        var _a3, _b2;
+        const { data: sessionData, error: sessionError } = result;
+        if (sessionError) {
+          return this._returnResult({ data: null, error: sessionError });
+        }
+        const body = Object.assign({ friendly_name: params.friendlyName, factor_type: params.factorType }, params.factorType === "phone" ? { phone: params.phone } : params.factorType === "totp" ? { issuer: params.issuer } : {});
+        const { data, error } = await _request(this.fetch, "POST", `${this.url}/factors`, {
+          body,
+          headers: this.headers,
+          jwt: (_a3 = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a3 === void 0 ? void 0 : _a3.access_token
+        });
+        if (error) {
+          return this._returnResult({ data: null, error });
+        }
+        if (params.factorType === "totp" && data.type === "totp" && ((_b2 = data === null || data === void 0 ? void 0 : data.totp) === null || _b2 === void 0 ? void 0 : _b2.qr_code)) {
+          data.totp.qr_code = `data:image/svg+xml;utf-8,${data.totp.qr_code}`;
+        }
+        return this._returnResult({ data, error: null });
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: null, error });
+      }
+      throw error;
+    }
+  }
+  async _verify(params) {
+    return this._acquireLock(-1, async () => {
+      try {
+        return await this._useSession(async (result) => {
+          var _a3;
+          const { data: sessionData, error: sessionError } = result;
+          if (sessionError) {
+            return this._returnResult({ data: null, error: sessionError });
+          }
+          const body = Object.assign({ challenge_id: params.challengeId }, "webauthn" in params ? {
+            webauthn: Object.assign(Object.assign({}, params.webauthn), { credential_response: params.webauthn.type === "create" ? serializeCredentialCreationResponse(params.webauthn.credential_response) : serializeCredentialRequestResponse(params.webauthn.credential_response) })
+          } : { code: params.code });
+          const { data, error } = await _request(this.fetch, "POST", `${this.url}/factors/${params.factorId}/verify`, {
+            body,
+            headers: this.headers,
+            jwt: (_a3 = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a3 === void 0 ? void 0 : _a3.access_token
+          });
+          if (error) {
+            return this._returnResult({ data: null, error });
+          }
+          await this._saveSession(Object.assign({ expires_at: Math.round(Date.now() / 1e3) + data.expires_in }, data));
+          await this._notifyAllSubscribers("MFA_CHALLENGE_VERIFIED", data);
+          return this._returnResult({ data, error });
+        });
+      } catch (error) {
+        if (isAuthError$1(error)) {
+          return this._returnResult({ data: null, error });
+        }
+        throw error;
+      }
+    });
+  }
+  async _challenge(params) {
+    return this._acquireLock(-1, async () => {
+      try {
+        return await this._useSession(async (result) => {
+          var _a3;
+          const { data: sessionData, error: sessionError } = result;
+          if (sessionError) {
+            return this._returnResult({ data: null, error: sessionError });
+          }
+          const response = await _request(this.fetch, "POST", `${this.url}/factors/${params.factorId}/challenge`, {
+            body: params,
+            headers: this.headers,
+            jwt: (_a3 = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a3 === void 0 ? void 0 : _a3.access_token
+          });
+          if (response.error) {
+            return response;
+          }
+          const { data } = response;
+          if (data.type !== "webauthn") {
+            return { data, error: null };
+          }
+          switch (data.webauthn.type) {
+            case "create":
+              return {
+                data: Object.assign(Object.assign({}, data), { webauthn: Object.assign(Object.assign({}, data.webauthn), { credential_options: Object.assign(Object.assign({}, data.webauthn.credential_options), { publicKey: deserializeCredentialCreationOptions(data.webauthn.credential_options.publicKey) }) }) }),
+                error: null
+              };
+            case "request":
+              return {
+                data: Object.assign(Object.assign({}, data), { webauthn: Object.assign(Object.assign({}, data.webauthn), { credential_options: Object.assign(Object.assign({}, data.webauthn.credential_options), { publicKey: deserializeCredentialRequestOptions(data.webauthn.credential_options.publicKey) }) }) }),
+                error: null
+              };
+          }
+        });
+      } catch (error) {
+        if (isAuthError$1(error)) {
+          return this._returnResult({ data: null, error });
+        }
+        throw error;
+      }
+    });
+  }
+  /**
+   * {@see GoTrueMFAApi#challengeAndVerify}
+   */
+  async _challengeAndVerify(params) {
+    const { data: challengeData, error: challengeError } = await this._challenge({
+      factorId: params.factorId
+    });
+    if (challengeError) {
+      return this._returnResult({ data: null, error: challengeError });
+    }
+    return await this._verify({
+      factorId: params.factorId,
+      challengeId: challengeData.id,
+      code: params.code
+    });
+  }
+  /**
+   * {@see GoTrueMFAApi#listFactors}
+   */
+  async _listFactors() {
+    var _a3;
+    const { data: { user }, error: userError } = await this.getUser();
+    if (userError) {
+      return { data: null, error: userError };
+    }
+    const data = {
+      all: [],
+      phone: [],
+      totp: [],
+      webauthn: []
+    };
+    for (const factor of (_a3 = user === null || user === void 0 ? void 0 : user.factors) !== null && _a3 !== void 0 ? _a3 : []) {
+      data.all.push(factor);
+      if (factor.status === "verified") {
+        data[factor.factor_type].push(factor);
+      }
+    }
+    return {
+      data,
+      error: null
+    };
+  }
+  /**
+   * {@see GoTrueMFAApi#getAuthenticatorAssuranceLevel}
+   */
+  async _getAuthenticatorAssuranceLevel() {
+    var _a3, _b2;
+    const { data: { session }, error: sessionError } = await this.getSession();
+    if (sessionError) {
+      return this._returnResult({ data: null, error: sessionError });
+    }
+    if (!session) {
+      return {
+        data: { currentLevel: null, nextLevel: null, currentAuthenticationMethods: [] },
+        error: null
+      };
+    }
+    const { payload } = decodeJWT(session.access_token);
+    let currentLevel = null;
+    if (payload.aal) {
+      currentLevel = payload.aal;
+    }
+    let nextLevel = currentLevel;
+    const verifiedFactors = (_b2 = (_a3 = session.user.factors) === null || _a3 === void 0 ? void 0 : _a3.filter((factor) => factor.status === "verified")) !== null && _b2 !== void 0 ? _b2 : [];
+    if (verifiedFactors.length > 0) {
+      nextLevel = "aal2";
+    }
+    const currentAuthenticationMethods = payload.amr || [];
+    return { data: { currentLevel, nextLevel, currentAuthenticationMethods }, error: null };
+  }
+  /**
+   * Retrieves details about an OAuth authorization request.
+   * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+   *
+   * Returns authorization details including client info, scopes, and user information.
+   * If the API returns a redirect_uri, it means consent was already given - the caller
+   * should handle the redirect manually if needed.
+   */
+  async _getAuthorizationDetails(authorizationId) {
+    try {
+      return await this._useSession(async (result) => {
+        const { data: { session }, error: sessionError } = result;
+        if (sessionError) {
+          return this._returnResult({ data: null, error: sessionError });
+        }
+        if (!session) {
+          return this._returnResult({ data: null, error: new AuthSessionMissingError$1() });
+        }
+        return await _request(this.fetch, "GET", `${this.url}/oauth/authorizations/${authorizationId}`, {
+          headers: this.headers,
+          jwt: session.access_token,
+          xform: (data) => ({ data, error: null })
+        });
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: null, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Approves an OAuth authorization request.
+   * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+   */
+  async _approveAuthorization(authorizationId, options) {
+    try {
+      return await this._useSession(async (result) => {
+        const { data: { session }, error: sessionError } = result;
+        if (sessionError) {
+          return this._returnResult({ data: null, error: sessionError });
+        }
+        if (!session) {
+          return this._returnResult({ data: null, error: new AuthSessionMissingError$1() });
+        }
+        const response = await _request(this.fetch, "POST", `${this.url}/oauth/authorizations/${authorizationId}/consent`, {
+          headers: this.headers,
+          jwt: session.access_token,
+          body: { action: "approve" },
+          xform: (data) => ({ data, error: null })
+        });
+        if (response.data && response.data.redirect_url) {
+          if (isBrowser() && !(options === null || options === void 0 ? void 0 : options.skipBrowserRedirect)) {
+            window.location.assign(response.data.redirect_url);
+          }
+        }
+        return response;
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: null, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Denies an OAuth authorization request.
+   * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+   */
+  async _denyAuthorization(authorizationId, options) {
+    try {
+      return await this._useSession(async (result) => {
+        const { data: { session }, error: sessionError } = result;
+        if (sessionError) {
+          return this._returnResult({ data: null, error: sessionError });
+        }
+        if (!session) {
+          return this._returnResult({ data: null, error: new AuthSessionMissingError$1() });
+        }
+        const response = await _request(this.fetch, "POST", `${this.url}/oauth/authorizations/${authorizationId}/consent`, {
+          headers: this.headers,
+          jwt: session.access_token,
+          body: { action: "deny" },
+          xform: (data) => ({ data, error: null })
+        });
+        if (response.data && response.data.redirect_url) {
+          if (isBrowser() && !(options === null || options === void 0 ? void 0 : options.skipBrowserRedirect)) {
+            window.location.assign(response.data.redirect_url);
+          }
+        }
+        return response;
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: null, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Lists all OAuth grants that the authenticated user has authorized.
+   * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+   */
+  async _listOAuthGrants() {
+    try {
+      return await this._useSession(async (result) => {
+        const { data: { session }, error: sessionError } = result;
+        if (sessionError) {
+          return this._returnResult({ data: null, error: sessionError });
+        }
+        if (!session) {
+          return this._returnResult({ data: null, error: new AuthSessionMissingError$1() });
+        }
+        return await _request(this.fetch, "GET", `${this.url}/user/oauth/grants`, {
+          headers: this.headers,
+          jwt: session.access_token,
+          xform: (data) => ({ data, error: null })
+        });
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: null, error });
+      }
+      throw error;
+    }
+  }
+  /**
+   * Revokes a user's OAuth grant for a specific client.
+   * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+   */
+  async _revokeOAuthGrant(options) {
+    try {
+      return await this._useSession(async (result) => {
+        const { data: { session }, error: sessionError } = result;
+        if (sessionError) {
+          return this._returnResult({ data: null, error: sessionError });
+        }
+        if (!session) {
+          return this._returnResult({ data: null, error: new AuthSessionMissingError$1() });
+        }
+        await _request(this.fetch, "DELETE", `${this.url}/user/oauth/grants`, {
+          headers: this.headers,
+          jwt: session.access_token,
+          query: { client_id: options.clientId },
+          noResolveJson: true
+        });
+        return { data: {}, error: null };
+      });
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: null, error });
+      }
+      throw error;
+    }
+  }
+  async fetchJwk(kid, jwks = { keys: [] }) {
+    let jwk = jwks.keys.find((key) => key.kid === kid);
+    if (jwk) {
+      return jwk;
+    }
+    const now = Date.now();
+    jwk = this.jwks.keys.find((key) => key.kid === kid);
+    if (jwk && this.jwks_cached_at + JWKS_TTL > now) {
+      return jwk;
+    }
+    const { data, error } = await _request(this.fetch, "GET", `${this.url}/.well-known/jwks.json`, {
+      headers: this.headers
+    });
+    if (error) {
+      throw error;
+    }
+    if (!data.keys || data.keys.length === 0) {
+      return null;
+    }
+    this.jwks = data;
+    this.jwks_cached_at = now;
+    jwk = data.keys.find((key) => key.kid === kid);
+    if (!jwk) {
+      return null;
+    }
+    return jwk;
+  }
+  /**
+   * Extracts the JWT claims present in the access token by first verifying the
+   * JWT against the server's JSON Web Key Set endpoint
+   * `/.well-known/jwks.json` which is often cached, resulting in significantly
+   * faster responses. Prefer this method over {@link #getUser} which always
+   * sends a request to the Auth server for each JWT.
+   *
+   * If the project is not using an asymmetric JWT signing key (like ECC or
+   * RSA) it always sends a request to the Auth server (similar to {@link
+   * #getUser}) to verify the JWT.
+   *
+   * @param jwt An optional specific JWT you wish to verify, not the one you
+   *            can obtain from {@link #getSession}.
+   * @param options Various additional options that allow you to customize the
+   *                behavior of this method.
+   */
+  async getClaims(jwt, options = {}) {
+    try {
+      let token = jwt;
+      if (!token) {
+        const { data, error } = await this.getSession();
+        if (error || !data.session) {
+          return this._returnResult({ data: null, error });
+        }
+        token = data.session.access_token;
+      }
+      const { header, payload, signature, raw: { header: rawHeader, payload: rawPayload } } = decodeJWT(token);
+      if (!(options === null || options === void 0 ? void 0 : options.allowExpired)) {
+        validateExp(payload.exp);
+      }
+      const signingKey = !header.alg || header.alg.startsWith("HS") || !header.kid || !("crypto" in globalThis && "subtle" in globalThis.crypto) ? null : await this.fetchJwk(header.kid, (options === null || options === void 0 ? void 0 : options.keys) ? { keys: options.keys } : options === null || options === void 0 ? void 0 : options.jwks);
+      if (!signingKey) {
+        const { error } = await this.getUser(token);
+        if (error) {
+          throw error;
+        }
+        return {
+          data: {
+            claims: payload,
+            header,
+            signature
+          },
+          error: null
+        };
+      }
+      const algorithm = getAlgorithm(header.alg);
+      const publicKey = await crypto.subtle.importKey("jwk", signingKey, algorithm, true, [
+        "verify"
+      ]);
+      const isValid = await crypto.subtle.verify(algorithm, publicKey, signature, stringToUint8Array(`${rawHeader}.${rawPayload}`));
+      if (!isValid) {
+        throw new AuthInvalidJwtError$1("Invalid JWT signature");
+      }
+      return {
+        data: {
+          claims: payload,
+          header,
+          signature
+        },
+        error: null
+      };
+    } catch (error) {
+      if (isAuthError$1(error)) {
+        return this._returnResult({ data: null, error });
+      }
+      throw error;
+    }
+  }
+};
+GoTrueClient$1.nextInstanceID = {};
+const AuthAdminApi$1 = GoTrueAdminApi$1;
+const AuthClient$1 = GoTrueClient$1;
+const module$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  AuthAdminApi: AuthAdminApi$1,
+  AuthApiError: AuthApiError$1,
+  AuthClient: AuthClient$1,
+  AuthError: AuthError$1,
+  AuthImplicitGrantRedirectError: AuthImplicitGrantRedirectError$1,
+  AuthInvalidCredentialsError: AuthInvalidCredentialsError$1,
+  AuthInvalidJwtError: AuthInvalidJwtError$1,
+  AuthInvalidTokenResponseError: AuthInvalidTokenResponseError$1,
+  AuthPKCEGrantCodeExchangeError: AuthPKCEGrantCodeExchangeError$1,
+  AuthRetryableFetchError: AuthRetryableFetchError$1,
+  AuthSessionMissingError: AuthSessionMissingError$1,
+  AuthUnknownError: AuthUnknownError$1,
+  AuthWeakPasswordError: AuthWeakPasswordError$1,
+  CustomAuthError: CustomAuthError$1,
+  GoTrueAdminApi: GoTrueAdminApi$1,
+  GoTrueClient: GoTrueClient$1,
+  NavigatorLockAcquireTimeoutError: NavigatorLockAcquireTimeoutError$1,
+  SIGN_OUT_SCOPES: SIGN_OUT_SCOPES$1,
+  isAuthApiError: isAuthApiError$1,
+  isAuthError: isAuthError$1,
+  isAuthImplicitGrantRedirectError: isAuthImplicitGrantRedirectError$1,
+  isAuthRetryableFetchError: isAuthRetryableFetchError$1,
+  isAuthSessionMissingError: isAuthSessionMissingError$1,
+  isAuthWeakPasswordError: isAuthWeakPasswordError$1,
+  lockInternals: internals,
+  navigatorLock: navigatorLock$1,
+  processLock: processLock$1
+}, Symbol.toStringTag, { value: "Module" }));
+const require$$1 = /* @__PURE__ */ getAugmentedNamespace(module$1);
+var hasRequiredSupabaseAuthClient;
+function requireSupabaseAuthClient() {
+  if (hasRequiredSupabaseAuthClient) return SupabaseAuthClient;
+  hasRequiredSupabaseAuthClient = 1;
+  Object.defineProperty(SupabaseAuthClient, "__esModule", { value: true });
+  SupabaseAuthClient.SupabaseAuthClient = void 0;
+  const auth_js_1 = require$$1;
+  let SupabaseAuthClient$1 = class SupabaseAuthClient extends auth_js_1.AuthClient {
+    constructor(options) {
+      super(options);
+    }
+  };
+  SupabaseAuthClient.SupabaseAuthClient = SupabaseAuthClient$1;
+  return SupabaseAuthClient;
+}
+var hasRequiredSupabaseClient;
+function requireSupabaseClient() {
+  if (hasRequiredSupabaseClient) return SupabaseClient$1;
+  hasRequiredSupabaseClient = 1;
+  Object.defineProperty(SupabaseClient$1, "__esModule", { value: true });
+  const functions_js_1 = require$$3$1;
+  const postgrest_js_1 = requireCjs();
+  const realtime_js_1 = require$$4;
+  const storage_js_1 = require$$3;
+  const constants_1 = /* @__PURE__ */ requireConstants();
+  const fetch_1 = /* @__PURE__ */ requireFetch();
+  const helpers_1 = /* @__PURE__ */ requireHelpers();
+  const SupabaseAuthClient_1 = /* @__PURE__ */ requireSupabaseAuthClient();
+  class SupabaseClient2 {
+    /**
+     * Create a new client for use in the browser.
+     * @param supabaseUrl The unique Supabase URL which is supplied when you create a new project in your project dashboard.
+     * @param supabaseKey The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+     * @param options.db.schema You can switch in between schemas. The schema needs to be on the list of exposed schemas inside Supabase.
+     * @param options.auth.autoRefreshToken Set to "true" if you want to automatically refresh the token before expiring.
+     * @param options.auth.persistSession Set to "true" if you want to automatically save the user session into local storage.
+     * @param options.auth.detectSessionInUrl Set to "true" if you want to automatically detects OAuth grants in the URL and signs in the user.
+     * @param options.realtime Options passed along to realtime-js constructor.
+     * @param options.storage Options passed along to the storage-js constructor.
+     * @param options.global.fetch A custom fetch implementation.
+     * @param options.global.headers Any additional headers to send with each network request.
+     * @example
+     * ```ts
+     * import { createClient } from '@supabase/supabase-js'
+     *
+     * const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+     * const { data } = await supabase.from('profiles').select('*')
+     * ```
+     */
+    constructor(supabaseUrl, supabaseKey, options) {
+      var _a3, _b2, _c;
+      this.supabaseUrl = supabaseUrl;
+      this.supabaseKey = supabaseKey;
+      const baseUrl = (0, helpers_1.validateSupabaseUrl)(supabaseUrl);
+      if (!supabaseKey)
+        throw new Error("supabaseKey is required.");
+      this.realtimeUrl = new URL("realtime/v1", baseUrl);
+      this.realtimeUrl.protocol = this.realtimeUrl.protocol.replace("http", "ws");
+      this.authUrl = new URL("auth/v1", baseUrl);
+      this.storageUrl = new URL("storage/v1", baseUrl);
+      this.functionsUrl = new URL("functions/v1", baseUrl);
+      const defaultStorageKey = `sb-${baseUrl.hostname.split(".")[0]}-auth-token`;
+      const DEFAULTS = {
+        db: constants_1.DEFAULT_DB_OPTIONS,
+        realtime: constants_1.DEFAULT_REALTIME_OPTIONS,
+        auth: Object.assign(Object.assign({}, constants_1.DEFAULT_AUTH_OPTIONS), { storageKey: defaultStorageKey }),
+        global: constants_1.DEFAULT_GLOBAL_OPTIONS
+      };
+      const settings = (0, helpers_1.applySettingDefaults)(options !== null && options !== void 0 ? options : {}, DEFAULTS);
+      this.storageKey = (_a3 = settings.auth.storageKey) !== null && _a3 !== void 0 ? _a3 : "";
+      this.headers = (_b2 = settings.global.headers) !== null && _b2 !== void 0 ? _b2 : {};
+      if (!settings.accessToken) {
+        this.auth = this._initSupabaseAuthClient((_c = settings.auth) !== null && _c !== void 0 ? _c : {}, this.headers, settings.global.fetch);
+      } else {
+        this.accessToken = settings.accessToken;
+        this.auth = new Proxy({}, {
+          get: (_, prop) => {
+            throw new Error(`@supabase/supabase-js: Supabase Client is configured with the accessToken option, accessing supabase.auth.${String(prop)} is not possible`);
+          }
+        });
+      }
+      this.fetch = (0, fetch_1.fetchWithAuth)(supabaseKey, this._getAccessToken.bind(this), settings.global.fetch);
+      this.realtime = this._initRealtimeClient(Object.assign({ headers: this.headers, accessToken: this._getAccessToken.bind(this) }, settings.realtime));
+      if (this.accessToken) {
+        this.accessToken().then((token) => this.realtime.setAuth(token)).catch((e) => console.warn("Failed to set initial Realtime auth token:", e));
+      }
+      this.rest = new postgrest_js_1.PostgrestClient(new URL("rest/v1", baseUrl).href, {
+        headers: this.headers,
+        schema: settings.db.schema,
+        fetch: this.fetch
+      });
+      this.storage = new storage_js_1.StorageClient(this.storageUrl.href, this.headers, this.fetch, options === null || options === void 0 ? void 0 : options.storage);
+      if (!settings.accessToken) {
+        this._listenForAuthEvents();
+      }
+    }
+    /**
+     * Supabase Functions allows you to deploy and invoke edge functions.
+     */
+    get functions() {
+      return new functions_js_1.FunctionsClient(this.functionsUrl.href, {
+        headers: this.headers,
+        customFetch: this.fetch
+      });
+    }
+    /**
+     * Perform a query on a table or a view.
+     *
+     * @param relation - The table or view name to query
+     */
+    from(relation) {
+      return this.rest.from(relation);
+    }
+    // NOTE: signatures must be kept in sync with PostgrestClient.schema
+    /**
+     * Select a schema to query or perform an function (rpc) call.
+     *
+     * The schema needs to be on the list of exposed schemas inside Supabase.
+     *
+     * @param schema - The schema to query
+     */
+    schema(schema) {
+      return this.rest.schema(schema);
+    }
+    // NOTE: signatures must be kept in sync with PostgrestClient.rpc
+    /**
+     * Perform a function call.
+     *
+     * @param fn - The function name to call
+     * @param args - The arguments to pass to the function call
+     * @param options - Named parameters
+     * @param options.head - When set to `true`, `data` will not be returned.
+     * Useful if you only need the count.
+     * @param options.get - When set to `true`, the function will be called with
+     * read-only access mode.
+     * @param options.count - Count algorithm to use to count rows returned by the
+     * function. Only applicable for [set-returning
+     * functions](https://www.postgresql.org/docs/current/functions-srf.html).
+     *
+     * `"exact"`: Exact but slow count algorithm. Performs a `COUNT(*)` under the
+     * hood.
+     *
+     * `"planned"`: Approximated but fast count algorithm. Uses the Postgres
+     * statistics under the hood.
+     *
+     * `"estimated"`: Uses exact count for low numbers and planned count for high
+     * numbers.
+     */
+    rpc(fn, args = {}, options = {
+      head: false,
+      get: false,
+      count: void 0
+    }) {
+      return this.rest.rpc(fn, args, options);
+    }
+    /**
+     * Creates a Realtime channel with Broadcast, Presence, and Postgres Changes.
+     *
+     * @param {string} name - The name of the Realtime channel.
+     * @param {Object} opts - The options to pass to the Realtime channel.
+     *
+     */
+    channel(name, opts = { config: {} }) {
+      return this.realtime.channel(name, opts);
+    }
+    /**
+     * Returns all Realtime channels.
+     */
+    getChannels() {
+      return this.realtime.getChannels();
+    }
+    /**
+     * Unsubscribes and removes Realtime channel from Realtime client.
+     *
+     * @param {RealtimeChannel} channel - The name of the Realtime channel.
+     *
+     */
+    removeChannel(channel) {
+      return this.realtime.removeChannel(channel);
+    }
+    /**
+     * Unsubscribes and removes all Realtime channels from Realtime client.
+     */
+    removeAllChannels() {
+      return this.realtime.removeAllChannels();
+    }
+    async _getAccessToken() {
+      var _a3, _b2;
+      if (this.accessToken) {
+        return await this.accessToken();
+      }
+      const { data } = await this.auth.getSession();
+      return (_b2 = (_a3 = data.session) === null || _a3 === void 0 ? void 0 : _a3.access_token) !== null && _b2 !== void 0 ? _b2 : this.supabaseKey;
+    }
+    _initSupabaseAuthClient({ autoRefreshToken, persistSession, detectSessionInUrl, storage: storage2, userStorage, storageKey, flowType, lock, debug, throwOnError }, headers, fetch2) {
+      const authHeaders = {
+        Authorization: `Bearer ${this.supabaseKey}`,
+        apikey: `${this.supabaseKey}`
+      };
+      return new SupabaseAuthClient_1.SupabaseAuthClient({
+        url: this.authUrl.href,
+        headers: Object.assign(Object.assign({}, authHeaders), headers),
+        storageKey,
+        autoRefreshToken,
+        persistSession,
+        detectSessionInUrl,
+        storage: storage2,
+        userStorage,
+        flowType,
+        lock,
+        debug,
+        throwOnError,
+        fetch: fetch2,
+        // auth checks if there is a custom authorizaiton header using this flag
+        // so it knows whether to return an error when getUser is called with no session
+        hasCustomAuthorizationHeader: Object.keys(this.headers).some((key) => key.toLowerCase() === "authorization")
+      });
+    }
+    _initRealtimeClient(options) {
+      return new realtime_js_1.RealtimeClient(this.realtimeUrl.href, Object.assign(Object.assign({}, options), { params: Object.assign({ apikey: this.supabaseKey }, options === null || options === void 0 ? void 0 : options.params) }));
+    }
+    _listenForAuthEvents() {
+      const data = this.auth.onAuthStateChange((event, session) => {
+        this._handleTokenChanged(event, "CLIENT", session === null || session === void 0 ? void 0 : session.access_token);
+      });
+      return data;
+    }
+    _handleTokenChanged(event, source, token) {
+      if ((event === "TOKEN_REFRESHED" || event === "SIGNED_IN") && this.changedAccessToken !== token) {
+        this.changedAccessToken = token;
+        this.realtime.setAuth(token);
+      } else if (event === "SIGNED_OUT") {
+        this.realtime.setAuth();
+        if (source == "STORAGE")
+          this.auth.signOut();
+        this.changedAccessToken = void 0;
+      }
+    }
+  }
+  SupabaseClient$1.default = SupabaseClient2;
+  return SupabaseClient$1;
+}
+var hasRequiredMain;
+function requireMain() {
+  if (hasRequiredMain) return main;
+  hasRequiredMain = 1;
+  (function(exports$1) {
+    var __createBinding2 = main && main.__createBinding || (Object.create ? (function(o, m, k2, k22) {
+      if (k22 === void 0) k22 = k2;
+      var desc = Object.getOwnPropertyDescriptor(m, k2);
+      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function() {
+          return m[k2];
+        } };
+      }
+      Object.defineProperty(o, k22, desc);
+    }) : (function(o, m, k2, k22) {
+      if (k22 === void 0) k22 = k2;
+      o[k22] = m[k2];
+    }));
+    var __exportStar2 = main && main.__exportStar || function(m, exports$12) {
+      for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports$12, p)) __createBinding2(exports$12, m, p);
+    };
+    var __importDefault2 = main && main.__importDefault || function(mod) {
+      return mod && mod.__esModule ? mod : { "default": mod };
+    };
+    Object.defineProperty(exports$1, "__esModule", { value: true });
+    exports$1.createClient = exports$1.SupabaseClient = exports$1.FunctionRegion = exports$1.FunctionsError = exports$1.FunctionsRelayError = exports$1.FunctionsFetchError = exports$1.FunctionsHttpError = exports$1.PostgrestError = void 0;
+    const SupabaseClient_1 = __importDefault2(/* @__PURE__ */ requireSupabaseClient());
+    __exportStar2(require$$1, exports$1);
+    var postgrest_js_1 = requireCjs();
+    Object.defineProperty(exports$1, "PostgrestError", { enumerable: true, get: function() {
+      return postgrest_js_1.PostgrestError;
+    } });
+    var functions_js_1 = require$$3$1;
+    Object.defineProperty(exports$1, "FunctionsHttpError", { enumerable: true, get: function() {
+      return functions_js_1.FunctionsHttpError;
+    } });
+    Object.defineProperty(exports$1, "FunctionsFetchError", { enumerable: true, get: function() {
+      return functions_js_1.FunctionsFetchError;
+    } });
+    Object.defineProperty(exports$1, "FunctionsRelayError", { enumerable: true, get: function() {
+      return functions_js_1.FunctionsRelayError;
+    } });
+    Object.defineProperty(exports$1, "FunctionsError", { enumerable: true, get: function() {
+      return functions_js_1.FunctionsError;
+    } });
+    Object.defineProperty(exports$1, "FunctionRegion", { enumerable: true, get: function() {
+      return functions_js_1.FunctionRegion;
+    } });
+    __exportStar2(require$$4, exports$1);
+    var SupabaseClient_2 = /* @__PURE__ */ requireSupabaseClient();
+    Object.defineProperty(exports$1, "SupabaseClient", { enumerable: true, get: function() {
+      return __importDefault2(SupabaseClient_2).default;
+    } });
+    const createClient2 = (supabaseUrl, supabaseKey, options) => {
+      return new SupabaseClient_1.default(supabaseUrl, supabaseKey, options);
+    };
+    exports$1.createClient = createClient2;
+    function shouldShowDeprecationWarning() {
+      if (typeof window !== "undefined") {
+        return false;
+      }
+      if (typeof process === "undefined") {
+        return false;
+      }
+      const processVersion = process["version"];
+      if (processVersion === void 0 || processVersion === null) {
+        return false;
+      }
+      const versionMatch = processVersion.match(/^v(\d+)\./);
+      if (!versionMatch) {
+        return false;
+      }
+      const majorVersion = parseInt(versionMatch[1], 10);
+      return majorVersion <= 18;
+    }
+    if (shouldShowDeprecationWarning()) {
+      console.warn(`⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217`);
+    }
+  })(main);
+  return main;
+}
+var mainExports = /* @__PURE__ */ requireMain();
+const index = /* @__PURE__ */ getDefaultExportFromCjs(mainExports);
+const index$1 = /* @__PURE__ */ _mergeNamespaces({
+  __proto__: null,
+  default: index
+}, [mainExports]);
+const {
+  PostgrestError,
+  FunctionsHttpError: FunctionsHttpError2,
+  FunctionsFetchError: FunctionsFetchError2,
+  FunctionsRelayError: FunctionsRelayError2,
+  FunctionsError: FunctionsError2,
+  FunctionRegion,
+  SupabaseClient,
+  createClient,
+  GoTrueAdminApi: GoTrueAdminApi2,
+  GoTrueClient: GoTrueClient2,
+  AuthAdminApi,
+  AuthClient,
+  navigatorLock,
+  NavigatorLockAcquireTimeoutError: NavigatorLockAcquireTimeoutError2,
+  lockInternals,
+  processLock,
+  SIGN_OUT_SCOPES,
+  AuthError: AuthError2,
+  AuthApiError: AuthApiError2,
+  AuthUnknownError: AuthUnknownError2,
+  CustomAuthError: CustomAuthError2,
+  AuthSessionMissingError: AuthSessionMissingError2,
+  AuthInvalidTokenResponseError: AuthInvalidTokenResponseError2,
+  AuthInvalidCredentialsError: AuthInvalidCredentialsError2,
+  AuthImplicitGrantRedirectError: AuthImplicitGrantRedirectError2,
+  AuthPKCEGrantCodeExchangeError: AuthPKCEGrantCodeExchangeError2,
+  AuthRetryableFetchError: AuthRetryableFetchError2,
+  AuthWeakPasswordError: AuthWeakPasswordError2,
+  AuthInvalidJwtError: AuthInvalidJwtError2,
+  isAuthError,
+  isAuthApiError,
+  isAuthSessionMissingError,
+  isAuthImplicitGrantRedirectError,
+  isAuthRetryableFetchError,
+  isAuthWeakPasswordError,
+  RealtimePresence: RealtimePresence2,
+  RealtimeChannel: RealtimeChannel2,
+  RealtimeClient: RealtimeClient2,
+  REALTIME_LISTEN_TYPES,
+  REALTIME_POSTGRES_CHANGES_LISTEN_EVENT,
+  REALTIME_PRESENCE_LISTEN_EVENTS,
+  REALTIME_SUBSCRIBE_STATES,
+  REALTIME_CHANNEL_STATES
+} = index || index$1;
+const SUPABASE_URL = typeof window !== "undefined" && window.SUPABASE_URL || typeof window !== "undefined" && ((_a2 = window.ENV_CONFIG) == null ? void 0 : _a2.SUPABASE_URL) || "https://boyuxgdplbpkknplxbxp.supabase.co";
+const SUPABASE_ANON_KEY = typeof window !== "undefined" && window.SUPABASE_ANON_KEY || typeof window !== "undefined" && ((_b = window.ENV_CONFIG) == null ? void 0 : _b.SUPABASE_ANON_KEY) || null;
+let supabaseInstance = null;
+function getSupabaseClient() {
+  if (supabaseInstance) return supabaseInstance;
+  if (!SUPABASE_ANON_KEY) {
+    console.warn("⚠️ Supabase anon key not configured. Real-time sync disabled.");
+    console.warn("   Make sure env-config.js is loaded before this script.");
+    return null;
+  }
+  try {
+    supabaseInstance = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      realtime: {
+        params: {
+          eventsPerSecond: 10
+        }
+      }
+    });
+    console.log("✅ Supabase client initialized for 3p1");
+    return supabaseInstance;
+  } catch (error) {
+    console.error("❌ Failed to initialize Supabase client:", error);
+    return null;
+  }
+}
+const supabase = getSupabaseClient();
+function useRealtimeSync(tableName, onDataChange, options) {
+  const handleChange = reactExports.useCallback(onDataChange, []);
+  reactExports.useEffect(() => {
+    if (!supabase) {
+      console.warn("Supabase not initialized, skipping realtime subscription");
+      return;
+    }
+    const channelName = `realtime-${tableName}-${Date.now()}`;
+    console.log(`📡 Subscribing to ${tableName} changes...`);
+    const channel = supabase.channel(channelName).on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: tableName,
+        filter: options == null ? void 0 : options.filter
+      },
+      (payload) => {
+        console.log(`📡 [${tableName}] ${payload.eventType}:`, payload);
+        handleChange({
+          eventType: payload.eventType,
+          new: payload.new,
+          old: payload.old
+        });
+      }
+    ).subscribe((status) => {
+      console.log(`📡 [${tableName}] Subscription status:`, status);
+    });
+    return () => {
+      console.log(`🔌 Unsubscribing from ${tableName}`);
+      supabase.removeChannel(channel);
+    };
+  }, [tableName, handleChange, options == null ? void 0 : options.schema, options == null ? void 0 : options.filter, options == null ? void 0 : options.enabled]);
+}
 const KPIDashboard = React.lazy(() => __vitePreload(() => import("./KPIDashboard.js"), true ? [] : void 0, import.meta.url).then((m) => ({ default: m.KPIDashboard })));
 const AdminDashboard = React.lazy(() => __vitePreload(() => import("./AdminDashboard.js"), true ? [] : void 0, import.meta.url).then((m) => ({ default: m.AdminDashboard })));
 const LoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-64 bg-gray-900", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-3", children: [
@@ -36705,6 +49514,50 @@ function App() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+  useRealtimeSync("tickers", (payload) => {
+    var _a3, _b2, _c, _d, _e;
+    console.log("📡 [3p1] Realtime ticker change:", payload.eventType, ((_a3 = payload.new) == null ? void 0 : _a3.ticker) || ((_b2 = payload.old) == null ? void 0 : _b2.ticker));
+    if (payload.eventType === "INSERT" && payload.new) {
+      const symbol = (_c = payload.new.ticker) == null ? void 0 : _c.toUpperCase();
+      if (symbol && !library[symbol]) {
+        showNotification(`📡 Nouveau ticker ajouté: ${symbol}`, "info");
+        hasLoadedTickersRef.current = false;
+        setIsInitialized((prev) => prev);
+      }
+    } else if (payload.eventType === "DELETE" && payload.old) {
+      const symbol = (_d = payload.old.ticker) == null ? void 0 : _d.toUpperCase();
+      if (symbol) {
+        showNotification(`📡 Ticker supprimé: ${symbol}`, "warning");
+        setLibrary((prev) => {
+          const updated = { ...prev };
+          delete updated[symbol];
+          storage.setItem(STORAGE_KEY, updated).catch(console.warn);
+          return updated;
+        });
+      }
+    } else if (payload.eventType === "UPDATE" && payload.new) {
+      const symbol = (_e = payload.new.ticker) == null ? void 0 : _e.toUpperCase();
+      if (symbol && library[symbol]) {
+        setLibrary((prev) => {
+          if (!prev[symbol]) return prev;
+          return {
+            ...prev,
+            [symbol]: {
+              ...prev[symbol],
+              info: {
+                ...prev[symbol].info,
+                securityRank: payload.new.security_rank || prev[symbol].info.securityRank,
+                earningsPredictability: payload.new.earnings_predictability,
+                priceGrowthPersistence: payload.new.price_growth_persistence,
+                priceStability: payload.new.price_stability,
+                beta: payload.new.beta
+              }
+            }
+          };
+        });
+      }
+    }
+  });
   const [isAdmin, setIsAdmin] = reactExports.useState(false);
   reactExports.useEffect(() => {
     try {
@@ -36795,7 +49648,7 @@ function App() {
   const [isReadOnly, setIsReadOnly] = reactExports.useState(false);
   reactExports.useEffect(() => {
     const loadFromStorage = async () => {
-      var _a;
+      var _a3;
       try {
         const saved = await storage.getItem(STORAGE_KEY);
         if (saved) {
@@ -36811,7 +49664,7 @@ function App() {
           const cleaned = {};
           const removedMutualFunds = [];
           for (const [symbol, profile] of Object.entries(parsed)) {
-            const companyName = ((_a = profile == null ? void 0 : profile.info) == null ? void 0 : _a.name) || "";
+            const companyName = ((_a3 = profile == null ? void 0 : profile.info) == null ? void 0 : _a3.name) || "";
             if (isMutualFund(symbol, companyName)) {
               removedMutualFunds.push(symbol);
             } else {
@@ -36858,11 +49711,11 @@ function App() {
       return;
     }
     const refreshPriceCacheIfNeeded = async () => {
-      var _a, _b;
+      var _a3, _b2;
       try {
         const response = await fetch("/api/market-data-batch?tickers=AAPL&checkOnly=true");
         const result = await response.json();
-        if (((_a = result.stats) == null ? void 0 : _a.stale) > 0 || ((_b = result.stats) == null ? void 0 : _b.missing) > 0) {
+        if (((_a3 = result.stats) == null ? void 0 : _a3.stale) > 0 || ((_b2 = result.stats) == null ? void 0 : _b2.missing) > 0) {
           console.log("🔄 Cache prix expiré - Mise à jour automatique...");
           fetch("/api/fmp-batch-sync", { method: "POST" }).then(() => console.log("✅ Cache prix mis à jour")).catch((err) => console.warn("⚠️ Erreur mise à jour cache prix:", err));
         } else {
@@ -37285,7 +50138,7 @@ function App() {
     }
   };
   const performSync = async (saveCurrentVersion) => {
-    var _a, _b, _c, _d;
+    var _a3, _b2, _c, _d;
     try {
       if (saveCurrentVersion) {
         const hasValidData = data && data.length > 0;
@@ -37344,8 +50197,8 @@ function App() {
       if (result.info) {
         const existingProfile = library[activeId];
         let preservedValueLineMetrics = {
-          securityRank: ((_a = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _a.securityRank) || result.info.securityRank || "N/A",
-          earningsPredictability: ((_b = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _b.earningsPredictability) || result.info.earningsPredictability,
+          securityRank: ((_a3 = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _a3.securityRank) || result.info.securityRank || "N/A",
+          earningsPredictability: ((_b2 = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _b2.earningsPredictability) || result.info.earningsPredictability,
           priceGrowthPersistence: ((_c = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _c.priceGrowthPersistence) || result.info.priceGrowthPersistence,
           priceStability: ((_d = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _d.priceStability) || result.info.priceStability
         };
@@ -37482,7 +50335,7 @@ Vérifiez les logs de la console pour plus de détails.`;
       showNotification(`Erreur lors de la récupération des données : ${errorMessage}`, "error");
     }
   };
-  const handleUpdateRow = (index, field, value) => {
+  const handleUpdateRow = (index2, field, value) => {
     if (isReadOnly) {
       showNotification("Cette version est en lecture seule. Déverrouillez-la pour la modifier.", "warning");
       return;
@@ -37490,7 +50343,7 @@ Vérifiez les logs de la console pour plus de détails.`;
     setPastData((prev) => [...prev, data]);
     setFutureData([]);
     const updated = [...data];
-    updated[index] = { ...updated[index], [field]: value, autoFetched: false };
+    updated[index2] = { ...updated[index2], [field]: value, autoFetched: false };
     setData(updated);
   };
   const handleUpdateAssumption = (key, value) => {
@@ -38573,12 +51426,13 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-base sm:text-xl font-bold text-gray-700 truncate flex-1 sm:flex-none", children: "Analyse Financière Pro" })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-sm border border-gray-200 p-1 flex items-center gap-1 w-full sm:w-auto", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex bg-gray-800/50 p-1 rounded-lg border border-gray-700/50 backdrop-blur-sm", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "button",
               {
                 onClick: () => setCurrentView("analysis"),
-                className: `flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all flex-1 sm:flex-none ${currentView === "analysis" ? "bg-blue-50 text-blue-700 shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"}`,
+                title: "Tableau de bord principal",
+                className: `p-2 rounded-lg transition-colors duration-200 flex items-center gap-2 ${currentView === "analysis" ? "bg-blue-600 text-white shadow-md" : "text-gray-400 hover:text-white hover:bg-gray-800"}`,
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: "Analyse" })
@@ -38589,10 +51443,11 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
               "button",
               {
                 onClick: () => setCurrentView("kpi"),
-                className: `flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all flex-1 sm:flex-none ${currentView === "kpi" ? "bg-blue-50 text-blue-700 shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"}`,
+                title: "Tableau de bord KPI et classement",
+                className: `p-2 rounded-lg transition-colors duration-200 flex items-center gap-2 ${currentView === "kpi" ? "bg-blue-600 text-white shadow-md" : "text-gray-400 hover:text-white hover:bg-gray-800"}`,
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: "KPI" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: "KPIs & Classement" })
                 ]
               }
             ),
@@ -38600,7 +51455,8 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
               "button",
               {
                 onClick: () => setCurrentView("info"),
-                className: `flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all flex-1 sm:flex-none ${currentView === "info" ? "bg-blue-50 text-blue-700 shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"}`,
+                title: "Mode d'emploi et documentation",
+                className: `p-2 rounded-lg transition-colors duration-200 flex items-center gap-2 ${currentView === "info" ? "bg-blue-600 text-white shadow-md" : "text-gray-400 hover:text-white hover:bg-gray-800"}`,
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: "Mode d'emploi" })
@@ -38646,11 +51502,11 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 ] })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1 bg-white rounded-md shadow-sm border border-gray-200 p-0.5 no-print", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: undo, disabled: pastData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$G, { className: "w-4 h-4" }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: undo, disabled: pastData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", "aria-label": "Annuler la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$G, { className: "w-4 h-4" }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-px bg-gray-200 my-1" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: redo, disabled: futureData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$F, { className: "w-4 h-4" }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: redo, disabled: futureData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", "aria-label": "Rétablir la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$F, { className: "w-4 h-4" }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-px bg-gray-200 my-1" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleResetData, className: "p-1.5 rounded hover:bg-red-50 text-red-600", title: "Réinitialiser les données", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-4 h-4" }) })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleResetData, className: "p-1.5 rounded hover:bg-red-50 text-red-600", title: "Réinitialiser les données", "aria-label": "Réinitialiser toutes les données", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-4 h-4" }) })
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(HistoricalTable, { data, onUpdateRow: handleUpdateRow }),
@@ -38749,10 +51605,11 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 sm:space-y-3 text-xs sm:text-sm", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs text-gray-500 mb-1", children: "Nom Société" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "config-company-name", className: "block text-xs text-gray-500 mb-1", children: "Nom Société" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
                     "input",
                     {
+                      id: "config-company-name",
                       type: "text",
                       value: info.name,
                       onChange: (e) => handleUpdateInfo("name", e.target.value),
@@ -38761,10 +51618,11 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                   )
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs text-gray-500 mb-1", children: "Secteur" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "config-company-sector", className: "block text-xs text-gray-500 mb-1", children: "Secteur" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
                     "input",
                     {
+                      id: "config-company-sector",
                       type: "text",
                       value: info.sector,
                       onChange: (e) => handleUpdateInfo("sector", e.target.value),
@@ -38773,10 +51631,11 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                   )
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs text-gray-500 mb-1", children: "Capitalisation" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "config-company-marketcap", className: "block text-xs text-gray-500 mb-1", children: "Capitalisation" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
                     "input",
                     {
+                      id: "config-company-marketcap",
                       type: "text",
                       value: info.marketCap,
                       onChange: (e) => handleUpdateInfo("marketCap", e.target.value),

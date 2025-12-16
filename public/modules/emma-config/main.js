@@ -64,29 +64,29 @@ export async function init() {
     // Design field listeners - update preview when design changes
     const designFields = [
         // Colors (basic + advanced)
-        'designColorPrimary', 'designColorPrimaryDark', 'designColorPrimaryLight',
-        'designColorTextDark', 'designColorTextMuted',
-        'designColorBackground', 'designColorBorder', 'designColorLink',
-        'designColorButton', 'designColorSuccess', 'designColorWarning',
+        'promptDesignColorPrimary', 'promptDesignColorPrimaryDark', 'promptDesignColorPrimaryLight',
+        'promptDesignColorTextDark', 'promptDesignColorTextMuted',
+        'promptDesignColorBackground', 'promptDesignColorBorder', 'promptDesignColorLink',
+        'promptDesignColorButton', 'promptDesignColorSuccess', 'promptDesignColorWarning',
         // Branding
-        'designBrandingCompanyName', 'designBrandingTagline',
-        'designBrandingAvatarUrl', 'designBrandingLogoUrl',
+        'promptDesignBrandingCompanyName', 'promptDesignBrandingTagline',
+        'promptDesignBrandingAvatarUrl', 'promptDesignBrandingLogoUrl',
         // Header & Footer
-        'designHeaderShowAvatar', 'designHeaderShowDate', 'designHeaderShowEdition',
-        'designFooterShowLogo', 'designFooterShowDisclaimer', 'designFooterCopyright',
+        'promptDesignHeaderShowAvatar', 'promptDesignHeaderShowDate', 'promptDesignHeaderShowEdition',
+        'promptDesignFooterShowLogo', 'promptDesignFooterShowDisclaimer', 'promptDesignFooterCopyright',
         // SMS
-        'designSmsMaxSegments', 'designSmsSignature', 'designSmsAlertThreshold',
+        'promptDesignSmsMaxSegments', 'promptDesignSmsSignature', 'promptDesignSmsAlertThreshold',
         // Typography
-        'designTypoFontFamily', 'designTypoFontSize', 'designTypoLineHeight',
+        'promptDesignTypoFontFamily', 'promptDesignTypoFontSize', 'promptDesignTypoLineHeight',
         // Layout
-        'designLayoutBorderRadius', 'designLayoutContainerWidth',
-        'designLayoutPadding', 'designLayoutShadow',
+        'promptDesignLayoutBorderRadius', 'promptDesignLayoutContainerWidth',
+        'promptDesignLayoutPadding', 'promptDesignLayoutShadow',
         // Sections
-        'designSectionsShowCallout', 'designSectionsShowSidebar',
-        'designSectionsShowBadges', 'designSectionsShowDividers',
-        'designSectionsCalloutBg', 'designSectionsCalloutBorder',
+        'promptDesignSectionsShowCallout', 'promptDesignSectionsShowSidebar',
+        'promptDesignSectionsShowBadges', 'promptDesignSectionsShowDividers',
+        'promptDesignSectionsCalloutBg', 'promptDesignSectionsCalloutBorder',
         // Emojis
-        'designEmojiHeader', 'designEmojiSuccess', 'designEmojiAlert'
+        'promptDesignEmojiHeader', 'promptDesignEmojiSuccess', 'promptDesignEmojiAlert'
     ];
 
     designFields.forEach(fieldId => {

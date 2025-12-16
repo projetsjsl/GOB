@@ -1012,7 +1012,7 @@ export default function App() {
 
                     // Sinon, utiliser la nouvelle donnée avec autoFetched: true
                     return {
-                        ...newRow,
+                        ...(newRow as AnnualData),
                         autoFetched: true
                     };
                 });
@@ -1381,7 +1381,7 @@ export default function App() {
 
                 // Sinon, utiliser la nouvelle donnée avec autoFetched: true
                 return {
-                    ...newRow,
+                    ...(newRow as AnnualData),
                     autoFetched: true
                 };
             });
@@ -1391,7 +1391,7 @@ export default function App() {
                 const exists = mergedData.some(row => row.year === newRow.year);
                 if (!exists) {
                     mergedData.push({
-                        ...newRow,
+                        ...(newRow as AnnualData),
                         autoFetched: true
                     });
                 }
@@ -1888,13 +1888,13 @@ export default function App() {
                     if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
                         return existingRow; 
                     }
-                    return { ...newRow, autoFetched: true };
+                    return { ...(newRow as AnnualData), autoFetched: true };
                 });
 
                 result.data.forEach(newRow => {
                     const exists = mergedData.some(row => row.year === newRow.year);
                     if (!exists) {
-                        mergedData.push({ ...newRow, autoFetched: true });
+                        mergedData.push({ ...(newRow as AnnualData), autoFetched: true });
                     }
                 });
                 mergedData.sort((a, b) => a.year - b.year);
@@ -2055,7 +2055,7 @@ export default function App() {
                                 return existingRow;
                             }
                             return {
-                                ...newRow,
+                                ...(newRow as AnnualData),
                                 autoFetched: true
                             };
                         });
@@ -2065,7 +2065,7 @@ export default function App() {
                             const exists = mergedData.some(row => row.year === newRow.year);
                             if (!exists) {
                                 mergedData.push({
-                                    ...newRow,
+                                    ...(newRow as AnnualData),
                                     autoFetched: true
                                 });
                             }
@@ -2581,33 +2581,39 @@ export default function App() {
                             </div>
 
                             {/* VIEW TABS */}
-                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1 flex items-center gap-1 w-full sm:w-auto">
+                            <div className="flex bg-gray-800/50 p-1 rounded-lg border border-gray-700/50 backdrop-blur-sm">
                                 <button
                                     onClick={() => setCurrentView('analysis')}
-                                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all flex-1 sm:flex-none ${currentView === 'analysis'
-                                        ? 'bg-blue-50 text-blue-700 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                                        }`}
+                                    title="Tableau de bord principal"
+                                    className={`p-2 rounded-lg transition-colors duration-200 flex items-center gap-2 ${
+                                        currentView === 'analysis' 
+                                            ? 'bg-blue-600 text-white shadow-md' 
+                                            : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                                    }`}
                                 >
                                     <ChartBarSquareIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                                     <span className="hidden xs:inline">Analyse</span>
                                 </button>
                                 <button
                                     onClick={() => setCurrentView('kpi')}
-                                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all flex-1 sm:flex-none ${currentView === 'kpi'
-                                        ? 'bg-blue-50 text-blue-700 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                                        }`}
+                                    title="Tableau de bord KPI et classement"
+                                    className={`p-2 rounded-lg transition-colors duration-200 flex items-center gap-2 ${
+                                        currentView === 'kpi' 
+                                            ? 'bg-blue-600 text-white shadow-md' 
+                                            : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                                    }`}
                                 >
                                     <PresentationChartBarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                                    <span className="hidden xs:inline">KPI</span>
+                                    <span className="hidden xs:inline">KPIs & Classement</span>
                                 </button>
                                 <button
                                     onClick={() => setCurrentView('info')}
-                                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all flex-1 sm:flex-none ${currentView === 'info'
-                                        ? 'bg-blue-50 text-blue-700 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                                        }`}
+                                    title="Mode d'emploi et documentation"
+                                    className={`p-2 rounded-lg transition-colors duration-200 flex items-center gap-2 ${
+                                        currentView === 'info' 
+                                            ? 'bg-blue-600 text-white shadow-md' 
+                                            : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                                    }`}
                                 >
                                     <InformationCircleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                                     <span className="hidden xs:inline">Mode d'emploi</span>
@@ -2659,15 +2665,15 @@ export default function App() {
                                             )}
                                         </h3>
                                         <div className="flex gap-1 bg-white rounded-md shadow-sm border border-gray-200 p-0.5 no-print">
-                                            <button onClick={undo} disabled={pastData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30">
+                                            <button onClick={undo} disabled={pastData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30" aria-label="Annuler la modification">
                                                 <ArrowUturnLeftIcon className="w-4 h-4" />
                                             </button>
                                             <div className="w-px bg-gray-200 my-1"></div>
-                                            <button onClick={redo} disabled={futureData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30">
+                                            <button onClick={redo} disabled={futureData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30" aria-label="Rétablir la modification">
                                                 <ArrowUturnRightIcon className="w-4 h-4" />
                                             </button>
                                             <div className="w-px bg-gray-200 my-1"></div>
-                                            <button onClick={handleResetData} className="p-1.5 rounded hover:bg-red-50 text-red-600" title="Réinitialiser les données">
+                                            <button onClick={handleResetData} className="p-1.5 rounded hover:bg-red-50 text-red-600" title="Réinitialiser les données" aria-label="Réinitialiser toutes les données">
                                                 <ArrowPathIcon className="w-4 h-4" />
                                             </button>
                                         </div>
@@ -2765,8 +2771,9 @@ export default function App() {
                                         </h3>
                                         <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
                                             <div>
-                                                <label className="block text-xs text-gray-500 mb-1">Nom Société</label>
+                                                <label htmlFor="config-company-name" className="block text-xs text-gray-500 mb-1">Nom Société</label>
                                                 <input
+                                                    id="config-company-name"
                                                     type="text"
                                                     value={info.name}
                                                     onChange={(e) => handleUpdateInfo('name', e.target.value)}
@@ -2774,8 +2781,9 @@ export default function App() {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs text-gray-500 mb-1">Secteur</label>
+                                                <label htmlFor="config-company-sector" className="block text-xs text-gray-500 mb-1">Secteur</label>
                                                 <input
+                                                    id="config-company-sector"
                                                     type="text"
                                                     value={info.sector}
                                                     onChange={(e) => handleUpdateInfo('sector', e.target.value)}
@@ -2783,8 +2791,9 @@ export default function App() {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs text-gray-500 mb-1">Capitalisation</label>
+                                                <label htmlFor="config-company-marketcap" className="block text-xs text-gray-500 mb-1">Capitalisation</label>
                                                 <input
+                                                    id="config-company-marketcap"
                                                     type="text"
                                                     value={info.marketCap}
                                                     onChange={(e) => handleUpdateInfo('marketCap', e.target.value)}
