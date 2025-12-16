@@ -167,41 +167,40 @@ window.sendEmailPlan = async function(employee, phases, tasks, resources) {
         }
     });
     
-    function sendEmailToAddress(to, subject, html) {
+    async function sendEmailToAddress(to, subject, html) {
+        // Feedback visuel (simple alert pour l'instant, idéalement un toast dans l'UI)
+        const originalText = document.activeElement ? document.activeElement.innerText : '';
+        if (document.activeElement) document.activeElement.innerText = 'Envoi... ⏳';
 
-    // Feedback visuel (simple alert pour l'instant, idéalement un toast dans l'UI)
-    const originalText = document.activeElement ? document.activeElement.innerText : '';
-    if (document.activeElement) document.activeElement.innerText = 'Envoi... ⏳';
+        try {
+            const response = await fetch('/api/send-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    to: to,
+                    subject: subject,
+                    html: html,
+                    briefingType: 'onboarding_plan'
+                }),
+            });
 
-    try {
-        const response = await fetch('/api/send-email', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                to: to,
-                subject: subject,
-                html: html,
-                briefingType: 'onboarding_plan'
-            }),
-        });
+            const data = await response.json();
 
-        const data = await response.json();
-
-        if (response.ok) {
-            alert('✅ Email envoyé avec succès !');
-        } else {
-            console.error('Erreur envoi email:', data);
-            alert(`❌ Erreur lors de l'envoi : ${data.message || 'Erreur inconnue'}`);
+            if (response.ok) {
+                alert('✅ Email envoyé avec succès !');
+            } else {
+                console.error('Erreur envoi email:', data);
+                alert(`❌ Erreur lors de l'envoi : ${data.message || 'Erreur inconnue'}`);
+            }
+        } catch (error) {
+            console.error('Erreur réseau:', error);
+            alert('❌ Erreur réseau lors de l\'envoi de l\'email.');
+        } finally {
+            if (document.activeElement) document.activeElement.innerText = originalText;
         }
-    } catch (error) {
-        console.error('Erreur réseau:', error);
-        alert('❌ Erreur réseau lors de l\'envoi de l\'email.');
-    } finally {
-        if (document.activeElement) document.activeElement.innerText = originalText;
     }
-};
 
 window.copyEmailHTML = function(employee, phases, tasks, resources) {
     const html = window.generateEmailHTML(employee, phases, tasks, resources);
