@@ -12,6 +12,16 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./caroline-plan-data.js"></script>
     <script src="./email-template.js"></script>
+    <!-- Emma Client SDK - Unified AI integration -->
+    <script type="module">
+        import { EmmaClient } from '/lib/emma-client.js';
+        window.EmmaClient = EmmaClient;
+        window.emmaRHClient = new EmmaClient({ 
+            appName: 'bienvenue', 
+            mode: 'auto' // Uses local for sensitive HR data, external for general questions
+        });
+        console.log('✅ Emma Client loaded for Bienvenue');
+    </script>
     <style>
         @media print {
             .no-print, button, .toolbar, .admin-panel, .save-indicator, .header-controls, .toggle-view { display: none !important; }
@@ -126,14 +136,11 @@
         // SUPABASE CONFIGURATION
         // ============================================
         // ============================================
-        // SUPABASE CONFIGURATION
+        // SUPABASE CONFIGURATION (Environment-based with fallback)
         // ============================================
-        // Config loaded from existing environment or hardcoded fallback found in repo
-        const SUPABASE_URL = 'https://boyuxgdplbpkknplxbxp.supabase.co'; // Found in README
-        // Note: Ideally this key should be in an env var. For this standalone file, we use the anon key if available or prompt user.
-        // Assuming the user has access or the key is injected.
-        // If not, the app will prompt/fail gracefully.
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJveXV4Z2RwbGJwa2tucGx4YnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzMzU5MTQsImV4cCI6MjA3NTkxMTkxNH0.-M-QdpBFlDtg1CeA00VepQCNzGzvU-tISyVA0yCLBdw';
+        // Get config from window (injected by Vercel/build) or use hardcoded anon key
+        const SUPABASE_URL = window.SUPABASE_URL || 'https://boyuxgdplbpkknplxbxp.supabase.co';
+        const SUPABASE_KEY = window.SUPABASE_ANON_KEY || window.ENV_CONFIG?.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJveXV4Z2RwbGJwa2tucGx4YnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzMzU5MTQsImV4cCI6MjA3NTkxMTkxNH0.-M-QdpBFlDtg1CeA00VepQCNzGzvU-tISyVA0yCLBdw';
         
         let supabase;
         try {
@@ -272,73 +279,89 @@
             const scrollToBottom = () => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); };
             useEffect(() => { scrollToBottom(); }, [messages]);
 
-            // CORE AI LOGIC: Heuristic Analysis Engine
-            // This function processes user questions and generates Emma's response
-            const getEmmaResponse = (question) => {
-                const q = question.toLowerCase(); // Normalize question for easier matching
-                // Filter tasks for pending and late statuses
+            // CORE AI LOGIC: Uses EmmaClient SDK with local HR-aware fallback
+            // This function processes user questions via the unified Emma API
+            const getEmmaResponse = async (question) => {
+                const q = question.toLowerCase(); // Normalize for local processing
                 const pending = tasks.filter(t => t.status === 'pending');
                 const late = pending.filter(t => t.dueDate < new Date().toISOString().split('T')[0]);
-                // Determine the next phase with pending tasks
                 const nextPhase = phases.find(p => tasks.some(t => t.phaseId === p.id && t.status === 'pending'));
-
-                // 1. URGENCY ANALYSIS: Checks for keywords related to delays or problems
+                
+                // LOCAL HR-SPECIFIC LOGIC (sensitive data - never sent to external API)
+                // These questions relate to the employee's personal onboarding data
                 if (q.includes('retard') || q.includes('late') || q.includes('urgence') || q.includes('problème')) {
                     if (late.length > 0) {
-                        // If there are late tasks, provide details on the most critical one
                         return `🚨 Analyse critique : Vous avez ${late.length} tâches en retard. La plus critique est "${late[0].title}". Je suggère de la traiter immédiatement ou de contacter ${resources.find(r => late[0].assignedTo?.includes(r.id))?.name || 'votre responsable'} pour un délai.`;
                     }
-                    // If no late tasks, reassure the user
                     return "✅ Analyse : Aucun indicateur de retard détecté. Votre trajectoire est optimale.";
                 }
-
-                // 2. RESOURCE IDENTIFICATION: Helps identify contacts based on keywords
+                
                 if (q.includes('qui') || q.includes('contact') || q.includes('responsable')) {
-                    // Try to find a resource by name mentioned in the question
                     const foundRes = resources.find(r => q.includes(r.name.toLowerCase()));
                     if (foundRes) return `👤 **${foundRes.name}** est votre contact pour : ${foundRes.role}. Vous pouvez le joindre à ${foundRes.email || 'son bureau'}.`;
-                    
-                    // Specific handling for IT/Admin questions
                     if (q.includes('admin') || q.includes('it')) {
                         const tech = resources.find(r => r.role.toLowerCase().includes('it') || r.role.toLowerCase().includes('tech'));
-                        return tech ? `💻 Pour les questions IT, contactez **${tech.name}**. C'est l'expert !` : "Je ne trouve pas d'expert IT désigné, demandez à Julie.";
+                        return tech ? `💻 Pour les questions IT, contactez **${tech.name}**. C'est l'expert !` : "Je ne trouve pas d'expert IT désigné.";
                     }
-                    // General list of contacts if no specific one is found
                     return `👥 Vos alliés sont :\n${resources.map(r => `- ${r.name} (${r.role})`).join('\n')}`;
                 }
-
-                // 3. PREDICTIVE SCHEDULING: Provides information about upcoming tasks/phases
+                
                 if (q.includes('suite') || q.includes('prochain') || q.includes('demain')) {
                     if (nextPhase) {
-                        // List the top 3 pending tasks for the next phase
                         const nextTasks = tasks.filter(t => t.phaseId === nextPhase.id && t.status === 'pending').slice(0, 3);
                         return `🔮 Prévision : Vous entrez dans la phase "${nextPhase.name}". Voici vos 3 priorités stratégiques :\n${nextTasks.map(t => `👉 ${t.title}`).join('\n')}`;
                     }
-                    // If all tasks are completed
                     return "✨ Vous avez atteint l'horizon des événements ! Tout est complété.";
                 }
-
-                // 4. META-ANALYSIS (Audit): Provides a summary of progress
+                
                 if (q.includes('synthèse') || q.includes('résumé') || q.includes('audit')) {
-                    // Calculate completion rate
                     const completionRate = Math.round((tasks.filter(t => t.status === 'completed').length / tasks.length) * 100);
                     return `📊 **Audit d'Intégration**\n- Score Global : ${completionRate}/100\n- Rapidité : ${late.length === 0 ? 'Excellente 🚀' : 'Attention requise ⚠️'}\n- Prochaine étape critique : ${pending[0]?.title || 'Aucune'}\n\nMon conseil : Continuez sur cette lancée !`;
                 }
-
-                // FALLBACK: Generic response if no specific match is found
+                
+                // EXTERNAL AI for general questions (non-sensitive)
+                // Try to use the Emma API for intelligent responses
+                if (window.emmaRHClient) {
+                    try {
+                        const result = await window.emmaRHClient.chat(question, {
+                            context: { 
+                                appContext: 'hr-onboarding',
+                                employeeName: employee?.name,
+                                tasksCount: tasks.length,
+                                phasesCount: phases.length
+                            }
+                        });
+                        if (result.success && result.text) {
+                            return result.text;
+                        }
+                    } catch (err) {
+                        console.warn('Emma API unavailable, using local fallback:', err);
+                    }
+                }
+                
+                // FALLBACK: Generic response
                 return "🤔 Intéressant. Pourriez-vous préciser si cela concerne une tâche, un contact ou votre planning global ?";
             };
 
+            // State for loading indicator
+            const [isLoading, setIsLoading] = useState(false);
+
             // Handles sending a message from the user
-            const handleSend = () => {
-                if (!input.trim()) return; // Prevent sending empty messages
-                // Add user message and Emma's response to conversation
+            const handleSend = async () => {
+                if (!input.trim() || isLoading) return;
                 const userMsg = { from: 'user', text: input };
                 setConversationMessages(prev => [...prev, userMsg]);
+                const question = input;
                 setInput('');
-                setTimeout(() => {
-                    setConversationMessages(prev => [...prev, { from: 'emma', text: getEmmaResponse(input) }]);
-                }, 600);
+                setIsLoading(true);
+                try {
+                    const response = await getEmmaResponse(question);
+                    setConversationMessages(prev => [...prev, { from: 'emma', text: response }]);
+                } catch (err) {
+                    setConversationMessages(prev => [...prev, { from: 'emma', text: "Désolée, j'ai rencontré une erreur. Réessayez." }]);
+                } finally {
+                    setIsLoading(false);
+                }
             };
 
             return (
