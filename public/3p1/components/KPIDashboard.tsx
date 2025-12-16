@@ -2749,7 +2749,6 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                               className={`cursor-pointer hover:r-8 ${getRatioFillClass(metric.ratio31)}`}
                               stroke={currentId === metric.profile.id ? '#2563eb' : '#fff'}
                               strokeWidth={currentId === metric.profile.id ? 2 : 1}
-                              className="cursor-pointer hover:r-8"
                               onClick={() => onSelect(metric.profile.id)}
                             />
                             {currentId === metric.profile.id && (
@@ -2832,7 +2831,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
               
               const maxCount = Math.max(...bins.map(b => b.count));
               
-              return bins.map((bin, idx) => (
+              return bins.map((bin, idx) => {
                   const barHeightStyle: React.CSSProperties = {
                       height: `${(bin.count / maxCount) * 240}px`,
                       minHeight: bin.count > 0 ? '4px' : '0px'
@@ -2848,7 +2847,8 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     <span className="text-[8px] text-gray-500 mt-1">{bin.min !== null && bin.min !== undefined ? bin.min.toFixed(0) : 'N/A'}%</span>
                   )}
                 </div>
-              ));
+                  );
+              });
             })()}
           </div>
           <div className="mt-2 text-xs text-gray-500 text-center">
@@ -2908,7 +2908,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                 return { sector, avgReturn, avgJPEGY, avgRatio31, count: sectorMetrics.length };
               })
               .sort((a, b) => b.avgReturn - a.avgReturn)
-              .map(({ sector, avgReturn, avgJPEGY, avgRatio31, count }) => (
+              .map(({ sector, avgReturn, avgJPEGY, avgRatio31, count }) => {
+                const barWidthStyle: React.CSSProperties = {
+                  width: `${Math.min(Math.max((avgReturn + 50) / 200 * 100, 0), 100)}%`
+                };
+                return (
                 <div key={sector} className="p-3 bg-gradient-to-r from-gray-50 to-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-bold text-gray-800">{sector}</span>
@@ -2919,10 +2923,6 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-600">Rendement moyen:</span>
-                        const barWidthStyle: React.CSSProperties = {
-                          width: `${Math.min(Math.max((avgReturn + 50) / 200 * 100, 0), 100)}%`
-                        };
-                        return (
                         <div className="flex items-center gap-2">
                             <div className="w-32 h-3 bg-gray-200 rounded-full overflow-hidden">
                               <div
@@ -2966,7 +2966,8 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
           </div>
         </div>
 
@@ -3015,14 +3016,12 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                   ).length;
                 }), 1);
                 return (
-                  const riskBarStyle: React.CSSProperties = {
-                    height: `${(count / maxCount) * 100}%`,
-                    minHeight: '10px'
-                  };
-                  return (
                   <div key={level} className="flex-1 flex flex-col items-center">
                     <div
-                      style={riskBarStyle}
+                      style={{
+                        height: `${(count / maxCount) * 100}%`,
+                        minHeight: '10px'
+                      }}
                       className={`w-full rounded-t cursor-pointer hover:opacity-80 transition-opacity ${
                         idx === 0 ? 'bg-green-300' : idx === 1 ? 'bg-yellow-500' : 'bg-red-600'
                       }`}
@@ -3055,15 +3054,13 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       </span>
                     )}
                   </div>
-                      const riskBarWidthStyle: React.CSSProperties = { width: `${(count / filteredMetrics.length) * 100}%` };
-                      return (
                       <div className="flex items-center gap-2">
                         <div className="w-32 h-4 bg-gray-200 rounded-full overflow-hidden">
                           <div
                             className={`h-full ${
                               idx === 0 ? 'bg-green-400' : idx === 1 ? 'bg-yellow-400' : 'bg-red-500'
                             }`}
-                            style={riskBarWidthStyle}
+                            style={{ width: `${(count / filteredMetrics.length) * 100}%` }}
                           />
                         </div>
                     <span className="text-xs font-semibold w-8 text-right">{count}</span>
@@ -3090,13 +3087,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
               return (
                 <div key={range} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                   <span className="text-sm font-medium">{range}</span>
-                    const ratioBarStyle: React.CSSProperties = { width: `${(count / filteredMetrics.length) * 100}%` };
-                    return (
                     <div className="flex items-center gap-2">
                         <div className="w-32 h-4 bg-gray-200 rounded-full overflow-hidden">
                           <div
                             className={`h-full bg-${color}-500`}
-                            style={ratioBarStyle}
+                            style={{ width: `${(count / filteredMetrics.length) * 100}%` }}
                           />
                         </div>
                     <span className="text-xs font-semibold w-8 text-right">{count}</span>
@@ -3117,7 +3112,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
             <div className="flex gap-1.5 sm:gap-2 min-w-max pb-2">
               {filteredMetrics
                 .sort((a, b) => b.totalReturnPercent - a.totalReturnPercent)
-                .map((metric) => (
+                .map((metric) => {
                     const timelineBarStyle: React.CSSProperties = {
                         height: `${Math.max(Math.min((metric.totalReturnPercent + 50) / 200 * 100, 100), 5)}px`,
                         minHeight: '15px'
@@ -3137,7 +3132,8 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       {metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`}
                     </div>
                   </div>
-                ))}
+                    );
+                })}
             </div>
           </div>
         </div>

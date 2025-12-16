@@ -1807,6 +1807,9 @@ video {
 .fill-current {
   fill: currentColor;
 }
+.fill-gray-400 {
+  fill: #9ca3af;
+}
 .fill-gray-500 {
   fill: #6b7280;
 }
@@ -1818,6 +1821,12 @@ video {
 }
 .fill-gray-800 {
   fill: #1f2937;
+}
+.fill-green-600 {
+  fill: #16a34a;
+}
+.fill-red-600 {
+  fill: #dc2626;
 }
 .fill-yellow-500 {
   fill: #eab308;
@@ -2312,6 +2321,9 @@ video {
 }
 .opacity-80 {
   opacity: 0.8;
+}
+.opacity-85 {
+  opacity: 0.85;
 }
 .opacity-90 {
   opacity: 0.9;

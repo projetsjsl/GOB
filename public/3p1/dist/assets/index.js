@@ -33589,6 +33589,14 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     const currentValue = assumptions[metric] || false;
     onUpdateAssumption(metric, currentValue ? 0 : 1);
   };
+  const calculateMedian2 = (values) => {
+    if (values.length === 0) return 0;
+    const validValues = values.filter((v) => isFinite(v));
+    if (validValues.length === 0) return 0;
+    const sorted = [...validValues].sort((a2, b) => a2 - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+  };
   const calculateHistoricalRanges = reactExports.useMemo(() => {
     const validData = data.filter((d) => d.priceHigh > 0 && d.priceLow > 0).sort((a2, b) => a2.year - b.year);
     if (validData.length === 0) {
@@ -33642,7 +33650,8 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
       return {
         min: Math.min(...filtered),
         max: Math.max(...filtered),
-        avg: filtered.reduce((a2, b) => a2 + b, 0) / filtered.length
+        avg: filtered.reduce((a2, b) => a2 + b, 0) / filtered.length,
+        median: calculateMedian2(filtered)
       };
     };
     return {
@@ -33661,59 +33670,59 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     const normalizedSector = sectorKey.toLowerCase();
     if (normalizedSector.includes("tech") || normalizedSector.includes("technologie") || normalizedSector.includes("ti")) {
       return {
-        pe: { min: 15, max: 35, avg: 25 },
-        pcf: { min: 12, max: 28, avg: 20 },
-        pbv: { min: 3, max: 8, avg: 5.5 },
-        yield: { min: 0.5, max: 2.5, avg: 1.5 },
-        epsGrowth: { min: 8, max: 20, avg: 14 },
-        cfGrowth: { min: 8, max: 20, avg: 14 },
-        bvGrowth: { min: 5, max: 15, avg: 10 },
-        divGrowth: { min: 0, max: 10, avg: 5 }
+        pe: { min: 15, max: 35, avg: 25, median: 25 },
+        pcf: { min: 12, max: 28, avg: 20, median: 20 },
+        pbv: { min: 3, max: 8, avg: 5.5, median: 5.5 },
+        yield: { min: 0.5, max: 2.5, avg: 1.5, median: 1.5 },
+        epsGrowth: { min: 8, max: 20, avg: 14, median: 14 },
+        cfGrowth: { min: 8, max: 20, avg: 14, median: 14 },
+        bvGrowth: { min: 5, max: 15, avg: 10, median: 10 },
+        divGrowth: { min: 0, max: 10, avg: 5, median: 5 }
       };
     }
     return {
-      pe: { min: 10, max: 25, avg: 17 },
-      pcf: { min: 8, max: 20, avg: 14 },
-      pbv: { min: 2, max: 6, avg: 4 },
-      yield: { min: 1, max: 4, avg: 2.5 },
-      epsGrowth: { min: 5, max: 15, avg: 10 },
-      cfGrowth: { min: 5, max: 15, avg: 10 },
-      bvGrowth: { min: 3, max: 12, avg: 7 },
-      divGrowth: { min: 1, max: 8, avg: 4 }
+      pe: { min: 10, max: 25, avg: 17, median: 17 },
+      pcf: { min: 8, max: 20, avg: 14, median: 14 },
+      pbv: { min: 2, max: 6, avg: 4, median: 4 },
+      yield: { min: 1, max: 4, avg: 2.5, median: 2.5 },
+      epsGrowth: { min: 5, max: 15, avg: 10, median: 10 },
+      cfGrowth: { min: 5, max: 15, avg: 10, median: 10 },
+      bvGrowth: { min: 3, max: 12, avg: 7, median: 7 },
+      divGrowth: { min: 1, max: 8, avg: 4, median: 4 }
     };
   }, [sector, info == null ? void 0 : info.sector]);
   const title5YearProjections = reactExports.useMemo(() => {
     if (!calculateHistoricalRanges) return null;
     return {
-      pe: { min: assumptions.targetPE * 0.9, max: assumptions.targetPE * 1.1, avg: assumptions.targetPE },
-      pcf: { min: assumptions.targetPCF * 0.9, max: assumptions.targetPCF * 1.1, avg: assumptions.targetPCF },
-      pbv: { min: assumptions.targetPBV * 0.9, max: assumptions.targetPBV * 1.1, avg: assumptions.targetPBV },
-      yield: { min: assumptions.targetYield * 0.9, max: assumptions.targetYield * 1.1, avg: assumptions.targetYield },
-      epsGrowth: { min: assumptions.growthRateEPS * 0.8, max: assumptions.growthRateEPS * 1.2, avg: assumptions.growthRateEPS },
-      cfGrowth: { min: assumptions.growthRateCF * 0.8, max: assumptions.growthRateCF * 1.2, avg: assumptions.growthRateCF },
-      bvGrowth: { min: assumptions.growthRateBV * 0.8, max: assumptions.growthRateBV * 1.2, avg: assumptions.growthRateBV },
-      divGrowth: { min: assumptions.growthRateDiv * 0.8, max: assumptions.growthRateDiv * 1.2, avg: assumptions.growthRateDiv }
+      pe: { min: assumptions.targetPE * 0.9, max: assumptions.targetPE * 1.1, avg: assumptions.targetPE, median: assumptions.targetPE },
+      pcf: { min: assumptions.targetPCF * 0.9, max: assumptions.targetPCF * 1.1, avg: assumptions.targetPCF, median: assumptions.targetPCF },
+      pbv: { min: assumptions.targetPBV * 0.9, max: assumptions.targetPBV * 1.1, avg: assumptions.targetPBV, median: assumptions.targetPBV },
+      yield: { min: assumptions.targetYield * 0.9, max: assumptions.targetYield * 1.1, avg: assumptions.targetYield, median: assumptions.targetYield },
+      epsGrowth: { min: assumptions.growthRateEPS * 0.8, max: assumptions.growthRateEPS * 1.2, avg: assumptions.growthRateEPS, median: assumptions.growthRateEPS },
+      cfGrowth: { min: assumptions.growthRateCF * 0.8, max: assumptions.growthRateCF * 1.2, avg: assumptions.growthRateCF, median: assumptions.growthRateCF },
+      bvGrowth: { min: assumptions.growthRateBV * 0.8, max: assumptions.growthRateBV * 1.2, avg: assumptions.growthRateBV, median: assumptions.growthRateBV },
+      divGrowth: { min: assumptions.growthRateDiv * 0.8, max: assumptions.growthRateDiv * 1.2, avg: assumptions.growthRateDiv, median: assumptions.growthRateDiv }
     };
   }, [calculateHistoricalRanges, assumptions]);
   const sector5YearProjections = reactExports.useMemo(() => {
     return {
-      pe: { min: sectorRanges.pe.avg * 0.9, max: sectorRanges.pe.avg * 1.1, avg: sectorRanges.pe.avg },
-      pcf: { min: sectorRanges.pcf.avg * 0.9, max: sectorRanges.pcf.avg * 1.1, avg: sectorRanges.pcf.avg },
-      pbv: { min: sectorRanges.pbv.avg * 0.9, max: sectorRanges.pbv.avg * 1.1, avg: sectorRanges.pbv.avg },
-      yield: { min: sectorRanges.yield.avg * 0.9, max: sectorRanges.yield.avg * 1.1, avg: sectorRanges.yield.avg },
-      epsGrowth: { min: sectorRanges.epsGrowth.avg * 0.8, max: sectorRanges.epsGrowth.avg * 1.2, avg: sectorRanges.epsGrowth.avg },
-      cfGrowth: { min: sectorRanges.cfGrowth.avg * 0.8, max: sectorRanges.cfGrowth.avg * 1.2, avg: sectorRanges.cfGrowth.avg },
-      bvGrowth: { min: sectorRanges.bvGrowth.avg * 0.8, max: sectorRanges.bvGrowth.avg * 1.2, avg: sectorRanges.bvGrowth.avg },
-      divGrowth: { min: sectorRanges.divGrowth.avg * 0.8, max: sectorRanges.divGrowth.avg * 1.2, avg: sectorRanges.divGrowth.avg }
+      pe: { min: sectorRanges.pe.avg * 0.9, max: sectorRanges.pe.avg * 1.1, avg: sectorRanges.pe.avg, median: sectorRanges.pe.median },
+      pcf: { min: sectorRanges.pcf.avg * 0.9, max: sectorRanges.pcf.avg * 1.1, avg: sectorRanges.pcf.avg, median: sectorRanges.pcf.median },
+      pbv: { min: sectorRanges.pbv.avg * 0.9, max: sectorRanges.pbv.avg * 1.1, avg: sectorRanges.pbv.avg, median: sectorRanges.pbv.median },
+      yield: { min: sectorRanges.yield.avg * 0.9, max: sectorRanges.yield.avg * 1.1, avg: sectorRanges.yield.avg, median: sectorRanges.yield.median },
+      epsGrowth: { min: sectorRanges.epsGrowth.avg * 0.8, max: sectorRanges.epsGrowth.avg * 1.2, avg: sectorRanges.epsGrowth.avg, median: sectorRanges.epsGrowth.median },
+      cfGrowth: { min: sectorRanges.cfGrowth.avg * 0.8, max: sectorRanges.cfGrowth.avg * 1.2, avg: sectorRanges.cfGrowth.avg, median: sectorRanges.cfGrowth.median },
+      bvGrowth: { min: sectorRanges.bvGrowth.avg * 0.8, max: sectorRanges.bvGrowth.avg * 1.2, avg: sectorRanges.bvGrowth.avg, median: sectorRanges.bvGrowth.median },
+      divGrowth: { min: sectorRanges.divGrowth.avg * 0.8, max: sectorRanges.divGrowth.avg * 1.2, avg: sectorRanges.divGrowth.avg, median: sectorRanges.divGrowth.median }
     };
   }, [sectorRanges]);
   const formatRange = (range3, suffix = "") => {
     if (!range3) return "N/A";
-    return `${range3.min.toFixed(1)} - ${range3.max.toFixed(1)}${suffix} (méd: ${range3.avg.toFixed(1)}${suffix})`;
+    return `${range3.min.toFixed(1)} - ${range3.max.toFixed(1)}${suffix} (Med: ${range3.median.toFixed(1)}${suffix})`;
   };
   const formatGrowthRange = (range3) => {
     if (!range3) return "N/A";
-    return `${range3.min.toFixed(1)}% - ${range3.max.toFixed(1)}% (méd: ${range3.avg.toFixed(1)}%)`;
+    return `${range3.min.toFixed(1)}% - ${range3.max.toFixed(1)}% (Med: ${range3.median.toFixed(1)}%)`;
   };
   const MetricReferenceRanges = ({ metric }) => {
     if (!calculateHistoricalRanges) return null;
@@ -49482,6 +49491,22 @@ const DEFAULT_PROFILE = {
   isWatchlist: false
 };
 const STORAGE_KEY = "finance_pro_profiles";
+const ProgressBar = ({ current, total }) => {
+  const progressRef = reactExports.useRef(null);
+  const percent = total > 0 ? current / total * 100 : 0;
+  reactExports.useEffect(() => {
+    if (progressRef.current) {
+      progressRef.current.style.width = `${percent}%`;
+    }
+  }, [percent]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full bg-slate-700 h-2 rounded-full mb-3 overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "div",
+    {
+      ref: progressRef,
+      className: "bg-blue-500 h-full rounded-full transition-all duration-300 ease-out"
+    }
+  ) });
+};
 function App() {
   const [showLanding, setShowLanding] = reactExports.useState(true);
   const [library, setLibrary] = reactExports.useState({});
@@ -51295,13 +51320,13 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
         "%"
       ] })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full bg-slate-700 h-2 rounded-full mb-3 overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-      "div",
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ProgressBar,
       {
-        className: "bg-blue-500 h-full rounded-full transition-all duration-300 ease-out",
-        style: { width: `${bulkSyncProgress.current / bulkSyncProgress.total * 100}%` }
+        current: bulkSyncProgress.current,
+        total: bulkSyncProgress.total
       }
-    ) }),
+    ),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center text-xs text-slate-400 mb-3", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
         "Success: ",
