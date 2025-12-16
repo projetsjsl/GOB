@@ -218,115 +218,160 @@
         // ... (Chatbot code) ...
 
         // Login Component
-
-
         // Chatbot Emma RH
         // Chatbot Emma RH
         // Chatbot Ultra-Intelligent Emma RH
+        // ============================================================================
+        // MODULE: ULTRA-INTELLIGENT EMMA CHATBOT
+        // ============================================================================
+        //
+        // ARCHITECTURE NOTE:
+        // This component simulates an advanced AI assistant entirely in the browser.
+        // It relies on "Context Injection" - passing the raw state (tasks, phases, employees)
+        // directly into the analysis logic (`getEmmaResponse`).
+        //
+        // WHY NO BACKEND?
+        // To keep the deployment simple (static HTML), we use heuristic logic instead of a real LLM.
+        // The `getEmmaResponse` function parses keywords and checks data arrays to generate "smart" answers.
+        //
+        // KNOWN ISSUES & LEARNINGS:
+        // 1. JSX Syntax: Ensure all adjacent elements are wrapped in a fragment <> or <div>.
+        // 2. React Minification: If using CDN, inline scripts must be perfectly valid.
+        // 3. State Injection: Passing too much data (e.g. full objects) is fine here but verify performance if scaling.
+        //
+        // ============================================================================
+        
         const EmmaChatbot = ({ employee, tasks, phases, resources }) => {
+            // State to control chatbot visibility
             const [isOpen, setIsOpen] = useState(true);
+            // State to store chat messages, initialized with an Emma greeting
             const [messages, setMessages] = useState([
                 { from: 'emma', text: `Bonjour ${employee?.name?.split(' ')[0] || ''} ! Je suis Emma, votre stratège RH virtuelle. 🧠 Je connais l'intégralité de votre dossier : ${tasks.length} tâches, ${phases.length} phases. Posez-moi une question sur votre avancement, vos blocages ou vos collègues !` }
             ]);
+            // State for the user's input message
             const [input, setInput] = useState('');
+            // Ref to scroll to the bottom of the chat messages
             const messagesEndRef = useRef(null);
 
+            // Effect to scroll to the latest message whenever messages state changes
             const scrollToBottom = () => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); };
             useEffect(() => { scrollToBottom(); }, [messages]);
 
-            // Cerveau "IA" simulé avec Context Injection
+            // CORE AI LOGIC: Heuristic Analysis Engine
+            // This function processes user questions and generates Emma's response
             const getEmmaResponse = (question) => {
-                const q = question.toLowerCase();
+                const q = question.toLowerCase(); // Normalize question for easier matching
+                // Filter tasks for pending and late statuses
                 const pending = tasks.filter(t => t.status === 'pending');
                 const late = pending.filter(t => t.dueDate < new Date().toISOString().split('T')[0]);
+                // Determine the next phase with pending tasks
                 const nextPhase = phases.find(p => tasks.some(t => t.phaseId === p.id && t.status === 'pending'));
 
-                // 1. Analyse Deep Context - Retards & Urgences
+                // 1. URGENCY ANALYSIS: Checks for keywords related to delays or problems
                 if (q.includes('retard') || q.includes('late') || q.includes('urgence') || q.includes('problème')) {
                     if (late.length > 0) {
+                        // If there are late tasks, provide details on the most critical one
                         return `🚨 Analyse critique : Vous avez ${late.length} tâches en retard. La plus critique est "${late[0].title}". Je suggère de la traiter immédiatement ou de contacter ${resources.find(r => late[0].assignedTo?.includes(r.id))?.name || 'votre responsable'} pour un délai.`;
                     }
+                    // If no late tasks, reassure the user
                     return "✅ Analyse : Aucun indicateur de retard détecté. Votre trajectoire est optimale.";
                 }
 
-                // 2. Intelligence Relationnelle - Qui fait quoi ?
+                // 2. RESOURCE IDENTIFICATION: Helps identify contacts based on keywords
                 if (q.includes('qui') || q.includes('contact') || q.includes('responsable')) {
+                    // Try to find a resource by name mentioned in the question
                     const foundRes = resources.find(r => q.includes(r.name.toLowerCase()));
                     if (foundRes) return `👤 **${foundRes.name}** est votre contact pour : ${foundRes.role}. Vous pouvez le joindre à ${foundRes.email || 'son bureau'}.`;
                     
+                    // Specific handling for IT/Admin questions
                     if (q.includes('admin') || q.includes('it')) {
                         const tech = resources.find(r => r.role.toLowerCase().includes('it') || r.role.toLowerCase().includes('tech'));
                         return tech ? `💻 Pour les questions IT, contactez **${tech.name}**. C'est l'expert !` : "Je ne trouve pas d'expert IT désigné, demandez à Julie.";
                     }
+                    // General list of contacts if no specific one is found
                     return `👥 Vos alliés sont :\n${resources.map(r => `- ${r.name} (${r.role})`).join('\n')}`;
                 }
 
-                // 3. Prédiction & Next Steps
+                // 3. PREDICTIVE SCHEDULING: Provides information about upcoming tasks/phases
                 if (q.includes('suite') || q.includes('prochain') || q.includes('demain')) {
                     if (nextPhase) {
+                        // List the top 3 pending tasks for the next phase
                         const nextTasks = tasks.filter(t => t.phaseId === nextPhase.id && t.status === 'pending').slice(0, 3);
                         return `🔮 Prévision : Vous entrez dans la phase "${nextPhase.name}". Voici vos 3 priorités stratégiques :\n${nextTasks.map(t => `👉 ${t.title}`).join('\n')}`;
                     }
+                    // If all tasks are completed
                     return "✨ Vous avez atteint l'horizon des événements ! Tout est complété.";
                 }
 
-                // 4. Méta-Analyse (Synthèse)
+                // 4. META-ANALYSIS (Audit): Provides a summary of progress
                 if (q.includes('synthèse') || q.includes('résumé') || q.includes('audit')) {
+                    // Calculate completion rate
                     const completionRate = Math.round((tasks.filter(t => t.status === 'completed').length / tasks.length) * 100);
                     return `📊 **Audit d'Intégration**\n- Score Global : ${completionRate}/100\n- Rapidité : ${late.length === 0 ? 'Excellente 🚀' : 'Attention requise ⚠️'}\n- Prochaine étape critique : ${pending[0]?.title || 'Aucune'}\n\nMon conseil : Continuez sur cette lancée !`;
                 }
 
-                // Default Intelligent Fallback
+                // FALLBACK: Generic response if no specific match is found
                 return "🤔 Intéressant. Pourriez-vous préciser si cela concerne une tâche, un contact ou votre planning global ?";
             };
 
+            // Handles sending a message from the user
             const handleSend = () => {
-                if (!input.trim()) return;
+                if (!input.trim()) return; // Prevent sending empty messages
+                // Add user message to the chat
                 const newMessages = [...messages, { from: 'user', text: input }];
                 setMessages(newMessages);
                 setInput('');
-                            <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50">
+                setTimeout(() => {
+                    setMessages([...newMessages, { from: 'emma', text: getEmmaResponse(input) }]);
+                }, 600);
+            };
+
+            return (
+                <div className={`fixed bottom-6 right-6 z-50 flex flex-col items-end transition-all duration-300 ${isOpen ? '' : 'translate-y-2'}`}>
+                     {isOpen && (
+                        <div className="bg-white rounded-2xl shadow-2xl w-80 sm:w-96 mb-4 overflow-hidden border border-gray-100 flex flex-col animate-fade-in-up" style={{ maxHeight: '500px' }}>
+                            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 flex justify-between items-center text-white">
+                                <div className="flex items-center gap-3">
+                                    <div className="relative">
+                                        <div className="w-10 h-10 bg-white rounded-full p-0.5"><img src="https://ui-avatars.com/api/?name=Emma+AI&background=7c3aed&color=fff" className="rounded-full" /></div>
+                                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-purple-600 animate-pulse"></div>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-sm">Emma AI <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full">BETA</span></h3>
+                                        <p className="text-xs opacity-80">Assistante RH Intelligente</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white"><Icons.X /></button>
+                            </div>
+                            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50 h-[300px]">
                                 {messages.map((msg, i) => (
-                                    <div key={i} className={`chat-bubble flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                        {msg.from === 'emma' && (
-                                            <img src="/images/emma-avatar-new.jpg" alt="Emma" className="w-8 h-8 rounded-full mr-2 object-cover" />
-                                        )}
-                                        <div className={`max-w-[75%] p-3 rounded-2xl ${msg.from === 'user' ? 'bg-blue-600 text-white rounded-br-sm' : 'bg-white text-gray-800 rounded-bl-sm shadow'}`}>
-                                            <p className="text-sm whitespace-pre-line">{msg.text}</p>
+                                    <div key={i} className={`flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                        <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.from === 'user' ? 'bg-purple-600 text-white rounded-br-none' : 'bg-white shadow-sm border border-gray-100 text-gray-700 rounded-bl-none'}`}>
+                                            <ReactMarkdown>{msg.text}</ReactMarkdown>
                                         </div>
                                     </div>
                                 ))}
                                 <div ref={messagesEndRef} />
                             </div>
-
-                            {/* Suggestions */}
-                            <div className="p-2 bg-gray-50 border-t border-gray-100 flex flex-wrap gap-2 justify-center">
-                                {suggestions.map((s, i) => (
-                                    <button key={i} onClick={() => sendMessage(s)} className="text-xs bg-white text-blue-600 border border-blue-200 px-3 py-1 rounded-full hover:bg-blue-50 transition-colors shadow-sm">
-                                        {s}
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* Input */}
-                            <div className="p-3 border-t bg-white">
-                                <div className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        value={input}
-                                        onChange={(e) => setInput(e.target.value)}
-                                        onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                                        placeholder="Écrivez votre message..."
-                                        className="flex-1 px-4 py-2 border-2 border-gray-200 rounded-full focus:border-blue-500 focus:outline-none text-sm"
-                                    />
-                                    <button onClick={sendMessage} className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">
-                                        <Icons.Send />
-                                    </button>
-                                </div>
+                            <div className="p-3 bg-white border-t flex gap-2">
+                                <input 
+                                    className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                                    placeholder="Posez une question à Emma..."
+                                    value={input}
+                                    onChange={e => setInput(e.target.value)}
+                                    onKeyPress={e => e.key === 'Enter' && handleSend()}
+                                />
+                                <button onClick={handleSend} className="w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center hover:bg-purple-700 transition-transform hover:scale-110 shadow-lg"><Icons.Send /></button>
                             </div>
                         </div>
-                    )}
-                </>
+                     )}
+                     {!isOpen && (
+                         <button onClick={() => setIsOpen(true)} className="group flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white pl-4 pr-1 py-1 rounded-full shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1">
+                             <span className="font-bold text-sm">Besoin d'aide ?</span>
+                             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 transition-colors"><Icons.MessageSquare /></div>
+                         </button>
+                     )}
+                </div>
             );
         };
 
