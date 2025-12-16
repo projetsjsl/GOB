@@ -124,7 +124,7 @@
     },
     "api/cron/fmp-batch-sync.js": {
       "maxDuration": 300
-    },
+    }
   },
   "headers": [
     {
