@@ -244,11 +244,27 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
       }
     });
 
-    const calculateRange = (values: number[]): Range | null => {
+    // Filtrer les ratios avec des limites réalistes selon le type
+    const filterRatiosByType = (values: number[], type: 'pe' | 'pcf' | 'pbv' | 'yield' | 'growth'): number[] => {
+      if (values.length === 0) return [];
+      
+      // Limites réalistes selon le type de ratio (plus strictes que config.outliers)
+      const limits: Record<string, { min: number; max: number }> = {
+        pe: { min: 1, max: 200 },      // P/E: 1x à 200x
+        pcf: { min: 1, max: 200 },     // P/CF: 1x à 200x
+        pbv: { min: 0.1, max: 50 },    // P/BV: 0.1x à 50x
+        yield: { min: 0, max: 50 },    // Yield: 0% à 50%
+        growth: { min: -50, max: 100 } // Growth: -50% à +100%
+      };
+      
+      const limit = limits[type] || config.outliers;
+      return values.filter(v => isFinite(v) && v >= limit.min && v <= limit.max);
+    };
+
+    const calculateRange = (values: number[], type: 'pe' | 'pcf' | 'pbv' | 'yield' | 'growth' = 'growth'): Range | null => {
       if (values.length === 0) return null;
-      // Filter extreme outliers for display
-      const { min, max } = config.outliers;
-      const filtered = values.filter(v => isFinite(v) && v > min && v < max);
+      // Filter extreme outliers for display avec limites spécifiques par type
+      const filtered = filterRatiosByType(values, type);
       if (filtered.length === 0) return null;
       return {
         min: Math.min(...filtered),
@@ -260,14 +276,14 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
 
     // Use calculateRange on the arrays of Y-o-Y growth to show true history range
     return {
-      pe: calculateRange(peRatios),
-      pcf: calculateRange(pcfRatios),
-      pbv: calculateRange(pbvRatios),
-      yield: calculateRange(yields),
-      epsGrowth: calculateRange(epsGrowthRates),
-      cfGrowth: calculateRange(cfGrowthRates),
-      bvGrowth: calculateRange(bvGrowthRates),
-      divGrowth: calculateRange(divGrowthRates)
+      pe: calculateRange(peRatios, 'pe'),
+      pcf: calculateRange(pcfRatios, 'pcf'),
+      pbv: calculateRange(pbvRatios, 'pbv'),
+      yield: calculateRange(yields, 'yield'),
+      epsGrowth: calculateRange(epsGrowthRates, 'growth'),
+      cfGrowth: calculateRange(cfGrowthRates, 'growth'),
+      bvGrowth: calculateRange(bvGrowthRates, 'growth'),
+      divGrowth: calculateRange(divGrowthRates, 'growth')
     };
   }, [data]);
 

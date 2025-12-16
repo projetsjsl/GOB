@@ -1,4 +1,5 @@
 import { AnnualData, CalculatedRatios, Assumptions, Recommendation } from '../types';
+import { sanitizeAssumptionsSync } from './validation';
 
 export const safeDiv = (num: number, den: number): number => {
   if (den === 0 || isNaN(den)) return 0;
@@ -298,7 +299,7 @@ export const autoFillAssumptionsFromFMPData = (
 
   // Retourner les assumptions auto-remplies avec limites STRICTES
   // Ces limites sont cruciales pour éviter les prix cibles aberrants
-  return {
+  const rawAssumptions: Partial<Assumptions> = {
     currentPrice: round(currentPrice, 2),
     currentDividend: round(lastData.dividendPerShare || existingAssumptions?.currentDividend || 0, 4),
     baseYear: lastValidData.year,
@@ -327,5 +328,18 @@ export const autoFillAssumptionsFromFMPData = (
     excludeCF: existingAssumptions?.excludeCF,
     excludeBV: existingAssumptions?.excludeBV,
     excludeDIV: existingAssumptions?.excludeDIV
+  };
+
+  // ✅ SANITISER les assumptions avec les paramètres personnalisés avant de retourner
+  // Cela garantit que même si les calculs génèrent des valeurs aberrantes, elles seront corrigées
+  const sanitized = sanitizeAssumptionsSync(rawAssumptions);
+  
+  // Retourner en Partial pour préserver la compatibilité
+  return {
+    ...sanitized,
+    excludeEPS: rawAssumptions.excludeEPS,
+    excludeCF: rawAssumptions.excludeCF,
+    excludeBV: rawAssumptions.excludeBV,
+    excludeDIV: rawAssumptions.excludeDIV
   };
 };

@@ -147,9 +147,26 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
       ? calculateCAGR(firstRow.dividendPerShare, lastRow.dividendPerShare, yearsDiff)
       : null;
 
-    const calculateRange = (values: number[]): Range | null => {
+    // Filtrer les ratios avec des limites réalistes selon le type
+    const filterRatios = (values: number[], type: 'pe' | 'pcf' | 'pbv' | 'yield' | 'growth'): number[] => {
+      if (values.length === 0) return [];
+      
+      // Limites réalistes selon le type de ratio
+      const limits: Record<string, { min: number; max: number }> = {
+        pe: { min: 1, max: 200 },      // P/E: 1x à 200x (au-delà c'est aberrant)
+        pcf: { min: 1, max: 200 },     // P/CF: 1x à 200x
+        pbv: { min: 0.1, max: 50 },    // P/BV: 0.1x à 50x
+        yield: { min: 0, max: 50 },    // Yield: 0% à 50%
+        growth: { min: -50, max: 100 }  // Growth: -50% à +100% (pour les cas extrêmes mais réalistes)
+      };
+      
+      const limit = limits[type] || { min: -100, max: 1000 };
+      return values.filter(v => isFinite(v) && v >= limit.min && v <= limit.max);
+    };
+
+    const calculateRange = (values: number[], type: 'pe' | 'pcf' | 'pbv' | 'yield' | 'growth' = 'growth'): Range | null => {
       if (values.length === 0) return null;
-      const filtered = values.filter(v => isFinite(v) && v > -100 && v < 1000); // Filtrer valeurs aberrantes
+      const filtered = filterRatios(values, type);
       if (filtered.length === 0) return null;
       return {
         min: Math.min(...filtered),
@@ -159,14 +176,22 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
     };
 
     return {
-      pe: calculateRange(peRatios),
-      pcf: calculateRange(pcfRatios),
-      pbv: calculateRange(pbvRatios),
-      yield: calculateRange(yields),
-      epsGrowth: epsCAGR !== null ? { min: epsCAGR, max: epsCAGR, avg: epsCAGR } : calculateRange(epsGrowthRates),
-      cfGrowth: cfCAGR !== null ? { min: cfCAGR, max: cfCAGR, avg: cfCAGR } : calculateRange(cfGrowthRates),
-      bvGrowth: bvCAGR !== null ? { min: bvCAGR, max: bvCAGR, avg: bvCAGR } : calculateRange(bvGrowthRates),
-      divGrowth: divCAGR !== null ? { min: divCAGR, max: divCAGR, avg: divCAGR } : calculateRange(divGrowthRates)
+      pe: calculateRange(peRatios, 'pe'),
+      pcf: calculateRange(pcfRatios, 'pcf'),
+      pbv: calculateRange(pbvRatios, 'pbv'),
+      yield: calculateRange(yields, 'yield'),
+      epsGrowth: epsCAGR !== null && epsCAGR >= -50 && epsCAGR <= 100 
+        ? { min: epsCAGR, max: epsCAGR, avg: epsCAGR } 
+        : calculateRange(epsGrowthRates, 'growth'),
+      cfGrowth: cfCAGR !== null && cfCAGR >= -50 && cfCAGR <= 100
+        ? { min: cfCAGR, max: cfCAGR, avg: cfCAGR }
+        : calculateRange(cfGrowthRates, 'growth'),
+      bvGrowth: bvCAGR !== null && bvCAGR >= -50 && bvCAGR <= 100
+        ? { min: bvCAGR, max: bvCAGR, avg: bvCAGR }
+        : calculateRange(bvGrowthRates, 'growth'),
+      divGrowth: divCAGR !== null && divCAGR >= -50 && divCAGR <= 100
+        ? { min: divCAGR, max: divCAGR, avg: divCAGR }
+        : calculateRange(divGrowthRates, 'growth')
     };
   }, [data]);
 

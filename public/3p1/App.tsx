@@ -2363,16 +2363,20 @@ export default function App() {
                                 const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
                                 
                                 // Auto-fill assumptions basées sur les données historiques FMP (fonction centralisée)
+                                // ✅ autoFillAssumptionsFromFMPData sanitis déjà les valeurs, mais on double-vérifie
                                 const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
                                     result.data,
                                     result.currentPrice,
                                     INITIAL_ASSUMPTIONS
                                 );
                                 
+                                // ✅ SANITISER une deuxième fois pour être absolument sûr (les paramètres peuvent avoir changé)
+                                const sanitizedAutoFilled = sanitizeAssumptionsSync(autoFilledAssumptions);
+                                
                                 // Détecter et exclure automatiquement les métriques avec prix cibles aberrants
                                 const tempAssumptions = {
                                     ...INITIAL_ASSUMPTIONS,
-                                    ...autoFilledAssumptions
+                                    ...sanitizedAutoFilled
                                 } as Assumptions;
                                 const outlierDetection = detectOutlierMetrics(result.data, tempAssumptions);
                                 
