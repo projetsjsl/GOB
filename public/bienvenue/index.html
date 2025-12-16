@@ -1740,10 +1740,10 @@
                             .from('employee_tasks')
                             .upsert({ 
                                 employee_id: selectedEmployee.id, 
-                                task_template_id: originalTaskId, 
+                                template_id: originalTaskId, 
                                 status: newStatus,
                                 updated_at: new Date()
-                            }, { onConflict: 'employee_id, task_template_id' });
+                            }, { onConflict: 'employee_id, template_id' });
                             
                         if (error) {
                             console.error('Supabase Upsert Error:', error);
@@ -1806,7 +1806,7 @@
                         const { error: assignError } = await supabase
                             .from('employee_tasks')
                             .delete()
-                            .eq('task_template_id', originalTaskId);
+                            .eq('template_id', originalTaskId);
                         
                         if (assignError) console.warn('Error clearing assignments:', assignError);
 
