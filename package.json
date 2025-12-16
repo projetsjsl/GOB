@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node build.js",
+    "build": "vite build",
     "build:vite": "vite build",
     "preview": "vite preview",
     "build:legacy": "node build.js",
