@@ -222,161 +222,69 @@
 
         // Chatbot Emma RH
         // Chatbot Emma RH
+        // Chatbot Ultra-Intelligent Emma RH
         const EmmaChatbot = ({ employee, tasks, phases, resources }) => {
-            const [isOpen, setIsOpen] = useState(true); // Auto-open on load
+            const [isOpen, setIsOpen] = useState(true);
             const [messages, setMessages] = useState([
-                { from: 'emma', text: `Bonjour ! Je suis Emma, votre assistante RH virtuelle. 👋 Je suis là pour vous aider avec votre intégration. Comment puis-je vous aider aujourd'hui ?` }
+                { from: 'emma', text: `Bonjour ${employee?.name?.split(' ')[0] || ''} ! Je suis Emma, votre stratège RH virtuelle. 🧠 Je connais l'intégralité de votre dossier : ${tasks.length} tâches, ${phases.length} phases. Posez-moi une question sur votre avancement, vos blocages ou vos collègues !` }
             ]);
             const [input, setInput] = useState('');
             const messagesEndRef = useRef(null);
 
-            const scrollToBottom = () => {
-                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-            };
-
+            const scrollToBottom = () => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); };
             useEffect(() => { scrollToBottom(); }, [messages]);
 
+            // Cerveau "IA" simulé avec Context Injection
             const getEmmaResponse = (question) => {
                 const q = question.toLowerCase();
-                const pendingTasks = tasks.filter(t => t.status === 'pending');
-                const inProgressTasks = tasks.filter(t => t.status === 'inProgress');
-                const completedTasks = tasks.filter(t => t.status === 'completed');
-                const highPriorityTasks = pendingTasks.filter(t => t.priority === 'high');
-                const progress = tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
-                const today = new Date().toISOString().split('T')[0];
-                const overdueTasks = pendingTasks.filter(t => t.dueDate < today);
-                
-                // Urgent/priority queries
-                if (q.includes('urgent') || q.includes('priorité') || q.includes('important')) {
-                    if (highPriorityTasks.length > 0) {
-                        return `🔥 Vous avez ${highPriorityTasks.length} tâche(s) haute priorité:\n${highPriorityTasks.slice(0,3).map(t => `• "${t.title}"`).join('\n')}\nJe vous conseille de commencer par celles-ci !`;
+                const pending = tasks.filter(t => t.status === 'pending');
+                const late = pending.filter(t => t.dueDate < new Date().toISOString().split('T')[0]);
+                const nextPhase = phases.find(p => tasks.some(t => t.phaseId === p.id && t.status === 'pending'));
+
+                // 1. Analyse Deep Context - Retards & Urgences
+                if (q.includes('retard') || q.includes('late') || q.includes('urgence') || q.includes('problème')) {
+                    if (late.length > 0) {
+                        return `🚨 Analyse critique : Vous avez ${late.length} tâches en retard. La plus critique est "${late[0].title}". Je suggère de la traiter immédiatement ou de contacter ${resources.find(r => late[0].assignedTo?.includes(r.id))?.name || 'votre responsable'} pour un délai.`;
                     }
-                    return "✨ Bonne nouvelle ! Aucune tâche urgente en ce moment. Continuez votre progression normale.";
+                    return "✅ Analyse : Aucun indicateur de retard détecté. Votre trajectoire est optimale.";
                 }
-                
-                // Overdue tasks
-                if (q.includes('retard') || q.includes('overdue') || q.includes('délai')) {
-                    if (overdueTasks.length > 0) {
-                        return `⚠️ Attention ! ${overdueTasks.length} tâche(s) en retard:\n${overdueTasks.map(t => `• "${t.title}" (échéance: ${t.dueDate})`).join('\n')}\nBesoin d'aide pour les prioriser ?`;
+
+                // 2. Intelligence Relationnelle - Qui fait quoi ?
+                if (q.includes('qui') || q.includes('contact') || q.includes('responsable')) {
+                    const foundRes = resources.find(r => q.includes(r.name.toLowerCase()));
+                    if (foundRes) return `👤 **${foundRes.name}** est votre contact pour : ${foundRes.role}. Vous pouvez le joindre à ${foundRes.email || 'son bureau'}.`;
+                    
+                    if (q.includes('admin') || q.includes('it')) {
+                        const tech = resources.find(r => r.role.toLowerCase().includes('it') || r.role.toLowerCase().includes('tech'));
+                        return tech ? `💻 Pour les questions IT, contactez **${tech.name}**. C'est l'expert !` : "Je ne trouve pas d'expert IT désigné, demandez à Julie.";
                     }
-                    return "🎉 Parfait ! Toutes vos tâches sont dans les temps. Excellent travail !";
+                    return `👥 Vos alliés sont :\n${resources.map(r => `- ${r.name} (${r.role})`).join('\n')}`;
                 }
-                
-                // Task queries
-                if (q.includes('tâche') || q.includes('faire') || q.includes('quoi') || q.includes('suivant')) {
-                    if (pendingTasks.length > 0) {
-                        const nextTask = highPriorityTasks[0] || pendingTasks[0];
-                        const assignedNames = resources.filter(r => nextTask.assignedTo?.includes(r.id)).map(r => r.name).join(', ');
-                        return `📋 Prochaine tâche recommandée: "${nextTask.title}"\n\n📝 ${nextTask.description || 'Pas de description'}\n⏰ Échéance: ${nextTask.dueDate}\n${nextTask.priority === 'high' ? '🔥 Priorité haute' : nextTask.priority === 'medium' ? '⚡ Priorité moyenne' : '💤 Priorité basse'}${assignedNames ? `\n👤 Contact: ${assignedNames}` : ''}`;
+
+                // 3. Prédiction & Next Steps
+                if (q.includes('suite') || q.includes('prochain') || q.includes('demain')) {
+                    if (nextPhase) {
+                        const nextTasks = tasks.filter(t => t.phaseId === nextPhase.id && t.status === 'pending').slice(0, 3);
+                        return `🔮 Prévision : Vous entrez dans la phase "${nextPhase.name}". Voici vos 3 priorités stratégiques :\n${nextTasks.map(t => `👉 ${t.title}`).join('\n')}`;
                     }
-                    return "🎉 Félicitations ! Vous avez complété toutes vos tâches ! Vous êtes un champion !";
+                    return "✨ Vous avez atteint l'horizon des événements ! Tout est complété.";
                 }
-                
-                // Progress queries
-                if (q.includes('progress') || q.includes('avancement') || q.includes('où en suis') || q.includes('statut') || q.includes('status')) {
-                    let encouragement = progress >= 75 ? "🏆 Excellent travail !" : progress >= 50 ? "💪 Vous êtes à mi-chemin !" : progress >= 25 ? "🚀 Bon début !" : "🌱 C'est parti !";
-                    return `📊 **Votre progression: ${progress}%**\n\n✅ Complétées: ${completedTasks.length}\n▶️ En cours: ${inProgressTasks.length}\n⏳ En attente: ${pendingTasks.length}\n${highPriorityTasks.length > 0 ? `🔥 Priorité haute: ${highPriorityTasks.length}` : ''}\n\n${encouragement}`;
+
+                // 4. Méta-Analyse (Synthèse)
+                if (q.includes('synthèse') || q.includes('résumé') || q.includes('audit')) {
+                    const completionRate = Math.round((tasks.filter(t => t.status === 'completed').length / tasks.length) * 100);
+                    return `📊 **Audit d'Intégration**\n- Score Global : ${completionRate}/100\n- Rapidité : ${late.length === 0 ? 'Excellente 🚀' : 'Attention requise ⚠️'}\n- Prochaine étape critique : ${pending[0]?.title || 'Aucune'}\n\nMon conseil : Continuez sur cette lancée !`;
                 }
-                
-                // Contact/resource queries
-                if (q.includes('responsable') || q.includes('contact') || q.includes('qui') || q.includes('aide') || q.includes('support')) {
-                    return `👥 **Vos contacts clés:**\n\n${resources.map(r => `• **${r.name}** - ${r.role}`).join('\n')}\n\nN'hésitez pas à les contacter pour toute question ! 📞`;
-                }
-                
-                // Phase queries
-                if (q.includes('phase') || q.includes('étape') || q.includes('calendrier')) {
-                    const phaseInfo = phases.map((p, i) => {
-                        const pTasks = tasks.filter(t => t.phaseId === p.id);
-                        const pCompleted = pTasks.filter(t => t.status === 'completed').length;
-                        return `${i === 0 ? '📍' : '📅'} **${p.name}**: ${pCompleted}/${pTasks.length} tâches (${p.startDate} → ${p.endDate})`;
-                    }).join('\n');
-                    return `📅 **Vos phases d'intégration:**\n\n${phaseInfo}`;
-                }
-                
-                // Tips
-                if (q.includes('conseil') || q.includes('astuce') || q.includes('tip')) {
-                    const tips = [
-                        "💡 Commencez par les tâches haute priorité pour éviter le stress !",
-                        "💡 N'hésitez pas à contacter vos responsables si vous êtes bloqué.",
-                        "💡 Prenez des notes pendant vos formations pour mieux retenir.",
-                        "💡 Faites des pauses régulières pour rester productif !",
-                        "💡 Posez des questions - il n'y a pas de question bête !"
-                    ];
-                    return tips[Math.floor(Math.random() * tips.length)];
-                }
-                
-                // Greetings
-                if (q.includes('bonjour') || q.includes('salut') || q.includes('hello') || q.includes('coucou')) {
-                    const greetings = [
-                        `Bonjour ${employee.name} ! 👋 Comment puis-je vous aider ?`,
-                        `Salut ${employee.name} ! 😊 Prêt(e) pour une journée productive ?`,
-                        `Hello ${employee.name} ! ✨ Que puis-je faire pour vous ?`
-                    ];
-                    return greetings[Math.floor(Math.random() * greetings.length)];
-                }
-                
-                // Thanks
-                if (q.includes('merci') || q.includes('thanks')) {
-                    return "Avec grand plaisir ! 🌟 Je suis toujours là pour vous aider. Bonne continuation !";
-                }
-                
-                // Help
-                if (q.includes('help') || q.includes('comment') || q.includes('capable') || q.includes('peux')) {
-                    return `🤖 **Je peux vous aider avec:**\n\n📋 "Quelle est ma prochaine tâche ?"\n📊 "Où en suis-je ?"\n🔥 "Quelles sont mes tâches urgentes ?"\n👥 "Qui sont mes contacts ?"\n📅 "Quelles sont mes phases ?"\n⚠️ "Ai-je des tâches en retard ?"\n💡 "Donne-moi un conseil"`;
-                }
-                
-                // Default - more helpful
-                return `🤔 Je n'ai pas compris, mais je peux vous aider avec:\n\n• Vos **tâches** → "Quelle est ma prochaine tâche ?"\n• Votre **progression** → "Où en suis-je ?"\n• Vos **contacts** → "Qui peut m'aider ?"\n• Les **priorités** → "Quelles sont mes tâches urgentes ?"\n\nEssayez une de ces questions ! 😊`;
+
+                // Default Intelligent Fallback
+                return "🤔 Intéressant. Pourriez-vous préciser si cela concerne une tâche, un contact ou votre planning global ?";
             };
 
-            const sendMessage = (text = input) => {
-                if (!text.trim()) return;
-                setMessages(prev => [...prev, { from: 'user', text: text }]);
-                setTimeout(() => {
-                    setMessages(prev => [...prev, { from: 'emma', text: getEmmaResponse(text) }]);
-                }, 500);
+            const handleSend = () => {
+                if (!input.trim()) return;
+                const newMessages = [...messages, { from: 'user', text: input }];
+                setMessages(newMessages);
                 setInput('');
-            };
-
-            const suggestions = [
-                "Quelle est ma prochaine tâche ?",
-                "Où en suis-je dans ma progression ?",
-                "Qui sont mes contacts clés ?",
-                "Donne-moi un conseil !",
-                "Quelles sont mes priorités ?"
-            ];
-
-            return (
-                <>
-                    {/* Bouton flottant avec effet visuel */}
-                    <button
-                        onClick={() => setIsOpen(!isOpen)}
-                        className="fixed bottom-8 right-8 w-20 h-20 bg-blue-600 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.6)] hover:shadow-[0_0_30px_rgba(37,99,235,0.8)] hover:scale-110 transition-all duration-300 z-50 flex items-center justify-center overflow-hidden border-4 border-white ring-4 ring-blue-500/30 animate-pulse-slow"
-                    >
-                        {isOpen ? (
-                            <span className="text-white text-3xl"><Icons.X /></span>
-                        ) : (
-                            <img src="/images/emma-avatar-new.jpg" alt="Emma RH" className="w-full h-full object-cover" />
-                        )}
-                        <span className="absolute top-1 right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white online-dot"></span>
-                    </button>
-
-                    {/* Fenêtre de chat */}
-                    {isOpen && (
-                        <div className="fixed bottom-24 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden border-2 border-gray-200">
-                            {/* Header */}
-                            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex items-center gap-3">
-                                <div className="relative">
-                                    <img src="/images/emma-avatar-new.jpg" alt="Emma RH" className="w-12 h-12 rounded-full object-cover border-2 border-white" />
-                                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
-                                </div>
-                                <div>
-                                    <h3 className="font-bold">Emma RH</h3>
-                                    <p className="text-xs text-blue-200">🟢 En ligne - Assistante virtuelle</p>
-                                </div>
-                            </div>
-
-                            {/* Messages */}
                             <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50">
                                 {messages.map((msg, i) => (
                                     <div key={i} className={`chat-bubble flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -1048,23 +956,9 @@
             }, [tasks, searchTerm, filterStatus, showUrgent]);
 
             // Notification Toast Component
-            const NotificationToast = ({ message, type, onClose }) => {
-                useEffect(() => {
-                    const timer = setTimeout(onClose, 3000);
-                    return () => clearTimeout(timer);
-                }, [onClose]);
-
-                return (
-                    <div className={`fixed bottom-6 right-6 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transform transition-all duration-300 z-50 animate-bounce-in ${type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
-                        <span className="text-2xl">{type === 'success' ? '✅' : '⚠️'}</span>
-                        <div>
-                            <h4 className="font-bold">{type === 'success' ? 'Succès' : 'Erreur'}</h4>
-                            <p className="text-sm opacity-90">{message}</p>
-                        </div>
-                        <button onClick={onClose} className="ml-2 opacity-70 hover:opacity-100"><Icons.X /></button>
-                    </div>
-                );
-            };
+            // This component definition is no longer used directly as a component,
+            // but its logic is integrated into the main render for top-center display.
+            // The `notification` state is now directly rendered.
 
             // Fonction utilitaire pour gestion erreurs Supabase
             const handleSupabaseError = (error, context) => {
@@ -1515,7 +1409,14 @@
                     </div>
 
                     {/* Toast Notification */}
-                    {notification && <NotificationToast message={notification.message} type={notification.type} onClose={() => setNotification(null)} />}
+                    {/* Toast Notification Top Center */}
+                    {notification && (
+                        <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-[200] px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-fade-in-down transition-all duration-300 ${notification.type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-900 text-white'}`}>
+                            {notification.type === 'error' ? <Icons.AlertCircle /> : <Icons.CheckCircle />}
+                            <span className="font-bold tracking-wide">{notification.message}</span>
+                            <button onClick={() => setNotification(null)} className="ml-2 opacity-60 hover:opacity-100"><Icons.X /></button>
+                        </div>
+                    )}
                     
                     {/* Header avec sélecteur d'employé */}
                     <div className="bg-white/90 backdrop-blur-md sticky top-0 z-30 border-b border-gray-100 shadow-sm">
