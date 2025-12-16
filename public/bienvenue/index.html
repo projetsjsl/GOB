@@ -247,26 +247,26 @@
         const EmmaChatbot = ({ employee, tasks, phases, resources }) => {
             // State to control chatbot visibility
             const [isOpen, setIsOpen] = useState(true);
-            // State to store chat messages, initialized with a placeholder greeting
-            const [messages, setMessages] = useState([]);
+            // State to store chat messages (only user conversations, not the greeting)
+            const [conversationMessages, setConversationMessages] = useState([]);
             // State for the user's input message
             const [input, setInput] = useState('');
             // Ref to scroll to the bottom of the chat messages
             const messagesEndRef = useRef(null);
 
-            // Effect to set/update Emma's greeting when employee data loads
-            useEffect(() => {
-                if (employee?.name && employee.name !== 'Chargement...') {
-                    const greeting = `Bonjour ${employee.name.split(' ')[0]} ! Je suis Emma, votre stratège RH virtuelle. 🧠 Je connais l'intégralité de votre dossier : ${tasks.length} tâches, ${phases.length} phases. Posez-moi une question sur votre avancement, vos blocages ou vos collègues !`;
-                    setMessages(prev => {
-                        // Replace greeting if it's the only message or the first message is a greeting
-                        if (prev.length === 0 || (prev.length >= 1 && prev[0].from === 'emma' && prev[0].text.startsWith('Bonjour'))) {
-                            return [{ from: 'emma', text: greeting }, ...prev.slice(1)];
-                        }
-                        return prev;
-                    });
-                }
+            // Compute Emma's greeting dynamically based on current props
+            const emmaGreeting = useMemo(() => {
+                const name = employee?.name && employee.name !== 'Chargement...' 
+                    ? employee.name.split(' ')[0] 
+                    : 'à vous';
+                return `Bonjour ${name} ! Je suis Emma, votre stratège RH virtuelle. 🧠 Je connais l'intégralité de votre dossier : ${tasks.length} tâches, ${phases.length} phases. Posez-moi une question sur votre avancement, vos blocages ou vos collègues !`;
             }, [employee?.name, tasks.length, phases.length]);
+
+            // Combine the greeting with conversation messages for display
+            const messages = useMemo(() => [
+                { from: 'emma', text: emmaGreeting },
+                ...conversationMessages
+            ], [emmaGreeting, conversationMessages]);
 
             // Effect to scroll to the latest message whenever messages state changes
             const scrollToBottom = () => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); };
@@ -332,12 +332,12 @@
             // Handles sending a message from the user
             const handleSend = () => {
                 if (!input.trim()) return; // Prevent sending empty messages
-                // Add user message to the chat
-                const newMessages = [...messages, { from: 'user', text: input }];
-                setMessages(newMessages);
+                // Add user message and Emma's response to conversation
+                const userMsg = { from: 'user', text: input };
+                setConversationMessages(prev => [...prev, userMsg]);
                 setInput('');
                 setTimeout(() => {
-                    setMessages([...newMessages, { from: 'emma', text: getEmmaResponse(input) }]);
+                    setConversationMessages(prev => [...prev, { from: 'emma', text: getEmmaResponse(input) }]);
                 }, 600);
             };
 
