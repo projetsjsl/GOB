@@ -976,18 +976,3 @@ function updateLastUpdateTime() {
     document.getElementById('dashboardLastUpdate').textContent =
         `Dernière mise à jour: ${formatDate(now)}`;
 }
-
-function showDashboardError() {
-    const tbody = document.getElementById('dashboardTableBody');
-    tbody.innerHTML = `
-        <tr>
-            <td colspan="7" class="px-4 py-8 text-center text-red-500">
-                <div class="flex flex-col items-center gap-2">
-                    <span class="text-4xl">⚠️</span>
-                    <p class="font-semibold">Erreur de chargement</p>
-                    <p class="text-sm">Impossible de charger les données du dashboard</p>
-                </div>
-            </td>
-        </tr>
-    `;
-}
