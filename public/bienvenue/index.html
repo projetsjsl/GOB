@@ -307,7 +307,7 @@
             // Compute Emma's greeting dynamically based on current props
             const emmaGreeting = useMemo(() => {
                 const name = employee?.name && employee.name !== 'Chargement...' ? employee.name.split(' ')[0] : '';
-                return `Bonjour ${name} ! Je suis Emma. Comment puis-je vous aider aujourd'hui ?`;
+                return `Bonjour ${name} ! Je suis Emma RH, assistante virtuelle RH. Comment puis-je vous aider aujourd'hui au sujet de votre intégration aujourd'hui ?`;
             }, [employee?.name]);
 
             // Combine the greeting with conversation messages for display
