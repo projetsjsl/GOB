@@ -172,7 +172,7 @@ CONTRAINTES:
     console.log('📦 Modèle: gemini-1.5-flash-latest');
     console.log('📤 Envoi de la requête...');
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
     // ✅ Utiliser geminiFetchWithRetry pour gestion automatique du rate limiting (429)
     const response = await geminiFetchWithRetry(apiUrl, {
