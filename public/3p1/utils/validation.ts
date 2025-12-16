@@ -242,17 +242,80 @@ export const validateProfile = (
 };
 
 /**
+ * Cache pour les paramètres de validation (évite les appels API répétés)
+ */
+let validationSettingsCache: {
+  settings: any;
+  timestamp: number;
+} | null = null;
+
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Charge les paramètres de validation depuis l'API (avec cache)
+ */
+async function loadValidationSettingsWithCache(): Promise<any> {
+  // Vérifier le cache
+  if (validationSettingsCache && Date.now() - validationSettingsCache.timestamp < CACHE_DURATION) {
+    return validationSettingsCache.settings;
+  }
+
+  try {
+    const API_BASE = typeof window !== 'undefined' ? window.location.origin : '';
+    const response = await fetch(`${API_BASE}/api/validation-settings?key=default`);
+    
+    if (response.ok) {
+      const settings = await response.json();
+      validationSettingsCache = {
+        settings,
+        timestamp: Date.now()
+      };
+      return settings;
+    }
+  } catch (error) {
+    console.warn('Failed to load validation settings, using defaults:', error);
+  }
+
+  // Retourner les valeurs par défaut
+  return {
+    growth_min: -20.00,
+    growth_max: 20.00,
+    target_pe_min: 5.0,
+    target_pe_max: 50.0,
+    target_pcf_min: 3.0,
+    target_pcf_max: 50.0,
+    target_pbv_min: 0.5,
+    target_pbv_max: 10.0,
+    target_yield_min: 0.0,
+    target_yield_max: 15.0,
+    required_return_min: 5.0,
+    required_return_max: 25.0,
+    dividend_payout_ratio_min: 0.0,
+    dividend_payout_ratio_max: 100.0,
+    growth_precision: 2,
+    ratio_precision: 1,
+    yield_precision: 2
+  };
+}
+
+/**
+ * Invalide le cache des paramètres de validation
+ */
+export function invalidateValidationSettingsCache() {
+  validationSettingsCache = null;
+}
+
+/**
  * SANITIZE ASSUMPTIONS - Corrige les valeurs aberrantes avant sauvegarde
  * Cette fonction doit être appelée AVANT chaque sauvegarde Supabase
  * 
- * Limites appliquées:
- * - Taux de croissance: -20% à +20% (valeurs réalistes long terme)
- * - P/E Ratio: 5 à 50 (évite les valeurs irréalistes)
- * - P/CF Ratio: 3 à 50
- * - P/BV Ratio: 0.5 à 10
- * - Dividend Yield: 0% à 15%
+ * Utilise les paramètres personnalisés depuis Supabase si disponibles,
+ * sinon utilise les valeurs par défaut.
  */
-export const sanitizeAssumptions = (assumptions: Partial<Assumptions>): Assumptions => {
+export const sanitizeAssumptions = async (assumptions: Partial<Assumptions>): Promise<Assumptions> => {
+  // Charger les paramètres de validation (avec cache)
+  const validationSettings = await loadValidationSettingsWithCache();
+
   // Valeurs par défaut sécurisées
   const safeDefaults: Assumptions = {
     currentPrice: 0,
@@ -286,6 +349,13 @@ export const sanitizeAssumptions = (assumptions: Partial<Assumptions>): Assumpti
     return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
   };
 
+  // Extraire les limites depuis les paramètres de validation
+  const growthMin = validationSettings.growth_min ?? -20;
+  const growthMax = validationSettings.growth_max ?? 20;
+  const growthPrecision = validationSettings.growth_precision ?? 2;
+  const ratioPrecision = validationSettings.ratio_precision ?? 1;
+  const yieldPrecision = validationSettings.yield_precision ?? 2;
+
   const sanitized: Assumptions = {
     // Prix actuel: doit être > 0
     currentPrice: assumptions.currentPrice && assumptions.currentPrice > 0 && isFinite(assumptions.currentPrice)
@@ -302,22 +372,22 @@ export const sanitizeAssumptions = (assumptions: Partial<Assumptions>): Assumpti
       ? assumptions.baseYear
       : safeDefaults.baseYear,
     
-    // TAUX DE CROISSANCE: Limités à -20% / +20% (réaliste long terme)
-    growthRateEPS: round(clamp(assumptions.growthRateEPS, -20, 20, safeDefaults.growthRateEPS), 2),
-    growthRateSales: round(clamp(assumptions.growthRateSales, -20, 20, safeDefaults.growthRateSales), 2),
-    growthRateCF: round(clamp(assumptions.growthRateCF, -20, 20, safeDefaults.growthRateCF), 2),
-    growthRateBV: round(clamp(assumptions.growthRateBV, -20, 20, safeDefaults.growthRateBV), 2),
-    growthRateDiv: round(clamp(assumptions.growthRateDiv, -20, 20, safeDefaults.growthRateDiv), 2),
+    // TAUX DE CROISSANCE: Utilise les limites personnalisées
+    growthRateEPS: round(clamp(assumptions.growthRateEPS, growthMin, growthMax, safeDefaults.growthRateEPS), growthPrecision),
+    growthRateSales: round(clamp(assumptions.growthRateSales, growthMin, growthMax, safeDefaults.growthRateSales), growthPrecision),
+    growthRateCF: round(clamp(assumptions.growthRateCF, growthMin, growthMax, safeDefaults.growthRateCF), growthPrecision),
+    growthRateBV: round(clamp(assumptions.growthRateBV, growthMin, growthMax, safeDefaults.growthRateBV), growthPrecision),
+    growthRateDiv: round(clamp(assumptions.growthRateDiv, growthMin, growthMax, safeDefaults.growthRateDiv), growthPrecision),
     
-    // RATIOS CIBLES: Limités à des valeurs réalistes
-    targetPE: round(clamp(assumptions.targetPE, 5, 50, safeDefaults.targetPE), 1),
-    targetPCF: round(clamp(assumptions.targetPCF, 3, 50, safeDefaults.targetPCF), 1),
-    targetPBV: round(clamp(assumptions.targetPBV, 0.5, 10, safeDefaults.targetPBV), 2),
-    targetYield: round(clamp(assumptions.targetYield, 0, 15, safeDefaults.targetYield), 2),
+    // RATIOS CIBLES: Utilise les limites personnalisées
+    targetPE: round(clamp(assumptions.targetPE, validationSettings.target_pe_min ?? 5, validationSettings.target_pe_max ?? 50, safeDefaults.targetPE), ratioPrecision),
+    targetPCF: round(clamp(assumptions.targetPCF, validationSettings.target_pcf_min ?? 3, validationSettings.target_pcf_max ?? 50, safeDefaults.targetPCF), ratioPrecision),
+    targetPBV: round(clamp(assumptions.targetPBV, validationSettings.target_pbv_min ?? 0.5, validationSettings.target_pbv_max ?? 10, safeDefaults.targetPBV), ratioPrecision),
+    targetYield: round(clamp(assumptions.targetYield, validationSettings.target_yield_min ?? 0, validationSettings.target_yield_max ?? 15, safeDefaults.targetYield), yieldPrecision),
     
     // Autres paramètres
-    requiredReturn: round(clamp(assumptions.requiredReturn, 5, 25, safeDefaults.requiredReturn), 1),
-    dividendPayoutRatio: round(clamp(assumptions.dividendPayoutRatio, 0, 100, safeDefaults.dividendPayoutRatio), 1),
+    requiredReturn: round(clamp(assumptions.requiredReturn, validationSettings.required_return_min ?? 5, validationSettings.required_return_max ?? 25, safeDefaults.requiredReturn), ratioPrecision),
+    dividendPayoutRatio: round(clamp(assumptions.dividendPayoutRatio, validationSettings.dividend_payout_ratio_min ?? 0, validationSettings.dividend_payout_ratio_max ?? 100, safeDefaults.dividendPayoutRatio), ratioPrecision),
     
     // Exclusions: préserver les valeurs booléennes
     excludeEPS: assumptions.excludeEPS ?? safeDefaults.excludeEPS,
@@ -348,6 +418,101 @@ export const sanitizeAssumptions = (assumptions: Partial<Assumptions>): Assumpti
   if (corrections.length > 0) {
     console.log(`🔧 Assumptions sanitized: ${corrections.join(', ')}`);
   }
+
+  return sanitized;
+};
+
+/**
+ * Version synchrone de sanitizeAssumptions (utilise les valeurs par défaut)
+ * Pour compatibilité avec le code existant
+ */
+export const sanitizeAssumptionsSync = (assumptions: Partial<Assumptions>): Assumptions => {
+  // Valeurs par défaut sécurisées
+  const safeDefaults: Assumptions = {
+    currentPrice: 0,
+    currentDividend: 0,
+    baseYear: new Date().getFullYear(),
+    growthRateEPS: 5,
+    growthRateSales: 5,
+    growthRateCF: 5,
+    growthRateBV: 5,
+    growthRateDiv: 0,
+    targetPE: 15,
+    targetPCF: 10,
+    targetPBV: 2,
+    targetYield: 2,
+    requiredReturn: 10,
+    dividendPayoutRatio: 30,
+    excludeEPS: false,
+    excludeCF: false,
+    excludeBV: false,
+    excludeDIV: false
+  };
+
+  // Helper pour limiter une valeur dans une plage
+  const clamp = (value: number | undefined | null, min: number, max: number, defaultVal: number): number => {
+    if (value === undefined || value === null || !isFinite(value)) return defaultVal;
+    return Math.max(min, Math.min(value, max));
+  };
+
+  // Helper pour arrondir proprement
+  const round = (value: number, decimals: number = 2): number => {
+    return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+  };
+
+  // Utiliser les valeurs du cache si disponibles, sinon valeurs par défaut
+  const settings = validationSettingsCache?.settings || {
+    growth_min: -20,
+    growth_max: 20,
+    target_pe_min: 5,
+    target_pe_max: 50,
+    target_pcf_min: 3,
+    target_pcf_max: 50,
+    target_pbv_min: 0.5,
+    target_pbv_max: 10,
+    target_yield_min: 0,
+    target_yield_max: 15,
+    required_return_min: 5,
+    required_return_max: 25,
+    dividend_payout_ratio_min: 0,
+    dividend_payout_ratio_max: 100,
+    growth_precision: 2,
+    ratio_precision: 1,
+    yield_precision: 2
+  };
+
+  const sanitized: Assumptions = {
+    currentPrice: assumptions.currentPrice && assumptions.currentPrice > 0 && isFinite(assumptions.currentPrice)
+      ? round(assumptions.currentPrice, 2)
+      : safeDefaults.currentPrice,
+    
+    currentDividend: assumptions.currentDividend && assumptions.currentDividend >= 0 && isFinite(assumptions.currentDividend)
+      ? round(assumptions.currentDividend, 4)
+      : safeDefaults.currentDividend,
+    
+    baseYear: assumptions.baseYear && assumptions.baseYear >= 2015 && assumptions.baseYear <= new Date().getFullYear() + 1
+      ? assumptions.baseYear
+      : safeDefaults.baseYear,
+    
+    growthRateEPS: round(clamp(assumptions.growthRateEPS, settings.growth_min, settings.growth_max, safeDefaults.growthRateEPS), settings.growth_precision),
+    growthRateSales: round(clamp(assumptions.growthRateSales, settings.growth_min, settings.growth_max, safeDefaults.growthRateSales), settings.growth_precision),
+    growthRateCF: round(clamp(assumptions.growthRateCF, settings.growth_min, settings.growth_max, safeDefaults.growthRateCF), settings.growth_precision),
+    growthRateBV: round(clamp(assumptions.growthRateBV, settings.growth_min, settings.growth_max, safeDefaults.growthRateBV), settings.growth_precision),
+    growthRateDiv: round(clamp(assumptions.growthRateDiv, settings.growth_min, settings.growth_max, safeDefaults.growthRateDiv), settings.growth_precision),
+    
+    targetPE: round(clamp(assumptions.targetPE, settings.target_pe_min, settings.target_pe_max, safeDefaults.targetPE), settings.ratio_precision),
+    targetPCF: round(clamp(assumptions.targetPCF, settings.target_pcf_min, settings.target_pcf_max, safeDefaults.targetPCF), settings.ratio_precision),
+    targetPBV: round(clamp(assumptions.targetPBV, settings.target_pbv_min, settings.target_pbv_max, safeDefaults.targetPBV), settings.ratio_precision),
+    targetYield: round(clamp(assumptions.targetYield, settings.target_yield_min, settings.target_yield_max, safeDefaults.targetYield), settings.yield_precision),
+    
+    requiredReturn: round(clamp(assumptions.requiredReturn, settings.required_return_min, settings.required_return_max, safeDefaults.requiredReturn), settings.ratio_precision),
+    dividendPayoutRatio: round(clamp(assumptions.dividendPayoutRatio, settings.dividend_payout_ratio_min, settings.dividend_payout_ratio_max, safeDefaults.dividendPayoutRatio), settings.ratio_precision),
+    
+    excludeEPS: assumptions.excludeEPS ?? safeDefaults.excludeEPS,
+    excludeCF: assumptions.excludeCF ?? safeDefaults.excludeCF,
+    excludeBV: assumptions.excludeBV ?? safeDefaults.excludeBV,
+    excludeDIV: assumptions.excludeDIV ?? safeDefaults.excludeDIV
+  };
 
   return sanitized;
 };

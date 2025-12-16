@@ -7,7 +7,7 @@
 
 import { AnnualData, CompanyInfo, Assumptions, AnalysisProfile } from '../types';
 import { fetchMarketData } from './marketDataCache';
-import { sanitizeAssumptions } from '../utils/validation';
+import { sanitizeAssumptionsSync } from '../utils/validation';
 
 export interface SupabaseSnapshotData {
   annual_data: AnnualData[];
@@ -98,7 +98,7 @@ export async function loadProfileFromSupabase(
       : (snapshot.assumptions?.currentPrice || 0);
 
     // 3. Mettre à jour le prix dans les assumptions et SANITISER pour éviter aberrations
-    const updatedAssumptions = sanitizeAssumptions({
+    const updatedAssumptions = sanitizeAssumptionsSync({
       ...snapshot.assumptions,
       currentPrice: currentPrice > 0 ? currentPrice : snapshot.assumptions?.currentPrice || 0
     });
@@ -185,7 +185,7 @@ export async function loadProfilesBatchFromSupabase(
         data: snapshot.annual_data || [],
         info: snapshot.company_info || {},
         currentPrice,
-        assumptions: sanitizeAssumptions({
+        assumptions: sanitizeAssumptionsSync({
           ...snapshot.assumptions,
           currentPrice: currentPrice > 0 ? currentPrice : snapshot.assumptions?.currentPrice || 0
         }),

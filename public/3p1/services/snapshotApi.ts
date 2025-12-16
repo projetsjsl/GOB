@@ -1,5 +1,5 @@
 import { AnnualData, AnalysisProfile, Assumptions, CompanyInfo } from '../types';
-import { sanitizeAssumptions } from '../utils/validation';
+import { sanitizeAssumptionsSync } from '../utils/validation';
 
 const API_BASE = typeof window !== 'undefined' ? window.location.origin : '';
 
@@ -18,7 +18,7 @@ export async function saveSnapshot(
 ): Promise<{ success: boolean; snapshot?: any; error?: string }> {
     try {
         // ✅ SANITIZE: Corriger les valeurs aberrantes AVANT sauvegarde
-        const sanitizedAssumptions = sanitizeAssumptions(assumptions);
+        const sanitizedAssumptions = sanitizeAssumptionsSync(assumptions);
         
         const response = await fetch(`${API_BASE}/api/finance-snapshots`, {
             method: 'POST',

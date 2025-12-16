@@ -27,7 +27,9 @@ import { fetchCompanyData } from './services/financeApi';
 import { saveSnapshot, hasManualEdits, loadSnapshot, listSnapshots } from './services/snapshotApi';
 import { RestoreDataDialog } from './components/RestoreDataDialog';
 import { ConfigModal } from './components/ConfigModal';
+import { ValidationSettingsPanel } from './components/ValidationSettingsPanel';
 import { loadConfig, saveConfig, DEFAULT_CONFIG, GuardrailConfig } from './config/AppConfig';
+import { invalidateValidationSettingsCache } from './utils/validation';
 import { loadAllTickersFromSupabase, mapSourceToIsWatchlist } from './services/tickersApi';
 import { loadProfilesBatchFromSupabase, loadProfileFromSupabase } from './services/supabaseDataLoader';
 import { storage } from './utils/storage';
@@ -145,11 +147,19 @@ export default function App() {
     // --- CONFIG SYSTEM ---
     const [guardrailConfig, setGuardrailConfig] = useState<GuardrailConfig>(() => loadConfig());
     const [isConfigOpen, setIsConfigOpen] = useState(false);
+    const [isValidationSettingsOpen, setIsValidationSettingsOpen] = useState(false);
 
     const handleSaveConfig = (newConfig: GuardrailConfig) => {
         setGuardrailConfig(newConfig);
         saveConfig(newConfig);
         showNotification('Configuration sauvegardée avec succès', 'success');
+    };
+
+    const handleValidationSettingsClose = () => {
+        setIsValidationSettingsOpen(false);
+        // Invalider le cache pour recharger les nouveaux paramètres
+        invalidateValidationSettingsCache();
+        showNotification('Paramètres de validation mis à jour', 'success');
     };
 
     // Keyboard shortcut to toggle admin (Ctrl+Shift+A)
@@ -2695,6 +2705,7 @@ export default function App() {
                                     onRestoreData={profile && profile.data.length > 0 ? () => setShowRestoreDialog(true) : undefined}
                                     showSyncButton={true}
                                     onOpenSettings={() => setIsConfigOpen(true)}
+                                    onOpenValidationSettings={() => setIsValidationSettingsOpen(true)}
                                 />
 
                         {/* CONDITIONAL RENDER: ANALYSIS VS INFO VS KPI */}
@@ -2996,6 +3007,12 @@ export default function App() {
             <NotificationManager
                 notifications={notifications}
                 onRemove={(id) => setNotifications(prev => prev.filter(n => n.id !== id))}
+            />
+
+            {/* VALIDATION SETTINGS PANEL */}
+            <ValidationSettingsPanel
+                isOpen={isValidationSettingsOpen}
+                onClose={handleValidationSettingsClose}
             />
         </div>
     );
