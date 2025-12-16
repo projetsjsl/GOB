@@ -152,6 +152,9 @@ async function fetchSectorData() {
 
   } catch (error) {
     console.error('❌ Erreur lors de la récupération des données:', error.message);
+    
+    // ✅ FIX: Ne pas throw, retourner une erreur gracieuse
+    // Le handler principal gérera l'affichage
     throw error;
   }
 }

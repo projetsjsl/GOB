@@ -76,17 +76,35 @@ export default async function handler(req, res) {
         const emmaResponse = await callEmmaAgent(promptConfig.prompt, context);
         
         if (!emmaResponse.success) {
-      console.error('[Emma Briefing] Erreur Emma Agent:', emmaResponse.error);
-      // Retourner une erreur plus informative
-      return res.status(500).json({
-        success: false,
-        error: 'Failed to generate briefing content',
-        type: normalizedType,
-        details: emmaResponse.error,
-        suggestion: 'Vérifiez la configuration des prompts et des APIs externes (Perplexity, FMP, etc.)',
-        timestamp: new Date().toISOString()
-      });
-    }(`Emma Agent failed: ${emmaResponse.error}`);
+            console.error('[Emma Briefing] Erreur Emma Agent:', emmaResponse.error);
+            
+            // ✅ FIX: Distinguer les types d'erreurs pour codes HTTP appropriés
+            let statusCode = 500;
+            let errorType = 'Failed to generate briefing content';
+            
+            if (emmaResponse.error?.includes('API key') || emmaResponse.error?.includes('Unauthorized')) {
+                statusCode = 401;
+                errorType = 'API key configuration error';
+            } else if (emmaResponse.error?.includes('timeout') || emmaResponse.error?.includes('network')) {
+                statusCode = 503;
+                errorType = 'Service temporarily unavailable';
+            } else if (emmaResponse.error?.includes('quota') || emmaResponse.error?.includes('rate limit')) {
+                statusCode = 429;
+                errorType = 'Rate limit exceeded';
+            }
+            
+            return res.status(statusCode).json({
+                success: false,
+                error: errorType,
+                type: normalizedType,
+                details: emmaResponse.error,
+                suggestion: statusCode === 401
+                    ? 'Vérifiez les clés API (Perplexity, Gemini, FMP) dans Vercel'
+                    : statusCode === 429
+                    ? 'Limite de requêtes atteinte. Réessayez plus tard.'
+                    : 'Vérifiez la configuration des prompts et des APIs externes (Perplexity, FMP, etc.)',
+                timestamp: new Date().toISOString()
+            });
         }
 
         // 4. Générer le HTML de l'email

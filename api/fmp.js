@@ -248,8 +248,45 @@ export default async function handler(req, res) {
         });
       }
 
-      // Handle other HTTP errors
-      throw new Error(`FMP API error: ${errorDetails}`);
+      // Handle 401 Unauthorized (invalid API key)
+      if (fmpResponse.status === 401 || fmpResponse.status === 403) {
+        console.error(`❌ FMP API: Invalid API key`);
+        return res.status(401).json({
+          success: false,
+          error: 'FMP API key invalid',
+          message: 'La clé API FMP est invalide ou expirée',
+          details: errorBody || 'Unauthorized',
+          endpoint,
+          fix: 'Vérifiez FMP_API_KEY dans les variables d\'environnement Vercel',
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Handle 429 Rate Limit
+      if (fmpResponse.status === 429) {
+        console.error(`❌ FMP API: Rate limit exceeded`);
+        return res.status(429).json({
+          success: false,
+          error: 'FMP rate limit exceeded',
+          message: 'Limite de requêtes FMP atteinte',
+          details: errorBody || 'Too many requests',
+          endpoint,
+          retryAfter: 60,
+          suggestion: 'Attendez quelques secondes avant de réessayer',
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Handle other HTTP errors - retourner le statut original au lieu de 500
+      return res.status(fmpResponse.status).json({
+        success: false,
+        error: 'FMP API error',
+        message: errorDetails,
+        endpoint,
+        status: fmpResponse.status,
+        fallback: true,
+        timestamp: new Date().toISOString()
+      });
     }
 
     const data = await fmpResponse.json();
@@ -269,10 +306,27 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('❌ FMP API Error:', error.message);
-    return res.status(500).json({
+    
+    // ✅ FIX: Distinguer les types d'erreurs pour codes HTTP appropriés
+    let statusCode = 500;
+    let errorType = 'Erreur FMP API';
+    
+    if (error.message.includes('API key') || error.message.includes('Unauthorized')) {
+      statusCode = 401;
+      errorType = 'FMP API key invalid';
+    } else if (error.message.includes('timeout') || error.message.includes('network')) {
+      statusCode = 503;
+      errorType = 'Service temporarily unavailable';
+    } else if (error.message.includes('rate limit') || error.message.includes('429')) {
+      statusCode = 429;
+      errorType = 'Rate limit exceeded';
+    }
+    
+    return res.status(statusCode).json({
       success: false,
-      error: 'Erreur FMP API',
+      error: errorType,
       message: error.message,
+      endpoint: req.query.endpoint || 'unknown',
       fallback: true,
       timestamp: new Date().toISOString()
     });

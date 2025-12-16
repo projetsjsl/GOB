@@ -87,9 +87,34 @@ export default async function handler(req, res) {
         if (!screenerRes.ok) {
             const errorText = await screenerRes.text();
             console.error(`❌ FMP Stock Screener error: ${screenerRes.status} - ${errorText.substring(0, 200)}`);
-            return res.status(screenerRes.status).json({
-                error: 'FMP Stock Screener failed',
-                message: errorText.substring(0, 200)
+            
+            // ✅ FIX: Gérer les erreurs avec codes HTTP appropriés
+            let statusCode = screenerRes.status;
+            let errorType = 'FMP Stock Screener failed';
+            
+            if (screenerRes.status === 401 || screenerRes.status === 403) {
+                errorType = 'FMP API key invalid';
+            } else if (screenerRes.status === 402) {
+                errorType = 'FMP endpoint requires paid subscription';
+            } else if (screenerRes.status === 429) {
+                errorType = 'FMP rate limit exceeded';
+            } else if (screenerRes.status >= 500) {
+                statusCode = 503; // Service unavailable au lieu de 500
+                errorType = 'FMP service temporarily unavailable';
+            }
+            
+            return res.status(statusCode).json({
+                error: errorType,
+                message: errorText.substring(0, 200),
+                status: screenerRes.status,
+                suggestion: statusCode === 401 
+                    ? 'Vérifiez FMP_API_KEY dans Vercel'
+                    : statusCode === 402
+                    ? 'Cet endpoint nécessite un abonnement FMP payant'
+                    : statusCode === 429
+                    ? 'Limite de requêtes atteinte. Réessayez plus tard.'
+                    : 'Service temporairement indisponible',
+                timestamp: new Date().toISOString()
             });
         }
 

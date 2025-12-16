@@ -679,13 +679,56 @@ export default async function handler(req, res) {
       const interval = req.query.interval || '5min';
       const outputsize = req.query.outputsize || '78';
 
-      const intradayData = await fetchIntradayFromTwelve(symbolInput, interval, outputsize);
+      try {
+        const intradayData = await fetchIntradayFromTwelve(symbolInput, interval, outputsize);
 
-      // Mettre en cache
-      setCache(cacheKey, intradayData);
+        // Mettre en cache
+        setCache(cacheKey, intradayData);
 
-      console.log(`✅ Intraday: ${symbolInput} from Twelve Data`);
-      return res.status(200).json(intradayData);
+        console.log(`✅ Intraday: ${symbolInput} from Twelve Data`);
+        return res.status(200).json(intradayData);
+      } catch (error) {
+        // ✅ FIX: Gérer les erreurs gracieusement au lieu de 500
+        console.error(`❌ Intraday error for ${symbolInput}:`, error.message);
+        
+        // Vérifier si c'est une erreur de clé API manquante
+        if (error.message.includes('TWELVE_DATA_API_KEY')) {
+          return res.status(503).json({
+            error: 'Service unavailable',
+            message: 'Intraday data requires TWELVE_DATA_API_KEY configuration',
+            endpoint: 'intraday',
+            symbol: symbolInput,
+            suggestion: 'Configure TWELVE_DATA_API_KEY in Vercel environment variables',
+            fallback: true,
+            timestamp: new Date().toISOString()
+          });
+        }
+        
+        // Vérifier si c'est une erreur de quota ou rate limit
+        if (error.message.includes('429') || error.message.includes('rate limit') || error.message.includes('quota')) {
+          return res.status(429).json({
+            error: 'Rate limit exceeded',
+            message: 'Twelve Data API rate limit reached',
+            endpoint: 'intraday',
+            symbol: symbolInput,
+            retryAfter: 60,
+            suggestion: 'Wait before retrying or upgrade your Twelve Data plan',
+            fallback: true,
+            timestamp: new Date().toISOString()
+          });
+        }
+        
+        // Autres erreurs - retourner 503 (Service Unavailable) au lieu de 500
+        return res.status(503).json({
+          error: 'Service temporarily unavailable',
+          message: `Intraday data not available for ${symbolInput}`,
+          endpoint: 'intraday',
+          symbol: symbolInput,
+          details: error.message,
+          fallback: true,
+          timestamp: new Date().toISOString()
+        });
+      }
     }
 
     // ========================================================================
