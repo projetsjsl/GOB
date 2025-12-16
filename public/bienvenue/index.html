@@ -967,7 +967,7 @@
                              // Mapping snake_case -> camelCase
                              setEmployees(empData.map(e => ({
                                  ...e,
-                                 avatarUrl: e.avatar_url || (e.name.includes('Caroline') ? 'https://ui-avatars.com/api/?name=Caroline&background=EB4F27&color=fff&size=128' : null),
+                                 avatarUrl: e.avatar_url || (e.name.includes('Caroline') ? '/images/caroline_avatar.jpg' : null),
                                  startDate: e.start_date,
                              })));
                         }
