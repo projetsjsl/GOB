@@ -1061,7 +1061,7 @@
             const [tasks, setTasks] = useState([]);
 
             useEffect(() => {
-                if (!selectedEmployee) return;
+                if (!selectedEmployee || !selectedEmployee.id) return;
                 const startDate = getValidDate(selectedEmployee.startDate);
                 
                 // Charger les statuts sauvegardés pour cet employé
@@ -1074,11 +1074,18 @@
                         ...tt,
                         id: taskKey,
                         dueDate: new Date(dueMs).toISOString().split('T')[0],
-                        status: savedStatuses[tt.id] || 'pending' // Charger le statut sauvegardé ou 'pending'
+                        status: savedStatuses[tt.id] || 'pending'
                     };
                 });
-                setTasks(generatedTasks);
-            }, [selectedEmployee, taskTemplates]); // Removed employeeTasks - status updates are handled via setTasks directly
+                
+                // CRITICAL: Only update if tasks actually changed to prevent infinite loops
+                setTasks(prevTasks => {
+                    const prevIds = prevTasks.map(t => t.id + t.status).join(',');
+                    const newIds = generatedTasks.map(t => t.id + t.status).join(',');
+                    if (prevIds === newIds) return prevTasks; // No change, return same reference
+                    return generatedTasks;
+                });
+            }, [selectedEmployee?.id, selectedEmployee?.startDate, taskTemplates.length]); // Use primitive deps only
 
             const stats = useMemo(() => {
                 const total = tasks.length;
