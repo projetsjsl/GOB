@@ -120,32 +120,31 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
 
     // Helper function pour obtenir la couleur et la position du JPEGY
     // Zones: 0-0.5 (11.1%), 0.5-1.5 (55.6%), 1.5-1.75 (5.6%), 1.75-2.0 (5.6%), 2.0+ (22.2%)
-    const getJpegyColor = (value: number | null): { color: string; bgColor: string; position: number } => {
+    const getJpegyColor = (value: number | null): { textClass: string; bgClass: string; position: number } => {
         if (value === null || value <= 0) {
-            return { color: '#6b7280', bgColor: '#f3f4f6', position: 0 };
+            return { textClass: 'text-gray-500', bgClass: 'bg-gray-100', position: 0 };
         }
         if (value <= 0.5) {
             // Vert pâle (0 à 0.5) - 11.1% de la barre
             const position = (value / 0.5) * 11.1; // 0-11.1% de la barre
-            return { color: '#86efac', bgColor: '#dcfce7', position };
+            return { textClass: 'text-green-300', bgClass: 'bg-green-100', position };
         } else if (value <= 1.5) {
             // Vert foncé (0.5 à 1.5) - 55.6% de la barre
             const position = 11.1 + ((value - 0.5) / 1.0) * 55.6; // 11.1-66.7% de la barre
-            return { color: '#16a34a', bgColor: '#bbf7d0', position };
+            return { textClass: 'text-green-600', bgClass: 'bg-green-200', position };
         } else if (value <= 1.75) {
             // Jaune (1.5 à 1.75) - 5.6% de la barre
             const position = 66.7 + ((value - 1.5) / 0.25) * 5.6; // 66.7-72.3% de la barre
-            return { color: '#eab308', bgColor: '#fef9c3', position };
+            return { textClass: 'text-yellow-500', bgClass: 'bg-yellow-100', position };
         } else if (value <= 2.0) {
             // Orange (1.75 à 2.0) - 5.6% de la barre
             const position = 72.3 + ((value - 1.75) / 0.25) * 5.6; // 72.3-77.9% de la barre
-            return { color: '#f97316', bgColor: '#fed7aa', position };
+            return { textClass: 'text-orange-500', bgClass: 'bg-orange-200', position };
         } else {
             // Rouge (au-dessus de 2.0) - 22.2% de la barre
-            // Pour les valeurs > 2.0, on limite à 100% mais on peut aller jusqu'à ~4.0 pour utiliser toute la zone rouge
-            const maxValue = 4.0; // Valeur maximale pour utiliser toute la zone rouge
+            const maxValue = 4.0;
             const position = Math.min(77.9 + ((value - 2.0) / (maxValue - 2.0)) * 22.2, 100);
-            return { color: '#dc2626', bgColor: '#fecaca', position };
+            return { textClass: 'text-red-600', bgClass: 'bg-red-200', position };
         }
     };
 
@@ -166,7 +165,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                     {/* JPEGY (P/E Actuel) */}
                     <div className="bg-white p-3 sm:p-4 rounded-lg border border-purple-200">
                         <div className="text-sm text-gray-600 mb-1">JPEGY (P/E Actuel)</div>
-                        <div className="text-3xl font-bold mb-3 flex items-center gap-2" style={{ color: jpegy !== null ? jpegyColor.color : '#6b7280' }}>
+                        <div className={`text-3xl font-bold mb-3 flex items-center gap-2 ${jpegy !== null ? jpegyColor.textClass : 'text-gray-500'}`}>
                             {jpegy !== null ? jpegy.toFixed(2) : (
                                 <>
                                     <span>N/A</span>
@@ -179,11 +178,11 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                         <div className="relative h-8 bg-gray-100 rounded-full overflow-hidden mb-3">
                             {/* Segments de couleur - proportions: 0-0.5 (11.1%), 0.5-1.5 (55.6%), 1.5-1.75 (5.6%), 1.75-2.0 (5.6%), 2.0+ (22.1%) */}
                             <div className="absolute inset-0 flex">
-                                <div className="bg-green-200" style={{ width: '11.1%' }}></div>
-                                <div className="bg-green-600" style={{ width: '55.6%' }}></div>
-                                <div className="bg-yellow-400" style={{ width: '5.6%' }}></div>
-                                <div className="bg-orange-500" style={{ width: '5.6%' }}></div>
-                                <div className="bg-red-600" style={{ width: '22.1%' }}></div>
+                                <div className="bg-green-200 w-[11.1%]"></div>
+                                <div className="bg-green-600 w-[55.6%]"></div>
+                                <div className="bg-yellow-400 w-[5.6%]"></div>
+                                <div className="bg-orange-500 w-[5.6%]"></div>
+                                <div className="bg-red-600 w-[22.1%]"></div>
                             </div>
                             {/* Indicateur de position */}
                             {jpegy !== null && jpegy > 0 && (
@@ -220,7 +219,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                     {/* JPEGY (Forward P/E) */}
                     <div className="bg-white p-3 sm:p-4 rounded-lg border border-purple-200">
                         <div className="text-sm text-gray-600 mb-1">JPEGY (Forward P/E)</div>
-                        <div className="text-3xl font-bold mb-3 flex items-center gap-2" style={{ color: forwardJpegy !== null ? forwardJpegyColor.color : '#6b7280' }}>
+                        <div className={`text-3xl font-bold mb-3 flex items-center gap-2 ${forwardJpegy !== null ? forwardJpegyColor.textClass : 'text-gray-500'}`}>
                             {forwardJpegy !== null ? forwardJpegy.toFixed(2) : (
                                 <>
                                     <span>N/A</span>
@@ -233,11 +232,11 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                         <div className="relative h-8 bg-gray-100 rounded-full overflow-hidden mb-3">
                             {/* Segments de couleur - proportions: 0-0.5 (11.1%), 0.5-1.5 (55.6%), 1.5-1.75 (5.6%), 1.75-2.0 (5.6%), 2.0+ (22.1%) */}
                             <div className="absolute inset-0 flex">
-                                <div className="bg-green-200" style={{ width: '11.1%' }}></div>
-                                <div className="bg-green-600" style={{ width: '55.6%' }}></div>
-                                <div className="bg-yellow-400" style={{ width: '5.6%' }}></div>
-                                <div className="bg-orange-500" style={{ width: '5.6%' }}></div>
-                                <div className="bg-red-600" style={{ width: '22.1%' }}></div>
+                                <div className="bg-green-200 w-[11.1%]"></div>
+                                <div className="bg-green-600 w-[55.6%]"></div>
+                                <div className="bg-yellow-400 w-[5.6%]"></div>
+                                <div className="bg-orange-500 w-[5.6%]"></div>
+                                <div className="bg-red-600 w-[22.1%]"></div>
                             </div>
                             {/* Indicateur de position */}
                             {forwardJpegy !== null && forwardJpegy > 0 && (

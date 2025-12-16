@@ -1,10 +1,13 @@
 /**
  * Service pour charger les données depuis Supabase au lieu de FMP
  * Optimise le chargement initial en utilisant les snapshots existants
+ * 
+ * IMPORTANT: Toutes les assumptions chargées sont sanitisées pour éviter les valeurs aberrantes
  */
 
 import { AnnualData, CompanyInfo, Assumptions, AnalysisProfile } from '../types';
 import { fetchMarketData } from './marketDataCache';
+import { sanitizeAssumptions } from '../utils/validation';
 
 export interface SupabaseSnapshotData {
   annual_data: AnnualData[];
@@ -94,11 +97,11 @@ export async function loadProfileFromSupabase(
       ? marketData.currentPrice 
       : (snapshot.assumptions?.currentPrice || 0);
 
-    // 3. Mettre à jour le prix dans les assumptions si nécessaire
-    const updatedAssumptions = {
+    // 3. Mettre à jour le prix dans les assumptions et SANITISER pour éviter aberrations
+    const updatedAssumptions = sanitizeAssumptions({
       ...snapshot.assumptions,
       currentPrice: currentPrice > 0 ? currentPrice : snapshot.assumptions?.currentPrice || 0
-    };
+    });
 
     console.log(`✅ ${upperTicker}: Chargé depuis Supabase (snapshot du ${snapshot.snapshot_date})`);
 
@@ -177,14 +180,15 @@ export async function loadProfilesBatchFromSupabase(
         ? marketData.currentPrice
         : (snapshot.assumptions?.currentPrice || 0);
 
+      // ✅ SANITISER les assumptions pour éviter les valeurs aberrantes
       results[upperTicker] = {
         data: snapshot.annual_data || [],
         info: snapshot.company_info || {},
         currentPrice,
-        assumptions: {
+        assumptions: sanitizeAssumptions({
           ...snapshot.assumptions,
           currentPrice: currentPrice > 0 ? currentPrice : snapshot.assumptions?.currentPrice || 0
-        },
+        }),
         source: 'supabase' as const
       };
     } else {

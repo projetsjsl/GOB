@@ -1,9 +1,11 @@
 import { AnnualData, AnalysisProfile, Assumptions, CompanyInfo } from '../types';
+import { sanitizeAssumptions } from '../utils/validation';
 
 const API_BASE = typeof window !== 'undefined' ? window.location.origin : '';
 
 /**
  * Save current analysis as a snapshot
+ * IMPORTANT: Les assumptions sont sanitisées avant sauvegarde pour éviter les valeurs aberrantes
  */
 export async function saveSnapshot(
     ticker: string,
@@ -15,6 +17,9 @@ export async function saveSnapshot(
     autoFetched = false
 ): Promise<{ success: boolean; snapshot?: any; error?: string }> {
     try {
+        // ✅ SANITIZE: Corriger les valeurs aberrantes AVANT sauvegarde
+        const sanitizedAssumptions = sanitizeAssumptions(assumptions);
+        
         const response = await fetch(`${API_BASE}/api/finance-snapshots`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -22,7 +27,7 @@ export async function saveSnapshot(
                 ticker,
                 profile_id: `profile_${ticker}`,
                 annual_data: data,
-                assumptions,
+                assumptions: sanitizedAssumptions,
                 company_info: info,
                 notes,
                 is_current: isCurrent,

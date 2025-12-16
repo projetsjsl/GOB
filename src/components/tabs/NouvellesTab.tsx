@@ -524,3 +524,4 @@ export const NouvellesTab: React.FC<TabProps> = (props) => {
 };
 
 export default NouvellesTab;
+

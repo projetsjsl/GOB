@@ -291,22 +291,35 @@ export const autoFillAssumptionsFromFMPData = (
     .filter((v): v is number => v !== null && isFinite(v) && v >= 0 && v < 100);
   const avgYield = yieldValues.length > 0 ? calculateAverage(yieldValues) : 2.0;
   
-  // Retourner les assumptions auto-remplies avec limites de sécurité
+  // Helper pour arrondir proprement
+  const round = (value: number, decimals: number = 2): number => {
+    return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+  };
+
+  // Retourner les assumptions auto-remplies avec limites STRICTES
+  // Ces limites sont cruciales pour éviter les prix cibles aberrants
   return {
-    currentPrice,
-    currentDividend: lastData.dividendPerShare || existingAssumptions?.currentDividend || 0,
+    currentPrice: round(currentPrice, 2),
+    currentDividend: round(lastData.dividendPerShare || existingAssumptions?.currentDividend || 0, 4),
     baseYear: lastValidData.year,
-    // Limiter les taux de croissance à 0-20% (valeurs raisonnables)
-    growthRateEPS: Math.min(Math.max(growthEPS, -20), 20),
-    growthRateSales: Math.min(Math.max(growthCF, -20), 20), // Proxy: utilise CF car pas de SalesPerShare dans AnnualData
-    growthRateCF: Math.min(Math.max(growthCF, -20), 20), 
-    growthRateBV: Math.min(Math.max(growthBV, -20), 20),
-    growthRateDiv: Math.min(Math.max(growthDiv, -20), 20),
-    // Limiter les ratios à des valeurs raisonnables
-    targetPE: parseFloat(Math.max(1, Math.min(avgPE, 100)).toFixed(1)),
-    targetPCF: parseFloat(Math.max(1, Math.min(avgPCF, 100)).toFixed(1)),
-    targetPBV: parseFloat(Math.max(0.5, Math.min(avgPBV, 50)).toFixed(1)),
-    targetYield: parseFloat(Math.max(0, Math.min(avgYield, 20)).toFixed(2)),
+    
+    // Taux de croissance: LIMITÉS à -20% / +20% (réaliste long terme)
+    growthRateEPS: round(Math.min(Math.max(growthEPS, -20), 20), 2),
+    growthRateSales: round(Math.min(Math.max(growthCF, -20), 20), 2),
+    growthRateCF: round(Math.min(Math.max(growthCF, -20), 20), 2), 
+    growthRateBV: round(Math.min(Math.max(growthBV, -20), 20), 2),
+    growthRateDiv: round(Math.min(Math.max(growthDiv, -20), 20), 2),
+    
+    // Ratios cibles: LIMITÉS à des valeurs RÉALISTES
+    // P/E: 5-50 (évite les 100x irréalistes)
+    // P/CF: 3-50
+    // P/BV: 0.5-10 (la plupart des entreprises sont entre 1 et 5)
+    // Yield: 0-15%
+    targetPE: round(Math.max(5, Math.min(avgPE, 50)), 1),
+    targetPCF: round(Math.max(3, Math.min(avgPCF, 50)), 1),
+    targetPBV: round(Math.max(0.5, Math.min(avgPBV, 10)), 2),
+    targetYield: round(Math.max(0, Math.min(avgYield, 15)), 2),
+    
     // Préserver les autres valeurs existantes si fournies
     requiredReturn: existingAssumptions?.requiredReturn,
     dividendPayoutRatio: existingAssumptions?.dividendPayoutRatio,

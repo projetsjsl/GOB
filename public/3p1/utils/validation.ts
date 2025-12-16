@@ -242,6 +242,117 @@ export const validateProfile = (
 };
 
 /**
+ * SANITIZE ASSUMPTIONS - Corrige les valeurs aberrantes avant sauvegarde
+ * Cette fonction doit être appelée AVANT chaque sauvegarde Supabase
+ * 
+ * Limites appliquées:
+ * - Taux de croissance: -20% à +20% (valeurs réalistes long terme)
+ * - P/E Ratio: 5 à 50 (évite les valeurs irréalistes)
+ * - P/CF Ratio: 3 à 50
+ * - P/BV Ratio: 0.5 à 10
+ * - Dividend Yield: 0% à 15%
+ */
+export const sanitizeAssumptions = (assumptions: Partial<Assumptions>): Assumptions => {
+  // Valeurs par défaut sécurisées
+  const safeDefaults: Assumptions = {
+    currentPrice: 0,
+    currentDividend: 0,
+    baseYear: new Date().getFullYear(),
+    growthRateEPS: 5,
+    growthRateSales: 5,
+    growthRateCF: 5,
+    growthRateBV: 5,
+    growthRateDiv: 0,
+    targetPE: 15,
+    targetPCF: 10,
+    targetPBV: 2,
+    targetYield: 2,
+    requiredReturn: 10,
+    dividendPayoutRatio: 30,
+    excludeEPS: false,
+    excludeCF: false,
+    excludeBV: false,
+    excludeDIV: false
+  };
+
+  // Helper pour limiter une valeur dans une plage
+  const clamp = (value: number | undefined | null, min: number, max: number, defaultVal: number): number => {
+    if (value === undefined || value === null || !isFinite(value)) return defaultVal;
+    return Math.max(min, Math.min(value, max));
+  };
+
+  // Helper pour arrondir proprement
+  const round = (value: number, decimals: number = 2): number => {
+    return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+  };
+
+  const sanitized: Assumptions = {
+    // Prix actuel: doit être > 0
+    currentPrice: assumptions.currentPrice && assumptions.currentPrice > 0 && isFinite(assumptions.currentPrice)
+      ? round(assumptions.currentPrice, 2)
+      : safeDefaults.currentPrice,
+    
+    // Dividende actuel: >= 0
+    currentDividend: assumptions.currentDividend && assumptions.currentDividend >= 0 && isFinite(assumptions.currentDividend)
+      ? round(assumptions.currentDividend, 4)
+      : safeDefaults.currentDividend,
+    
+    // Année de base: doit être récente
+    baseYear: assumptions.baseYear && assumptions.baseYear >= 2015 && assumptions.baseYear <= new Date().getFullYear() + 1
+      ? assumptions.baseYear
+      : safeDefaults.baseYear,
+    
+    // TAUX DE CROISSANCE: Limités à -20% / +20% (réaliste long terme)
+    growthRateEPS: round(clamp(assumptions.growthRateEPS, -20, 20, safeDefaults.growthRateEPS), 2),
+    growthRateSales: round(clamp(assumptions.growthRateSales, -20, 20, safeDefaults.growthRateSales), 2),
+    growthRateCF: round(clamp(assumptions.growthRateCF, -20, 20, safeDefaults.growthRateCF), 2),
+    growthRateBV: round(clamp(assumptions.growthRateBV, -20, 20, safeDefaults.growthRateBV), 2),
+    growthRateDiv: round(clamp(assumptions.growthRateDiv, -20, 20, safeDefaults.growthRateDiv), 2),
+    
+    // RATIOS CIBLES: Limités à des valeurs réalistes
+    targetPE: round(clamp(assumptions.targetPE, 5, 50, safeDefaults.targetPE), 1),
+    targetPCF: round(clamp(assumptions.targetPCF, 3, 50, safeDefaults.targetPCF), 1),
+    targetPBV: round(clamp(assumptions.targetPBV, 0.5, 10, safeDefaults.targetPBV), 2),
+    targetYield: round(clamp(assumptions.targetYield, 0, 15, safeDefaults.targetYield), 2),
+    
+    // Autres paramètres
+    requiredReturn: round(clamp(assumptions.requiredReturn, 5, 25, safeDefaults.requiredReturn), 1),
+    dividendPayoutRatio: round(clamp(assumptions.dividendPayoutRatio, 0, 100, safeDefaults.dividendPayoutRatio), 1),
+    
+    // Exclusions: préserver les valeurs booléennes
+    excludeEPS: assumptions.excludeEPS ?? safeDefaults.excludeEPS,
+    excludeCF: assumptions.excludeCF ?? safeDefaults.excludeCF,
+    excludeBV: assumptions.excludeBV ?? safeDefaults.excludeBV,
+    excludeDIV: assumptions.excludeDIV ?? safeDefaults.excludeDIV
+  };
+
+  // Log si des corrections ont été faites
+  const corrections: string[] = [];
+  
+  if (assumptions.growthRateEPS !== undefined && assumptions.growthRateEPS !== sanitized.growthRateEPS) {
+    corrections.push(`growthRateEPS: ${assumptions.growthRateEPS} → ${sanitized.growthRateEPS}`);
+  }
+  if (assumptions.growthRateCF !== undefined && assumptions.growthRateCF !== sanitized.growthRateCF) {
+    corrections.push(`growthRateCF: ${assumptions.growthRateCF} → ${sanitized.growthRateCF}`);
+  }
+  if (assumptions.targetPE !== undefined && assumptions.targetPE !== sanitized.targetPE) {
+    corrections.push(`targetPE: ${assumptions.targetPE} → ${sanitized.targetPE}`);
+  }
+  if (assumptions.targetPCF !== undefined && assumptions.targetPCF !== sanitized.targetPCF) {
+    corrections.push(`targetPCF: ${assumptions.targetPCF} → ${sanitized.targetPCF}`);
+  }
+  if (assumptions.targetPBV !== undefined && assumptions.targetPBV !== sanitized.targetPBV) {
+    corrections.push(`targetPBV: ${assumptions.targetPBV} → ${sanitized.targetPBV}`);
+  }
+
+  if (corrections.length > 0) {
+    console.log(`🔧 Assumptions sanitized: ${corrections.join(', ')}`);
+  }
+
+  return sanitized;
+};
+
+/**
  * Check if data appears to be from FMP (real API data)
  * vs placeholder/skeleton data
  */

@@ -115,3 +115,4 @@ export const ExpandableComponent: React.FC<ExpandableComponentProps> = ({
 };
 
 export default ExpandableComponent;
+

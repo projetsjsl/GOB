@@ -1837,7 +1837,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     ? "Afficher tous les tickers\n\nDésactive le filtre N/A pour voir tous les tickers.\n\nRaccourci: Ctrl+Shift+F" 
                     : "Afficher uniquement les N/A\n\nFiltre pour ne voir que les tickers avec des données invalides (N/A).\n\nUtile pour identifier rapidement les tickers nécessitant une synchronisation.\n\nRaccourci: Ctrl+Shift+F"}
                   aria-label={filters.showOnlyNA ? "Afficher tous les tickers" : "Afficher uniquement les tickers avec N/A"}
-                  aria-pressed={Boolean(filters.showOnlyNA).toString() as "true" | "false"}
+                  aria-pressed={filters.showOnlyNA ? "true" : "false"}
                   tabIndex={0}
                 >
                   {filters.showOnlyNA ? 'Afficher Tous' : 'Afficher N/A'}

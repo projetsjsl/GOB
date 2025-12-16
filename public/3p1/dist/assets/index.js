@@ -8547,22 +8547,28 @@ const autoFillAssumptionsFromFMPData = (data, currentPrice, existingAssumptions)
     return d.dividendPerShare / d.priceHigh * 100;
   }).filter((v) => v !== null && isFinite(v) && v >= 0 && v < 100);
   const avgYield = yieldValues.length > 0 ? calculateAverage2(yieldValues) : 2;
+  const round2 = (value, decimals = 2) => {
+    return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+  };
   return {
-    currentPrice,
-    currentDividend: lastData.dividendPerShare || (existingAssumptions == null ? void 0 : existingAssumptions.currentDividend) || 0,
+    currentPrice: round2(currentPrice, 2),
+    currentDividend: round2(lastData.dividendPerShare || (existingAssumptions == null ? void 0 : existingAssumptions.currentDividend) || 0, 4),
     baseYear: lastValidData.year,
-    // Limiter les taux de croissance à 0-20% (valeurs raisonnables)
-    growthRateEPS: Math.min(Math.max(growthEPS, -20), 20),
-    growthRateSales: Math.min(Math.max(growthCF, -20), 20),
-    // Proxy: utilise CF car pas de SalesPerShare dans AnnualData
-    growthRateCF: Math.min(Math.max(growthCF, -20), 20),
-    growthRateBV: Math.min(Math.max(growthBV, -20), 20),
-    growthRateDiv: Math.min(Math.max(growthDiv, -20), 20),
-    // Limiter les ratios à des valeurs raisonnables
-    targetPE: parseFloat(Math.max(1, Math.min(avgPE, 100)).toFixed(1)),
-    targetPCF: parseFloat(Math.max(1, Math.min(avgPCF, 100)).toFixed(1)),
-    targetPBV: parseFloat(Math.max(0.5, Math.min(avgPBV, 50)).toFixed(1)),
-    targetYield: parseFloat(Math.max(0, Math.min(avgYield, 20)).toFixed(2)),
+    // Taux de croissance: LIMITÉS à -20% / +20% (réaliste long terme)
+    growthRateEPS: round2(Math.min(Math.max(growthEPS, -20), 20), 2),
+    growthRateSales: round2(Math.min(Math.max(growthCF, -20), 20), 2),
+    growthRateCF: round2(Math.min(Math.max(growthCF, -20), 20), 2),
+    growthRateBV: round2(Math.min(Math.max(growthBV, -20), 20), 2),
+    growthRateDiv: round2(Math.min(Math.max(growthDiv, -20), 20), 2),
+    // Ratios cibles: LIMITÉS à des valeurs RÉALISTES
+    // P/E: 5-50 (évite les 100x irréalistes)
+    // P/CF: 3-50
+    // P/BV: 0.5-10 (la plupart des entreprises sont entre 1 et 5)
+    // Yield: 0-15%
+    targetPE: round2(Math.max(5, Math.min(avgPE, 50)), 1),
+    targetPCF: round2(Math.max(3, Math.min(avgPCF, 50)), 1),
+    targetPBV: round2(Math.max(0.5, Math.min(avgPBV, 10)), 2),
+    targetYield: round2(Math.max(0, Math.min(avgYield, 15)), 2),
     // Préserver les autres valeurs existantes si fournies
     requiredReturn: existingAssumptions == null ? void 0 : existingAssumptions.requiredReturn,
     dividendPayoutRatio: existingAssumptions == null ? void 0 : existingAssumptions.dividendPayoutRatio,
@@ -33157,9 +33163,86 @@ Utile pour:
     ] })
   ] });
 };
+const sanitizeAssumptions = (assumptions) => {
+  const safeDefaults = {
+    currentPrice: 0,
+    currentDividend: 0,
+    baseYear: (/* @__PURE__ */ new Date()).getFullYear(),
+    growthRateEPS: 5,
+    growthRateSales: 5,
+    growthRateCF: 5,
+    growthRateBV: 5,
+    growthRateDiv: 0,
+    targetPE: 15,
+    targetPCF: 10,
+    targetPBV: 2,
+    targetYield: 2,
+    requiredReturn: 10,
+    dividendPayoutRatio: 30,
+    excludeEPS: false,
+    excludeCF: false,
+    excludeBV: false,
+    excludeDIV: false
+  };
+  const clamp = (value, min2, max2, defaultVal) => {
+    if (value === void 0 || value === null || !isFinite(value)) return defaultVal;
+    return Math.max(min2, Math.min(value, max2));
+  };
+  const round2 = (value, decimals = 2) => {
+    return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+  };
+  const sanitized = {
+    // Prix actuel: doit être > 0
+    currentPrice: assumptions.currentPrice && assumptions.currentPrice > 0 && isFinite(assumptions.currentPrice) ? round2(assumptions.currentPrice, 2) : safeDefaults.currentPrice,
+    // Dividende actuel: >= 0
+    currentDividend: assumptions.currentDividend && assumptions.currentDividend >= 0 && isFinite(assumptions.currentDividend) ? round2(assumptions.currentDividend, 4) : safeDefaults.currentDividend,
+    // Année de base: doit être récente
+    baseYear: assumptions.baseYear && assumptions.baseYear >= 2015 && assumptions.baseYear <= (/* @__PURE__ */ new Date()).getFullYear() + 1 ? assumptions.baseYear : safeDefaults.baseYear,
+    // TAUX DE CROISSANCE: Limités à -20% / +20% (réaliste long terme)
+    growthRateEPS: round2(clamp(assumptions.growthRateEPS, -20, 20, safeDefaults.growthRateEPS), 2),
+    growthRateSales: round2(clamp(assumptions.growthRateSales, -20, 20, safeDefaults.growthRateSales), 2),
+    growthRateCF: round2(clamp(assumptions.growthRateCF, -20, 20, safeDefaults.growthRateCF), 2),
+    growthRateBV: round2(clamp(assumptions.growthRateBV, -20, 20, safeDefaults.growthRateBV), 2),
+    growthRateDiv: round2(clamp(assumptions.growthRateDiv, -20, 20, safeDefaults.growthRateDiv), 2),
+    // RATIOS CIBLES: Limités à des valeurs réalistes
+    targetPE: round2(clamp(assumptions.targetPE, 5, 50, safeDefaults.targetPE), 1),
+    targetPCF: round2(clamp(assumptions.targetPCF, 3, 50, safeDefaults.targetPCF), 1),
+    targetPBV: round2(clamp(assumptions.targetPBV, 0.5, 10, safeDefaults.targetPBV), 2),
+    targetYield: round2(clamp(assumptions.targetYield, 0, 15, safeDefaults.targetYield), 2),
+    // Autres paramètres
+    requiredReturn: round2(clamp(assumptions.requiredReturn, 5, 25, safeDefaults.requiredReturn), 1),
+    dividendPayoutRatio: round2(clamp(assumptions.dividendPayoutRatio, 0, 100, safeDefaults.dividendPayoutRatio), 1),
+    // Exclusions: préserver les valeurs booléennes
+    excludeEPS: assumptions.excludeEPS ?? safeDefaults.excludeEPS,
+    excludeCF: assumptions.excludeCF ?? safeDefaults.excludeCF,
+    excludeBV: assumptions.excludeBV ?? safeDefaults.excludeBV,
+    excludeDIV: assumptions.excludeDIV ?? safeDefaults.excludeDIV
+  };
+  const corrections = [];
+  if (assumptions.growthRateEPS !== void 0 && assumptions.growthRateEPS !== sanitized.growthRateEPS) {
+    corrections.push(`growthRateEPS: ${assumptions.growthRateEPS} → ${sanitized.growthRateEPS}`);
+  }
+  if (assumptions.growthRateCF !== void 0 && assumptions.growthRateCF !== sanitized.growthRateCF) {
+    corrections.push(`growthRateCF: ${assumptions.growthRateCF} → ${sanitized.growthRateCF}`);
+  }
+  if (assumptions.targetPE !== void 0 && assumptions.targetPE !== sanitized.targetPE) {
+    corrections.push(`targetPE: ${assumptions.targetPE} → ${sanitized.targetPE}`);
+  }
+  if (assumptions.targetPCF !== void 0 && assumptions.targetPCF !== sanitized.targetPCF) {
+    corrections.push(`targetPCF: ${assumptions.targetPCF} → ${sanitized.targetPCF}`);
+  }
+  if (assumptions.targetPBV !== void 0 && assumptions.targetPBV !== sanitized.targetPBV) {
+    corrections.push(`targetPBV: ${assumptions.targetPBV} → ${sanitized.targetPBV}`);
+  }
+  if (corrections.length > 0) {
+    console.log(`🔧 Assumptions sanitized: ${corrections.join(", ")}`);
+  }
+  return sanitized;
+};
 const API_BASE = typeof window !== "undefined" ? window.location.origin : "";
 async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent = true, autoFetched = false) {
   try {
+    const sanitizedAssumptions = sanitizeAssumptions(assumptions);
     const response = await fetch(`${API_BASE}/api/finance-snapshots`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -33167,7 +33250,7 @@ async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent =
         ticker: ticker2,
         profile_id: `profile_${ticker2}`,
         annual_data: data,
-        assumptions,
+        assumptions: sanitizedAssumptions,
         company_info: info,
         notes,
         is_current: isCurrent,
@@ -36599,10 +36682,10 @@ async function loadProfilesBatchFromSupabase(tickers) {
         data: snapshot.annual_data || [],
         info: snapshot.company_info || {},
         currentPrice,
-        assumptions: {
+        assumptions: sanitizeAssumptions({
           ...snapshot.assumptions,
           currentPrice: currentPrice > 0 ? currentPrice : ((_b2 = snapshot.assumptions) == null ? void 0 : _b2.currentPrice) || 0
-        },
+        }),
         source: "supabase"
       };
     } else {
