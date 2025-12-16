@@ -91,6 +91,26 @@ const DEFAULT_PROFILE: AnalysisProfile = {
 
 const STORAGE_KEY = 'finance_pro_profiles';
 
+const ProgressBar = ({ current, total }: { current: number; total: number }) => {
+    const progressRef = useRef<HTMLDivElement>(null);
+    const percent = total > 0 ? (current / total) * 100 : 0;
+
+    useEffect(() => {
+        if (progressRef.current) {
+            progressRef.current.style.width = `${percent}%`;
+        }
+    }, [percent]);
+
+    return (
+        <div className="w-full bg-slate-700 h-2 rounded-full mb-3 overflow-hidden">
+            <div 
+                ref={progressRef}
+                className="bg-blue-500 h-full rounded-full transition-all duration-300 ease-out" 
+            />
+        </div>
+    );
+};
+
 export default function App() {
     // --- GLOBAL STATE & PERSISTENCE ---
     const [showLanding, setShowLanding] = useState(true); // Show landing page by default
@@ -2439,19 +2459,10 @@ export default function App() {
                 </span>
                 <span className="text-xs text-slate-400 font-mono">{Math.round((bulkSyncProgress.current / bulkSyncProgress.total) * 100)}%</span>
             </div>
-            {(() => {
-                const progressBarStyle: React.CSSProperties = { 
-                    width: `${(bulkSyncProgress.current / bulkSyncProgress.total) * 100}%` 
-                };
-                return (
-            <div className="w-full bg-slate-700 h-2 rounded-full mb-3 overflow-hidden">
-                <div 
-                    className="bg-blue-500 h-full rounded-full transition-all duration-300 ease-out" 
-                    style={progressBarStyle}
-                ></div>
-            </div>
-                );
-            })()}
+            <ProgressBar 
+                current={bulkSyncProgress.current} 
+                total={bulkSyncProgress.total} 
+            />
             
             <div className="flex justify-between items-center text-xs text-slate-400 mb-3">
                  <span>Success: <span className="text-green-400">{syncStats.successCount}</span></span>
