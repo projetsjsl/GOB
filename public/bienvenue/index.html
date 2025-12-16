@@ -699,16 +699,70 @@
 
             // --- Logic Resources ---
             const [newResName, setNewResName] = useState('');
+
             const handleAddResource = async () => {
                 const newId = (Math.max(...resources.map(r => r.id), 0) || 0) + 1;
                 const newRes = { id: newId, name: newResName || 'Ressource', role: 'Role', color: '#3B82F6', email: '', avatar: 'R' };
+                
                 setResources([...resources, newRes]);
                 setNewResName('');
-                if (useSupabase && supabase) supabase.from('resources').insert([{ name: newRes.name, role: newRes.role, color: newRes.color }]);
+
+                if (useSupabase && supabase) {
+                    try {
+                        const { error } = await supabase.from('resources').insert([{
+                            name: newRes.name,
+                            role: newRes.role,
+                            color: newRes.color,
+                            avatar_initials: newRes.avatar,
+                            display_order: newId
+                        }]);
+                        if (error) throw error;
+                        showNotification('Ressource ajoutée', 'success');
+                    } catch (e) {
+                         console.error('Error adding resource:', e);
+                         showNotification('Erreur ajout ressource', 'error');
+                    }
+                }
             };
-             const updateRes = async (id, field, value) => {
+
+            const updateRes = async (id, field, value) => {
                 setResources(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r));
-                if (useSupabase && supabase) supabase.from('resources').update({ [field]: value }).eq('id', id);
+                
+                if (useSupabase && supabase) {
+                    try {
+                        const dbField = field === 'avatar' ? 'avatar_initials' : field;
+                        const { error } = await supabase.from('resources').update({ [dbField]: value }).eq('id', id);
+                        if (error) throw error;
+                    } catch (e) {
+                        console.error('Error updating resource:', e);
+                        showNotification('Erreur modification ressource', 'error');
+                    }
+                }
+            };
+
+            const handleDeleteResource = async (resId) => {
+                if (!confirm('Voulez-vous vraiment supprimer cette ressource ?')) return;
+
+                // Check dependencies (Tasks)
+                const assignedTasks = taskTemplates.filter(t => t.assignedTo && t.assignedTo.includes(resId));
+                if (assignedTasks.length > 0) {
+                     if(!confirm(`Cette ressource est assignée à ${assignedTasks.length} modèles de tâches. Voulez-vous continuer ? (Elle sera retirée de ces tâches)`)) return;
+                }
+
+                setResources(prev => prev.filter(r => r.id !== resId));
+
+                if (useSupabase && supabase) {
+                    try {
+                        const { error } = await supabase.from('resources').delete().eq('id', resId);
+                        if (error) throw error;
+                        showNotification('Ressource supprimée', 'success');
+                    } catch (e) {
+                        console.error('Error deleting resource:', e);
+                        handleSupabaseError(e, 'Delete Resource');
+                        alert("Impossible de supprimer cette ressource (probablement liée à des données existantes).");
+                        window.location.reload();
+                    }
+                }
             };
 
             // --- Logic Phases ---
@@ -948,7 +1002,7 @@
                                                     <input className="w-full text-xs text-gray-500 border-b border-transparent focus:border-blue-500 outline-none" value={res.role} onChange={e => updateRes(res.id, 'role', e.target.value)} />
                                                 </div>
                                                 <input type="color" className="w-8 h-8 rounded cursor-pointer border-0 p-0" value={res.color} onChange={e => updateRes(res.id, 'color', e.target.value)} />
-                                                <button onClick={(e) => { e.stopPropagation(); setResources(resources.filter(r => r.id !== res.id)); }} className="text-red-400 hover:text-red-600 transition-colors"><Icons.Trash /></button>
+                                                <button onClick={(e) => { e.stopPropagation(); handleDeleteResource(res.id); }} className="text-red-400 hover:text-red-600 transition-colors" title="Supprimer la ressource"><Icons.Trash /></button>
                                             </div>
                                         ))}
                                     </div>
