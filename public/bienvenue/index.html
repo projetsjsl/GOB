@@ -375,9 +375,12 @@
                 
                 if (supabaseModule && typeof supabaseModule.createClient === 'function') {
                     supabase = supabaseModule.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    // ✅ FIX: Exposer le client Supabase globalement pour emma-client.js
-                    window.supabaseClient = supabase;
-                    window.supabaseModule = supabaseModule; // Exposer aussi le module pour createClient
+                    // ✅ FIX: Exposer le module Supabase globalement pour emma-client.js
+                    // Le CDN expose déjà window.supabase comme module, mais on s'assure qu'il est disponible
+                    if (!window.supabase) {
+                        window.supabase = supabaseModule;
+                    }
+                    window.supabaseClient = supabase; // Exposer aussi le client pour usage direct
                     console.log('✅ Supabase client initialized');
                 } else {
                     console.warn('⚠️ Supabase module not found. Make sure the CDN script is loaded before this code.');
