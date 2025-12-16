@@ -1721,26 +1721,41 @@
                 
                 // Charger les statuts sauvegardés pour cet employé
                 const savedStatuses = employeeTasks[selectedEmployee.id] || {};
+                console.log(`📋 Chargement statuts pour employé ${selectedEmployee.id}:`, savedStatuses);
+                
                 const generatedTasks = taskTemplates.map(tt => {
                     const taskKey = `${selectedEmployee.id}-${tt.id}`;
                     const dueMs = startDate.getTime() + (tt.dayOffset || 0) * 86400000;
+                    const savedStatus = savedStatuses[tt.id] || 'pending';
                     
                     return {
                         ...tt,
                         id: taskKey,
                         dueDate: new Date(dueMs).toISOString().split('T')[0],
-                        status: savedStatuses[tt.id] || 'pending'
+                        status: savedStatus
                     };
                 });
+                
+                // Log pour debugging
+                const statusCounts = {
+                    pending: generatedTasks.filter(t => t.status === 'pending').length,
+                    inProgress: generatedTasks.filter(t => t.status === 'inProgress').length,
+                    completed: generatedTasks.filter(t => t.status === 'completed').length
+                };
+                console.log(`📊 Statuts chargés:`, statusCounts);
                 
                 // CRITICAL: Only update if tasks actually changed to prevent infinite loops
                 setTasks(prevTasks => {
                     const prevIds = prevTasks.map(t => t.id + t.status).join(',');
                     const newIds = generatedTasks.map(t => t.id + t.status).join(',');
-                    if (prevIds === newIds) return prevTasks; // No change, return same reference
+                    if (prevIds === newIds) {
+                        console.log('⏭️ Pas de changement dans les tâches, skip update');
+                        return prevTasks; // No change, return same reference
+                    }
+                    console.log('✅ Mise à jour des tâches avec nouveaux statuts');
                     return generatedTasks;
                 });
-            }, [selectedEmployee?.id, selectedEmployee?.startDate, taskTemplates.length]); // Use primitive deps only
+            }, [selectedEmployee?.id, selectedEmployee?.startDate, taskTemplates.length, employeeTasks]); // CRITICAL: Ajouter employeeTasks dans les dépendances
 
             const stats = useMemo(() => {
                 const total = tasks.length;
@@ -1820,6 +1835,12 @@
             };
 
             const toggleTaskStatus = async (taskId) => {
+                if (!selectedEmployee || !selectedEmployee.id) {
+                    console.error('❌ Aucun employé sélectionné pour sauvegarder le statut');
+                    showNotification('Erreur: Aucun employé sélectionné', 'error');
+                    return;
+                }
+
                 // Optimistic Update
                 let newStatus;
                 let originalTaskId;
@@ -1837,6 +1858,15 @@
                     return task;
                 }));
 
+                // Vérification critique
+                if (!originalTaskId || isNaN(originalTaskId)) {
+                    console.error('❌ Impossible d\'extraire l\'ID de la tâche depuis:', taskId);
+                    showNotification('Erreur: ID de tâche invalide', 'error');
+                    return;
+                }
+
+                console.log(`🔄 Changement de statut: Task=${originalTaskId}, Emp=${selectedEmployee.id}, ${previousStatus} → ${newStatus}`);
+
                 // DB Update - OPTIMISÉ avec feedback visuel immédiat
                 if (useSupabase && supabase && originalTaskId) {
                     // Mise à jour optimiste IMMÉDIATE (UI réactive)
@@ -1848,37 +1878,21 @@
                         }
                     }));
 
-                    // Sauvegarde en arrière-plan (non-bloquante)
-                    supabase
-                        .from('employee_tasks')
-                        .upsert({ 
-                            employee_id: selectedEmployee.id, 
-                            template_id: originalTaskId, 
-                            status: newStatus,
-                            updated_at: new Date()
-                        }, { onConflict: 'employee_id, template_id' })
-                        .then(({ error }) => {
-                            if (error) {
-                                console.error('Supabase Upsert Error:', error);
-                                // Rollback en cas d'erreur
-                                setEmployeeTasks(prev => ({
-                                    ...prev,
-                                    [selectedEmployee.id]: {
-                                        ...prev[selectedEmployee.id],
-                                        [originalTaskId]: previousStatus || 'pending'
-                                    }
-                                }));
-                                setTasks(prev => prev.map(task => 
-                                    task.id === taskId ? { ...task, status: previousStatus || 'pending' } : task
-                                ));
-                                showNotification(`Erreur sauvegarde: ${error.message || error.details}`, 'error');
-                            } else {
-                                // Confirmation silencieuse (pas besoin de notification pour chaque changement)
-                                console.log(`✅ Statut sauvegardé: ${newStatus}`);
-                            }
-                        })
-                        .catch(e => {
-                            console.error('Erreur sauvegarde:', e);
+                    // Sauvegarde en arrière-plan (non-bloquante) avec AWAIT pour garantir l'exécution
+                    try {
+                        const { data, error } = await supabase
+                            .from('employee_tasks')
+                            .upsert({ 
+                                employee_id: selectedEmployee.id, 
+                                template_id: originalTaskId, 
+                                status: newStatus,
+                                updated_at: new Date().toISOString()
+                            }, { onConflict: 'employee_id, template_id' })
+                            .select();
+                        
+                        if (error) {
+                            console.error('❌ Supabase Upsert Error:', error);
+                            console.error('❌ Détails:', JSON.stringify(error, null, 2));
                             // Rollback en cas d'erreur
                             setEmployeeTasks(prev => ({
                                 ...prev,
@@ -1890,8 +1904,33 @@
                             setTasks(prev => prev.map(task => 
                                 task.id === taskId ? { ...task, status: previousStatus || 'pending' } : task
                             ));
-                            showNotification(`Erreur sauvegarde: ${e.message || e.details}`, 'error');
-                        });
+                            showNotification(`Erreur sauvegarde: ${error.message || error.details || JSON.stringify(error)}`, 'error');
+                        } else {
+                            // Vérifier que la sauvegarde a réussi
+                            if (data && data.length > 0) {
+                                console.log(`✅ Statut sauvegardé avec succès:`, data[0]);
+                                console.log(`✅ Task ${originalTaskId} pour Emp ${selectedEmployee.id} = ${newStatus}`);
+                            } else {
+                                console.warn('⚠️ Aucune donnée retournée après upsert');
+                            }
+                        }
+                    } catch (e) {
+                        console.error('❌ Exception lors de la sauvegarde:', e);
+                        // Rollback en cas d'erreur
+                        setEmployeeTasks(prev => ({
+                            ...prev,
+                            [selectedEmployee.id]: {
+                                ...prev[selectedEmployee.id],
+                                [originalTaskId]: previousStatus || 'pending'
+                            }
+                        }));
+                        setTasks(prev => prev.map(task => 
+                            task.id === taskId ? { ...task, status: previousStatus || 'pending' } : task
+                        ));
+                        showNotification(`Erreur sauvegarde: ${e.message || e.details || String(e)}`, 'error');
+                    }
+                } else {
+                    console.warn('⚠️ Supabase non disponible ou ID invalide:', { useSupabase, supabase: !!supabase, originalTaskId });
                 }
             };
 
