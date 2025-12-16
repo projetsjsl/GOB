@@ -375,6 +375,9 @@
                 
                 if (supabaseModule && typeof supabaseModule.createClient === 'function') {
                     supabase = supabaseModule.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    // ✅ FIX: Exposer le client Supabase globalement pour emma-client.js
+                    window.supabaseClient = supabase;
+                    window.supabaseModule = supabaseModule; // Exposer aussi le module pour createClient
                     console.log('✅ Supabase client initialized');
                 } else {
                     console.warn('⚠️ Supabase module not found. Make sure the CDN script is loaded before this code.');
@@ -1923,16 +1926,32 @@
                 }
                 
                 try {
+                    // ✅ FIX: Extraire le templateId réel si taskId est au format "employeeId-templateId"
+                    let templateId = taskId;
+                    if (typeof taskId === 'string' && taskId.includes('-')) {
+                        templateId = parseInt(taskId.split('-')[1]);
+                        if (isNaN(templateId)) {
+                            console.error(`❌ Impossible d'extraire templateId de ${taskId}`);
+                            return false;
+                        }
+                    } else {
+                        templateId = parseInt(taskId);
+                        if (isNaN(templateId)) {
+                            console.error(`❌ taskId invalide: ${taskId}`);
+                            return false;
+                        }
+                    }
+                    
                     const dbField = dbFieldName || (field === 'phaseId' ? 'phase_id' : 
                                                      field === 'dayOffset' ? 'day_offset' : 
                                                      field === 'assignedTo' ? 'assigned_to' : field);
                     
-                    console.log(`💾 Sauvegarde ${field} (${dbField}) pour tâche ${taskId}:`, value);
+                    console.log(`💾 Sauvegarde ${field} (${dbField}) pour tâche template ${templateId}:`, value);
                     
                     const { data, error } = await supabase
                         .from('task_templates')
                         .update({ [dbField]: value })
-                        .eq('id', taskId)
+                        .eq('id', templateId)
                         .select(); // Retourner les données pour vérifier
                     
                     if (error) {
@@ -1942,11 +1961,11 @@
                     }
                     
                     if (data && data.length > 0) {
-                        console.log(`✅ ${field} sauvegardé avec succès pour tâche ${taskId}`);
+                        console.log(`✅ ${field} sauvegardé avec succès pour tâche template ${templateId}`);
                         // Feedback visuel discret (pas de notification pour chaque champ)
                         return true;
                     } else {
-                        console.warn(`⚠️ Aucune donnée retournée pour tâche ${taskId}`);
+                        console.warn(`⚠️ Aucune donnée retournée pour tâche template ${templateId}`);
                         return false;
                     }
                 } catch (e) {
@@ -2037,10 +2056,15 @@
 
                 if (useSupabase && supabase) {
                     try {
+                        // ✅ FIX: Mapper le champ React vers le champ DB
+                        const dbField = field === 'phaseId' ? 'phase_id' : 
+                                       field === 'dayOffset' ? 'day_offset' : 
+                                       field === 'assignedTo' ? 'assigned_to' : field;
+                        
                         // Special handling for JSON fields if needed, but Supabase handles standard types well
                         const { error } = await supabase
                             .from('task_templates')
-                            .update({ [field]: value })
+                            .update({ [dbField]: value })
                             .eq('id', originalTaskId);
                             
                         if (error) throw error;
