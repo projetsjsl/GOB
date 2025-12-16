@@ -6,7 +6,7 @@
  * Uses the lib/llm-registry.js helper functions which interact with Supabase.
  */
 
-import { getAllModels, getModelById, addModel, updateModel, deleteModel } from '../../lib/llm-registry.js';
+import { getAllModels, getModelById, addModel, updateModel, deleteModel } from '../lib/llm-registry.js';
 
 export default async function handler(req, res) {
   // Enable CORS for simplicity
