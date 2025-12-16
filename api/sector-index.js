@@ -303,29 +303,64 @@ export default async function handler(req, res) {
     }
 
     // Récupérer les données sectorielles
-    const sectorData = await fetchSectorData();
+    try {
+      const sectorData = await fetchSectorData();
+      const result = calculateIndexPerformance(sectorData, name, horizon.toUpperCase());
 
-    const result = calculateIndexPerformance(sectorData, name, horizon.toUpperCase());
-
-    return res.status(200).json({
-      success: true,
-      ...result,
-      timestamp: new Date().toISOString()
-    });
+      return res.status(200).json({
+        success: true,
+        ...result,
+        timestamp: new Date().toISOString()
+      });
+    } catch (sectorError) {
+      // ✅ FIX: Gérer les erreurs de fetchSectorData gracieusement
+      console.error('Erreur récupération données sectorielles:', sectorError);
+      
+      const isRateLimit = sectorError.message && sectorError.message.includes('Quota');
+      const statusCode = isRateLimit ? 429 : 503;
+      
+      return res.status(statusCode).json({
+        success: false,
+        error: isRateLimit ? 'Quota Alpha Vantage dépassé' : 'Service temporairement indisponible',
+        message: sectorError.message,
+        name,
+        horizon,
+        rateLimitExceeded: isRateLimit,
+        suggestion: isRateLimit 
+          ? 'Veuillez réessayer dans quelques minutes. Les données sont mises en cache pour 1 heure.'
+          : 'Vérifiez la configuration de la clé API Alpha Vantage',
+        timestamp: new Date().toISOString()
+      });
+    }
 
   } catch (error) {
     console.error('Erreur /api/sector-index:', error);
     
-    // Retourner une réponse plus informative
-    const isRateLimit = error.message && error.message.includes('Quota');
-    const statusCode = isRateLimit ? 429 : 500;
+    // ✅ FIX: Distinguer les types d'erreurs pour codes HTTP appropriés
+    let statusCode = 500;
+    let errorType = 'Erreur serveur';
+    
+    if (error.message?.includes('API key') || error.message?.includes('Unauthorized')) {
+      statusCode = 401;
+      errorType = 'API key invalid';
+    } else if (error.message?.includes('timeout') || error.message?.includes('network')) {
+      statusCode = 503;
+      errorType = 'Service temporarily unavailable';
+    } else if (error.message?.includes('quota') || error.message?.includes('Quota')) {
+      statusCode = 429;
+      errorType = 'Rate limit exceeded';
+    }
     
     return res.status(statusCode).json({
       success: false,
-      error: error.message,
+      error: errorType,
+      message: error.message,
       timestamp: new Date().toISOString(),
-      rateLimitExceeded: isRateLimit,
-      suggestion: isRateLimit ? 'Veuillez réessayer dans quelques minutes. Les données sont mises en cache pour 1 heure.' : 'Erreur de l\'API Alpha Vantage'
+      suggestion: statusCode === 401
+        ? 'Vérifiez ALPHA_VANTAGE_API_KEY dans Vercel'
+        : statusCode === 429
+        ? 'Quota Alpha Vantage dépassé. Réessayez plus tard.'
+        : 'Service temporairement indisponible'
     });
   }
 }

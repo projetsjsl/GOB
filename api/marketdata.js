@@ -790,11 +790,33 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('❌ Market Data API error:', error.message);
-    return res.status(500).json({
-      error: 'Erreur serveur',
+    
+    // ✅ FIX: Distinguer les types d'erreurs pour codes HTTP appropriés
+    let statusCode = 500;
+    let errorType = 'Erreur serveur';
+    
+    if (error.message.includes('API key') || error.message.includes('Unauthorized')) {
+      statusCode = 401;
+      errorType = 'API key invalid';
+    } else if (error.message.includes('timeout') || error.message.includes('network')) {
+      statusCode = 503;
+      errorType = 'Service temporarily unavailable';
+    } else if (error.message.includes('rate limit') || error.message.includes('quota')) {
+      statusCode = 429;
+      errorType = 'Rate limit exceeded';
+    }
+    
+    return res.status(statusCode).json({
+      error: errorType,
       message: error.message,
       endpoint: req.query.endpoint,
-      symbol: req.query.symbol,
+      symbol: req.query.symbol || req.query.symbols,
+      suggestion: statusCode === 401
+        ? 'Vérifiez les clés API (POLYGON_API_KEY, TWELVE_DATA_API_KEY, FMP_API_KEY) dans Vercel'
+        : statusCode === 429
+        ? 'Limite de requêtes atteinte. Réessayez plus tard.'
+        : 'Service temporairement indisponible',
+      fallback: true,
       timestamp: new Date().toISOString()
     });
   }

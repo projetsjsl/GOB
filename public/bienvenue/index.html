@@ -735,6 +735,54 @@
             );
         };
 
+        // Email Prompt Modal Component (replaces prompt())
+        const EmailPromptModal = ({ isOpen, onClose, onConfirm, defaultValue = 'projetsjsl@gmail.com' }) => {
+            const [email, setEmail] = useState(defaultValue);
+            
+            if (!isOpen) return null;
+            
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (email && email.includes('@')) {
+                    onConfirm(email);
+                    onClose();
+                }
+            };
+            
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[10000] p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">Entrez l'adresse email du destinataire</h3>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                placeholder="email@exemple.com"
+                                autoFocus
+                            />
+                            <div className="flex gap-3 justify-end">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                                >
+                                    Annuler
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    Confirmer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
         // Login Component
         const LoginScreen = ({ employees, onLogin }) => {
             const [selectedEmp, setSelectedEmp] = useState(null);
@@ -756,6 +804,8 @@
                 // Mot de passe sécurisé
                 if (password.toLowerCase() === 'vip') {
                     onLogin(selectedEmp);
+                    // Clear password after successful login
+                    setPassword('');
                 } else {
                     setError('Mot de passe incorrect');
                 }
@@ -820,6 +870,37 @@
             );
         };
 
+        // Helper function to send email with address
+        const sendEmailWithAddress = async (to, subject, html, employee) => {
+            // Feedback UI
+            const originalText = document.activeElement ? document.activeElement.innerText : '';
+            if (document.activeElement) document.activeElement.innerText = 'Envoi... ⏳';
+
+            try {
+                const response = await fetch('/api/send-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: to,
+                        subject: subject,
+                        html: html
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showNotification(`Email envoyé à ${to} !`, 'success');
+                    if (document.activeElement) document.activeElement.innerText = originalText;
+                } else {
+                    throw new Error(result.error || 'Erreur lors de l\'envoi');
+                }
+            } catch (error) {
+                console.error('Erreur envoi email:', error);
+                showNotification(`Erreur: ${error.message}`, 'error');
+                if (document.activeElement) document.activeElement.innerText = originalText;
+            }
+        };
+
         // FONCTION D'ENVOI EMAIL VIA RESEND (Réelle API)
         const sendEmailViaResend = async (employee, phases, tasks, resources) => {
              let html;
@@ -828,13 +909,18 @@
                 html = window.generateEmailHTML(employee, phases, tasks, resources);
              } catch (e) {
                 console.error("Erreur génération email:", e);
-                alert("Erreur: Le modèle d'email ne s'est pas chargé correctement. Rechargez la page.");
+                showNotification("Erreur: Le modèle d'email ne s'est pas chargé correctement. Rechargez la page.", 'error');
                 return;
              }
              
              const subject = `Plan d'Intégration - ${employee?.name || 'Nouveau'}`;
-             const to = prompt("Entrez l'adresse email du destinataire:", "projetsjsl@gmail.com"); 
-             if (!to) return;
+             // Use modal instead of prompt()
+             setEmailPromptCallback((email) => {
+                 if (email) {
+                     sendEmailWithAddress(email, subject, html, employee);
+                 }
+             });
+             setShowEmailPrompt(true);
              
              // Feedback UI
              const originalText = document.activeElement ? document.activeElement.innerText : '';
@@ -1615,6 +1701,8 @@
             const [filterStatus, setFilterStatus] = useState('all');
             const [showUrgent, setShowUrgent] = useState(false);
             const [saveIndicator, setSaveIndicator] = useState({ visible: false, message: '' });
+            const [showEmailPrompt, setShowEmailPrompt] = useState(false);
+            const [emailPromptCallback, setEmailPromptCallback] = useState(null);
 
             const triggerSaveIndicator = (msg = 'Sauvegarde...') => {
                 setSaveIndicator({ visible: true, message: msg });
@@ -2145,16 +2233,32 @@
                             }])
                             .select();
 
-                        if (error) throw error;
-                        
-                        if (data && data[0]) {
+                        if (error) {
+                            // Handle 409 conflict specifically
+                            if (error.code === '23505' || error.message?.includes('duplicate') || error.status === 409) {
+                                // Conflict: task might already exist, reload from DB
+                                console.warn('Conflit lors de l\'ajout de tâche, rechargement depuis la DB...');
+                                // Remove optimistic update and reload
+                                setTaskTemplates(prev => prev.filter(t => t.id !== newId));
+                                // Optionally reload tasks from DB
+                                showNotification('Tâche déjà existante ou conflit détecté. Rechargement...', 'error');
+                                // Reload tasks after a short delay
+                                setTimeout(() => {
+                                    loadData();
+                                }, 1000);
+                            } else {
+                                throw error;
+                            }
+                        } else if (data && data[0]) {
                             // Replace optimistic item with real DB item (mostly for ID)
                             const realId = data[0].id;
                             setTaskTemplates(prev => prev.map(t => t.id === newId ? { ...t, id: realId } : t));
+                            showNotification('Nouvelle tâche ajoutée', 'success');
                         }
-                        showNotification('Nouvelle tâche ajoutée', 'success');
                    } catch (e) {
                        handleSupabaseError(e, 'Add Task');
+                       // Remove optimistic update on error
+                       setTaskTemplates(prev => prev.filter(t => t.id !== newId));
                    }
                 } else {
                      showNotification('Nouvelle tâche ajoutée (Local)', 'success');
@@ -2454,7 +2558,34 @@
             return (
                 <div className="min-h-screen relative">
                     {/* Login Screen Overlay */}
-                    {!isAuthenticated && <LoginScreen employees={employees} onLogin={(id) => { setSelectedEmployeeId(id); setIsAuthenticated(true); }} />}
+                    {!isAuthenticated && <LoginScreen employees={employees} onLogin={(id) => { 
+                        setSelectedEmployeeId(id); 
+                        setIsAuthenticated(true);
+                        // Force re-render to hide login screen
+                        setTimeout(() => {
+                            // Ensure login screen is hidden
+                            const loginScreen = document.querySelector('.fixed.inset-0.z-\\[100\\]');
+                            if (loginScreen && isAuthenticated) {
+                                loginScreen.style.display = 'none';
+                            }
+                        }, 100);
+                    }} />}
+                    
+                    {/* Email Prompt Modal */}
+                    <EmailPromptModal 
+                        isOpen={showEmailPrompt}
+                        onClose={() => {
+                            setShowEmailPrompt(false);
+                            setEmailPromptCallback(null);
+                        }}
+                        onConfirm={(email) => {
+                            if (emailPromptCallback) {
+                                emailPromptCallback(email);
+                                setEmailPromptCallback(null);
+                            }
+                            setShowEmailPrompt(false);
+                        }}
+                    />
                     
                     {/* Save Indicator (Bottom Left) */}
                     <div className={`fixed bottom-6 left-6 bg-gray-900 text-white px-4 py-2 rounded-full shadow-lg z-50 transition-all duration-300 flex items-center gap-2 ${saveIndicator.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
@@ -2612,16 +2743,37 @@
                                 <Icons.Eye /> <span className="hidden md:inline">Aperçu Email</span>
                             </button>
 
-                            <button onClick={() => {
+                            <button onClick={async () => {
                                 const html = window.generateEmailHTML(selectedEmployee, phases, filteredTasks, resources);
-                                const blob = new Blob([html], { type: 'text/html' });
-                                const item = new ClipboardItem({ 'text/html': blob });
-                                navigator.clipboard.write([item]).then(() => {
-                                    showNotification('Email copié dans le presse-papier ! Collez-le dans Outlook/Gmail.', 'success');
-                                }).catch(err => {
+                                try {
+                                    // Try modern ClipboardItem API first (for HTML)
+                                    if (typeof ClipboardItem !== 'undefined') {
+                                        const blob = new Blob([html], { type: 'text/html' });
+                                        const item = new ClipboardItem({ 'text/html': blob });
+                                        await navigator.clipboard.write([item]);
+                                        showNotification('Email copié dans le presse-papier ! Collez-le dans Outlook/Gmail.', 'success');
+                                    } else {
+                                        // Fallback: copy as plain text
+                                        await navigator.clipboard.writeText(html);
+                                        showNotification('Email copié (texte). Utilisez "Aperçu" pour le format HTML.', 'success');
+                                    }
+                                } catch (err) {
                                     console.error('Erreur copie:', err);
-                                    showNotification('Erreur lors de la copie. Utilisez "Aperçu" et copiez manuellement.', 'error');
-                                });
+                                    // Final fallback: create temporary textarea
+                                    try {
+                                        const textarea = document.createElement('textarea');
+                                        textarea.value = html;
+                                        textarea.style.position = 'fixed';
+                                        textarea.style.opacity = '0';
+                                        document.body.appendChild(textarea);
+                                        textarea.select();
+                                        document.execCommand('copy');
+                                        document.body.removeChild(textarea);
+                                        showNotification('Email copié (méthode alternative)', 'success');
+                                    } catch (fallbackErr) {
+                                        showNotification('Erreur lors de la copie. Utilisez "Aperçu" et copiez manuellement.', 'error');
+                                    }
+                                }
                             }} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg flex items-center gap-2 transition-colors" title="Copier pour Outlook/Gmail">
                                 <Icons.Send /> <span className="hidden md:inline">Copier l'email</span>
                             </button>
@@ -2759,13 +2911,39 @@
                                     <div className="border-2 border-gray-100 rounded-xl p-6 bg-gray-50 overflow-auto max-h-[600px] email-preview" dangerouslySetInnerHTML={{ __html: emailPreviewContent }}></div>
                                     <div className="mt-6 flex justify-end gap-3">
                                         <button onClick={() => setShowEmailPreview(false)} className="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg">Fermer</button>
-                                        <button onClick={() => {
-                                            const blob = new Blob([emailPreviewContent], { type: 'text/html' });
-                                            const item = new ClipboardItem({ 'text/html': blob });
-                                            navigator.clipboard.write([item]).then(() => {
-                                                showNotification('Email copié !', 'success');
-                                                setShowEmailPreview(false);
-                                            }).catch(err => showNotification('Erreur copie', 'error'));
+                                        <button onClick={async () => {
+                                            try {
+                                                // Try modern ClipboardItem API first (for HTML)
+                                                if (typeof ClipboardItem !== 'undefined') {
+                                                    const blob = new Blob([emailPreviewContent], { type: 'text/html' });
+                                                    const item = new ClipboardItem({ 'text/html': blob });
+                                                    await navigator.clipboard.write([item]);
+                                                    showNotification('Email copié !', 'success');
+                                                    setShowEmailPreview(false);
+                                                } else {
+                                                    // Fallback: copy as plain text
+                                                    await navigator.clipboard.writeText(emailPreviewContent);
+                                                    showNotification('Email copié (texte). Format HTML dans l\'aperçu.', 'success');
+                                                    setShowEmailPreview(false);
+                                                }
+                                            } catch (err) {
+                                                console.error('Erreur copie:', err);
+                                                // Final fallback: create temporary textarea
+                                                try {
+                                                    const textarea = document.createElement('textarea');
+                                                    textarea.value = emailPreviewContent;
+                                                    textarea.style.position = 'fixed';
+                                                    textarea.style.opacity = '0';
+                                                    document.body.appendChild(textarea);
+                                                    textarea.select();
+                                                    document.execCommand('copy');
+                                                    document.body.removeChild(textarea);
+                                                    showNotification('Email copié (méthode alternative)', 'success');
+                                                    setShowEmailPreview(false);
+                                                } catch (fallbackErr) {
+                                                    showNotification('Erreur copie. Sélectionnez et copiez manuellement.', 'error');
+                                                }
+                                            }
                                         }} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold flex items-center gap-2">
                                             <Icons.Send /> Copier le contenu
                                         </button>

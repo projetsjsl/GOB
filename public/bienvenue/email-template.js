@@ -142,9 +142,32 @@ window.generateEmailHTML = function(employee, phases, tasks, resources) {
 window.sendEmailPlan = async function(employee, phases, tasks, resources) {
     const html = window.generateEmailHTML(employee, phases, tasks, resources);
     const subject = `Plan d'Intégration - ${employee.name}`;
-    const to = prompt("Entrez l'adresse email du destinataire:", "projetsjsl@gmail.com"); // Valeur par défaut pour test
-
-    if (!to) return;
+    
+    // Use a promise-based approach for email input
+    // This will be handled by the React component in index.html
+    // For now, use a simple fallback if called directly
+    return new Promise((resolve) => {
+        // Try to use the React modal if available
+        if (window.showEmailPromptModal) {
+            window.showEmailPromptModal((email) => {
+                if (email) {
+                    sendEmailToAddress(email, subject, html);
+                }
+                resolve();
+            });
+        } else {
+            // Fallback: use a simple input (not ideal but works)
+            const to = window.prompt ? window.prompt("Entrez l'adresse email du destinataire:", "projetsjsl@gmail.com") : null;
+            if (!to) {
+                resolve();
+                return;
+            }
+            sendEmailToAddress(to, subject, html);
+            resolve();
+        }
+    });
+    
+    function sendEmailToAddress(to, subject, html) {
 
     // Feedback visuel (simple alert pour l'instant, idéalement un toast dans l'UI)
     const originalText = document.activeElement ? document.activeElement.innerText : '';

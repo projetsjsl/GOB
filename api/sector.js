@@ -186,7 +186,7 @@ export default async function handler(req, res) {
       source: 'alpha_vantage'
     });
   } catch (error) {
-    console.error('Erreur /api/sector:', error);
+    console.error('❌ Sector API Error:', error);
     
     // Retourner une réponse plus informative
     const isRateLimit = error.message && error.message.includes('Quota');

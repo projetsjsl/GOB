@@ -92,12 +92,25 @@ export class EmmaClient {
      */
     async _loadModeFromSupabase() {
         try {
-            if (typeof window !== 'undefined' && window.supabase) {
+            // Try multiple ways to access Supabase module
+            let supabaseModule = null;
+            if (typeof window !== 'undefined') {
+                // Try window.supabase (CDN exposes it this way)
+                if (window.supabase && typeof window.supabase.createClient === 'function') {
+                    supabaseModule = window.supabase;
+                }
+                // Try global supabase (some CDN versions expose it globally)
+                else if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
+                    supabaseModule = supabase;
+                }
+            }
+            
+            if (supabaseModule) {
                 const supabaseUrl = window.ENV_CONFIG?.SUPABASE_URL || 'https://boyuxgdplbpkknplxbxp.supabase.co';
                 const supabaseKey = window.ENV_CONFIG?.SUPABASE_ANON_KEY;
                 
                 if (supabaseKey) {
-                    const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+                    const client = supabaseModule.createClient(supabaseUrl, supabaseKey);
                     const { data, error } = await client
                         .from('emma_config')
                         .select('value')
@@ -342,17 +355,24 @@ export class EmmaClient {
      * @private
      */
     async _loadConfigFromSupabase() {
-        if (typeof window === 'undefined' || !window.supabase) {
+        // Try multiple ways to access Supabase module
+        let supabaseModule = null;
+        if (typeof window !== 'undefined') {
+            // Try window.supabase (CDN exposes it this way)
+            if (window.supabase && typeof window.supabase.createClient === 'function') {
+                supabaseModule = window.supabase;
+            }
+            // Try global supabase (some CDN versions expose it globally)
+            else if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
+                supabaseModule = supabase;
+            }
+        }
+        
+        if (!supabaseModule) {
             return;
         }
         
         try {
-            // Try to get config from the emma_config table
-            // window.supabase is the module, need to create a client first
-            if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-                throw new Error('Supabase module not available');
-            }
-            
             const supabaseUrl = window.ENV_CONFIG?.SUPABASE_URL || 'https://boyuxgdplbpkknplxbxp.supabase.co';
             const supabaseKey = window.ENV_CONFIG?.SUPABASE_ANON_KEY;
             
@@ -360,7 +380,7 @@ export class EmmaClient {
                 throw new Error('Supabase key not configured');
             }
             
-            const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+            const client = supabaseModule.createClient(supabaseUrl, supabaseKey);
             const { data, error } = await client
                 .from('emma_config')
                 .select('*')
