@@ -2532,6 +2532,36 @@ export default function App() {
 
     const profile = library[activeId] || DEFAULT_PROFILE; // Ensure profile is always available
 
+    // Handler générique pour mettre à jour un profil complet (utilisé par KPIDashboard)
+    const handleUpdateProfile = (id: string, updates: Partial<AnalysisProfile>) => {
+        setLibrary(prev => {
+            if (!prev[id]) return prev;
+            
+            const updatedProfile = { 
+                ...prev[id], 
+                ...updates,
+                // Ne pas écraser lastModified si fourni dans updates, sinon update
+                lastModified: updates.lastModified || Date.now()
+            };
+            
+            const updatedLibrary = { 
+                ...prev, 
+                [id]: updatedProfile 
+            };
+            
+            // Persister les changements
+            if (typeof requestIdleCallback !== 'undefined') {
+                requestIdleCallback(() => {
+                    storage.setItem(STORAGE_KEY, updatedLibrary).catch(e => console.warn('Failed to save to Storage:', e));
+                });
+            } else {
+                storage.setItem(STORAGE_KEY, updatedLibrary).catch(e => console.warn('Failed to save to Storage:', e));
+            }
+            
+            return updatedLibrary;
+        });
+    };
+
     return (
         <div className="flex h-screen bg-gray-100 font-sans text-slate-800 overflow-hidden">
 
@@ -2680,6 +2710,7 @@ export default function App() {
                                         onBulkSync={handleBulkSyncAllTickers}
                                         onSyncNA={handleSyncSpecificTickers}
                                         isBulkSyncing={isBulkSyncing}
+                                        onUpdateProfile={handleUpdateProfile}
                                     />
                                 </Suspense>
                             </ErrorBoundary>
@@ -2758,7 +2789,6 @@ export default function App() {
                                         info={profile.info}
                                         sector={profile.info?.sector}
                                         assumptions={assumptions}
-                                        config={guardrailConfig}
                                     />
 
                                     <div className="mt-8">

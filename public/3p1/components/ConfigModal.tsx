@@ -77,6 +77,8 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
                     <button
                         onClick={onClose}
                         className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-700"
+                        aria-label="Fermer"
+                        title="Fermer"
                     >
                         <XMarkIcon className="w-6 h-6" />
                     </button>
@@ -266,6 +268,7 @@ const ConfigInput = ({ label, value, onChange, help }: { label: string, value: n
             value={value}
             onChange={(e) => onChange(parseFloat(e.target.value))}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            aria-label={label}
         />
         {help && <span className="text-xs text-gray-500">{help}</span>}
     </div>

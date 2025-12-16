@@ -73,11 +73,22 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
     );
 
     // Marges (estimées - à améliorer avec vraies données)
-    const opMargin = 15.0; // Placeholder
-    const netMargin = 10.0; // Placeholder
+    // Marges (estimées - à améliorer avec vraies données)
+    // On essaie de récupérer depuis info si disponible (via financials ou analysisData)
+    // Pour l'instant on initialise à null pour éviter les fausses données
+    // TODO: Connecter aux données réelles de FMP via info.financials quand disponibles
+    const opMargin = info.financials?.incomeStatement?.[0]?.operatingIncomeRatio != null 
+        ? info.financials.incomeStatement[0].operatingIncomeRatio * 100 
+        : null;
+    
+    const netMargin = info.financials?.incomeStatement?.[0]?.netIncomeRatio != null 
+        ? info.financials.incomeStatement[0].netIncomeRatio * 100 
+        : null;
 
     // Ratio d'endettement (estimé)
-    const debtToEquity = 0.5; // Placeholder
+    const debtToEquity = info.financials?.balanceSheet?.[0]?.debtEquityRatio != null 
+        ? info.financials.balanceSheet[0].debtEquityRatio 
+        : null;
 
     // Taux de distribution dividende
     const payoutRatio = ((lastData?.dividendPerShare || 0) / (lastData?.earningsPerShare || 1)) * 100;
@@ -347,13 +358,13 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                 <div className="bg-white p-5 rounded-lg shadow border border-gray-200">
                     <h4 className="font-bold text-gray-800 mb-3 cursor-help" title="Marges de Rentabilité\n\nMesurent l'efficacité opérationnelle et la rentabilité de l'entreprise.\n\n• Marge Opérationnelle: Efficacité opérationnelle\n• Marge Nette: Rentabilité globale\n• Taux Distribution: Proportion des bénéfices distribués\n\nSource: FMP income-statement et key-metrics">💰 Marges</h4>
                     <div className="space-y-2 text-sm">
-                        <div className="flex justify-between cursor-help" title={`Marge Opérationnelle: ${opMargin.toFixed(1)}%\n\nFormule: (Résultat Opérationnel / Chiffre d'Affaires) × 100\n\nMesure l'efficacité opérationnelle de l'entreprise.\nSource: FMP income-statement`}>
+                        <div className="flex justify-between cursor-help" title={`Marge Opérationnelle: ${opMargin !== null ? opMargin.toFixed(1) : 'N/A'}%\n\nFormule: (Résultat Opérationnel / Chiffre d'Affaires) × 100\n\nMesure l'efficacité opérationnelle de l'entreprise.\nSource: FMP income-statement`}>
                             <span className="text-gray-600">Marge Opérationnelle</span>
-                            <span className="font-semibold">{opMargin.toFixed(1)}%</span>
+                            <span className="font-semibold">{opMargin !== null ? `${opMargin.toFixed(1)}%` : 'N/A'}</span>
                         </div>
-                        <div className="flex justify-between cursor-help" title={`Marge Nette: ${netMargin.toFixed(1)}%\n\nFormule: (Bénéfice Net / Chiffre d'Affaires) × 100\n\nMesure la rentabilité globale de l'entreprise.\nSource: FMP income-statement`}>
+                        <div className="flex justify-between cursor-help" title={`Marge Nette: ${netMargin !== null ? netMargin.toFixed(1) : 'N/A'}%\n\nFormule: (Bénéfice Net / Chiffre d'Affaires) × 100\n\nMesure la rentabilité globale de l'entreprise.\nSource: FMP income-statement`}>
                             <span className="text-gray-600">Marge Nette</span>
-                            <span className="font-semibold">{netMargin.toFixed(1)}%</span>
+                            <span className="font-semibold">{netMargin !== null ? `${netMargin.toFixed(1)}%` : 'N/A'}</span>
                         </div>
                         <div className="flex justify-between cursor-help" title={`Taux de Distribution (Payout Ratio): ${payoutRatio.toFixed(1)}%\n\nFormule: (Dividendes / Bénéfice Net) × 100\n\nMesure la proportion des bénéfices distribuée aux actionnaires.\nSource: FMP key-metrics`}>
                             <span className="text-gray-600">Taux Distribution DIV</span>
@@ -365,9 +376,9 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                 <div className="bg-white p-5 rounded-lg shadow border border-gray-200">
                     <h4 className="font-bold text-gray-800 mb-3 cursor-help" title="Structure Financière\n\nMesure la santé financière et l'efficacité d'utilisation des ressources.\n\n• Ratio d'Endettement: Niveau de dette\n• ROE: Rentabilité des capitaux propres\n• ROA: Efficacité d'utilisation des actifs\n\nSource: FMP balance-sheet-statement et key-metrics">🏦 Structure Financière</h4>
                     <div className="space-y-2 text-sm">
-                        <div className="flex justify-between cursor-help" title={`Ratio d'Endettement (Debt-to-Equity): ${debtToEquity.toFixed(2)}\n\nFormule: Dette Totale / Capitaux Propres\n\nMesure le niveau d'endettement de l'entreprise.\nUn ratio élevé indique plus de risque financier.\nSource: FMP balance-sheet-statement`}>
+                        <div className="flex justify-between cursor-help" title={`Ratio d'Endettement (Debt-to-Equity): ${debtToEquity !== null ? debtToEquity.toFixed(2) : 'N/A'}\n\nFormule: Dette Totale / Capitaux Propres\n\nMesure le niveau d'endettement de l'entreprise.\nUn ratio élevé indique plus de risque financier.\nSource: FMP balance-sheet-statement`}>
                             <span className="text-gray-600">Ratio d'Endettement</span>
-                            <span className="font-semibold">{debtToEquity.toFixed(2)}</span>
+                            <span className="font-semibold">{debtToEquity !== null ? debtToEquity.toFixed(2) : 'N/A'}</span>
                         </div>
                         <div className="flex justify-between cursor-help" title={info.roe !== null && info.roe !== undefined ? `ROE (Return on Equity): ${info.roe.toFixed(2)}%\n\nFormule: (Bénéfice Net / Capitaux Propres) × 100\n\nMesure la rentabilité des capitaux propres.\nUn ROE élevé indique une utilisation efficace des capitaux.\nSource: FMP key-metrics` : "ROE (Return on Equity): N/A\n\nDonnées non disponibles pour ce ticker.\nSource: FMP key-metrics"}>
                             <span className="text-gray-600">ROE</span>

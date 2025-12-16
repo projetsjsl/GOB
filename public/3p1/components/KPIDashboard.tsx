@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { StarIcon, EyeIcon } from '@heroicons/react/24/solid';
-import { AnalysisProfile } from '../types';
+import { AnalysisProfile, Recommendation } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
 import { formatCurrency, formatPercent } from '../utils/calculations';
 import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon, ExclamationCircleIcon, ChevronDownIcon, ChevronUpIcon, MagnifyingGlassPlusIcon, MagnifyingGlassMinusIcon, ArrowsPointingOutIcon, ArrowPathIcon, BookOpenIcon } from '@heroicons/react/24/outline';
@@ -10,6 +10,8 @@ import { SyncSelectionDialog } from './SyncSelectionDialog';
 import { GuideDialog } from './GuideDialog';
 import { StatusBadge } from './StatusBadge';
 import { logger } from '../utils/logger';
+import { AdditionalMetrics } from './AdditionalMetrics';
+import { EvaluationDetails } from './EvaluationDetails';
 
 interface KPIDashboardProps {
   profiles: AnalysisProfile[];
@@ -18,9 +20,10 @@ interface KPIDashboardProps {
   onBulkSync?: () => void; // Optionnel : fonction pour synchroniser tous les tickers
   onSyncNA?: (tickers: string[]) => void; // Optionnel : fonction pour synchroniser uniquement les N/A
   isBulkSyncing?: boolean; // Optionnel : état de la synchronisation
+  onUpdateProfile?: (id: string, newProfile: AnalysisProfile) => void;
 }
 
-export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isBulkSyncing = false }) => {
+export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isBulkSyncing = false, onUpdateProfile }) => {
   const [sortConfig, setSortConfig] = useState<{
     key: string;
     direction: 'asc' | 'desc';
@@ -59,6 +62,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   // États pour gérer la visibilité des sections (collapse/expand)
   const [sectionsVisibility, setSectionsVisibility] = useState<Record<string, boolean>>({
     globalStats: true,
+    detailedAnalysis: true,
     comparison: true,
     filters: true,
     performanceMatrix: true,
@@ -381,7 +385,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   }, [profiles, approvedVersions]);
 
   // Charger les versions approuvées pour tous les profils (avec cache et optimisation)
-  const approvedVersionsCacheRef = React.useRef<{ profileIds: string[]; approvedSet: Set<string>; timestamp: number } | null>(null);
+  const approvedVersionsCacheRef = React.useRef<{ profileIds: string; approvedSet: Set<string>; timestamp: number } | null>(null);
   const APPROVED_VERSIONS_CACHE_TTL = 300000; // Cache valide pendant 5 minutes
   
   useEffect(() => {
@@ -521,7 +525,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         minJPEGY: 0,
         maxJPEGY: 10,
         sector: '',
-        recommendation: 'all' as 'all' | 'ACHAT' | 'CONSERVER' | 'VENTE'
+        recommendation: 'all' as 'all' | Recommendation,
+        source: 'all' as 'all' | 'portfolio' | 'watchlist'
       };
     }
     
@@ -534,7 +539,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       minJPEGY: jpegyValues.length > 0 ? Math.max(0, Math.floor(Math.min(...jpegyValues, 0))) : 0,
       maxJPEGY: jpegyValues.length > 0 ? Math.ceil(Math.max(...jpegyValues, 10)) + 2 : 10, // Marge de sécurité
       sector: '',
-      recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL',
+      recommendation: 'all' as 'all' | Recommendation,
       source: 'all' as 'all' | 'portfolio' | 'watchlist'
     };
   }, [profileMetrics]);
@@ -555,7 +560,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     minGrowth: -50,
     maxGrowth: 100,
     sector: '',
-    recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL',
+    recommendation: 'all' as 'all' | Recommendation,
     source: 'all' as 'all' | 'portfolio' | 'watchlist',
     showOnlyNA: false,
     showOnlyApproved: false,
@@ -587,7 +592,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
 
   // Mettre à jour les filtres quand defaultFilterValues change (nouveaux profils chargés)
   useEffect(() => {
-    setFilters(defaultFilterValues);
+    setFilters((prev) => ({
+      ...prev,
+      ...defaultFilterValues
+    }));
   }, [defaultFilterValues]);
 
   // Filtrer et trier les profils
@@ -1206,7 +1214,23 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               {comparisonMode ? '✕ Mode Comparaison' : '🔍 Mode Comparaison'}
             </button>
             <button
-              onClick={() => setFilters(defaultFilterValues)}
+              onClick={() => setFilters({
+                ...defaultFilterValues,
+                minRatio31: 0,
+                maxRatio31: 100,
+                minPE: 0,
+                maxPE: 1000,
+                minYield: 0,
+                maxYield: 50,
+                minVolatility: 0,
+                maxVolatility: 200,
+                minGrowth: -50,
+                maxGrowth: 100,
+                showOnlyNA: false,
+                showOnlyApproved: false,
+                showOnlySkeleton: false,
+                groupBy: 'none'
+              })}
               className="px-2 sm:px-3 py-1 text-[10px] sm:text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
               title="Réinitialiser tous les filtres\n\nRéinitialise tous les filtres actifs:\n• Rendement\n• JPEGY\n• Ratio 3:1\n• Recommandation\n• Secteur\n• Source\n\nAffiche tous les titres du portefeuille."
             >
@@ -2148,6 +2172,68 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           </>
         )}
       </div>
+
+      {/* Section Analyse Détaillée (Visible uniquement si un ticker est sélectionné) */}
+      {currentId && profiles.find(p => p.id === currentId) && (
+        <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-blue-200 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 flex items-center gap-2">
+              <MagnifyingGlassPlusIcon className="w-6 h-6 text-blue-600" />
+              Analyse Détaillée : <span className="text-blue-600">{currentId}</span>
+              <span className="text-sm font-normal text-gray-500 ml-2">
+                ({profiles.find(p => p.id === currentId)?.info?.name || 'Inconnu'})
+              </span>
+            </h3>
+            <button
+              onClick={() => toggleSection('detailedAnalysis')}
+              className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
+              title={sectionsVisibility.detailedAnalysis ? "Réduire cette section" : "Agrandir cette section"}
+            >
+              {sectionsVisibility.detailedAnalysis ? (
+                <ChevronUpIcon className="w-5 h-5 text-gray-600" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5 text-gray-600" />
+              )}
+            </button>
+          </div>
+          
+          {sectionsVisibility.detailedAnalysis && profiles.find(p => p.id === currentId) && (
+            <div className="space-y-6">
+              {profiles.find(p => p.id === currentId)?.data && (
+                <>
+                  <AdditionalMetrics 
+                    data={profiles.find(p => p.id === currentId)!.data!} 
+                    assumptions={profiles.find(p => p.id === currentId)!.assumptions} 
+                    info={profiles.find(p => p.id === currentId)!.info} 
+                  />
+                  
+                  <div className="border-t border-gray-200 pt-6">
+                    <EvaluationDetails
+                      data={profiles.find(p => p.id === currentId)!.data!}
+                      assumptions={profiles.find(p => p.id === currentId)!.assumptions}
+                      info={profiles.find(p => p.id === currentId)!.info}
+                      sector={profiles.find(p => p.id === currentId)!.info.sector}
+                      onUpdateAssumption={(key, value) => {
+                        const profile = profiles.find(p => p.id === currentId);
+                        if (profile && onUpdateProfile) {
+                          const updatedProfile = {
+                            ...profile,
+                            assumptions: {
+                              ...profile.assumptions,
+                              [key]: value
+                            }
+                          };
+                          onUpdateProfile(profile.id, updatedProfile);
+                        }
+                      }}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Graphique X/Y Amélioré */}
       <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
