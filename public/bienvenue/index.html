@@ -139,6 +139,162 @@
     
     <script type="text/babel">
         const { useState, useMemo, useEffect, useRef } = React;
+
+        // ============================================================================
+        // 🚀 SYSTÈME OPTIMISÉ - UTILITAIRES CENTRALISÉS
+        // ============================================================================
+        
+        // Mapping DB ↔ React (snake_case ↔ camelCase) - UNE SEULE FOIS
+        const DataMapper = {
+            // Employee
+            employeeToReact: (db) => ({
+                ...db,
+                avatarUrl: db.avatar_url || (db.name?.includes('Caroline') ? '/images/caroline_avatar.jpg' : null),
+                startDate: db.start_date
+            }),
+            employeeToDB: (react) => ({
+                name: react.name,
+                role: react.role,
+                email: react.email,
+                start_date: react.startDate,
+                avatar_url: react.avatarUrl
+            }),
+            
+            // Resource
+            resourceToReact: (db) => ({
+                ...db,
+                avatar: db.avatar_initials,
+                displayOrder: db.display_order
+            }),
+            resourceToDB: (react) => ({
+                name: react.name,
+                role: react.role,
+                email: react.email,
+                avatar_initials: react.avatar,
+                display_order: react.displayOrder
+            }),
+            
+            // Phase
+            phaseToReact: (db) => ({
+                ...db,
+                startOffset: db.start_offset,
+                displayOrder: db.display_order
+            }),
+            phaseToDB: (react) => ({
+                name: react.name,
+                color: react.color,
+                duration: react.duration,
+                start_offset: react.startOffset,
+                display_order: react.displayOrder
+            }),
+            
+            // Task Template
+            taskTemplateToReact: (db) => ({
+                ...db,
+                phaseId: db.phase_id,
+                dayOffset: db.day_offset,
+                assignedTo: db.assigned_to || []
+            }),
+            taskTemplateToDB: (react) => ({
+                title: react.title,
+                description: react.description,
+                priority: react.priority,
+                phase_id: react.phaseId,
+                day_offset: react.dayOffset,
+                assigned_to: react.assignedTo
+            })
+        };
+
+        // Gestionnaire Supabase unifié avec retry et validation
+        const SupabaseManager = {
+            async queryWithRetry(supabaseClient, queryFn, retries = 3, delay = 1000) {
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const result = await queryFn();
+                        if (result.error) throw result.error;
+                        return result;
+                    } catch (error) {
+                        if (i === retries - 1) throw error;
+                        console.warn(`⚠️ Tentative ${i + 1}/${retries} échouée, retry dans ${delay}ms...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                    }
+                }
+            },
+            
+            async upsertWithValidation(supabaseClient, table, data, conflictKey, validateFn = null) {
+                if (validateFn && !validateFn(data)) {
+                    throw new Error(`Validation failed for ${table}`);
+                }
+                
+                const { data: result, error } = await this.queryWithRetry(supabaseClient, () => 
+                    supabaseClient.from(table).upsert(data, { onConflict: conflictKey }).select()
+                );
+                
+                if (error) throw error;
+                if (!result || result.length === 0) {
+                    throw new Error(`No data returned from ${table} upsert`);
+                }
+                
+                return result[0];
+            }
+        };
+
+        // Task Manager unifié - UNE SEULE SOURCE DE VÉRITÉ
+        const TaskManager = {
+            // Génère les tâches pour un employé (fusion template + statuts)
+            generateTasks(employee, taskTemplates, employeeTasks) {
+                if (!employee || !employee.id) return [];
+                
+                const startDate = new Date(employee.startDate || new Date());
+                const savedStatuses = employeeTasks[employee.id] || {};
+                
+                return taskTemplates.map(tt => {
+                    const taskKey = `${employee.id}-${tt.id}`;
+                    const dueMs = startDate.getTime() + (tt.dayOffset || 0) * 86400000;
+                    const savedStatus = savedStatuses[tt.id] || 'pending';
+                    
+                    return {
+                        ...tt,
+                        id: taskKey,
+                        templateId: tt.id,
+                        employeeId: employee.id,
+                        dueDate: new Date(dueMs).toISOString().split('T')[0],
+                        status: savedStatus
+                    };
+                });
+            },
+            
+            // Sauvegarde le statut d'une tâche (robuste avec retry)
+            async saveTaskStatus(supabaseClient, employeeId, templateId, newStatus, onSuccess, onError) {
+                if (!supabaseClient || !employeeId || !templateId) {
+                    onError?.('Paramètres invalides');
+                    return false;
+                }
+                
+                try {
+                    const result = await SupabaseManager.upsertWithValidation(
+                        supabaseClient,
+                        'employee_tasks',
+                        {
+                            employee_id: employeeId,
+                            template_id: templateId,
+                            status: newStatus,
+                            updated_at: new Date().toISOString()
+                        },
+                        'employee_id, template_id',
+                        (data) => ['pending', 'inProgress', 'completed'].includes(data.status)
+                    );
+                    
+                    console.log(`✅ Statut sauvegardé: Emp=${employeeId}, Task=${templateId}, Status=${newStatus}`);
+                    onSuccess?.(result);
+                    return true;
+                } catch (error) {
+                    console.error('❌ Erreur sauvegarde statut:', error);
+                    onError?.(error.message || String(error));
+                    return false;
+                }
+            }
+        };
         
         // Icônes SVG
         const Icons = {
@@ -1501,41 +1657,24 @@
                             supabase.from('employee_tasks').select('*')
                         ]);
 
-                        // Traitement des résultats
+                        // Traitement des résultats avec DataMapper (OPTIMISÉ)
                         if (empResult.data) {
                             console.log(`✅ ${empResult.data.length} employés récupérés.`);
-                            setEmployees(empResult.data.map(e => ({
-                                ...e,
-                                avatarUrl: e.avatar_url || (e.name.includes('Caroline') ? '/images/caroline_avatar.jpg' : null),
-                                startDate: e.start_date,
-                            })));
+                            setEmployees(empResult.data.map(DataMapper.employeeToReact));
                         } else if (empResult.error) {
                             console.warn('Fallback V1 table', empResult.error);
                         }
 
                         if (resResult.data) {
-                            setResources(resResult.data.map(r => ({
-                                ...r,
-                                avatar: r.avatar_initials,
-                                displayOrder: r.display_order
-                            })));
+                            setResources(resResult.data.map(DataMapper.resourceToReact));
                         }
 
                         if (phaseResult.data) {
-                            setPhaseTemplates(phaseResult.data.map(p => ({
-                                ...p,
-                                startOffset: p.start_offset,
-                                displayOrder: p.display_order
-                            })));
+                            setPhaseTemplates(phaseResult.data.map(DataMapper.phaseToReact));
                         }
 
                         if (taskResult.data) {
-                            setTaskTemplates(taskResult.data.map(t => ({
-                                ...t,
-                                phaseId: t.phase_id,
-                                dayOffset: t.day_offset,
-                                assignedTo: t.assigned_to || []
-                            })));
+                            setTaskTemplates(taskResult.data.map(DataMapper.taskTemplateToReact));
                         }
 
                         if (empTaskResult.data) {
@@ -1715,26 +1854,11 @@
 
             const [tasks, setTasks] = useState([]);
 
+            // Génération des tâches avec TaskManager (OPTIMISÉ - UNE SEULE SOURCE DE VÉRITÉ)
             useEffect(() => {
                 if (!selectedEmployee || !selectedEmployee.id) return;
-                const startDate = getValidDate(selectedEmployee.startDate);
                 
-                // Charger les statuts sauvegardés pour cet employé
-                const savedStatuses = employeeTasks[selectedEmployee.id] || {};
-                console.log(`📋 Chargement statuts pour employé ${selectedEmployee.id}:`, savedStatuses);
-                
-                const generatedTasks = taskTemplates.map(tt => {
-                    const taskKey = `${selectedEmployee.id}-${tt.id}`;
-                    const dueMs = startDate.getTime() + (tt.dayOffset || 0) * 86400000;
-                    const savedStatus = savedStatuses[tt.id] || 'pending';
-                    
-                    return {
-                        ...tt,
-                        id: taskKey,
-                        dueDate: new Date(dueMs).toISOString().split('T')[0],
-                        status: savedStatus
-                    };
-                });
+                const generatedTasks = TaskManager.generateTasks(selectedEmployee, taskTemplates, employeeTasks);
                 
                 // Log pour debugging
                 const statusCounts = {
@@ -1742,20 +1866,18 @@
                     inProgress: generatedTasks.filter(t => t.status === 'inProgress').length,
                     completed: generatedTasks.filter(t => t.status === 'completed').length
                 };
-                console.log(`📊 Statuts chargés:`, statusCounts);
+                console.log(`📊 Tâches générées pour ${selectedEmployee.name}:`, statusCounts);
                 
                 // CRITICAL: Only update if tasks actually changed to prevent infinite loops
                 setTasks(prevTasks => {
                     const prevIds = prevTasks.map(t => t.id + t.status).join(',');
                     const newIds = generatedTasks.map(t => t.id + t.status).join(',');
                     if (prevIds === newIds) {
-                        console.log('⏭️ Pas de changement dans les tâches, skip update');
                         return prevTasks; // No change, return same reference
                     }
-                    console.log('✅ Mise à jour des tâches avec nouveaux statuts');
                     return generatedTasks;
                 });
-            }, [selectedEmployee?.id, selectedEmployee?.startDate, taskTemplates.length, employeeTasks]); // CRITICAL: Ajouter employeeTasks dans les dépendances
+            }, [selectedEmployee?.id, selectedEmployee?.startDate, taskTemplates.length, employeeTasks]);
 
             const stats = useMemo(() => {
                 const total = tasks.length;
@@ -1834,103 +1956,71 @@
                 }
             };
 
+            // Toggle Task Status - OPTIMISÉ avec TaskManager (robuste et simple)
             const toggleTaskStatus = async (taskId) => {
                 if (!selectedEmployee || !selectedEmployee.id) {
-                    console.error('❌ Aucun employé sélectionné pour sauvegarder le statut');
                     showNotification('Erreur: Aucun employé sélectionné', 'error');
                     return;
                 }
 
-                // Optimistic Update
-                let newStatus;
-                let originalTaskId;
-                let previousStatus; // Sauvegarder l'ancien statut pour rollback
-                
-                setTasks(prev => prev.map(task => {
-                    if (task.id === taskId) {
-                        const statuses = ['pending', 'inProgress', 'completed'];
-                        const currentIndex = statuses.indexOf(task.status);
-                        previousStatus = task.status; // Sauvegarder pour rollback
-                        newStatus = statuses[(currentIndex + 1) % statuses.length];
-                        originalTaskId = parseInt(taskId.split('-')[1]);
-                        return { ...task, status: newStatus };
-                    }
-                    return task;
-                }));
-
-                // Vérification critique
-                if (!originalTaskId || isNaN(originalTaskId)) {
-                    console.error('❌ Impossible d\'extraire l\'ID de la tâche depuis:', taskId);
-                    showNotification('Erreur: ID de tâche invalide', 'error');
+                // Trouver la tâche
+                const task = tasks.find(t => t.id === taskId);
+                if (!task || !task.templateId) {
+                    console.error('❌ Tâche introuvable:', taskId);
+                    showNotification('Erreur: Tâche introuvable', 'error');
                     return;
                 }
 
-                console.log(`🔄 Changement de statut: Task=${originalTaskId}, Emp=${selectedEmployee.id}, ${previousStatus} → ${newStatus}`);
+                // Calculer le nouveau statut
+                const statuses = ['pending', 'inProgress', 'completed'];
+                const currentIndex = statuses.indexOf(task.status);
+                const newStatus = statuses[(currentIndex + 1) % statuses.length];
+                const previousStatus = task.status;
 
-                // DB Update - OPTIMISÉ avec feedback visuel immédiat
-                if (useSupabase && supabase && originalTaskId) {
-                    // Mise à jour optimiste IMMÉDIATE (UI réactive)
-                    setEmployeeTasks(prev => ({
-                        ...prev,
-                        [selectedEmployee.id]: {
-                            ...prev[selectedEmployee.id],
-                            [originalTaskId]: newStatus
-                        }
-                    }));
+                console.log(`🔄 Changement statut: Task=${task.templateId}, Emp=${selectedEmployee.id}, ${previousStatus} → ${newStatus}`);
 
-                    // Sauvegarde en arrière-plan (non-bloquante) avec AWAIT pour garantir l'exécution
-                    try {
-                        const { data, error } = await supabase
-                            .from('employee_tasks')
-                            .upsert({ 
-                                employee_id: selectedEmployee.id, 
-                                template_id: originalTaskId, 
-                                status: newStatus,
-                                updated_at: new Date().toISOString()
-                            }, { onConflict: 'employee_id, template_id' })
-                            .select();
-                        
-                        if (error) {
-                            console.error('❌ Supabase Upsert Error:', error);
-                            console.error('❌ Détails:', JSON.stringify(error, null, 2));
-                            // Rollback en cas d'erreur
+                // Optimistic Update IMMÉDIAT
+                setTasks(prev => prev.map(t => 
+                    t.id === taskId ? { ...t, status: newStatus } : t
+                ));
+                setEmployeeTasks(prev => ({
+                    ...prev,
+                    [selectedEmployee.id]: {
+                        ...prev[selectedEmployee.id],
+                        [task.templateId]: newStatus
+                    }
+                }));
+
+                // Sauvegarde avec TaskManager (robuste avec retry)
+                if (useSupabase && supabase) {
+                    const success = await TaskManager.saveTaskStatus(
+                        supabase,
+                        selectedEmployee.id,
+                        task.templateId,
+                        newStatus,
+                        (result) => {
+                            console.log(`✅ Statut sauvegardé:`, result);
+                        },
+                        (error) => {
+                            console.error('❌ Erreur sauvegarde:', error);
+                            // Rollback automatique
+                            setTasks(prev => prev.map(t => 
+                                t.id === taskId ? { ...t, status: previousStatus } : t
+                            ));
                             setEmployeeTasks(prev => ({
                                 ...prev,
                                 [selectedEmployee.id]: {
                                     ...prev[selectedEmployee.id],
-                                    [originalTaskId]: previousStatus || 'pending'
+                                    [task.templateId]: previousStatus
                                 }
                             }));
-                            setTasks(prev => prev.map(task => 
-                                task.id === taskId ? { ...task, status: previousStatus || 'pending' } : task
-                            ));
-                            showNotification(`Erreur sauvegarde: ${error.message || error.details || JSON.stringify(error)}`, 'error');
-                        } else {
-                            // Vérifier que la sauvegarde a réussi
-                            if (data && data.length > 0) {
-                                console.log(`✅ Statut sauvegardé avec succès:`, data[0]);
-                                console.log(`✅ Task ${originalTaskId} pour Emp ${selectedEmployee.id} = ${newStatus}`);
-                            } else {
-                                console.warn('⚠️ Aucune donnée retournée après upsert');
-                            }
+                            showNotification(`Erreur sauvegarde: ${error}`, 'error');
                         }
-                    } catch (e) {
-                        console.error('❌ Exception lors de la sauvegarde:', e);
-                        // Rollback en cas d'erreur
-                        setEmployeeTasks(prev => ({
-                            ...prev,
-                            [selectedEmployee.id]: {
-                                ...prev[selectedEmployee.id],
-                                [originalTaskId]: previousStatus || 'pending'
-                            }
-                        }));
-                        setTasks(prev => prev.map(task => 
-                            task.id === taskId ? { ...task, status: previousStatus || 'pending' } : task
-                        ));
-                        showNotification(`Erreur sauvegarde: ${e.message || e.details || String(e)}`, 'error');
+                    );
+                    
+                    if (success) {
+                        triggerSaveIndicator('Statut sauvegardé');
                     }
-                } else {
-                    console.warn('⚠️ Supabase non disponible ou ID invalide:', { useSupabase, supabase: !!supabase, originalTaskId });
                 }
             };
 
