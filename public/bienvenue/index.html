@@ -2429,18 +2429,26 @@
                                      </div>
 
                                      {editing === 'resources' && (
-                                         <div 
-                                             className="fixed bg-white shadow-2xl rounded-lg p-3 border-2 border-blue-200 z-[9999] w-56 animate-bounce-in"
-                                             style={{
-                                                 // Calculer la position dynamiquement pour éviter l'overflow
-                                                 position: 'fixed',
-                                                 top: '50%',
-                                                 left: '50%',
-                                                 transform: 'translate(-50%, -50%)',
-                                                 maxHeight: '80vh',
-                                                 overflowY: 'auto'
-                                             }}
-                                         >
+                                         <>
+                                             {/* Overlay pour fermer en cliquant à l'extérieur */}
+                                             <div 
+                                                 className="fixed inset-0 z-[9998] bg-black/20 backdrop-blur-sm"
+                                                 onClick={() => setEditing(null)}
+                                             />
+                                             <div 
+                                                 className="fixed bg-white shadow-2xl rounded-lg p-3 border-2 border-blue-200 z-[9999] w-64 animate-bounce-in"
+                                                 style={{
+                                                     // Calculer la position dynamiquement pour éviter l'overflow
+                                                     position: 'fixed',
+                                                     top: '50%',
+                                                     left: '50%',
+                                                     transform: 'translate(-50%, -50%)',
+                                                     maxHeight: '80vh',
+                                                     overflowY: 'auto',
+                                                     boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                                                 }}
+                                                 onClick={(e) => e.stopPropagation()}
+                                             >
                                              <div className="flex items-center justify-between mb-3">
                                                  <div className="text-xs font-bold text-gray-700 uppercase">Assigner responsable(s) :</div>
                                                  <button onClick={() => setEditing(null)} className="text-gray-400 hover:text-gray-600 p-1">
