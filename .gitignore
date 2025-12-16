@@ -8,6 +8,10 @@ yarn-error.log*
 dist/
 build/
 
+# Exception: Include compiled 3p1 assets for Vercel
+!public/3p1/dist/
+!public/3p1/dist/**
+
 # Environment variables
 .env
 .env.local
