@@ -674,6 +674,29 @@
                 showNotification('Employé dupliqué', 'success');
             };
 
+            const handleDeleteEmployee = async (empId) => {
+                if (!confirm('Voulez-vous vraiment supprimer cet employé ? Cette action est irréversible.')) return;
+                
+                // Optimistic: immediately remove from UI
+                setEmployees(prev => prev.filter(e => e.id !== empId));
+
+                if (useSupabase && supabase) {
+                    try {
+                        const { error: taskError } = await supabase.from('employee_tasks').delete().eq('employee_id', empId);
+                        if (taskError) console.warn('Error clearing employee tasks:', taskError);
+
+                        const { error } = await supabase.from('employees').delete().eq('id', empId);
+                        if (error) throw error;
+                        
+                        showNotification('Employé supprimé', 'success');
+                    } catch (error) {
+                        console.error('Delete Employee Error:', error);
+                        // Re-fetch to restore state in case of error, or just warn
+                        alert("Erreur lors de la suppression (voir console). Il est possible que des données liées empêchent la suppression.");
+                    }
+                }
+            };
+
             // --- Logic Resources ---
             const [newResName, setNewResName] = useState('');
             const handleAddResource = async () => {
@@ -1474,30 +1497,7 @@
                 }
             };
 
-            const handleDeleteEmployee = async (empId, hasTasks) => {
-                if (!confirm('Voulez-vous vraiment supprimer cet employé ? Cette action est irréversible.')) return;
-                
-                setEmployees(prev => prev.filter(e => e.id !== empId));
 
-                if (useSupabase && supabase) {
-                    try {
-                        // First delete related tasks to avoid FK constraint errors if cascade is missing
-                        const { error: taskError } = await supabase.from('employee_tasks').delete().eq('employee_id', empId);
-                        if (taskError) console.warn('Error clearing employee tasks:', taskError);
-
-                        const { error } = await supabase.from('employees').delete().eq('id', empId);
-                        if (error) throw error;
-                        
-                        showNotification('Employé supprimé', 'success');
-                    } catch (error) {
-                        console.error('Delete Employee Error:', error);
-                        handleSupabaseError(error, 'Delete Employee');
-                        // Revert optimistic update (simplified)
-                        alert("Erreur lors de la suppression (voir console). Il est possible que des données liées empêchent la suppression.");
-                        window.location.reload(); 
-                    }
-                }
-            };
 
             // Task CRUD functions with Supabase
             const updateTask = async (taskId, field, value) => {
