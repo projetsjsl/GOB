@@ -1021,14 +1021,18 @@
 
             // NOTE: Auto-save effects removed in favor of direct DB updates in handler functions
 
-            const selectedEmployee = employees.find(e => e.id === selectedEmployeeId) || employees[0] || { 
-                id: 0, 
-                name: 'Chargement...', 
-                role: '...', 
-                avatarUrl: null, 
-                startDate: new Date().toISOString().split('T')[0],
-                endDate: new Date().toISOString().split('T')[0]
-            };
+            // CRITICAL: Memoize selectedEmployee to prevent infinite useEffect loops
+            // The fallback object was being recreated on every render, triggering effects
+            const selectedEmployee = useMemo(() => {
+                return employees.find(e => e.id === selectedEmployeeId) || employees[0] || { 
+                    id: 0, 
+                    name: 'Chargement...', 
+                    role: '...', 
+                    avatarUrl: null, 
+                    startDate: new Date().toISOString().split('T')[0],
+                    endDate: new Date().toISOString().split('T')[0]
+                };
+            }, [employees, selectedEmployeeId]);
 
             // Helper pour sécuriser les dates
             const getValidDate = (dateStr) => {
