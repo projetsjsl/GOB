@@ -6,24 +6,48 @@
     <title>Plateforme d'Intégration RH - Bienvenue</title>
     <meta name="description" content="Système de gestion complète pour l'intégration des nouveaux employés">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Use production builds for faster loading -->
+    <!-- CRITICAL: React et Supabase en premier (bloquants mais nécessaires) -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Environment config from Vercel -->
+    <!-- Environment config - CRITICAL pour Supabase -->
     <script src="/js/env-config.js"></script>
-    <script src="./caroline-plan-data.js"></script>
-    <script src="./email-template.js"></script>
-    <!-- Emma Client SDK - Unified AI integration -->
+    <!-- Babel - DOIT être chargé avant le script type="text/babel" -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Scripts non-critiques - Chargés en arrière-plan avec defer -->
+    <script src="./caroline-plan-data.js" defer></script>
+    <script src="./email-template.js" defer></script>
+    <!-- Emma Client SDK - Chargé en arrière-plan (non-bloquant) -->
     <script type="module">
-        import { EmmaClient } from '/lib/emma-client.js';
-        window.EmmaClient = EmmaClient;
-        window.emmaRHClient = new EmmaClient({ 
-            appName: 'bienvenue', 
-            mode: 'auto' // Uses local for sensitive HR data, external for general questions
-        });
-        console.log('✅ Emma Client loaded for Bienvenue');
+        // Charger Emma Client APRÈS le rendu initial pour ne pas bloquer
+        (async () => {
+            try {
+                const { EmmaClient } = await import('/lib/emma-client.js');
+                window.EmmaClient = EmmaClient;
+                // Attendre que la page soit prête avant d'initialiser
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', () => {
+                        setTimeout(() => {
+                            window.emmaRHClient = new EmmaClient({ 
+                                appName: 'bienvenue', 
+                                mode: 'auto'
+                            });
+                            console.log('✅ Emma Client loaded for Bienvenue');
+                        }, 500);
+                    });
+                } else {
+                    setTimeout(() => {
+                        window.emmaRHClient = new EmmaClient({ 
+                            appName: 'bienvenue', 
+                            mode: 'auto'
+                        });
+                        console.log('✅ Emma Client loaded for Bienvenue');
+                    }, 500);
+                }
+            } catch (e) {
+                console.warn('Emma Client loading delayed:', e);
+            }
+        })();
     </script>
     <style>
         @media print {
@@ -87,8 +111,11 @@
 </head>
 <body class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
     <!-- Loading screen shown while React/Babel initializes -->
-    <div id="loading-screen" class="fixed inset-0 bg-gray-900 z-[200] flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')] bg-cover bg-center">
+    <!-- OPTIMISÉ: Image de fond chargée en lazy pour ne pas bloquer -->
+    <div id="loading-screen" class="fixed inset-0 bg-gray-900 z-[200] flex items-center justify-center">
         <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm"></div>
+        <!-- Image chargée en arrière-plan après le rendu -->
+        <div id="loading-bg" class="absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-500" style="background-image: url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');"></div>
         <div class="relative text-center">
             <div class="w-24 h-24 mx-auto mb-6 rounded-full border-4 border-white shadow-lg overflow-hidden animate-pulse">
                 <img src="/images/emma-avatar-new.jpg" alt="Emma RH" class="w-full h-full object-cover" onerror="this.style.display='none'"/>
@@ -1534,96 +1561,106 @@
 
             // ============================================================================
             // REAL-TIME SUBSCRIPTIONS - Live sync across all connected users
+            // OPTIMISÉ: Démarre APRÈS le chargement initial pour ne pas ralentir
             // ============================================================================
             useEffect(() => {
-                if (!useSupabase || !supabase) return;
+                if (!useSupabase || !supabase || isLoading) return; // Attendre la fin du chargement
                 
-                console.log('📡 Setting up real-time subscriptions...');
+                // Petit délai pour laisser le rendu initial se terminer
+                const timeoutId = setTimeout(() => {
+                    console.log('📡 Setting up real-time subscriptions...');
+                    
+                    // Helper to map employee data from DB format
+                    const mapEmployee = (e) => ({
+                        ...e,
+                        avatarUrl: e.avatar_url || (e.name?.includes('Caroline') ? '/images/caroline_avatar.jpg' : null),
+                        startDate: e.start_date,
+                    });
+
+                    // Subscribe to employees table changes
+                    const employeesChannel = supabase
+                        .channel('realtime-employees')
+                        .on('postgres_changes', 
+                            { event: '*', schema: 'public', table: 'employees' },
+                            (payload) => {
+                                console.log('👥 Real-time employee change:', payload.eventType);
+                                if (payload.eventType === 'INSERT') {
+                                    setEmployees(prev => [...prev, mapEmployee(payload.new)]);
+                                    showNotification('Nouvel employé ajouté', 'success');
+                                } else if (payload.eventType === 'UPDATE') {
+                                    setEmployees(prev => prev.map(e => 
+                                        e.id === payload.new.id ? mapEmployee(payload.new) : e
+                                    ));
+                                } else if (payload.eventType === 'DELETE') {
+                                    setEmployees(prev => prev.filter(e => e.id !== payload.old.id));
+                                }
+                            }
+                        )
+                        .subscribe((status) => {
+                            console.log('📡 Employees subscription:', status);
+                        });
+
+                    // Subscribe to employee_tasks table changes
+                    const tasksChannel = supabase
+                        .channel('realtime-tasks')
+                        .on('postgres_changes',
+                            { event: '*', schema: 'public', table: 'employee_tasks' },
+                            (payload) => {
+                                console.log('📋 Real-time task change:', payload.eventType);
+                                // Update the specific task status
+                                if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+                                    const { employee_id, template_id, status } = payload.new;
+                                    setEmployeeTasks(prev => ({
+                                        ...prev,
+                                        [employee_id]: {
+                                            ...prev[employee_id],
+                                            [template_id]: status
+                                        }
+                                    }));
+                                }
+                            }
+                        )
+                        .subscribe((status) => {
+                            console.log('📡 Tasks subscription:', status);
+                        });
+
+                    // Subscribe to resources table changes
+                    const resourcesChannel = supabase
+                        .channel('realtime-resources')
+                        .on('postgres_changes',
+                            { event: '*', schema: 'public', table: 'resources' },
+                            async (payload) => {
+                                console.log('👤 Real-time resource change:', payload.eventType);
+                                // Refetch all resources to maintain order
+                                const { data } = await supabase.from('resources').select('*').order('display_order');
+                                if (data) {
+                                    setResources(data.map(r => ({
+                                        ...r,
+                                        avatar: r.avatar_initials,
+                                        displayOrder: r.display_order
+                                    })));
+                                }
+                            }
+                        )
+                        .subscribe((status) => {
+                            console.log('📡 Resources subscription:', status);
+                        });
+
+                    // Stocker les channels pour cleanup
+                    window._realtimeChannels = { employeesChannel, tasksChannel, resourcesChannel };
+                }, 300); // Délai de 300ms après le chargement
                 
-                // Helper to map employee data from DB format
-                const mapEmployee = (e) => ({
-                    ...e,
-                    avatarUrl: e.avatar_url || (e.name?.includes('Caroline') ? '/images/caroline_avatar.jpg' : null),
-                    startDate: e.start_date,
-                });
-
-                // Subscribe to employees table changes
-                const employeesChannel = supabase
-                    .channel('realtime-employees')
-                    .on('postgres_changes', 
-                        { event: '*', schema: 'public', table: 'employees' },
-                        (payload) => {
-                            console.log('👥 Real-time employee change:', payload.eventType);
-                            if (payload.eventType === 'INSERT') {
-                                setEmployees(prev => [...prev, mapEmployee(payload.new)]);
-                                showNotification('Nouvel employé ajouté', 'success');
-                            } else if (payload.eventType === 'UPDATE') {
-                                setEmployees(prev => prev.map(e => 
-                                    e.id === payload.new.id ? mapEmployee(payload.new) : e
-                                ));
-                            } else if (payload.eventType === 'DELETE') {
-                                setEmployees(prev => prev.filter(e => e.id !== payload.old.id));
-                            }
-                        }
-                    )
-                    .subscribe((status) => {
-                        console.log('📡 Employees subscription:', status);
-                    });
-
-                // Subscribe to employee_tasks table changes
-                const tasksChannel = supabase
-                    .channel('realtime-tasks')
-                    .on('postgres_changes',
-                        { event: '*', schema: 'public', table: 'employee_tasks' },
-                        (payload) => {
-                            console.log('📋 Real-time task change:', payload.eventType);
-                            // Update the specific task status
-                            if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
-                                const { employee_id, template_id, status } = payload.new;
-                                setEmployeeTasks(prev => ({
-                                    ...prev,
-                                    [employee_id]: {
-                                        ...prev[employee_id],
-                                        [template_id]: status
-                                    }
-                                }));
-                            }
-                        }
-                    )
-                    .subscribe((status) => {
-                        console.log('📡 Tasks subscription:', status);
-                    });
-
-                // Subscribe to resources table changes
-                const resourcesChannel = supabase
-                    .channel('realtime-resources')
-                    .on('postgres_changes',
-                        { event: '*', schema: 'public', table: 'resources' },
-                        async (payload) => {
-                            console.log('👤 Real-time resource change:', payload.eventType);
-                            // Refetch all resources to maintain order
-                            const { data } = await supabase.from('resources').select('*').order('display_order');
-                            if (data) {
-                                setResources(data.map(r => ({
-                                    ...r,
-                                    avatar: r.avatar_initials,
-                                    displayOrder: r.display_order
-                                })));
-                            }
-                        }
-                    )
-                    .subscribe((status) => {
-                        console.log('📡 Resources subscription:', status);
-                    });
-
                 // Cleanup subscriptions on unmount
                 return () => {
-                    console.log('🔌 Cleaning up real-time subscriptions');
-                    supabase.removeChannel(employeesChannel);
-                    supabase.removeChannel(tasksChannel);
-                    supabase.removeChannel(resourcesChannel);
+                    clearTimeout(timeoutId);
+                    if (window._realtimeChannels && supabase) {
+                        console.log('🔌 Cleaning up real-time subscriptions');
+                        supabase.removeChannel(window._realtimeChannels.employeesChannel);
+                        supabase.removeChannel(window._realtimeChannels.tasksChannel);
+                        supabase.removeChannel(window._realtimeChannels.resourcesChannel);
+                    }
                 };
-            }, [useSupabase]);
+            }, [useSupabase, isLoading]); // Dépendre de isLoading
 
             // Mise à jour simplifiée des phases (accès direct DB)
             const updatePhaseDirect = async (id, field, value) => {
@@ -2607,22 +2644,41 @@
             );
         };
 
-        // Hide loading screen once React is ready
+        // Hide loading screen OPTIMISÉ - Cache dès que React est prêt, pas après le render complet
         const hideLoadingScreen = () => {
             const loadingScreen = document.getElementById('loading-screen');
+            const loadingBg = document.getElementById('loading-bg');
+            
+            // Charger l'image de fond en arrière-plan (non-bloquant)
+            if (loadingBg) {
+                loadingBg.style.opacity = '1';
+            }
+            
+            // Cacher l'écran de chargement IMMÉDIATEMENT après le premier render
             if (loadingScreen) {
-                loadingScreen.style.transition = 'opacity 0.3s ease-out';
-                loadingScreen.style.opacity = '0';
-                setTimeout(() => loadingScreen.remove(), 300);
+                // Utiliser requestAnimationFrame pour ne pas bloquer le rendu
+                requestAnimationFrame(() => {
+                    loadingScreen.style.transition = 'opacity 0.3s ease-out';
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingScreen.remove();
+                        console.log('⚡ Écran de chargement masqué');
+                    }, 300);
+                });
             }
         };
+
+        // Cacher l'écran de chargement dès que React est disponible (pas après le render complet)
+        if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined') {
+            // React est prêt, on peut commencer à cacher l'écran
+            setTimeout(hideLoadingScreen, 100);
+        }
 
         ReactDOM.render(
             <ErrorBoundary>
                 <OnboardingPlatform />
             </ErrorBoundary>, 
-            document.getElementById('root'),
-            hideLoadingScreen // Callback when render is complete
+            document.getElementById('root')
         );
     </script>
 </body>
