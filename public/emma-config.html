@@ -119,6 +119,9 @@
                     <button id="tabSms" onclick="switchMainTab('sms')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Configurer les paramètres SMS">
                         📱 SMS
                     </button>
+                    <button id="tabEmail" onclick="switchMainTab('email')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Tester et gérer les emails">
+                        📧 Email
+                    </button>
                     <button id="tabHelp" onclick="switchMainTab('help')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Mode d'emploi et intégration n8n">
                         📖 Aide
                     </button>
@@ -1231,6 +1234,13 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- EMAIL TAB CONTENT - Testing and Management                  -->
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <div id="emailTabContent" class="hidden">
+                    <!-- Dynamic content rendered by email-manager.js -->
                 </div>
 
                 <!-- ═══════════════════════════════════════════════════════════ -->

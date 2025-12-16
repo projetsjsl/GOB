@@ -12,6 +12,7 @@ import { loadConfigs, renderConfigList, saveConfig, deleteConfig, createNewConfi
 import { loadDashboard, filterDashboard, editPromptFromDashboard, filterByRelatedPrompts, clearRelationshipFilter, reloadDashboard } from './dashboard-manager.js';
 import { initChatAssistant } from './chat-assistant.js';
 import { initBuilder } from './builder.js';
+import { emailManager } from './email-manager.js';
 
 /**
  * Fonction d'initialisation principale
@@ -164,4 +165,7 @@ export async function init() {
 
     // Initialiser le Visual Builder
     initBuilder();
+
+    // Initialiser le gestionnaire Email
+    emailManager.init();
 }

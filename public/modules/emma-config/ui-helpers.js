@@ -54,6 +54,7 @@ export function switchMainTab(tab) {
     document.getElementById('promptsTabContent').classList.toggle('hidden', tab !== 'prompts');
     document.getElementById('designTabContent').classList.toggle('hidden', tab !== 'design');
     document.getElementById('smsTabContent').classList.toggle('hidden', tab !== 'sms');
+    document.getElementById('emailTabContent').classList.toggle('hidden', tab !== 'email');
     document.getElementById('helpTabContent').classList.toggle('hidden', tab !== 'help');
     
     // Builder tab
@@ -75,6 +76,7 @@ export function switchMainTab(tab) {
         prompts: '📝 Gestion des Prompts',
         design: '🎨 Design des Emails',
         sms: '📱 Configuration SMS',
+        email: '📧 Gestion & Tests Email',
         help: '📖 Mode d\'Emploi',
         emmaia: '🤖 Emma IA - Modèles Chat',
         builder: '🏗️ Visual Email Builder'
