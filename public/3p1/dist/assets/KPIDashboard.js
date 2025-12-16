@@ -3749,7 +3749,6 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                         className: `cursor-pointer hover:r-8 ${getRatioFillClass(metric.ratio31)}`,
                         stroke: currentId === metric.profile.id ? "#2563eb" : "#fff",
                         strokeWidth: currentId === metric.profile.id ? 2 : 1,
-                        className: "cursor-pointer hover:r-8",
                         onClick: () => onSelect(metric.profile.id)
                       }
                     ),

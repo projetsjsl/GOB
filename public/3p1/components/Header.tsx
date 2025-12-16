@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CompanyInfo, Assumptions, Recommendation } from '../types';
-import { ArrowTrendingUpIcon, BanknotesIcon, TagIcon, CalendarDaysIcon, PrinterIcon, CloudArrowDownIcon, EyeIcon, StarIcon, ArrowPathIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { ArrowTrendingUpIcon, BanknotesIcon, TagIcon, CalendarDaysIcon, PrinterIcon, CloudArrowDownIcon, EyeIcon, StarIcon, ArrowPathIcon, ArrowDownTrayIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import { formatPercent } from '../utils/calculations';
 import { createLogoErrorHandler, createLogoLoadHandler } from '../utils/logoUtils';
 
@@ -14,7 +14,9 @@ interface HeaderProps {
   onUpdateAssumption: (key: keyof Assumptions, value: number) => void;
   onFetchData?: () => Promise<void>;
   onRestoreData?: () => void;
+  onRestoreData?: () => void;
   showSyncButton?: boolean; // Nouveau prop pour contrôler la visibilité du bouton
+  onOpenSettings?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -27,7 +29,9 @@ export const Header: React.FC<HeaderProps> = ({
   onUpdateAssumption,
   onFetchData,
   onRestoreData,
-  showSyncButton = true // Par défaut, afficher le bouton
+
+  showSyncButton = true, // Par défaut, afficher le bouton
+  onOpenSettings
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -210,10 +214,20 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={handlePrint}
               className="p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors no-print"
-              title="Imprimer la fiche\n\nOuvre la boîte de dialogue d'impression du navigateur.\nVous pouvez sauvegarder en PDF ou imprimer directement.\n\nLes éléments avec la classe 'no-print' ne seront pas imprimés."
+              title="Imprimer la fiche"
             >
               <PrinterIcon className="w-4 h-4 sm:w-6 sm:h-6" />
             </button>
+
+            {onOpenSettings && (
+              <button
+                onClick={onOpenSettings}
+                className="p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors no-print"
+                title="Configuration Globale"
+              >
+                <Cog6ToothIcon className="w-4 h-4 sm:w-6 sm:h-6" />
+              </button>
+            )}
           </div>
         </div>
       </div>

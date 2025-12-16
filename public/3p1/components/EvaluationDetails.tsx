@@ -1,7 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { AnnualData, Assumptions, CompanyInfo } from '../types';
 import { formatCurrency, projectFutureValue, calculateCAGR } from '../utils/calculations';
 import { CalculatorIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { GuardrailConfig, DEFAULT_CONFIG } from '../config/AppConfig';
 
 interface EvaluationDetailsProps {
   data: AnnualData[];
@@ -9,6 +8,7 @@ interface EvaluationDetailsProps {
   onUpdateAssumption: (key: keyof Assumptions, value: number | boolean) => void;
   info?: CompanyInfo;
   sector?: string;
+  config?: GuardrailConfig;
 }
 
 interface Range {
@@ -18,7 +18,7 @@ interface Range {
   median: number;
 }
 
-export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assumptions, onUpdateAssumption, info, sector }) => {
+export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assumptions, onUpdateAssumption, info, sector, config = DEFAULT_CONFIG }) => {
   // États pour gérer l'affichage/réduction des intervalles de référence
   const [expandedMetrics, setExpandedMetrics] = useState<{
     eps: boolean;
@@ -55,16 +55,19 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   const projectFutureValueSafe = (current: number, rate: number, years: number): number => {
     // Valider les entrées
     if (current <= 0 || !isFinite(current) || !isFinite(rate)) return 0;
-    // Limiter le taux de croissance à un maximum raisonnable (50% par an)
-    const safeRate = Math.max(-50, Math.min(rate, 50));
+    // Limiter le taux de croissance (Configurable)
+    const { min, max } = config.growth;
+    const safeRate = Math.max(min, Math.min(rate, max));
     return current * Math.pow(1 + safeRate / 100, years);
   };
 
-  // Valider et limiter les taux de croissance (MÊME QUE KPIDashboard)
-  const safeGrowthEPS = Math.max(-50, Math.min(assumptions.growthRateEPS || 0, 50));
-  const safeGrowthCF = Math.max(-50, Math.min(assumptions.growthRateCF || 0, 50));
-  const safeGrowthBV = Math.max(-50, Math.min(assumptions.growthRateBV || 0, 50));
-  const safeGrowthDiv = Math.max(-50, Math.min(assumptions.growthRateDiv || 0, 50));
+  // Valider et limiter les taux de croissance (Configurable)
+  const growthMin = config.growth.min;
+  const growthMax = config.growth.max;
+  const safeGrowthEPS = Math.max(growthMin, Math.min(assumptions.growthRateEPS || 0, growthMax));
+  const safeGrowthCF = Math.max(growthMin, Math.min(assumptions.growthRateCF || 0, growthMax));
+  const safeGrowthBV = Math.max(growthMin, Math.min(assumptions.growthRateBV || 0, growthMax));
+  const safeGrowthDiv = Math.max(growthMin, Math.min(assumptions.growthRateDiv || 0, growthMax));
 
   const futureValues = {
     eps: projectFutureValueSafe(baseValues.eps, safeGrowthEPS, 5),
@@ -73,11 +76,11 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
     div: projectFutureValueSafe(baseValues.div, safeGrowthDiv, 5)
   };
 
-  // Valider et limiter les ratios cibles (MÊME QUE KPIDashboard)
-  const safeTargetPE = Math.max(1, Math.min(assumptions.targetPE || 0, 100));
-  const safeTargetPCF = Math.max(1, Math.min(assumptions.targetPCF || 0, 100));
-  const safeTargetPBV = Math.max(0.5, Math.min(assumptions.targetPBV || 0, 50));
-  const safeTargetYield = Math.max(0.1, Math.min(assumptions.targetYield || 0, 20));
+  // Valider et limiter les ratios cibles (Configurable)
+  const safeTargetPE = Math.max(config.ratios.pe.min, Math.min(assumptions.targetPE || 0, config.ratios.pe.max));
+  const safeTargetPCF = Math.max(config.ratios.pcf.min, Math.min(assumptions.targetPCF || 0, config.ratios.pcf.max));
+  const safeTargetPBV = Math.max(config.ratios.pbv.min, Math.min(assumptions.targetPBV || 0, config.ratios.pbv.max));
+  const safeTargetYield = Math.max(config.ratios.yield.min, Math.min(assumptions.targetYield || 0, config.ratios.yield.max));
 
   // Target Prices - MÊME VALIDATION QUE KPIDashboard
   const targets = {
@@ -89,8 +92,8 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
 
   // Average Target Price (excluding disabled metrics) - MÊME VALIDATION QUE KPIDashboard
   const currentPrice = Math.max(assumptions.currentPrice || 0, 0.01);
-  const maxReasonableTarget = currentPrice * 50;
-  const minReasonableTarget = currentPrice * 0.1; // Minimum 10% du prix actuel
+  const maxReasonableTarget = currentPrice * config.projections.maxReasonableTargetMultiplier;
+  const minReasonableTarget = currentPrice * config.projections.minReasonableTargetMultiplier;
   
   const validTargets = [
     !assumptions.excludeEPS && targets.eps > 0 && targets.eps >= minReasonableTarget && targets.eps <= maxReasonableTarget && isFinite(targets.eps) ? targets.eps : null,
@@ -106,8 +109,8 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   // Dividend Accumulation - MÊME VALIDATION QUE KPIDashboard
   let totalDividends = 0;
   let currentD = Math.max(0, baseValues.div);
-  // Limiter les dividendes totaux à 10x le prix actuel (au-delà c'est aberrant)
-  const maxReasonableDividends = currentPrice * 10;
+  // Limiter les dividendes totaux (Configurable)
+  const maxReasonableDividends = currentPrice * config.projections.maxDividendMultiplier;
   for (let i = 0; i < 5; i++) {
     currentD = currentD * (1 + safeGrowthDiv / 100);
     if (isFinite(currentD) && currentD >= 0 && totalDividends + currentD <= maxReasonableDividends) {
@@ -124,9 +127,11 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   if (currentPrice > 0 && avgTargetPrice > 0 && isFinite(avgTargetPrice) && isFinite(totalDividends) && validTargets.length > 0) {
     const rawReturn = ((avgTargetPrice + totalDividends - currentPrice) / currentPrice) * 100;
     // VALIDATION STRICTE: Vérifier que le calcul est raisonnable
-    if (isFinite(rawReturn) && rawReturn >= -100 && rawReturn <= 1000) {
-      // Vérifier que avgTargetPrice n'est pas aberrant (max 100x le prix actuel)
-      if (avgTargetPrice <= currentPrice * 100 && avgTargetPrice >= currentPrice * 0.1) {
+    if (isFinite(rawReturn) && rawReturn >= config.returns.min && rawReturn <= config.returns.max) {
+      // Vérifier que avgTargetPrice n'est pas aberrant
+      const maxTarget = currentPrice * config.returns.maxTargetMultiplier;
+      const minTarget = currentPrice * config.projections.minReasonableTargetMultiplier;
+      if (avgTargetPrice <= maxTarget && avgTargetPrice >= minTarget) {
         totalReturnPercent = rawReturn;
       } else {
         // Prix cible aberrant, marquer comme invalide
@@ -241,7 +246,8 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
     const calculateRange = (values: number[]): Range | null => {
       if (values.length === 0) return null;
       // Filter extreme outliers for display
-      const filtered = values.filter(v => isFinite(v) && v > -100 && v < 500);
+      const { min, max } = config.outliers;
+      const filtered = values.filter(v => isFinite(v) && v > min && v < max);
       if (filtered.length === 0) return null;
       return {
         min: Math.min(...filtered),

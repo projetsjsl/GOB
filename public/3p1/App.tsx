@@ -26,6 +26,8 @@ import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon,
 import { fetchCompanyData } from './services/financeApi';
 import { saveSnapshot, hasManualEdits, loadSnapshot, listSnapshots } from './services/snapshotApi';
 import { RestoreDataDialog } from './components/RestoreDataDialog';
+import { ConfigModal } from './components/ConfigModal';
+import { loadConfig, saveConfig, DEFAULT_CONFIG, GuardrailConfig } from './config/AppConfig';
 import { loadAllTickersFromSupabase, mapSourceToIsWatchlist } from './services/tickersApi';
 import { loadProfilesBatchFromSupabase, loadProfileFromSupabase } from './services/supabaseDataLoader';
 import { storage } from './utils/storage';
@@ -139,6 +141,16 @@ export default function App() {
     // --- ADMIN DASHBOARD STATE ---
     const [showAdmin, setShowAdmin] = useState(false);
     const [isRepairing, setIsRepairing] = useState<string | null>(null);
+
+    // --- CONFIG SYSTEM ---
+    const [guardrailConfig, setGuardrailConfig] = useState<GuardrailConfig>(() => loadConfig());
+    const [isConfigOpen, setIsConfigOpen] = useState(false);
+
+    const handleSaveConfig = (newConfig: GuardrailConfig) => {
+        setGuardrailConfig(newConfig);
+        saveConfig(newConfig);
+        showNotification('Configuration sauvegardée avec succès', 'success');
+    };
 
     // Keyboard shortcut to toggle admin (Ctrl+Shift+A)
     useEffect(() => {
@@ -2518,6 +2530,8 @@ export default function App() {
         );
     }
 
+    const profile = library[activeId] || DEFAULT_PROFILE; // Ensure profile is always available
+
     return (
         <div className="flex h-screen bg-gray-100 font-sans text-slate-800 overflow-hidden">
 
@@ -2647,9 +2661,10 @@ export default function App() {
                                     isWatchlist={isWatchlist}
                                     onUpdateInfo={handleUpdateInfo}
                                     onUpdateAssumption={handleUpdateAssumption}
-                                    onFetchData={handleFetchData}
-                                    onRestoreData={handleOpenRestoreDialog}
-                                    showSyncButton={currentView === 'analysis'}
+                                    onFetchData={profile?.info?.symbol ? handleFetchData : undefined}
+                                    onRestoreData={profile && profile.data.length > 0 ? () => setShowRestoreDialog(true) : undefined}
+                                    showSyncButton={true}
+                                    onOpenSettings={() => setIsConfigOpen(true)}
                                 />
 
                         {/* CONDITIONAL RENDER: ANALYSIS VS INFO VS KPI */}
@@ -2740,16 +2755,18 @@ export default function App() {
                                     {/* Historical Ranges Table - Aide pour les hypothèses */}
                                     <HistoricalRangesTable
                                         data={data}
-                                        info={info}
-                                        sector={info.sector}
+                                        info={profile.info}
+                                        sector={profile.info?.sector}
                                         assumptions={assumptions}
+                                        config={guardrailConfig}
                                     />
 
                                     <div className="mt-8">
                                         <AdditionalMetrics
-                                            data={data}
-                                            assumptions={assumptions}
-                                            info={info}
+                                            data={profile.data}
+                                            assumptions={profile.assumptions}
+                                            info={profile.info}
+                                            config={guardrailConfig}
                                         />
                                     </div>
 

@@ -8587,8 +8587,9 @@ const Header = ({
   onUpdateAssumption,
   onFetchData,
   onRestoreData,
-  showSyncButton = true
+  showSyncButton = true,
   // Par défaut, afficher le bouton
+  onOpenSettings
 }) => {
   const [isLoading, setIsLoading] = reactExports.useState(false);
   const handleNumericChange = (e, key, min2 = -Infinity) => {
@@ -8787,8 +8788,17 @@ Source: FMP key-metrics`, children: [
             {
               onClick: handlePrint,
               className: "p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors no-print",
-              title: "Imprimer la fiche\\n\\nOuvre la boîte de dialogue d'impression du navigateur.\\nVous pouvez sauvegarder en PDF ou imprimer directement.\\n\\nLes éléments avec la classe 'no-print' ne seront pas imprimés.",
+              title: "Imprimer la fiche",
               children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$9, { className: "w-4 h-4 sm:w-6 sm:h-6" })
+            }
+          ),
+          onOpenSettings && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: onOpenSettings,
+              className: "p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors no-print",
+              title: "Configuration Globale",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-4 h-4 sm:w-6 sm:h-6" })
             }
           )
         ] })
@@ -33498,8 +33508,46 @@ const NotesEditor = ({ initialNotes, onSave }) => {
     )
   ] });
 };
-const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector }) => {
-  const [expandedMetrics, setExpandedMetrics] = reactExports.useState({
+const DEFAULT_CONFIG = {
+  growth: {
+    min: -50,
+    max: 50
+  },
+  ratios: {
+    pe: { min: 1, max: 100 },
+    pcf: { min: 1, max: 100 },
+    pbv: { min: 0.5, max: 50 },
+    yield: { min: 0.1, max: 20 }
+  },
+  outliers: {
+    min: -100,
+    max: 500
+  },
+  projections: {
+    maxReasonableTargetMultiplier: 50,
+    minReasonableTargetMultiplier: 0.1,
+    maxDividendMultiplier: 10
+  },
+  returns: {
+    min: -100,
+    max: 1e3,
+    maxTargetMultiplier: 100
+  }
+};
+const CONFIG_STORAGE_KEY = "finance_pro_guardrails";
+const loadConfig = () => {
+  try {
+    const stored = localStorage.getItem(CONFIG_STORAGE_KEY);
+    if (stored) {
+      return { ...DEFAULT_CONFIG, ...JSON.parse(stored) };
+    }
+  } catch (e) {
+    console.warn("Failed to load guardrails config", e);
+  }
+  return DEFAULT_CONFIG;
+};
+const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector, config: config2 = DEFAULT_CONFIG }) => {
+  const [expandedMetrics, setExpandedMetrics] = useState({
     eps: false,
     cf: false,
     bv: false,
@@ -33521,23 +33569,26 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
   };
   const projectFutureValueSafe = (current, rate, years) => {
     if (current <= 0 || !isFinite(current) || !isFinite(rate)) return 0;
-    const safeRate = Math.max(-50, Math.min(rate, 50));
+    const { min: min2, max: max2 } = config2.growth;
+    const safeRate = Math.max(min2, Math.min(rate, max2));
     return current * Math.pow(1 + safeRate / 100, years);
   };
-  const safeGrowthEPS = Math.max(-50, Math.min(assumptions.growthRateEPS || 0, 50));
-  const safeGrowthCF = Math.max(-50, Math.min(assumptions.growthRateCF || 0, 50));
-  const safeGrowthBV = Math.max(-50, Math.min(assumptions.growthRateBV || 0, 50));
-  const safeGrowthDiv = Math.max(-50, Math.min(assumptions.growthRateDiv || 0, 50));
+  const growthMin = config2.growth.min;
+  const growthMax = config2.growth.max;
+  const safeGrowthEPS = Math.max(growthMin, Math.min(assumptions.growthRateEPS || 0, growthMax));
+  const safeGrowthCF = Math.max(growthMin, Math.min(assumptions.growthRateCF || 0, growthMax));
+  const safeGrowthBV = Math.max(growthMin, Math.min(assumptions.growthRateBV || 0, growthMax));
+  const safeGrowthDiv = Math.max(growthMin, Math.min(assumptions.growthRateDiv || 0, growthMax));
   const futureValues = {
     eps: projectFutureValueSafe(baseValues.eps, safeGrowthEPS, 5),
     cf: projectFutureValueSafe(baseValues.cf, safeGrowthCF, 5),
     bv: projectFutureValueSafe(baseValues.bv, safeGrowthBV, 5),
     div: projectFutureValueSafe(baseValues.div, safeGrowthDiv, 5)
   };
-  const safeTargetPE = Math.max(1, Math.min(assumptions.targetPE || 0, 100));
-  const safeTargetPCF = Math.max(1, Math.min(assumptions.targetPCF || 0, 100));
-  const safeTargetPBV = Math.max(0.5, Math.min(assumptions.targetPBV || 0, 50));
-  const safeTargetYield = Math.max(0.1, Math.min(assumptions.targetYield || 0, 20));
+  const safeTargetPE = Math.max(config2.ratios.pe.min, Math.min(assumptions.targetPE || 0, config2.ratios.pe.max));
+  const safeTargetPCF = Math.max(config2.ratios.pcf.min, Math.min(assumptions.targetPCF || 0, config2.ratios.pcf.max));
+  const safeTargetPBV = Math.max(config2.ratios.pbv.min, Math.min(assumptions.targetPBV || 0, config2.ratios.pbv.max));
+  const safeTargetYield = Math.max(config2.ratios.yield.min, Math.min(assumptions.targetYield || 0, config2.ratios.yield.max));
   const targets = {
     eps: futureValues.eps > 0 && safeTargetPE > 0 && safeTargetPE <= 100 ? futureValues.eps * safeTargetPE : 0,
     cf: futureValues.cf > 0 && safeTargetPCF > 0 && safeTargetPCF <= 100 ? futureValues.cf * safeTargetPCF : 0,
@@ -33545,8 +33596,8 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     div: futureValues.div > 0 && safeTargetYield > 0 && safeTargetYield <= 20 ? futureValues.div / (safeTargetYield / 100) : 0
   };
   const currentPrice = Math.max(assumptions.currentPrice || 0, 0.01);
-  const maxReasonableTarget = currentPrice * 50;
-  const minReasonableTarget = currentPrice * 0.1;
+  const maxReasonableTarget = currentPrice * config2.projections.maxReasonableTargetMultiplier;
+  const minReasonableTarget = currentPrice * config2.projections.minReasonableTargetMultiplier;
   const validTargets = [
     !assumptions.excludeEPS && targets.eps > 0 && targets.eps >= minReasonableTarget && targets.eps <= maxReasonableTarget && isFinite(targets.eps) ? targets.eps : null,
     !assumptions.excludeCF && targets.cf > 0 && targets.cf >= minReasonableTarget && targets.cf <= maxReasonableTarget && isFinite(targets.cf) ? targets.cf : null,
@@ -33556,7 +33607,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
   const avgTargetPrice = validTargets.length > 0 ? validTargets.reduce((a2, b) => a2 + b, 0) / validTargets.length : 0;
   let totalDividends = 0;
   let currentD = Math.max(0, baseValues.div);
-  const maxReasonableDividends = currentPrice * 10;
+  const maxReasonableDividends = currentPrice * config2.projections.maxDividendMultiplier;
   for (let i = 0; i < 5; i++) {
     currentD = currentD * (1 + safeGrowthDiv / 100);
     if (isFinite(currentD) && currentD >= 0 && totalDividends + currentD <= maxReasonableDividends) {
@@ -33569,8 +33620,10 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
   let totalReturnPercent = -100;
   if (currentPrice > 0 && avgTargetPrice > 0 && isFinite(avgTargetPrice) && isFinite(totalDividends) && validTargets.length > 0) {
     const rawReturn = (avgTargetPrice + totalDividends - currentPrice) / currentPrice * 100;
-    if (isFinite(rawReturn) && rawReturn >= -100 && rawReturn <= 1e3) {
-      if (avgTargetPrice <= currentPrice * 100 && avgTargetPrice >= currentPrice * 0.1) {
+    if (isFinite(rawReturn) && rawReturn >= config2.returns.min && rawReturn <= config2.returns.max) {
+      const maxTarget = currentPrice * config2.returns.maxTargetMultiplier;
+      const minTarget = currentPrice * config2.projections.minReasonableTargetMultiplier;
+      if (avgTargetPrice <= maxTarget && avgTargetPrice >= minTarget) {
         totalReturnPercent = rawReturn;
       } else {
         totalReturnPercent = -100;
@@ -33597,7 +33650,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     const mid = Math.floor(sorted.length / 2);
     return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
   };
-  const calculateHistoricalRanges = reactExports.useMemo(() => {
+  const calculateHistoricalRanges = useMemo(() => {
     const validData = data.filter((d) => d.priceHigh > 0 && d.priceLow > 0).sort((a2, b) => a2.year - b.year);
     if (validData.length === 0) {
       return null;
@@ -33645,7 +33698,8 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     });
     const calculateRange = (values) => {
       if (values.length === 0) return null;
-      const filtered = values.filter((v) => isFinite(v) && v > -100 && v < 500);
+      const { min: min2, max: max2 } = config2.outliers;
+      const filtered = values.filter((v) => isFinite(v) && v > min2 && v < max2);
       if (filtered.length === 0) return null;
       return {
         min: Math.min(...filtered),
@@ -33665,7 +33719,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
       divGrowth: calculateRange(divGrowthRates)
     };
   }, [data]);
-  const sectorRanges = reactExports.useMemo(() => {
+  const sectorRanges = useMemo(() => {
     const sectorKey = sector || (info == null ? void 0 : info.sector) || "";
     const normalizedSector = sectorKey.toLowerCase();
     if (normalizedSector.includes("tech") || normalizedSector.includes("technologie") || normalizedSector.includes("ti")) {
@@ -33691,7 +33745,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
       divGrowth: { min: 1, max: 8, avg: 4, median: 4 }
     };
   }, [sector, info == null ? void 0 : info.sector]);
-  const title5YearProjections = reactExports.useMemo(() => {
+  const title5YearProjections = useMemo(() => {
     if (!calculateHistoricalRanges) return null;
     return {
       pe: { min: assumptions.targetPE * 0.9, max: assumptions.targetPE * 1.1, avg: assumptions.targetPE, median: assumptions.targetPE },
@@ -33704,7 +33758,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
       divGrowth: { min: assumptions.growthRateDiv * 0.8, max: assumptions.growthRateDiv * 1.2, avg: assumptions.growthRateDiv, median: assumptions.growthRateDiv }
     };
   }, [calculateHistoricalRanges, assumptions]);
-  const sector5YearProjections = reactExports.useMemo(() => {
+  const sector5YearProjections = useMemo(() => {
     return {
       pe: { min: sectorRanges.pe.avg * 0.9, max: sectorRanges.pe.avg * 1.1, avg: sectorRanges.pe.avg, median: sectorRanges.pe.median },
       pcf: { min: sectorRanges.pcf.avg * 0.9, max: sectorRanges.pcf.avg * 1.1, avg: sectorRanges.pcf.avg, median: sectorRanges.pcf.median },
@@ -33756,15 +33810,15 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
         ratioSuffix: "%"
       }
     };
-    const config2 = metricConfig[metric];
-    const titleRatio = calculateHistoricalRanges[config2.ratioKey];
-    const sectorRatio = sectorRanges[config2.ratioKey];
-    const title5YRatio = title5YearProjections == null ? void 0 : title5YearProjections[config2.ratioKey];
-    const sector5YRatio = sector5YearProjections[config2.ratioKey];
-    const titleGrowth = calculateHistoricalRanges[config2.growthKey];
-    const sectorGrowth = sectorRanges[config2.growthKey];
-    const title5YGrowth = title5YearProjections == null ? void 0 : title5YearProjections[config2.growthKey];
-    const sector5YGrowth = sector5YearProjections[config2.growthKey];
+    const config22 = metricConfig[metric];
+    const titleRatio = calculateHistoricalRanges[config22.ratioKey];
+    const sectorRatio = sectorRanges[config22.ratioKey];
+    const title5YRatio = title5YearProjections == null ? void 0 : title5YearProjections[config22.ratioKey];
+    const sector5YRatio = sector5YearProjections[config22.ratioKey];
+    const titleGrowth = calculateHistoricalRanges[config22.growthKey];
+    const sectorGrowth = sectorRanges[config22.growthKey];
+    const title5YGrowth = title5YearProjections == null ? void 0 : title5YearProjections[config22.growthKey];
+    const sector5YGrowth = sector5YearProjections[config22.growthKey];
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-blue-50 border-l-4 border-blue-400 p-2 sm:p-3 md:p-4 mt-2 mb-2 rounded-r", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs font-semibold text-blue-800 mb-2 sm:mb-3", children: [
         "📊 Intervalles de Référence - ",
@@ -33772,7 +33826,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4 text-xs", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-700 mb-2", children: config2.growthLabel }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-700 mb-2", children: config22.growthLabel }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-xs", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-blue-100 text-gray-600", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-1 text-left text-[10px]", children: "Source" }),
@@ -33796,7 +33850,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "font-semibold text-gray-700 mb-2", children: [
             "Ratio ",
-            config2.ratioLabel
+            config22.ratioLabel
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-xs", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-blue-100 text-gray-600", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
@@ -33807,13 +33861,13 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
             /* @__PURE__ */ jsxRuntimeExports.jsxs("tbody", { className: "divide-y divide-blue-200", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-1 text-gray-600", children: "Titre" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-1 text-right font-medium", children: formatRange(titleRatio, config2.ratioSuffix) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-1 text-right font-medium", children: title5YRatio ? formatRange(title5YRatio, config2.ratioSuffix) : "N/A" })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-1 text-right font-medium", children: formatRange(titleRatio, config22.ratioSuffix) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-1 text-right font-medium", children: title5YRatio ? formatRange(title5YRatio, config22.ratioSuffix) : "N/A" })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-1 text-gray-600", children: "Secteur" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-1 text-right font-medium", children: formatRange(sectorRatio, config2.ratioSuffix) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-1 text-right font-medium", children: formatRange(sector5YRatio, config2.ratioSuffix) })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-1 text-right font-medium", children: formatRange(sectorRatio, config22.ratioSuffix) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-1 text-right font-medium", children: formatRange(sector5YRatio, config22.ratioSuffix) })
               ] })
             ] })
           ] })
@@ -34711,7 +34765,7 @@ const DataSourcesInfo = () => {
     ] }) })
   ] });
 };
-const AdditionalMetrics = ({ data, assumptions, info }) => {
+const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_CONFIG }) => {
   const lastData = data[data.length - 1];
   const validHistory = data.filter((d) => d.priceHigh > 0 && d.priceLow > 0);
   const baseYearData = data.find((d) => d.year === assumptions.baseYear) || lastData;
@@ -34723,9 +34777,10 @@ const AdditionalMetrics = ({ data, assumptions, info }) => {
   const forwardEPS = baseEPS * (1 + assumptions.growthRateEPS / 100);
   const forwardPE = forwardEPS > 0 ? assumptions.currentPrice / forwardEPS : 0;
   const hasValidEPS = baseEPS > 0.01 && isFinite(baseEPS);
-  const safeBasePE = hasValidEPS && assumptions.currentPrice > 0 && currentPE > 0 && currentPE <= 1e3 ? currentPE : 0;
-  const safeBaseYield = Math.max(0, Math.min(currentYield, 50));
-  const growthPlusYield = (assumptions.growthRateEPS || 0) + safeBaseYield;
+  const safeBasePE = hasValidEPS && assumptions.currentPrice > 0 && currentPE > 0 && currentPE <= config2.ratios.pe.max * 10 ? currentPE : 0;
+  const safeYieldLimit = config2.ratios.yield.max * 2.5;
+  const safeBaseYieldVal = Math.max(0, Math.min(currentYield, safeYieldLimit));
+  const growthPlusYield = (assumptions.growthRateEPS || 0) + safeBaseYieldVal;
   let jpegy = null;
   if (growthPlusYield > 0.01 && safeBasePE > 0 && hasValidEPS) {
     const rawJPEGY = safeBasePE / growthPlusYield;
@@ -34750,8 +34805,8 @@ const AdditionalMetrics = ({ data, assumptions, info }) => {
   const netMargin = 10;
   const debtToEquity = 0.5;
   const payoutRatio = ((lastData == null ? void 0 : lastData.dividendPerShare) || 0) / ((lastData == null ? void 0 : lastData.earningsPerShare) || 1) * 100;
-  const safeGrowthRateEPS = Math.max(-50, Math.min(assumptions.growthRateEPS || 0, 50));
-  const safeTargetPE = Math.max(1, Math.min(assumptions.targetPE || 0, 100));
+  const safeGrowthRateEPS = Math.max(config2.growth.min, Math.min(assumptions.growthRateEPS || 0, config2.growth.max));
+  const safeTargetPE = Math.max(config2.ratios.pe.min, Math.min(assumptions.targetPE || 0, config2.ratios.pe.max));
   const projectedPrice5Y = baseEPS > 0 && safeTargetPE > 0 ? baseEPS * Math.pow(1 + safeGrowthRateEPS / 100, 5) * safeTargetPE : 0;
   const totalReturn = assumptions.currentPrice > 0 && projectedPrice5Y > 0 ? (projectedPrice5Y / assumptions.currentPrice - 1) * 100 : 0;
   const annualizedReturn = assumptions.currentPrice > 0 && projectedPrice5Y > 0 ? (Math.pow(projectedPrice5Y / assumptions.currentPrice, 1 / 5) - 1) * 100 : 0;
@@ -49508,6 +49563,7 @@ const ProgressBar = ({ current, total }) => {
   ) });
 };
 function App() {
+  var _a3, _b2;
   const [showLanding, setShowLanding] = reactExports.useState(true);
   const [library, setLibrary] = reactExports.useState({});
   const [activeId, setActiveId] = reactExports.useState("ACN");
@@ -49529,6 +49585,8 @@ function App() {
   };
   const [showAdmin, setShowAdmin] = reactExports.useState(false);
   const [isRepairing, setIsRepairing] = reactExports.useState(null);
+  const [guardrailConfig, setGuardrailConfig] = reactExports.useState(() => loadConfig());
+  const [isConfigOpen, setIsConfigOpen] = reactExports.useState(false);
   reactExports.useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "a") {
@@ -49540,8 +49598,8 @@ function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
   useRealtimeSync("tickers", (payload) => {
-    var _a3, _b2, _c, _d, _e;
-    console.log("📡 [3p1] Realtime ticker change:", payload.eventType, ((_a3 = payload.new) == null ? void 0 : _a3.ticker) || ((_b2 = payload.old) == null ? void 0 : _b2.ticker));
+    var _a4, _b3, _c, _d, _e;
+    console.log("📡 [3p1] Realtime ticker change:", payload.eventType, ((_a4 = payload.new) == null ? void 0 : _a4.ticker) || ((_b3 = payload.old) == null ? void 0 : _b3.ticker));
     if (payload.eventType === "INSERT" && payload.new) {
       const symbol = (_c = payload.new.ticker) == null ? void 0 : _c.toUpperCase();
       if (symbol && !library[symbol]) {
@@ -49673,7 +49731,7 @@ function App() {
   const [isReadOnly, setIsReadOnly] = reactExports.useState(false);
   reactExports.useEffect(() => {
     const loadFromStorage = async () => {
-      var _a3;
+      var _a4;
       try {
         const saved = await storage.getItem(STORAGE_KEY);
         if (saved) {
@@ -49688,12 +49746,12 @@ function App() {
           }
           const cleaned = {};
           const removedMutualFunds = [];
-          for (const [symbol, profile] of Object.entries(parsed)) {
-            const companyName = ((_a3 = profile == null ? void 0 : profile.info) == null ? void 0 : _a3.name) || "";
+          for (const [symbol, profile2] of Object.entries(parsed)) {
+            const companyName = ((_a4 = profile2 == null ? void 0 : profile2.info) == null ? void 0 : _a4.name) || "";
             if (isMutualFund(symbol, companyName)) {
               removedMutualFunds.push(symbol);
             } else {
-              cleaned[symbol] = profile;
+              cleaned[symbol] = profile2;
             }
           }
           if (removedMutualFunds.length > 0) {
@@ -49736,11 +49794,11 @@ function App() {
       return;
     }
     const refreshPriceCacheIfNeeded = async () => {
-      var _a3, _b2;
+      var _a4, _b3;
       try {
         const response = await fetch("/api/market-data-batch?tickers=AAPL&checkOnly=true");
         const result = await response.json();
-        if (((_a3 = result.stats) == null ? void 0 : _a3.stale) > 0 || ((_b2 = result.stats) == null ? void 0 : _b2.missing) > 0) {
+        if (((_a4 = result.stats) == null ? void 0 : _a4.stale) > 0 || ((_b3 = result.stats) == null ? void 0 : _b3.missing) > 0) {
           console.log("🔄 Cache prix expiré - Mise à jour automatique...");
           fetch("/api/fmp-batch-sync", { method: "POST" }).then(() => console.log("✅ Cache prix mis à jour")).catch((err) => console.warn("⚠️ Erreur mise à jour cache prix:", err));
         } else {
@@ -50048,18 +50106,18 @@ function App() {
   const [isWatchlist, setIsWatchlist] = reactExports.useState(false);
   reactExports.useEffect(() => {
     if (!isInitialized) return;
-    const profile = library[activeId];
-    if (profile) {
+    const profile2 = library[activeId];
+    if (profile2) {
       isLoadingProfileRef.current = true;
-      setData(profile.data);
+      setData(profile2.data);
       setAssumptions({
         ...INITIAL_ASSUMPTIONS,
         // ensure new fields are populated for old profiles
-        ...profile.assumptions
+        ...profile2.assumptions
       });
-      setInfo(profile.info);
-      setNotes(profile.notes || "");
-      setIsWatchlist(!!profile.isWatchlist);
+      setInfo(profile2.info);
+      setNotes(profile2.notes || "");
+      setIsWatchlist(!!profile2.isWatchlist);
       setPastData([]);
       setFutureData([]);
       requestAnimationFrame(() => {
@@ -50163,7 +50221,7 @@ function App() {
     }
   };
   const performSync = async (saveCurrentVersion) => {
-    var _a3, _b2, _c, _d;
+    var _a4, _b3, _c, _d;
     try {
       if (saveCurrentVersion) {
         const hasValidData = data && data.length > 0;
@@ -50222,8 +50280,8 @@ function App() {
       if (result.info) {
         const existingProfile = library[activeId];
         let preservedValueLineMetrics = {
-          securityRank: ((_a3 = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _a3.securityRank) || result.info.securityRank || "N/A",
-          earningsPredictability: ((_b2 = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _b2.earningsPredictability) || result.info.earningsPredictability,
+          securityRank: ((_a4 = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _a4.securityRank) || result.info.securityRank || "N/A",
+          earningsPredictability: ((_b3 = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _b3.earningsPredictability) || result.info.earningsPredictability,
           priceGrowthPersistence: ((_c = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _c.priceGrowthPersistence) || result.info.priceGrowthPersistence,
           priceStability: ((_d = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _d.priceStability) || result.info.priceStability
         };
@@ -50262,13 +50320,13 @@ function App() {
         };
         setInfo(completeInfo);
         setLibrary((prev) => {
-          const profile = prev[activeId];
-          if (!profile) return prev;
+          const profile2 = prev[activeId];
+          if (!profile2) return prev;
           return {
             ...prev,
             [activeId]: {
-              ...profile,
-              info: { ...profile.info, ...updatedInfo }
+              ...profile2,
+              info: { ...profile2.info, ...updatedInfo }
             }
           };
         });
@@ -50429,14 +50487,6 @@ Vérifiez les logs de la console pour plus de détails.`;
     }
     setIsReadOnly(false);
   };
-  const handleOpenRestoreDialog = async () => {
-    const result = await listSnapshots(activeId, 1);
-    if (result.success && result.snapshots && result.snapshots.length > 0) {
-      const latest = result.snapshots[0];
-      setLatestSnapshotDate(latest.snapshot_date);
-    }
-    setShowRestoreDialog(true);
-  };
   const handleRestoreFromSnapshot = async () => {
     try {
       const result = await listSnapshots(activeId, 50);
@@ -50539,23 +50589,23 @@ Vérifiez les logs de la console pour plus de détails.`;
         priceStability: prev.priceStability || result.info.priceStability
       }));
       setLibrary((prev) => {
-        const profile = prev[activeId];
-        if (!profile) return prev;
+        const profile2 = prev[activeId];
+        if (!profile2) return prev;
         return {
           ...prev,
           [activeId]: {
-            ...profile,
+            ...profile2,
             data: mergedData,
             // Utiliser les données mergées au lieu de result.data
             assumptions: finalAssumptions,
             // Inclure les exclusions automatiques
             info: {
-              ...profile.info,
+              ...profile2.info,
               ...result.info,
-              securityRank: profile.info.securityRank || result.info.securityRank || "N/A",
-              earningsPredictability: profile.info.earningsPredictability || result.info.earningsPredictability,
-              priceGrowthPersistence: profile.info.priceGrowthPersistence || result.info.priceGrowthPersistence,
-              priceStability: profile.info.priceStability || result.info.priceStability
+              securityRank: profile2.info.securityRank || result.info.securityRank || "N/A",
+              earningsPredictability: profile2.info.earningsPredictability || result.info.earningsPredictability,
+              priceGrowthPersistence: profile2.info.priceGrowthPersistence || result.info.priceGrowthPersistence,
+              priceStability: profile2.info.priceStability || result.info.priceStability
             },
             lastModified: Date.now()
           }
@@ -50814,11 +50864,11 @@ Vérifiez les logs de la console pour plus de détails.`;
   };
   const handleToggleWatchlist = (id) => {
     setLibrary((prev) => {
-      const profile = prev[id];
-      if (!profile) return prev;
+      const profile2 = prev[id];
+      if (!profile2) return prev;
       const updated = {
-        ...profile,
-        isWatchlist: !profile.isWatchlist
+        ...profile2,
+        isWatchlist: !profile2.isWatchlist
       };
       const newLib = { ...prev, [id]: updated };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newLib));
@@ -50869,14 +50919,14 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
       if (abortSync.current) break;
       try {
         setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
-        const profile = library[tickerSymbol];
-        if (!profile) continue;
+        const profile2 = library[tickerSymbol];
+        if (!profile2) continue;
         console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
         await saveSnapshot(
           tickerSymbol,
-          profile.data,
-          profile.assumptions,
-          profile.info,
+          profile2.data,
+          profile2.assumptions,
+          profile2.info,
           `Avant synchronisation globale - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
           false,
           false
@@ -50884,7 +50934,7 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
         console.log(`🔄 Synchronisation ${tickerSymbol}...`);
         const result = await fetchCompanyData(tickerSymbol);
         const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
-        const mergedData = profile.data.map((existingRow) => {
+        const mergedData = profile2.data.map((existingRow) => {
           const newRow = newDataByYear.get(existingRow.year);
           if (!newRow) return existingRow;
           if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
@@ -50902,9 +50952,9 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
         const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
           mergedData,
           result.currentPrice,
-          profile.assumptions
+          profile2.assumptions
         );
-        const tempAssumptions = { ...profile.assumptions, ...autoFilledAssumptions };
+        const tempAssumptions = { ...profile2.assumptions, ...autoFilledAssumptions };
         const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
         if (outlierDetection.detectedOutliers.length > 0) {
           console.log(`⚠️ ${tickerSymbol}: Outliers détectés: ${outlierDetection.detectedOutliers.join(", ")}`);
@@ -50920,12 +50970,12 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
           const updated = {
             ...prev,
             [tickerSymbol]: {
-              ...profile,
+              ...profile2,
               data: mergedData,
               info: {
-                ...profile.info,
+                ...profile2.info,
                 ...result.info,
-                name: result.info.name || profile.info.name
+                name: result.info.name || profile2.info.name
               },
               assumptions: finalAssumptions,
               lastModified: Date.now()
@@ -50942,7 +50992,7 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
           tickerSymbol,
           mergedData,
           finalAssumptions,
-          { ...profile.info, ...result.info },
+          { ...profile2.info, ...result.info },
           `Synchronisation globale - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
           true,
           true
@@ -51007,17 +51057,17 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
         batch.map(async (tickerSymbol) => {
           try {
             setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
-            const profile = library[tickerSymbol];
-            if (!profile) {
+            const profile2 = library[tickerSymbol];
+            if (!profile2) {
               console.warn(`⚠️ ${tickerSymbol}: Profil non trouvé`);
               return;
             }
             console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
             await saveSnapshot(
               tickerSymbol,
-              profile.data,
-              profile.assumptions,
-              profile.info,
+              profile2.data,
+              profile2.assumptions,
+              profile2.info,
               `Avant synchronisation (N/A) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
               false,
               false
@@ -51025,7 +51075,7 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
             console.log(`🔄 Synchronisation ${tickerSymbol}...`);
             const result = await fetchCompanyData(tickerSymbol);
             const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
-            const mergedData = profile.data.map((existingRow) => {
+            const mergedData = profile2.data.map((existingRow) => {
               const newRow = newDataByYear.get(existingRow.year);
               if (!newRow) return existingRow;
               if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
@@ -51049,10 +51099,10 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
             const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
               mergedData,
               result.currentPrice,
-              profile.assumptions
+              profile2.assumptions
             );
             const tempAssumptions = {
-              ...profile.assumptions,
+              ...profile2.assumptions,
               ...autoFilledAssumptions
             };
             const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
@@ -51070,12 +51120,12 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
               const updated = {
                 ...prev,
                 [tickerSymbol]: {
-                  ...profile,
+                  ...profile2,
                   data: mergedData,
                   info: {
-                    ...profile.info,
+                    ...profile2.info,
                     ...result.info,
-                    name: result.info.name || profile.info.name
+                    name: result.info.name || profile2.info.name
                   },
                   assumptions: finalAssumptions,
                   lastModified: Date.now()
@@ -51093,7 +51143,7 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
               mergedData,
               finalAssumptions,
               {
-                ...profile.info,
+                ...profile2.info,
                 ...result.info
               },
               `Synchronisation (N/A) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
@@ -51185,8 +51235,8 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
           return false;
         }
         if (library[symbol]) {
-          const profile = library[symbol];
-          const hasValidData = profile.data && profile.data.length > 0 && profile.data.some(
+          const profile2 = library[symbol];
+          const hasValidData = profile2.data && profile2.data.length > 0 && profile2.data.some(
             (d) => d.earningsPerShare !== 0 || d.cashFlowPerShare !== 0
           );
           if (hasValidData) {
@@ -51382,6 +51432,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-full w-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ErrorBoundary, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(reactExports.Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx(LoadingFallback, {}), children: /* @__PURE__ */ jsxRuntimeExports.jsx(AdminDashboard, { onRepair: handleAdminRepair, isRepairing }) }) }) })
     ] });
   }
+  const profile = library[activeId] || DEFAULT_PROFILE;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex h-screen bg-gray-100 font-sans text-slate-800 overflow-hidden", children: [
     isSidebarOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(
       "div",
@@ -51500,9 +51551,10 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
             isWatchlist,
             onUpdateInfo: handleUpdateInfo,
             onUpdateAssumption: handleUpdateAssumption,
-            onFetchData: handleFetchData,
-            onRestoreData: handleOpenRestoreDialog,
-            showSyncButton: currentView === "analysis"
+            onFetchData: ((_a3 = profile == null ? void 0 : profile.info) == null ? void 0 : _a3.symbol) ? handleFetchData : void 0,
+            onRestoreData: profile && profile.data.length > 0 ? () => setShowRestoreDialog(true) : void 0,
+            showSyncButton: true,
+            onOpenSettings: () => setIsConfigOpen(true)
           }
         ),
         currentView === "info" ? /* @__PURE__ */ jsxRuntimeExports.jsx(InfoTab, {}) : currentView === "kpi" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ErrorBoundary, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(reactExports.Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx(LoadingFallback, {}), children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -51579,17 +51631,19 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
               HistoricalRangesTable,
               {
                 data,
-                info,
-                sector: info.sector,
-                assumptions
+                info: profile.info,
+                sector: (_b2 = profile.info) == null ? void 0 : _b2.sector,
+                assumptions,
+                config: guardrailConfig
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-8", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
               AdditionalMetrics,
               {
-                data,
-                assumptions,
-                info
+                data: profile.data,
+                assumptions: profile.assumptions,
+                info: profile.info,
+                config: guardrailConfig
               }
             ) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(DataSourcesInfo, {})

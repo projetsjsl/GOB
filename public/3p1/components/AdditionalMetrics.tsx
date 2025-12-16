@@ -1,14 +1,16 @@
 import React from 'react';
 import { Assumptions, AnnualData, CompanyInfo } from '../types';
 import { calculateAverage, formatCurrency, formatPercent } from '../utils/calculations';
+import { GuardrailConfig, DEFAULT_CONFIG } from '../config/AppConfig';
 
 interface AdditionalMetricsProps {
     data: AnnualData[];
     assumptions: Assumptions;
     info: CompanyInfo;
+    config?: GuardrailConfig;
 }
 
-export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assumptions, info }) => {
+export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assumptions, info, config = DEFAULT_CONFIG }) => {
     // Calculs des métriques manquantes
     const lastData = data[data.length - 1];
     const validHistory = data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
@@ -31,9 +33,13 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
     // MÊME LOGIQUE QUE KPIDashboard pour cohérence
     // JPEGY = P/E / (Growth % + Yield %)
     const hasValidEPS = baseEPS > 0.01 && isFinite(baseEPS);
-    const safeBasePE = hasValidEPS && assumptions.currentPrice > 0 && currentPE > 0 && currentPE <= 1000 ? currentPE : 0;
-    const safeBaseYield = Math.max(0, Math.min(currentYield, 50)); // Limiter yield à 0-50%
-    const growthPlusYield = (assumptions.growthRateEPS || 0) + safeBaseYield;
+    const safeBasePE = hasValidEPS && assumptions.currentPrice > 0 && currentPE > 0 && currentPE <= config.ratios.pe.max * 10 ? currentPE : 0;
+    const safeBaseYield = Math.max(0, Math.min(currentYield, 50)); // Keep yield hardcap at 50% for JPEGY sanity or use config? Using config.ratios.yield.max seems safer but JPEGY often allows higher yield impact. Let's stick to safe hardcap for JPEGY or config max * 2.
+    // Actually, user wants configuration. Let's use config.ratios.yield.max but maybe multiplied if JPEGY allows outlier yields. 
+    // For now, let's just use the config limit for consistency.
+    const safeYieldLimit = config.ratios.yield.max * 2.5; // Allow a bit more for "current" outlier yield before breaking JPEGY
+    const safeBaseYieldVal = Math.max(0, Math.min(currentYield, safeYieldLimit));
+    const growthPlusYield = (assumptions.growthRateEPS || 0) + safeBaseYieldVal;
     
     // JPEGY: valider que growthPlusYield > 0.01 ET que basePE est valide
     // Retourner null si impossible à calculer (au lieu de 0)
@@ -78,8 +84,8 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
 
     // Rendement espéré (formule Value Line) - Utiliser baseEPS au lieu de lastData pour cohérence avec EvaluationDetails
     // Valider les entrées pour éviter les erreurs
-    const safeGrowthRateEPS = Math.max(-50, Math.min(assumptions.growthRateEPS || 0, 50));
-    const safeTargetPE = Math.max(1, Math.min(assumptions.targetPE || 0, 100));
+    const safeGrowthRateEPS = Math.max(config.growth.min, Math.min(assumptions.growthRateEPS || 0, config.growth.max));
+    const safeTargetPE = Math.max(config.ratios.pe.min, Math.min(assumptions.targetPE || 0, config.ratios.pe.max));
     const projectedPrice5Y = baseEPS > 0 && safeTargetPE > 0 
         ? baseEPS * Math.pow(1 + safeGrowthRateEPS / 100, 5) * safeTargetPE 
         : 0;
