@@ -56,9 +56,6 @@
     "api/fmp-stock-screener.js": {
       "maxDuration": 30
     },
-    "api/3p1-sync-na.js": {
-      "maxDuration": 60
-    },
     "api/finance-snapshots.js": {
       "maxDuration": 30
     },
@@ -113,9 +110,6 @@
     "api/jslai-proxy.js": {
       "maxDuration": 30
     },
-    "api/jslai-proxy-resource.js": {
-      "maxDuration": 30
-    },
     "api/fmp-sync.js": {
       "maxDuration": 300
     },
@@ -131,9 +125,6 @@
     "api/cron/fmp-batch-sync.js": {
       "maxDuration": 300
     },
-    "api/market-data-batch.js": {
-      "maxDuration": 30
-    }
   },
   "headers": [
     {
