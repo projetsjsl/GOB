@@ -206,5 +206,8 @@ window.copyEmailHTML = function(employee, phases, tasks, resources) {
     const html = window.generateEmailHTML(employee, phases, tasks, resources);
     navigator.clipboard.writeText(html).then(() => {
         alert('HTML copié ! Collez-le dans votre client email (mode HTML).');
+    }).catch(err => {
+        console.error('Erreur copie:', err);
+        alert('Erreur lors de la copie. Sélectionnez et copiez manuellement.');
     });
 };

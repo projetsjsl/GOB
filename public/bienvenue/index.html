@@ -896,13 +896,18 @@
                 }
             } catch (error) {
                 console.error('Erreur envoi email:', error);
-                showNotification(`Erreur: ${error.message}`, 'error');
+                const notifyFn = showNotificationFn || (typeof showNotification !== 'undefined' ? showNotification : console.error);
+                if (typeof notifyFn === 'function') {
+                    notifyFn(`Erreur: ${error.message}`, 'error');
+                } else {
+                    console.error(`Erreur: ${error.message}`);
+                }
                 if (document.activeElement) document.activeElement.innerText = originalText;
             }
         };
 
         // FONCTION D'ENVOI EMAIL VIA RESEND (Réelle API)
-        const sendEmailViaResend = async (employee, phases, tasks, resources) => {
+        const sendEmailViaResend = async (employee, phases, tasks, resources, showNotificationFn) => {
              let html;
              try {
                 if (typeof window.generateEmailHTML !== 'function') throw new Error("Le générateur d'email n'est pas chargé.");
@@ -2778,7 +2783,7 @@
                                 <Icons.Send /> <span className="hidden md:inline">Copier l'email</span>
                             </button>
 
-                            <button onClick={() => sendEmailViaResend(selectedEmployee, phases, filteredTasks, resources)} className="p-2 text-green-600 hover:bg-green-50 rounded-lg flex items-center gap-2 transition-colors" title="Envoyer via Resend">
+                            <button onClick={() => sendEmailViaResend(selectedEmployee, phases, filteredTasks, resources, showNotification)} className="p-2 text-green-600 hover:bg-green-50 rounded-lg flex items-center gap-2 transition-colors" title="Envoyer via Resend">
                                 <Icons.Send /> <span className="font-bold">Envoyer (Resend)</span>
                             </button>
                         </div>
