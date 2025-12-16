@@ -601,27 +601,31 @@
             };
 
             return (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
-                    <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
-                        <div className="p-6 border-b flex justify-between items-center bg-gray-50">
-                             <h2 className="text-2xl font-bold flex items-center gap-2"><span className="bg-blue-100 p-2 rounded text-blue-600"><Icons.Settings /></span> Administration RH</h2>
+                <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4 animate-fade-in">
+                    <div className="bg-white/95 backdrop-blur-xl rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col border border-white/20 ring-1 ring-black/5">
+                        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-blue-50/50 to-indigo-50/50">
+                             <h2 className="text-2xl font-bold flex items-center gap-3 text-gray-800">
+                                <span className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white p-2.5 rounded-xl shadow-lg shadow-blue-500/20"><Icons.Settings /></span> 
+                                Administration RH
+                             </h2>
                              <div className="flex gap-2">
-                                <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full"><Icons.X /></button>
+                                <button onClick={onClose} className="p-2 hover:bg-gray-200/50 rounded-full transition-colors"><Icons.X /></button>
                              </div>
                         </div>
-                        <div className="flex border-b bg-white overflow-x-auto">
+                        <div className="flex border-b border-gray-100 bg-white/50 overflow-x-auto">
                             {[
                                 { id: 'employees', icon: <Icons.Users />, label: 'Profils Employés' },
                                 { id: 'resources', icon: <Icons.User />, label: 'Ressources' },
                                 { id: 'phases', icon: <Icons.Layers />, label: 'Phases' },
                                 { id: 'tasks', icon: <Icons.List />, label: 'Modèles Tâches' }
                             ].map(tab => (
-                                <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-4 py-3 font-bold text-sm flex items-center gap-2 transition-colors border-b-2 ${activeTab === tab.id ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:bg-gray-50'}`}>
+                                <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-6 py-4 font-bold text-sm flex items-center gap-2 transition-all relative ${activeTab === tab.id ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50/50'}`}>
                                     {tab.icon} {tab.label}
+                                    {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-t-full mx-6" />}
                                 </button>
                             ))}
                         </div>
-                        <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+                        <div className="flex-1 overflow-y-auto p-6 bg-gray-50/50">
                             {activeTab === 'employees' && (
                                 <div className="space-y-6">
                                     <div className="bg-white p-4 rounded-xl border shadow-sm flex gap-2 items-end">
@@ -649,7 +653,7 @@
                                                 <div className="flex items-center gap-1">
                                                      <input type="date" className="w-32 text-xs border rounded px-1 py-1" value={emp.startDate} onChange={e => updateEmp(emp.id, 'startDate', e.target.value)} />
                                                      <button onClick={() => duplicateEmp(emp)} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded" title="Dupliquer"><Icons.Copy /></button>
-                                                     <button onClick={() => { if(confirm('Supprimer ?')) { setEmployees(employees.filter(e => e.id !== emp.id)); if(useSupabase && supabase) supabase.from('employees').delete().eq('id', emp.id); } }} className="p-1.5 text-red-500 hover:bg-red-50 rounded"><Icons.Trash /></button>
+                                                     <button onClick={(e) => { e.stopPropagation(); if(confirm('Supprimer ?')) { setEmployees(employees.filter(empI => empI.id !== emp.id)); if(useSupabase && supabase) supabase.from('employees').delete().eq('id', emp.id); } }} className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors"><Icons.Trash /></button>
                                                 </div>
                                             </div>
                                         ))}
@@ -673,7 +677,7 @@
                                                     <input className="w-full text-xs text-gray-500 border-b border-transparent focus:border-blue-500 outline-none" value={res.role} onChange={e => updateRes(res.id, 'role', e.target.value)} />
                                                 </div>
                                                 <input type="color" className="w-8 h-8 rounded cursor-pointer border-0 p-0" value={res.color} onChange={e => updateRes(res.id, 'color', e.target.value)} />
-                                                <button onClick={() => setResources(resources.filter(r => r.id !== res.id))} className="text-red-400 hover:text-red-600"><Icons.Trash /></button>
+                                                <button onClick={(e) => { e.stopPropagation(); setResources(resources.filter(r => r.id !== res.id)); }} className="text-red-400 hover:text-red-600 transition-colors"><Icons.Trash /></button>
                                             </div>
                                         ))}
                                     </div>
@@ -1575,6 +1579,18 @@
 
                     {/* Main Content */}
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                            <div>
+                                <h1 className="text-3xl font-extrabold text-gray-900">Tableau de Bord</h1>
+                                <p className="text-gray-500 mt-1">Gérez le parcours d'intégration de vos employés</p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="bg-white px-4 py-2 rounded-lg border shadow-sm text-sm font-bold text-gray-600">
+                                    📅 {new Date().getFullYear()}
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Stats Cards */}
                         <div className={`collapsible-content ${showStats ? '' : 'collapsed'}`} style={{ maxHeight: showStats ? '200px' : '0' }}>
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 mt-2">
