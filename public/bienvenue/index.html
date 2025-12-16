@@ -686,7 +686,8 @@
             phaseTemplates, setPhaseTemplates, 
             taskTemplates, setTaskTemplates,
             supabase, useSupabase, 
-            showNotification, uploadAvatar, onClose 
+            showNotification, uploadAvatar, onClose,
+            saveTaskField // Passer saveTaskField en props
         }) => {
             const [activeTab, setActiveTab] = useState('employees');
             const [newEmpName, setNewEmpName] = useState('');
@@ -1701,27 +1702,44 @@
                 showNotification(`Erreur sauvegarde (${context})`, 'error');
             };
 
-            // Helper function to save task field to Supabase
+            // Helper function to save task field to Supabase - OPTIMISÉ avec logs et feedback
             const saveTaskField = async (taskId, field, value, dbFieldName = null) => {
-                if (!useSupabase || !supabase) return;
+                if (!useSupabase || !supabase) {
+                    console.warn('⚠️ Supabase non disponible pour sauvegarder', field);
+                    return false;
+                }
                 
                 try {
                     const dbField = dbFieldName || (field === 'phaseId' ? 'phase_id' : 
                                                      field === 'dayOffset' ? 'day_offset' : 
                                                      field === 'assignedTo' ? 'assigned_to' : field);
                     
-                    const { error } = await supabase
+                    console.log(`💾 Sauvegarde ${field} (${dbField}) pour tâche ${taskId}:`, value);
+                    
+                    const { data, error } = await supabase
                         .from('task_templates')
                         .update({ [dbField]: value })
-                        .eq('id', taskId);
+                        .eq('id', taskId)
+                        .select(); // Retourner les données pour vérifier
                     
                     if (error) {
-                        console.error(`Erreur sauvegarde ${field}:`, error);
-                        showNotification(`Erreur sauvegarde ${field}`, 'error');
-                        throw error;
+                        console.error(`❌ Erreur sauvegarde ${field}:`, error);
+                        showNotification(`Erreur sauvegarde ${field}: ${error.message || error.details}`, 'error');
+                        return false;
+                    }
+                    
+                    if (data && data.length > 0) {
+                        console.log(`✅ ${field} sauvegardé avec succès pour tâche ${taskId}`);
+                        // Feedback visuel discret (pas de notification pour chaque champ)
+                        return true;
+                    } else {
+                        console.warn(`⚠️ Aucune donnée retournée pour tâche ${taskId}`);
+                        return false;
                     }
                 } catch (e) {
+                    console.error(`❌ Exception lors de la sauvegarde ${field}:`, e);
                     handleSupabaseError(e, `Save Task ${field}`);
+                    return false;
                 }
             };
 
@@ -2541,6 +2559,7 @@
                             showNotification={showNotification}
                             uploadAvatar={uploadAvatar}
                             onClose={() => setShowAdmin(false)}
+                            saveTaskField={saveTaskField}
                         />
                     )}
 
