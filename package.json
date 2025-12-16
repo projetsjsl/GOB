@@ -7,12 +7,6 @@
     "build": "vite build",
     "build:vite": "vite build",
     "preview": "vite preview",
-    "build:legacy": "node build.js",
-    "start": "node test-sms-server.js",
-    "validate-workflow": "node validate-n8n-workflow.js",
-    "import-workflow": "node import-workflow-header-black-white.js",
-    "sms:test-server": "node test-sms-server.js",
-    "sms:scenarios": "node test-scenarios.js",
     "verify-3p1": "node scripts/verify-3p1-build.js",
     "test-3p1": "cd public/3p1 && npm run build && cd ../.. && node scripts/verify-3p1-build.js"
   },
