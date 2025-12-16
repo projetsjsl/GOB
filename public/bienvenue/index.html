@@ -1156,12 +1156,7 @@
                                                             </span>
                                                         </td>
                                                         <td className="p-3 text-right">
-                                                            <button onClick={() => {
-                                                                if(confirm('Supprimer cette tâche ?')) {
-                                                                    setTaskTemplates(prev => prev.filter(t => t.id !== task.id));
-                                                                    if(useSupabase && supabase) supabase.from('task_templates').delete().eq('id', task.id);
-                                                                }
-                                                            }} className="p-1.5 text-red-500 hover:bg-red-50 rounded"><Icons.Trash /></button>
+                                                            <button onClick={() => deleteTask(task.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded" title="Supprimer la tâche"><Icons.Trash /></button>
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -1579,6 +1574,8 @@
             };
 
             const deleteTask = async (taskId) => {
+                if(!confirm('Supprimer cette tâche ? (Cela la retirera aussi du parcours des employés actuels)')) return;
+
                 const originalTaskId = parseInt(taskId.split('-')[1]);
                 
                 // Optimistic
@@ -1587,6 +1584,15 @@
 
                 if (useSupabase && supabase) {
                     try {
+                        // 1. Delete assignments in employee_tasks
+                        const { error: assignError } = await supabase
+                            .from('employee_tasks')
+                            .delete()
+                            .eq('task_template_id', originalTaskId);
+                        
+                        if (assignError) console.warn('Error clearing assignments:', assignError);
+
+                        // 2. Delete the template
                         const { error } = await supabase
                             .from('task_templates')
                             .delete()
@@ -1596,7 +1602,9 @@
                         showNotification('Tâche supprimée', 'success');
                     } catch (e) {
                         handleSupabaseError(e, 'Delete Task');
-                        // Revert?
+                        // Re-fetch to sync state?
+                        alert("Erreur lors de la suppression de la tâche. Rafraîchissement...");
+                        window.location.reload();
                     }
                 }
             };
