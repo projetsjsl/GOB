@@ -1,14 +1,14 @@
 /**
  * Cron Job Vercel pour synchroniser UNIQUEMENT LES PRIX FMP vers ticker_price_cache
  * 
- * ⚠️ IMPORTANT : Ce cron synchronise UNIQUEMENT les PRIX (pas les ratios/métriques)
+ * IMPORTANT : Ce cron synchronise UNIQUEMENT les PRIX (pas les ratios/métriques)
  * Les données fondamentales (ratios, métriques) sont récupérées à la demande dans 3p1
  * 
  * Fréquence : Toutes les 15 minutes (optionnel - recommandé: à la demande)
  * Configuration dans vercel.json
  * 
  * Note: Vercel Pro permet des crons toutes les minutes
- * Pour Hobby, utiliser "0 */15 * * * *" (toutes les 15 minutes)
+ * Pour Hobby, utiliser la syntaxe cron "0 X/15 X X X X" (toutes les 15 minutes)
  */
 
 import { createClient } from '@supabase/supabase-js';

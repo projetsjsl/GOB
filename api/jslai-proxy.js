@@ -313,9 +313,9 @@ export default async function handler(req, res) {
             
             // Vérifier tous les scripts chargés
             const scripts = document.querySelectorAll('script[src]');
-            console.log(`📜 Total scripts: ${scripts.length}`);
+            console.log('📜 Total scripts: ' + scripts.length);
             scripts.forEach((script, index) => {
-              console.log(`  ${index + 1}. ${script.src} - ${script.complete ? '✅ Loaded' : '⏳ Loading'}`);
+              console.log('  ' + (index + 1) + '. ' + script.src + ' - ' + (script.complete ? '✅ Loaded' : '⏳ Loading'));
             });
           }, 3000); // Augmenter le délai à 3 secondes
         });
