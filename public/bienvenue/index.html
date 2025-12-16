@@ -552,7 +552,7 @@
             );
         };
 
-        // FONCTION D'ENVOI EMAIL VIA RESEND (Simulée ou API)
+        // FONCTION D'ENVOI EMAIL VIA RESEND (Réelle API)
         const sendEmailViaResend = async (employee, phases, tasks, resources) => {
              let html;
              try {
@@ -563,14 +563,41 @@
                 alert("Erreur: Le modèle d'email ne s'est pas chargé correctement. Rechargez la page.");
                 return;
              }
-             // Ici, idéalement appel à un backend secure. Pour démo frontend-only:
+             
              const subject = `Plan d'Intégration - ${employee.name}`;
-             const to = prompt("Adresse email du destinataire :", "projetsjsl@gmail.com");
+             const to = prompt("Entrez l'adresse email du destinataire:", "projetsjsl@gmail.com"); 
              if (!to) return;
              
-             // Simulation d'appel API
-             console.log("Envoi email vers", to, "Subject:", subject);
-             alert(`📧 Simulation: Email envoyé à ${to} via Resend ! \n(Nécessite un backend pour l'envoi réel)`);
+             // Feedback UI
+             const originalText = document.activeElement ? document.activeElement.innerText : '';
+             if (document.activeElement) document.activeElement.innerText = 'Envoi... ⏳';
+
+             try {
+                const response = await fetch('/api/send-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: to,
+                        subject: subject,
+                        html: html,
+                        briefingType: 'onboarding_plan'
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('✅ Email envoyé avec succès !');
+                } else {
+                    console.error('Erreur envoi email:', data);
+                    alert(`❌ Erreur lors de l'envoi : ${data.message || 'Erreur inconnue'}`);
+                }
+             } catch (error) {
+                console.error('Erreur réseau:', error);
+                alert('❌ Erreur réseau lors de l\'envoi de l\'email.');
+             } finally {
+                if (document.activeElement) document.activeElement.innerText = originalText;
+             }
         };
 
         // ADMIN PANEL COMPONENT (Top Level pour éviter re-render)
