@@ -889,7 +889,10 @@
 
                 const result = await response.json();
                 if (response.ok) {
-                    showNotification(`Email envoyé à ${to} !`, 'success');
+                    const notifyFn = showNotificationFn || (typeof showNotification !== 'undefined' ? showNotification : console.log);
+                    if (typeof notifyFn === 'function') {
+                        notifyFn(`Email envoyé à ${to} !`, 'success');
+                    }
                     if (document.activeElement) document.activeElement.innerText = originalText;
                 } else {
                     throw new Error(result.error || 'Erreur lors de l\'envoi');
