@@ -348,7 +348,20 @@ export class EmmaClient {
         
         try {
             // Try to get config from the emma_config table
-            const { data, error } = await window.supabase
+            // window.supabase is the module, need to create a client first
+            if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+                throw new Error('Supabase module not available');
+            }
+            
+            const supabaseUrl = window.ENV_CONFIG?.SUPABASE_URL || 'https://boyuxgdplbpkknplxbxp.supabase.co';
+            const supabaseKey = window.ENV_CONFIG?.SUPABASE_ANON_KEY;
+            
+            if (!supabaseKey) {
+                throw new Error('Supabase key not configured');
+            }
+            
+            const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+            const { data, error } = await client
                 .from('emma_config')
                 .select('*')
                 .eq('section', 'client')
