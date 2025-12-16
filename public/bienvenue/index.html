@@ -686,10 +686,49 @@
             phaseTemplates, setPhaseTemplates, 
             taskTemplates, setTaskTemplates,
             supabase, useSupabase, 
-            showNotification, uploadAvatar, onClose,
-            saveTaskField // Passer saveTaskField en props
+            showNotification, uploadAvatar, onClose
         }) => {
             const [activeTab, setActiveTab] = useState('employees');
+            
+            // Helper function to save task field to Supabase - DÉFINIE DANS AdminPanel
+            const saveTaskField = async (taskId, field, value, dbFieldName = null) => {
+                if (!useSupabase || !supabase) {
+                    console.warn('⚠️ Supabase non disponible pour sauvegarder', field);
+                    return false;
+                }
+                
+                try {
+                    const dbField = dbFieldName || (field === 'phaseId' ? 'phase_id' : 
+                                                     field === 'dayOffset' ? 'day_offset' : 
+                                                     field === 'assignedTo' ? 'assigned_to' : field);
+                    
+                    console.log(`💾 [AdminPanel] Sauvegarde ${field} (${dbField}) pour tâche ${taskId}:`, value);
+                    
+                    const { data, error } = await supabase
+                        .from('task_templates')
+                        .update({ [dbField]: value })
+                        .eq('id', taskId)
+                        .select();
+                    
+                    if (error) {
+                        console.error(`❌ Erreur sauvegarde ${field}:`, error);
+                        showNotification(`Erreur sauvegarde ${field}: ${error.message || error.details}`, 'error');
+                        return false;
+                    }
+                    
+                    if (data && data.length > 0) {
+                        console.log(`✅ [AdminPanel] ${field} sauvegardé avec succès pour tâche ${taskId}`);
+                        return true;
+                    } else {
+                        console.warn(`⚠️ Aucune donnée retournée pour tâche ${taskId}`);
+                        return false;
+                    }
+                } catch (e) {
+                    console.error(`❌ Exception lors de la sauvegarde ${field}:`, e);
+                    showNotification(`Erreur sauvegarde ${field}: ${e.message || e.details}`, 'error');
+                    return false;
+                }
+            };
             const [newEmpName, setNewEmpName] = useState('');
             const [newEmpRole, setNewEmpRole] = useState('');
             const [newEmpEmail, setNewEmpEmail] = useState('');
@@ -2559,7 +2598,6 @@
                             showNotification={showNotification}
                             uploadAvatar={uploadAvatar}
                             onClose={() => setShowAdmin(false)}
-                            saveTaskField={saveTaskField}
                         />
                     )}
 
