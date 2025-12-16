@@ -33547,7 +33547,7 @@ const loadConfig = () => {
   return DEFAULT_CONFIG;
 };
 const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector, config: config2 = DEFAULT_CONFIG }) => {
-  const [expandedMetrics, setExpandedMetrics] = useState({
+  const [expandedMetrics, setExpandedMetrics] = reactExports.useState({
     eps: false,
     cf: false,
     bv: false,
@@ -33650,7 +33650,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     const mid = Math.floor(sorted.length / 2);
     return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
   };
-  const calculateHistoricalRanges = useMemo(() => {
+  const calculateHistoricalRanges = reactExports.useMemo(() => {
     const validData = data.filter((d) => d.priceHigh > 0 && d.priceLow > 0).sort((a2, b) => a2.year - b.year);
     if (validData.length === 0) {
       return null;
@@ -33719,7 +33719,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
       divGrowth: calculateRange(divGrowthRates)
     };
   }, [data]);
-  const sectorRanges = useMemo(() => {
+  const sectorRanges = reactExports.useMemo(() => {
     const sectorKey = sector || (info == null ? void 0 : info.sector) || "";
     const normalizedSector = sectorKey.toLowerCase();
     if (normalizedSector.includes("tech") || normalizedSector.includes("technologie") || normalizedSector.includes("ti")) {
@@ -33745,7 +33745,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
       divGrowth: { min: 1, max: 8, avg: 4, median: 4 }
     };
   }, [sector, info == null ? void 0 : info.sector]);
-  const title5YearProjections = useMemo(() => {
+  const title5YearProjections = reactExports.useMemo(() => {
     if (!calculateHistoricalRanges) return null;
     return {
       pe: { min: assumptions.targetPE * 0.9, max: assumptions.targetPE * 1.1, avg: assumptions.targetPE, median: assumptions.targetPE },
@@ -33758,7 +33758,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
       divGrowth: { min: assumptions.growthRateDiv * 0.8, max: assumptions.growthRateDiv * 1.2, avg: assumptions.growthRateDiv, median: assumptions.growthRateDiv }
     };
   }, [calculateHistoricalRanges, assumptions]);
-  const sector5YearProjections = useMemo(() => {
+  const sector5YearProjections = reactExports.useMemo(() => {
     return {
       pe: { min: sectorRanges.pe.avg * 0.9, max: sectorRanges.pe.avg * 1.1, avg: sectorRanges.pe.avg, median: sectorRanges.pe.median },
       pcf: { min: sectorRanges.pcf.avg * 0.9, max: sectorRanges.pcf.avg * 1.1, avg: sectorRanges.pcf.avg, median: sectorRanges.pcf.median },
@@ -33904,8 +33904,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
                 type: "checkbox",
                 checked: !assumptions.excludeEPS,
                 onChange: () => handleToggleExclusion("excludeEPS"),
-                className: "w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0",
-                style: { accentColor: "#2563eb" },
+                className: "w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0 accent-blue-600",
                 title: assumptions.excludeEPS ? "Inclure BPA (EPS) dans le calcul\n\n✅ Cliquez pour inclure cette métrique dans le prix cible moyen.\n\nLa métrique sera:\n• Incluse dans le calcul du prix cible moyen\n• Affichée normalement (non grisée)\n• Les champs seront éditables" : "Exclure BPA (EPS) du calcul\n\n❌ Cliquez pour exclure cette métrique du prix cible moyen.\n\nLa métrique sera:\n• Exclue du calcul du prix cible moyen\n• Affichée en gris (opacité 50%)\n• Les champs seront désactivés\n\nUtile si:\n• Le prix cible est aberrant\n• Les données sont incomplètes\n• La métrique n'est pas pertinente pour ce type d'entreprise"
               }
             ),
@@ -33992,8 +33991,7 @@ ${assumptions.excludeEPS ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le
                 type: "checkbox",
                 checked: !assumptions.excludeCF,
                 onChange: () => handleToggleExclusion("excludeCF"),
-                className: "w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0",
-                style: { accentColor: "#2563eb" },
+                className: "w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0 accent-blue-600",
                 title: assumptions.excludeCF ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"
               }
             ),
@@ -34080,8 +34078,7 @@ ${assumptions.excludeCF ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
                 type: "checkbox",
                 checked: !assumptions.excludeBV,
                 onChange: () => handleToggleExclusion("excludeBV"),
-                className: "w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0",
-                style: { accentColor: "#2563eb" },
+                className: "w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0 accent-blue-600",
                 title: assumptions.excludeBV ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"
               }
             ),
@@ -34168,8 +34165,7 @@ ${assumptions.excludeBV ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
                 type: "checkbox",
                 checked: !assumptions.excludeDIV,
                 onChange: () => handleToggleExclusion("excludeDIV"),
-                className: "w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0",
-                style: { accentColor: "#2563eb" },
+                className: "w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0 accent-blue-600",
                 title: assumptions.excludeDIV ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"
               }
             ),
@@ -34766,6 +34762,7 @@ const DataSourcesInfo = () => {
   ] });
 };
 const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_CONFIG }) => {
+  var _a3, _b2, _c, _d, _e, _f, _g, _h, _i;
   const lastData = data[data.length - 1];
   const validHistory = data.filter((d) => d.priceHigh > 0 && d.priceLow > 0);
   const baseYearData = data.find((d) => d.year === assumptions.baseYear) || lastData;
@@ -34801,9 +34798,9 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
   const avgPCF = calculateAverage(
     validHistory.map((d) => (d.priceHigh / d.cashFlowPerShare + d.priceLow / d.cashFlowPerShare) / 2).filter((v) => isFinite(v) && v > 0)
   );
-  const opMargin = 15;
-  const netMargin = 10;
-  const debtToEquity = 0.5;
+  const opMargin = ((_c = (_b2 = (_a3 = info.financials) == null ? void 0 : _a3.incomeStatement) == null ? void 0 : _b2[0]) == null ? void 0 : _c.operatingIncomeRatio) != null ? info.financials.incomeStatement[0].operatingIncomeRatio * 100 : null;
+  const netMargin = ((_f = (_e = (_d = info.financials) == null ? void 0 : _d.incomeStatement) == null ? void 0 : _e[0]) == null ? void 0 : _f.netIncomeRatio) != null ? info.financials.incomeStatement[0].netIncomeRatio * 100 : null;
+  const debtToEquity = ((_i = (_h = (_g = info.financials) == null ? void 0 : _g.balanceSheet) == null ? void 0 : _h[0]) == null ? void 0 : _i.debtEquityRatio) != null ? info.financials.balanceSheet[0].debtEquityRatio : null;
   const payoutRatio = ((lastData == null ? void 0 : lastData.dividendPerShare) || 0) / ((lastData == null ? void 0 : lastData.earningsPerShare) || 1) * 100;
   const safeGrowthRateEPS = Math.max(config2.growth.min, Math.min(assumptions.growthRateEPS || 0, config2.growth.max));
   const safeTargetPE = Math.max(config2.ratios.pe.min, Math.min(assumptions.targetPE || 0, config2.ratios.pe.max));
@@ -34818,24 +34815,24 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
   const sellLimit = projectedPrice5Y * 0.95;
   const getJpegyColor = (value) => {
     if (value === null || value <= 0) {
-      return { color: "#6b7280", bgColor: "#f3f4f6", position: 0 };
+      return { textClass: "text-gray-500", bgClass: "bg-gray-100", position: 0 };
     }
     if (value <= 0.5) {
       const position = value / 0.5 * 11.1;
-      return { color: "#86efac", bgColor: "#dcfce7", position };
+      return { textClass: "text-green-300", bgClass: "bg-green-100", position };
     } else if (value <= 1.5) {
       const position = 11.1 + (value - 0.5) / 1 * 55.6;
-      return { color: "#16a34a", bgColor: "#bbf7d0", position };
+      return { textClass: "text-green-600", bgClass: "bg-green-200", position };
     } else if (value <= 1.75) {
       const position = 66.7 + (value - 1.5) / 0.25 * 5.6;
-      return { color: "#eab308", bgColor: "#fef9c3", position };
+      return { textClass: "text-yellow-500", bgClass: "bg-yellow-100", position };
     } else if (value <= 2) {
       const position = 72.3 + (value - 1.75) / 0.25 * 5.6;
-      return { color: "#f97316", bgColor: "#fed7aa", position };
+      return { textClass: "text-orange-500", bgClass: "bg-orange-200", position };
     } else {
       const maxValue = 4;
       const position = Math.min(77.9 + (value - 2) / (maxValue - 2) * 22.2, 100);
-      return { color: "#dc2626", bgColor: "#fecaca", position };
+      return { textClass: "text-red-600", bgClass: "bg-red-200", position };
     }
   };
   const jpegyColor = getJpegyColor(jpegy);
@@ -34847,17 +34844,17 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 rounded-lg border border-purple-200", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 mb-1", children: "JPEGY (P/E Actuel)" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-3xl font-bold mb-3 flex items-center gap-2", style: { color: jpegy !== null ? jpegyColor.color : "#6b7280" }, children: jpegy !== null ? jpegy.toFixed(2) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-3xl font-bold mb-3 flex items-center gap-2 ${jpegy !== null ? jpegyColor.textClass : "text-gray-500"}`, children: jpegy !== null ? jpegy.toFixed(2) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "N/A" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-lg", title: "JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%", children: "⚠️" })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative h-8 bg-gray-100 rounded-full overflow-hidden mb-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute inset-0 flex", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-green-200", style: { width: "11.1%" } }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-green-600", style: { width: "55.6%" } }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-400", style: { width: "5.6%" } }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-orange-500", style: { width: "5.6%" } }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-red-600", style: { width: "22.1%" } })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-green-200 w-[11.1%]" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-green-600 w-[55.6%]" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-400 w-[5.6%]" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-orange-500 w-[5.6%]" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-red-600 w-[22.1%]" })
             ] }),
             jpegy !== null && jpegy > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
               "div",
@@ -34906,17 +34903,17 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 rounded-lg border border-purple-200", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 mb-1", children: "JPEGY (Forward P/E)" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-3xl font-bold mb-3 flex items-center gap-2", style: { color: forwardJpegy !== null ? forwardJpegyColor.color : "#6b7280" }, children: forwardJpegy !== null ? forwardJpegy.toFixed(2) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-3xl font-bold mb-3 flex items-center gap-2 ${forwardJpegy !== null ? forwardJpegyColor.textClass : "text-gray-500"}`, children: forwardJpegy !== null ? forwardJpegy.toFixed(2) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "N/A" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-lg", title: "Forward JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%", children: "⚠️" })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative h-8 bg-gray-100 rounded-full overflow-hidden mb-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute inset-0 flex", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-green-200", style: { width: "11.1%" } }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-green-600", style: { width: "55.6%" } }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-400", style: { width: "5.6%" } }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-orange-500", style: { width: "5.6%" } }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-red-600", style: { width: "22.1%" } })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-green-200 w-[11.1%]" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-green-600 w-[55.6%]" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-400 w-[5.6%]" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-orange-500 w-[5.6%]" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-red-600 w-[22.1%]" })
             ] }),
             forwardJpegy !== null && forwardJpegy > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
               "div",
@@ -35087,29 +35084,23 @@ Un rendement supérieur au cible peut indiquer une opportunité.`, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-5 rounded-lg shadow border border-gray-200", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-gray-800 mb-3 cursor-help", title: "Marges de Rentabilité\\n\\nMesurent l'efficacité opérationnelle et la rentabilité de l'entreprise.\\n\\n• Marge Opérationnelle: Efficacité opérationnelle\\n• Marge Nette: Rentabilité globale\\n• Taux Distribution: Proportion des bénéfices distribués\\n\\nSource: FMP income-statement et key-metrics", children: "💰 Marges" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 text-sm", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Marge Opérationnelle: ${opMargin.toFixed(1)}%
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Marge Opérationnelle: ${opMargin !== null ? opMargin.toFixed(1) : "N/A"}%
 
 Formule: (Résultat Opérationnel / Chiffre d'Affaires) × 100
 
 Mesure l'efficacité opérationnelle de l'entreprise.
 Source: FMP income-statement`, children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Marge Opérationnelle" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-semibold", children: [
-              opMargin.toFixed(1),
-              "%"
-            ] })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: opMargin !== null ? `${opMargin.toFixed(1)}%` : "N/A" })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Marge Nette: ${netMargin.toFixed(1)}%
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Marge Nette: ${netMargin !== null ? netMargin.toFixed(1) : "N/A"}%
 
 Formule: (Bénéfice Net / Chiffre d'Affaires) × 100
 
 Mesure la rentabilité globale de l'entreprise.
 Source: FMP income-statement`, children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Marge Nette" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-semibold", children: [
-              netMargin.toFixed(1),
-              "%"
-            ] })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: netMargin !== null ? `${netMargin.toFixed(1)}%` : "N/A" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Taux de Distribution (Payout Ratio): ${payoutRatio.toFixed(1)}%
 
@@ -35128,7 +35119,7 @@ Source: FMP key-metrics`, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-5 rounded-lg shadow border border-gray-200", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-gray-800 mb-3 cursor-help", title: "Structure Financière\\n\\nMesure la santé financière et l'efficacité d'utilisation des ressources.\\n\\n• Ratio d'Endettement: Niveau de dette\\n• ROE: Rentabilité des capitaux propres\\n• ROA: Efficacité d'utilisation des actifs\\n\\nSource: FMP balance-sheet-statement et key-metrics", children: "🏦 Structure Financière" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 text-sm", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Ratio d'Endettement (Debt-to-Equity): ${debtToEquity.toFixed(2)}
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Ratio d'Endettement (Debt-to-Equity): ${debtToEquity !== null ? debtToEquity.toFixed(2) : "N/A"}
 
 Formule: Dette Totale / Capitaux Propres
 
@@ -35136,7 +35127,7 @@ Mesure le niveau d'endettement de l'entreprise.
 Un ratio élevé indique plus de risque financier.
 Source: FMP balance-sheet-statement`, children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Ratio d'Endettement" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: debtToEquity.toFixed(2) })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: debtToEquity !== null ? debtToEquity.toFixed(2) : "N/A" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: info.roe !== null && info.roe !== void 0 ? `ROE (Return on Equity): ${info.roe.toFixed(2)}%
 
@@ -51433,6 +51424,29 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
     ] });
   }
   const profile = library[activeId] || DEFAULT_PROFILE;
+  const handleUpdateProfile = (id, updates) => {
+    setLibrary((prev) => {
+      if (!prev[id]) return prev;
+      const updatedProfile = {
+        ...prev[id],
+        ...updates,
+        // Ne pas écraser lastModified si fourni dans updates, sinon update
+        lastModified: updates.lastModified || Date.now()
+      };
+      const updatedLibrary = {
+        ...prev,
+        [id]: updatedProfile
+      };
+      if (typeof requestIdleCallback !== "undefined") {
+        requestIdleCallback(() => {
+          storage.setItem(STORAGE_KEY, updatedLibrary).catch((e) => console.warn("Failed to save to Storage:", e));
+        });
+      } else {
+        storage.setItem(STORAGE_KEY, updatedLibrary).catch((e) => console.warn("Failed to save to Storage:", e));
+      }
+      return updatedLibrary;
+    });
+  };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex h-screen bg-gray-100 font-sans text-slate-800 overflow-hidden", children: [
     isSidebarOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(
       "div",
@@ -51565,7 +51579,8 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
             onSelect: setActiveId,
             onBulkSync: handleBulkSyncAllTickers,
             onSyncNA: handleSyncSpecificTickers,
-            isBulkSyncing
+            isBulkSyncing,
+            onUpdateProfile: handleUpdateProfile
           }
         ) }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-3 order-2 lg:order-1", children: [
@@ -51633,8 +51648,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 data,
                 info: profile.info,
                 sector: (_b2 = profile.info) == null ? void 0 : _b2.sector,
-                assumptions,
-                config: guardrailConfig
+                assumptions
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-8", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -51880,6 +51894,8 @@ root.render(
   /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) })
 );
 export {
+  AdditionalMetrics as A,
+  EvaluationDetails as E,
   ForwardRef as F,
   React as R,
   ForwardRef$x as a,

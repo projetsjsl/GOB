@@ -1,4 +1,4 @@
-import { r as reactExports, c as calculateRecommendation, j as jsxRuntimeExports, F as ForwardRef$6, a as ForwardRef$7, b as ForwardRef$8, d as ForwardRef$9, e as ForwardRef$a, f as ForwardRef$b, g as ForwardRef$c, h as ForwardRef$d, i as ForwardRef$e, R as React, k as ForwardRef$f, l as ForwardRef$g, m as ForwardRef$h, n as listSnapshots } from "./index.js";
+import { r as reactExports, c as calculateRecommendation, j as jsxRuntimeExports, F as ForwardRef$6, a as ForwardRef$7, b as ForwardRef$8, d as ForwardRef$9, e as ForwardRef$a, f as ForwardRef$b, g as ForwardRef$c, h as ForwardRef$d, i as ForwardRef$e, R as React, k as ForwardRef$f, l as ForwardRef$g, A as AdditionalMetrics, E as EvaluationDetails, m as ForwardRef$h, n as listSnapshots } from "./index.js";
 function ArrowsPointingOutIcon({
   title,
   titleId,
@@ -1372,7 +1372,8 @@ const StatusBadge = ({
     }
   );
 };
-const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isBulkSyncing = false }) => {
+const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isBulkSyncing = false, onUpdateProfile }) => {
+  var _a, _b, _c;
   const [sortConfig, setSortConfig] = reactExports.useState({ key: "totalReturnPercent", direction: "desc" });
   const [showSyncDialog, setShowSyncDialog] = reactExports.useState(false);
   const [showGuideDialog, setShowGuideDialog] = reactExports.useState(false);
@@ -1395,6 +1396,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
   const svgRatio31Ref = reactExports.useRef(null);
   const [sectionsVisibility, setSectionsVisibility] = reactExports.useState({
     globalStats: true,
+    detailedAnalysis: true,
     comparison: true,
     filters: true,
     performanceMatrix: true,
@@ -1741,7 +1743,8 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
         minJPEGY: 0,
         maxJPEGY: 10,
         sector: "",
-        recommendation: "all"
+        recommendation: "all",
+        source: "all"
       };
     }
     const returns = profileMetrics.map((m) => m.totalReturnPercent);
@@ -1803,7 +1806,10 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
     density: "comfortable"
   });
   reactExports.useEffect(() => {
-    setFilters(defaultFilterValues);
+    setFilters((prev) => ({
+      ...prev,
+      ...defaultFilterValues
+    }));
   }, [defaultFilterValues]);
   const filteredMetrics = reactExports.useMemo(() => {
     const filtered = profileMetrics.filter((metric) => {
@@ -2200,7 +2206,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
         ] })
       ] }),
       sectionsVisibility.comparison && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4", children: selectedForComparison.map((ticker) => {
-        var _a, _b;
+        var _a2, _b2;
         const metric = filteredMetrics.find((m) => m.profile.id === ticker);
         if (!metric) return null;
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
@@ -2249,14 +2255,14 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "P/E:" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-bold", children: [
-                ((_a = metric.currentPE) == null ? void 0 : _a.toFixed(1)) || "N/A",
+                ((_a2 = metric.currentPE) == null ? void 0 : _a2.toFixed(1)) || "N/A",
                 "x"
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Yield:" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-bold", children: [
-                ((_b = metric.currentYield) == null ? void 0 : _b.toFixed(2)) || "N/A",
+                ((_b2 = metric.currentYield) == null ? void 0 : _b2.toFixed(2)) || "N/A",
                 "%"
               ] })
             ] }),
@@ -2307,7 +2313,23 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "button",
             {
-              onClick: () => setFilters(defaultFilterValues),
+              onClick: () => setFilters({
+                ...defaultFilterValues,
+                minRatio31: 0,
+                maxRatio31: 100,
+                minPE: 0,
+                maxPE: 1e3,
+                minYield: 0,
+                maxYield: 50,
+                minVolatility: 0,
+                maxVolatility: 200,
+                minGrowth: -50,
+                maxGrowth: 100,
+                showOnlyNA: false,
+                showOnlyApproved: false,
+                showOnlySkeleton: false,
+                groupBy: "none"
+              }),
               className: "px-2 sm:px-3 py-1 text-[10px] sm:text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors",
               title: "Réinitialiser tous les filtres\\n\\nRéinitialise tous les filtres actifs:\\n• Rendement\\n• JPEGY\\n• Ratio 3:1\\n• Recommandation\\n• Secteur\\n• Source\\n\\nAffiche tous les titres du portefeuille.",
               children: "🔄 Réinitialiser"
@@ -2910,7 +2932,7 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
                 className: `px-3 py-1 text-xs rounded transition-colors ${filters.showOnlyNA ? "bg-orange-600 hover:bg-orange-700 text-white" : "bg-gray-100 hover:bg-orange-100 hover:text-orange-600 text-gray-700"}`,
                 title: filters.showOnlyNA ? "Afficher tous les tickers\n\nDésactive le filtre N/A pour voir tous les tickers.\n\nRaccourci: Ctrl+Shift+F" : "Afficher uniquement les N/A\n\nFiltre pour ne voir que les tickers avec des données invalides (N/A).\n\nUtile pour identifier rapidement les tickers nécessitant une synchronisation.\n\nRaccourci: Ctrl+Shift+F",
                 "aria-label": filters.showOnlyNA ? "Afficher tous les tickers" : "Afficher uniquement les tickers avec N/A",
-                "aria-pressed": Boolean(filters.showOnlyNA).toString(),
+                "aria-pressed": filters.showOnlyNA ? "true" : "false",
                 tabIndex: 0,
                 children: filters.showOnlyNA ? "Afficher Tous" : "Afficher N/A"
               }
@@ -2946,7 +2968,7 @@ Plus rapide que de synchroniser tous les tickers.`,
               "button",
               {
                 onClick: async () => {
-                  var _a;
+                  var _a2;
                   setIsAnalyzingNA(true);
                   setNaAnalysisResult(null);
                   try {
@@ -2958,7 +2980,7 @@ Plus rapide que de synchroniser tous les tickers.`,
                     if (result.success) {
                       setNaAnalysisResult({
                         total: result.totalTickers || 0,
-                        na: ((_a = result.naTickers) == null ? void 0 : _a.length) || 0,
+                        na: ((_a2 = result.naTickers) == null ? void 0 : _a2.length) || 0,
                         valid: result.validTickers || 0,
                         errors: result.errorTickers || 0,
                         naTickers: result.naTickers || []
@@ -3013,8 +3035,8 @@ Tous les ${result.validTickers} tickers ont des données valides.`);
                   const top10 = sorted.slice(0, 10);
                   requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
-                      var _a;
-                      const firstEl = document.querySelector(`[data-ticker="${(_a = top10[0]) == null ? void 0 : _a.profile.id}"]`);
+                      var _a2;
+                      const firstEl = document.querySelector(`[data-ticker="${(_a2 = top10[0]) == null ? void 0 : _a2.profile.id}"]`);
                       firstEl == null ? void 0 : firstEl.scrollIntoView({ behavior: "smooth", block: "center" });
                     });
                   });
@@ -3177,6 +3199,61 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           },
           metric.profile.id
         )) })
+      ] }) })
+    ] }),
+    currentId && profiles.find((p) => p.id === currentId) && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-blue-200 mb-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800 flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$2, { className: "w-6 h-6 text-blue-600" }),
+          "Analyse Détaillée : ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-blue-600", children: currentId }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-normal text-gray-500 ml-2", children: [
+            "(",
+            ((_b = (_a = profiles.find((p) => p.id === currentId)) == null ? void 0 : _a.info) == null ? void 0 : _b.name) || "Inconnu",
+            ")"
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => toggleSection("detailedAnalysis"),
+            className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
+            title: sectionsVisibility.detailedAnalysis ? "Réduire cette section" : "Agrandir cette section",
+            children: sectionsVisibility.detailedAnalysis ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-5 h-5 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-5 h-5 text-gray-600" })
+          }
+        )
+      ] }),
+      sectionsVisibility.detailedAnalysis && profiles.find((p) => p.id === currentId) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: ((_c = profiles.find((p) => p.id === currentId)) == null ? void 0 : _c.data) && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          AdditionalMetrics,
+          {
+            data: profiles.find((p) => p.id === currentId).data,
+            assumptions: profiles.find((p) => p.id === currentId).assumptions,
+            info: profiles.find((p) => p.id === currentId).info
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-t border-gray-200 pt-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          EvaluationDetails,
+          {
+            data: profiles.find((p) => p.id === currentId).data,
+            assumptions: profiles.find((p) => p.id === currentId).assumptions,
+            info: profiles.find((p) => p.id === currentId).info,
+            sector: profiles.find((p) => p.id === currentId).info.sector,
+            onUpdateAssumption: (key, value) => {
+              const profile = profiles.find((p) => p.id === currentId);
+              if (profile && onUpdateProfile) {
+                const updatedProfile = {
+                  ...profile,
+                  assumptions: {
+                    ...profile.assumptions,
+                    [key]: value
+                  }
+                };
+                onUpdateProfile(profile.id, updatedProfile);
+              }
+            }
+          }
+        ) })
       ] }) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200", children: [
@@ -4258,7 +4335,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           )
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { className: "divide-y divide-gray-100", children: filteredMetrics.map((metric) => {
-          var _a, _b, _c, _d, _e, _f, _g;
+          var _a2, _b2, _c2, _d, _e, _f, _g;
           return /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "tr",
             {
@@ -4295,11 +4372,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Formule:" }),
                         " JPEGY = ",
-                        ((_a = metric.currentPE) == null ? void 0 : _a.toFixed(2)) || "P/E",
+                        ((_a2 = metric.currentPE) == null ? void 0 : _a2.toFixed(2)) || "P/E",
                         " ÷ (",
-                        ((_b = metric.historicalGrowth) == null ? void 0 : _b.toFixed(1)) || "Growth",
+                        ((_b2 = metric.historicalGrowth) == null ? void 0 : _b2.toFixed(1)) || "Growth",
                         "% + ",
-                        ((_c = metric.currentYield) == null ? void 0 : _c.toFixed(2)) || "Yield",
+                        ((_c2 = metric.currentYield) == null ? void 0 : _c2.toFixed(2)) || "Yield",
                         "%)"
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [

@@ -1,3 +1,4 @@
+import React, { useState, useMemo } from 'react';
 import { formatCurrency, projectFutureValue, calculateCAGR } from '../utils/calculations';
 import { CalculatorIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { GuardrailConfig, DEFAULT_CONFIG } from '../config/AppConfig';
@@ -476,8 +477,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                     type="checkbox"
                     checked={!assumptions.excludeEPS}
                     onChange={() => handleToggleExclusion('excludeEPS')}
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0"
-                    style={{ accentColor: '#2563eb' }}
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0 accent-blue-600"
                     title={assumptions.excludeEPS 
                       ? "Inclure BPA (EPS) dans le calcul\n\n✅ Cliquez pour inclure cette métrique dans le prix cible moyen.\n\nLa métrique sera:\n• Incluse dans le calcul du prix cible moyen\n• Affichée normalement (non grisée)\n• Les champs seront éditables"
                       : "Exclure BPA (EPS) du calcul\n\n❌ Cliquez pour exclure cette métrique du prix cible moyen.\n\nLa métrique sera:\n• Exclue du calcul du prix cible moyen\n• Affichée en gris (opacité 50%)\n• Les champs seront désactivés\n\nUtile si:\n• Le prix cible est aberrant\n• Les données sont incomplètes\n• La métrique n'est pas pertinente pour ce type d'entreprise"}
@@ -538,8 +538,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                     type="checkbox"
                     checked={!assumptions.excludeCF}
                     onChange={() => handleToggleExclusion('excludeCF')}
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0"
-                    style={{ accentColor: '#2563eb' }}
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0 accent-blue-600"
                     title={assumptions.excludeCF ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"}
                   />
                   <span className="select-none">CFA (Cash Flow)</span>
@@ -596,8 +595,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                     type="checkbox"
                     checked={!assumptions.excludeBV}
                     onChange={() => handleToggleExclusion('excludeBV')}
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0"
-                    style={{ accentColor: '#2563eb' }}
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0 accent-blue-600"
                     title={assumptions.excludeBV ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"}
                   />
                   <span className="select-none">BV (Book Value)</span>
@@ -654,8 +652,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                     type="checkbox"
                     checked={!assumptions.excludeDIV}
                     onChange={() => handleToggleExclusion('excludeDIV')}
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0"
-                    style={{ accentColor: '#2563eb' }}
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0 accent-blue-600"
                     title={assumptions.excludeDIV ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"}
                   />
                   <span className="select-none">DIV (Dividende)</span>
