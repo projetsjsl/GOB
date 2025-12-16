@@ -1692,10 +1692,11 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                 <!-- Save button -->
                                 <div class="flex items-center justify-between mt-4 pt-4 border-t border-indigo-200">
                                     <div id="emmaModeStatus" class="text-sm text-gray-500">
-                                        Mode actuel: <strong id="emmaModeCurrentValue" class="text-indigo-600">Automatique</strong>
+                                        Mode global: <strong id="emmaModeCurrentValue" class="text-indigo-600">Chargement...</strong>
+                                        <span class="text-xs text-gray-400 ml-2">(partagé avec tous les utilisateurs)</span>
                                     </div>
                                     <button onclick="saveEmmaMode()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
-                                        💾 Sauvegarder le mode
+                                        🌐 Sauvegarder pour tous
                                     </button>
                                 </div>
                             </section>
@@ -1966,42 +1967,98 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
 
 
     <!-- ═══════════════════════════════════════════════════════════ -->
-    <!-- EMMA MODE CONFIGURATION SCRIPT                              -->
+    <!-- EMMA MODE CONFIGURATION SCRIPT (GLOBAL VIA SUPABASE)        -->
     <!-- ═══════════════════════════════════════════════════════════ -->
     <script>
-        // Emma processing mode configuration
-        const EMMA_MODE_KEY = 'emma_processing_mode';
+        // Emma processing mode configuration - GLOBAL for all users
+        const EMMA_MODE_CONFIG_KEY = 'emma_processing_mode';
         
-        // Load saved mode on page load
-        function loadEmmaMode() {
-            const savedMode = localStorage.getItem(EMMA_MODE_KEY) || 'auto';
-            const radioBtn = document.querySelector(`input[name="emmaProcessingMode"][value="${savedMode}"]`);
-            if (radioBtn) {
-                radioBtn.checked = true;
+        // Supabase client for global config
+        let emmaConfigSupabase = null;
+        
+        // Initialize Supabase for config
+        async function initConfigSupabase() {
+            if (emmaConfigSupabase) return emmaConfigSupabase;
+            if (typeof supabase !== 'undefined' && window.ENV_CONFIG?.SUPABASE_ANON_KEY) {
+                emmaConfigSupabase = supabase.createClient(
+                    window.ENV_CONFIG.SUPABASE_URL || 'https://boyuxgdplbpkknplxbxp.supabase.co',
+                    window.ENV_CONFIG.SUPABASE_ANON_KEY
+                );
             }
-            updateModeLabel(savedMode);
-            return savedMode;
+            return emmaConfigSupabase;
         }
         
-        // Save mode to localStorage
-        function saveEmmaMode() {
-            const selectedMode = document.querySelector('input[name="emmaProcessingMode"]:checked')?.value || 'auto';
-            localStorage.setItem(EMMA_MODE_KEY, selectedMode);
-            updateModeLabel(selectedMode);
-            
-            // Show success notification
-            const statusEl = document.getElementById('emmaModeStatus');
-            if (statusEl) {
-                statusEl.innerHTML = `<span class="text-green-600 font-medium">✅ Mode "${getModeLabel(selectedMode)}" sauvegardé!</span>`;
-                setTimeout(() => {
-                    statusEl.innerHTML = `Mode actuel: <strong class="text-indigo-600">${getModeLabel(selectedMode)}</strong>`;
-                }, 2000);
+        // Load saved mode from Supabase (GLOBAL for all users)
+        async function loadEmmaMode() {
+            try {
+                const client = await initConfigSupabase();
+                if (client) {
+                    const { data, error } = await client
+                        .from('emma_config')
+                        .select('value')
+                        .eq('key', EMMA_MODE_CONFIG_KEY)
+                        .single();
+                    
+                    if (!error && data?.value) {
+                        const savedMode = data.value;
+                        const radioBtn = document.querySelector(`input[name="emmaProcessingMode"][value="${savedMode}"]`);
+                        if (radioBtn) {
+                            radioBtn.checked = true;
+                        }
+                        updateModeLabel(savedMode);
+                        console.log('🌐 Emma mode loaded from Supabase (GLOBAL):', savedMode);
+                        return savedMode;
+                    }
+                }
+            } catch (err) {
+                console.warn('Could not load mode from Supabase, using default:', err);
             }
             
-            // If EmmaClient exists, update its mode
-            if (window.emmaRHClient) {
-                window.emmaRHClient.config.mode = selectedMode;
-                console.log('✅ Emma mode updated to:', selectedMode);
+            // Default to auto
+            updateModeLabel('auto');
+            return 'auto';
+        }
+        
+        // Save mode to Supabase (GLOBAL for all users)
+        async function saveEmmaMode() {
+            const selectedMode = document.querySelector('input[name="emmaProcessingMode"]:checked')?.value || 'auto';
+            const statusEl = document.getElementById('emmaModeStatus');
+            
+            try {
+                const client = await initConfigSupabase();
+                if (client) {
+                    // Upsert the mode config
+                    const { error } = await client
+                        .from('emma_config')
+                        .upsert({
+                            key: EMMA_MODE_CONFIG_KEY,
+                            section: 'global',
+                            value: selectedMode,
+                            description: 'Emma processing mode (external/local/auto)',
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'key' });
+                    
+                    if (error) throw error;
+                    
+                    updateModeLabel(selectedMode);
+                    
+                    // Show success notification
+                    if (statusEl) {
+                        statusEl.innerHTML = `<span class="text-green-600 font-medium">✅ Mode "${getModeLabel(selectedMode)}" sauvegardé pour TOUS les utilisateurs!</span>`;
+                        setTimeout(() => {
+                            statusEl.innerHTML = `Mode global: <strong class="text-indigo-600">${getModeLabel(selectedMode)}</strong>`;
+                        }, 3000);
+                    }
+                    
+                    console.log('🌐 Emma mode saved to Supabase (GLOBAL):', selectedMode);
+                } else {
+                    throw new Error('Supabase not initialized');
+                }
+            } catch (err) {
+                console.error('Failed to save mode to Supabase:', err);
+                if (statusEl) {
+                    statusEl.innerHTML = `<span class="text-red-600 font-medium">❌ Erreur: ${err.message}</span>`;
+                }
             }
         }
         
@@ -2025,8 +2082,8 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
         
         // Initialize on DOM ready
         document.addEventListener('DOMContentLoaded', function() {
-            // Delay slightly to ensure DOM is ready
-            setTimeout(loadEmmaMode, 100);
+            // Delay slightly to ensure Supabase is available
+            setTimeout(loadEmmaMode, 500);
         });
         
         // Make saveEmmaMode globally available

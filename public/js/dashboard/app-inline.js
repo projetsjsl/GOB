@@ -3289,6 +3289,21 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
         }, []); // Dépendance vide = une seule fois au montage
 
+        // 🔄 Real-time Sync Integration
+        // Listens for 'tickersUpdated' event from realtime-sync.js
+        useEffect(() => {
+            const handleRealtimeUpdate = (e) => {
+                console.log('⚡ Dashboard received realtime ticker update', e.detail);
+                // Reload tickers to ensure UI is in sync
+                loadTickersFromSupabase().catch(err => 
+                    console.error('Failed to reload tickers after realtime update:', err)
+                );
+            };
+
+            window.addEventListener('tickersUpdated', handleRealtimeUpdate);
+            return () => window.removeEventListener('tickersUpdated', handleRealtimeUpdate);
+        }, []); // Using empty deps - loadTickersFromSupabase from initial render is safe here
+
         // Charger les news par ticker quand les tickers changent ET que les news générales sont disponibles
         useEffect(() => {
             if (tickers.length > 0 && Object.keys(stockData).length > 0 && newsData.length > 0) {

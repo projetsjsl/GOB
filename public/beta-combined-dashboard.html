@@ -151,6 +151,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Source+Sans+Pro:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Avenir+Next:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Roboto:wght@400;500;700;900&family=Georgia:wght@400;700&display=swap" rel="stylesheet">
 
+    <!-- Environment Configuration from env-config.js -->
+    <script src="/js/env-config.js"></script>
+
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
     <!-- Roles & Permissions System -->
@@ -947,6 +950,9 @@
 
     <!-- Inline (legacy) bundle to preserve existing design -->
     <script type="text/babel" data-presets="react" src="/js/dashboard/app-inline.js"></script>
+
+    <!-- Global Real-time Sync (must load after app-inline to dispatch events) -->
+    <script src="/js/dashboard/realtime-sync.js"></script>
 </body>
 
 </html>

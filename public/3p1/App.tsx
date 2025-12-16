@@ -29,6 +29,7 @@ import { RestoreDataDialog } from './components/RestoreDataDialog';
 import { loadAllTickersFromSupabase, mapSourceToIsWatchlist } from './services/tickersApi';
 import { loadProfilesBatchFromSupabase, loadProfileFromSupabase } from './services/supabaseDataLoader';
 import { storage } from './utils/storage';
+import { useRealtimeSync } from './hooks/useRealtimeSync';
 
 // Lazy load heavy components for better initial load performance
 const KPIDashboard = React.lazy(() => import('./components/KPIDashboard').then(m => ({ default: m.KPIDashboard })));
@@ -130,6 +131,55 @@ export default function App() {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
+
+    // --- SUPABASE REALTIME SUBSCRIPTIONS ---
+    // Live sync: when any user adds/updates/deletes tickers, all clients see it instantly
+    useRealtimeSync('tickers', (payload) => {
+        console.log('📡 [3p1] Realtime ticker change:', payload.eventType, payload.new?.ticker || payload.old?.ticker);
+        
+        if (payload.eventType === 'INSERT' && payload.new) {
+            const symbol = payload.new.ticker?.toUpperCase();
+            if (symbol && !library[symbol]) {
+                showNotification(`📡 Nouveau ticker ajouté: ${symbol}`, 'info');
+                // Trigger reload of tickers
+                hasLoadedTickersRef.current = false;
+                setIsInitialized(prev => prev); // Force re-render
+            }
+        } else if (payload.eventType === 'DELETE' && payload.old) {
+            const symbol = payload.old.ticker?.toUpperCase();
+            if (symbol) {
+                showNotification(`📡 Ticker supprimé: ${symbol}`, 'warning');
+                setLibrary(prev => {
+                    const updated = { ...prev };
+                    delete updated[symbol];
+                    storage.setItem(STORAGE_KEY, updated).catch(console.warn);
+                    return updated;
+                });
+            }
+        } else if (payload.eventType === 'UPDATE' && payload.new) {
+            const symbol = payload.new.ticker?.toUpperCase();
+            if (symbol && library[symbol]) {
+                // Update ValueLine metrics from Supabase
+                setLibrary(prev => {
+                    if (!prev[symbol]) return prev;
+                    return {
+                        ...prev,
+                        [symbol]: {
+                            ...prev[symbol],
+                            info: {
+                                ...prev[symbol].info,
+                                securityRank: payload.new.security_rank || prev[symbol].info.securityRank,
+                                earningsPredictability: payload.new.earnings_predictability,
+                                priceGrowthPersistence: payload.new.price_growth_persistence,
+                                priceStability: payload.new.price_stability,
+                                beta: payload.new.beta
+                            }
+                        }
+                    };
+                });
+            }
+        }
+    });
 
     // --- USER ROLE MANAGEMENT ---
     const [isAdmin, setIsAdmin] = useState(false);
