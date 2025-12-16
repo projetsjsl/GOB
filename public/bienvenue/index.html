@@ -653,8 +653,14 @@
             const updateEmp = async (id, field, value) => {
                 setEmployees(prev => prev.map(e => e.id === id ? { ...e, [field]: value } : e));
                 if (useSupabase && supabase) {
-                    const col = field === 'startDate' ? 'start_date' : field === 'avatarUrl' ? 'avatar_url' : field;
-                    await supabase.from('employees').update({ [col]: value }).eq('id', id);
+                    try {
+                        const col = field === 'startDate' ? 'start_date' : field === 'avatarUrl' ? 'avatar_url' : field;
+                        const { error } = await supabase.from('employees').update({ [col]: value }).eq('id', id);
+                        if (error) throw error;
+                    } catch (e) {
+                        console.error('Update Employee Error:', e);
+                        showNotification('Erreur sauvegarde employé', 'error');
+                    }
                 }
             };
 
@@ -895,7 +901,7 @@
                                                 <div className="flex items-center gap-1">
                                                      <input type="date" className="w-32 text-xs border rounded px-1 py-1" value={emp.startDate} onChange={e => updateEmp(emp.id, 'startDate', e.target.value)} />
                                                      <button onClick={() => duplicateEmp(emp)} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded" title="Dupliquer"><Icons.Copy /></button>
-                                                     <button onClick={(e) => { e.stopPropagation(); if(confirm('Supprimer ?')) { setEmployees(employees.filter(empI => empI.id !== emp.id)); if(useSupabase && supabase) supabase.from('employees').delete().eq('id', emp.id); } }} className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors"><Icons.Trash /></button>
+                                                     <button onClick={(e) => { e.stopPropagation(); handleDeleteEmployee(emp.id); }} className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors" title="Supprimer l'employé"><Icons.Trash /></button>
                                                 </div>
                                             </div>
                                         ))}
@@ -1438,6 +1444,7 @@
                 // DB Update
                 if (useSupabase && supabase && originalTaskId) {
                     try {
+                        console.log(`Saving task status: Emp=${selectedEmployee.id}, Task=${originalTaskId}, Status=${newStatus}`);
                         const { error } = await supabase
                             .from('employee_tasks')
                             .upsert({ 
@@ -1447,7 +1454,10 @@
                                 updated_at: new Date()
                             }, { onConflict: 'employee_id, task_template_id' });
                             
-                        if (error) throw error;
+                        if (error) {
+                            console.error('Supabase Upsert Error:', error);
+                            throw error;
+                        }
                         
                         // Update local map
                         setEmployeeTasks(prev => ({
@@ -1459,7 +1469,32 @@
                         }));
                     } catch (e) {
                         handleSupabaseError(e, 'Status Update');
-                        // Revert optimistic update? (Simplified: warn user)
+                        alert(`Erreur de sauvegarde : ${e.message || e.details}`);
+                    }
+                }
+            };
+
+            const handleDeleteEmployee = async (empId, hasTasks) => {
+                if (!confirm('Voulez-vous vraiment supprimer cet employé ? Cette action est irréversible.')) return;
+                
+                setEmployees(prev => prev.filter(e => e.id !== empId));
+
+                if (useSupabase && supabase) {
+                    try {
+                        // First delete related tasks to avoid FK constraint errors if cascade is missing
+                        const { error: taskError } = await supabase.from('employee_tasks').delete().eq('employee_id', empId);
+                        if (taskError) console.warn('Error clearing employee tasks:', taskError);
+
+                        const { error } = await supabase.from('employees').delete().eq('id', empId);
+                        if (error) throw error;
+                        
+                        showNotification('Employé supprimé', 'success');
+                    } catch (error) {
+                        console.error('Delete Employee Error:', error);
+                        handleSupabaseError(error, 'Delete Employee');
+                        // Revert optimistic update (simplified)
+                        alert("Erreur lors de la suppression (voir console). Il est possible que des données liées empêchent la suppression.");
+                        window.location.reload(); 
                     }
                 }
             };
