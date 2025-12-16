@@ -42,6 +42,7 @@
 
 // ✅ Import du retry handler pour gestion rate limiting Gemini
 import { geminiFetchWithRetry } from '../../lib/utils/gemini-retry.js';
+import { getAllModels } from '../../lib/llm-registry.js';
 
 export default async function handler(req, res) {
   // CORS basique
@@ -168,11 +169,19 @@ CONTRAINTES:
     // ========================================
     // VERSION SANS SDK (SANS FUNCTION CALLING) - ACTUELLE // OK
     // ========================================
-    console.log('🔧 Appel API Gemini REST directe (sans SDK)');
-    console.log('📦 Modèle: gemini-1.5-flash-latest');
+
+    // Fetch models from registry
+    const allModels = await getAllModels();
+    const googleModels = allModels.filter(m => m.provider === 'google' && m.enabled !== false);
+    
+    // Default to gemini-1.5-flash if no active model found
+    const selectedModel = googleModels.length > 0 ? googleModels[0] : { model_id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash Fallback' };
+
+    console.log(`🔧 Appel API Gemini REST directe (sans SDK)`);
+    console.log(`📦 Modèle sélectionné: ${selectedModel.model_id} (${selectedModel.name})`);
     console.log('📤 Envoi de la requête...');
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel.model_id}:generateContent?key=${GEMINI_API_KEY}`;
 
     // ✅ Utiliser geminiFetchWithRetry pour gestion automatique du rate limiting (429)
     const response = await geminiFetchWithRetry(apiUrl, {

@@ -13,6 +13,7 @@ import { loadDashboard, filterDashboard, editPromptFromDashboard, filterByRelate
 import { initChatAssistant } from './chat-assistant.js';
 import { initBuilder } from './builder.js';
 import { emailManager } from './email-manager.js';
+import { initModelsManager } from './models-manager.js';
 
 /**
  * Fonction d'initialisation principale
@@ -168,4 +169,7 @@ export async function init() {
 
     // Initialiser le gestionnaire Email
     emailManager.init();
+
+    // Initialiser le gestionnaire de modèles
+    initModelsManager();
 }

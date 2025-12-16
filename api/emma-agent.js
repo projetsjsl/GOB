@@ -16,6 +16,7 @@ import { TickerExtractor } from '../lib/utils/ticker-extractor.js';
 import { PERPLEXITY_SYSTEM_PROMPT } from '../config/perplexity-prompt.js';
 import { INTENT_PROMPTS } from '../config/intent-prompts.js';
 import { configManager } from '../lib/config-manager.js'; // NEW: Config Manager
+import { getAllModels } from '../lib/llm-registry.js';
 import { geminiFetchWithRetry } from '../lib/utils/gemini-retry.js';
 import { ContextMemory } from '../lib/context-memory.js';
 import { ResponseValidator } from '../lib/response-validator.js';
@@ -503,14 +504,26 @@ class SmartAgent {
      * - Gemini (15%): Questions conceptuelles/éducatives (gratuit)
      * - Claude (5%): Rédaction premium (briefings, lettres clients)
      */
-    _selectModel(intentData, outputMode, toolsData, userMessage = '') {
+    async _selectModel(intentData, outputMode, toolsData, userMessage = '') {
         console.log('🎯 SmartRouter: Selecting optimal model...');
+
+        // Fetch models from registry
+        const allModels = await getAllModels();
+        const perplexityModels = allModels.filter(m => m.provider === 'perplexity' && m.enabled !== false);
+        const geminiModels = allModels.filter(m => m.provider === 'google' && m.enabled !== false);
+        
+        // Helper to get best model (first available or dummy)
+        const getModel = (list, fallbackId) => list.length > 0 ? list[0] : { model_id: fallbackId, max_tokens: 4000 };
+
+        const perplexityConfig = getModel(perplexityModels, 'sonar-reasoning');
+        const geminiConfig = getModel(geminiModels, 'gemini-1.5-flash');
 
         // BRIEFING MODE: Perplexity Sonar pour données en temps réel
         if (outputMode === 'briefing') {
             console.log('📝 Briefing detected → Using PERPLEXITY SONAR (real-time data + sources)');
             return {
                 model: 'perplexity',
+                modelConfig: perplexityConfig,
                 reason: 'Briefing requires real-time market data with sources',
                 recency: 'day' // Données les plus récentes pour briefings financiers
             };
@@ -521,6 +534,7 @@ class SmartAgent {
             console.log('📋 Ticker note detected → Using PERPLEXITY (professional note with sources)');
             return {
                 model: 'perplexity',
+                modelConfig: perplexityConfig,
                 reason: 'Professional ticker note requires real-time data and sources',
                 recency: 'day' // Données les plus récentes pour notes professionnelles
             };
@@ -531,6 +545,7 @@ class SmartAgent {
             console.log('📊 Data extraction → Using PERPLEXITY (structured data)');
             return {
                 model: 'perplexity',
+                modelConfig: perplexityConfig,
                 reason: 'Data extraction requires factual accuracy',
                 recency: intentData?.recency_filter || 'month'
             };
@@ -585,6 +600,7 @@ class SmartAgent {
             const validRecency = (recencyValue && recencyValue !== 'none') ? recencyValue : 'day';
             return {
                 model: 'perplexity',
+                modelConfig: perplexityConfig,
                 reason: `Factual data required for ${intent}${isTodayRequest ? ' (today requested)' : ''}`,
                 recency: validRecency
             };
@@ -600,6 +616,7 @@ class SmartAgent {
             console.log(`💭 Conceptual query (${intent}) → Using GEMINI (free, educational)`);
             return {
                 model: 'gemini',
+                modelConfig: geminiConfig,
                 reason: `Educational/conceptual question about ${intent}`,
                 recency: null // Pas de recency pour conceptuel
             };
@@ -609,6 +626,7 @@ class SmartAgent {
         console.log('🔄 Default fallback → Using PERPLEXITY');
         return {
             model: 'perplexity',
+            modelConfig: perplexityConfig,
             reason: 'Default fallback for reliability',
             recency: 'month'
         };
@@ -1762,7 +1780,7 @@ class SmartAgent {
             console.log(`💬 Conversation context: ${conversationContext.length} messages`);
 
             // 🎯 SMART ROUTER: Sélectionner le meilleur modèle
-            const modelSelection = this._selectModel(intentData, outputMode, toolsData, userMessage);
+            const modelSelection = await this._selectModel(intentData, outputMode, toolsData, userMessage);
             console.log(`🤖 Selected model: ${modelSelection.model} (${modelSelection.reason})`);
 
             // Construire le prompt approprié
@@ -1781,13 +1799,35 @@ class SmartAgent {
             // Router vers le bon modèle
             if (modelSelection.model === 'claude') {
                 // CLAUDE: Briefings premium
-                response = await this._call_claude(prompt, outputMode, userMessage, intentData, toolResults, context);
+                response = await this._call_claude(
+                    prompt, 
+                    outputMode, 
+                    userMessage, 
+                    intentData, 
+                    toolResults, 
+                    context, 
+                    modelSelection.modelConfig
+                );
             } else if (modelSelection.model === 'gemini') {
                 // GEMINI: Questions conceptuelles (gratuit)
-                response = await this._call_gemini(prompt, outputMode, context);
+                response = await this._call_gemini(
+                    prompt, 
+                    outputMode, 
+                    context, 
+                    modelSelection.modelConfig
+                );
             } else {
                 // PERPLEXITY: Données factuelles avec sources (default)
-                const perplexityResult = await this._call_perplexity(prompt, outputMode, modelSelection.recency, userMessage, intentData, toolResults, context);
+                const perplexityResult = await this._call_perplexity(
+                    prompt, 
+                    outputMode, 
+                    modelSelection.recency, 
+                    userMessage, 
+                    intentData, 
+                    toolResults, 
+                    context, 
+                    modelSelection.modelConfig
+                );
 
                 // Extraire contenu et citations
                 if (typeof perplexityResult === 'object' && perplexityResult.content) {
@@ -3118,7 +3158,7 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
         return citations;
     }
 
-    async _call_perplexity(prompt, outputMode = 'chat', recency = 'month', userMessage = '', intentData = null, toolResults = [], context = {}) {
+    async _call_perplexity(prompt, outputMode = 'chat', recency = 'month', userMessage = '', intentData = null, toolResults = [], context = {}, modelConfig = null) {
         // ✅ Variables pour gestion de timeout (déclarées avant try pour être accessibles dans catch)
         let timeout = null;
         let timeoutDuration = 60000;  // Valeur par défaut
@@ -3126,7 +3166,7 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
         try {
             // 🚀🚀🚀 RÉPONSES ULTRA-LONGUES PAR DÉFAUT (MAXIMUM DÉTAIL)
             // RÈGLE: Plus c'est long, mieux c'est!
-            let maxTokens = 4000;  // 🎯 DEFAULT ULTRA-AUGMENTÉ: 4000 tokens (~3000 mots = ULTRA-DÉTAILLÉ)
+            let maxTokens = modelConfig?.max_tokens || 4000;  // 🎯 DEFAULT ULTRA-AUGMENTÉ: 4000 tokens (~3000 mots = ULTRA-DÉTAILLÉ)
             let complexityInfo = null;
 
             // 📱 SMS: Contenu complet mais optimisé pour éviter timeouts
@@ -3384,7 +3424,7 @@ Sois exhaustif et cite tes sources.`;
                 // Utiliser ce prompt spécialisé au lieu du prompt normal
                 // Prompt minimal pour laisser Perplexity faire son travail naturellement
                 const searchRequestBody = {
-                    model: 'sonar-pro',
+                    model: modelConfig?.model_id || 'sonar-pro',
                     messages: [
                         {
                             role: 'system',
@@ -3453,7 +3493,7 @@ Sois exhaustif et cite tes sources.`;
             const defaultPerplexityPrompt = await configManager.get('prompts', 'perplexity_system_prompt', PERPLEXITY_SYSTEM_PROMPT);
 
             const requestBody = {
-                model: 'sonar-pro',  // Modèle premium Perplexity (Jan 2025) - Meilleure qualité, plus de citations, recherche approfondie
+                model: modelConfig?.model_id || 'sonar-pro',  // Modèle premium Perplexity (Jan 2025) - Meilleure qualité, plus de citations, recherche approfondie
                 messages: [
                     {
                         role: 'system',
@@ -3770,14 +3810,14 @@ ACHETER < 340$ (marge 25%+)
      * Appel à Gemini (gratuit) pour questions conceptuelles
      * Utilise un système de fallback intelligent pour maximiser la disponibilité
      */
-    async _call_gemini(prompt, outputMode = 'chat', context = {}) {
+    async _call_gemini(prompt, outputMode = 'chat', context = {}, modelConfig = null) {
         try {
             if (!process.env.GEMINI_API_KEY) {
                 throw new Error('GEMINI_API_KEY not configured');
             }
 
             // 🚀🚀🚀 RÉPONSES ULTRA-LONGUES PAR DÉFAUT
-            let maxTokens = 4000;  // 🎯 DEFAULT ULTRA-AUGMENTÉ: 4000 tokens (~3000 mots)
+            let maxTokens = modelConfig?.max_tokens || 4000;  // 🎯 DEFAULT ULTRA-AUGMENTÉ: 4000 tokens (~3000 mots)
             if (context.user_channel === 'sms') {
                 maxTokens = 2000;  // 📱 SMS: MAX 2000 tokens (4-5 SMS)
                 console.log('📱 Gemini SMS mode: FORCED 2000 tokens max (4-5 SMS détaillés)');
@@ -3838,6 +3878,7 @@ RÈGLES CRITIQUES:
             }, {
                 apiKey: process.env.GEMINI_API_KEY,
                 maxRetries: 2, // 2 retries par modèle
+                preferredModels: modelConfig?.model_id ? [modelConfig.model_id] : null,
                 logAttempts: true
             });
 
@@ -3852,38 +3893,45 @@ RÈGLES CRITIQUES:
     }
 
     /**
-     * Appel à Claude (premium) pour briefings et rédaction
-     */
-    async _call_claude(prompt, outputMode = 'briefing', userMessage = '', intentData = null, toolResults = [], context = {}) {
-        try {
-            if (!process.env.ANTHROPIC_API_KEY) {
-                throw new Error('ANTHROPIC_API_KEY not configured');
+ * Appel à Claude (premium) pour briefings et rédaction
+ */
+async _call_claude(prompt, outputMode = 'briefing', userMessage = '', intentData = null, toolResults = [], context = {}, modelConfig = null) {
+    try {
+        if (!process.env.ANTHROPIC_API_KEY) {
+            throw new Error('ANTHROPIC_API_KEY not configured');
+        }
+
+        // 🚀 Configuration des tokens
+        // Priorité: Config DB > Logique adaptative > Défaut hardcodé
+        let maxTokens = modelConfig?.max_tokens || 4000;
+
+        // Adaptations spécifiques selon le contexte (override si nécessaire pour contraintes physiques)
+        if (context.user_channel === 'sms') {
+            // 📱 SMS: Contrainte stricte pour éviter coût/spam
+            const smsLimit = 2000;
+            if (maxTokens > smsLimit) {
+                maxTokens = smsLimit;
+                console.log(`📱 Claude SMS: Limiting tokens to ${maxTokens} (channel constraint)`);
             }
+        } else if (outputMode === 'briefing' && !modelConfig) {
+            // 📊 Briefing sans config spécifique: on booste par défaut
+            maxTokens = 10000;
+            console.log('📊 Claude Briefing (default boost): 10000 tokens');
+        } else if (outputMode === 'chat' && !modelConfig) {
+            // 🧠 Chat sans config: on adapte à la complexité
+            const complexityInfo = this._detectComplexity(userMessage, intentData, toolResults);
+            maxTokens = complexityInfo.tokens * 3;
+            console.log(`🧠 Claude Auto-Complexity: ${maxTokens} tokens`);
+        }
 
-            // 🚀🚀🚀 RÉPONSES ULTRA-LONGUES PAR DÉFAUT
-            let maxTokens = 4000;  // 🎯 DEFAULT ULTRA-AUGMENTÉ: 4000 tokens (~3000 mots)
+        // Configuration Modèle & Température
+        const modelId = modelConfig?.model_id || 'claude-3-5-sonnet-20240620';
+        const temperature = modelConfig?.temperature ?? 0.5; // 0.5 par défaut (équilibré)
 
-            // 📱 SMS: 4-5 messages pour réponses détaillées
-            if (context.user_channel === 'sms') {
-                maxTokens = 2000;  // 📱 SMS: MAX 2000 tokens (4-5 SMS)
-                console.log('📱 Claude SMS mode: FORCED 2000 tokens max (4-5 SMS détaillés)');
-            } else if (outputMode === 'briefing') {
-                maxTokens = 10000;  // 🚀 Briefing MAXIMUM (AUGMENTÉ 8000 → 10000)
-                console.log('📊 Claude Briefing mode: 10000 tokens (MAXIMUM EXHAUSTIF)');
-            } else if (outputMode === 'data') {
-                maxTokens = 500;
-            } else if (outputMode === 'chat') {
-                // 🧠 Détection automatique de complexité
-                const complexityInfo = this._detectComplexity(userMessage, intentData, toolResults);
-                // 🚀🚀 MULTIPLIER par 3 pour réponses ULTRA-LONGUES
-                maxTokens = complexityInfo.tokens * 3;
-                console.log(`🧠 Claude - Complexité détectée: ${complexityInfo.level} → ${maxTokens} tokens (×3 BOOST MAXIMUM pour réponses ULTRA-LONGUES)`);
-            }
-
-            // System prompt pour Claude
-            const systemPrompt = outputMode === 'data'
-                ? 'Tu es Emma Data Extractor. Retourne UNIQUEMENT du JSON valide, pas de texte explicatif.'
-                : `Tu es Emma, analyste financière experte et rédactrice professionnelle.
+        // System prompt pour Claude
+        const systemPrompt = outputMode === 'data'
+            ? 'Tu es Emma Data Extractor. Retourne UNIQUEMENT du JSON valide, pas de texte explicatif.'
+            : `Tu es Emma, analyste financière experte et rédactrice professionnelle.
 
 RÈGLES CRITIQUES:
 - ❌ NE JAMAIS retourner du JSON brut ou du code dans tes réponses
@@ -3917,26 +3965,26 @@ Exemples (utiliser avec parcimonie):
 
 Tu es utilisée principalement pour rédiger des briefings quotidiens de haute qualité.`;
 
-            const response = await fetch('https://api.anthropic.com/v1/messages', {
-                method: 'POST',
-                headers: {
-                    'x-api-key': process.env.ANTHROPIC_API_KEY,
-                    'anthropic-version': '2023-06-01',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    model: 'claude-3-5-sonnet-20240620',
-                    max_tokens: maxTokens,
-                    temperature: 0.5, // Déterministe pour écriture professionnelle
-                    system: systemPrompt,
-                    messages: [
-                        {
-                            role: 'user',
-                            content: prompt
-                        }
-                    ]
-                })
-            });
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+                'x-api-key': process.env.ANTHROPIC_API_KEY,
+                'anthropic-version': '2023-06-01',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: modelId,
+                max_tokens: maxTokens,
+                temperature: temperature,
+                system: systemPrompt,
+                messages: [
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ]
+            })
+        });
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
