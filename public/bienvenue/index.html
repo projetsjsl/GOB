@@ -185,9 +185,19 @@
         
         let supabase;
         try {
-            if (window.supabase) {
-                // If global supabase instance exists (from app-inline.js?)
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            if (SUPABASE_KEY) {
+                // The CDN script exposes supabase as a global variable
+                // Check both window.supabase and global supabase
+                const supabaseModule = (typeof window !== 'undefined' && window.supabase) || (typeof supabase !== 'undefined' ? supabase : null);
+                
+                if (supabaseModule && typeof supabaseModule.createClient === 'function') {
+                    supabase = supabaseModule.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    console.log('✅ Supabase client initialized');
+                } else {
+                    console.warn('⚠️ Supabase module not found. Make sure the CDN script is loaded before this code.');
+                }
+            } else {
+                console.warn('⚠️ SUPABASE_ANON_KEY not configured. Supabase features disabled.');
             }
         } catch (e) {
             console.error("Supabase init error:", e);
@@ -1234,7 +1244,10 @@
                                                                         const val = e.target.value;
                                                                         setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, title: val } : t));
                                                                     }}
-                                                                    onBlur={() => { if(useSupabase && supabase) supabase.from('task_templates').update({ title: task.title }).eq('id', task.id); }}
+                                                                    onBlur={async (e) => {
+                                                                        const val = e.target.value;
+                                                                        await saveTaskField(task.id, 'title', val);
+                                                                    }}
                                                                 />
                                                                 <input 
                                                                     className="text-xs text-gray-500 bg-transparent border-none p-0 outline-none focus:ring-0 placeholder-gray-300"
@@ -1244,7 +1257,10 @@
                                                                          const val = e.target.value;
                                                                          setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, description: val } : t));
                                                                     }}
-                                                                     onBlur={() => { if(useSupabase && supabase) supabase.from('task_templates').update({ description: task.description }).eq('id', task.id); }}
+                                                                    onBlur={async (e) => {
+                                                                        const val = e.target.value;
+                                                                        await saveTaskField(task.id, 'description', val);
+                                                                    }}
                                                                 />
                                                             </div>
 
@@ -1254,10 +1270,10 @@
                                                                 <div className="relative">
                                                                     <select 
                                                                         value={task.priority || 'medium'} 
-                                                                        onChange={(e) => {
+                                                                        onChange={async (e) => {
                                                                             const val = e.target.value;
                                                                             setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, priority: val } : t));
-                                                                            if(useSupabase && supabase) supabase.from('task_templates').update({ priority: val }).eq('id', task.id);
+                                                                            await saveTaskField(task.id, 'priority', val);
                                                                         }}
                                                                         className={`appearance-none pl-3 pr-8 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider border outline-none cursor-pointer transition-colors ${
                                                                             task.priority === 'high' ? 'bg-red-50 text-red-600 border-red-100 hover:bg-red-100' : 
@@ -1280,10 +1296,13 @@
                                                                         className="w-8 bg-transparent border-none p-0 text-sm font-bold text-gray-700 text-center outline-none"
                                                                         value={task.dayOffset}
                                                                         onChange={(e) => {
-                                                                            const val = parseInt(e.target.value);
+                                                                            const val = parseInt(e.target.value) || 0;
                                                                             setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, dayOffset: val } : t));
                                                                         }}
-                                                                        onBlur={() => { if(useSupabase && supabase) supabase.from('task_templates').update({ day_offset: task.dayOffset }).eq('id', task.id); }}
+                                                                        onBlur={async (e) => {
+                                                                            const val = parseInt(e.target.value) || 0;
+                                                                            await saveTaskField(task.id, 'dayOffset', val);
+                                                                        }}
                                                                     />
                                                                 </div>
                                                             </div>
@@ -1295,7 +1314,7 @@
                                                                     return (
                                                                         <button 
                                                                             key={res.id}
-                                                                            onClick={() => {
+                                                                            onClick={async () => {
                                                                                 const current = task.assignedTo || [];
                                                                                 const updated = current.includes(res.id) 
                                                                                     ? current.filter(id => id !== res.id)
@@ -1303,11 +1322,7 @@
                                                                                 
                                                                                 setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, assignedTo: updated } : t));
                                                                                 
-                                                                                if(useSupabase && supabase) {
-                                                                                    supabase.from('task_templates').update({ assigned_to: updated }).eq('id', task.id).then(({error}) => {
-                                                                                        if(error) console.error('Error updating assignments', error);
-                                                                                    });
-                                                                                }
+                                                                                await saveTaskField(task.id, 'assignedTo', updated);
                                                                             }}
                                                                             className={`px-2 py-1 rounded-md text-[10px] font-bold transition-all border shadow-sm ${
                                                                                 isAssigned 
@@ -1675,6 +1690,30 @@
             const handleSupabaseError = (error, context) => {
                 console.error(`Erreur Supabase (${context}):`, error);
                 showNotification(`Erreur sauvegarde (${context})`, 'error');
+            };
+
+            // Helper function to save task field to Supabase
+            const saveTaskField = async (taskId, field, value, dbFieldName = null) => {
+                if (!useSupabase || !supabase) return;
+                
+                try {
+                    const dbField = dbFieldName || (field === 'phaseId' ? 'phase_id' : 
+                                                     field === 'dayOffset' ? 'day_offset' : 
+                                                     field === 'assignedTo' ? 'assigned_to' : field);
+                    
+                    const { error } = await supabase
+                        .from('task_templates')
+                        .update({ [dbField]: value })
+                        .eq('id', taskId);
+                    
+                    if (error) {
+                        console.error(`Erreur sauvegarde ${field}:`, error);
+                        showNotification(`Erreur sauvegarde ${field}`, 'error');
+                        throw error;
+                    }
+                } catch (e) {
+                    handleSupabaseError(e, `Save Task ${field}`);
+                }
             };
 
             const toggleTaskStatus = async (taskId) => {
