@@ -505,8 +505,9 @@ const UserModal = ({ user, onSave, onClose }: { user: any, onSave: (data: any) =
                 </div>
 
                 <div>
-                    <label className="block text-xs uppercase text-slate-400 mb-1">Role</label>
+                    <label htmlFor="user-role-select" className="block text-xs uppercase text-slate-400 mb-1">Role</label>
                     <select 
+                        id="user-role-select"
                         value={formData.role}
                         onChange={e => setFormData({...formData, role: e.target.value})}
                         className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white"

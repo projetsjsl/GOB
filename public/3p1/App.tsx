@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { Header } from './components/Header';
 import { HistoricalTable } from './components/HistoricalTable';
 import { ValuationCharts } from './components/ValuationCharts';
@@ -11,15 +11,14 @@ import { EvaluationDetails } from './components/EvaluationDetails';
 import { HistoricalRangesTable } from './components/HistoricalRangesTable';
 import { DataSourcesInfo } from './components/DataSourcesInfo';
 import { AdditionalMetrics } from './components/AdditionalMetrics';
-import { KPIDashboard } from './components/KPIDashboard';
 import { InfoTab } from './components/InfoTab';
 import { TickerSearch } from './components/TickerSearch';
 import { ConfirmSyncDialog } from './components/ConfirmSyncDialog';
 import { HistoricalVersionBanner } from './components/HistoricalVersionBanner';
 import { NotificationManager } from './components/Notification';
 import { SyncProgressBar } from './components/SyncProgressBar';
-import { AdminDashboard } from './components/AdminDashboard';
 import { LandingPage } from './components/LandingPage';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
 import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation, autoFillAssumptionsFromFMPData, isMutualFund } from './utils/calculations';
 import { detectOutlierMetrics } from './utils/outlierDetection';
@@ -30,6 +29,21 @@ import { RestoreDataDialog } from './components/RestoreDataDialog';
 import { loadAllTickersFromSupabase, mapSourceToIsWatchlist } from './services/tickersApi';
 import { loadProfilesBatchFromSupabase, loadProfileFromSupabase } from './services/supabaseDataLoader';
 import { storage } from './utils/storage';
+
+// Lazy load heavy components for better initial load performance
+const KPIDashboard = React.lazy(() => import('./components/KPIDashboard').then(m => ({ default: m.KPIDashboard })));
+const AdminDashboard = React.lazy(() => import('./components/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center h-64 bg-gray-900">
+    <div className="flex flex-col items-center gap-3">
+      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+      <span className="text-gray-400 text-sm">Chargement...</span>
+    </div>
+  </div>
+);
+
 
 // Données initiales par défaut (VIDE - en attente de chargement)
 const INITIAL_DATA: AnnualData[] = [];
@@ -122,19 +136,41 @@ export default function App() {
 
     useEffect(() => {
         try {
+            // Check URL parameters first (allows direct link access as admin)
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlRole = urlParams.get('role');
+            const urlAdmin = urlParams.get('admin');
+            
+            if (urlRole === 'admin' || urlAdmin === 'true') {
+                setIsAdmin(true);
+                // Persist admin role in localStorage for session
+                localStorage.setItem('3p1-admin', 'true');
+                console.log('🔐 Admin access granted via URL parameter');
+                return;
+            }
+            
+            // Check localStorage for persisted admin flag
+            if (localStorage.getItem('3p1-admin') === 'true') {
+                setIsAdmin(true);
+                console.log('🔐 Admin access granted via localStorage');
+                return;
+            }
+            
+            // Check sessionStorage (set by main dashboard login)
             const userJson = sessionStorage.getItem('gob-user');
             if (userJson) {
                 const user = JSON.parse(userJson);
                 // Check multiple possible admin indicators
                 if (user.role === 'admin' || user.is_admin === true || user.username === 'admin' || user.id === 'admin') {
                     setIsAdmin(true);
-                    console.log('🔐 Admin access granted');
+                    console.log('🔐 Admin access granted via sessionStorage');
                 }
             }
         } catch (e) {
             console.warn('Failed to parse user role', e);
         }
     }, []);
+
 
     const handleAdminRepair = async (tickerToRepair: string) => {
         setIsRepairing(tickerToRepair);
@@ -2404,7 +2440,11 @@ export default function App() {
                     Close Admin
                 </button>
                 <div className="h-full w-full">
-                     <AdminDashboard onRepair={handleAdminRepair} isRepairing={isRepairing} />
+                     <ErrorBoundary>
+                         <Suspense fallback={<LoadingFallback />}>
+                             <AdminDashboard onRepair={handleAdminRepair} isRepairing={isRepairing} />
+                         </Suspense>
+                     </ErrorBoundary>
                 </div>
             </div>
         );
@@ -2542,14 +2582,18 @@ export default function App() {
                         {currentView === 'info' ? (
                             <InfoTab />
                         ) : currentView === 'kpi' ? (
-                            <KPIDashboard
-                                profiles={Object.values(library)}
-                                currentId={activeId}
-                                onSelect={setActiveId}
-                                onBulkSync={handleBulkSyncAllTickers}
-                                onSyncNA={handleSyncSpecificTickers}
-                                isBulkSyncing={isBulkSyncing}
-                            />
+                            <ErrorBoundary>
+                                <Suspense fallback={<LoadingFallback />}>
+                                    <KPIDashboard
+                                        profiles={Object.values(library)}
+                                        currentId={activeId}
+                                        onSelect={setActiveId}
+                                        onBulkSync={handleBulkSyncAllTickers}
+                                        onSyncNA={handleSyncSpecificTickers}
+                                        isBulkSyncing={isBulkSyncing}
+                                    />
+                                </Suspense>
+                            </ErrorBoundary>
                         ) : (
                             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
 

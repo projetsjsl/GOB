@@ -19,19 +19,35 @@ export const calculateRowRatios = (row: AnnualData): CalculatedRatios => {
 };
 
 export const calculateAverage = (data: number[]): number => {
-  if (data.length === 0) return 0;
-  const sum = data.reduce((a, b) => a + b, 0);
-  return sum / data.length;
+  if (!data || data.length === 0) return 0;
+  // Filter out invalid values before calculating
+  const validData = data.filter(n => n != null && isFinite(n));
+  if (validData.length === 0) return 0;
+  const sum = validData.reduce((a, b) => a + b, 0);
+  return isFinite(sum) ? sum / validData.length : 0;
 };
 
+
 export const projectFutureValue = (current: number, rate: number, years: number): number => {
-  return current * Math.pow(1 + rate / 100, years);
+  // Validate inputs - return 0 for invalid data
+  if (current == null || rate == null || years == null) return 0;
+  if (!isFinite(current) || !isFinite(rate) || !isFinite(years)) return 0;
+  if (years <= 0) return current;
+  
+  const result = current * Math.pow(1 + rate / 100, years);
+  return isFinite(result) ? result : 0;
 };
 
 export const calculateCAGR = (startValue: number, endValue: number, years: number): number => {
+  // Validate inputs - return 0 for invalid data
+  if (startValue == null || endValue == null || years == null) return 0;
+  if (!isFinite(startValue) || !isFinite(endValue) || !isFinite(years)) return 0;
   if (startValue <= 0 || endValue <= 0 || years <= 0) return 0;
-  return (Math.pow(endValue / startValue, 1 / years) - 1) * 100;
+  
+  const result = (Math.pow(endValue / startValue, 1 / years) - 1) * 100;
+  return isFinite(result) ? result : 0;
 };
+
 
 export const formatCurrency = (val: number) => 
   new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(val);

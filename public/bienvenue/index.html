@@ -10,6 +10,8 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Environment config from Vercel -->
+    <script src="/js/env-config.js"></script>
     <script src="./caroline-plan-data.js"></script>
     <script src="./email-template.js"></script>
     <!-- Emma Client SDK - Unified AI integration -->
@@ -140,7 +142,11 @@
         // ============================================
         // Get config from window (injected by Vercel/build) or use hardcoded anon key
         const SUPABASE_URL = window.SUPABASE_URL || 'https://boyuxgdplbpkknplxbxp.supabase.co';
-        const SUPABASE_KEY = window.SUPABASE_ANON_KEY || window.ENV_CONFIG?.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJveXV4Z2RwbGJwa2tucGx4YnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzMzU5MTQsImV4cCI6MjA3NTkxMTkxNH0.-M-QdpBFlDtg1CeA00VepQCNzGzvU-tISyVA0yCLBdw';
+        // Get key from env-config.js (injected by Vercel)
+        const SUPABASE_KEY = window.SUPABASE_ANON_KEY || window.ENV_CONFIG?.SUPABASE_ANON_KEY;
+        if (!SUPABASE_KEY) {
+            console.error('❌ SUPABASE_ANON_KEY not configured. Check env-config.js or Vercel env vars.');
+        }
         
         let supabase;
         try {
@@ -1613,10 +1619,10 @@
                     {/* Header avec sélecteur d'employé */}
                     <div className="bg-white/90 backdrop-blur-md sticky top-0 z-30 border-b border-gray-100 shadow-sm">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div className="flex justify-between items-center h-20">
+                            <div className="flex justify-between items-center h-28">
                                 {/* Logo / Title */}
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg text-lg">
+                                <div className="flex items-center gap-5">
+                                    <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg text-2xl">
                                         <Icons.Layers />
                                     </div>
                                     <div>
@@ -1646,8 +1652,8 @@
                                           </p>
                                      </div>
 
-                                    <div className="hidden md:flex items-center gap-3 bg-white pl-2 pr-4 py-1.5 rounded-full border shadow-sm">
-                                        <div className="w-9 h-9 rounded-full overflow-hidden border border-gray-100">
+                                    <div className="hidden md:flex items-center gap-4 bg-white pl-3 pr-5 py-2 rounded-full border shadow-sm">
+                                        <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-100">
                                             {selectedEmployee.avatarUrl ? <img src={selectedEmployee.avatarUrl} className="w-full h-full object-cover" /> : <span className="flex items-center justify-center h-full text-sm font-bold bg-blue-50 text-blue-600">{selectedEmployee.name?.charAt(0)}</span>}
                                         </div>
                                         <div className="flex flex-col">

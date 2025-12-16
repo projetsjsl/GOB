@@ -1621,6 +1621,85 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                         </div>
 
                         <div class="p-6 space-y-8">
+                            <!-- ═══════════════════════════════════════════════════ -->
+                            <!-- MODE SELECTION - User-friendly UI for dual-mode    -->
+                            <!-- ═══════════════════════════════════════════════════ -->
+                            <section class="border-2 border-indigo-200 rounded-xl p-5 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+                                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-xl">🎛️</span>
+                                    Mode de traitement Emma
+                                    <span class="ml-2 px-2 py-0.5 bg-indigo-600 text-white text-xs rounded-full">NOUVEAU</span>
+                                </h3>
+                                <p class="text-sm text-gray-600 mb-4">Choisissez comment Emma traite vos demandes. Ce paramètre s'applique à toutes les applications.</p>
+                                
+                                <!-- Mode Radio Cards -->
+                                <div class="grid grid-cols-3 gap-4 mb-4">
+                                    <!-- EXTERNAL Mode -->
+                                    <label class="emma-mode-card cursor-pointer">
+                                        <input type="radio" name="emmaProcessingMode" value="external" class="hidden peer">
+                                        <div class="peer-checked:border-green-500 peer-checked:bg-green-50 border-2 border-gray-200 rounded-xl p-4 hover:border-green-300 transition-all">
+                                            <div class="text-center">
+                                                <div class="text-3xl mb-2">🌐</div>
+                                                <div class="font-bold text-gray-800">IA Externe</div>
+                                                <div class="text-xs text-gray-500 mt-1">API Emma complète</div>
+                                            </div>
+                                            <ul class="text-xs text-gray-600 mt-3 space-y-1">
+                                                <li>✅ Analyse financière avancée</li>
+                                                <li>✅ Accès données temps réel</li>
+                                                <li>✅ Réponses intelligentes</li>
+                                                <li>⚠️ Requiert connexion</li>
+                                            </ul>
+                                        </div>
+                                    </label>
+                                    
+                                    <!-- LOCAL Mode -->
+                                    <label class="emma-mode-card cursor-pointer">
+                                        <input type="radio" name="emmaProcessingMode" value="local" class="hidden peer">
+                                        <div class="peer-checked:border-amber-500 peer-checked:bg-amber-50 border-2 border-gray-200 rounded-xl p-4 hover:border-amber-300 transition-all">
+                                            <div class="text-center">
+                                                <div class="text-3xl mb-2">🔒</div>
+                                                <div class="font-bold text-gray-800">Local / Privé</div>
+                                                <div class="text-xs text-gray-500 mt-1">Aucune donnée envoyée</div>
+                                            </div>
+                                            <ul class="text-xs text-gray-600 mt-3 space-y-1">
+                                                <li>✅ 100% confidentiel</li>
+                                                <li>✅ Fonctionne hors-ligne</li>
+                                                <li>✅ Réponses instantanées</li>
+                                                <li>⚠️ Capacités limitées</li>
+                                            </ul>
+                                        </div>
+                                    </label>
+                                    
+                                    <!-- AUTO Mode (default) -->
+                                    <label class="emma-mode-card cursor-pointer">
+                                        <input type="radio" name="emmaProcessingMode" value="auto" checked class="hidden peer">
+                                        <div class="peer-checked:border-indigo-500 peer-checked:bg-indigo-50 border-2 border-gray-200 rounded-xl p-4 hover:border-indigo-300 transition-all">
+                                            <div class="text-center">
+                                                <div class="text-3xl mb-2">🤖</div>
+                                                <div class="font-bold text-gray-800">Automatique</div>
+                                                <div class="text-xs text-gray-500 mt-1">Décision intelligente</div>
+                                            </div>
+                                            <ul class="text-xs text-gray-600 mt-3 space-y-1">
+                                                <li>✅ Meilleur des 2 mondes</li>
+                                                <li>✅ Données sensibles = local</li>
+                                                <li>✅ Questions générales = IA</li>
+                                                <li>⭐ Recommandé</li>
+                                            </ul>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <!-- Save button -->
+                                <div class="flex items-center justify-between mt-4 pt-4 border-t border-indigo-200">
+                                    <div id="emmaModeStatus" class="text-sm text-gray-500">
+                                        Mode actuel: <strong id="emmaModeCurrentValue" class="text-indigo-600">Automatique</strong>
+                                    </div>
+                                    <button onclick="saveEmmaMode()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
+                                        💾 Sauvegarder le mode
+                                    </button>
+                                </div>
+                            </section>
+
                             <!-- Info box -->
                             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                                 <p class="text-sm text-blue-800">
@@ -1885,6 +1964,74 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
         </div>
     </div>
 
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- EMMA MODE CONFIGURATION SCRIPT                              -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <script>
+        // Emma processing mode configuration
+        const EMMA_MODE_KEY = 'emma_processing_mode';
+        
+        // Load saved mode on page load
+        function loadEmmaMode() {
+            const savedMode = localStorage.getItem(EMMA_MODE_KEY) || 'auto';
+            const radioBtn = document.querySelector(`input[name="emmaProcessingMode"][value="${savedMode}"]`);
+            if (radioBtn) {
+                radioBtn.checked = true;
+            }
+            updateModeLabel(savedMode);
+            return savedMode;
+        }
+        
+        // Save mode to localStorage
+        function saveEmmaMode() {
+            const selectedMode = document.querySelector('input[name="emmaProcessingMode"]:checked')?.value || 'auto';
+            localStorage.setItem(EMMA_MODE_KEY, selectedMode);
+            updateModeLabel(selectedMode);
+            
+            // Show success notification
+            const statusEl = document.getElementById('emmaModeStatus');
+            if (statusEl) {
+                statusEl.innerHTML = `<span class="text-green-600 font-medium">✅ Mode "${getModeLabel(selectedMode)}" sauvegardé!</span>`;
+                setTimeout(() => {
+                    statusEl.innerHTML = `Mode actuel: <strong class="text-indigo-600">${getModeLabel(selectedMode)}</strong>`;
+                }, 2000);
+            }
+            
+            // If EmmaClient exists, update its mode
+            if (window.emmaRHClient) {
+                window.emmaRHClient.config.mode = selectedMode;
+                console.log('✅ Emma mode updated to:', selectedMode);
+            }
+        }
+        
+        // Get human-readable mode label
+        function getModeLabel(mode) {
+            const labels = {
+                'external': 'IA Externe',
+                'local': 'Local / Privé',
+                'auto': 'Automatique'
+            };
+            return labels[mode] || mode;
+        }
+        
+        // Update label display
+        function updateModeLabel(mode) {
+            const labelEl = document.getElementById('emmaModeCurrentValue');
+            if (labelEl) {
+                labelEl.textContent = getModeLabel(mode);
+            }
+        }
+        
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Delay slightly to ensure DOM is ready
+            setTimeout(loadEmmaMode, 100);
+        });
+        
+        // Make saveEmmaMode globally available
+        window.saveEmmaMode = saveEmmaMode;
+    </script>
 
     <!-- ═══════════════════════════════════════════════════════════ -->
     <!-- MODULAR JAVASCRIPT - Chargement via ES6 modules             -->
