@@ -6,8 +6,9 @@
     <title>Plateforme d'Intégration RH - Bienvenue</title>
     <meta name="description" content="Système de gestion complète pour l'intégration des nouveaux employés">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Use production builds for faster loading -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Environment config from Vercel -->
@@ -85,6 +86,28 @@
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <!-- Loading screen shown while React/Babel initializes -->
+    <div id="loading-screen" class="fixed inset-0 bg-gray-900 z-[200] flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')] bg-cover bg-center">
+        <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm"></div>
+        <div class="relative text-center">
+            <div class="w-24 h-24 mx-auto mb-6 rounded-full border-4 border-white shadow-lg overflow-hidden animate-pulse">
+                <img src="/images/emma-avatar-new.jpg" alt="Emma RH" class="w-full h-full object-cover" onerror="this.style.display='none'"/>
+            </div>
+            <h1 class="text-2xl font-bold text-white mb-2">Portail Emma RH</h1>
+            <p class="text-blue-300 font-medium mb-4">Chargement...</p>
+            <div class="w-48 h-1 bg-gray-700 rounded-full mx-auto overflow-hidden">
+                <div class="h-full bg-blue-500 rounded-full animate-loading-bar"></div>
+            </div>
+        </div>
+    </div>
+    <style>
+        @keyframes loading-bar { 
+            0% { width: 0; } 
+            50% { width: 70%; } 
+            100% { width: 100%; } 
+        }
+        .animate-loading-bar { animation: loading-bar 2s ease-in-out infinite; }
+    </style>
     <div id="root"></div>
     
     <script type="text/babel">
@@ -515,15 +538,19 @@
 
         // Login Component
         const LoginScreen = ({ employees, onLogin }) => {
-            const [selectedEmp, setSelectedEmp] = useState(employees[0]?.id);
+            const [selectedEmp, setSelectedEmp] = useState(null);
             const [password, setPassword] = useState('');
             const [error, setError] = useState('');
 
+            // Always sync with employees when they load/change
             useEffect(() => {
-                if (employees.length > 0 && !selectedEmp) {
-                    setSelectedEmp(employees[0].id);
+                if (employees.length > 0) {
+                    // If no selection or current selection is invalid, select first employee
+                    if (selectedEmp === null || !employees.find(e => e.id === selectedEmp)) {
+                        setSelectedEmp(employees[0].id);
+                    }
                 }
-            }, [employees, selectedEmp]);
+            }, [employees]);
 
             const handleLogin = (e) => {
                 e.preventDefault();
@@ -2448,11 +2475,22 @@
             );
         };
 
+        // Hide loading screen once React is ready
+        const hideLoadingScreen = () => {
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+                loadingScreen.style.transition = 'opacity 0.3s ease-out';
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => loadingScreen.remove(), 300);
+            }
+        };
+
         ReactDOM.render(
             <ErrorBoundary>
                 <OnboardingPlatform />
             </ErrorBoundary>, 
-            document.getElementById('root')
+            document.getElementById('root'),
+            hideLoadingScreen // Callback when render is complete
         );
     </script>
 </body>
