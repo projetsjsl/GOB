@@ -174,8 +174,8 @@ CONTRAINTES:
     const allModels = await getAllModels();
     const googleModels = allModels.filter(m => m.provider === 'google' && m.enabled !== false);
     
-    // Default to gemini-1.5-flash if no active model found
-    const selectedModel = googleModels.length > 0 ? googleModels[0] : { model_id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash Fallback' };
+    // Default to gemini-2.0-flash-exp if no active model found
+    const selectedModel = googleModels.length > 0 ? googleModels[0] : { model_id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash Exp Fallback' };
 
     console.log(`🔧 Appel API Gemini REST directe (sans SDK)`);
     console.log(`📦 Modèle sélectionné: ${selectedModel.model_id} (${selectedModel.name})`);

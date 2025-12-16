@@ -267,9 +267,16 @@ export default async function handler(req, res) {
     const { name, horizon } = req.query;
 
     if (!name) {
+      // Valeur par défaut pour faciliter les tests
+      const defaultName = 'msci_world';
+      console.log(`⚠️ Paramètre name manquant, utilisation de la valeur par défaut: ${defaultName}`);
       return res.status(400).json({
         success: false,
-        error: 'Paramètre "name" requis (msci_world ou sptsx)'
+        error: 'Paramètre "name" requis (msci_world ou sptsx)',
+        suggestion: `Utilisez ?name=${defaultName}&horizon=B pour tester`,
+        example: `${req.url.split('?')[0]}?name=${defaultName}&horizon=B`
+      });
+    }
       });
     }
 

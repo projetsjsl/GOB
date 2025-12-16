@@ -64,7 +64,21 @@ export default async function handler(req, res) {
       console.error('[Email Adapter] Données email invalides:', req.body);
       return res.status(400).json({
         success: false,
-        error: 'Missing from, text, or html parameters'
+        error: 'Missing from, text, or html parameters',
+        received: {
+          hasFrom: !!from,
+          hasText: !!text,
+          hasHtml: !!html,
+          keys: Object.keys(req.body || {})
+        },
+        expected: {
+          from: 'user@example.com (expéditeur)',
+          text: 'Contenu texte de l'email (ou html)',
+          html: 'Contenu HTML de l'email (optionnel si text présent)'
+        },
+        note: 'Cet endpoint est conçu pour recevoir des webhooks n8n/ImprovMX, pas des appels directs'
+      });
+    }
       });
     }
 

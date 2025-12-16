@@ -513,6 +513,21 @@ export default async function handler(req, res) {
   try {
     const { action, symbol, limit } = req.query || req.body || {};
 
+    if (!action) {
+      return res.status(400).json({ 
+        error: 'action requis',
+        availableActions: [
+          'sync-instruments',
+          'sync-quote',
+          'sync-history',
+          'sync-fundamentals',
+          'sync-indices',
+          'sync-all'
+        ],
+        example: 'POST /api/fmp-sync avec body: { "action": "sync-quote", "symbol": "AAPL" }'
+      });
+    }
+
     let result;
 
     switch (action) {

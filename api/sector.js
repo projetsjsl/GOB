@@ -93,7 +93,33 @@ async function fetchSectorData() {
       throw new Error(`Information API: ${data.Information}`);
     }
 
-    if (!data['Rank A: Real-Time Performance']) {
+    // Vérifier si les données sont valides (plusieurs formats possibles)
+    if (!data['Rank A: Real-Time Performance'] && !data['Meta Data'] && !data['Rank B: 1 Day Performance']) {
+      // Si quota dépassé ou format inattendu, essayer de retourner le cache même expiré
+      console.warn('⚠️ Format de réponse inattendu, tentative de retourner cache expiré');
+      try {
+        const { createClient } = await import('@supabase/supabase-js');
+        const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
+        
+        if (supabaseUrl && supabaseKey) {
+          const supabase = createClient(supabaseUrl, supabaseKey);
+          const { data: staleCache } = await supabase
+            .from('daily_market_cache')
+            .select('data')
+            .eq('cache_type', CACHE_KEY)
+            .order('updated_at', { ascending: false })
+            .limit(1)
+            .single();
+          
+          if (staleCache && staleCache.data) {
+            console.log('📦 Retour du cache expiré (mieux que rien)');
+            return staleCache.data;
+          }
+        }
+      } catch (e) {
+        // Ignorer erreur cache
+      }
       throw new Error('Format de réponse inattendu de l\'API Alpha Vantage');
     }
 

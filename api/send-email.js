@@ -184,7 +184,21 @@ export default async function handler(req, res) {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.message || 'Failed to send via Resend');
+            // Gérer les erreurs spécifiques Resend
+            const errorMessage = data.message || 'Failed to send via Resend';
+            const errorCode = data.error?.code || response.status;
+            
+            // Gérer les limitations Resend gracieusement
+            if (errorCode === 429 || errorMessage.includes('rate limit') || errorMessage.includes('quota')) {
+                return res.status(429).json({
+                    error: 'Rate limit exceeded',
+                    message: 'Limite d\'envoi Resend atteinte. Réessayez plus tard.',
+                    retryAfter: 3600, // 1 heure
+                    suggestion: 'Vérifiez votre quota Resend ou attendez avant de réessayer'
+                });
+            }
+            
+            throw new Error(errorMessage);
         }
 
         // ═══════════════════════════════════════════════════════════════

@@ -9,7 +9,12 @@ export default async function handler(req, res) {
   const { path } = req.query;
 
   if (!path) {
-    return res.status(400).json({ error: 'Path parameter required' });
+      return res.status(400).json({ 
+        error: 'Path parameter required',
+        example: 'GET /api/jslai-proxy?path=reee',
+        description: 'Le paramètre path doit être le chemin relatif sur jslai.app (ex: "reee", "evaluation")'
+      });
+    } });
   }
 
   try {

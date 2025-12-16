@@ -10,7 +10,7 @@
 // ⚠️  Toujours tester en local avant de déployer
 //
 // ✅ CONFIGURATION VALIDÉE (Testée le 15/10/2025) :
-// - Modèle: gemini-1.5-flash-latest (quota plus élevé)
+// - Modèle: gemini-2.0-flash-exp (quota plus élevé)
 // - SDK: @google/generative-ai (PAS @google/genai)
 // - Validation: Messages, tokens, safety settings
 // - Mode Expert: useValidatedMode = true par défaut
@@ -21,7 +21,7 @@
 // - GEMINI_API_KEY (AI...) : ✅ Configurée
 //
 // ❌ INTERDICTIONS ABSOLUES :
-// - Modifier le modèle sans test (gemini-1.5-flash-latest)
+// - Modifier le modèle sans test (gemini-2.0-flash-exp)
 // - Changer le SDK (doit rester @google/generative-ai)
 // - Modifier les paramètres de validation sans test
 // - Changer la température sans test (0.3 pour mode expert)
@@ -88,10 +88,10 @@ export default async function handler(req, res) {
       };
     });
 
-    console.log('🔧 Initialisation Gemini avec model: gemini-1.5-flash-latest');
+    console.log('🔧 Initialisation Gemini avec model: gemini-2.0-flash-exp');
     console.log('📤 Envoi de la requête à Gemini');
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ export default async function handler(req, res) {
         responseTokens: data?.usageMetadata?.candidatesTokenCount || 0,
         totalTokens: data?.usageMetadata?.totalTokenCount || 0
       },
-      model: 'gemini-1.5-flash-latest',
+      model: 'gemini-2.0-flash-exp',
       validated: useValidatedMode,
       timestamp: new Date().toISOString()
     });

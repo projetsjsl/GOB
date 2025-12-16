@@ -516,7 +516,7 @@ class SmartAgent {
         const getModel = (list, fallbackId) => list.length > 0 ? list[0] : { model_id: fallbackId, max_tokens: 4000 };
 
         const perplexityConfig = getModel(perplexityModels, 'sonar-reasoning');
-        const geminiConfig = getModel(geminiModels, 'gemini-1.5-flash');
+        const geminiConfig = getModel(geminiModels, 'gemini-2.0-flash-exp');
 
         // BRIEFING MODE: Perplexity Sonar pour données en temps réel
         if (outputMode === 'briefing') {

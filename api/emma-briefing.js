@@ -76,7 +76,17 @@ export default async function handler(req, res) {
         const emmaResponse = await callEmmaAgent(promptConfig.prompt, context);
         
         if (!emmaResponse.success) {
-            throw new Error(`Emma Agent failed: ${emmaResponse.error}`);
+      console.error('[Emma Briefing] Erreur Emma Agent:', emmaResponse.error);
+      // Retourner une erreur plus informative
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to generate briefing content',
+        type: normalizedType,
+        details: emmaResponse.error,
+        suggestion: 'Vérifiez la configuration des prompts et des APIs externes (Perplexity, FMP, etc.)',
+        timestamp: new Date().toISOString()
+      });
+    }(`Emma Agent failed: ${emmaResponse.error}`);
         }
 
         // 4. Générer le HTML de l'email

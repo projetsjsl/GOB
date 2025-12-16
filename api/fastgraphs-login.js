@@ -193,6 +193,14 @@ export default async function handler(req, res) {
 
     console.log('Workflow terminé.');
 
+    // Récupérer le HTML de la page finale pour debug
+    let finalHtml = '';
+    try {
+        finalHtml = await page.content();
+    } catch (e) {
+        console.warn('Impossible de récupérer le HTML final:', e.message);
+    }
+
     // Note: On ne ferme PAS le browser pour laisser la session active pour l'utilisateur
     // await browser.close(); 
     // Au lieu de ça, on se déconnecte juste du CDP côté serveur

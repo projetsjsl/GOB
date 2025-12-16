@@ -331,7 +331,10 @@ export default async function handler(req, res) {
     if (!action) {
       return res.status(400).json({ 
         error: 'action requis',
-        availableActions: ['compute', 'compute-batch']
+        availableActions: ['compute', 'compute-batch'],
+        example: 'GET /api/kpi-engine?action=compute&kpi_code=ROE&symbol=AAPL'
+      });
+    }
       });
     }
 

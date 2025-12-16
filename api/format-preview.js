@@ -10,7 +10,6 @@
  * Charge les configs depuis Supabase pour persistance.
  */
 
-import { adaptForChannel, adaptForSMS } from '../lib/channel-adapter.js';
 import { getDesignConfig } from '../lib/design-config.js';
 import { 
   createEmailWrapper, 
@@ -22,7 +21,31 @@ import {
   DEFAULT_COLORS 
 } from '../lib/email-helpers.js';
 
-// ... (keep markdownToEmailHtml unchanged or update it if needed, but for now focus on the template structure)
+/**
+ * Convertit le markdown en HTML pour email
+ * Fonction simple de conversion markdown → HTML avec styles inline
+ */
+function markdownToEmailHtml(markdown, colors = DEFAULT_COLORS) {
+  if (!markdown) return '';
+  
+  let html = markdown
+    // Headers avec couleurs du thème
+    .replace(/^### (.+)$/gm, `<h3 style="color: ${colors.primary || DEFAULT_COLORS.primary}; margin-top: 24px; margin-bottom: 12px; font-size: 18px; font-weight: 600; border-left: 4px solid ${colors.primaryLight || DEFAULT_COLORS.primary}; padding-left: 12px;">$1</h3>`)
+    .replace(/^## (.+)$/gm, `<h2 style="color: ${colors.primaryDark || DEFAULT_COLORS.primaryDark}; margin-top: 28px; margin-bottom: 16px; font-size: 20px; font-weight: 700; border-bottom: 3px solid ${colors.primary || DEFAULT_COLORS.primary}; padding-bottom: 8px;">$1</h2>`)
+    .replace(/^# (.+)$/gm, `<h1 style="color: ${colors.primaryDark || DEFAULT_COLORS.primaryDark}; margin-top: 32px; margin-bottom: 20px; font-size: 24px; font-weight: 700;">$1</h1>`)
+    // Bold avec couleur primary
+    .replace(/\*\*(.+?)\*\*/g, `<strong style="font-weight: 700; color: ${colors.primary || DEFAULT_COLORS.primary};">$1</strong>`)
+    // Italic
+    .replace(/\*(.+?)\*/g, '<em style="font-style: italic;">$1</em>')
+    // Line breaks
+    .replace(/\n\n/g, `</p><p style="margin: 12px 0; line-height: 1.8; color: ${colors.textDark || DEFAULT_COLORS.text};">`)
+    .replace(/\n/g, '<br>')
+    // Wrap in paragraph
+    .replace(/^/, `<p style="margin: 12px 0; line-height: 1.8; color: ${colors.textDark || DEFAULT_COLORS.text};">`)
+    .replace(/$/, '</p>');
+  
+  return html;
+}
 
 /**
  * Génère le template email complet (TABLE-BASED pour Outlook)
@@ -92,8 +115,18 @@ function generateEmailTemplate(content, type, config) {
  * Génère le template SMS
  * Note: Pas de limite - Twilio gère automatiquement le multi-SMS
  */
-function generateSmsTemplate(content) {
-  const sms = adaptForSMS(content, {});
+async function generateSmsTemplate(content) {
+  // Import dynamique avec fallback
+  let adaptForSMS;
+  try {
+    const channelAdapter = await import('../lib/channel-adapter.js');
+    adaptForSMS = channelAdapter.adaptForSMS;
+  } catch (e) {
+    console.warn('⚠️ channel-adapter.js non trouvé, utilisation de fallback');
+    adaptForSMS = (content) => content.replace(/<[^>]*>/g, '').trim();
+  }
+  
+  const sms = await adaptForSMS(content, {});
   const chars = sms.length;
   // SMS standard = 160 chars (GSM-7) ou 70 chars (UCS-2 avec emojis)
   // On utilise 153 car SMS concaténés = 153 chars utiles par segment
@@ -154,7 +187,7 @@ export default async function handler(req, res) {
 
     switch (channel) {
       case 'sms':
-        result = generateSmsTemplate(text);
+        result = await generateSmsTemplate(text);
         break;
       case 'email':
         result = { html: generateEmailTemplate(text, briefingType, config) };

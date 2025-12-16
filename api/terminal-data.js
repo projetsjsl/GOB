@@ -301,6 +301,17 @@ export default async function handler(req, res) {
           'price-history',
           'symbol-metrics',
           'sectors'
+        ],
+        example: 'GET /api/terminal-data?action=instruments'
+      });
+    } [
+          'instruments',
+          'kpi-values',
+          'watchlists',
+          'market-indices',
+          'price-history',
+          'symbol-metrics',
+          'sectors'
         ]
       });
     }

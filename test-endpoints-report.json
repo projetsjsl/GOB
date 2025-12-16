@@ -1,0 +1,618 @@
+{
+  "timestamp": "2025-12-16T22:17:10.038Z",
+  "baseUrl": "https://gobapps.com",
+  "summary": {
+    "total": 48,
+    "passed": 28,
+    "failed": 20,
+    "timeout": 0,
+    "successRate": "58.33%"
+  },
+  "categories": {
+    "Market Data": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0
+    },
+    "Chat & AI": {
+      "total": 5,
+      "passed": 3,
+      "failed": 2
+    },
+    "Emma Briefings": {
+      "total": 3,
+      "passed": 1,
+      "failed": 2
+    },
+    "Calendriers": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "FMP (Financial Modeling Prep)": {
+      "total": 5,
+      "passed": 3,
+      "failed": 2
+    },
+    "Supabase & Data": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "News & Media": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "Admin": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "Adapters (SMS/Email/Messenger)": {
+      "total": 3,
+      "passed": 0,
+      "failed": 3
+    },
+    "Financial Indicators": {
+      "total": 3,
+      "passed": 2,
+      "failed": 1
+    },
+    "Sector & Market": {
+      "total": 2,
+      "passed": 0,
+      "failed": 2
+    },
+    "Proxy & Utilities": {
+      "total": 5,
+      "passed": 1,
+      "failed": 4
+    },
+    "3p1 & Finance Pro": {
+      "total": 2,
+      "passed": 1,
+      "failed": 1
+    },
+    "Groupchat": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "Other": {
+      "total": 3,
+      "passed": 0,
+      "failed": 3
+    }
+  },
+  "results": [
+    {
+      "category": "Market Data",
+      "path": "/api/marketdata/batch",
+      "method": "GET",
+      "description": "Market data batch",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 242,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "Market Data",
+      "path": "/api/market-data-batch",
+      "method": "GET",
+      "description": "Market data batch (alt)",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 573,
+      "error": null,
+      "responsePreview": "{\"success\":true,\"isFresh\":true,\"stats\":{\"fresh\":1,\"stale\":0,\"missing\":0},\"timestamp\":\"2025-12-16T22:15:17.060Z\"}"
+    },
+    {
+      "category": "Chat & AI",
+      "path": "/api/gemini/chat",
+      "method": "POST",
+      "description": "Gemini chat",
+      "status": "failed",
+      "statusCode": 500,
+      "duration": 295,
+      "error": "HTTP 500",
+      "responsePreview": "{\"error\":\"Erreur de connexion à l'API Gemini.\",\"suggestions\":[\"Vérifiez votre connexion internet\",\"Réessayez dans quelques instants\",\"Si le problème persiste, contactez le support\"],\"technical\":\"Gemini API error 404: {\\n  \\\"error\\\": {\\n    \\\"code\\\": 404,\\n    \\\"message\\\": \\\"models/gemini-1.5-flash i"
+    },
+    {
+      "category": "Chat & AI",
+      "path": "/api/chat-assistant",
+      "method": "POST",
+      "description": "Chat assistant",
+      "status": "failed",
+      "statusCode": 500,
+      "duration": 286,
+      "error": "HTTP 500",
+      "responsePreview": "{\"error\":\"Gemini API error: 404\",\"details\":\"{\\n  \\\"error\\\": {\\n    \\\"code\\\": 404,\\n    \\\"message\\\": \\\"models/gemini-1.5-flash-latest is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.\\\",\\n    "
+    },
+    {
+      "category": "Chat & AI",
+      "path": "/api/chat",
+      "method": "POST",
+      "description": "Chat API",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 1219,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "Chat & AI",
+      "path": "/api/emma-agent",
+      "method": "POST",
+      "description": "Emma Agent",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 319,
+      "error": null,
+      "responsePreview": "{\"success\":true,\"response\":\"Merci pour ton message ! 😊\\n\\nJe suis Emma, ton assistante IA. Je peux t'aider avec des questions financières, générales, et bien plus !\\n\\nComment puis-je t'aider aujourd"
+    },
+    {
+      "category": "Chat & AI",
+      "path": "/api/ai-services",
+      "method": "GET",
+      "description": "AI Services",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 57,
+      "error": null,
+      "responsePreview": "{\"status\":\"healthy\",\"message\":\"AI Services endpoint opérationnel\",\"timestamp\":\"2025-12-16T22:15:20.240Z\",\"debug\":{\"openai_key\":\"sk-...E40A\",\"anthropic_key\":\"sk-ant-...gAA\\n\",\"perplexity_key\":\"pplx-..."
+    },
+    {
+      "category": "Emma Briefings",
+      "path": "/api/emma-briefing",
+      "method": "GET",
+      "description": "Emma Briefing",
+      "status": "failed",
+      "statusCode": 500,
+      "duration": 74,
+      "error": "HTTP 500",
+      "responsePreview": "{\"success\":false,\"error\":\"Failed to generate briefing content\",\"type\":\"morning\"}"
+    },
+    {
+      "category": "Emma Briefings",
+      "path": "/api/briefing",
+      "method": "GET",
+      "description": "Briefing",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 16083,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "Emma Briefings",
+      "path": "/api/emma-n8n",
+      "method": "POST",
+      "description": "Emma N8N (nécessite auth)",
+      "status": "failed",
+      "statusCode": 403,
+      "duration": 75,
+      "error": "HTTP 403",
+      "responsePreview": "{\"success\":false,\"error\":\"Invalid API key\"}"
+    },
+    {
+      "category": "Calendriers",
+      "path": "/api/calendar-economic",
+      "method": "GET",
+      "description": "Economic Calendar",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 276,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "Calendriers",
+      "path": "/api/calendar-earnings",
+      "method": "GET",
+      "description": "Earnings Calendar",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 125,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "Calendriers",
+      "path": "/api/calendar-dividends",
+      "method": "GET",
+      "description": "Dividends Calendar",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 451,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "FMP (Financial Modeling Prep)",
+      "path": "/api/fmp-company-data",
+      "method": "GET",
+      "description": "FMP Company Data",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 307,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "FMP (Financial Modeling Prep)",
+      "path": "/api/fmp-search",
+      "method": "GET",
+      "description": "FMP Search",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 123,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "FMP (Financial Modeling Prep)",
+      "path": "/api/fmp-stock-screener",
+      "method": "GET",
+      "description": "FMP Stock Screener",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 181,
+      "error": "HTTP 401",
+      "responsePreview": "{\"error\":\"FMP Stock Screener failed\",\"message\":\"{\\n  \\\"Error Message\\\": \\\"Invalid API KEY. Feel free to create a Free API Key or visit https://site.financialmodelingprep.com/faqs?search=why-is-my-api-key-invalid for more information.\\\"\\n}\"}"
+    },
+    {
+      "category": "FMP (Financial Modeling Prep)",
+      "path": "/api/fmp-sector-data",
+      "method": "GET",
+      "description": "FMP Sector Data",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 475,
+      "error": null,
+      "responsePreview": "{\"success\":false,\"sector\":\"Technology\",\"message\":\"Aucun ratio valide trouvé\",\"data\":null}"
+    },
+    {
+      "category": "FMP (Financial Modeling Prep)",
+      "path": "/api/fmp-sync",
+      "method": "POST",
+      "description": "FMP Sync",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 92,
+      "error": "HTTP 400",
+      "responsePreview": "{\"error\":\"action invalide\",\"availableActions\":[\"sync-instruments\",\"sync-quote\",\"sync-history\",\"sync-fundamentals\",\"sync-indices\",\"sync-all\"]}"
+    },
+    {
+      "category": "Supabase & Data",
+      "path": "/api/supabase-watchlist",
+      "method": "GET",
+      "description": "Supabase Watchlist",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 197,
+      "error": null,
+      "responsePreview": "{\"success\":true,\"tickers\":[\"AAPL\",\"GOOGL\",\"MSFT\",\"TSLA\",\"AMZN\"],\"count\":5,\"lastUpdated\":\"2025-10-13T20:42:27.307555+00:00\",\"source\":\"supabase\"}"
+    },
+    {
+      "category": "Supabase & Data",
+      "path": "/api/finance-snapshots",
+      "method": "GET",
+      "description": "Finance Snapshots",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 229,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "Supabase & Data",
+      "path": "/api/validation-settings",
+      "method": "GET",
+      "description": "Validation Settings",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 190,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "News & Media",
+      "path": "/api/news",
+      "method": "GET",
+      "description": "News API",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 478,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "News & Media",
+      "path": "/api/finviz-news",
+      "method": "GET",
+      "description": "Finviz News",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 553,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "News & Media",
+      "path": "/api/finviz-why-moving",
+      "method": "GET",
+      "description": "Finviz Why Moving",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 471,
+      "error": null,
+      "responsePreview": "{\"success\":true,\"ticker\":\"AAPL\",\"explanation\":\"OpenAI CFO on hardware device: 'No changes right now, no announcements to be made'\",\"explanation_enriched\":null,\"date\":\"Dec 16\",\"source\":\"Finviz AI\",\"typ"
+    },
+    {
+      "category": "Admin",
+      "path": "/api/admin/tickers",
+      "method": "GET",
+      "description": "Admin Tickers",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 325,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "Admin",
+      "path": "/api/admin/redirects",
+      "method": "GET",
+      "description": "Admin Redirects",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 156,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "Admin",
+      "path": "/api/admin/emma-config",
+      "method": "GET",
+      "description": "Admin Emma Config",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 142,
+      "error": null,
+      "responsePreview": "{\"config\":{\"value\":{\"groupchat\":false,\"finvox\":false,\"assistant-vocal\":false,\"emmaia\":false,\"email-briefings\":false},\"type\":\"json\",\"description\":\"\",\"updated_at\":\"2025-12-14T19:18:25.58043+00:00\",\"upda"
+    },
+    {
+      "category": "Adapters (SMS/Email/Messenger)",
+      "path": "/api/adapters/sms",
+      "method": "POST",
+      "description": "SMS Adapter",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 164,
+      "error": "HTTP 400",
+      "responsePreview": "{\"success\":false,\"error\":\"Missing From or Body parameters\"}"
+    },
+    {
+      "category": "Adapters (SMS/Email/Messenger)",
+      "path": "/api/adapters/email",
+      "method": "POST",
+      "description": "Email Adapter",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 109,
+      "error": "HTTP 400",
+      "responsePreview": "{\"success\":false,\"error\":\"Missing from, text, or html parameters\"}"
+    },
+    {
+      "category": "Adapters (SMS/Email/Messenger)",
+      "path": "/api/adapters/messenger",
+      "method": "POST",
+      "description": "Messenger Adapter",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 131,
+      "error": "HTTP 400",
+      "responsePreview": "{\"success\":false,\"error\":\"Invalid webhook format\"}"
+    },
+    {
+      "category": "Financial Indicators",
+      "path": "/api/yield-curve",
+      "method": "GET",
+      "description": "Yield Curve",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 1718,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "Financial Indicators",
+      "path": "/api/treasury-rates",
+      "method": "GET",
+      "description": "Treasury Rates",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 82,
+      "error": "HTTP 400",
+      "responsePreview": "{\"error\":\"Pays invalide\",\"valid_countries\":[\"US\",\"CA\",\"both\"],\"received\":\"both\"}"
+    },
+    {
+      "category": "Financial Indicators",
+      "path": "/api/rsi-screener",
+      "method": "GET",
+      "description": "RSI Screener",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 33315,
+      "error": null,
+      "responsePreview": "{\"success\":true,\"type\":\"both\",\"markets\":[\"US\"],\"total_analyzed\":200,\"total_with_data\":199,\"oversold\":{\"count\":0,\"criteria\":\"RSI(14) ≤ 20 ET RSI(5) ≤ 5\",\"stocks\":[]},\"overbought\":{\"count\":0,\"criteria\":"
+    },
+    {
+      "category": "Sector & Market",
+      "path": "/api/sector",
+      "method": "GET",
+      "description": "Sector Data",
+      "status": "failed",
+      "statusCode": 500,
+      "duration": 144,
+      "error": "HTTP 500",
+      "responsePreview": "{\"success\":false,\"error\":\"Format de réponse inattendu de l'API Alpha Vantage\",\"timestamp\":\"2025-12-16T22:16:22.346Z\"}"
+    },
+    {
+      "category": "Sector & Market",
+      "path": "/api/sector-index",
+      "method": "GET",
+      "description": "Sector Index",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 76,
+      "error": "HTTP 400",
+      "responsePreview": "{\"success\":false,\"error\":\"Paramètre \\\"name\\\" requis (msci_world ou sptsx)\"}"
+    },
+    {
+      "category": "Proxy & Utilities",
+      "path": "/api/jslai-proxy",
+      "method": "GET",
+      "description": "JSLAI Proxy",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 98,
+      "error": "HTTP 400",
+      "responsePreview": "{\"error\":\"Path parameter required\"}"
+    },
+    {
+      "category": "Proxy & Utilities",
+      "path": "/api/jslai-proxy-resource",
+      "method": "GET",
+      "description": "JSLAI Proxy Resource",
+      "status": "failed",
+      "statusCode": 403,
+      "duration": 147,
+      "error": "HTTP 403",
+      "responsePreview": "{\"error\":\"Only jslai.app URLs are allowed\"}"
+    },
+    {
+      "category": "Proxy & Utilities",
+      "path": "/api/kpi-engine",
+      "method": "GET",
+      "description": "KPI Engine",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 117,
+      "error": "HTTP 400",
+      "responsePreview": "{\"error\":\"action requis\",\"availableActions\":[\"compute\",\"compute-batch\"]}"
+    },
+    {
+      "category": "Proxy & Utilities",
+      "path": "/api/terminal-data",
+      "method": "GET",
+      "description": "Terminal Data",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 118,
+      "error": "HTTP 400",
+      "responsePreview": "{\"error\":\"action requis\",\"availableActions\":[\"instruments\",\"kpi-values\",\"watchlists\",\"market-indices\",\"price-history\",\"symbol-metrics\",\"sectors\"]}"
+    },
+    {
+      "category": "Proxy & Utilities",
+      "path": "/api/health-check-simple",
+      "method": "GET",
+      "description": "Health Check",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 294,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "3p1 & Finance Pro",
+      "path": "/api/3p1-sync-na",
+      "method": "POST",
+      "description": "3p1 Sync NA",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 41757,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "3p1 & Finance Pro",
+      "path": "/api/remove-ticker",
+      "method": "POST",
+      "description": "Remove Ticker",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 163,
+      "error": "HTTP 400",
+      "responsePreview": "{\"success\":false,\"error\":\"Confirmation required. Set confirm: true to proceed\"}"
+    },
+    {
+      "category": "Groupchat",
+      "path": "/api/groupchat/simulate",
+      "method": "POST",
+      "description": "Groupchat Simulate",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 102,
+      "error": null,
+      "responsePreview": "data: {\"type\":\"error\",\"message\":\"Task required\",\"_t\":0}\n\n"
+    },
+    {
+      "category": "Groupchat",
+      "path": "/api/groupchat/admin",
+      "method": "GET",
+      "description": "Groupchat Admin",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 54,
+      "error": null,
+      "responsePreview": null
+    },
+    {
+      "category": "Groupchat",
+      "path": "/api/groupchat/test",
+      "method": "GET",
+      "description": "Groupchat Test",
+      "status": "passed",
+      "statusCode": 200,
+      "duration": 144,
+      "error": null,
+      "responsePreview": "{\"message\":\"POST with { provider: \\\"simulation|browserbase|browserless|steel|anthropic|all\\\" }\"}"
+    },
+    {
+      "category": "Other",
+      "path": "/api/fastgraphs-login",
+      "method": "POST",
+      "description": "FastGraphs Login",
+      "status": "failed",
+      "statusCode": 500,
+      "duration": 969,
+      "error": "HTTP 500",
+      "responsePreview": "{\"success\":false,\"error\":\"Unexpected token '<', \\\"<!DOCTYPE \\\"... is not valid JSON\",\"details\":\"Une erreur est survenue lors de l'automatisation.\",\"automation\":{\"steps\":[]},\"debugInfo\":{\"stack\":\"SyntaxError: Unexpected token '<', \\\"<!DOCTYPE \\\"... is not valid JSON\\n    at JSON.parse (<anonymous>)\\n"
+    },
+    {
+      "category": "Other",
+      "path": "/api/send-email",
+      "method": "POST",
+      "description": "Send Email",
+      "status": "failed",
+      "statusCode": 500,
+      "duration": 418,
+      "error": "HTTP 500",
+      "responsePreview": "{\"error\":\"Internal server error\",\"message\":\"You can only send testing emails to your own email address (projetsjsl@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\"}"
+    },
+    {
+      "category": "Other",
+      "path": "/api/format-preview",
+      "method": "POST",
+      "description": "Format Preview",
+      "status": "failed",
+      "statusCode": 500,
+      "duration": 258,
+      "error": "HTTP 500",
+      "responsePreview": "A server error has occurred\n\nFUNCTION_INVOCATION_FAILED\n\niad1::ktwh6-1765923429650-9b30423b03d4\n"
+    }
+  ]
+}

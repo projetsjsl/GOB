@@ -35,6 +35,8 @@ export default async function handler(req, res) {
 
         // Validate country parameter
         const validCountries = ['US', 'CA', 'both'];
+        // Normaliser 'both' en acceptant les deux formats
+        const normalizedCountry = country.toLowerCase() === 'both' ? 'both' : country.toUpperCase();
         if (!validCountries.includes(country.toUpperCase())) {
             return res.status(400).json({
                 error: 'Pays invalide',
