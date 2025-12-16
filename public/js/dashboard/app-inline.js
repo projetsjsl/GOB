@@ -5859,7 +5859,7 @@ STRUCTURE JSON OBLIGATOIRE:
         };
 
         // Composant onglet Scrapping SA (simplifié)
-        const ScrappingSATab = () => (
+        const _Unused_ScrappingSATab = () => (
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
                     <h2 className={`text-2xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
@@ -6577,7 +6577,7 @@ STRUCTURE JSON OBLIGATOIRE:
         );
 
         // Composant onglet Seeking Alpha
-        const SeekingAlphaTab = () => (
+        const _Unused_SeekingAlphaTab = () => (
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
                     <h2 className={`text-2xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
@@ -25674,9 +25674,45 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     })}
 
                     {activeTab === 'dans-watchlist' && <DansWatchlistTab />}
-                    {activeTab === 'scrapping-sa' && <ScrappingSATab />}
+                    {activeTab === 'scrapping-sa' && <ScrappingSATab
+                        isDarkMode={isDarkMode}
+                        runSeekingAlphaScraper={runSeekingAlphaScraper}
+                        scrapingStatus={scrapingStatus}
+                        scrapingLogs={scrapingLogs}
+                        clearScrapingLogs={clearScrapingLogs}
+                        generateScrapingScript={generateScrapingScript}
+                        addScrapingLog={addScrapingLog}
+                        tickers={tickers}
+                        Icon={Icon}
+                        seekingAlphaData={seekingAlphaData}
+                    />}
                     {activeTab === 'email-briefings' && <EmailBriefingsTab />}
-                    {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
+                    {activeTab === 'seeking-alpha' && <SeekingAlphaTab
+                        isDarkMode={isDarkMode}
+                        loading={loading}
+                        refreshAllStocks={refreshAllStocks}
+                        fetchNews={fetchNews}
+                        runSeekingAlphaScraper={runSeekingAlphaScraper}
+                        scrapingStatus={scrapingStatus}
+                        openSeekingAlpha={openSeekingAlpha}
+                        generateScrapingScript={generateScrapingScript}
+                        addScrapingLog={addScrapingLog}
+                        tickers={tickers}
+                        seekingAlphaData={seekingAlphaData}
+                        analyzeWithClaude={analyzeWithClaude}
+                        selectedStock={selectedStock}
+                        setSelectedStock={setSelectedStock}
+                        seekingAlphaStockData={seekingAlphaStockData}
+                        cleanText={cleanText}
+                        getGradeColor={getGradeColor}
+                        openPeersComparison={openPeersComparison}
+                        stockData={stockData}
+                        setActiveTab={setActiveTab}
+                        Icon={Icon}
+                        getCompanyLogo={getCompanyLogo}
+                        seekingAlphaViewMode={seekingAlphaViewMode}
+                        setSeekingAlphaViewMode={setSeekingAlphaViewMode}
+                    />}
                     {activeTab === 'economic-calendar' && <EconomicCalendarTab />}
                     {activeTab === 'investing-calendar' && <InvestingCalendarTab />}
                     {activeTab === 'finvox' && <FinVoxTab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
