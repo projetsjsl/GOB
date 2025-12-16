@@ -13,6 +13,7 @@
 // - OpenAI: fetch() direct (PAS le SDK) + gpt-4o + 2000 tokens + temp 0.7
 import { configManager } from '../lib/config-manager.js';
 import { createSupabaseClient } from '../lib/supabase-config.js';
+import { getAllModels, getModelById } from '../lib/llm-registry.js';
 
 // Initialize config manager (non-blocking)
 configManager.initialize().catch(console.error);
@@ -106,8 +107,8 @@ export default async function handler(req, res) {
             successRate: `${successRate}%`,
             cacheHitRate: modelStats.totalRequests > 0 ? 
               (modelStats.cacheHits / modelStats.totalRequests * 100).toFixed(2) + '%' : '0%',
-            availableModels: Object.keys(PERPLEXITY_MODELS),
-            modelConfig: MODEL_CONFIG
+            availableModels: (await getAllModels()).map(m => m.id),
+            modelConfig: (await getAllModels()).reduce((acc, m) => { acc[m.id] = m; return acc; }, {})
           }
         });
       } else if (!service) {
@@ -186,35 +187,10 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 // 🎯 MODÈLES PERPLEXITY - HIÉRARCHIE DE BACKUP (DÉFINITION INITIALE)
 // Ces valeurs seront écrasées par configManager si disponible
-const PERPLEXITY_MODELS = {
-  // TIER 0-5 : Modèles premium (50 req/min)
-  primary: 'sonar-reasoning-pro',    // DeepSeek-R1 + CoT (analyses complexes)
-  backup1: 'sonar-reasoning',        // Raisonnement rapide (analyses moyennes)
-  backup2: 'sonar-pro',              // Recherche avancée (requêtes complexes)
-  backup3: 'sonar',                  // Recherche basique (requêtes simples)
-  
-  // TIER 1+ : Modèle expert (5 req/min - usage limité)
-  expert: 'sonar-deep-research'      // Recherche exhaustive (rapports complets)
-};
+// PERPLEXITY_MODELS removed; model list now fetched from llm-registry
 
 // 📊 CONFIGURATION PAR TYPE D'USAGE
-const MODEL_CONFIG = {
-  'analysis': {
-    models: ['sonar-reasoning-pro', 'sonar-reasoning', 'sonar-pro', 'sonar'],
-    max_tokens: [2000, 1500, 1000, 800],
-    description: 'Analyses financières complexes'
-  },
-  'news': {
-    models: ['sonar-pro', 'sonar', 'sonar-reasoning', 'sonar-reasoning-pro'],
-    max_tokens: [1500, 1000, 1200, 1800],
-    description: 'Actualités et recherche d\'informations'
-  },
-  'research': {
-    models: ['sonar-deep-research', 'sonar-reasoning-pro', 'sonar-reasoning', 'sonar-pro'],
-    max_tokens: [3000, 2000, 1500, 1000],
-    description: 'Recherche approfondie et rapports'
-  }
-};
+// MODEL_CONFIG removed; configurations now sourced from llm-registry
 // ============================================================================
 // 🛡️  GUARDRAIL : Cette fonction utilise la configuration validée
 // ⚠️  NE PAS MODIFIER les paramètres sans test complet
@@ -223,9 +199,12 @@ const MODEL_CONFIG = {
 // ============================================================================
 // 🔄 FONCTION DE BACKUP INTELLIGENT
 async function tryPerplexityWithBackup(perplexityKey, prompt, section, recency = 'day') {
-  const config = MODEL_CONFIG[section] || MODEL_CONFIG['analysis'];
-    const models = config.models;
-    const maxTokensList = config.max_tokens;
+  // Fetch model configurations from llm-registry
+  const allModels = await getAllModels();
+  // For simplicity, use all enabled models in order
+  const enabledModels = allModels.filter(m => m.enabled !== false);
+  const models = enabledModels.map(m => m.model_id);
+  const maxTokensList = enabledModels.map(m => m.max_tokens);
 
     // Récupérer la config dynamique pour Perplexity (Rôle Researcher par défaut pour analysis)
     let dynamicConfig = null;
