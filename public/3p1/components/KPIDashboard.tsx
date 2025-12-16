@@ -810,6 +810,55 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     return '#dc2626'; // Rouge
   };
 
+  // Helpers pour Tailwind (classes CSS) pour éviter les styles inline
+  const getReturnTextClass = (returnPercent: number | null | undefined): string => {
+    if (returnPercent === null || returnPercent === undefined) return 'text-gray-400';
+    if (returnPercent >= 50) return 'text-green-600';
+    if (returnPercent >= 20) return 'text-green-300';
+    if (returnPercent >= 0) return 'text-yellow-600'; // Note: yellow-600 for text readability
+    return 'text-red-600';
+  };
+
+  const getReturnBgClass = (returnPercent: number | null | undefined): string => {
+    if (returnPercent === null || returnPercent === undefined) return 'bg-gray-100'; // fallback
+    if (returnPercent >= 50) return 'bg-green-600';
+    if (returnPercent >= 20) return 'bg-green-300';
+    if (returnPercent >= 0) return 'bg-yellow-400';
+    return 'bg-red-600';
+  };
+
+  const getJpegyTextClass = (jpegy: number | null): string => {
+    if (jpegy === null) return 'text-gray-400';
+    if (jpegy <= 0.5) return 'text-green-300';
+    if (jpegy <= 1.5) return 'text-green-600';
+    if (jpegy <= 1.75) return 'text-yellow-600';
+    if (jpegy <= 2.0) return 'text-orange-500';
+    return 'text-red-600';
+  };
+
+  const getJpegyBgClass = (jpegy: number | null): string => {
+    if (jpegy === null) return 'bg-gray-400';
+    if (jpegy <= 0.5) return 'bg-green-300';
+    if (jpegy <= 1.5) return 'bg-green-600';
+    if (jpegy <= 1.75) return 'bg-yellow-500';
+    if (jpegy <= 2.0) return 'bg-orange-500';
+    return 'bg-red-600';
+  };
+
+  const getRatioTextClass = (ratio: number | null): string => {
+    if (ratio === null || !isFinite(ratio) || ratio < 0) return 'text-gray-400';
+    if (ratio >= 3) return 'text-green-600';
+    if (ratio >= 1) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  const getRatioFillClass = (ratio: number | null): string => {
+    if (ratio === null || !isFinite(ratio) || ratio < 0) return 'fill-gray-400';
+    if (ratio >= 3) return 'fill-green-600';
+    if (ratio >= 1) return 'fill-yellow-500';
+    return 'fill-red-600';
+  };
+
   // Vérifier si on a des profils
   if (profiles.length === 0) {
     return (
@@ -961,7 +1010,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               <div className="text-xs text-gray-500 mb-1">JPEGY Moyen</div>
               {globalStats.avgJPEGY != null && isFinite(globalStats.avgJPEGY) ? (
                 <>
-                  <div className="text-2xl font-bold" style={{ color: getJpegyColor(globalStats.avgJPEGY) || '#9ca3af' }}>
+                  <div className={`text-2xl font-bold ${getJpegyTextClass(globalStats.avgJPEGY)}`}>
                     {globalStats.avgJPEGY.toFixed(2)}
                   </div>
                   <div className="text-xs text-gray-400 mt-1">Médiane: {(globalStats.medianJPEGY != null && isFinite(globalStats.medianJPEGY)) ? globalStats.medianJPEGY.toFixed(2) : 'N/A'}</div>
@@ -1053,7 +1102,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                       <div className="text-right">
                         {metric.jpegy !== null ? (
                           <>
-                            <span className="font-bold" style={{ color: getJpegyColor(metric.jpegy) || '#9ca3af' }}>
+                            <span className={`font-bold ${getJpegyTextClass(metric.jpegy)}`}>
                               {metric.jpegy.toFixed(2)}
                             </span>
                             <div className="mt-1 pt-1 border-t border-gray-200">
@@ -1529,8 +1578,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
           <h4 className="text-sm font-semibold text-gray-700 mb-3">Options d'affichage</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <div>
-              <label className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Densité</label>
+              <label htmlFor="display-density" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Densité</label>
               <select
+                id="display-density"
                 value={displayOptions.density}
                 onChange={(e) => setDisplayOptions({ ...displayOptions, density: e.target.value as any })}
                 className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs"
@@ -1763,7 +1813,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     ? "Afficher tous les tickers\n\nDésactive le filtre N/A pour voir tous les tickers.\n\nRaccourci: Ctrl+Shift+F" 
                     : "Afficher uniquement les N/A\n\nFiltre pour ne voir que les tickers avec des données invalides (N/A).\n\nUtile pour identifier rapidement les tickers nécessitant une synchronisation.\n\nRaccourci: Ctrl+Shift+F"}
                   aria-label={filters.showOnlyNA ? "Afficher tous les tickers" : "Afficher uniquement les tickers avec N/A"}
-                  aria-pressed={filters.showOnlyNA ? "true" : "false"}
+                  aria-pressed={Boolean(filters.showOnlyNA).toString() as "true" | "false"}
                   tabIndex={0}
                 >
                   {filters.showOnlyNA ? 'Afficher Tous' : 'Afficher N/A'}
@@ -1891,11 +1941,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                       comparisonMode && selectedForComparison.includes(metric.profile.id)
                         ? 'border-purple-600 ring-4 ring-purple-300 shadow-xl' 
                         : 'border-gray-200'
-                    }`}
-                    style={{
-                      backgroundColor: getReturnColor(metric.totalReturnPercent),
-                      opacity: currentId === metric.profile.id ? 1 : 0.85
-                    }}
+                    } ${getReturnBgClass(metric.totalReturnPercent)} ${currentId === metric.profile.id ? 'opacity-100' : 'opacity-85'}`}
                     title={`${metric.profile.info.name || metric.profile.id}
 Rendement: ${metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A (données invalides)' : `${metric.totalReturnPercent.toFixed(1)}%`}
 JPEGY: ${metric.jpegy !== null ? metric.jpegy.toFixed(2) : 'N/A (non calculable)'}
@@ -1971,11 +2017,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <div 
-                        className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-sm relative"
-                        style={{ backgroundColor: metric.hasInvalidData ? '#fee2e2' : getReturnColor(metric.totalReturnPercent) }}
+                        className={`w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-sm relative transition-colors ${metric.hasInvalidData ? 'bg-red-100' : ''}`}
                       >
-                        {metric.profile.id}
-                        <div className="absolute -top-1 -right-1">
+                        <div className={`absolute inset-0 rounded-lg ${metric.hasInvalidData ? '' : getReturnBgClass(metric.totalReturnPercent)}`} />
+                        <span className="relative z-10">{metric.profile.id}</span>
+                        <div className="absolute -top-1 -right-1 z-10">
                           {(metric.profile.isWatchlist ?? false) ? (
                             <EyeIcon className="w-4 h-4 text-blue-300" title="Watchlist" />
                           ) : (
@@ -2000,13 +2046,13 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         <div className="text-xs text-gray-500">{metric.profile.info.sector}</div>
                       </div>
                       <div className="text-right">
-                        <div className={`font-bold text-lg ${metric.hasInvalidData ? 'text-gray-400' : ''}`} style={metric.hasInvalidData ? {} : { color: getReturnColor(metric.totalReturnPercent) }}>
+                        <div className={`font-bold text-lg ${metric.hasInvalidData ? 'text-gray-400' : getReturnTextClass(metric.totalReturnPercent)}`}>
                           {metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A' : `${metric.totalReturnPercent.toFixed(1)}%`}
                         </div>
                         <div className="text-xs text-gray-500">Rendement</div>
                       </div>
                       <div className="text-right">
-                        <div className={`font-semibold flex items-center justify-end gap-1 ${metric.jpegy === null ? 'text-gray-400' : ''}`} style={metric.jpegy !== null && getJpegyColor(metric.jpegy) ? { color: getJpegyColor(metric.jpegy)! } : {}}>
+                        <div className={`font-semibold flex items-center justify-end gap-1 ${metric.jpegy === null ? 'text-gray-400' : getJpegyTextClass(metric.jpegy)}`}>
                           {metric.jpegy !== null ? metric.jpegy.toFixed(2) : 'N/A'}
                           {metric.jpegy === null && <ExclamationTriangleIcon className="w-3 h-3 text-orange-500" title="JPEGY non calculable" />}
                         </div>
@@ -2076,11 +2122,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         : metric.hasInvalidData
                         ? 'border-red-300 border-dashed'
                         : 'border-gray-200'
-                    }`}
-                    style={{
-                      backgroundColor: metric.hasInvalidData ? '#fee2e2' : getReturnColor(metric.totalReturnPercent),
-                      opacity: currentId === metric.profile.id ? 1 : (metric.hasInvalidData ? 0.6 : 0.8)
-                    }}
+                    } ${metric.hasInvalidData ? 'bg-red-50' : getReturnBgClass(metric.totalReturnPercent)} ${currentId === metric.profile.id ? 'opacity-100' : (metric.hasInvalidData ? 'opacity-60' : 'opacity-80')}`}
                     title={`${metric.profile.id}: ${metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'Données invalides' : `${metric.totalReturnPercent.toFixed(1)}%`}`}
                   >
                     <div className={`flex flex-col items-center ${metric.hasInvalidData ? 'text-gray-600' : 'text-white'} text-[9px] relative`}>
@@ -2704,7 +2746,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                               cx={x}
                               cy={y}
                               r={currentId === metric.profile.id ? 8 : 6}
-                              fill={ratio31Color || '#9ca3af'}
+                              className={`cursor-pointer hover:r-8 ${getRatioFillClass(metric.ratio31)}`}
                               stroke={currentId === metric.profile.id ? '#2563eb' : '#fff'}
                               strokeWidth={currentId === metric.profile.id ? 2 : 1}
                               className="cursor-pointer hover:r-8"
@@ -2797,7 +2839,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     style={{
                       height: `${(bin.count / maxCount) * 240}px`,
                       minHeight: bin.count > 0 ? '4px' : '0px'
-                    }}
+                    } as React.CSSProperties}
                     title={`${bin.min !== null && bin.min !== undefined ? bin.min.toFixed(0) : 'N/A'}% - ${bin.max !== null && bin.max !== undefined ? bin.max.toFixed(0) : 'N/A'}%: ${bin.count} titre(s)`}
                   />
                   {idx % 3 === 0 && (
@@ -2878,11 +2920,10 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       <div className="flex items-center gap-2">
                         <div className="w-32 h-3 bg-gray-200 rounded-full overflow-hidden">
                           <div
-                            className="h-full"
+                            className={`h-full ${getReturnBgClass(avgReturn)}`}
                             style={{
-                              width: `${Math.min(Math.max((avgReturn + 50) / 200 * 100, 0), 100)}%`,
-                              backgroundColor: getReturnColor(avgReturn)
-                            }}
+                              width: `${Math.min(Math.max((avgReturn + 50) / 200 * 100, 0), 100)}%`
+                            } as React.CSSProperties}
                           />
                         </div>
                         <span className={`text-xs font-bold w-16 text-right ${
@@ -2899,8 +2940,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       <span className="text-xs text-gray-600">JPEGY moyen:</span>
                       {avgJPEGY !== null ? (
                         <span 
-                          className="text-xs font-semibold px-2 py-0.5 rounded text-white"
-                          style={{ backgroundColor: getJpegyColor(avgJPEGY) || '#9ca3af' }}
+                          className={`text-xs font-semibold px-2 py-0.5 rounded text-white ${getJpegyBgClass(avgJPEGY)}`}
                         >
                           {avgJPEGY.toFixed(2)}
                         </span>
@@ -2973,12 +3013,13 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                 return (
                   <div key={level} className="flex-1 flex flex-col items-center">
                     <div
-                      className="w-full rounded-t cursor-pointer hover:opacity-80 transition-opacity"
                       style={{
                         height: `${(count / maxCount) * 100}%`,
-                        backgroundColor: idx === 0 ? '#86efac' : idx === 1 ? '#eab308' : '#dc2626',
                         minHeight: '10px'
                       }}
+                      className={`w-full rounded-t cursor-pointer hover:opacity-80 transition-opacity ${
+                        idx === 0 ? 'bg-green-300' : idx === 1 ? 'bg-yellow-500' : 'bg-red-600'
+                      }`}
                       title={`${level}: ${count} titre(s)`}
                     />
                     <span className="text-[9px] text-gray-600 mt-1 text-center">{level}</span>
@@ -3074,14 +3115,13 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                   >
                     <div className="text-[10px] sm:text-xs font-bold mb-1 truncate w-full text-center">{metric.profile.id}</div>
                     <div
-                      className="w-full rounded mb-1"
+                      className={`w-full rounded mb-1 ${getReturnBgClass(metric.totalReturnPercent)}`}
                       style={{
                         height: `${Math.max(Math.min((metric.totalReturnPercent + 50) / 200 * 100, 100), 5)}px`,
-                        backgroundColor: getReturnColor(metric.totalReturnPercent),
                         minHeight: '15px'
                       }}
                     />
-                    <div className={`text-[9px] sm:text-xs font-semibold ${metric.hasInvalidData ? 'text-gray-400' : ''}`} style={metric.hasInvalidData ? {} : { color: getReturnColor(metric.totalReturnPercent) }}>
+                    <div className={`text-[9px] sm:text-xs font-semibold ${metric.hasInvalidData ? 'text-gray-400' : getReturnTextClass(metric.totalReturnPercent)}`}>
                       {metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`}
                     </div>
                   </div>
@@ -3365,8 +3405,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       <div className="group relative">
                         <div className="flex items-center justify-end">
                           <span
-                            className="inline-block w-4 h-4 rounded-full mr-2"
-                            style={{ backgroundColor: getJpegyColor(metric.jpegy) || '#9ca3af' }}
+                            className={`inline-block w-4 h-4 rounded-full mr-2 ${getJpegyBgClass(metric.jpegy)}`}
                           />
                           {metric.jpegy !== null && metric.jpegy !== undefined ? metric.jpegy.toFixed(2) : 'N/A'}
                         </div>
@@ -3386,7 +3425,9 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       </span>
                     )}
                   </td>
-                  <td className="p-2 sm:p-3 text-right font-semibold text-xs sm:text-sm" style={{ color: metric._isLoading ? '#9ca3af' : (metric.hasInvalidData ? '#9ca3af' : getReturnColor(metric.totalReturnPercent)) }}>
+                  <td className={`p-2 sm:p-3 text-right font-semibold text-xs sm:text-sm ${
+                    metric._isLoading || metric.hasInvalidData ? 'text-gray-400' : getReturnTextClass(metric.totalReturnPercent)
+                  }`}>
                     {metric._isLoading ? (
                       <div className="flex items-center justify-end gap-1 text-gray-400">
                         <ArrowPathIcon className="w-3 h-3 animate-spin" />

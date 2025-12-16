@@ -70,3 +70,4 @@ debug_*.png
 .vercel
 .env.vercel
 .env*.local
+.env.temp_migration

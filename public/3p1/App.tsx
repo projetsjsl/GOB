@@ -2442,7 +2442,7 @@ export default function App() {
             <div className="w-full bg-slate-700 h-2 rounded-full mb-3 overflow-hidden">
                 <div 
                     className="bg-blue-500 h-full rounded-full transition-all duration-300 ease-out" 
-                    style={{ width: `${(bulkSyncProgress.current / bulkSyncProgress.total) * 100}%` }}
+                    style={{ width: `${(bulkSyncProgress.current / bulkSyncProgress.total) * 100}%` } as React.CSSProperties}
                 ></div>
             </div>
             

@@ -4,6 +4,7 @@
 
 import { loadAllConfigs } from './api-client.js';
 import { RUNTIME_FLOWS, getRelatedPrompts, getFlowsUsingPrompt } from './runtime-relationships.js';
+import { showStatus } from './ui-helpers.js';
 
 let dashboardData = null;
 let currentFilter = 'all';
@@ -11,6 +12,18 @@ let relationshipFilter = null; // Pour filtrer par relations
 let promptRelationships = {}; // Map des relations entre prompts
 let isLoadingDashboard = false; // Flag pour éviter les chargements multiples
 let dashboardLoaded = false; // Flag pour tracker si le dashboard a été chargé
+
+/**
+ * Affiche une erreur de chargement
+ */
+function showDashboardError() {
+    showStatus('❌ Erreur chargement dashboard', 'error');
+    const container = document.getElementById('dashboardTabContent');
+    if (container) {
+        // Optionnel : Afficher un message d'erreur plus visible dans le dashboard
+        // container.innerHTML = '<div class="p-8 text-center text-red-500">Erreur de chargement du dashboard</div>';
+    }
+}
 
 /**
  * Charge et affiche le dashboard
@@ -66,11 +79,17 @@ export async function loadDashboard(forceReload = false) {
         // Use requestAnimationFrame pour un meilleur timing
         requestAnimationFrame(() => {
             setTimeout(() => {
-                buildPromptRelationships(dashboardData.allPrompts);
-                renderArchitecture(dashboardData);
-                dashboardLoaded = true;
-                isLoadingDashboard = false;
-                console.log('✅ Dashboard chargé complètement');
+                try {
+                    buildPromptRelationships(dashboardData.allPrompts);
+                    renderArchitecture(dashboardData);
+                    dashboardLoaded = true;
+                    console.log('✅ Dashboard chargé complètement');
+                } catch (innerError) {
+                    console.error('❌ Erreur rendering asynchrone dashboard:', innerError);
+                    showStatus('⚠️ Erreur affichage architecture', 'error');
+                } finally {
+                    isLoadingDashboard = false;
+                }
             }, 50);
         });
 
