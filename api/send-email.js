@@ -154,6 +154,23 @@ export default async function handler(req, res) {
             throw new Error('RESEND_API_KEY not configured');
         }
 
+        // Sanitize subject (remove newlines, trim)
+        const cleanSubject = String(subject || 'Sujet Manquant').replace(/[\r\n]+/g, ' ').trim();
+
+        // payload Resend
+        const payload = {
+            from: FROM_EMAIL,
+            to: TO_EMAIL,
+            subject: cleanSubject,
+            html: html,
+            tags: [
+                { name: 'category', value: 'briefing' },
+                { name: 'type', value: briefingType || 'manual' }
+            ]
+        };
+        
+        console.log(`[Send Email] Sending to ${TO_EMAIL} with subject: "${cleanSubject}"`);
+
         // Appel API Resend
         const response = await fetch('https://api.resend.com/emails', {
             method: 'POST',
@@ -161,16 +178,7 @@ export default async function handler(req, res) {
                 'Authorization': `Bearer ${RESEND_API_KEY}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                from: FROM_EMAIL,
-                to: TO_EMAIL,
-                subject: subject,
-                html: html,
-                tags: [
-                    { name: 'category', value: 'briefing' },
-                    { name: 'type', value: briefingType || 'manual' }
-                ]
-            })
+            body: JSON.stringify(payload)
         });
 
         const data = await response.json();

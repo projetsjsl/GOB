@@ -606,7 +606,7 @@
                 return;
              }
              
-             const subject = `Plan d'Intégration - ${employee.name}`;
+             const subject = `Plan d'Intégration - ${employee?.name || 'Nouveau'}`;
              const to = prompt("Entrez l'adresse email du destinataire:", "projetsjsl@gmail.com"); 
              if (!to) return;
              
