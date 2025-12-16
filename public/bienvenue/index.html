@@ -202,7 +202,10 @@
             { id: 1, name: 'Jean-Pierre Ouellet', role: 'Directeur', email: 'jpo@gob.com', avatar: 'JP' },
             { id: 2, name: 'Marc Bolduc', role: 'Directeur', email: 'mb@gob.com', avatar: 'MB' },
             { id: 3, name: 'Emma', role: 'Responsable RH', email: 'emma@gob.com', avatar: 'EM' },
-            { id: 4, name: 'Support TI', role: 'Support Technique', email: 'ti@gob.com', avatar: 'TI' }
+            { id: 4, name: 'Support TI', role: 'Support Technique', email: 'ti@gob.com', avatar: 'TI' },
+            { id: 5, name: 'Vincent', role: 'Expert & Formation', email: 'vincent@gob.com', avatar: 'VI' },
+            { id: 6, name: 'Catherine', role: 'Communication', email: 'catherine@gob.com', avatar: 'CA' },
+            { id: 7, name: 'Mélinda', role: 'Trading', email: 'melinda@gob.com', avatar: 'ME' }
         ];
 
         const defaultPhases = [
@@ -222,14 +225,26 @@
             { id: 4, phaseId: 1, title: 'Rencontre d\'introduction équipe', description: 'Rencontre informelle avec les membres de l\'équipe immédiate pour briser la glace.', priority: 'medium', category: 'social', dayOffset: 1, assignedTo: [1, 2] },
             { id: 5, phaseId: 1, title: 'Formation CRM & Outils', description: 'Session de formation initiale sur le CRM, la gestion documentaire et les outils de communication.', priority: 'high', category: 'technique', dayOffset: 1, assignedTo: [4] },
 
-            // Phase 2 - Formation
+            // Phase 2 - Formation (Vincent's Domain)
             { id: 6, phaseId: 2, title: 'Formation Conformité & Éthique', description: 'Compléter les modules obligatoires sur la conformité, le code d\'éthique et la sécurité de l\'information.', priority: 'high', category: 'formation', dayOffset: 2, assignedTo: [3] },
             { id: 7, phaseId: 2, title: 'Formation Gamme de Produits', description: 'Vue d\'ensemble détaillée des produits et services offerts, avec focus sur les nouveautés.', priority: 'medium', category: 'formation', dayOffset: 3, assignedTo: [1] },
+            { id: 11, phaseId: 2, title: 'Histoire GOB & Style d\'Investissement', description: 'Présentation par Vincent sur l\'histoire du groupe et la philosophie d\'investissement.', priority: 'high', category: 'formation', dayOffset: 2, assignedTo: [5] },
+            { id: 12, phaseId: 2, title: 'Les Modèles en Gestion Discrétionnaire (GD)', description: 'Explication détaillée des modèles de gestion discrétionnaire par Vincent.', priority: 'high', category: 'formation', dayOffset: 3, assignedTo: [5] },
+            { id: 13, phaseId: 2, title: 'Outils : Calculs GD & Tableaux de Bord', description: 'Session pratique avec Vincent sur les outils de calcul et le tableau de bord.', priority: 'high', category: 'technique', dayOffset: 4, assignedTo: [5] },
+            { id: 14, phaseId: 2, title: 'Arborescence & Sources d\'Information', description: 'Survol des essentiels : où trouver l\'information et comprendre l\'arborescence des dossiers.', priority: 'medium', category: 'administratif', dayOffset: 2, assignedTo: [5] },
+            { id: 15, phaseId: 2, title: 'Grille Tarifaire et Avantages', description: 'Explication complète de la structure tarifaire et de ses avantages concurrentiels.', priority: 'high', category: 'formation', dayOffset: 3, assignedTo: [5] },
+            { id: 16, phaseId: 2, title: 'Présentation "Nouveau Client"', description: 'Détail du contenu et de la structure de la présentation type pour un nouveau client.', priority: 'high', category: 'formation', dayOffset: 4, assignedTo: [5] },
+
+            // Phase 2 continuation
             { id: 8, phaseId: 2, title: 'Atelier Tableaux de Bord', description: 'Formation pratique sur l\'utilisation et l\'interprétation des tableaux de bord de performance.', priority: 'medium', category: 'technique', dayOffset: 4, assignedTo: [4] },
 
             // Phase 3 - Immersion
             { id: 9, phaseId: 3, title: 'Observation RDV Client (Senior)', description: 'Accompagnement d\'un conseiller senior lors d\'une rencontre client pour observation des bonnes pratiques.', priority: 'high', category: 'pratique', dayOffset: 8, assignedTo: [1] },
-            { id: 10, phaseId: 3, title: 'Simulation Dossier Client', description: 'Réalisation complète d\'un dossier client fictif pour valider l\'acquisition des compétences.', priority: 'medium', category: 'pratique', dayOffset: 10, assignedTo: [2] }
+            { id: 10, phaseId: 3, title: 'Simulation Dossier Client', description: 'Réalisation complète d\'un dossier client fictif pour valider l\'acquisition des compétences.', priority: 'medium', category: 'pratique', dayOffset: 10, assignedTo: [2] },
+            
+            // Phase 3 - Tours de roue (Catherine & Mélinda)
+            { id: 17, phaseId: 3, title: 'Tour de Roue : Communication', description: 'Session d\'immersion avec Catherine sur le volet Communication et Marketing.', priority: 'medium', category: 'formation', dayOffset: 7, assignedTo: [6] },
+            { id: 18, phaseId: 3, title: 'Tour de Roue : Trading', description: 'Session d\'immersion avec Mélinda sur le fonctionnement du desk de Trading.', priority: 'medium', category: 'technique', dayOffset: 9, assignedTo: [7] }
         ];
 
         // Catégories disponibles pour les tâches
@@ -676,6 +691,59 @@
                 }
             };
 
+            const handleAddPhase = async () => {
+                const newId = (Math.max(...phaseTemplates.map(p => p.id), 0) || 0) + 1;
+                const newPhase = {
+                    id: newId,
+                    name: `Nouvelle Phase ${newId}`,
+                    description: 'Description de la phase',
+                    duration: 5,
+                    startOffset: 0,
+                    color: '#' + Math.floor(Math.random()*16777215).toString(16),
+                    order: newId
+                };
+                
+                setPhaseTemplates([...phaseTemplates, newPhase]);
+                
+                if (useSupabase && supabase) {
+                    const { error } = await supabase.from('phases').insert([{
+                        name: newPhase.name,
+                        description: newPhase.description,
+                        duration: newPhase.duration,
+                        start_offset: newPhase.startOffset,
+                        color: newPhase.color,
+                        display_order: newPhase.order
+                    }]);
+                    if (error) {
+                        console.error('Error adding phase:', error);
+                        showNotification('Erreur ajout phase', 'error');
+                    }
+                }
+                showNotification('Phase ajoutée', 'success');
+            };
+
+            const handleDeletePhase = async (id) => {
+                // Check for assigned tasks
+                const assignedTasks = taskTemplates.filter(t => t.phaseId === id);
+                if (assignedTasks.length > 0) {
+                    alert(`Impossible de supprimer cette phase : ${assignedTasks.length} modèle(s) de tâche y sont assignés. Veuillez d'abord supprimer ou déplacer ces tâches.`);
+                    return;
+                }
+
+                if (!confirm('Êtes-vous sûr de vouloir supprimer cette phase ?')) return;
+
+                setPhaseTemplates(prev => prev.filter(p => p.id !== id));
+
+                if (useSupabase && supabase) {
+                    const { error } = await supabase.from('phases').delete().eq('id', id);
+                    if (error) {
+                        console.error('Error deleting phase:', error);
+                        showNotification('Erreur suppression phase', 'error');
+                    }
+                }
+                showNotification('Phase supprimée', 'success');
+            };
+
             // --- Logic Recipes (Templates) ---
             const [recipes, setRecipes] = useState(() => {
                 try { return JSON.parse(localStorage.getItem('onboarding_recipes') || '[]'); } catch { return []; }
@@ -859,24 +927,39 @@
                             )}
                              {activeTab === 'phases' && (
                                 <div className="space-y-4">
-                                    {phaseTemplates.map(phase => (
-                                        <div key={phase.id} className="bg-white p-4 rounded-xl border-l-4 shadow-sm" style={{ borderLeftColor: phase.color }}>
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <input type="color" value={phase.color} onChange={e => updatePhase(phase.id, 'color', e.target.value)} className="w-6 h-6 rounded cursor-pointer border-0" />
-                                                <input className="flex-1 font-bold text-lg border-b border-transparent focus:border-blue-500 outline-none" value={phase.name} onChange={e => updatePhase(phase.id, 'name', e.target.value)} />
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-4 text-sm">
-                                                <div>
-                                                    <label className="text-xs text-gray-500 font-bold uppercase">Durée (jours)</label>
-                                                    <input type="number" className="w-full p-1 border rounded" value={phase.duration} onChange={e => updatePhase(phase.id, 'duration', parseInt(e.target.value))} />
+                                    <div className="bg-white p-4 rounded-xl border shadow-sm flex justify-between items-center">
+                                        <h3 className="font-bold text-gray-700">Gestion des Phases</h3>
+                                        <button onClick={handleAddPhase} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 gap-2 flex items-center">
+                                            <Icons.Plus /> Ajouter une Phase
+                                        </button>
+                                    </div>
+                                    <div className="grid gap-4">
+                                        {phaseTemplates.map(phase => (
+                                            <div key={phase.id} className="bg-white p-4 rounded-xl border-l-4 shadow-sm relative group" style={{ borderLeftColor: phase.color }}>
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <input type="color" value={phase.color} onChange={e => updatePhase(phase.id, 'color', e.target.value)} className="w-6 h-6 rounded cursor-pointer border-0" />
+                                                    <input className="flex-1 font-bold text-lg border-b border-transparent focus:border-blue-500 outline-none" value={phase.name} onChange={e => updatePhase(phase.id, 'name', e.target.value)} />
+                                                    <button 
+                                                        onClick={() => handleDeletePhase(phase.id)} 
+                                                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                                        title="Supprimer la phase"
+                                                    >
+                                                        <Icons.Trash />
+                                                    </button>
                                                 </div>
-                                                <div>
-                                                     <label className="text-xs text-gray-500 font-bold uppercase">Délicat (J+)</label>
-                                                     <input type="number" className="w-full p-1 border rounded" value={phase.startOffset} onChange={e => updatePhase(phase.id, 'startOffset', parseInt(e.target.value))} />
+                                                <div className="grid grid-cols-2 gap-4 text-sm pl-9">
+                                                    <div>
+                                                        <label className="text-xs text-gray-500 font-bold uppercase">Durée (jours)</label>
+                                                        <input type="number" className="w-full p-1 border rounded" value={phase.duration} onChange={e => updatePhase(phase.id, 'duration', parseInt(e.target.value))} />
+                                                    </div>
+                                                    <div>
+                                                         <label className="text-xs text-gray-500 font-bold uppercase">Délicat (J+)</label>
+                                                         <input type="number" className="w-full p-1 border rounded" value={phase.startOffset} onChange={e => updatePhase(phase.id, 'startOffset', parseInt(e.target.value))} />
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                             {activeTab === 'tasks' && (
