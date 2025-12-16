@@ -2439,12 +2439,19 @@ export default function App() {
                 </span>
                 <span className="text-xs text-slate-400 font-mono">{Math.round((bulkSyncProgress.current / bulkSyncProgress.total) * 100)}%</span>
             </div>
+            {(() => {
+                const progressBarStyle: React.CSSProperties = { 
+                    width: `${(bulkSyncProgress.current / bulkSyncProgress.total) * 100}%` 
+                };
+                return (
             <div className="w-full bg-slate-700 h-2 rounded-full mb-3 overflow-hidden">
                 <div 
                     className="bg-blue-500 h-full rounded-full transition-all duration-300 ease-out" 
-                    style={{ width: `${(bulkSyncProgress.current / bulkSyncProgress.total) * 100}%` } as React.CSSProperties}
+                    style={progressBarStyle}
                 ></div>
             </div>
+                );
+            })()}
             
             <div className="flex justify-between items-center text-xs text-slate-400 mb-3">
                  <span>Success: <span className="text-green-400">{syncStats.successCount}</span></span>
