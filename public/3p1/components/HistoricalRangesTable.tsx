@@ -76,28 +76,42 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
     const bvGrowthRates: number[] = [];
     const divGrowthRates: number[] = [];
 
+    // Helper pour filtrer les ratios aberrants lors de l'ajout
+    const addRatioIfValid = (ratios: number[], value: number, type: 'pe' | 'pcf' | 'pbv' | 'yield', min: number, max: number) => {
+      if (isFinite(value) && value >= min && value <= max) {
+        ratios.push(value);
+      }
+    };
+
     validData.forEach((row, idx) => {
       if (row.earningsPerShare > 0) {
         const peHigh = row.priceHigh / row.earningsPerShare;
         const peLow = row.priceLow / row.earningsPerShare;
-        peRatios.push(peHigh, peLow);
+        // ✅ Filtrer directement : P/E doit être entre 1x et 200x
+        addRatioIfValid(peRatios, peHigh, 'pe', 1, 200);
+        addRatioIfValid(peRatios, peLow, 'pe', 1, 200);
       }
 
       if (row.cashFlowPerShare > 0) {
         const pcfHigh = row.priceHigh / row.cashFlowPerShare;
         const pcfLow = row.priceLow / row.cashFlowPerShare;
-        pcfRatios.push(pcfHigh, pcfLow);
+        // ✅ Filtrer directement : P/CF doit être entre 1x et 200x
+        addRatioIfValid(pcfRatios, pcfHigh, 'pcf', 1, 200);
+        addRatioIfValid(pcfRatios, pcfLow, 'pcf', 1, 200);
       }
 
       if (row.bookValuePerShare > 0) {
         const pbvHigh = row.priceHigh / row.bookValuePerShare;
         const pbvLow = row.priceLow / row.bookValuePerShare;
-        pbvRatios.push(pbvHigh, pbvLow);
+        // ✅ Filtrer directement : P/BV doit être entre 0.1x et 50x
+        addRatioIfValid(pbvRatios, pbvHigh, 'pbv', 0.1, 50);
+        addRatioIfValid(pbvRatios, pbvLow, 'pbv', 0.1, 50);
       }
 
       if (row.priceHigh > 0 && row.dividendPerShare > 0) {
         const yieldValue = (row.dividendPerShare / row.priceHigh) * 100;
-        yields.push(yieldValue);
+        // ✅ Filtrer directement : Yield doit être entre 0% et 50%
+        addRatioIfValid(yields, yieldValue, 'yield', 0, 50);
       }
 
       // Calculer les taux de croissance entre années consécutives
@@ -106,22 +120,26 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
         
         if (prevRow.earningsPerShare > 0 && row.earningsPerShare > 0) {
           const growth = ((row.earningsPerShare - prevRow.earningsPerShare) / prevRow.earningsPerShare) * 100;
-          epsGrowthRates.push(growth);
+          // ✅ Filtrer directement : Growth doit être entre -50% et +100%
+          addRatioIfValid(epsGrowthRates, growth, 'growth', -50, 100);
         }
 
         if (prevRow.cashFlowPerShare > 0 && row.cashFlowPerShare > 0) {
           const growth = ((row.cashFlowPerShare - prevRow.cashFlowPerShare) / prevRow.cashFlowPerShare) * 100;
-          cfGrowthRates.push(growth);
+          // ✅ Filtrer directement : Growth doit être entre -50% et +100%
+          addRatioIfValid(cfGrowthRates, growth, 'growth', -50, 100);
         }
 
         if (prevRow.bookValuePerShare > 0 && row.bookValuePerShare > 0) {
           const growth = ((row.bookValuePerShare - prevRow.bookValuePerShare) / prevRow.bookValuePerShare) * 100;
-          bvGrowthRates.push(growth);
+          // ✅ Filtrer directement : Growth doit être entre -50% et +100%
+          addRatioIfValid(bvGrowthRates, growth, 'growth', -50, 100);
         }
 
         if (prevRow.dividendPerShare > 0 && row.dividendPerShare > 0) {
           const growth = ((row.dividendPerShare - prevRow.dividendPerShare) / prevRow.dividendPerShare) * 100;
-          divGrowthRates.push(growth);
+          // ✅ Filtrer directement : Growth doit être entre -50% et +100%
+          addRatioIfValid(divGrowthRates, growth, 'growth', -50, 100);
         }
       }
     });

@@ -1170,9 +1170,19 @@ export default function App() {
 
             // Détecter et exclure automatiquement les métriques avec prix cibles aberrants
             const finalData = data.length > 0 ? data : result.data; // Utiliser les données mergées
+            
+            // ✅ SANITISER les assumptions auto-remplies AVANT de les merger avec les assumptions existantes
+            // Cela garantit que même si les assumptions existantes contiennent des valeurs aberrantes,
+            // elles seront corrigées lors du merge
+            const sanitizedAutoFilled = sanitizeAssumptionsSync(autoFilledAssumptions);
+            
+            // ✅ SANITISER aussi les assumptions existantes avant le merge
+            const sanitizedExisting = sanitizeAssumptionsSync(assumptions);
+            
+            // Merger les assumptions sanitisées (auto-filled prend priorité sur existantes)
             const finalAssumptions = {
-                ...assumptions,
-                ...autoFilledAssumptions // Inclure les métriques recalculées
+                ...sanitizedExisting,
+                ...sanitizedAutoFilled // Les valeurs auto-remplies (sanitisées) prennent priorité
             };
             
             const outlierDetection = detectOutlierMetrics(finalData, finalAssumptions);
@@ -1194,15 +1204,18 @@ export default function App() {
                 excludeDIV: outlierDetection.excludeDIV
             };
 
+            // ✅ SANITISER une dernière fois avant de mettre à jour le state et sauvegarder
+            const finalSanitizedAssumptions = sanitizeAssumptionsSync(assumptionsWithOutlierExclusions);
+
             // Mettre à jour les assumptions dans le state
-            setAssumptions(assumptionsWithOutlierExclusions);
+            setAssumptions(finalSanitizedAssumptions);
 
             // Auto-save snapshot after successful sync
             console.log('💾 Auto-saving snapshot after API sync...');
             await saveSnapshot(
                 activeId,
                 finalData,
-                assumptionsWithOutlierExclusions, // Inclure les exclusions automatiques
+                finalSanitizedAssumptions, // ✅ Assumptions complètement sanitisées
                 info,
                 `API sync - ${new Date().toLocaleString()}`,
                 true,  // Mark as current

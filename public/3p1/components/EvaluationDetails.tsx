@@ -203,19 +203,36 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
     const bvGrowthRates: number[] = [];
     const divGrowthRates: number[] = [];
 
+    // Helper pour filtrer les ratios aberrants lors de l'ajout
+    const addRatioIfValid = (ratios: number[], value: number, type: 'pe' | 'pcf' | 'pbv' | 'yield' | 'growth', min: number, max: number) => {
+      if (isFinite(value) && value >= min && value <= max) {
+        ratios.push(value);
+      }
+    };
+
     validData.forEach((row, idx) => {
-      // Ratios
+      // Ratios - ✅ Filtrer directement lors de l'ajout
       if (row.earningsPerShare > 0) {
-        peRatios.push(row.priceHigh / row.earningsPerShare, row.priceLow / row.earningsPerShare);
+        const peHigh = row.priceHigh / row.earningsPerShare;
+        const peLow = row.priceLow / row.earningsPerShare;
+        addRatioIfValid(peRatios, peHigh, 'pe', 1, 200);
+        addRatioIfValid(peRatios, peLow, 'pe', 1, 200);
       }
       if (row.cashFlowPerShare > 0.1) { // Same threshold as calculations.ts
-        pcfRatios.push(row.priceHigh / row.cashFlowPerShare, row.priceLow / row.cashFlowPerShare);
+        const pcfHigh = row.priceHigh / row.cashFlowPerShare;
+        const pcfLow = row.priceLow / row.cashFlowPerShare;
+        addRatioIfValid(pcfRatios, pcfHigh, 'pcf', 1, 200);
+        addRatioIfValid(pcfRatios, pcfLow, 'pcf', 1, 200);
       }
       if (row.bookValuePerShare > 0) {
-        pbvRatios.push(row.priceHigh / row.bookValuePerShare, row.priceLow / row.bookValuePerShare);
+        const pbvHigh = row.priceHigh / row.bookValuePerShare;
+        const pbvLow = row.priceLow / row.bookValuePerShare;
+        addRatioIfValid(pbvRatios, pbvHigh, 'pbv', 0.1, 50);
+        addRatioIfValid(pbvRatios, pbvLow, 'pbv', 0.1, 50);
       }
       if (row.priceHigh > 0 && row.dividendPerShare >= 0) {
-        yields.push((row.dividendPerShare / row.priceHigh) * 100);
+        const yieldValue = (row.dividendPerShare / row.priceHigh) * 100;
+        addRatioIfValid(yields, yieldValue, 'yield', 0, 50);
       }
 
       // Calculer les taux de croissance entre années consécutives (Yearly volatility)
@@ -224,22 +241,26 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
         
         if (prevRow.earningsPerShare > 0 && row.earningsPerShare > 0) {
           const growth = ((row.earningsPerShare - prevRow.earningsPerShare) / prevRow.earningsPerShare) * 100;
-          if (isFinite(growth) && Math.abs(growth) < 500) epsGrowthRates.push(growth);
+          // ✅ Filtrer directement : Growth doit être entre -50% et +100%
+          addRatioIfValid(epsGrowthRates, growth, 'growth', -50, 100);
         }
 
         if (prevRow.cashFlowPerShare > 0 && row.cashFlowPerShare > 0) {
           const growth = ((row.cashFlowPerShare - prevRow.cashFlowPerShare) / prevRow.cashFlowPerShare) * 100;
-          if (isFinite(growth) && Math.abs(growth) < 500) cfGrowthRates.push(growth);
+          // ✅ Filtrer directement : Growth doit être entre -50% et +100%
+          addRatioIfValid(cfGrowthRates, growth, 'growth', -50, 100);
         }
 
         if (prevRow.bookValuePerShare > 0 && row.bookValuePerShare > 0) {
           const growth = ((row.bookValuePerShare - prevRow.bookValuePerShare) / prevRow.bookValuePerShare) * 100;
-          if (isFinite(growth) && Math.abs(growth) < 500) bvGrowthRates.push(growth);
+          // ✅ Filtrer directement : Growth doit être entre -50% et +100%
+          addRatioIfValid(bvGrowthRates, growth, 'growth', -50, 100);
         }
 
         if (prevRow.dividendPerShare > 0 && row.dividendPerShare > 0) {
           const growth = ((row.dividendPerShare - prevRow.dividendPerShare) / prevRow.dividendPerShare) * 100;
-          if (isFinite(growth) && Math.abs(growth) < 500) divGrowthRates.push(growth);
+          // ✅ Filtrer directement : Growth doit être entre -50% et +100%
+          addRatioIfValid(divGrowthRates, growth, 'growth', -50, 100);
         }
       }
     });
