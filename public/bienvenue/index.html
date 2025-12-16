@@ -363,7 +363,7 @@
                     return "✨ Vous avez atteint l'horizon des événements ! Tout est complété.";
                 }
                 
-                if (q.includes('synthèse') || q.includes('résumé') || q.includes('audit')) {
+                if (q.includes('synthèse') || q.includes('résumé') || q.includes('audit') || q.includes('avancement')) {
                     const completionRate = Math.round((tasks.filter(t => t.status === 'completed').length / tasks.length) * 100);
                     return `📊 **Audit d'Intégration**\n- Score Global : ${completionRate}/100\n- Rapidité : ${late.length === 0 ? 'Excellente 🚀' : 'Attention requise ⚠️'}\n- Prochaine étape critique : ${pending[0]?.title || 'Aucune'}\n\nMon conseil : Continuez sur cette lancée !`;
                 }
@@ -396,15 +396,18 @@
             const [isLoading, setIsLoading] = useState(false);
 
             // Handles sending a message from the user
-            const handleSend = async () => {
-                if (!input.trim() || isLoading) return;
-                const userMsg = { from: 'user', text: input };
+            const handleSend = async (messageText = null) => {
+                const textToSend = typeof messageText === 'string' ? messageText : input;
+                if (!textToSend.trim() || isLoading) return;
+                
+                const userMsg = { from: 'user', text: textToSend };
                 setConversationMessages(prev => [...prev, userMsg]);
-                const question = input;
-                setInput('');
+                
+                if (!messageText) setInput('');
+                
                 setIsLoading(true);
                 try {
-                    const response = await getEmmaResponse(question);
+                    const response = await getEmmaResponse(textToSend);
                     setConversationMessages(prev => [...prev, { from: 'emma', text: response }]);
                 } catch (err) {
                     setConversationMessages(prev => [...prev, { from: 'emma', text: "Désolée, j'ai rencontré une erreur. Réessayez." }]);
@@ -469,10 +472,23 @@
                                         </div>
                                     </div>
                                 )}
-                                <div ref={messagesEndRef} />
+                            <div ref={messagesEndRef} />
                             </div>
 
-                           
+                            {/* Suggestions Area */}
+                            <div className="px-4 pt-2 pb-0 bg-gray-50 flex gap-2 overflow-x-auto no-scrollbar mask-gradient">
+                                {suggestions.map((s, i) => (
+                                    <button 
+                                        key={i} 
+                                        onClick={() => handleSend(s)}
+                                        className="whitespace-nowrap px-3 py-1.5 bg-white border border-purple-200 text-purple-700 rounded-full text-xs font-medium hover:bg-purple-50 transition-colors shadow-sm shrink-0"
+                                    >
+                                        {s}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Input Area */}
                             <div className="p-3 bg-white border-t flex gap-2 shrink-0">
                                 <input 
                                     className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
@@ -724,9 +740,10 @@
                             name: newRes.name,
                             role: newRes.role,
                             color: newRes.color,
+                            email: newRes.email,
                             avatar_initials: newRes.avatar,
                             display_order: newId
-                        }]).select(); // Select the inserted data to get the actual ID
+                        }]).select();
                         if (error) throw error;
                         
                         // Update the local state with the actual ID from Supabase
