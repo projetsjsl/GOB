@@ -871,7 +871,7 @@
         };
 
         // Helper function to send email with address
-        const sendEmailWithAddress = async (to, subject, html, employee) => {
+        const sendEmailWithAddress = async (to, subject, html, employee, showNotificationFn) => {
             // Feedback UI
             const originalText = document.activeElement ? document.activeElement.innerText : '';
             if (document.activeElement) document.activeElement.innerText = 'Envoi... ⏳';
@@ -914,7 +914,12 @@
                 html = window.generateEmailHTML(employee, phases, tasks, resources);
              } catch (e) {
                 console.error("Erreur génération email:", e);
-                showNotification("Erreur: Le modèle d'email ne s'est pas chargé correctement. Rechargez la page.", 'error');
+                const notifyFn = showNotificationFn || (typeof showNotification !== 'undefined' ? showNotification : console.error);
+                if (typeof notifyFn === 'function') {
+                    notifyFn("Erreur: Le modèle d'email ne s'est pas chargé correctement. Rechargez la page.", 'error');
+                } else {
+                    console.error("Erreur: Le modèle d'email ne s'est pas chargé correctement. Rechargez la page.");
+                }
                 return;
              }
              
@@ -922,7 +927,7 @@
              // Use modal instead of prompt()
              setEmailPromptCallback((email) => {
                  if (email) {
-                     sendEmailWithAddress(email, subject, html, employee);
+                     sendEmailWithAddress(email, subject, html, employee, showNotificationFn);
                  }
              });
              setShowEmailPrompt(true);
