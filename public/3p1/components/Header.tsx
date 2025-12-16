@@ -16,7 +16,6 @@ interface HeaderProps {
   onRestoreData?: () => void;
   showSyncButton?: boolean; // Nouveau prop pour contrôler la visibilité du bouton
   onOpenSettings?: () => void;
-  onOpenValidationSettings?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -31,8 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
   onRestoreData,
 
   showSyncButton = true, // Par défaut, afficher le bouton
-  onOpenSettings,
-  onOpenValidationSettings
+  onOpenSettings
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -224,19 +222,9 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={onOpenSettings}
                 className="p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors no-print"
-                title="Configuration Globale"
+                title="Configuration Complète : Guardrails, Validation, Ajustements"
               >
                 <Cog6ToothIcon className="w-4 h-4 sm:w-6 sm:h-6" />
-              </button>
-            )}
-
-            {onOpenValidationSettings && (
-              <button
-                onClick={onOpenValidationSettings}
-                className="p-1.5 sm:p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-full transition-colors no-print"
-                title="Paramètres de Validation et Cohérence FMP/Supabase"
-              >
-                <ShieldCheckIcon className="w-4 h-4 sm:w-6 sm:h-6" />
               </button>
             )}
           </div>

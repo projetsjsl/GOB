@@ -26,8 +26,7 @@ import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon,
 import { fetchCompanyData } from './services/financeApi';
 import { saveSnapshot, hasManualEdits, loadSnapshot, listSnapshots } from './services/snapshotApi';
 import { RestoreDataDialog } from './components/RestoreDataDialog';
-import { ConfigModal } from './components/ConfigModal';
-import { ValidationSettingsPanel } from './components/ValidationSettingsPanel';
+import { UnifiedSettingsPanel } from './components/UnifiedSettingsPanel';
 import { loadConfig, saveConfig, DEFAULT_CONFIG, GuardrailConfig } from './config/AppConfig';
 import { invalidateValidationSettingsCache } from './utils/validation';
 import { loadAllTickersFromSupabase, mapSourceToIsWatchlist } from './services/tickersApi';
@@ -146,8 +145,7 @@ export default function App() {
 
     // --- CONFIG SYSTEM ---
     const [guardrailConfig, setGuardrailConfig] = useState<GuardrailConfig>(() => loadConfig());
-    const [isConfigOpen, setIsConfigOpen] = useState(false);
-    const [isValidationSettingsOpen, setIsValidationSettingsOpen] = useState(false);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const handleSaveConfig = (newConfig: GuardrailConfig) => {
         setGuardrailConfig(newConfig);
@@ -155,8 +153,10 @@ export default function App() {
         showNotification('Configuration sauvegardée avec succès', 'success');
     };
 
-    const handleValidationSettingsClose = () => {
-        setIsValidationSettingsOpen(false);
+    const handleSettingsClose = () => {
+        setIsSettingsOpen(false);
+        // Reload guardrail config after settings are saved
+        setGuardrailConfig(loadConfig());
         // Invalider le cache pour recharger les nouveaux paramètres
         invalidateValidationSettingsCache();
         showNotification('Paramètres de validation mis à jour', 'success');
@@ -840,10 +840,20 @@ export default function App() {
 
     // --- ACTIVE SESSION STATE ---
     const [data, setData] = useState<AnnualData[]>(INITIAL_DATA);
-    const [assumptions, setAssumptions] = useState<Assumptions>(INITIAL_ASSUMPTIONS);
+    const [assumptions, _setAssumptionsRaw] = useState<Assumptions>(INITIAL_ASSUMPTIONS);
     const [info, setInfo] = useState<CompanyInfo>(INITIAL_INFO);
     const [notes, setNotes] = useState<string>('');
     const [isWatchlist, setIsWatchlist] = useState<boolean>(false);
+
+    // ✅ WRAPPER SIMPLE : Sanitis automatiquement toutes les mises à jour d'assumptions
+    // Plus besoin de sanitis manuellement partout dans le code !
+    const setAssumptions = (value: Assumptions | ((prev: Assumptions) => Assumptions)) => {
+        if (typeof value === 'function') {
+            _setAssumptionsRaw(prev => sanitizeAssumptionsSync(value(prev)));
+        } else {
+            _setAssumptionsRaw(sanitizeAssumptionsSync(value));
+        }
+    };
 
     // Load Active Profile when ID changes
     useEffect(() => {
@@ -1171,18 +1181,11 @@ export default function App() {
             // Détecter et exclure automatiquement les métriques avec prix cibles aberrants
             const finalData = data.length > 0 ? data : result.data; // Utiliser les données mergées
             
-            // ✅ SANITISER les assumptions auto-remplies AVANT de les merger avec les assumptions existantes
-            // Cela garantit que même si les assumptions existantes contiennent des valeurs aberrantes,
-            // elles seront corrigées lors du merge
-            const sanitizedAutoFilled = sanitizeAssumptionsSync(autoFilledAssumptions);
-            
-            // ✅ SANITISER aussi les assumptions existantes avant le merge
-            const sanitizedExisting = sanitizeAssumptionsSync(assumptions);
-            
-            // Merger les assumptions sanitisées (auto-filled prend priorité sur existantes)
+            // ✅ SIMPLIFIÉ : Plus besoin de sanitiser manuellement, setAssumptions le fait automatiquement !
+            // Merger les assumptions (auto-filled prend priorité sur existantes)
             const finalAssumptions = {
-                ...sanitizedExisting,
-                ...sanitizedAutoFilled // Les valeurs auto-remplies (sanitisées) prennent priorité
+                ...assumptions,
+                ...autoFilledAssumptions // Les valeurs auto-remplies prennent priorité
             };
             
             const outlierDetection = detectOutlierMetrics(finalData, finalAssumptions);
@@ -1204,18 +1207,16 @@ export default function App() {
                 excludeDIV: outlierDetection.excludeDIV
             };
 
-            // ✅ SANITISER une dernière fois avant de mettre à jour le state et sauvegarder
-            const finalSanitizedAssumptions = sanitizeAssumptionsSync(assumptionsWithOutlierExclusions);
-
-            // Mettre à jour les assumptions dans le state
-            setAssumptions(finalSanitizedAssumptions);
+            // ✅ SIMPLIFIÉ : setAssumptions sanitis automatiquement !
+            setAssumptions(assumptionsWithOutlierExclusions);
 
             // Auto-save snapshot after successful sync
+            // ✅ saveSnapshot sanitis aussi, donc double protection
             console.log('💾 Auto-saving snapshot after API sync...');
             await saveSnapshot(
                 activeId,
                 finalData,
-                finalSanitizedAssumptions, // ✅ Assumptions complètement sanitisées
+                assumptionsWithOutlierExclusions, // setAssumptions a déjà sanitisé, saveSnapshot sanitisera aussi
                 info,
                 `API sync - ${new Date().toLocaleString()}`,
                 true,  // Mark as current
@@ -2721,8 +2722,7 @@ export default function App() {
                                     onFetchData={profile?.info?.symbol ? handleFetchData : undefined}
                                     onRestoreData={profile && profile.data.length > 0 ? () => setShowRestoreDialog(true) : undefined}
                                     showSyncButton={true}
-                                    onOpenSettings={() => setIsConfigOpen(true)}
-                                    onOpenValidationSettings={() => setIsValidationSettingsOpen(true)}
+                                    onOpenSettings={() => setIsSettingsOpen(true)}
                                 />
 
                         {/* CONDITIONAL RENDER: ANALYSIS VS INFO VS KPI */}
@@ -3026,10 +3026,10 @@ export default function App() {
                 onRemove={(id) => setNotifications(prev => prev.filter(n => n.id !== id))}
             />
 
-            {/* VALIDATION SETTINGS PANEL */}
-            <ValidationSettingsPanel
-                isOpen={isValidationSettingsOpen}
-                onClose={handleValidationSettingsClose}
+            {/* UNIFIED SETTINGS PANEL */}
+            <UnifiedSettingsPanel
+                isOpen={isSettingsOpen}
+                onClose={handleSettingsClose}
             />
         </div>
     );
