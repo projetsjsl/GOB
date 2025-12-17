@@ -94,6 +94,13 @@ const DEFAULT_PROFILE: AnalysisProfile = {
 };
 
 const STORAGE_KEY = 'finance_pro_profiles';
+const CACHE_MAX_AGE_MS = 5 * 60 * 1000; // 5 minutes - Cache invalidation automatique
+
+// ✅ Structure du cache avec timestamp pour invalidation automatique
+interface CacheEntry {
+    data: Record<string, AnalysisProfile>;
+    timestamp: number;
+}
 
 const ProgressBar = ({ current, total }: { current: number; total: number }) => {
     const progressRef = useRef<HTMLDivElement>(null);
@@ -228,6 +235,8 @@ export default function App() {
             const symbol = payload.new.ticker?.toUpperCase();
             if (symbol) {
                 showNotification(`📡 Nouveau ticker ajouté par un autre utilisateur: ${symbol}`, 'info');
+                // ✅ NOUVEAU : Invalider le cache localStorage automatiquement
+                storage.removeItem(STORAGE_KEY).catch(console.warn);
                 // ✅ FORCER le rechargement complet depuis Supabase pour synchronisation
                 hasLoadedTickersRef.current = false;
                 supabaseTickersCacheRef.current = null; // Invalider le cache
@@ -243,11 +252,12 @@ export default function App() {
             const symbol = payload.old.ticker?.toUpperCase();
             if (symbol) {
                 showNotification(`📡 Ticker supprimé par un autre utilisateur: ${symbol}`, 'warning');
-                // ✅ Supprimer du localStorage ET forcer rechargement
+                // ✅ NOUVEAU : Invalider le cache localStorage automatiquement
+                storage.removeItem(STORAGE_KEY).catch(console.warn);
+                // ✅ Supprimer du state local ET forcer rechargement
                 setLibrary(prev => {
                     const updated = { ...prev };
                     delete updated[symbol];
-                    storage.setItem(STORAGE_KEY, updated).catch(console.warn);
                     return updated;
                 });
                 // Recharger depuis Supabase pour être sûr
@@ -264,6 +274,8 @@ export default function App() {
             const symbol = payload.new.ticker?.toUpperCase();
             if (symbol) {
                 showNotification(`📡 Ticker mis à jour: ${symbol}`, 'info');
+                // ✅ NOUVEAU : Invalider le cache localStorage automatiquement
+                storage.removeItem(STORAGE_KEY).catch(console.warn);
                 // ✅ Mettre à jour les métriques ValueLine ET recharger pour cohérence
                 setLibrary(prev => {
                     if (!prev[symbol]) return prev;
@@ -450,10 +462,28 @@ export default function App() {
             try {
                 const saved = await storage.getItem(STORAGE_KEY);
                 if (saved) {
-                    let parsed: Record<string, AnalysisProfile> = saved;
+                    let parsed: Record<string, AnalysisProfile> | CacheEntry = saved;
+                    let cacheTimestamp: number | null = null;
                     
-                    // If saved is string (from localStorage migration), parse it
-                    if (typeof saved === 'string') {
+                    // ✅ NOUVEAU : Vérifier si c'est la nouvelle structure avec timestamp
+                    if (saved && typeof saved === 'object' && 'data' in saved && 'timestamp' in saved) {
+                        const cacheEntry = saved as CacheEntry;
+                        cacheTimestamp = cacheEntry.timestamp;
+                        parsed = cacheEntry.data;
+                        
+                        // ✅ Vérifier si le cache est obsolète (> 5 min)
+                        const now = Date.now();
+                        const cacheAge = now - cacheTimestamp;
+                        if (cacheAge > CACHE_MAX_AGE_MS) {
+                            console.log(`🔄 Cache obsolète (${Math.round(cacheAge / 1000 / 60)} min) - Rechargement depuis Supabase...`);
+                            // Invalider le cache et recharger depuis Supabase
+                            await storage.removeItem(STORAGE_KEY);
+                            parsed = {};
+                        } else {
+                            console.log(`✅ Cache valide (${Math.round(cacheAge / 1000)}s) - Utilisation cache localStorage`);
+                        }
+                    } else if (typeof saved === 'string') {
+                        // Migration depuis ancien format (string)
                         try {
                            parsed = JSON.parse(saved);
                         } catch (e) {
@@ -739,9 +769,13 @@ export default function App() {
                         newTickersCount++;
                     });
 
-                    // Sauvegarder dans localStorage
+                    // ✅ NOUVEAU : Sauvegarder dans localStorage avec timestamp
                     try {
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                        const cacheEntry: CacheEntry = {
+                            data: updated,
+                            timestamp: Date.now()
+                        };
+                        await storage.setItem(STORAGE_KEY, cacheEntry);
                     } catch (e) {
                         console.warn('Failed to save to LocalStorage:', e);
                     }
