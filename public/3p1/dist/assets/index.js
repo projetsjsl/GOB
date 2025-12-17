@@ -52181,6 +52181,18 @@ Vérifiez votre connexion et réessayez.`,
             }
             return true;
           });
+          const teamTickersInNew = newTickers.filter((t) => t.source === "team" || t.source === "both");
+          const teamTickersAlreadyInLibrary = result.tickers.filter((t) => {
+            const symbol = t.ticker.toUpperCase();
+            return (t.source === "team" || t.source === "both") && existingSymbols.has(symbol);
+          });
+          console.log(`📊 Team tickers: ${teamTickersInNew.length} nouveaux à créer, ${teamTickersAlreadyInLibrary.length} déjà dans library`);
+          if (teamTickersInNew.length > 0) {
+            console.log(`   ➕ Nouveaux:`, teamTickersInNew.map((t) => t.ticker).join(", "));
+          }
+          if (teamTickersAlreadyInLibrary.length > 0) {
+            console.log(`   🔄 Déjà dans library (seront mis à jour):`, teamTickersAlreadyInLibrary.map((t) => t.ticker).join(", "));
+          }
           const updated = { ...prev };
           let newTickersCount = 0;
           let migrationCount = 0;
@@ -52202,6 +52214,10 @@ Vérifiez votre connexion et réessayez.`,
               const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
               const hasValueLineUpdates = supabaseTicker.security_rank || supabaseTicker.earnings_predictability || supabaseTicker.price_growth_persistence || supabaseTicker.price_stability;
               const needsUpdate = updated[tickerSymbol].isWatchlist !== shouldBeWatchlist || hasValueLineUpdates;
+              const isTeamTicker2 = supabaseTicker.source === "team" || supabaseTicker.source === "both";
+              if (isTeamTicker2 && needsUpdate) {
+                console.log(`   🔄 Mise à jour team ticker existant: ${tickerSymbol} (isWatchlist: ${updated[tickerSymbol].isWatchlist} → ${shouldBeWatchlist})`);
+              }
               if (needsUpdate) {
                 updated[tickerSymbol] = {
                   ...updated[tickerSymbol],
