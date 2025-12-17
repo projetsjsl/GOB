@@ -124,17 +124,17 @@ export const UnifiedSettingsPanel: React.FC<UnifiedSettingsPanelProps> = ({
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[10000] p-4 text-left">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[95vh] flex flex-col">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-                    <div className="flex items-center gap-4">
-                        <div className="bg-blue-600 p-3 rounded-xl shadow-lg">
-                            <Cog6ToothIcon className="w-7 h-7 text-white" />
+                <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex-shrink-0">
+                    <div className="flex items-center gap-3 min-w-0">
+                        <div className="bg-blue-600 p-2 rounded-lg shadow-lg flex-shrink-0">
+                            <Cog6ToothIcon className="w-5 h-5 text-white" />
                         </div>
-                        <div>
-                            <h3 className="text-2xl font-bold text-gray-900">Configuration Complète 3p1</h3>
-                            <p className="text-sm text-gray-600 mt-1">
-                                Gestion unifiée de tous les paramètres : Guardrails, Validation, Ajustements
+                        <div className="min-w-0">
+                            <h3 className="text-lg font-bold text-gray-900 truncate">Configuration Complète 3p1</h3>
+                            <p className="text-xs text-gray-600 mt-0.5 truncate">
+                                Guardrails, Validation, Ajustements
                             </p>
                         </div>
                     </div>
@@ -168,7 +168,7 @@ export const UnifiedSettingsPanel: React.FC<UnifiedSettingsPanelProps> = ({
                 </div>
 
                 {/* Tabs */}
-                <div className="flex border-b border-gray-200 overflow-x-auto bg-gray-50 px-6">
+                <div className="flex border-b border-gray-200 overflow-x-auto bg-gray-50 px-4 flex-shrink-0">
                     {[
                         { id: 'overview' as TabType, label: '📊 Vue d\'ensemble', icon: '📊' },
                         { id: 'guardrails' as TabType, label: '🛡️ Guardrails', icon: '🛡️' },
@@ -190,7 +190,7 @@ export const UnifiedSettingsPanel: React.FC<UnifiedSettingsPanelProps> = ({
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6">
+                <div className="flex-1 overflow-y-auto p-4">
                     {isLoading ? (
                         <div className="flex items-center justify-center h-64">
                             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>

@@ -36898,13 +36898,13 @@ const UnifiedSettingsPanel = ({
     }
   };
   if (!isOpen) return null;
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[10000] p-4 text-left", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[95vh] flex flex-col", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-600 p-3 rounded-xl shadow-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$r, { className: "w-7 h-7 text-white" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-2xl font-bold text-gray-900", children: "Configuration Complète 3p1" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mt-1", children: "Gestion unifiée de tous les paramètres : Guardrails, Validation, Ajustements" })
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[10000] p-4 text-left", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex-shrink-0", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 min-w-0", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-600 p-2 rounded-lg shadow-lg flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$r, { className: "w-5 h-5 text-white" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-900 truncate", children: "Configuration Complète 3p1" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-0.5 truncate", children: "Guardrails, Validation, Ajustements" })
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
@@ -36931,7 +36931,7 @@ const UnifiedSettingsPanel = ({
         )
       ] })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex border-b border-gray-200 overflow-x-auto bg-gray-50 px-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex border-b border-gray-200 overflow-x-auto bg-gray-50 px-4 flex-shrink-0", children: [
       { id: "overview", label: "📊 Vue d'ensemble", icon: "📊" },
       { id: "guardrails", label: "🛡️ Guardrails", icon: "🛡️" },
       { id: "validation", label: "✅ Validation & Cohérence", icon: "✅" }
@@ -36947,7 +36947,7 @@ const UnifiedSettingsPanel = ({
       },
       tab.id
     )) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-y-auto p-6", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-64", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600" }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-y-auto p-4", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-64", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600" }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
       activeTab === "overview" && /* @__PURE__ */ jsxRuntimeExports.jsx(
         OverviewTab,
         {
