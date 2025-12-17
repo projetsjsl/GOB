@@ -1490,7 +1490,7 @@
                                 </button>
                             ))}
                         </div>
-                        <div className="flex-1 overflow-y-auto p-6 bg-gray-50/50">
+                        <div className="flex-1 overflow-hidden p-6 bg-gray-50/50 flex flex-col">
                             {activeTab === 'recipes' && (
                                 <div className="space-y-6">
                                     {/* Create Recipe */}
@@ -1722,8 +1722,8 @@
                                          </div>
                                     </div>
 
-                                    {/* Task List Grouped by Phase */}
-                                    <div className="space-y-8 pb-12">
+                                    {/* Task List Grouped by Phase - SCROLLABLE */}
+                                    <div className="flex-1 overflow-y-auto space-y-8 pb-12 pr-2 -mr-2">
                                         {phaseTemplates.sort((a,b) => (a.displayOrder || 0) - (b.displayOrder || 0)).map(phase => (
                                             <div key={phase.id} className="bg-blue-50/30 rounded-xl overflow-hidden border border-blue-100/50">
                                                 {/* Phase Header */}
