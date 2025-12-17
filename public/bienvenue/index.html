@@ -1091,21 +1091,35 @@
                 return;
              }
              
-             const subject = `Plan d'Intégration - ${employee?.name || employee.name || 'Nouveau'}`;
+             // Générer un sujet par défaut si employee n'est pas défini
+             const employeeName = (employee && employee.name) ? employee.name : 'Nouveau collaborateur';
+             const subject = `Plan d'Intégration - ${employeeName}`;
+             
              const to = prompt("Entrez l'adresse email du destinataire:", "projetsjsl@gmail.com"); 
-             if (!to) return;
+             if (!to || !to.trim()) {
+                 notify('Envoi annulé - adresse email requise', 'info');
+                 return;
+             }
+             
+             // Vérifier que le sujet est bien défini
+             if (!subject || subject.trim() === '' || subject === 'Plan d\'Intégration - ') {
+                 notify('Erreur: Le sujet de l\'email est manquant ou invalide', 'error');
+                 console.error('Subject error:', { subject, employee, employeeName });
+                 return;
+             }
              
              // Feedback UI
              const originalText = document.activeElement ? document.activeElement.innerText : '';
              if (document.activeElement) document.activeElement.innerText = 'Envoi... ⏳';
 
              try {
+                console.log('📧 Envoi email:', { to: to.trim(), subject: subject.trim(), htmlLength: html.length });
                 const response = await fetch('/api/send-email', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        to: to,
-                        subject: subject,
+                        to: to.trim(),
+                        subject: subject.trim(),
                         html: html,
                         briefingType: 'onboarding_plan'
                     }),
