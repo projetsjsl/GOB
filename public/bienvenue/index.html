@@ -350,7 +350,7 @@
             generateTasks(employee, taskTemplates, employeeTasks) {
                 if (!employee || !employee.id) return [];
                 
-                const startDate = new Date(employee.startDate || new Date());
+                const startDate = new Date(employee.startDate || '2026-01-01');
                 const savedStatuses = employeeTasks[employee.id] || {};
                 
                 return taskTemplates.map(tt => {
@@ -1202,7 +1202,7 @@
                     name: newEmpName || 'Nouvel Employé', 
                     role: newEmpRole || 'Poste', 
                     email: newEmpEmail, 
-                    startDate: new Date().toISOString().split('T')[0],
+                    startDate: new Date('2026-01-01').toISOString().split('T')[0],
                     avatarUrl: null
                 };
                 setEmployees([...employees, newEmp]);
@@ -2187,10 +2187,10 @@
                 };
             }, [employees, selectedEmployeeId]);
 
-            // Helper pour sécuriser les dates
+            // Helper pour sécuriser les dates (défaut 2026)
             const getValidDate = (dateStr) => {
                 const d = new Date(dateStr);
-                return isNaN(d.getTime()) ? new Date() : d;
+                return isNaN(d.getTime()) ? new Date('2026-01-01') : d;
             };
 
             /**
@@ -3238,7 +3238,7 @@
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="bg-white px-4 py-2 rounded-lg border shadow-sm text-sm font-bold text-gray-600">
-                                    📅 {new Date().getFullYear()}
+                                    📅 2026
                                 </div>
                             </div>
                         </div>
