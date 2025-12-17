@@ -1123,6 +1123,72 @@
         };
 
         /**
+         * DatePicker - Composant calendrier simple et réutilisable
+         * ---------------------------------------------------------
+         * Affiche un input date natif avec un style amélioré et gestion d'ouverture/fermeture
+         * 
+         * @param {object} props - Les propriétés du composant
+         * @param {string} props.value - La valeur de la date (format YYYY-MM-DD)
+         * @param {function} props.onChange - Callback appelé lors du changement de date
+         * @param {function} [props.onBlur] - Callback appelé lorsque l'input perd le focus
+         * @param {string} [props.placeholder] - Texte de placeholder
+         * @param {string} [props.className] - Classes CSS additionnelles
+         * @param {string} [props.min] - Date minimale autorisée (format YYYY-MM-DD)
+         * @param {string} [props.max] - Date maximale autorisée (format YYYY-MM-DD)
+         * @param {boolean} [props.showIcon=true] - Affiche ou non l'icône calendrier
+         */
+        const DatePicker = ({ value, onChange, onBlur, placeholder, className = '', min = null, max = null, showIcon = true }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            const inputRef = useRef(null);
+
+            const handleClick = () => {
+                setIsOpen(true);
+                // Focus sur l'input pour ouvrir le calendrier natif
+                setTimeout(() => {
+                    if (inputRef.current) {
+                        inputRef.current.showPicker?.();
+                        inputRef.current.focus();
+                    }
+                }, 10);
+            };
+
+            const formatDate = (dateStr) => {
+                if (!dateStr) return placeholder || 'Sélectionner date';
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            };
+
+            return (
+                <div className="relative inline-block">
+                    <input
+                        ref={inputRef}
+                        type="date"
+                        value={value || ''}
+                        onChange={(e) => {
+                            onChange(e.target.value);
+                            setIsOpen(false);
+                        }}
+                        onBlur={(e) => {
+                            setIsOpen(false);
+                            if (onBlur) onBlur(e);
+                        }}
+                        min={min}
+                        max={max}
+                        className="absolute opacity-0 w-full h-full cursor-pointer"
+                        style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
+                    />
+                    <div
+                        onClick={handleClick}
+                        className={`${className} cursor-pointer flex items-center gap-1 hover:bg-blue-50 transition-colors rounded px-2 py-1 border border-transparent hover:border-blue-300`}
+                    >
+                        {showIcon && <span>📅</span>}
+                        <span className="text-xs whitespace-nowrap">{formatDate(value)}</span>
+                    </div>
+                </div>
+            );
+        };
+
+        /**
          * AdminPanel - Panneau d'administration complet
          * ----------------------------------------------
          * Composant de niveau supérieur pour gérer toutes les entités:
