@@ -38590,6 +38590,21 @@ const ReportsPanel = ({
 };
 const loadAllTickersFromSupabase = async () => {
   try {
+    let teamTickersResponse = await fetch("/api/admin/tickers?is_active=true&source=team&limit=1000&order_by=ticker&order_direction=asc");
+    let bothTickersResponse = await fetch("/api/admin/tickers?is_active=true&source=both&limit=1000&order_by=ticker&order_direction=asc");
+    const allTeamTickers = [];
+    if (teamTickersResponse.ok) {
+      const teamResult = await teamTickersResponse.json();
+      if (teamResult.success && teamResult.tickers) {
+        allTeamTickers.push(...teamResult.tickers);
+      }
+    }
+    if (bothTickersResponse.ok) {
+      const bothResult = await bothTickersResponse.json();
+      if (bothResult.success && bothResult.tickers) {
+        allTeamTickers.push(...bothResult.tickers);
+      }
+    }
     let response = await fetch("/api/admin/tickers?is_active=true&limit=1000");
     let result = null;
     if (response.ok) {
@@ -38608,7 +38623,31 @@ const loadAllTickersFromSupabase = async () => {
           }
           return { ...ticker2, source: "manual" };
         });
-        console.log(`✅ ${tickers.length} tickers chargés depuis /api/admin/tickers`);
+        const tickerSymbols = new Set(tickers.map((t) => t.ticker.toUpperCase()));
+        const normalizedTeamTickers = allTeamTickers.map((ticker2) => {
+          if (ticker2.source) return ticker2;
+          if (ticker2.category) return { ...ticker2, source: ticker2.category };
+          if (Array.isArray(ticker2.categories)) {
+            const hasTeam = ticker2.categories.includes("team");
+            const hasWatchlist = ticker2.categories.includes("watchlist");
+            const derived = hasTeam && hasWatchlist ? "both" : hasWatchlist ? "watchlist" : hasTeam ? "team" : "manual";
+            return { ...ticker2, source: derived };
+          }
+          return { ...ticker2, source: "manual" };
+        });
+        normalizedTeamTickers.forEach((teamTicker) => {
+          const symbol = teamTicker.ticker.toUpperCase();
+          if (!tickerSymbols.has(symbol)) {
+            tickers.push(teamTicker);
+            tickerSymbols.add(symbol);
+          } else {
+            const index2 = tickers.findIndex((t) => t.ticker.toUpperCase() === symbol);
+            if (index2 >= 0 && (teamTicker.source === "team" || teamTicker.source === "both")) {
+              tickers[index2] = teamTicker;
+            }
+          }
+        });
+        console.log(`✅ ${tickers.length} tickers chargés depuis /api/admin/tickers (dont ${normalizedTeamTickers.length} team tickers)`);
         return {
           success: true,
           tickers

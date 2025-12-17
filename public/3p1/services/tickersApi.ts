@@ -43,7 +43,28 @@ export interface LoadTickersResult {
  */
 export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> => {
   try {
-    // ✅ ESSAI 1: Utiliser l'API admin qui retourne tous les champs (incluant source)
+    // ✅ ESSAI 1: Charger TOUS les team tickers explicitement (sans limite de priority)
+    // Cela garantit que les 25 team tickers sont toujours chargés, même avec priority basse
+    let teamTickersResponse = await fetch('/api/admin/tickers?is_active=true&source=team&limit=1000&order_by=ticker&order_direction=asc');
+    let bothTickersResponse = await fetch('/api/admin/tickers?is_active=true&source=both&limit=1000&order_by=ticker&order_direction=asc');
+    
+    const allTeamTickers: any[] = [];
+    
+    if (teamTickersResponse.ok) {
+      const teamResult = await teamTickersResponse.json();
+      if (teamResult.success && teamResult.tickers) {
+        allTeamTickers.push(...teamResult.tickers);
+      }
+    }
+    
+    if (bothTickersResponse.ok) {
+      const bothResult = await bothTickersResponse.json();
+      if (bothResult.success && bothResult.tickers) {
+        allTeamTickers.push(...bothResult.tickers);
+      }
+    }
+    
+    // ✅ ESSAI 2: Charger tous les autres tickers (limit 1000 pour éviter surcharge)
     let response = await fetch('/api/admin/tickers?is_active=true&limit=1000');
     let result: any = null;
 
@@ -75,7 +96,36 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
           return { ...ticker, source: 'manual' as const };
         });
 
-        console.log(`✅ ${tickers.length} tickers chargés depuis /api/admin/tickers`);
+        // ✅ FUSIONNER: Ajouter les team tickers (éviter doublons)
+        const tickerSymbols = new Set(tickers.map((t: any) => t.ticker.toUpperCase()));
+        const normalizedTeamTickers = allTeamTickers.map((ticker: any) => {
+          if (ticker.source) return ticker;
+          if (ticker.category) return { ...ticker, source: ticker.category };
+          if (Array.isArray(ticker.categories)) {
+            const hasTeam = ticker.categories.includes('team');
+            const hasWatchlist = ticker.categories.includes('watchlist');
+            const derived = hasTeam && hasWatchlist ? 'both' : hasWatchlist ? 'watchlist' : hasTeam ? 'team' : 'manual';
+            return { ...ticker, source: derived };
+          }
+          return { ...ticker, source: 'manual' };
+        });
+        
+        // Ajouter les team tickers qui ne sont pas déjà dans la liste
+        normalizedTeamTickers.forEach((teamTicker: any) => {
+          const symbol = teamTicker.ticker.toUpperCase();
+          if (!tickerSymbols.has(symbol)) {
+            tickers.push(teamTicker);
+            tickerSymbols.add(symbol);
+          } else {
+            // Remplacer par la version team si elle existe (pour garantir source correct)
+            const index = tickers.findIndex((t: any) => t.ticker.toUpperCase() === symbol);
+            if (index >= 0 && (teamTicker.source === 'team' || teamTicker.source === 'both')) {
+              tickers[index] = teamTicker; // Remplacer pour garantir source correct
+            }
+          }
+        });
+
+        console.log(`✅ ${tickers.length} tickers chargés depuis /api/admin/tickers (dont ${normalizedTeamTickers.length} team tickers)`);
         return {
           success: true,
           tickers
