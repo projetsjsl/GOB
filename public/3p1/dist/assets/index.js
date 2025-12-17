@@ -52155,6 +52155,7 @@ Vérifiez votre connexion et réessayez.`,
           return;
         }
         console.log(`✅ ${result.tickers.length} tickers chargés depuis Supabase`);
+        hasLoadedTickersRef.current = true;
         supabaseTickersCacheRef.current = {
           data: result.tickers,
           timestamp: Date.now()

@@ -674,6 +674,9 @@ export default function App() {
                 }
                 
                 console.log(`✅ ${result.tickers.length} tickers chargés depuis Supabase`);
+                
+                // ✅ Marquer comme chargé seulement après succès
+                hasLoadedTickersRef.current = true;
 
                 // Mettre à jour le cache pour handleSelectTicker
                 supabaseTickersCacheRef.current = {
