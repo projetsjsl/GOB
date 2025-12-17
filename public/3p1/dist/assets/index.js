@@ -38484,8 +38484,21 @@ async function fetchMarketDataBatch(tickers) {
   }
   try {
     const tickersStr = tickers.join(",");
-    const response = await fetch(`/api/market-data-batch?tickers=${encodeURIComponent(tickersStr)}`);
+    let response = await fetch(`/api/market-data-batch?tickers=${encodeURIComponent(tickersStr)}`);
+    if (response.status === 404) {
+      response = await fetch(`/api/marketdata/batch?tickers=${encodeURIComponent(tickersStr)}`);
+    }
     if (!response.ok) {
+      if (response.status === 404) {
+        console.warn("⚠️ Endpoint market-data-batch non disponible - Retour vide");
+        return {
+          success: true,
+          data: [],
+          stats: { total: tickers.length, fresh: 0, stale: 0, missing: tickers.length },
+          missingTickers: tickers,
+          timestamp: (/* @__PURE__ */ new Date()).toISOString()
+        };
+      }
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
     const result = await response.json();

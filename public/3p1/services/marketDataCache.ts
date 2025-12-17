@@ -57,9 +57,26 @@ export async function fetchMarketDataBatch(tickers: string[]): Promise<MarketDat
 
   try {
     const tickersStr = tickers.join(',');
-    const response = await fetch(`/api/market-data-batch?tickers=${encodeURIComponent(tickersStr)}`);
+    // Essayer d'abord /api/market-data-batch, puis /api/marketdata/batch en fallback
+    let response = await fetch(`/api/market-data-batch?tickers=${encodeURIComponent(tickersStr)}`);
+    
+    // Si 404, essayer l'autre endpoint
+    if (response.status === 404) {
+      response = await fetch(`/api/marketdata/batch?tickers=${encodeURIComponent(tickersStr)}`);
+    }
 
     if (!response.ok) {
+      // Si les deux endpoints échouent, retourner un résultat vide plutôt que d'échouer
+      if (response.status === 404) {
+        console.warn('⚠️ Endpoint market-data-batch non disponible - Retour vide');
+        return {
+          success: true,
+          data: [],
+          stats: { total: tickers.length, fresh: 0, stale: 0, missing: tickers.length },
+          missingTickers: tickers,
+          timestamp: new Date().toISOString()
+        };
+      }
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
 
