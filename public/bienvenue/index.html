@@ -912,13 +912,23 @@
 
         // FONCTION D'ENVOI EMAIL VIA RESEND (Réelle API) - VERSION FONCTIONNELLE
         const sendEmailViaResend = async (employee, phases, tasks, resources) => {
+             // Vérifier que generateEmailHTML est disponible
+             if (typeof window.generateEmailHTML !== 'function') {
+                 showNotification('⚠️ Le générateur d\'email n\'est pas encore chargé. Attendez quelques secondes et réessayez.', 'error');
+                 console.error('window.generateEmailHTML is not a function. email-template.js may not be loaded yet.');
+                 return;
+             }
+             
              let html;
              try {
-                if (typeof window.generateEmailHTML !== 'function') throw new Error("Le générateur d'email n'est pas chargé.");
                 html = window.generateEmailHTML(employee, phases, tasks, resources);
+                if (!html) {
+                    showNotification('Erreur: Impossible de générer l\'email. Vérifiez les données.', 'error');
+                    return;
+                }
              } catch (e) {
                 console.error("Erreur génération email:", e);
-                showNotification("Erreur: Le modèle d'email ne s'est pas chargé correctement. Rechargez la page.", 'error');
+                showNotification(`Erreur: ${e.message || "Le modèle d'email ne s'est pas chargé correctement. Rechargez la page."}`, 'error');
                 return;
              }
              
