@@ -2858,7 +2858,11 @@
                                 <Icons.Send /> <span className="hidden md:inline">Copier l'email</span>
                             </button>
 
-                            <button onClick={() => sendEmailViaResend(selectedEmployee, phases, filteredTasks, resources)} className="p-2 text-green-600 hover:bg-green-50 rounded-lg flex items-center gap-2 transition-colors" title="Envoyer via Resend">
+                            <button onClick={() => {
+                                // Utiliser la fonction globale ou locale
+                                const sendFn = window.sendEmailViaResend || sendEmailViaResend;
+                                sendFn(selectedEmployee, phases, filteredTasks, resources, showNotification);
+                            }} className="p-2 text-green-600 hover:bg-green-50 rounded-lg flex items-center gap-2 transition-colors" title="Envoyer via Resend">
                                 <Icons.Send /> <span className="font-bold">Envoyer (Resend)</span>
                             </button>
                         </div>

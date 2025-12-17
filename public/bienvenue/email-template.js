@@ -201,6 +201,7 @@ window.sendEmailPlan = async function(employee, phases, tasks, resources) {
             if (document.activeElement) document.activeElement.innerText = originalText;
         }
     }
+};
 
 window.copyEmailHTML = function(employee, phases, tasks, resources) {
     const html = window.generateEmailHTML(employee, phases, tasks, resources);
