@@ -2780,20 +2780,20 @@
                                          <>
                                              {/* Overlay pour fermer en cliquant à l'extérieur */}
                                              <div 
-                                                 className="fixed inset-0 z-[9998] bg-black/20 backdrop-blur-sm"
+                                                 className="fixed inset-0 z-[9998] bg-black/20 backdrop-blur-sm transition-opacity duration-200"
                                                  onClick={() => setEditing(null)}
                                              />
                                              <div 
-                                                 className="fixed bg-white shadow-2xl rounded-lg p-3 border-2 border-blue-200 z-[9999] w-64 animate-bounce-in"
+                                                 className="fixed bg-white shadow-2xl rounded-lg p-3 border-2 border-blue-200 z-[9999] w-64"
                                                  style={{
-                                                     // Calculer la position dynamiquement pour éviter l'overflow
-                                                     position: 'fixed',
                                                      top: '50%',
                                                      left: '50%',
                                                      transform: 'translate(-50%, -50%)',
                                                      maxHeight: '80vh',
                                                      overflowY: 'auto',
-                                                     boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                                                     boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                                                     willChange: 'transform',
+                                                     backfaceVisibility: 'hidden'
                                                  }}
                                                  onClick={(e) => e.stopPropagation()}
                                              >
