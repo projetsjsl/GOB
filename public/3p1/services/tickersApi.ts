@@ -166,10 +166,15 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
  * 
  * @param source - Le champ source depuis Supabase ('team', 'watchlist', 'both', 'manual')
  * @returns true si watchlist (icône œil), false si portefeuille (icône étoile)
+ * 
+ * ⚠️ IMPORTANT: Seuls les tickers avec source='team' sont considérés comme Portefeuille (⭐)
+ * Tous les autres (watchlist, both, manual, null, undefined) sont considérés comme Watchlist (👁️)
  */
-export const mapSourceToIsWatchlist = (source: string): boolean => {
-  // source='watchlist' ou 'both' → isWatchlist: true → Icône œil (EyeIcon, bleu)
-  // source='team' → isWatchlist: false → Icône étoile (StarIcon, jaune)
-  return source === 'watchlist' || source === 'both';
+export const mapSourceToIsWatchlist = (source: string | null | undefined): boolean => {
+  // ✅ Seuls les tickers avec source='team' sont Portefeuille (⭐)
+  // Tous les autres (watchlist, both, manual, null, undefined) sont Watchlist (👁️)
+  if (!source) return true; // null/undefined → Watchlist par défaut
+  if (source === 'team') return false; // ⭐ Portefeuille
+  return true; // watchlist, both, manual → 👁️ Watchlist
 };
 

@@ -38633,7 +38633,9 @@ const loadAllTickersFromSupabase = async () => {
   }
 };
 const mapSourceToIsWatchlist = (source) => {
-  return source === "watchlist" || source === "both";
+  if (!source) return true;
+  if (source === "team") return false;
+  return true;
 };
 async function fetchMarketDataBatch(tickers) {
   if (tickers.length === 0) {
