@@ -32987,6 +32987,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
   const [filterCountry, setFilterCountry] = reactExports.useState("all");
   const [filterExchange, setFilterExchange] = reactExports.useState("all");
   const [filterMarketCap, setFilterMarketCap] = reactExports.useState("all");
+  const [isFiltersExpanded, setIsFiltersExpanded] = reactExports.useState(true);
   const recommendationCacheRef = reactExports.useRef(/* @__PURE__ */ new Map());
   const getCachedRecommendation = (profile) => {
     const cacheKey = `${profile.id}-${profile.lastModified}`;
@@ -33340,144 +33341,157 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
         );
       })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-2 sm:p-3 md:p-4 border-t border-slate-800 bg-slate-900", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xs font-semibold text-slate-500 uppercase mb-2 sm:mb-3 flex items-center gap-1.5 sm:gap-2 cursor-help", title: "Filtres et Tri\\n\\nFiltrez et triez votre portefeuille selon différents critères.\\n\\nFiltres:\\n• Tous: Affiche tous les tickers\\n• Portefeuille: Uniquement les titres détenus\\n• Watchlist: Uniquement les titres surveillés\\n\\nTri:\\n• Alphabétique: A-Z ou Z-A\\n• Date de modification: Plus récent ou plus ancien\\n• Recommandation: Achat, Conserver, Vente\\n• Secteur: Par secteur d'activité", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-3 h-3 flex-shrink-0" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate", children: "Filtres et Tri" })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-3 gap-1.5 sm:gap-2 mb-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "button",
-          {
-            onClick: () => setFilterBy("all"),
-            className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors ${filterBy === "all" ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
-            title: "Afficher tous les tickers (Portefeuille + Watchlist)",
-            children: "Tous"
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          "button",
-          {
-            onClick: () => setFilterBy("portfolio"),
-            className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${filterBy === "portfolio" ? "bg-yellow-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
-            title: "Afficher uniquement les tickers du portefeuille (titres détenus)",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-3 h-3" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Portefeuille" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sm:hidden", children: "Port." })
-            ]
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          "button",
-          {
-            onClick: () => setFilterBy("watchlist"),
-            className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${filterBy === "watchlist" ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
-            title: "Afficher uniquement les tickers de la watchlist (titres surveillés)",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-3 h-3" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Watchlist" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sm:hidden", children: "Watch" })
-            ]
-          }
-        )
-      ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-t border-slate-800 bg-slate-900", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        "select",
+        "button",
         {
-          value: sortBy2,
-          onChange: (e) => setSortBy(e.target.value),
-          className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer mb-2",
-          title: "Trier les tickers\\n\\nOptions de tri:\\n• Alphabétique (A-Z): Par symbole croissant\\n• Alphabétique (Z-A): Par symbole décroissant\\n• Date modif. (Récent): Plus récemment modifiés en premier\\n• Date modif. (Ancien): Plus anciennement modifiés en premier\\n• Recommandation: Achat → Conserver → Vente\\n• Secteur: Par secteur d'activité",
+          onClick: () => setIsFiltersExpanded(!isFiltersExpanded),
+          className: "w-full p-2 sm:p-3 md:p-4 flex items-center justify-between hover:bg-slate-800 transition-colors",
+          title: isFiltersExpanded ? "Réduire les filtres pour voir plus de titres" : "Développer les filtres",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "lastModified", children: "📅 Date modif. (Récent)" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "lastModified-desc", children: "📅 Date modif. (Ancien)" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "alphabetical", children: "🔤 Alphabétique (A-Z)" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "alphabetical-desc", children: "🔤 Alphabétique (Z-A)" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "recommendation", children: "📊 Recommandation" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "sector", children: "🏢 Secteur" })
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xs font-semibold text-slate-500 uppercase flex items-center gap-1.5 sm:gap-2 cursor-help", title: "Filtres et Tri\\n\\nFiltrez et triez votre portefeuille selon différents critères.\\n\\nFiltres:\\n• Tous: Affiche tous les tickers\\n• Portefeuille: Uniquement les titres détenus\\n• Watchlist: Uniquement les titres surveillés\\n\\nTri:\\n• Alphabétique: A-Z ou Z-A\\n• Date de modification: Plus récent ou plus ancien\\n• Recommandation: Achat, Conserver, Vente\\n• Secteur: Par secteur d'activité", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-3 h-3 flex-shrink-0" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate", children: "Filtres et Tri" })
+            ] }),
+            isFiltersExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-4 h-4 text-slate-400 flex-shrink-0" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-4 h-4 text-slate-400 flex-shrink-0" })
           ]
         }
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 mt-3 pt-3 border-t border-slate-700", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-1", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] font-semibold text-slate-400 uppercase", children: "Filtres Avancés" }),
-          (filterCountry !== "all" || filterExchange !== "all" || filterMarketCap !== "all") && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      isFiltersExpanded && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-2 sm:px-3 md:px-4 pb-2 sm:pb-3 md:pb-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-3 gap-1.5 sm:gap-2 mb-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
             "button",
             {
-              onClick: () => {
-                setFilterCountry("all");
-                setFilterExchange("all");
-                setFilterMarketCap("all");
-              },
-              className: "text-[9px] text-blue-400 hover:text-blue-300 flex items-center gap-1",
-              title: "Réinitialiser tous les filtres avancés",
+              onClick: () => setFilterBy("all"),
+              className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors ${filterBy === "all" ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
+              title: "Afficher tous les tickers (Portefeuille + Watchlist)",
+              children: "Tous"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
+              onClick: () => setFilterBy("portfolio"),
+              className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${filterBy === "portfolio" ? "bg-yellow-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
+              title: "Afficher uniquement les tickers du portefeuille (titres détenus)",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-3 h-3" }),
-                "Réinitialiser"
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-3 h-3" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Portefeuille" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sm:hidden", children: "Port." })
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
+              onClick: () => setFilterBy("watchlist"),
+              className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${filterBy === "watchlist" ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
+              title: "Afficher uniquement les tickers de la watchlist (titres surveillés)",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-3 h-3" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Watchlist" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sm:hidden", children: "Watch" })
               ]
             }
           )
         ] }),
-        availableCountries.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-[9px] text-slate-400 mb-1", children: "🌍 Pays" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "select",
-            {
-              value: filterCountry,
-              onChange: (e) => setFilterCountry(e.target.value),
-              className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer",
-              title: "Filtrer par pays d'origine de l'entreprise",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "all", children: [
-                  "Tous les pays (",
-                  availableCountries.length,
-                  ")"
-                ] }),
-                availableCountries.map((country) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: country, children: country }, country))
-              ]
-            }
-          )
-        ] }),
-        availableExchanges.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-[9px] text-slate-400 mb-1", children: "📈 Bourse" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "select",
-            {
-              value: filterExchange,
-              onChange: (e) => setFilterExchange(e.target.value),
-              className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer",
-              title: "Filtrer par bourse où l'action est cotée",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "all", children: [
-                  "Toutes les bourses (",
-                  availableExchanges.length,
-                  ")"
-                ] }),
-                availableExchanges.map((exchange) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: exchange, children: exchange }, exchange))
-              ]
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-[9px] text-slate-400 mb-1", children: "💰 Capitalisation" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "select",
-            {
-              value: filterMarketCap,
-              onChange: (e) => setFilterMarketCap(e.target.value),
-              className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer",
-              title: "Filtrer par capitalisation boursière\\n\\n• Micro: < 300M USD\\n• Small: 300M - 2B USD\\n• Mid: 2B - 10B USD\\n• Large: 10B - 200B USD\\n• Mega: > 200B USD",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: "Toutes les capitalisations" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "micro", children: "Micro Cap (< 300M)" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "small", children: "Small Cap (300M - 2B)" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "mid", children: "Mid Cap (2B - 10B)" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "large", children: "Large Cap (10B - 200B)" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "mega", children: "Mega Cap (> 200B)" })
-              ]
-            }
-          )
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "select",
+          {
+            value: sortBy2,
+            onChange: (e) => setSortBy(e.target.value),
+            className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer mb-2",
+            title: "Trier les tickers\\n\\nOptions de tri:\\n• Alphabétique (A-Z): Par symbole croissant\\n• Alphabétique (Z-A): Par symbole décroissant\\n• Date modif. (Récent): Plus récemment modifiés en premier\\n• Date modif. (Ancien): Plus anciennement modifiés en premier\\n• Recommandation: Achat → Conserver → Vente\\n• Secteur: Par secteur d'activité",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "lastModified", children: "📅 Date modif. (Récent)" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "lastModified-desc", children: "📅 Date modif. (Ancien)" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "alphabetical", children: "🔤 Alphabétique (A-Z)" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "alphabetical-desc", children: "🔤 Alphabétique (Z-A)" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "recommendation", children: "📊 Recommandation" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "sector", children: "🏢 Secteur" })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 mt-3 pt-3 border-t border-slate-700", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] font-semibold text-slate-400 uppercase", children: "Filtres Avancés" }),
+            (filterCountry !== "all" || filterExchange !== "all" || filterMarketCap !== "all") && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "button",
+              {
+                onClick: () => {
+                  setFilterCountry("all");
+                  setFilterExchange("all");
+                  setFilterMarketCap("all");
+                },
+                className: "text-[9px] text-blue-400 hover:text-blue-300 flex items-center gap-1",
+                title: "Réinitialiser tous les filtres avancés",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-3 h-3" }),
+                  "Réinitialiser"
+                ]
+              }
+            )
+          ] }),
+          availableCountries.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-[9px] text-slate-400 mb-1", children: "🌍 Pays" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "select",
+              {
+                value: filterCountry,
+                onChange: (e) => setFilterCountry(e.target.value),
+                className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer",
+                title: "Filtrer par pays d'origine de l'entreprise",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "all", children: [
+                    "Tous les pays (",
+                    availableCountries.length,
+                    ")"
+                  ] }),
+                  availableCountries.map((country) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: country, children: country }, country))
+                ]
+              }
+            )
+          ] }),
+          availableExchanges.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-[9px] text-slate-400 mb-1", children: "📈 Bourse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "select",
+              {
+                value: filterExchange,
+                onChange: (e) => setFilterExchange(e.target.value),
+                className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer",
+                title: "Filtrer par bourse où l'action est cotée",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "all", children: [
+                    "Toutes les bourses (",
+                    availableExchanges.length,
+                    ")"
+                  ] }),
+                  availableExchanges.map((exchange) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: exchange, children: exchange }, exchange))
+                ]
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-[9px] text-slate-400 mb-1", children: "💰 Capitalisation" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "select",
+              {
+                value: filterMarketCap,
+                onChange: (e) => setFilterMarketCap(e.target.value),
+                className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer",
+                title: "Filtrer par capitalisation boursière\\n\\n• Micro: < 300M USD\\n• Small: 300M - 2B USD\\n• Mid: 2B - 10B USD\\n• Large: 10B - 200B USD\\n• Mega: > 200B USD",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: "Toutes les capitalisations" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "micro", children: "Micro Cap (< 300M)" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "small", children: "Small Cap (300M - 2B)" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "mid", children: "Mid Cap (2B - 10B)" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "large", children: "Large Cap (10B - 200B)" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "mega", children: "Mega Cap (> 200B)" })
+                ]
+              }
+            )
+          ] })
         ] })
       ] })
     ] })

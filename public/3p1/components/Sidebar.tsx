@@ -12,7 +12,9 @@ import {
   FunnelIcon,
   BarsArrowUpIcon,
   BarsArrowDownIcon,
-  XMarkIcon
+  XMarkIcon,
+  ChevronDownIcon,
+  ChevronUpIcon
 } from '@heroicons/react/24/outline';
 import { AnalysisProfile, Recommendation } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
@@ -48,6 +50,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
   const [filterCountry, setFilterCountry] = useState<string>('all');
   const [filterExchange, setFilterExchange] = useState<string>('all');
   const [filterMarketCap, setFilterMarketCap] = useState<string>('all');
+  // ✅ État pour collapse/expand des filtres
+  const [isFiltersExpanded, setIsFiltersExpanded] = useState(true);
 
   // ✅ OPTIMISATION: Cache des recommandations pour éviter les recalculs coûteux
   const recommendationCacheRef = useRef<Map<string, Recommendation>>(new Map());
@@ -404,13 +408,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
       {/* Version History Section - Retiré, maintenant dans RightSidebar */}
 
       {/* Filters & Sort Section */}
-      <div className="p-2 sm:p-3 md:p-4 border-t border-slate-800 bg-slate-900">
-        <h3 className="text-xs font-semibold text-slate-500 uppercase mb-2 sm:mb-3 flex items-center gap-1.5 sm:gap-2 cursor-help" title="Filtres et Tri\n\nFiltrez et triez votre portefeuille selon différents critères.\n\nFiltres:\n• Tous: Affiche tous les tickers\n• Portefeuille: Uniquement les titres détenus\n• Watchlist: Uniquement les titres surveillés\n\nTri:\n• Alphabétique: A-Z ou Z-A\n• Date de modification: Plus récent ou plus ancien\n• Recommandation: Achat, Conserver, Vente\n• Secteur: Par secteur d'activité">
-          <FunnelIcon className="w-3 h-3 flex-shrink-0" />
-          <span className="truncate">Filtres et Tri</span>
-        </h3>
+      <div className="border-t border-slate-800 bg-slate-900">
+        {/* Header avec bouton collapse/expand */}
+        <button
+          onClick={() => setIsFiltersExpanded(!isFiltersExpanded)}
+          className="w-full p-2 sm:p-3 md:p-4 flex items-center justify-between hover:bg-slate-800 transition-colors"
+          title={isFiltersExpanded ? "Réduire les filtres pour voir plus de titres" : "Développer les filtres"}
+        >
+          <h3 className="text-xs font-semibold text-slate-500 uppercase flex items-center gap-1.5 sm:gap-2 cursor-help" title="Filtres et Tri\n\nFiltrez et triez votre portefeuille selon différents critères.\n\nFiltres:\n• Tous: Affiche tous les tickers\n• Portefeuille: Uniquement les titres détenus\n• Watchlist: Uniquement les titres surveillés\n\nTri:\n• Alphabétique: A-Z ou Z-A\n• Date de modification: Plus récent ou plus ancien\n• Recommandation: Achat, Conserver, Vente\n• Secteur: Par secteur d'activité">
+            <FunnelIcon className="w-3 h-3 flex-shrink-0" />
+            <span className="truncate">Filtres et Tri</span>
+          </h3>
+          {isFiltersExpanded ? (
+            <ChevronUpIcon className="w-4 h-4 text-slate-400 flex-shrink-0" />
+          ) : (
+            <ChevronDownIcon className="w-4 h-4 text-slate-400 flex-shrink-0" />
+          )}
+        </button>
         
-        {/* Filter Buttons */}
+        {/* Contenu des filtres (collapsible) */}
+        {isFiltersExpanded && (
+          <div className="px-2 sm:px-3 md:px-4 pb-2 sm:pb-3 md:pb-4">
+            {/* Filter Buttons */}
         <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mb-2">
           <button
             onClick={() => setFilterBy('all')}
@@ -540,6 +559,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
             </select>
           </div>
         </div>
+          </div>
+        )}
       </div>
     </div>
   );
