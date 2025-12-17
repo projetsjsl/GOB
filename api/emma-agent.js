@@ -3281,13 +3281,36 @@ Cible: 520$ (+9%)
                             systemPrompt += `
 
 💻 FORMAT WEB/EMAIL OBLIGATOIRE:
-- MINIMUM 1500 mots (analyse détaillée)
+- MINIMUM 2000 mots (analyse détaillée exhaustive)
 - Markdown activé (** pour gras, ## pour titres)
 - Chaque section = 1-2 paragraphes complets
 - Explications narratives professionnelles
 - Comparaisons historiques et sectorielles explicites
-- Style rapport CFA® institutionnel`;
-                            console.log(`💻 comprehensive_analysis: Format Web/Email appliqué (1500+ mots)`);
+- Style rapport CFA® institutionnel
+
+🚨🚨🚨 RÈGLE ABSOLUE - 12 SECTIONS OBLIGATOIRES DANS L'ORDRE 🚨🚨🚨:
+Tu DOIS inclure TOUTES les 12 sections suivantes DANS L'ORDRE. AUCUNE EXCEPTION. Si une section manque, la réponse est INCOMPLÈTE.
+
+1. 📊 VUE D'ENSEMBLE (OBLIGATOIRE)
+2. 💰 VALORISATION (OBLIGATOIRE)
+3. 💼 FONDAMENTAUX (OBLIGATOIRE)
+4. 📈 CROISSANCE (OBLIGATOIRE)
+5. 🏰 MOAT ANALYSIS (OBLIGATOIRE)
+6. 💵 VALEUR INTRINSÈQUE (OBLIGATOIRE)
+7. 📋 RÉSULTATS RÉCENTS (OBLIGATOIRE)
+8. 🌍 CONTEXTE MACRO (OBLIGATOIRE)
+9. 💰 DIVIDENDE (OBLIGATOIRE - ou "N/A" si non applicable)
+10. ⚠️ RISQUES (OBLIGATOIRE)
+11. 📰 NEWS + CATALYSTS (OBLIGATOIRE)
+12. 🎯 RECOMMANDATION + QUESTIONS (OBLIGATOIRE)
+
+⚠️ VÉRIFICATION AVANT D'ENVOYER:
+✓ Section 1 présente? ✓ Section 2 présente? ✓ Section 3 présente? ✓ Section 4 présente?
+✓ Section 5 présente? ✓ Section 6 présente? ✓ Section 7 présente? ✓ Section 8 présente?
+✓ Section 9 présente? ✓ Section 10 présente? ✓ Section 11 présente? ✓ Section 12 présente?
+
+Si UNE SEULE section manque = RÉPONSE INCOMPLÈTE = CONTINUER JUSQU'À CE QUE TOUTES LES 12 SECTIONS SOIENT PRÉSENTES.`;
+                            console.log(`💻 comprehensive_analysis: Format Web/Email appliqué (2000+ mots, 12 sections obligatoires)`);
                         }
                     }
 

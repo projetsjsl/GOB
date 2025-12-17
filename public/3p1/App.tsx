@@ -822,11 +822,34 @@ export default function App() {
                         const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
                         const isTeamTicker = supabaseTicker.source === 'team' || supabaseTicker.source === 'both';
                         
+                        // ✅ CRITIQUE : Ne pas utiliser INITIAL_ASSUMPTIONS (valeurs à 0) pour les squelettes
+                        // Créer un objet assumptions minimal avec seulement les champs requis, sans valeurs inventées
                         updated[tickerSymbol] = {
                             id: tickerSymbol,
                             lastModified: Date.now(),
                             data: [], // Données vides pour l'instant
-                            assumptions: INITIAL_ASSUMPTIONS,
+                            assumptions: {
+                                // ✅ Seulement les champs requis, pas de valeurs inventées (0)
+                                currentPrice: 0, // Sera mis à jour lors du chargement FMP
+                                currentDividend: 0,
+                                baseYear: new Date().getFullYear(),
+                                requiredReturn: 10.0, // Valeur par défaut raisonnable
+                                // ✅ Tous les autres champs sont undefined (pas 0) pour éviter les valeurs inventées
+                                growthRateEPS: undefined,
+                                growthRateSales: undefined,
+                                growthRateCF: undefined,
+                                growthRateBV: undefined,
+                                growthRateDiv: undefined,
+                                targetPE: undefined,
+                                targetPCF: undefined,
+                                targetPBV: undefined,
+                                targetYield: undefined,
+                                dividendPayoutRatio: undefined,
+                                excludeEPS: false,
+                                excludeCF: false,
+                                excludeBV: false,
+                                excludeDIV: false
+                            } as Assumptions,
                             info: {
                                 symbol: tickerSymbol,
                                 name: supabaseTicker.company_name || tickerSymbol,
@@ -957,11 +980,33 @@ export default function App() {
                         const symbol = supabaseTicker.ticker.toUpperCase();
                         const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
                         
+                        // ✅ CRITIQUE : Ne pas utiliser INITIAL_ASSUMPTIONS (valeurs à 0) pour les squelettes
                         skeletonProfiles[symbol] = {
                             id: symbol,
                             lastModified: Date.now(),
                             data: [], // Données vides pour l'instant
-                            assumptions: INITIAL_ASSUMPTIONS,
+                            assumptions: {
+                                // ✅ Seulement les champs requis, pas de valeurs inventées (0)
+                                currentPrice: 0,
+                                currentDividend: 0,
+                                baseYear: new Date().getFullYear(),
+                                requiredReturn: 10.0,
+                                // ✅ Tous les autres champs sont undefined (pas 0) pour éviter les valeurs inventées
+                                growthRateEPS: undefined,
+                                growthRateSales: undefined,
+                                growthRateCF: undefined,
+                                growthRateBV: undefined,
+                                growthRateDiv: undefined,
+                                targetPE: undefined,
+                                targetPCF: undefined,
+                                targetPBV: undefined,
+                                targetYield: undefined,
+                                dividendPayoutRatio: undefined,
+                                excludeEPS: false,
+                                excludeCF: false,
+                                excludeBV: false,
+                                excludeDIV: false
+                            } as Assumptions,
                             info: {
                                 symbol: symbol,
                                 name: supabaseTicker.company_name || symbol,

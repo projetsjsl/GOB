@@ -22917,7 +22917,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 });
                 container.appendChild(script);
                 return () => { if (container) container.innerHTML = ''; };
-            }, [activeSubTab, isDarkMode]);
+            }, [activeSubTab, isDarkMode, activeTab, remountKey]);
 
             // Charger les données de yield curve au montage et au retour sur l'onglet
             React.useEffect(() => {

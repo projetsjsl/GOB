@@ -52354,7 +52354,30 @@ Vérifiez votre connexion et réessayez.`,
               lastModified: Date.now(),
               data: [],
               // Données vides pour l'instant
-              assumptions: INITIAL_ASSUMPTIONS,
+              assumptions: {
+                // ✅ Seulement les champs requis, pas de valeurs inventées (0)
+                currentPrice: 0,
+                // Sera mis à jour lors du chargement FMP
+                currentDividend: 0,
+                baseYear: (/* @__PURE__ */ new Date()).getFullYear(),
+                requiredReturn: 10,
+                // Valeur par défaut raisonnable
+                // ✅ Tous les autres champs sont undefined (pas 0) pour éviter les valeurs inventées
+                growthRateEPS: void 0,
+                growthRateSales: void 0,
+                growthRateCF: void 0,
+                growthRateBV: void 0,
+                growthRateDiv: void 0,
+                targetPE: void 0,
+                targetPCF: void 0,
+                targetPBV: void 0,
+                targetYield: void 0,
+                dividendPayoutRatio: void 0,
+                excludeEPS: false,
+                excludeCF: false,
+                excludeBV: false,
+                excludeDIV: false
+              },
               info: {
                 symbol: tickerSymbol,
                 name: supabaseTicker.company_name || tickerSymbol,
@@ -52464,7 +52487,28 @@ Vérifiez votre connexion et réessayez.`,
               lastModified: Date.now(),
               data: [],
               // Données vides pour l'instant
-              assumptions: INITIAL_ASSUMPTIONS,
+              assumptions: {
+                // ✅ Seulement les champs requis, pas de valeurs inventées (0)
+                currentPrice: 0,
+                currentDividend: 0,
+                baseYear: (/* @__PURE__ */ new Date()).getFullYear(),
+                requiredReturn: 10,
+                // ✅ Tous les autres champs sont undefined (pas 0) pour éviter les valeurs inventées
+                growthRateEPS: void 0,
+                growthRateSales: void 0,
+                growthRateCF: void 0,
+                growthRateBV: void 0,
+                growthRateDiv: void 0,
+                targetPE: void 0,
+                targetPCF: void 0,
+                targetPBV: void 0,
+                targetYield: void 0,
+                dividendPayoutRatio: void 0,
+                excludeEPS: false,
+                excludeCF: false,
+                excludeBV: false,
+                excludeDIV: false
+              },
               info: {
                 symbol,
                 name: supabaseTicker.company_name || symbol,

@@ -2667,27 +2667,19 @@
                 setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: value } : t));
 
                 // Extraire le templateId de manière sécurisée
-                // Format taskId: "employeeId-templateId" ou "employeeId--timestamp" pour IDs temporaires négatifs
+                // Format taskId: "employeeId-templateId" (ex: "1-19" ou "1--1735123456789" pour IDs temporaires)
                 let originalTaskId;
-                let isTemporaryId = false;
                 
                 if (typeof taskId === 'string' && taskId.includes('-')) {
-                    // Gérer le cas où le templateId est négatif (double tiret: "1--1735123456789")
+                    // Trouver le premier tiret qui sépare employeeId et templateId
                     const firstDashIndex = taskId.indexOf('-');
-                    const afterFirstDash = taskId.substring(firstDashIndex + 1);
+                    const templateIdStr = taskId.substring(firstDashIndex + 1);
                     
-                    // Si le deuxième caractère après le premier tiret est aussi un tiret, c'est un ID négatif
-                    if (afterFirstDash.startsWith('-')) {
-                        // ID négatif: "1--1735123456789" -> templateId = -1735123456789
-                        originalTaskId = parseInt(afterFirstDash);
-                        isTemporaryId = true;
-                    } else {
-                        // ID positif normal: "1-19" -> templateId = 19
-                        originalTaskId = parseInt(afterFirstDash);
-                    }
+                    // Parser le templateId (peut être négatif pour les IDs temporaires)
+                    originalTaskId = parseInt(templateIdStr);
                     
                     if (isNaN(originalTaskId)) {
-                        console.error(`❌ Impossible d'extraire templateId de ${taskId} (afterFirstDash: ${afterFirstDash})`);
+                        console.error(`❌ Impossible d'extraire templateId de ${taskId} (templateIdStr: ${templateIdStr})`);
                         showNotification('Erreur: ID de tâche invalide', 'error');
                         // Rollback optimistic update
                         if (originalValue !== null) {
@@ -2695,12 +2687,8 @@
                         }
                         return;
                     }
-                    
-                    // Vérifier si c'est un ID temporaire (négatif) même si on ne l'a pas détecté avant
-                    if (originalTaskId < 0) {
-                        isTemporaryId = true;
-                    }
                 } else {
+                    // Si ce n'est pas un string avec tiret, c'est directement le templateId
                     originalTaskId = parseInt(taskId);
                     if (isNaN(originalTaskId)) {
                         console.error(`❌ taskId invalide: ${taskId}`);
@@ -2709,17 +2697,12 @@
                         if (originalValue !== null) {
                             setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: originalValue } : t));
                         }
-                        return;
-                    }
-                    // Vérifier si c'est un ID temporaire (négatif)
-                    if (originalTaskId < 0) {
-                        isTemporaryId = true;
                     }
                 }
                 
                 // ✅ FIX: Si c'est un ID temporaire négatif, ne pas essayer de sauvegarder dans Supabase
                 // La tâche sera sauvegardée quand elle sera créée dans la DB
-                if (isTemporaryId || originalTaskId < 0) {
+                if (originalTaskId < 0) {
                     console.log(`⚠️ Tâche avec ID temporaire ${originalTaskId} - mise à jour locale uniquement`);
                     // Mettre à jour localement seulement dans taskTemplates
                     const updatedTemplates = taskTemplates.map(t => t.id === originalTaskId ? { ...t, [field]: value } : t);
