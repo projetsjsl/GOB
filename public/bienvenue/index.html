@@ -16,7 +16,8 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <!-- Scripts non-critiques - Chargés en arrière-plan avec defer -->
     <script src="./caroline-plan-data.js" defer></script>
-    <script src="./email-template.js" defer></script>
+    <!-- email-template.js DOIT être chargé avant le script Babel pour que window.generateEmailHTML soit disponible -->
+    <script src="./email-template.js"></script>
     <!-- Emma Client SDK - Chargé en arrière-plan (non-bloquant) -->
     <script type="module">
         // Charger Emma Client APRÈS le rendu initial pour ne pas bloquer
@@ -2802,23 +2803,47 @@
                             <div className="h-6 w-px bg-gray-300 mx-2"></div>
 
                             <button onClick={() => {
-                                const html = window.generateEmailHTML(selectedEmployee, phases, filteredTasks, resources);
-                                setEmailPreviewContent(html);
-                                setShowEmailPreview(true);
+                                try {
+                                    if (typeof window.generateEmailHTML !== 'function') {
+                                        showNotification('⚠️ Le générateur d\'email n\'est pas encore chargé. Attendez quelques secondes et réessayez.', 'error');
+                                        console.error('window.generateEmailHTML is not a function');
+                                        return;
+                                    }
+                                    const html = window.generateEmailHTML(selectedEmployee, phases, filteredTasks, resources);
+                                    if (!html) {
+                                        showNotification('Erreur: Impossible de générer l\'email. Vérifiez les données.', 'error');
+                                        return;
+                                    }
+                                    setEmailPreviewContent(html);
+                                    setShowEmailPreview(true);
+                                } catch (error) {
+                                    console.error('Erreur génération aperçu:', error);
+                                    showNotification(`Erreur: ${error.message || 'Impossible de générer l\'aperçu'}`, 'error');
+                                }
                             }} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg flex items-center gap-2 transition-colors" title="Aperçu de l'email">
                                 <Icons.Eye /> <span className="hidden md:inline">Aperçu Email</span>
                             </button>
 
-                            <button onClick={() => {
-                                const html = window.generateEmailHTML(selectedEmployee, phases, filteredTasks, resources);
-                                const blob = new Blob([html], { type: 'text/html' });
-                                const item = new ClipboardItem({ 'text/html': blob });
-                                navigator.clipboard.write([item]).then(() => {
+                            <button onClick={async () => {
+                                try {
+                                    if (typeof window.generateEmailHTML !== 'function') {
+                                        showNotification('⚠️ Le générateur d\'email n\'est pas encore chargé. Attendez quelques secondes et réessayez.', 'error');
+                                        console.error('window.generateEmailHTML is not a function');
+                                        return;
+                                    }
+                                    const html = window.generateEmailHTML(selectedEmployee, phases, filteredTasks, resources);
+                                    if (!html) {
+                                        showNotification('Erreur: Impossible de générer l\'email. Vérifiez les données.', 'error');
+                                        return;
+                                    }
+                                    const blob = new Blob([html], { type: 'text/html' });
+                                    const item = new ClipboardItem({ 'text/html': blob });
+                                    await navigator.clipboard.write([item]);
                                     showNotification('Email copié dans le presse-papier ! Collez-le dans Outlook/Gmail.', 'success');
-                                }).catch(err => {
+                                } catch (err) {
                                     console.error('Erreur copie:', err);
                                     showNotification('Erreur lors de la copie. Utilisez "Aperçu" et copiez manuellement.', 'error');
-                                });
+                                }
                             }} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg flex items-center gap-2 transition-colors" title="Copier pour Outlook/Gmail">
                                 <Icons.Send /> <span className="hidden md:inline">Copier l'email</span>
                             </button>
