@@ -2441,7 +2441,21 @@
 
 
 
-            // Task CRUD functions with Supabase
+            /**
+             * Met à jour un champ d'une tâche (template)
+             * --------------------------------------------
+             * PATTERN OPTIMISTIC UPDATE:
+             * 1. Mise à jour UI immédiate (setTasks + setTaskTemplates)
+             * 2. Sauvegarde en DB via saveTaskField
+             * 
+             * FORMAT TASK ID:
+             * - Format: "employeeId-templateId" (ex: "1-19")
+             * - Extrait templateId pour la requête DB
+             * 
+             * @param {string} taskId - ID de la tâche au format "employeeId-templateId"
+             * @param {string} field - Nom du champ à mettre à jour (camelCase)
+             * @param {any} value - Nouvelle valeur
+             */
             const updateTask = async (taskId, field, value) => {
                 // Optimistic UI
                 setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: value } : t));
@@ -2471,6 +2485,24 @@
                 }
             };
 
+            /**
+             * Supprime une tâche (template) et nettoie les assignations
+             * ------------------------------------------------------------
+             * CASCADE DELETE:
+             * 1. Supprime toutes les entrées dans employee_tasks pour ce template
+             *    (nettoie les statuts sauvegardés pour tous les employés)
+             * 2. Supprime le template dans task_templates
+             * 
+             * FORMAT TASK ID:
+             * - Peut être un nombre (templateId direct) ou "employeeId-templateId"
+             * - Extrait automatiquement le templateId pour les requêtes DB
+             * 
+             * OPTIMISTIC UPDATE:
+             * - Supprime immédiatement de l'UI
+             * - Rollback si erreur (reload complet de la page)
+             * 
+             * @param {string|number} taskId - ID de la tâche à supprimer
+             */
             const deleteTask = async (taskId) => {
                 const originalTaskId = typeof taskId === 'string' ? parseInt(taskId.split('-')[1]) : taskId;
                 if(!confirm('Supprimer cette tâche ? (Cela la retirera aussi du parcours des employés actuels)')) return;
