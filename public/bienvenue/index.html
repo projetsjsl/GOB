@@ -2888,27 +2888,28 @@
                                              />
                                              {/* Modal - Positionné de manière absolue dans le conteneur fixe */}
                                              <div 
-                                                 className="absolute bg-white shadow-2xl rounded-lg p-3 border-2 border-blue-200 w-64"
+                                                 className="absolute bg-white shadow-2xl rounded-lg p-4 border-2 border-blue-200 w-80"
                                                  style={{
                                                      top: '50%',
                                                      left: '50%',
                                                      transform: 'translate(-50%, -50%)',
-                                                     maxHeight: '80vh',
-                                                     overflowY: 'auto',
+                                                     maxHeight: '85vh',
                                                      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
                                                      opacity: 1,
                                                      pointerEvents: 'auto',
-                                                     zIndex: 9999
+                                                     zIndex: 9999,
+                                                     display: 'flex',
+                                                     flexDirection: 'column'
                                                  }}
                                                  onClick={(e) => e.stopPropagation()}
                                              >
-                                             <div className="flex items-center justify-between mb-3">
+                                             <div className="flex items-center justify-between mb-3 flex-shrink-0">
                                                  <div className="text-xs font-bold text-gray-700 uppercase">Assigner responsable(s) :</div>
                                                  <button onClick={() => setEditing(null)} className="text-gray-400 hover:text-gray-600 p-1">
                                                      <Icons.X className="w-4 h-4" />
                                                  </button>
                                              </div>
-                                             <div className="space-y-1 max-h-[300px] overflow-y-auto">
+                                             <div className="space-y-1 flex-1 overflow-y-auto min-h-0 pr-1">
                                                  {resources.map(r => (
                                                      <div 
                                                          key={r.id} 
