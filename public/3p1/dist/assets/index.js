@@ -52179,6 +52179,9 @@ Vérifiez votre connexion et réessayez.`,
           if (newTickersCount > 0) {
             console.log(`✅ ${newTickersCount} nouveaux tickers chargés depuis Supabase`);
           }
+          if (migrationCount > 0) {
+            console.log(`🔄 Migration: ${migrationCount} profil(s) mis à jour avec isWatchlist depuis Supabase`);
+          }
           return updated;
         });
         if (newTickers.length > 0) {
@@ -53594,8 +53597,19 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 }
               };
               updatedTickersCount++;
+              migrationCount++;
               if (tickerSymbol === activeId) {
                 setInfo(updated[tickerSymbol].info);
+                setIsWatchlist(shouldBeWatchlist2 ?? false);
+              }
+            } else if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist2) {
+              updated[tickerSymbol] = {
+                ...updated[tickerSymbol],
+                isWatchlist: shouldBeWatchlist2
+              };
+              migrationCount++;
+              if (tickerSymbol === activeId) {
+                setIsWatchlist(shouldBeWatchlist2 ?? false);
               }
             }
             return;

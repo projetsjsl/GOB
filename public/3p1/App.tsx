@@ -2564,10 +2564,24 @@ export default function App() {
                                 }
                             };
                             updatedTickersCount++;
+                            migrationCount++;
                             
                             // Si c'est le profil actif, mettre à jour aussi le state local
                             if (tickerSymbol === activeId) {
                                 setInfo(updated[tickerSymbol].info);
+                                setIsWatchlist(shouldBeWatchlist ?? false);
+                            }
+                        } else if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist) {
+                            // ✅ Même si pas d'autres updates, forcer isWatchlist pour migration
+                            updated[tickerSymbol] = {
+                                ...updated[tickerSymbol],
+                                isWatchlist: shouldBeWatchlist
+                            };
+                            migrationCount++;
+                            
+                            // Si c'est le profil actif, mettre à jour aussi le state local
+                            if (tickerSymbol === activeId) {
+                                setIsWatchlist(shouldBeWatchlist ?? false);
                             }
                         }
                         return;
