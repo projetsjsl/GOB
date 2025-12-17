@@ -51806,6 +51806,7 @@ function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
   const realtimeTimeoutRef = reactExports.useRef(null);
+  const loadTickersFromSupabaseRef = reactExports.useRef(null);
   useRealtimeSync("tickers", (payload) => {
     var _a4, _b3, _c, _d, _e;
     console.log("📡 [3p1] Realtime ticker change:", payload.eventType, ((_a4 = payload.new) == null ? void 0 : _a4.ticker) || ((_b3 = payload.old) == null ? void 0 : _b3.ticker));
@@ -51821,7 +51822,9 @@ function App() {
         supabaseTickersCacheRef.current = null;
         realtimeTimeoutRef.current = setTimeout(() => {
           realtimeTimeoutRef.current = null;
-          loadTickersFromSupabase();
+          if (loadTickersFromSupabaseRef.current) {
+            loadTickersFromSupabaseRef.current();
+          }
         }, 300);
       }
     } else if (payload.eventType === "DELETE" && payload.old) {
@@ -51838,7 +51841,9 @@ function App() {
         supabaseTickersCacheRef.current = null;
         realtimeTimeoutRef.current = setTimeout(() => {
           realtimeTimeoutRef.current = null;
-          loadTickersFromSupabase();
+          if (loadTickersFromSupabaseRef.current) {
+            loadTickersFromSupabaseRef.current();
+          }
         }, 300);
       }
     } else if (payload.eventType === "UPDATE" && payload.new) {
@@ -51867,7 +51872,9 @@ function App() {
         supabaseTickersCacheRef.current = null;
         realtimeTimeoutRef.current = setTimeout(() => {
           realtimeTimeoutRef.current = null;
-          loadTickersFromSupabase();
+          if (loadTickersFromSupabaseRef.current) {
+            loadTickersFromSupabaseRef.current();
+          }
         }, 500);
       }
     }
@@ -52074,11 +52081,12 @@ function App() {
         console.warn("⚠️ Erreur vérification cache prix:", error);
       }
     };
-    const loadTickersFromSupabase2 = async () => {
+    const loadTickersFromSupabase = async () => {
       if (isLoadingTickers) {
         console.log("⏳ Chargement tickers déjà en cours, ignoré");
         return;
       }
+      loadTickersFromSupabaseRef.current = loadTickersFromSupabase;
       hasLoadedTickersRef.current = true;
       setIsLoadingTickers(true);
       setTickersLoadError(null);
@@ -52446,13 +52454,13 @@ Vérifiez votre connexion et réessayez.`,
       }
     };
     refreshPriceCacheIfNeeded();
-    loadTickersFromSupabase2();
+    loadTickersFromSupabase();
     const syncIntervalId = setInterval(() => {
       if (!isLoadingTickers && hasLoadedTickersRef.current) {
         console.log("🔄 Synchronisation périodique avec Supabase pour cohérence multi-utilisateurs...");
         hasLoadedTickersRef.current = false;
         supabaseTickersCacheRef.current = null;
-        loadTickersFromSupabase2();
+        loadTickersFromSupabase();
       }
     }, 12e4);
     const intervalId = setInterval(() => {

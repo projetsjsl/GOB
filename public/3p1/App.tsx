@@ -213,6 +213,7 @@ export default function App() {
     // Live sync: when any user adds/updates/deletes tickers, all clients see it instantly
     // ✅ OPTIMISATION: Utiliser useRef pour éviter les closures stale et les race conditions
     const realtimeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const loadTickersFromSupabaseRef = useRef<(() => Promise<void>) | null>(null);
     
     useRealtimeSync('tickers', (payload) => {
         console.log('📡 [3p1] Realtime ticker change:', payload.eventType, payload.new?.ticker || payload.old?.ticker);
@@ -233,7 +234,9 @@ export default function App() {
                 // ✅ FIX: Utiliser un timeout avec nettoyage pour éviter les fuites mémoire
                 realtimeTimeoutRef.current = setTimeout(() => {
                     realtimeTimeoutRef.current = null;
-                    loadTickersFromSupabase();
+                    if (loadTickersFromSupabaseRef.current) {
+                        loadTickersFromSupabaseRef.current();
+                    }
                 }, 300); // Réduit à 300ms pour réactivité
             }
         } else if (payload.eventType === 'DELETE' && payload.old) {
@@ -252,7 +255,9 @@ export default function App() {
                 supabaseTickersCacheRef.current = null;
                 realtimeTimeoutRef.current = setTimeout(() => {
                     realtimeTimeoutRef.current = null;
-                    loadTickersFromSupabase();
+                    if (loadTickersFromSupabaseRef.current) {
+                        loadTickersFromSupabaseRef.current();
+                    }
                 }, 300);
             }
         } else if (payload.eventType === 'UPDATE' && payload.new) {
@@ -293,7 +298,9 @@ export default function App() {
                 supabaseTickersCacheRef.current = null;
                 realtimeTimeoutRef.current = setTimeout(() => {
                     realtimeTimeoutRef.current = null;
-                    loadTickersFromSupabase();
+                    if (loadTickersFromSupabaseRef.current) {
+                        loadTickersFromSupabaseRef.current();
+                    }
                 }, 500); // Réduit à 500ms pour réactivité
             }
         }
@@ -566,6 +573,9 @@ export default function App() {
                 console.log('⏳ Chargement tickers déjà en cours, ignoré');
                 return;
             }
+            
+            // ✅ Stocker la fonction dans useRef pour utilisation dans useRealtimeSync
+            loadTickersFromSupabaseRef.current = loadTickersFromSupabase;
             
             hasLoadedTickersRef.current = true; // Marquer comme chargé
             setIsLoadingTickers(true);
