@@ -33046,6 +33046,12 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
     }
     return rec;
   };
+  const tickerStats = reactExports.useMemo(() => {
+    const portfolio = profiles.filter((p) => !p.isWatchlist).length;
+    const watchlist = profiles.filter((p) => p.isWatchlist).length;
+    const total = profiles.length;
+    return { portfolio, watchlist, total };
+  }, [profiles]);
   const filteredAndSortedProfiles = reactExports.useMemo(() => {
     let filtered = profiles.filter(
       (p) => p.id.toLowerCase().includes(searchTerm.toLowerCase()) || p.info.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -33182,11 +33188,30 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 overflow-y-auto px-2 pb-4 space-y-1 custom-scrollbar pt-2", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xs font-semibold text-slate-500 uppercase px-2 mb-2 tracking-wider flex justify-between items-center", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cursor-help", title: "Liste de vos tickers\\n\\nAffiche tous les tickers de votre portefeuille et watchlist.\\n\\nUtilisez la barre de recherche pour filtrer par symbole ou nom.", children: "Portefeuille" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] bg-slate-800 px-1.5 py-0.5 rounded-full text-slate-400 cursor-help", title: `Nombre de tickers affichés: ${filteredAndSortedProfiles.length} / ${profiles.length}
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cursor-help", title: `Liste de vos tickers
+
+📊 Statistiques:
+• Portefeuille (⭐): ${tickerStats.portfolio} tickers
+• Watchlist (👁️): ${tickerStats.watchlist} tickers
+• Total: ${tickerStats.total} tickers
+
+Utilisez la barre de recherche pour filtrer par symbole ou nom.`, children: "Portefeuille" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
+          filterBy === "all" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[9px] bg-yellow-900/50 px-1.5 py-0.5 rounded text-yellow-400", title: `Portefeuille: ${tickerStats.portfolio} tickers`, children: [
+              "⭐ ",
+              tickerStats.portfolio
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[9px] bg-blue-900/50 px-1.5 py-0.5 rounded text-blue-400", title: `Watchlist: ${tickerStats.watchlist} tickers`, children: [
+              "👁️ ",
+              tickerStats.watchlist
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] bg-slate-800 px-1.5 py-0.5 rounded-full text-slate-400 cursor-help", title: `Nombre de tickers affichés: ${filteredAndSortedProfiles.length} / ${profiles.length}
 
 ${searchTerm ? `(Filtrés sur "${searchTerm}")` : ""}
 ${filterBy !== "all" ? `(Filtre: ${filterBy === "portfolio" ? "Portefeuille" : "Watchlist"})` : ""}`, children: filteredAndSortedProfiles.length })
+        ] })
       ] }),
       filteredAndSortedProfiles.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center text-slate-600 text-sm py-8 px-4", children: searchTerm ? "Aucun résultat" : "Commencez par ajouter un ticker" }) : filteredAndSortedProfiles.map((profile) => {
         var _a3, _b2;

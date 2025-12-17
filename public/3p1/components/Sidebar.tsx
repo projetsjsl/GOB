@@ -63,6 +63,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
     return rec;
   };
 
+  // ✅ COMPTAGE: Calculer les stats pour affichage
+  const tickerStats = useMemo(() => {
+    const portfolio = profiles.filter(p => !p.isWatchlist).length;
+    const watchlist = profiles.filter(p => p.isWatchlist).length;
+    const total = profiles.length;
+    return { portfolio, watchlist, total };
+  }, [profiles]);
+
   const filteredAndSortedProfiles = useMemo(() => {
     // Filtrage par recherche
     let filtered = profiles.filter(p =>
@@ -204,8 +212,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
       {/* Ticker List */}
       <div className="flex-1 overflow-y-auto px-2 pb-4 space-y-1 custom-scrollbar pt-2">
         <h3 className="text-xs font-semibold text-slate-500 uppercase px-2 mb-2 tracking-wider flex justify-between items-center">
-          <span className="cursor-help" title="Liste de vos tickers\n\nAffiche tous les tickers de votre portefeuille et watchlist.\n\nUtilisez la barre de recherche pour filtrer par symbole ou nom.">Portefeuille</span>
-          <span className="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded-full text-slate-400 cursor-help" title={`Nombre de tickers affichés: ${filteredAndSortedProfiles.length} / ${profiles.length}\n\n${searchTerm ? `(Filtrés sur "${searchTerm}")` : ''}\n${filterBy !== 'all' ? `(Filtre: ${filterBy === 'portfolio' ? 'Portefeuille' : 'Watchlist'})` : ''}`}>{filteredAndSortedProfiles.length}</span>
+          <span className="cursor-help" title={`Liste de vos tickers\n\n📊 Statistiques:\n• Portefeuille (⭐): ${tickerStats.portfolio} tickers\n• Watchlist (👁️): ${tickerStats.watchlist} tickers\n• Total: ${tickerStats.total} tickers\n\nUtilisez la barre de recherche pour filtrer par symbole ou nom.`}>Portefeuille</span>
+          <div className="flex items-center gap-1.5">
+            {filterBy === 'all' && (
+              <>
+                <span className="text-[9px] bg-yellow-900/50 px-1.5 py-0.5 rounded text-yellow-400" title={`Portefeuille: ${tickerStats.portfolio} tickers`}>⭐ {tickerStats.portfolio}</span>
+                <span className="text-[9px] bg-blue-900/50 px-1.5 py-0.5 rounded text-blue-400" title={`Watchlist: ${tickerStats.watchlist} tickers`}>👁️ {tickerStats.watchlist}</span>
+              </>
+            )}
+            <span className="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded-full text-slate-400 cursor-help" title={`Nombre de tickers affichés: ${filteredAndSortedProfiles.length} / ${profiles.length}\n\n${searchTerm ? `(Filtrés sur "${searchTerm}")` : ''}\n${filterBy !== 'all' ? `(Filtre: ${filterBy === 'portfolio' ? 'Portefeuille' : 'Watchlist'})` : ''}`}>{filteredAndSortedProfiles.length}</span>
+          </div>
         </h3>
         {filteredAndSortedProfiles.length === 0 ? (
           <div className="text-center text-slate-600 text-sm py-8 px-4">
