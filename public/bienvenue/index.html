@@ -2246,10 +2246,11 @@
             };
 
             const addTask = async (phaseId) => {
-                // Generate ID (Temporary for optimistic, will be replaced by DB ID usually, but here we keep simplified logic)
-                const newId = Math.max(...taskTemplates.map(t => t.id), 0) + 1;
+                // Utiliser un ID temporaire négatif pour éviter les conflits avec les IDs de la DB
+                // Les IDs négatifs n'existent jamais dans la DB (auto-increment commence à 1)
+                const tempId = -Date.now(); // ID temporaire unique et négatif
                 const newTaskTemplate = {
-                    id: newId, // Note: In real app, let DB assign ID and reload
+                    id: tempId, // ID temporaire négatif, sera remplacé par l'ID de la DB
                     phaseId,
                     title: 'Nouvelle tâche',
                     description: 'Description de la tâche...',
@@ -2259,14 +2260,15 @@
                     dayOffset: 0
                 };
                 
-                const updatedTemplates = [...taskTemplates, newTaskTemplate];
-                setTaskTemplates(updatedTemplates);
+                // Optimistic update avec ID temporaire
+                setTaskTemplates(prev => [...prev, newTaskTemplate]);
 
                 if (useSupabase && supabase) {
                    try {
                         const { data, error } = await supabase
                             .from('task_templates')
                             .insert([{
+                                // NE PAS inclure 'id' - laisser Supabase le générer automatiquement
                                 phase_id: phaseId,
                                 title: newTaskTemplate.title,
                                 description: newTaskTemplate.description,
@@ -2278,32 +2280,32 @@
                             .select();
 
                         if (error) {
+                            // Remove optimistic update on any error
+                            setTaskTemplates(prev => prev.filter(t => t.id !== tempId));
+                            
                             // Handle 409 conflict specifically
                             if (error.code === '23505' || error.message?.includes('duplicate') || error.status === 409 || error.code === 'PGRST116') {
                                 // Conflict: task might already exist, reload from DB
                                 console.warn('Conflit lors de l\'ajout de tâche, rechargement depuis la DB...', error);
-                                // Remove optimistic update and reload
-                                setTaskTemplates(prev => prev.filter(t => t.id !== newId));
-                                // Optionally reload tasks from DB
                                 showNotification('Tâche déjà existante ou conflit détecté. Rechargement...', 'error');
                                 // Reload tasks after a short delay
                                 setTimeout(() => {
                                     reloadTaskTemplates();
                                 }, 1000);
                             } else {
+                                // Other error
                                 throw error;
                             }
                         } else if (data && data[0]) {
-                            // Replace optimistic item with real DB item (mostly for ID)
-                            const realId = data[0].id;
-                            setTaskTemplates(prev => prev.map(t => t.id === newId ? DataMapper.taskTemplateToReact(data[0]) : t));
+                            // Replace optimistic item with real DB item (with correct ID from DB)
+                            setTaskTemplates(prev => prev.map(t => t.id === tempId ? DataMapper.taskTemplateToReact(data[0]) : t));
                             showNotification('Nouvelle tâche ajoutée', 'success');
                         }
                    } catch (e) {
                        console.error('Erreur ajout tâche:', e);
-                       handleSupabaseError(e, 'Add Task');
                        // Remove optimistic update on error
                        setTaskTemplates(prev => prev.filter(t => t.id !== tempId));
+                       handleSupabaseError(e, 'Add Task');
                        showNotification(`Erreur lors de l'ajout: ${e.message || 'Erreur inconnue'}`, 'error');
                    }
                 } else {
