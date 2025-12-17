@@ -796,9 +796,30 @@ export default function App() {
                             return;
                         }
 
-                        // ⚠️ RIGUEUR 100% : Ne pas créer de profil placeholder ici
-                        // Le profil sera créé uniquement si FMP réussit (voir code après)
-                        // On marque juste le ticker comme "à charger"
+                        // ✅ NOUVEAU : Créer un profil squelette IMMÉDIATEMENT pour affichage
+                        // Même si le profil n'existe pas encore, on le crée avec les infos de base depuis Supabase
+                        const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
+                        updated[tickerSymbol] = {
+                            id: tickerSymbol,
+                            lastModified: Date.now(),
+                            data: [], // Données vides pour l'instant
+                            assumptions: INITIAL_ASSUMPTIONS,
+                            info: {
+                                symbol: tickerSymbol,
+                                name: supabaseTicker.company_name || tickerSymbol,
+                                sector: supabaseTicker.sector || '',
+                                securityRank: supabaseTicker.security_rank || 'N/A',
+                                marketCap: 'N/A',
+                                earningsPredictability: supabaseTicker.earnings_predictability,
+                                priceGrowthPersistence: supabaseTicker.price_growth_persistence,
+                                priceStability: supabaseTicker.price_stability,
+                                beta: supabaseTicker.beta,
+                                preferredSymbol: supabaseTicker.ticker
+                            },
+                            notes: '',
+                            isWatchlist,
+                            _isSkeleton: true // Flag pour indiquer que c'est un profil incomplet
+                        };
                         newTickersCount++;
                     });
 
@@ -806,7 +827,7 @@ export default function App() {
                     saveToCache(updated).catch(e => console.warn('Failed to save to cache:', e));
 
                     if (newTickersCount > 0) {
-                        console.log(`✅ ${newTickersCount} nouveaux tickers chargés depuis Supabase`);
+                        console.log(`✅ ${newTickersCount} nouveaux profils squelettes créés depuis Supabase`);
                         console.log(`📊 Library après migration: ${Object.keys(updated).length} profils (dont ${Object.keys(updated).filter(k => k !== DEFAULT_PROFILE.id).length} réels)`);
                     } else {
                         console.log(`ℹ️ Aucun nouveau ticker - ${Object.keys(updated).length} profils déjà dans library`);
