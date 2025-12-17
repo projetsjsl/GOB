@@ -2659,6 +2659,10 @@
                     return;
                 }
                 
+                // Sauvegarder la valeur originale pour rollback si nécessaire
+                const originalTask = tasks.find(t => t.id === taskId);
+                const originalValue = originalTask ? originalTask[field] : null;
+                
                 // Optimistic UI - Mise à jour immédiate pour réactivité
                 setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: value } : t));
 
@@ -2670,7 +2674,9 @@
                         console.error(`❌ Impossible d'extraire templateId de ${taskId}`);
                         showNotification('Erreur: ID de tâche invalide', 'error');
                         // Rollback optimistic update
-                        setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: task[field] } : t));
+                        if (originalValue !== null) {
+                            setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: originalValue } : t));
+                        }
                         return;
                     }
                 } else {
@@ -2678,9 +2684,16 @@
                     if (isNaN(originalTaskId)) {
                         console.error(`❌ taskId invalide: ${taskId}`);
                         showNotification('Erreur: ID de tâche invalide', 'error');
+                        // Rollback optimistic update
+                        if (originalValue !== null) {
+                            setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: originalValue } : t));
+                        }
                         return;
                     }
                 }
+                
+                // Sauvegarder l'état précédent des templates pour rollback
+                const previousTemplates = [...taskTemplates];
                 
                 // Mettre à jour les templates localement
                 const updatedTemplates = taskTemplates.map(t => t.id === originalTaskId ? { ...t, [field]: value } : t);
@@ -2694,21 +2707,19 @@
                             showNotification('Modification sauvegardée !', 'success');
                         } else {
                             // Rollback optimistic update en cas d'échec
-                            const originalTask = taskTemplates.find(t => t.id === originalTaskId);
-                            if (originalTask) {
-                                setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: originalTask[field] } : t));
-                                setTaskTemplates(taskTemplates); // Restaurer l'état précédent
+                            if (originalValue !== null) {
+                                setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: originalValue } : t));
                             }
+                            setTaskTemplates(previousTemplates); // Restaurer l'état précédent
                         }
                     } catch (e) {
                         console.error('❌ Exception dans updateTask:', e);
                         handleSupabaseError(e, 'Update Task');
                         // Rollback optimistic update
-                        const originalTask = taskTemplates.find(t => t.id === originalTaskId);
-                        if (originalTask) {
-                            setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: originalTask[field] } : t));
-                            setTaskTemplates(taskTemplates);
+                        if (originalValue !== null) {
+                            setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: originalValue } : t));
                         }
+                        setTaskTemplates(previousTemplates);
                     }
                 } else {
                     // Mode local seulement
