@@ -3692,24 +3692,15 @@
                                                 return (
                                                     <div 
                                                         key={r.id} 
-                                                        onClick={async () => {
+                                                        onClick={async (e) => {
+                                                            e.stopPropagation();
                                                             const current = selectedTask.assignedTo || [];
                                                             const updated = current.includes(r.id) 
                                                                 ? current.filter(id => id !== r.id)
                                                                 : [...current, r.id];
                                                             
-                                                            // Mettre à jour la tâche
-                                                            const originalTaskId = typeof selectedTask.id === 'string' ? parseInt(selectedTask.id.split('-')[1]) : selectedTask.id;
-                                                            setTaskTemplates(prev => prev.map(t => t.id === originalTaskId ? { ...t, assignedTo: updated } : t));
-                                                            
-                                                            // Sauvegarder dans Supabase
-                                                            if (useSupabase && supabase) {
-                                                                try {
-                                                                    await saveTaskField(selectedTask.id, 'assignedTo', updated);
-                                                                } catch (e) {
-                                                                    console.error('Erreur sauvegarde ressources:', e);
-                                                                }
-                                                            }
+                                                            // Utiliser updateTask pour mettre à jour l'UI et la DB
+                                                            await updateTask(selectedTask.id, 'assignedTo', updated);
                                                         }} 
                                                         className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${
                                                             isSelected
