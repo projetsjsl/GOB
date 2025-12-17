@@ -1635,6 +1635,62 @@
                                                     </button>
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-4 text-sm pl-9">
+                                                    {/* Dates de début et fin avec calendriers */}
+                                                    <div className="col-span-2 mb-2">
+                                                        <div className="flex items-center gap-3 text-xs text-gray-600 mb-1">
+                                                            <span className="font-bold uppercase">Dates :</span>
+                                                            <div className="flex items-center gap-2">
+                                                                <DatePicker
+                                                                    value={(() => {
+                                                                        const emp = selectedEmployee || employees[0];
+                                                                        const empStart = new Date(emp?.startDate || '2026-01-01');
+                                                                        const phaseStart = new Date(empStart.getTime() + (phase.startOffset || 0) * 86400000);
+                                                                        return phaseStart.toISOString().split('T')[0];
+                                                                    })()}
+                                                                    onChange={(dateStr) => {
+                                                                        const emp = selectedEmployee || employees[0];
+                                                                        const empStart = new Date(emp?.startDate || '2026-01-01');
+                                                                        const newStart = new Date(dateStr);
+                                                                        const diffDays = Math.round((newStart.getTime() - empStart.getTime()) / (1000 * 60 * 60 * 24));
+                                                                        updatePhase(phase.id, 'startOffset', diffDays);
+                                                                    }}
+                                                                    placeholder="Date début"
+                                                                    className="bg-white border border-gray-300 rounded-lg px-2 py-1 text-xs hover:border-blue-500 focus:border-blue-500"
+                                                                    min={(selectedEmployee || employees[0])?.startDate || '2026-01-01'}
+                                                                    showIcon={true}
+                                                                />
+                                                                <span className="text-gray-400">→</span>
+                                                                <DatePicker
+                                                                    value={(() => {
+                                                                        const emp = selectedEmployee || employees[0];
+                                                                        const empStart = new Date(emp?.startDate || '2026-01-01');
+                                                                        const phaseStart = new Date(empStart.getTime() + (phase.startOffset || 0) * 86400000);
+                                                                        const phaseEnd = new Date(phaseStart.getTime() + (phase.duration || 1) * 86400000);
+                                                                        return phaseEnd.toISOString().split('T')[0];
+                                                                    })()}
+                                                                    onChange={(dateStr) => {
+                                                                        const emp = selectedEmployee || employees[0];
+                                                                        const empStart = new Date(emp?.startDate || '2026-01-01');
+                                                                        const phaseStart = new Date(empStart.getTime() + (phase.startOffset || 0) * 86400000);
+                                                                        const newEnd = new Date(dateStr);
+                                                                        const duration = Math.round((newEnd.getTime() - phaseStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                                                                        if (duration > 0) {
+                                                                            updatePhase(phase.id, 'duration', duration);
+                                                                        }
+                                                                    }}
+                                                                    placeholder="Date fin"
+                                                                    className="bg-white border border-gray-300 rounded-lg px-2 py-1 text-xs hover:border-blue-500 focus:border-blue-500"
+                                                                    min={(() => {
+                                                                        const emp = selectedEmployee || employees[0];
+                                                                        const empStart = new Date(emp?.startDate || '2026-01-01');
+                                                                        const phaseStart = new Date(empStart.getTime() + (phase.startOffset || 0) * 86400000);
+                                                                        return phaseStart.toISOString().split('T')[0];
+                                                                    })()}
+                                                                    showIcon={true}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     <div>
                                                         <label className="text-xs text-gray-500 font-bold uppercase">Durée (jours)</label>
                                                         <input type="number" className="w-full p-1 border rounded" value={phase.duration} onChange={e => updatePhase(phase.id, 'duration', parseInt(e.target.value))} />
