@@ -27,6 +27,7 @@ import { fetchCompanyData } from './services/financeApi';
 import { saveSnapshot, hasManualEdits, loadSnapshot, listSnapshots } from './services/snapshotApi';
 import { RestoreDataDialog } from './components/RestoreDataDialog';
 import { UnifiedSettingsPanel } from './components/UnifiedSettingsPanel';
+import { ReportsPanel } from './components/ReportsPanel';
 import { loadConfig, saveConfig, DEFAULT_CONFIG, GuardrailConfig } from './config/AppConfig';
 import { invalidateValidationSettingsCache } from './utils/validation';
 import { loadAllTickersFromSupabase, mapSourceToIsWatchlist } from './services/tickersApi';
@@ -146,6 +147,7 @@ export default function App() {
     // --- CONFIG SYSTEM ---
     const [guardrailConfig, setGuardrailConfig] = useState<GuardrailConfig>(() => loadConfig());
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isReportsOpen, setIsReportsOpen] = useState(false);
 
     const handleSaveConfig = (newConfig: GuardrailConfig) => {
         setGuardrailConfig(newConfig);
@@ -1897,131 +1899,201 @@ export default function App() {
         let successCount = 0;
         let errorCount = 0;
         const errors: string[] = [];
-        const delayBetweenTickers = 2000; // 2 seconds delay for stability
+        
+        // ✅ OPTIMISATION: Batch size pour FMP (5 tickers en parallèle)
+        const FMP_BATCH_SIZE = 5;
+        // ✅ OPTIMISATION: Délai réduit entre batches (500ms au lieu de 2000ms)
+        const delayBetweenBatches = 500;
+        // ✅ OPTIMISATION: Délai réduit entre tickers dans un batch (100ms)
+        const delayBetweenTickersInBatch = 100;
 
-        for (const tickerSymbol of allTickers) {
-             // 0. Check for Pause or Abort
-             if (abortSync.current) {
-                 console.log('🛑 Synchronisation arrêtée par l\'utilisateur.');
-                 break;
-             }
+        // Traiter par batch pour optimiser les appels FMP
+        for (let i = 0; i < allTickers.length; i += FMP_BATCH_SIZE) {
+            // 0. Check for Pause or Abort
+            if (abortSync.current) {
+                console.log('🛑 Synchronisation arrêtée par l\'utilisateur.');
+                break;
+            }
 
-             while (isSyncPaused.current) {
-                 if (abortSync.current) break;
-                 await new Promise(resolve => setTimeout(resolve, 500));
-             }
+            while (isSyncPaused.current) {
+                if (abortSync.current) break;
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
 
-             if (abortSync.current) break;
+            if (abortSync.current) break;
 
-            try {
-                // Update Progress
-                setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
+            const batch = allTickers.slice(i, i + FMP_BATCH_SIZE);
+            
+            // ✅ OPTIMISATION: Récupérer les données FMP en batch
+            const fmpResults = await Promise.allSettled(
+                batch.map(async (tickerSymbol) => {
+                    try {
+                        const profile = library[tickerSymbol];
+                        if (!profile) {
+                            return { tickerSymbol, success: false, error: 'Profil non trouvé', result: null };
+                        }
 
-                const profile = library[tickerSymbol];
-                if (!profile) continue;
+                        // 1. Sauvegarder un snapshot avant la sync
+                        console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
+                        await saveSnapshot(
+                            tickerSymbol,
+                            profile.data,
+                            profile.assumptions,
+                            profile.info,
+                            `Avant synchronisation globale - ${new Date().toLocaleString()}`,
+                            false, 
+                            false 
+                        );
 
-                // 1. Sauvegarder un snapshot avant la sync
-                console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
-                await saveSnapshot(
-                    tickerSymbol,
-                    profile.data,
-                    profile.assumptions,
-                    profile.info,
-                    `Avant synchronisation globale - ${new Date().toLocaleString()}`,
-                    false, 
-                    false 
-                );
-
-                // 2. Charger les nouvelles données FMP
-                console.log(`🔄 Synchronisation ${tickerSymbol}...`);
-                const result = await fetchCompanyData(tickerSymbol);
-
-                // 3. Merge intelligent
-                const newDataByYear = new Map(result.data.map(row => [row.year, row]));
-                const mergedData = profile.data.map((existingRow) => {
-                    const newRow = newDataByYear.get(existingRow.year);
-                    if (!newRow) return existingRow;
-                    if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
-                        return existingRow; 
+                        // 2. Charger les nouvelles données FMP
+                        console.log(`🔄 Synchronisation ${tickerSymbol}...`);
+                        const result = await fetchCompanyData(tickerSymbol);
+                        
+                        return { tickerSymbol, success: true, result, profile };
+                    } catch (error: any) {
+                        return { 
+                            tickerSymbol, 
+                            success: false, 
+                            error: error.message || 'Erreur inconnue', 
+                            result: null,
+                            profile: library[tickerSymbol] || null
+                        };
                     }
-                    return { ...(newRow as AnnualData), autoFetched: true };
-                });
+                })
+            );
 
-                result.data.forEach(newRow => {
-                    const exists = mergedData.some(row => row.year === newRow.year);
-                    if (!exists) {
-                        mergedData.push({ ...(newRow as AnnualData), autoFetched: true });
-                    }
-                });
-                mergedData.sort((a, b) => a.year - b.year);
-
-                // 4. Recalculer métriques
-                const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-                    mergedData,
-                    result.currentPrice,
-                    profile.assumptions 
-                );
-
-                // 5. Detect Outliers
-                const tempAssumptions = { ...profile.assumptions, ...autoFilledAssumptions } as Assumptions;
-                const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
-                
-                if (outlierDetection.detectedOutliers.length > 0) {
-                    console.log(`⚠️ ${tickerSymbol}: Outliers détectés: ${outlierDetection.detectedOutliers.join(', ')}`);
+            // Traiter les résultats du batch
+            for (const fmpResult of fmpResults) {
+                // ✅ Vérifier pause/arrêt avant chaque ticker
+                if (abortSync.current) {
+                    console.log('🛑 Synchronisation arrêtée par l\'utilisateur.');
+                    break;
                 }
 
-                const finalAssumptions = {
-                    ...tempAssumptions,
-                    excludeEPS: outlierDetection.excludeEPS,
-                    excludeCF: outlierDetection.excludeCF,
-                    excludeBV: outlierDetection.excludeBV,
-                    excludeDIV: outlierDetection.excludeDIV
-                };
+                while (isSyncPaused.current) {
+                    if (abortSync.current) break;
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
 
-                // 6. Update Library
-                setLibrary(prev => {
-                    const updated = {
-                        ...prev,
-                        [tickerSymbol]: {
-                            ...profile,
-                            data: mergedData,
-                            info: {
-                                ...profile.info,
-                                ...result.info,
-                                name: result.info.name || profile.info.name
-                            },
-                            assumptions: finalAssumptions,
-                            lastModified: Date.now()
+                if (abortSync.current) break;
+
+                if (fmpResult.status === 'fulfilled') {
+                    const { tickerSymbol, success, result, error, profile } = fmpResult.value;
+
+                    if (!success || !result || !profile) {
+                        errorCount++;
+                        setSyncStats({ successCount, errorCount });
+                        const errorMsg = `${tickerSymbol}: ${error || 'Erreur inconnue'}`;
+                        errors.push(errorMsg);
+                        console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
+                        setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
+                        continue;
+                    }
+
+                    try {
+                        // 3. Merge intelligent
+                        const newDataByYear = new Map(result.data.map(row => [row.year, row]));
+                        const mergedData = profile.data.map((existingRow) => {
+                            const newRow = newDataByYear.get(existingRow.year);
+                            if (!newRow) return existingRow;
+                            if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
+                                return existingRow; 
+                            }
+                            return { ...(newRow as AnnualData), autoFetched: true };
+                        });
+
+                        result.data.forEach(newRow => {
+                            const exists = mergedData.some(row => row.year === newRow.year);
+                            if (!exists) {
+                                mergedData.push({ ...(newRow as AnnualData), autoFetched: true });
+                            }
+                        });
+                        mergedData.sort((a, b) => a.year - b.year);
+
+                        // 4. Recalculer métriques
+                        const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                            mergedData,
+                            result.currentPrice,
+                            profile.assumptions 
+                        );
+
+                        // 5. Detect Outliers
+                        const tempAssumptions = { ...profile.assumptions, ...autoFilledAssumptions } as Assumptions;
+                        const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
+                        
+                        if (outlierDetection.detectedOutliers.length > 0) {
+                            console.log(`⚠️ ${tickerSymbol}: Outliers détectés: ${outlierDetection.detectedOutliers.join(', ')}`);
                         }
-                    };
-                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(updated)); } catch (e) { console.warn(e); }
-                    return updated;
-                });
 
-                // 7. Save Snapshot
-                await saveSnapshot(
-                    tickerSymbol,
-                    mergedData,
-                    finalAssumptions,
-                    { ...profile.info, ...result.info },
-                    `Synchronisation globale - ${new Date().toLocaleString()}`,
-                    true, 
-                    true   
-                );
+                        const finalAssumptions = {
+                            ...tempAssumptions,
+                            excludeEPS: outlierDetection.excludeEPS,
+                            excludeCF: outlierDetection.excludeCF,
+                            excludeBV: outlierDetection.excludeBV,
+                            excludeDIV: outlierDetection.excludeDIV
+                        };
 
-                successCount++;
-                setSyncStats({ successCount, errorCount });
-                console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
+                        // 6. Update Library
+                        setLibrary(prev => {
+                            const updated = {
+                                ...prev,
+                                [tickerSymbol]: {
+                                    ...profile,
+                                    data: mergedData,
+                                    info: {
+                                        ...profile.info,
+                                        ...result.info,
+                                        name: result.info.name || profile.info.name
+                                    },
+                                    assumptions: finalAssumptions,
+                                    lastModified: Date.now()
+                                }
+                            };
+                            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(updated)); } catch (e) { console.warn(e); }
+                            return updated;
+                        });
 
-                // 8. Delai de sécurité
-                await new Promise(resolve => setTimeout(resolve, delayBetweenTickers));
+                        // 7. Save Snapshot (en parallèle si possible)
+                        await saveSnapshot(
+                            tickerSymbol,
+                            mergedData,
+                            finalAssumptions,
+                            { ...profile.info, ...result.info },
+                            `Synchronisation globale - ${new Date().toLocaleString()}`,
+                            true, 
+                            true   
+                        );
 
-            } catch (error: any) {
-                errorCount++;
-                setSyncStats({ successCount, errorCount });
-                const errorMsg = `${tickerSymbol}: ${error.message || 'Erreur inconnue'}`;
-                errors.push(errorMsg);
-                console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
+                        successCount++;
+                        setSyncStats({ successCount, errorCount });
+                        console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
+                        setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
+
+                        // Délai minimal entre tickers dans le batch
+                        await new Promise(resolve => setTimeout(resolve, delayBetweenTickersInBatch));
+                    } catch (error: any) {
+                        errorCount++;
+                        setSyncStats({ successCount, errorCount });
+                        const errorMsg = `${tickerSymbol}: ${error.message || 'Erreur inconnue'}`;
+                        errors.push(errorMsg);
+                        console.error(`❌ Erreur traitement ${tickerSymbol}:`, error);
+                        setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
+                    }
+                } else {
+                    // Promise rejected
+                    const tickerSymbol = batch[fmpResults.indexOf(fmpResult)] || 'UNKNOWN';
+                    errorCount++;
+                    setSyncStats({ successCount, errorCount });
+                    const errorMsg = `${tickerSymbol}: ${fmpResult.reason?.message || 'Erreur inconnue'}`;
+                    errors.push(errorMsg);
+                    console.error(`❌ Erreur sync ${tickerSymbol}:`, fmpResult.reason);
+                    setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
+                }
+            }
+
+            // Délai entre batches (seulement si pas le dernier batch)
+            if (i + FMP_BATCH_SIZE < allTickers.length && !abortSync.current) {
+                await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
             }
         }
 
@@ -2307,8 +2379,37 @@ export default function App() {
                 return updated;
             });
 
+            // ✅ FONCTION UTILITAIRE: Parser marketCap depuis format string (ex: "2.5B", "500M") vers nombre
+            const parseMarketCapToNumber = (marketCapStr: string | null | undefined): number => {
+                if (!marketCapStr || marketCapStr === 'N/A' || marketCapStr === '0') return 0;
+                
+                // Si c'est déjà un nombre (string numérique)
+                const numValue = parseFloat(marketCapStr);
+                if (!isNaN(numValue) && !marketCapStr.match(/[A-Za-z]/)) {
+                    return numValue;
+                }
+                
+                // Parser format "2.5B", "500M", "1.2T"
+                const match = marketCapStr.toUpperCase().match(/^([\d.]+)([BMKT]?)$/);
+                if (!match) return 0;
+                
+                const value = parseFloat(match[1]);
+                const suffix = match[2];
+                
+                switch (suffix) {
+                    case 'T': return value * 1000000000000;
+                    case 'B': return value * 1000000000;
+                    case 'M': return value * 1000000;
+                    case 'K': return value * 1000;
+                    default: return value;
+                }
+            };
+
+            // ✅ FILTRE CAPITALISATION: Minimum 2 milliards USD
+            const MIN_MARKET_CAP = 2000000000; // 2 milliards
+
             // Charger les données FMP pour les nouveaux tickers en arrière-plan
-            // Exclure les fonds mutuels
+            // Exclure les fonds mutuels et les titres de moins de 2 milliards
             const newTickers = result.tickers.filter(t => {
                 const symbol = t.ticker.toUpperCase();
                 
@@ -2316,6 +2417,18 @@ export default function App() {
                 if (isMutualFund(symbol, t.company_name)) {
                     console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - exclu de la synchronisation`);
                     return false;
+                }
+
+                // ✅ FILTRE CAPITALISATION: Vérifier market_cap depuis Supabase si disponible
+                if (t.market_cap) {
+                    const marketCapNum = typeof t.market_cap === 'number' 
+                        ? t.market_cap 
+                        : parseMarketCapToNumber(String(t.market_cap));
+                    
+                    if (marketCapNum > 0 && marketCapNum < MIN_MARKET_CAP) {
+                        console.warn(`⚠️ ${symbol}: Capitalisation boursière trop faible (${t.market_cap} < 2B) - exclu de la synchronisation`);
+                        return false;
+                    }
                 }
 
                 // Si déjà dans library
@@ -2371,6 +2484,31 @@ export default function App() {
                                 if (!hasValidData) {
                                     console.error(`❌ ${symbol}: Aucune donnée financière valide - profil NON créé`);
                                     return;
+                                }
+                                
+                                // ✅ FILTRE CAPITALISATION: Vérifier marketCap depuis FMP
+                                const parseMarketCapToNumber = (marketCapStr: string | null | undefined): number => {
+                                    if (!marketCapStr || marketCapStr === 'N/A' || marketCapStr === '0') return 0;
+                                    const match = marketCapStr.toUpperCase().match(/^([\d.]+)([BMKT]?)$/);
+                                    if (!match) return 0;
+                                    const value = parseFloat(match[1]);
+                                    const suffix = match[2];
+                                    switch (suffix) {
+                                        case 'T': return value * 1000000000000;
+                                        case 'B': return value * 1000000000;
+                                        case 'M': return value * 1000000;
+                                        case 'K': return value * 1000;
+                                        default: return value;
+                                    }
+                                };
+                                
+                                const MIN_MARKET_CAP = 2000000000; // 2 milliards
+                                if (result.info.marketCap) {
+                                    const marketCapNum = parseMarketCapToNumber(result.info.marketCap);
+                                    if (marketCapNum > 0 && marketCapNum < MIN_MARKET_CAP) {
+                                        console.warn(`⚠️ ${symbol}: Capitalisation boursière trop faible (${result.info.marketCap} < 2B) - profil NON créé`);
+                                        return;
+                                    }
                                 }
                                 
                                 // ✅ TOUTES LES VALIDATIONS PASSÉES - Créer le profil avec les données réelles
@@ -2723,6 +2861,7 @@ export default function App() {
                                     onRestoreData={profile && profile.data.length > 0 ? () => setShowRestoreDialog(true) : undefined}
                                     showSyncButton={true}
                                     onOpenSettings={() => setIsSettingsOpen(true)}
+                                    onOpenReports={() => setIsReportsOpen(true)}
                                 />
 
                         {/* CONDITIONAL RENDER: ANALYSIS VS INFO VS KPI */}
@@ -2739,6 +2878,7 @@ export default function App() {
                                         onSyncNA={handleSyncSpecificTickers}
                                         isBulkSyncing={isBulkSyncing}
                                         onUpdateProfile={handleUpdateProfile}
+                                        onOpenSettings={() => setIsSettingsOpen(true)}
                                     />
                                 </Suspense>
                             </ErrorBoundary>
@@ -2757,15 +2897,15 @@ export default function App() {
                                             )}
                                         </h3>
                                         <div className="flex gap-1 bg-white rounded-md shadow-sm border border-gray-200 p-0.5 no-print">
-                                            <button onClick={undo} disabled={pastData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30" aria-label="Annuler la modification">
+                                            <button onClick={undo} disabled={pastData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30" title="↶ Annuler la dernière modification\n\nAnnule la dernière modification effectuée sur les données historiques.\n\n📊 Fonctionnalités:\n• Permet de revenir en arrière sur les changements\n• Fonctionne avec toutes les modifications (EPS, CF, BV, Dividendes, Prix)\n• Historique illimité (tant que vous ne quittez pas la page)\n\n⌨️ Raccourci: Ctrl+Z (Cmd+Z sur Mac)" aria-label="Annuler la modification">
                                                 <ArrowUturnLeftIcon className="w-4 h-4" />
                                             </button>
                                             <div className="w-px bg-gray-200 my-1"></div>
-                                            <button onClick={redo} disabled={futureData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30" aria-label="Rétablir la modification">
+                                            <button onClick={redo} disabled={futureData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30" title="↷ Rétablir la modification annulée\n\nRétablit la dernière modification que vous avez annulée.\n\n📊 Fonctionnalités:\n• Permet de refaire une action annulée\n• Fonctionne avec toutes les modifications\n• Disponible uniquement si vous avez annulé une action\n\n⌨️ Raccourci: Ctrl+Shift+Z (Cmd+Shift+Z sur Mac)" aria-label="Rétablir la modification">
                                                 <ArrowUturnRightIcon className="w-4 h-4" />
                                             </button>
                                             <div className="w-px bg-gray-200 my-1"></div>
-                                            <button onClick={handleResetData} className="p-1.5 rounded hover:bg-red-50 text-red-600" title="Réinitialiser les données" aria-label="Réinitialiser toutes les données">
+                                            <button onClick={handleResetData} className="p-1.5 rounded hover:bg-red-50 text-red-600" title="🔄 Réinitialiser les données\n\nRéinitialise toutes les données historiques à leurs valeurs d'origine.\n\n⚠️ Attention:\n• Cette action est irréversible\n• Toutes vos modifications manuelles seront perdues\n• Les données seront restaurées depuis la dernière synchronisation FMP\n• Les hypothèses ne sont PAS affectées\n\n💡 Utilisation:\n• Utile si vous avez fait des erreurs de saisie\n• Permet de repartir de zéro avec les données FMP\n• Confirmation requise avant exécution" aria-label="Réinitialiser toutes les données">
                                                 <ArrowPathIcon className="w-4 h-4" />
                                             </button>
                                         </div>
@@ -3031,6 +3171,17 @@ export default function App() {
                 isOpen={isSettingsOpen}
                 onClose={handleSettingsClose}
             />
+
+            {/* REPORTS PANEL */}
+            {profile && (
+                <ReportsPanel
+                    data={profile.data}
+                    assumptions={profile.assumptions}
+                    info={profile.info}
+                    isOpen={isReportsOpen}
+                    onClose={() => setIsReportsOpen(false)}
+                />
+            )}
         </div>
     );
 }

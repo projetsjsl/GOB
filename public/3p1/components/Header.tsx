@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CompanyInfo, Assumptions, Recommendation } from '../types';
-import { ArrowTrendingUpIcon, BanknotesIcon, TagIcon, CalendarDaysIcon, PrinterIcon, CloudArrowDownIcon, EyeIcon, StarIcon, ArrowPathIcon, ArrowDownTrayIcon, Cog6ToothIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { ArrowTrendingUpIcon, BanknotesIcon, TagIcon, CalendarDaysIcon, PrinterIcon, CloudArrowDownIcon, EyeIcon, StarIcon, ArrowPathIcon, ArrowDownTrayIcon, Cog6ToothIcon, ShieldCheckIcon, DocumentChartBarIcon } from '@heroicons/react/24/outline';
 import { formatPercent } from '../utils/calculations';
 import { createLogoErrorHandler, createLogoLoadHandler } from '../utils/logoUtils';
 
@@ -16,6 +16,7 @@ interface HeaderProps {
   onRestoreData?: () => void;
   showSyncButton?: boolean; // Nouveau prop pour contrôler la visibilité du bouton
   onOpenSettings?: () => void;
+  onOpenReports?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -30,7 +31,8 @@ export const Header: React.FC<HeaderProps> = ({
   onRestoreData,
 
   showSyncButton = true, // Par défaut, afficher le bouton
-  onOpenSettings
+  onOpenSettings,
+  onOpenReports
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -180,7 +182,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('open-save-dialog'))}
               className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print bg-blue-600 text-white hover:bg-blue-700"
-              title="Sauvegarder une version (Snapshot)\n\nCrée un snapshot de l'analyse actuelle incluant:\n• Toutes les données historiques\n• Toutes les hypothèses\n• Les métriques calculées\n• Date et heure de sauvegarde\n\nLes snapshots sont accessibles dans la sidebar droite."
+              title="💾 Sauvegarder une version (Snapshot)\n\nCrée un snapshot complet de l'analyse actuelle incluant:\n\n📊 Données:\n• Toutes les données historiques (EPS, CF, BV, Dividendes)\n• Prix historiques (High/Low par année)\n• Données manuelles et auto-fetchées\n\n⚙️ Hypothèses:\n• Tous les taux de croissance (EPS, CF, BV, DIV)\n• Tous les ratios cibles (P/E, P/CF, P/BV, Yield)\n• Prix actuel et dividende actuel\n• Taux de rendement requis\n• Exclusions de métriques (EPS, CF, BV, DIV)\n\n📈 Métriques:\n• Toutes les métriques calculées\n• Date et heure de sauvegarde\n• Version du snapshot\n\n💡 Utilisation:\n• Les snapshots sont accessibles dans la sidebar droite (icône horloge)\n• Permet de comparer différentes versions de l'analyse\n• Utile pour suivre l'évolution de vos hypothèses dans le temps"
             >
               <CloudArrowDownIcon className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Sauvegarder</span>
@@ -191,7 +193,7 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={handleSyncClick}
                 disabled={isLoading}
                 className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
-                title="Synchroniser les données (Sync. Données)\n\nRécupère les dernières données depuis l'API FMP:\n• Met à jour les données auto-fetchées (autoFetched: true)\n• Préserve les modifications manuelles (autoFetched: false)\n• Ajoute les nouvelles années disponibles\n• Recalcule les hypothèses (préserve les exclusions)\n• Préserve les métriques ValueLine\n\n⚠️ Ne synchronise que le ticker actuellement sélectionné."
+                title="🔄 Synchroniser les données (Sync. Données)\n\nRécupère les dernières données depuis l'API FMP Premium pour le ticker actuellement sélectionné.\n\n📊 Données mises à jour:\n• États financiers complets (30 ans d'historique)\n• Prix historiques (20 ans)\n• Métriques clés (30 années)\n• Dividendes et ratios\n• Informations de profil (secteur, pays, bourse)\n\n✅ Comportement intelligent:\n• Met à jour uniquement les données auto-fetchées (autoFetched: true)\n• Préserve toutes vos modifications manuelles (autoFetched: false)\n• Ajoute automatiquement les nouvelles années disponibles\n• Recalcule les hypothèses basées sur les nouvelles données\n• Préserve vos exclusions de métriques (EPS, CF, BV, DIV)\n• Préserve les métriques ValueLine (Security Rank, etc.)\n\n⚠️ Important:\n• Ne synchronise QUE le ticker actuellement sélectionné\n• Pour synchroniser tous les tickers, utilisez 'Sync Warehouse (Deep)' dans la sidebar\n• Les données manuelles (en orange) ne sont jamais écrasées"
               >
                 <ArrowPathIcon className={`w-3 h-3 sm:w-4 sm:h-4 ${isLoading ? 'animate-spin' : ''}`} />
                 <span className="hidden xs:inline">{isLoading ? 'Sync...' : 'Sync. Données'}</span>
@@ -203,7 +205,7 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={onRestoreData}
                 disabled={isLoading}
                 className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-purple-50 text-purple-600 hover:bg-purple-100'}`}
-                title="Restaurer les données\n\nOuvre un dialogue avec 2 options:\n\n1. Charger le dernier snapshot:\n   • Restaure la dernière sauvegarde\n   • Mode lecture seule\n\n2. Recalculer depuis FMP:\n   • Recharge les données FMP\n   • Réapplique les hypothèses auto-fill\n   • Préserve les exclusions et métriques ValueLine"
+                title="📥 Restaurer les données\n\nOuvre un dialogue de restauration avec 2 options principales:\n\n1️⃣ Charger le dernier snapshot:\n   • Restaure la dernière sauvegarde complète\n   • Inclut toutes les données historiques\n   • Inclut toutes les hypothèses\n   • Mode lecture seule (sécurisé)\n   • Permet de comparer avec la version actuelle\n\n2️⃣ Recalculer depuis FMP:\n   • Recharge les données FMP Premium (30 ans)\n   • Réapplique automatiquement les hypothèses auto-fill\n   • Préserve vos exclusions de métriques\n   • Préserve les métriques ValueLine\n   • Met à jour uniquement les données auto-fetchées\n\n💡 Utilisation:\n• Utilisez 'Charger snapshot' pour revenir à une version précédente\n• Utilisez 'Recalculer FMP' pour actualiser avec les dernières données\n• Les modifications manuelles sont toujours préservées"
               >
                 <ArrowDownTrayIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">Restaurer</span>
@@ -213,16 +215,25 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={handlePrint}
               className="p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors no-print"
-              title="Imprimer la fiche"
+              title="🖨️ Imprimer la fiche d'analyse\n\nGénère une version imprimable de l'analyse complète incluant:\n\n📊 Contenu imprimé:\n• En-tête avec informations de l'entreprise\n• Tableau des données historiques\n• Graphiques de valorisation\n• Matrices de sensibilité (P/E et P/CF)\n• Évaluation détaillée (4 métriques)\n• Notes de l'analyste\n• Résumé exécutif\n\n💡 Conseils:\n• Utilisez Ctrl+P (Cmd+P sur Mac) pour ouvrir le dialogue d'impression\n• Les éléments avec la classe 'no-print' sont automatiquement masqués\n• Optimisé pour impression en format A4\n• Les couleurs sont préservées pour une meilleure lisibilité"
             >
               <PrinterIcon className="w-4 h-4 sm:w-6 sm:h-6" />
             </button>
 
+            {onOpenReports && (
+              <button
+                onClick={onOpenReports}
+                className="p-1.5 sm:p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-full transition-colors no-print"
+                title="📊 Rapports Visuels et Analyse de Données\n\nOuvre le panneau de rapports visuels complets incluant:\n\n📈 Qualité des Données:\n• Visualisation des données aberrantes détectées\n• Métriques exclues et raisons d'exclusion\n• Analyse des outliers dans les données historiques\n• Graphiques des prix cibles par métrique\n• Statistiques détaillées (médiane, écart-type)\n\n✅ Rapport de Sanitisation:\n• Comparaison avant/après sanitisation\n• Détails de toutes les corrections appliquées\n• Raisons des corrections par paramètre\n• Statistiques par catégorie (croissance, ratios, prix)\n\n📊 Visualisation Complète:\n• Graphiques de toutes les données historiques\n• Évolution des prix (High/Low/Avg)\n• Ratios de valorisation (P/E, P/CF, P/BV)\n• Taux de croissance annuel\n• Corrélations et statistiques"
+              >
+                <DocumentChartBarIcon className="w-4 h-4 sm:w-6 sm:h-6" />
+              </button>
+            )}
             {onOpenSettings && (
               <button
                 onClick={onOpenSettings}
                 className="p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors no-print"
-                title="Configuration Complète : Guardrails, Validation, Ajustements"
+                title="⚙️ Configuration Complète : Guardrails, Validation, Ajustements\n\nOuvre le panneau de configuration unifié pour gérer tous les paramètres de l'application.\n\n🛡️ Guardrails (Limites d'affichage):\n• Limites de croissance (min/max)\n• Limites de ratios (P/E, P/CF, P/BV)\n• Multiplicateur maximum raisonnable\n• Contrôlent l'affichage des graphiques et tableaux\n• Stockés dans localStorage (navigateur)\n\n✅ Validation (Paramètres de sanitisation):\n• Limites de croissance par métrique\n• Limites de ratios cibles\n• Précision des calculs\n• Automatisation de la sanitisation\n• Cohérence des données\n• Stockés dans Supabase (partagés)\n\n📊 Ajustements:\n• Paramètres généraux de l'application\n• Comportement par défaut\n• Options d'affichage\n\n💡 Impact:\n• Les Guardrails affectent l'affichage uniquement\n• La Validation affecte les calculs et la sauvegarde\n• Les changements sont appliqués immédiatement"
               >
                 <Cog6ToothIcon className="w-4 h-4 sm:w-6 sm:h-6" />
               </button>

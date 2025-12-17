@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   PlusIcon,
   TrashIcon,
   MagnifyingGlassIcon,
-  ArrowTopRightOnSquareIcon,
   ChartBarIcon,
-  DocumentMagnifyingGlassIcon,
   DocumentDuplicateIcon,
   EyeIcon,
   StarIcon,
   ArrowPathIcon,
-  ShieldCheckIcon
+  ShieldCheckIcon,
+  FunnelIcon,
+  BarsArrowUpIcon,
+  BarsArrowDownIcon
 } from '@heroicons/react/24/outline';
 import { AnalysisProfile, Recommendation } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
@@ -35,24 +36,54 @@ interface SidebarProps {
   isAdmin?: boolean;
 }
 
+type SortOption = 'alphabetical' | 'alphabetical-desc' | 'lastModified' | 'lastModified-desc' | 'recommendation' | 'sector';
+type FilterOption = 'all' | 'portfolio' | 'watchlist';
+
 export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, isAdmin = false }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState<SortOption>('lastModified');
+  const [filterBy, setFilterBy] = useState<FilterOption>('all');
 
-  const filteredProfiles = profiles
-    .filter(p =>
+  const filteredAndSortedProfiles = useMemo(() => {
+    // Filtrage par recherche
+    let filtered = profiles.filter(p =>
       p.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.info.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => b.lastModified - a.lastModified);
+    );
 
-  const researchLinks = [
-    { name: 'Yahoo Finance', url: (symbol: string) => `https://finance.yahoo.com/quote/${symbol}` },
-    { name: 'Google Finance', url: (symbol: string) => `https://www.google.com/finance/quote/${symbol}` },
-    { name: 'TradingView', url: (symbol: string) => `https://www.tradingview.com/chart/?symbol=${symbol}` },
-    { name: 'Seeking Alpha', url: (symbol: string) => `https://seekingalpha.com/symbol/${symbol}` },
-    { name: 'Morningstar', url: (symbol: string) => `https://www.morningstar.com/search?query=${symbol}` },
-    { name: 'Finviz', url: (symbol: string) => `https://finviz.com/quote.ashx?t=${symbol}` },
-  ];
+    // Filtrage par source (portefeuille/watchlist)
+    if (filterBy === 'portfolio') {
+      filtered = filtered.filter(p => !p.isWatchlist);
+    } else if (filterBy === 'watchlist') {
+      filtered = filtered.filter(p => p.isWatchlist);
+    }
+
+    // Tri
+    const sorted = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case 'alphabetical':
+          return (a.info.preferredSymbol || a.id).localeCompare(b.info.preferredSymbol || b.id);
+        case 'alphabetical-desc':
+          return (b.info.preferredSymbol || b.id).localeCompare(a.info.preferredSymbol || a.id);
+        case 'lastModified':
+          return b.lastModified - a.lastModified;
+        case 'lastModified-desc':
+          return a.lastModified - b.lastModified;
+        case 'recommendation': {
+          const recA = calculateRecommendation(a.data, a.assumptions).recommendation;
+          const recB = calculateRecommendation(b.data, b.assumptions).recommendation;
+          const order = { [Recommendation.BUY]: 0, [Recommendation.HOLD]: 1, [Recommendation.SELL]: 2 };
+          return (order[recA] ?? 1) - (order[recB] ?? 1);
+        }
+        case 'sector':
+          return (a.info.sector || '').localeCompare(b.info.sector || '');
+        default:
+          return 0;
+      }
+    });
+
+    return sorted;
+  }, [profiles, searchTerm, sortBy, filterBy]);
 
   const getRecommendationColor = (rec: Recommendation) => {
     switch (rec) {
@@ -154,14 +185,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
       <div className="flex-1 overflow-y-auto px-2 pb-4 space-y-1 custom-scrollbar pt-2">
         <h3 className="text-xs font-semibold text-slate-500 uppercase px-2 mb-2 tracking-wider flex justify-between items-center">
           <span className="cursor-help" title="Liste de vos tickers\n\nAffiche tous les tickers de votre portefeuille et watchlist.\n\nUtilisez la barre de recherche pour filtrer par symbole ou nom.">Portefeuille</span>
-          <span className="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded-full text-slate-400 cursor-help" title={`Nombre de tickers dans votre portefeuille: ${filteredProfiles.length}\n\n${searchTerm ? `(Filtrés sur "${searchTerm}")` : ''}`}>{filteredProfiles.length}</span>
+          <span className="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded-full text-slate-400 cursor-help" title={`Nombre de tickers affichés: ${filteredAndSortedProfiles.length} / ${profiles.length}\n\n${searchTerm ? `(Filtrés sur "${searchTerm}")` : ''}\n${filterBy !== 'all' ? `(Filtre: ${filterBy === 'portfolio' ? 'Portefeuille' : 'Watchlist'})` : ''}`}>{filteredAndSortedProfiles.length}</span>
         </h3>
-        {filteredProfiles.length === 0 ? (
+        {filteredAndSortedProfiles.length === 0 ? (
           <div className="text-center text-slate-600 text-sm py-8 px-4">
             {searchTerm ? 'Aucun résultat' : 'Commencez par ajouter un ticker'}
           </div>
         ) : (
-          filteredProfiles.map(profile => {
+          filteredAndSortedProfiles.map(profile => {
             // Calculate status on the fly
             const { recommendation } = calculateRecommendation(profile.data, profile.assumptions);
 
@@ -270,27 +301,68 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
 
       {/* Version History Section - Retiré, maintenant dans RightSidebar */}
 
-      {/* Research Section */}
+      {/* Filters & Sort Section */}
       <div className="p-2 sm:p-3 md:p-4 border-t border-slate-800 bg-slate-900">
-        <h3 className="text-xs font-semibold text-slate-500 uppercase mb-2 sm:mb-3 flex items-center gap-1.5 sm:gap-2 cursor-help" title="Recherche Rapide\n\nLiens vers des sites d'analyse financière externes.\n\nOuvre chaque site dans un nouvel onglet avec le ticker actuellement sélectionné.">
-          <DocumentMagnifyingGlassIcon className="w-3 h-3 flex-shrink-0" />
-          <span className="truncate">Recherche Rapide</span>
+        <h3 className="text-xs font-semibold text-slate-500 uppercase mb-2 sm:mb-3 flex items-center gap-1.5 sm:gap-2 cursor-help" title="Filtres et Tri\n\nFiltrez et triez votre portefeuille selon différents critères.\n\nFiltres:\n• Tous: Affiche tous les tickers\n• Portefeuille: Uniquement les titres détenus\n• Watchlist: Uniquement les titres surveillés\n\nTri:\n• Alphabétique: A-Z ou Z-A\n• Date de modification: Plus récent ou plus ancien\n• Recommandation: Achat, Conserver, Vente\n• Secteur: Par secteur d'activité">
+          <FunnelIcon className="w-3 h-3 flex-shrink-0" />
+          <span className="truncate">Filtres et Tri</span>
         </h3>
-        <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
-          {researchLinks.map(link => (
-            <a
-              key={link.name}
-              href={link.url(currentId)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-between px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 bg-slate-800 hover:bg-slate-700 rounded text-[10px] sm:text-xs text-slate-300 transition-colors"
-              title={`Ouvrir ${link.name} pour ${currentId}\n\nOuvre ${link.name} dans un nouvel onglet avec le ticker ${currentId}.\n\nUtile pour:\n• Recherche d'informations complémentaires\n• Analyse technique\n• Actualités et analyses\n• Comparaison avec d'autres sources`}
-            >
-              {link.name}
-              <ArrowTopRightOnSquareIcon className="w-3 h-3 opacity-50" />
-            </a>
-          ))}
+        
+        {/* Filter Buttons */}
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mb-2">
+          <button
+            onClick={() => setFilterBy('all')}
+            className={`px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors ${
+              filterBy === 'all'
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+            }`}
+            title="Afficher tous les tickers (Portefeuille + Watchlist)"
+          >
+            Tous
+          </button>
+          <button
+            onClick={() => setFilterBy('portfolio')}
+            className={`px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${
+              filterBy === 'portfolio'
+                ? 'bg-yellow-600 text-white'
+                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+            }`}
+            title="Afficher uniquement les tickers du portefeuille (titres détenus)"
+          >
+            <StarIcon className="w-3 h-3" />
+            <span className="hidden sm:inline">Portefeuille</span>
+            <span className="sm:hidden">Port.</span>
+          </button>
+          <button
+            onClick={() => setFilterBy('watchlist')}
+            className={`px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${
+              filterBy === 'watchlist'
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+            }`}
+            title="Afficher uniquement les tickers de la watchlist (titres surveillés)"
+          >
+            <EyeIcon className="w-3 h-3" />
+            <span className="hidden sm:inline">Watchlist</span>
+            <span className="sm:hidden">Watch</span>
+          </button>
         </div>
+
+        {/* Sort Dropdown */}
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as SortOption)}
+          className="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer"
+          title="Trier les tickers\n\nOptions de tri:\n• Alphabétique (A-Z): Par symbole croissant\n• Alphabétique (Z-A): Par symbole décroissant\n• Date modif. (Récent): Plus récemment modifiés en premier\n• Date modif. (Ancien): Plus anciennement modifiés en premier\n• Recommandation: Achat → Conserver → Vente\n• Secteur: Par secteur d'activité"
+        >
+          <option value="lastModified">📅 Date modif. (Récent)</option>
+          <option value="lastModified-desc">📅 Date modif. (Ancien)</option>
+          <option value="alphabetical">🔤 Alphabétique (A-Z)</option>
+          <option value="alphabetical-desc">🔤 Alphabétique (Z-A)</option>
+          <option value="recommendation">⭐ Recommandation</option>
+          <option value="sector">🏢 Secteur</option>
+        </select>
       </div>
     </div>
   );
