@@ -635,9 +635,11 @@ export default function App() {
             // ✅ Stocker la fonction dans useRef pour utilisation dans useRealtimeSync
             loadTickersFromSupabaseRef.current = loadTickersFromSupabase;
             
-            hasLoadedTickersRef.current = true; // Marquer comme chargé
+            // ✅ NE PAS marquer comme chargé AVANT d'avoir réussi (pour permettre retry si échec)
             setIsLoadingTickers(true);
             setTickersLoadError(null);
+            
+            console.log('📡 Début chargement tickers depuis Supabase...');
 
             try {
                 const result = await loadAllTickersFromSupabase();

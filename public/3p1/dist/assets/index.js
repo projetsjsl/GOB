@@ -52124,9 +52124,9 @@ function App() {
         return;
       }
       loadTickersFromSupabaseRef.current = loadTickersFromSupabase;
-      hasLoadedTickersRef.current = true;
       setIsLoadingTickers(true);
       setTickersLoadError(null);
+      console.log("📡 Début chargement tickers depuis Supabase...");
       try {
         const result = await loadAllTickersFromSupabase();
         if (!result.success) {
