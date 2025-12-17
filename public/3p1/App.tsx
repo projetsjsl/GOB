@@ -192,44 +192,75 @@ export default function App() {
         
         if (payload.eventType === 'INSERT' && payload.new) {
             const symbol = payload.new.ticker?.toUpperCase();
-            if (symbol && !library[symbol]) {
-                showNotification(`📡 Nouveau ticker ajouté: ${symbol}`, 'info');
-                // Trigger reload of tickers
+            if (symbol) {
+                showNotification(`📡 Nouveau ticker ajouté par un autre utilisateur: ${symbol}`, 'info');
+                // ✅ FORCER le rechargement complet depuis Supabase pour synchronisation
                 hasLoadedTickersRef.current = false;
-                setIsInitialized(prev => prev); // Force re-render
+                supabaseTickersCacheRef.current = null; // Invalider le cache
+                // Recharger immédiatement
+                setTimeout(() => {
+                    loadTickersFromSupabase();
+                }, 500);
             }
         } else if (payload.eventType === 'DELETE' && payload.old) {
             const symbol = payload.old.ticker?.toUpperCase();
             if (symbol) {
-                showNotification(`📡 Ticker supprimé: ${symbol}`, 'warning');
+                showNotification(`📡 Ticker supprimé par un autre utilisateur: ${symbol}`, 'warning');
+                // ✅ Supprimer du localStorage ET forcer rechargement
                 setLibrary(prev => {
                     const updated = { ...prev };
                     delete updated[symbol];
                     storage.setItem(STORAGE_KEY, updated).catch(console.warn);
                     return updated;
                 });
+                // Recharger depuis Supabase pour être sûr
+                hasLoadedTickersRef.current = false;
+                supabaseTickersCacheRef.current = null;
+                setTimeout(() => {
+                    loadTickersFromSupabase();
+                }, 500);
             }
         } else if (payload.eventType === 'UPDATE' && payload.new) {
             const symbol = payload.new.ticker?.toUpperCase();
-            if (symbol && library[symbol]) {
-                // Update ValueLine metrics from Supabase
-                setLibrary(prev => {
-                    if (!prev[symbol]) return prev;
-                    return {
-                        ...prev,
-                        [symbol]: {
-                            ...prev[symbol],
-                            info: {
-                                ...prev[symbol].info,
-                                securityRank: payload.new.security_rank || prev[symbol].info.securityRank,
-                                earningsPredictability: payload.new.earnings_predictability,
-                                priceGrowthPersistence: payload.new.price_growth_persistence,
-                                priceStability: payload.new.price_stability,
-                                beta: payload.new.beta
+            if (symbol) {
+                showNotification(`📡 Ticker mis à jour: ${symbol}`, 'info');
+                // ✅ Mettre à jour les métriques ValueLine ET recharger pour cohérence
+                if (library[symbol]) {
+                    setLibrary(prev => {
+                        if (!prev[symbol]) return prev;
+                        return {
+                            ...prev,
+                            [symbol]: {
+                                ...prev[symbol],
+                                isWatchlist: mapSourceToIsWatchlist(payload.new.source),
+                                info: {
+                                    ...prev[symbol].info,
+                                    securityRank: payload.new.security_rank !== null && payload.new.security_rank !== undefined
+                                        ? payload.new.security_rank
+                                        : prev[symbol].info.securityRank,
+                                    earningsPredictability: payload.new.earnings_predictability !== null && payload.new.earnings_predictability !== undefined
+                                        ? payload.new.earnings_predictability
+                                        : prev[symbol].info.earningsPredictability,
+                                    priceGrowthPersistence: payload.new.price_growth_persistence !== null && payload.new.price_growth_persistence !== undefined
+                                        ? payload.new.price_growth_persistence
+                                        : prev[symbol].info.priceGrowthPersistence,
+                                    priceStability: payload.new.price_stability !== null && payload.new.price_stability !== undefined
+                                        ? payload.new.price_stability
+                                        : prev[symbol].info.priceStability,
+                                    beta: payload.new.beta !== null && payload.new.beta !== undefined
+                                        ? payload.new.beta
+                                        : prev[symbol].info.beta
+                                }
                             }
-                        }
-                    };
-                });
+                        };
+                    });
+                }
+                // Recharger depuis Supabase pour synchronisation complète
+                hasLoadedTickersRef.current = false;
+                supabaseTickersCacheRef.current = null;
+                setTimeout(() => {
+                    loadTickersFromSupabase();
+                }, 1000);
             }
         }
     });
@@ -455,6 +486,12 @@ export default function App() {
         };
 
         const loadTickersFromSupabase = async () => {
+            // Éviter les chargements multiples simultanés
+            if (isLoadingTickers) {
+                console.log('⏳ Chargement tickers déjà en cours, ignoré');
+                return;
+            }
+            
             hasLoadedTickersRef.current = true; // Marquer comme chargé
             setIsLoadingTickers(true);
             setTickersLoadError(null);
@@ -850,6 +887,7 @@ export default function App() {
         // Nettoyer l'interval quand le composant est démonté ou la page est fermée
         return () => {
             clearInterval(intervalId);
+            clearInterval(syncIntervalId);
         };
     }, [isInitialized]); // Seulement après l'initialisation - pas de dépendance à library pour éviter la boucle
 

@@ -51576,42 +51576,59 @@ function App() {
     console.log("📡 [3p1] Realtime ticker change:", payload.eventType, ((_a4 = payload.new) == null ? void 0 : _a4.ticker) || ((_b3 = payload.old) == null ? void 0 : _b3.ticker));
     if (payload.eventType === "INSERT" && payload.new) {
       const symbol = (_c = payload.new.ticker) == null ? void 0 : _c.toUpperCase();
-      if (symbol && !library[symbol]) {
-        showNotification(`📡 Nouveau ticker ajouté: ${symbol}`, "info");
+      if (symbol) {
+        showNotification(`📡 Nouveau ticker ajouté par un autre utilisateur: ${symbol}`, "info");
         hasLoadedTickersRef.current = false;
-        setIsInitialized((prev) => prev);
+        supabaseTickersCacheRef.current = null;
+        setTimeout(() => {
+          loadTickersFromSupabase();
+        }, 500);
       }
     } else if (payload.eventType === "DELETE" && payload.old) {
       const symbol = (_d = payload.old.ticker) == null ? void 0 : _d.toUpperCase();
       if (symbol) {
-        showNotification(`📡 Ticker supprimé: ${symbol}`, "warning");
+        showNotification(`📡 Ticker supprimé par un autre utilisateur: ${symbol}`, "warning");
         setLibrary((prev) => {
           const updated = { ...prev };
           delete updated[symbol];
           storage.setItem(STORAGE_KEY, updated).catch(console.warn);
           return updated;
         });
+        hasLoadedTickersRef.current = false;
+        supabaseTickersCacheRef.current = null;
+        setTimeout(() => {
+          loadTickersFromSupabase();
+        }, 500);
       }
     } else if (payload.eventType === "UPDATE" && payload.new) {
       const symbol = (_e = payload.new.ticker) == null ? void 0 : _e.toUpperCase();
-      if (symbol && library[symbol]) {
-        setLibrary((prev) => {
-          if (!prev[symbol]) return prev;
-          return {
-            ...prev,
-            [symbol]: {
-              ...prev[symbol],
-              info: {
-                ...prev[symbol].info,
-                securityRank: payload.new.security_rank || prev[symbol].info.securityRank,
-                earningsPredictability: payload.new.earnings_predictability,
-                priceGrowthPersistence: payload.new.price_growth_persistence,
-                priceStability: payload.new.price_stability,
-                beta: payload.new.beta
+      if (symbol) {
+        showNotification(`📡 Ticker mis à jour: ${symbol}`, "info");
+        if (library[symbol]) {
+          setLibrary((prev) => {
+            if (!prev[symbol]) return prev;
+            return {
+              ...prev,
+              [symbol]: {
+                ...prev[symbol],
+                isWatchlist: mapSourceToIsWatchlist(payload.new.source),
+                info: {
+                  ...prev[symbol].info,
+                  securityRank: payload.new.security_rank !== null && payload.new.security_rank !== void 0 ? payload.new.security_rank : prev[symbol].info.securityRank,
+                  earningsPredictability: payload.new.earnings_predictability !== null && payload.new.earnings_predictability !== void 0 ? payload.new.earnings_predictability : prev[symbol].info.earningsPredictability,
+                  priceGrowthPersistence: payload.new.price_growth_persistence !== null && payload.new.price_growth_persistence !== void 0 ? payload.new.price_growth_persistence : prev[symbol].info.priceGrowthPersistence,
+                  priceStability: payload.new.price_stability !== null && payload.new.price_stability !== void 0 ? payload.new.price_stability : prev[symbol].info.priceStability,
+                  beta: payload.new.beta !== null && payload.new.beta !== void 0 ? payload.new.beta : prev[symbol].info.beta
+                }
               }
-            }
-          };
-        });
+            };
+          });
+        }
+        hasLoadedTickersRef.current = false;
+        supabaseTickersCacheRef.current = null;
+        setTimeout(() => {
+          loadTickersFromSupabase();
+        }, 1e3);
       }
     }
   });
@@ -51785,7 +51802,11 @@ function App() {
         console.warn("⚠️ Erreur vérification cache prix:", error);
       }
     };
-    const loadTickersFromSupabase = async () => {
+    const loadTickersFromSupabase2 = async () => {
+      if (isLoadingTickers) {
+        console.log("⏳ Chargement tickers déjà en cours, ignoré");
+        return;
+      }
       hasLoadedTickersRef.current = true;
       setIsLoadingTickers(true);
       setTickersLoadError(null);
@@ -52068,12 +52089,13 @@ function App() {
       }
     };
     refreshPriceCacheIfNeeded();
-    loadTickersFromSupabase();
+    loadTickersFromSupabase2();
     const intervalId = setInterval(() => {
       refreshPriceCacheIfNeeded();
     }, 5 * 60 * 1e3);
     return () => {
       clearInterval(intervalId);
+      clearInterval(syncIntervalId);
     };
   }, [isInitialized]);
   const [data, setData] = reactExports.useState(INITIAL_DATA);
