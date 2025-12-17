@@ -531,17 +531,32 @@ export default function App() {
                         );
                         setActiveId(sortedKeys[0]);
                     } else {
+                        // ✅ NOUVEAU : Cache vide ou obsolète → Forcer chargement depuis Supabase
+                        console.log('📡 Cache vide ou obsolète - Chargement depuis Supabase...');
                         setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
                         setActiveId(DEFAULT_PROFILE.id);
+                        // Marquer pour forcer le chargement depuis Supabase
+                        hasLoadedTickersRef.current = false;
+                        supabaseTickersCacheRef.current = null;
                     }
                 } else {
+                    // ✅ NOUVEAU : Aucun cache → Forcer chargement depuis Supabase
+                    console.log('📡 Aucun cache trouvé - Chargement depuis Supabase...');
                     setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
                     setActiveId(DEFAULT_PROFILE.id);
+                    // Marquer pour forcer le chargement depuis Supabase
+                    hasLoadedTickersRef.current = false;
+                    supabaseTickersCacheRef.current = null;
                 }
             } catch (e) {
                 console.warn("Storage access failed", e);
+                // ✅ NOUVEAU : Erreur de cache → Forcer chargement depuis Supabase
+                console.log('📡 Erreur accès cache - Chargement depuis Supabase...');
                 setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
                 setActiveId(DEFAULT_PROFILE.id);
+                // Marquer pour forcer le chargement depuis Supabase
+                hasLoadedTickersRef.current = false;
+                supabaseTickersCacheRef.current = null;
             }
             setIsInitialized(true);
         };
