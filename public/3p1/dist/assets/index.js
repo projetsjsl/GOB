@@ -52135,10 +52135,12 @@ Vérifiez votre connexion et réessayez.`,
             if (updated[tickerSymbol]) {
               const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
               const hasValueLineUpdates = supabaseTicker.security_rank || supabaseTicker.earnings_predictability || supabaseTicker.price_growth_persistence || supabaseTicker.price_stability;
-              if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist || hasValueLineUpdates) {
+              const needsUpdate = updated[tickerSymbol].isWatchlist !== shouldBeWatchlist || hasValueLineUpdates;
+              if (needsUpdate) {
                 updated[tickerSymbol] = {
                   ...updated[tickerSymbol],
                   isWatchlist: shouldBeWatchlist,
+                  // ✅ FORCER mise à jour depuis Supabase
                   // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
                   // Toujours utiliser Supabase si disponible, sinon garder valeur existante
                   info: {
@@ -52152,6 +52154,17 @@ Vérifiez votre connexion et réessayez.`,
                 };
                 if (tickerSymbol === activeIdRef.current) {
                   setInfo(updated[tickerSymbol].info);
+                  setIsWatchlist(shouldBeWatchlist ?? false);
+                }
+              } else {
+                if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist) {
+                  updated[tickerSymbol] = {
+                    ...updated[tickerSymbol],
+                    isWatchlist: shouldBeWatchlist
+                  };
+                  if (tickerSymbol === activeIdRef.current) {
+                    setIsWatchlist(shouldBeWatchlist ?? false);
+                  }
                 }
               }
               return;
@@ -53593,6 +53606,9 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
           localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
         } catch (e) {
           console.warn("Failed to save to LocalStorage:", e);
+        }
+        if (migrationCount > 0) {
+          console.log(`🔄 Migration: ${migrationCount} profil(s) mis à jour avec isWatchlist depuis Supabase`);
         }
         return updated;
       });

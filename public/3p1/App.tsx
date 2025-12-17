@@ -639,7 +639,8 @@ export default function App() {
                         
                         // Si le profil existe déjà, mettre à jour les métriques ValueLine depuis Supabase
                         if (updated[tickerSymbol]) {
-                            // Mettre à jour isWatchlist si nécessaire (basé sur source Supabase)
+                            // ✅ MIGRATION FORCÉE : Toujours mettre à jour isWatchlist depuis Supabase
+                            // Les profils existants peuvent avoir un ancien isWatchlist incorrect
                             const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
                             
                             // Mettre à jour les métriques ValueLine depuis Supabase (si elles existent)
@@ -648,10 +649,14 @@ export default function App() {
                                                        supabaseTicker.price_growth_persistence || 
                                                        supabaseTicker.price_stability;
                             
-                            if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist || hasValueLineUpdates) {
+                            // ✅ FORCER la mise à jour de isWatchlist même si identique (migration)
+                            // Cela corrige les profils existants qui ont un ancien état incorrect
+                            const needsUpdate = updated[tickerSymbol].isWatchlist !== shouldBeWatchlist || hasValueLineUpdates;
+                            
+                            if (needsUpdate) {
                                 updated[tickerSymbol] = {
                                     ...updated[tickerSymbol],
-                                    isWatchlist: shouldBeWatchlist,
+                                    isWatchlist: shouldBeWatchlist, // ✅ FORCER mise à jour depuis Supabase
                                     // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
                                     // Toujours utiliser Supabase si disponible, sinon garder valeur existante
                                     info: {
@@ -677,6 +682,20 @@ export default function App() {
                                 // Si c'est le profil actif, mettre à jour aussi le state local
                                 if (tickerSymbol === activeIdRef.current) {
                                     setInfo(updated[tickerSymbol].info);
+                                    setIsWatchlist(shouldBeWatchlist ?? false);
+                                }
+                            } else {
+                                // ✅ Même si pas d'autres updates, forcer isWatchlist pour migration
+                                if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist) {
+                                    updated[tickerSymbol] = {
+                                        ...updated[tickerSymbol],
+                                        isWatchlist: shouldBeWatchlist
+                                    };
+                                    
+                                    // Si c'est le profil actif, mettre à jour aussi le state local
+                                    if (tickerSymbol === activeIdRef.current) {
+                                        setIsWatchlist(shouldBeWatchlist ?? false);
+                                    }
                                 }
                             }
                             return;
@@ -2560,6 +2579,10 @@ export default function App() {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
                 } catch (e) {
                     console.warn('Failed to save to LocalStorage:', e);
+                }
+
+                if (migrationCount > 0) {
+                    console.log(`🔄 Migration: ${migrationCount} profil(s) mis à jour avec isWatchlist depuis Supabase`);
                 }
 
                 return updated;
