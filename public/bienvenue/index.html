@@ -2669,7 +2669,7 @@
              * ---------------------------------------------------------
              * Affiche un input date natif avec un style amélioré et gestion d'ouverture/fermeture
              */
-            const DatePicker = ({ value, onChange, onBlur, placeholder, className = '', min = null, max = null }) => {
+            const DatePicker = ({ value, onChange, onBlur, placeholder, className = '', min = null, max = null, showIcon = true }) => {
                 const [isOpen, setIsOpen] = useState(false);
                 const inputRef = useRef(null);
 
@@ -2684,8 +2684,14 @@
                     }, 10);
                 };
 
+                const formatDate = (dateStr) => {
+                    if (!dateStr) return placeholder || 'Sélectionner date';
+                    const date = new Date(dateStr);
+                    return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                };
+
                 return (
-                    <div className="relative">
+                    <div className="relative inline-block">
                         <input
                             ref={inputRef}
                             type="date"
@@ -2700,15 +2706,15 @@
                             }}
                             min={min}
                             max={max}
-                            className={`${className} cursor-pointer`}
-                            style={{ opacity: isOpen ? 1 : 0, position: 'absolute', pointerEvents: isOpen ? 'auto' : 'none' }}
+                            className="absolute opacity-0 w-full h-full cursor-pointer"
+                            style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
                         />
                         <div
                             onClick={handleClick}
-                            className={`${className} cursor-pointer flex items-center gap-1 hover:bg-blue-50 transition-colors rounded px-2 py-1`}
+                            className={`${className} cursor-pointer flex items-center gap-1 hover:bg-blue-50 transition-colors rounded px-2 py-1 border border-transparent hover:border-blue-300`}
                         >
-                            <span>📅</span>
-                            <span className="text-xs">{value ? new Date(value).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : (placeholder || 'Sélectionner date')}</span>
+                            {showIcon && <span>📅</span>}
+                            <span className="text-xs whitespace-nowrap">{formatDate(value)}</span>
                         </div>
                     </div>
                 );
