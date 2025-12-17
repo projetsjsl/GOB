@@ -8358,7 +8358,7 @@ let validationSettingsCache = null;
 function invalidateValidationSettingsCache() {
   validationSettingsCache = null;
 }
-const sanitizeAssumptionsSync$1 = (assumptions) => {
+const sanitizeAssumptionsSync = (assumptions) => {
   const safeDefaults = {
     currentPrice: 0,
     currentDividend: 0,
@@ -8650,7 +8650,7 @@ const autoFillAssumptionsFromFMPData = (data, currentPrice, existingAssumptions)
     excludeBV: existingAssumptions == null ? void 0 : existingAssumptions.excludeBV,
     excludeDIV: existingAssumptions == null ? void 0 : existingAssumptions.excludeDIV
   };
-  const sanitized = sanitizeAssumptionsSync$1(rawAssumptions);
+  const sanitized = sanitizeAssumptionsSync(rawAssumptions);
   return {
     ...sanitized,
     excludeEPS: rawAssumptions.excludeEPS,
@@ -33344,7 +33344,7 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
 const API_BASE$1 = typeof window !== "undefined" ? window.location.origin : "";
 async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent = true, autoFetched = false) {
   try {
-    const sanitizedAssumptions = sanitizeAssumptionsSync$1(assumptions);
+    const sanitizedAssumptions = sanitizeAssumptionsSync(assumptions);
     const response = await fetch(`${API_BASE$1}/api/finance-snapshots`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -38268,7 +38268,7 @@ const ReportsPanel = ({
 }) => {
   const [activeTab, setActiveTab] = reactExports.useState("overview");
   const sanitizedAssumptions = reactExports.useMemo(() => {
-    return sanitizeAssumptionsSync$1(assumptions);
+    return sanitizeAssumptionsSync(assumptions);
   }, [assumptions]);
   if (!isOpen) return null;
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-[10000] bg-black/50 flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-2xl w-full max-w-7xl max-h-[95vh] flex flex-col", children: [
@@ -38568,7 +38568,7 @@ async function loadProfilesBatchFromSupabase(tickers) {
         data: snapshot.annual_data || [],
         info: snapshot.company_info || {},
         currentPrice,
-        assumptions: sanitizeAssumptionsSync$1({
+        assumptions: sanitizeAssumptionsSync({
           ...snapshot.assumptions,
           currentPrice: currentPrice > 0 ? currentPrice : ((_b2 = snapshot.assumptions) == null ? void 0 : _b2.currentPrice) || 0
         }),
@@ -52090,6 +52090,14 @@ function App() {
     };
     refreshPriceCacheIfNeeded();
     loadTickersFromSupabase2();
+    const syncIntervalId = setInterval(() => {
+      if (!isLoadingTickers && hasLoadedTickersRef.current) {
+        console.log("🔄 Synchronisation périodique avec Supabase pour cohérence multi-utilisateurs...");
+        hasLoadedTickersRef.current = false;
+        supabaseTickersCacheRef.current = null;
+        loadTickersFromSupabase2();
+      }
+    }, 12e4);
     const intervalId = setInterval(() => {
       refreshPriceCacheIfNeeded();
     }, 5 * 60 * 1e3);

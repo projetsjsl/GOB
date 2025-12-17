@@ -29,7 +29,7 @@ import { RestoreDataDialog } from './components/RestoreDataDialog';
 import { UnifiedSettingsPanel } from './components/UnifiedSettingsPanel';
 import { ReportsPanel } from './components/ReportsPanel';
 import { loadConfig, saveConfig, DEFAULT_CONFIG, GuardrailConfig } from './config/AppConfig';
-import { invalidateValidationSettingsCache } from './utils/validation';
+import { invalidateValidationSettingsCache, sanitizeAssumptionsSync } from './utils/validation';
 import { loadAllTickersFromSupabase, mapSourceToIsWatchlist } from './services/tickersApi';
 import { loadProfilesBatchFromSupabase, loadProfileFromSupabase } from './services/supabaseDataLoader';
 import { storage } from './utils/storage';
@@ -878,6 +878,17 @@ export default function App() {
         
         // Charger les tickers
         loadTickersFromSupabase();
+
+        // ✅ Synchronisation périodique avec Supabase (toutes les 2 minutes)
+        // Pour s'assurer que tous les utilisateurs voient les mêmes tickers
+        const syncIntervalId = setInterval(() => {
+            if (!isLoadingTickers && hasLoadedTickersRef.current) {
+                console.log('🔄 Synchronisation périodique avec Supabase pour cohérence multi-utilisateurs...');
+                hasLoadedTickersRef.current = false;
+                supabaseTickersCacheRef.current = null; // Invalider le cache
+                loadTickersFromSupabase();
+            }
+        }, 120000); // 2 minutes
 
         // ✅ Mise à jour automatique du cache prix toutes les 5 minutes pendant la session
         const intervalId = setInterval(() => {
