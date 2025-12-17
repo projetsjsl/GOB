@@ -2692,6 +2692,17 @@
                     }
                 }
                 
+                // ✅ FIX: Si c'est un ID temporaire négatif, ne pas essayer de sauvegarder dans Supabase
+                // La tâche sera sauvegardée quand elle sera créée dans la DB
+                if (originalTaskId < 0) {
+                    console.log(`⚠️ Tâche avec ID temporaire ${originalTaskId} - mise à jour locale uniquement`);
+                    // Mettre à jour localement seulement
+                    const updatedTemplates = taskTemplates.map(t => t.id === originalTaskId ? { ...t, [field]: value } : t);
+                    setTaskTemplates(updatedTemplates);
+                    showNotification('Modification enregistrée (sera sauvegardée lors de la création)', 'info');
+                    return;
+                }
+                
                 // Sauvegarder l'état précédent des templates pour rollback
                 const previousTemplates = [...taskTemplates];
                 
@@ -2746,12 +2757,41 @@
              * @param {string|number} taskId - ID de la tâche à supprimer
              */
             const deleteTask = async (taskId) => {
-                const originalTaskId = typeof taskId === 'string' ? parseInt(taskId.split('-')[1]) : taskId;
+                // Extraire le templateId de manière sécurisée
+                let originalTaskId;
+                if (typeof taskId === 'string' && taskId.includes('-')) {
+                    originalTaskId = parseInt(taskId.split('-')[1]);
+                    if (isNaN(originalTaskId)) {
+                        console.error(`❌ Impossible d'extraire templateId de ${taskId}`);
+                        showNotification('Erreur: ID de tâche invalide', 'error');
+                        return;
+                    }
+                } else {
+                    originalTaskId = parseInt(taskId);
+                    if (isNaN(originalTaskId)) {
+                        console.error(`❌ taskId invalide: ${taskId}`);
+                        showNotification('Erreur: ID de tâche invalide', 'error');
+                        return;
+                    }
+                }
+                
+                // Si c'est un ID temporaire négatif, supprimer directement de l'UI
+                if (originalTaskId < 0) {
+                    setTaskTemplates(prev => prev.filter(t => t.id !== originalTaskId));
+                    setTasks(prev => prev.filter(t => t.id !== taskId));
+                    showNotification('Tâche supprimée (non sauvegardée)', 'success');
+                    return;
+                }
+                
                 if(!confirm('Supprimer cette tâche ? (Cela la retirera aussi du parcours des employés actuels)')) return;
                 
-                // Optimistic
-                const updatedTemplates = taskTemplates.filter(t => t.id !== originalTaskId);
-                setTaskTemplates(updatedTemplates);
+                // Optimistic: Supprimer immédiatement de l'UI
+                setTaskTemplates(prev => prev.filter(t => t.id !== originalTaskId));
+                setTasks(prev => prev.filter(t => {
+                    // Supprimer toutes les instances de cette tâche pour tous les employés
+                    const taskTemplateId = typeof t.id === 'string' ? parseInt(t.id.split('-')[1]) : t.id;
+                    return taskTemplateId !== originalTaskId;
+                }));
 
                 if (useSupabase && supabase) {
                     try {
@@ -2772,11 +2812,15 @@
                         if (error) throw error;
                         showNotification('Tâche supprimée', 'success');
                     } catch (e) {
+                        console.error('❌ Erreur suppression tâche:', e);
                         handleSupabaseError(e, 'Delete Task');
-                        // Re-fetch to sync state?
-                        alert("Erreur lors de la suppression de la tâche. Rafraîchissement...");
-                        window.location.reload();
+                        // Rollback: Recharger les tâches depuis la DB
+                        setTimeout(() => {
+                            reloadTaskTemplates();
+                        }, 1000);
                     }
+                } else {
+                    showNotification('Tâche supprimée (mode local)', 'success');
                 }
             };
 

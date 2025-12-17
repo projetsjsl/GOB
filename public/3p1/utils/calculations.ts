@@ -297,29 +297,84 @@ export const autoFillAssumptionsFromFMPData = (
     return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
   };
 
+  // ✅ HELPER : Préserver les valeurs existantes si elles sont déjà définies (non-0 pour les taux)
+  // Cela permet de préserver les valeurs manuelles (orange) entrées par l'utilisateur
+  const preserveIfExists = (calculated: number, existing: number | undefined | null, isGrowthRate: boolean = false): number => {
+    // Pour les taux de croissance, préserver si la valeur existante est non-null, non-undefined, et non-0
+    // (0 signifie généralement "non défini" pour les taux de croissance)
+    if (isGrowthRate && existing !== undefined && existing !== null && existing !== 0) {
+      return existing; // Préserver la valeur manuelle (orange)
+    }
+    // Pour les autres valeurs, préserver si définie
+    if (!isGrowthRate && existing !== undefined && existing !== null) {
+      return existing; // Préserver la valeur manuelle
+    }
+    return calculated; // Utiliser la valeur calculée
+  };
+
   // Retourner les assumptions auto-remplies avec limites STRICTES
   // Ces limites sont cruciales pour éviter les prix cibles aberrants
   const rawAssumptions: Partial<Assumptions> = {
-    currentPrice: round(currentPrice, 2),
-    currentDividend: round(lastData.dividendPerShare || existingAssumptions?.currentDividend || 0, 4),
-    baseYear: lastValidData.year,
+    currentPrice: round(currentPrice, 2), // ✅ Toujours mettre à jour le prix actuel
+    currentDividend: preserveIfExists(
+      round(lastData.dividendPerShare || 0, 4),
+      existingAssumptions?.currentDividend,
+      false
+    ),
+    baseYear: preserveIfExists(
+      lastValidData.year,
+      existingAssumptions?.baseYear,
+      false
+    ),
     
-    // Taux de croissance: LIMITÉS à -20% / +20% (réaliste long terme)
-    growthRateEPS: round(Math.min(Math.max(growthEPS, -20), 20), 2),
-    growthRateSales: round(Math.min(Math.max(growthCF, -20), 20), 2),
-    growthRateCF: round(Math.min(Math.max(growthCF, -20), 20), 2), 
-    growthRateBV: round(Math.min(Math.max(growthBV, -20), 20), 2),
-    growthRateDiv: round(Math.min(Math.max(growthDiv, -20), 20), 2),
+    // ✅ Taux de croissance: PRÉSERVER les valeurs existantes (orange) si définies
+    growthRateEPS: preserveIfExists(
+      round(Math.min(Math.max(growthEPS, -20), 20), 2),
+      existingAssumptions?.growthRateEPS,
+      true // ✅ Flag pour indiquer que c'est un taux de croissance
+    ),
+    growthRateSales: preserveIfExists(
+      round(Math.min(Math.max(growthCF, -20), 20), 2),
+      existingAssumptions?.growthRateSales,
+      true
+    ),
+    growthRateCF: preserveIfExists(
+      round(Math.min(Math.max(growthCF, -20), 20), 2),
+      existingAssumptions?.growthRateCF,
+      true
+    ),
+    growthRateBV: preserveIfExists(
+      round(Math.min(Math.max(growthBV, -20), 20), 2),
+      existingAssumptions?.growthRateBV,
+      true
+    ),
+    growthRateDiv: preserveIfExists(
+      round(Math.min(Math.max(growthDiv, -20), 20), 2),
+      existingAssumptions?.growthRateDiv,
+      true
+    ),
     
-    // Ratios cibles: LIMITÉS à des valeurs RÉALISTES
-    // P/E: 5-50 (évite les 100x irréalistes)
-    // P/CF: 3-50
-    // P/BV: 0.5-10 (la plupart des entreprises sont entre 1 et 5)
-    // Yield: 0-15%
-    targetPE: round(Math.max(5, Math.min(avgPE, 50)), 1),
-    targetPCF: round(Math.max(3, Math.min(avgPCF, 50)), 1),
-    targetPBV: round(Math.max(0.5, Math.min(avgPBV, 10)), 2),
-    targetYield: round(Math.max(0, Math.min(avgYield, 15)), 2),
+    // ✅ Ratios cibles: PRÉSERVER les valeurs existantes (orange) si définies
+    targetPE: preserveIfExists(
+      round(Math.max(5, Math.min(avgPE, 50)), 1),
+      existingAssumptions?.targetPE,
+      false
+    ),
+    targetPCF: preserveIfExists(
+      round(Math.max(3, Math.min(avgPCF, 50)), 1),
+      existingAssumptions?.targetPCF,
+      false
+    ),
+    targetPBV: preserveIfExists(
+      round(Math.max(0.5, Math.min(avgPBV, 10)), 2),
+      existingAssumptions?.targetPBV,
+      false
+    ),
+    targetYield: preserveIfExists(
+      round(Math.max(0, Math.min(avgYield, 15)), 2),
+      existingAssumptions?.targetYield,
+      false
+    ),
     
     // Préserver les autres valeurs existantes si fournies
     requiredReturn: existingAssumptions?.requiredReturn,
