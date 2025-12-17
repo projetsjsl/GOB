@@ -8575,25 +8575,76 @@ const autoFillAssumptionsFromFMPData = (data, currentPrice, existingAssumptions)
   const round2 = (value, decimals = 2) => {
     return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
   };
+  const preserveIfExists = (calculated, existing, isGrowthRate = false) => {
+    if (isGrowthRate && existing !== void 0 && existing !== null && existing !== 0) {
+      return existing;
+    }
+    if (!isGrowthRate && existing !== void 0 && existing !== null) {
+      return existing;
+    }
+    return calculated;
+  };
   const rawAssumptions = {
     currentPrice: round2(currentPrice, 2),
-    currentDividend: round2(lastData.dividendPerShare || (existingAssumptions == null ? void 0 : existingAssumptions.currentDividend) || 0, 4),
-    baseYear: lastValidData.year,
-    // Taux de croissance: LIMITÉS à -20% / +20% (réaliste long terme)
-    growthRateEPS: round2(Math.min(Math.max(growthEPS, -20), 20), 2),
-    growthRateSales: round2(Math.min(Math.max(growthCF, -20), 20), 2),
-    growthRateCF: round2(Math.min(Math.max(growthCF, -20), 20), 2),
-    growthRateBV: round2(Math.min(Math.max(growthBV, -20), 20), 2),
-    growthRateDiv: round2(Math.min(Math.max(growthDiv, -20), 20), 2),
-    // Ratios cibles: LIMITÉS à des valeurs RÉALISTES
-    // P/E: 5-50 (évite les 100x irréalistes)
-    // P/CF: 3-50
-    // P/BV: 0.5-10 (la plupart des entreprises sont entre 1 et 5)
-    // Yield: 0-15%
-    targetPE: round2(Math.max(5, Math.min(avgPE, 50)), 1),
-    targetPCF: round2(Math.max(3, Math.min(avgPCF, 50)), 1),
-    targetPBV: round2(Math.max(0.5, Math.min(avgPBV, 10)), 2),
-    targetYield: round2(Math.max(0, Math.min(avgYield, 15)), 2),
+    // ✅ Toujours mettre à jour le prix actuel
+    currentDividend: preserveIfExists(
+      round2(lastData.dividendPerShare || 0, 4),
+      existingAssumptions == null ? void 0 : existingAssumptions.currentDividend,
+      false
+    ),
+    baseYear: preserveIfExists(
+      lastValidData.year,
+      existingAssumptions == null ? void 0 : existingAssumptions.baseYear,
+      false
+    ),
+    // ✅ Taux de croissance: PRÉSERVER les valeurs existantes (orange) si définies
+    growthRateEPS: preserveIfExists(
+      round2(Math.min(Math.max(growthEPS, -20), 20), 2),
+      existingAssumptions == null ? void 0 : existingAssumptions.growthRateEPS,
+      true
+      // ✅ Flag pour indiquer que c'est un taux de croissance
+    ),
+    growthRateSales: preserveIfExists(
+      round2(Math.min(Math.max(growthCF, -20), 20), 2),
+      existingAssumptions == null ? void 0 : existingAssumptions.growthRateSales,
+      true
+    ),
+    growthRateCF: preserveIfExists(
+      round2(Math.min(Math.max(growthCF, -20), 20), 2),
+      existingAssumptions == null ? void 0 : existingAssumptions.growthRateCF,
+      true
+    ),
+    growthRateBV: preserveIfExists(
+      round2(Math.min(Math.max(growthBV, -20), 20), 2),
+      existingAssumptions == null ? void 0 : existingAssumptions.growthRateBV,
+      true
+    ),
+    growthRateDiv: preserveIfExists(
+      round2(Math.min(Math.max(growthDiv, -20), 20), 2),
+      existingAssumptions == null ? void 0 : existingAssumptions.growthRateDiv,
+      true
+    ),
+    // ✅ Ratios cibles: PRÉSERVER les valeurs existantes (orange) si définies
+    targetPE: preserveIfExists(
+      round2(Math.max(5, Math.min(avgPE, 50)), 1),
+      existingAssumptions == null ? void 0 : existingAssumptions.targetPE,
+      false
+    ),
+    targetPCF: preserveIfExists(
+      round2(Math.max(3, Math.min(avgPCF, 50)), 1),
+      existingAssumptions == null ? void 0 : existingAssumptions.targetPCF,
+      false
+    ),
+    targetPBV: preserveIfExists(
+      round2(Math.max(0.5, Math.min(avgPBV, 10)), 2),
+      existingAssumptions == null ? void 0 : existingAssumptions.targetPBV,
+      false
+    ),
+    targetYield: preserveIfExists(
+      round2(Math.max(0, Math.min(avgYield, 15)), 2),
+      existingAssumptions == null ? void 0 : existingAssumptions.targetYield,
+      false
+    ),
     // Préserver les autres valeurs existantes si fournies
     requiredReturn: existingAssumptions == null ? void 0 : existingAssumptions.requiredReturn,
     dividendPayoutRatio: existingAssumptions == null ? void 0 : existingAssumptions.dividendPayoutRatio,
@@ -53325,9 +53376,28 @@ Vérifiez les logs de la console pour plus de détails.`;
         result.currentPrice,
         (existingProfile == null ? void 0 : existingProfile.assumptions) || INITIAL_ASSUMPTIONS
       );
+      const existingAssumptions = (existingProfile == null ? void 0 : existingProfile.assumptions) || INITIAL_ASSUMPTIONS;
       const tempAssumptions = {
-        ...(existingProfile == null ? void 0 : existingProfile.assumptions) || INITIAL_ASSUMPTIONS,
-        ...autoFilledAssumptions
+        ...autoFilledAssumptions,
+        // Nouvelles valeurs calculées (qui préservent déjà les valeurs existantes)
+        // ✅ PRÉSERVER explicitement les valeurs existantes pour être sûr (double protection)
+        growthRateEPS: existingAssumptions.growthRateEPS !== void 0 && existingAssumptions.growthRateEPS !== 0 ? existingAssumptions.growthRateEPS : autoFilledAssumptions.growthRateEPS,
+        growthRateSales: existingAssumptions.growthRateSales !== void 0 && existingAssumptions.growthRateSales !== 0 ? existingAssumptions.growthRateSales : autoFilledAssumptions.growthRateSales,
+        growthRateCF: existingAssumptions.growthRateCF !== void 0 && existingAssumptions.growthRateCF !== 0 ? existingAssumptions.growthRateCF : autoFilledAssumptions.growthRateCF,
+        growthRateBV: existingAssumptions.growthRateBV !== void 0 && existingAssumptions.growthRateBV !== 0 ? existingAssumptions.growthRateBV : autoFilledAssumptions.growthRateBV,
+        growthRateDiv: existingAssumptions.growthRateDiv !== void 0 && existingAssumptions.growthRateDiv !== 0 ? existingAssumptions.growthRateDiv : autoFilledAssumptions.growthRateDiv,
+        // Préserver aussi les ratios cibles si définis
+        targetPE: existingAssumptions.targetPE !== void 0 && existingAssumptions.targetPE !== 0 ? existingAssumptions.targetPE : autoFilledAssumptions.targetPE,
+        targetPCF: existingAssumptions.targetPCF !== void 0 && existingAssumptions.targetPCF !== 0 ? existingAssumptions.targetPCF : autoFilledAssumptions.targetPCF,
+        targetPBV: existingAssumptions.targetPBV !== void 0 && existingAssumptions.targetPBV !== 0 ? existingAssumptions.targetPBV : autoFilledAssumptions.targetPBV,
+        targetYield: existingAssumptions.targetYield !== void 0 && existingAssumptions.targetYield !== 0 ? existingAssumptions.targetYield : autoFilledAssumptions.targetYield,
+        // Préserver les autres valeurs existantes
+        requiredReturn: existingAssumptions.requiredReturn || autoFilledAssumptions.requiredReturn,
+        dividendPayoutRatio: existingAssumptions.dividendPayoutRatio || autoFilledAssumptions.dividendPayoutRatio,
+        excludeEPS: existingAssumptions.excludeEPS,
+        excludeCF: existingAssumptions.excludeCF,
+        excludeBV: existingAssumptions.excludeBV,
+        excludeDIV: existingAssumptions.excludeDIV
       };
       const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
       if (outlierDetection.detectedOutliers.length > 0) {

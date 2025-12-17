@@ -2162,16 +2162,55 @@ export default function App() {
             // ✅ IMPORTANT : Utiliser les données mergées (avec préservation des données manuelles) pour le calcul
             // Auto-fill assumptions basées sur les données historiques FMP (fonction centralisée)
             // ⚠️ CRITIQUE : Préserver les hypothèses existantes (orange) sauf currentPrice
+            // ✅ NOUVEAU : autoFillAssumptionsFromFMPData préserve maintenant automatiquement les valeurs existantes
             const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
                 mergedData, // ✅ Utiliser mergedData au lieu de result.data
                 result.currentPrice,
                 existingProfile?.assumptions || INITIAL_ASSUMPTIONS
             );
 
-            // ✅ Détecter et exclure automatiquement les métriques avec prix cibles aberrants (guardrails)
+            // ✅ MERGE INTELLIGENT : Préserver les valeurs existantes (orange) AVANT d'appliquer les nouvelles
+            // L'ordre est important : d'abord les nouvelles valeurs calculées, puis les valeurs existantes par-dessus
+            // Cela garantit que les valeurs manuelles (orange) ne sont jamais écrasées
+            const existingAssumptions = existingProfile?.assumptions || INITIAL_ASSUMPTIONS;
             const tempAssumptions = {
-                ...(existingProfile?.assumptions || INITIAL_ASSUMPTIONS),
-                ...autoFilledAssumptions
+                ...autoFilledAssumptions, // Nouvelles valeurs calculées (qui préservent déjà les valeurs existantes)
+                // ✅ PRÉSERVER explicitement les valeurs existantes pour être sûr (double protection)
+                growthRateEPS: existingAssumptions.growthRateEPS !== undefined && existingAssumptions.growthRateEPS !== 0 
+                    ? existingAssumptions.growthRateEPS 
+                    : autoFilledAssumptions.growthRateEPS,
+                growthRateSales: existingAssumptions.growthRateSales !== undefined && existingAssumptions.growthRateSales !== 0 
+                    ? existingAssumptions.growthRateSales 
+                    : autoFilledAssumptions.growthRateSales,
+                growthRateCF: existingAssumptions.growthRateCF !== undefined && existingAssumptions.growthRateCF !== 0 
+                    ? existingAssumptions.growthRateCF 
+                    : autoFilledAssumptions.growthRateCF,
+                growthRateBV: existingAssumptions.growthRateBV !== undefined && existingAssumptions.growthRateBV !== 0 
+                    ? existingAssumptions.growthRateBV 
+                    : autoFilledAssumptions.growthRateBV,
+                growthRateDiv: existingAssumptions.growthRateDiv !== undefined && existingAssumptions.growthRateDiv !== 0 
+                    ? existingAssumptions.growthRateDiv 
+                    : autoFilledAssumptions.growthRateDiv,
+                // Préserver aussi les ratios cibles si définis
+                targetPE: existingAssumptions.targetPE !== undefined && existingAssumptions.targetPE !== 0 
+                    ? existingAssumptions.targetPE 
+                    : autoFilledAssumptions.targetPE,
+                targetPCF: existingAssumptions.targetPCF !== undefined && existingAssumptions.targetPCF !== 0 
+                    ? existingAssumptions.targetPCF 
+                    : autoFilledAssumptions.targetPCF,
+                targetPBV: existingAssumptions.targetPBV !== undefined && existingAssumptions.targetPBV !== 0 
+                    ? existingAssumptions.targetPBV 
+                    : autoFilledAssumptions.targetPBV,
+                targetYield: existingAssumptions.targetYield !== undefined && existingAssumptions.targetYield !== 0 
+                    ? existingAssumptions.targetYield 
+                    : autoFilledAssumptions.targetYield,
+                // Préserver les autres valeurs existantes
+                requiredReturn: existingAssumptions.requiredReturn || autoFilledAssumptions.requiredReturn,
+                dividendPayoutRatio: existingAssumptions.dividendPayoutRatio || autoFilledAssumptions.dividendPayoutRatio,
+                excludeEPS: existingAssumptions.excludeEPS,
+                excludeCF: existingAssumptions.excludeCF,
+                excludeBV: existingAssumptions.excludeBV,
+                excludeDIV: existingAssumptions.excludeDIV
             } as Assumptions;
             const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
             

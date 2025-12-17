@@ -666,6 +666,10 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         }, []);
         
         // États principaux
+        // Track visited tabs to force remount on return
+        const [visitedTabs, setVisitedTabs] = useState(new Set());
+        const [tabMountKeys, setTabMountKeys] = useState({});
+        
         const [activeTab, setActiveTab] = useState(() => {
             if (typeof window !== 'undefined') {
                 const params = new URLSearchParams(window.location.search);
@@ -22703,6 +22707,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // COMPOSANT MARCHÉS & ÉCONOMIE
         // ============================================================================
         const MarketsEconomyTab = () => {
+            // Force remount tracking
+            const [remountKey, setRemountKey] = useState(0);
+            const isMountedRef = useRef(true);
+            
             const [localFrenchOnly, setLocalFrenchOnly] = useState(false);
             const [selectedSource, setSelectedSource] = useState('all'); // Filtre source
             const [selectedMarket, setSelectedMarket] = useState('all'); // Filtre marché
@@ -22716,6 +22724,25 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             const [selectedCountry, setSelectedCountry] = useState('both');
             const yieldChartRef = useRef(null);
             const yieldChartInstance = useRef(null);
+            
+            // Détecter quand on revient sur cet onglet et forcer rechargement
+            useEffect(() => {
+                // Vérifier si on revient sur l'onglet markets-economy
+                if (activeTab === 'markets-economy') {
+                    if (!isMountedRef.current) {
+                        // On revient sur l'onglet, forcer rechargement
+                        console.log('🔄 MarketsEconomyTab: Retour sur onglet, rechargement forcé');
+                        setRemountKey(prev => prev + 1);
+                    }
+                    isMountedRef.current = true;
+                } else {
+                    // On quitte l'onglet
+                    isMountedRef.current = false;
+                }
+                return () => {
+                    // Cleanup si nécessaire
+                };
+            }, [activeTab]);
 
             // Refs pour les widgets TradingView
             const marketOverviewRef = useRef(null);
@@ -22770,7 +22797,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
              // Charger le script TradingView Forex Heat Map + Cross Rates
             useEffect(() => {
-                if (activeSubTab !== 'forex') return;
+                if (activeSubTab !== 'forex' || activeTab !== 'markets-economy') return;
                 
                 // Heat Map
                 if (tradingViewForexRef.current) {
@@ -22810,7 +22837,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     });
                     container.appendChild(script);
                 }
-            }, [activeSubTab, isDarkMode]);
+            }, [activeSubTab, isDarkMode, activeTab, remountKey]);
 
             // Charger le script TradingView Stock Heatmap (USA or TSX)
             useEffect(() => {
@@ -22892,13 +22919,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 return () => { if (container) container.innerHTML = ''; };
             }, [activeSubTab, isDarkMode]);
 
-            // Charger les données de yield curve au montage
+            // Charger les données de yield curve au montage et au retour sur l'onglet
             React.useEffect(() => {
                 const fetchYieldCurve = async () => {
                     setYieldLoading(true);
                     setYieldError(null);
                     try {
-                        const response = await fetch(`/api/yield-curve?country=${selectedCountry}`);
+                        const response = await fetchWithTimeoutAndRetry(
+                            `/api/yield-curve?country=${selectedCountry}`,
+                            {},
+                            8000,
+                            1
+                        );
                         if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
                         const data = await response.json();
                         setYieldData(data);
@@ -22909,7 +22941,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     }
                 };
                 fetchYieldCurve();
-            }, [selectedCountry]);
+            }, [selectedCountry, remountKey]);
 
             // Créer/mettre à jour le graphique Chart.js pour yield curve
             React.useEffect(() => {
@@ -25818,10 +25850,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     })()}
 
 
-                    {activeTab === 'markets-economy' && <MarketsEconomyTab />}
-                    {activeTab === 'advanced-analysis' && window.AdvancedAnalysisTab && <window.AdvancedAnalysisTab isDarkMode={isDarkMode} />}
+                    {activeTab === 'markets-economy' && <MarketsEconomyTab key={`markets-economy-${tabMountKeys['markets-economy'] || 0}`} />}
+                    {activeTab === 'advanced-analysis' && window.AdvancedAnalysisTab && <window.AdvancedAnalysisTab key={`advanced-analysis-${tabMountKeys['advanced-analysis'] || 0}`} isDarkMode={isDarkMode} />}
                     {/* {activeTab === 'yield-curve' && <YieldCurveTab />} */} {/* Intégré dans Marchés & Économie */}
-                    {activeTab === 'intellistocks' && <JLabUnifiedTab />}
+                    {activeTab === 'intellistocks' && <JLabUnifiedTab key={`intellistocks-${tabMountKeys['intellistocks'] || 0}`} />}
                     {activeTab === 'groupchat' && window.GroupChatTab && React.createElement(window.GroupChatTab, { isDarkMode: isDarkMode, dashboardTab: activeTab, onDashboardTabChange: setActiveTab })}
                     {activeTab === 'ask-emma' && <AskEmmaTab
                         prefillMessage={emmaPrefillMessage}
@@ -25909,8 +25941,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         seekingAlphaViewMode={seekingAlphaViewMode}
                         setSeekingAlphaViewMode={setSeekingAlphaViewMode}
                     />}
-                    {activeTab === 'economic-calendar' && <EconomicCalendarTab />}
-                    {activeTab === 'investing-calendar' && <InvestingCalendarTab />}
+                    {activeTab === 'economic-calendar' && <EconomicCalendarTab key={`economic-calendar-${tabMountKeys['economic-calendar'] || 0}`} />}
+                    {activeTab === 'investing-calendar' && <InvestingCalendarTab key={`investing-calendar-${tabMountKeys['investing-calendar'] || 0}`} />}
                     {activeTab === 'finvox' && <FinVoxTab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
                     {activeTab === 'emmaia' && <EmmAIATab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
                     {activeTab === 'terminal-emmaia' && <TerminalEmmaIATab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
