@@ -53584,13 +53584,21 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
           if (hasValidData) {
             return false;
           }
-          console.log(`⚠️ ${symbol}: Profil existant mais données invalides/vides - Force resync FMP`);
         }
         return true;
       });
       if (newTickers.length > 0) {
         const batchSize = 5;
         const delayBetweenBatches = 500;
+        const errorSummary = {
+          notFound: [],
+          noData: [],
+          invalidPrice: [],
+          invalidData: [],
+          lowMarketCap: [],
+          other: []
+        };
+        let successCount = 0;
         for (let i = 0; i < newTickers.length; i += batchSize) {
           const batch = newTickers.slice(i, i + batchSize);
           if (i > 0) {
@@ -53602,18 +53610,18 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
               try {
                 const result2 = await fetchCompanyData(symbol);
                 if (!result2.data || result2.data.length === 0) {
-                  console.error(`❌ ${symbol}: Aucune donnée FMP retournée - profil NON créé`);
+                  errorSummary.noData.push(symbol);
                   return;
                 }
                 if (!result2.currentPrice || result2.currentPrice <= 0) {
-                  console.error(`❌ ${symbol}: Prix actuel invalide (${result2.currentPrice}) - profil NON créé`);
+                  errorSummary.invalidPrice.push(symbol);
                   return;
                 }
                 const hasValidData = result2.data.some(
                   (d) => d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
                 );
                 if (!hasValidData) {
-                  console.error(`❌ ${symbol}: Aucune donnée financière valide - profil NON créé`);
+                  errorSummary.invalidData.push(symbol);
                   return;
                 }
                 const parseMarketCapToNumber2 = (marketCapStr) => {
@@ -53639,7 +53647,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 if (result2.info.marketCap) {
                   const marketCapNum = parseMarketCapToNumber2(result2.info.marketCap);
                   if (marketCapNum > 0 && marketCapNum < MIN_MARKET_CAP2) {
-                    console.warn(`⚠️ ${symbol}: Capitalisation boursière trop faible (${result2.info.marketCap} < 2B) - profil NON créé`);
+                    errorSummary.lowMarketCap.push(symbol);
                     return;
                   }
                 }
@@ -53655,9 +53663,6 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                   ...sanitizedAutoFilled
                 };
                 const outlierDetection = detectOutlierMetrics(result2.data, tempAssumptions);
-                if (outlierDetection.detectedOutliers.length > 0) {
-                  console.log(`⚠️ ${symbol}: Métriques aberrantes auto-exclues: ${outlierDetection.detectedOutliers.join(", ")}`);
-                }
                 const finalAssumptions = {
                   ...tempAssumptions,
                   excludeEPS: outlierDetection.excludeEPS,
@@ -53698,12 +53703,37 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                   }
                   return updated;
                 });
-                console.log(`✅ ${symbol}: Profil créé avec données FMP valides`);
+                successCount++;
               } catch (error) {
-                console.error(`❌ ${symbol}: Erreur FMP - profil NON créé:`, error);
+                const errorMsg = (error == null ? void 0 : error.message) || String(error);
+                if (errorMsg.includes("introuvable") || errorMsg.includes("404") || errorMsg.includes("not found")) {
+                  errorSummary.notFound.push(symbol);
+                } else {
+                  errorSummary.other.push({ symbol, error: errorMsg });
+                }
               }
             })
           );
+        }
+        const totalErrors = errorSummary.notFound.length + errorSummary.noData.length + errorSummary.invalidPrice.length + errorSummary.invalidData.length + errorSummary.lowMarketCap.length + errorSummary.other.length;
+        if (totalErrors > 0) {
+          console.group(`📊 Résumé synchronisation: ${successCount} succès, ${totalErrors} erreurs`);
+          if (errorSummary.notFound.length > 0) {
+            console.warn(`⚠️ ${errorSummary.notFound.length} ticker(s) introuvable(s) dans FMP: ${errorSummary.notFound.slice(0, 10).join(", ")}${errorSummary.notFound.length > 10 ? ` (+${errorSummary.notFound.length - 10} autres)` : ""}`);
+          }
+          if (errorSummary.lowMarketCap.length > 0) {
+            console.warn(`⚠️ ${errorSummary.lowMarketCap.length} ticker(s) avec capitalisation < 2B: ${errorSummary.lowMarketCap.slice(0, 10).join(", ")}${errorSummary.lowMarketCap.length > 10 ? ` (+${errorSummary.lowMarketCap.length - 10} autres)` : ""}`);
+          }
+          if (errorSummary.noData.length > 0) {
+            console.warn(`⚠️ ${errorSummary.noData.length} ticker(s) sans données: ${errorSummary.noData.slice(0, 10).join(", ")}${errorSummary.noData.length > 10 ? ` (+${errorSummary.noData.length - 10} autres)` : ""}`);
+          }
+          if (errorSummary.invalidData.length > 0) {
+            console.warn(`⚠️ ${errorSummary.invalidData.length} ticker(s) avec données invalides: ${errorSummary.invalidData.slice(0, 10).join(", ")}${errorSummary.invalidData.length > 10 ? ` (+${errorSummary.invalidData.length - 10} autres)` : ""}`);
+          }
+          if (errorSummary.other.length > 0) {
+            console.warn(`⚠️ ${errorSummary.other.length} autre(s) erreur(s): ${errorSummary.other.slice(0, 5).map((e) => e.symbol).join(", ")}${errorSummary.other.length > 5 ? ` (+${errorSummary.other.length - 5} autres)` : ""}`);
+          }
+          console.groupEnd();
         }
       }
       const message = newTickersCount > 0 ? `${newTickersCount} nouveau(x) ticker(s) ajouté(s)${updatedTickersCount > 0 ? `, ${updatedTickersCount} mis à jour` : ""}` : updatedTickersCount > 0 ? `${updatedTickersCount} ticker(s) mis à jour` : "Synchronisation terminée (aucun changement)";

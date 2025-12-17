@@ -2568,8 +2568,7 @@ export default function App() {
                     if (hasValidData) {
                         return false; // Données valides, on passe
                     }
-                    console.log(`⚠️ ${symbol}: Profil existant mais données invalides/vides - Force resync FMP`);
-                    // On laisse passer pour re-fetch FMP
+                    // On laisse passer pour re-fetch FMP (pas de log individuel pour réduire le bruit)
                 }
 
                 return true;
@@ -2578,6 +2577,17 @@ export default function App() {
             if (newTickers.length > 0) {
                 const batchSize = 5;
                 const delayBetweenBatches = 500;
+                
+                // ✅ Collecter les erreurs pour afficher un résumé à la fin
+                const errorSummary = {
+                    notFound: [] as string[],
+                    noData: [] as string[],
+                    invalidPrice: [] as string[],
+                    invalidData: [] as string[],
+                    lowMarketCap: [] as string[],
+                    other: [] as Array<{symbol: string, error: string}>
+                };
+                let successCount = 0;
 
                 for (let i = 0; i < newTickers.length; i += batchSize) {
                     const batch = newTickers.slice(i, i + batchSize);
@@ -2594,12 +2604,12 @@ export default function App() {
                                 
                                 // VALIDATION STRICTE : Vérifier que les données sont valides
                                 if (!result.data || result.data.length === 0) {
-                                    console.error(`❌ ${symbol}: Aucune donnée FMP retournée - profil NON créé`);
+                                    errorSummary.noData.push(symbol);
                                     return;
                                 }
                                 
                                 if (!result.currentPrice || result.currentPrice <= 0) {
-                                    console.error(`❌ ${symbol}: Prix actuel invalide (${result.currentPrice}) - profil NON créé`);
+                                    errorSummary.invalidPrice.push(symbol);
                                     return;
                                 }
                                 
@@ -2608,7 +2618,7 @@ export default function App() {
                                 );
                                 
                                 if (!hasValidData) {
-                                    console.error(`❌ ${symbol}: Aucune donnée financière valide - profil NON créé`);
+                                    errorSummary.invalidData.push(symbol);
                                     return;
                                 }
                                 
@@ -2632,7 +2642,7 @@ export default function App() {
                                 if (result.info.marketCap) {
                                     const marketCapNum = parseMarketCapToNumber(result.info.marketCap);
                                     if (marketCapNum > 0 && marketCapNum < MIN_MARKET_CAP) {
-                                        console.warn(`⚠️ ${symbol}: Capitalisation boursière trop faible (${result.info.marketCap} < 2B) - profil NON créé`);
+                                        errorSummary.lowMarketCap.push(symbol);
                                         return;
                                     }
                                 }
@@ -2657,10 +2667,6 @@ export default function App() {
                                     ...sanitizedAutoFilled
                                 } as Assumptions;
                                 const outlierDetection = detectOutlierMetrics(result.data, tempAssumptions);
-                                
-                                if (outlierDetection.detectedOutliers.length > 0) {
-                                    console.log(`⚠️ ${symbol}: Métriques aberrantes auto-exclues: ${outlierDetection.detectedOutliers.join(', ')}`);
-                                }
                                 
                                 // Appliquer les exclusions détectées
                                 const finalAssumptions = {
@@ -2708,13 +2714,43 @@ export default function App() {
                                     return updated;
                                 });
                                 
-                                console.log(`✅ ${symbol}: Profil créé avec données FMP valides`);
-                            } catch (error) {
-                                console.error(`❌ ${symbol}: Erreur FMP - profil NON créé:`, error);
+                                successCount++;
+                            } catch (error: any) {
+                                const errorMsg = error?.message || String(error);
+                                if (errorMsg.includes('introuvable') || errorMsg.includes('404') || errorMsg.includes('not found')) {
+                                    errorSummary.notFound.push(symbol);
+                                } else {
+                                    errorSummary.other.push({ symbol, error: errorMsg });
+                                }
                                 // ⚠️ RIGUEUR 100% : Ne pas créer de profil si FMP échoue
                             }
                         })
                     );
+                }
+                
+                // ✅ Afficher un résumé des erreurs au lieu de logger chaque erreur individuellement
+                const totalErrors = errorSummary.notFound.length + errorSummary.noData.length + 
+                    errorSummary.invalidPrice.length + errorSummary.invalidData.length + 
+                    errorSummary.lowMarketCap.length + errorSummary.other.length;
+                
+                if (totalErrors > 0) {
+                    console.group(`📊 Résumé synchronisation: ${successCount} succès, ${totalErrors} erreurs`);
+                    if (errorSummary.notFound.length > 0) {
+                        console.warn(`⚠️ ${errorSummary.notFound.length} ticker(s) introuvable(s) dans FMP: ${errorSummary.notFound.slice(0, 10).join(', ')}${errorSummary.notFound.length > 10 ? ` (+${errorSummary.notFound.length - 10} autres)` : ''}`);
+                    }
+                    if (errorSummary.lowMarketCap.length > 0) {
+                        console.warn(`⚠️ ${errorSummary.lowMarketCap.length} ticker(s) avec capitalisation < 2B: ${errorSummary.lowMarketCap.slice(0, 10).join(', ')}${errorSummary.lowMarketCap.length > 10 ? ` (+${errorSummary.lowMarketCap.length - 10} autres)` : ''}`);
+                    }
+                    if (errorSummary.noData.length > 0) {
+                        console.warn(`⚠️ ${errorSummary.noData.length} ticker(s) sans données: ${errorSummary.noData.slice(0, 10).join(', ')}${errorSummary.noData.length > 10 ? ` (+${errorSummary.noData.length - 10} autres)` : ''}`);
+                    }
+                    if (errorSummary.invalidData.length > 0) {
+                        console.warn(`⚠️ ${errorSummary.invalidData.length} ticker(s) avec données invalides: ${errorSummary.invalidData.slice(0, 10).join(', ')}${errorSummary.invalidData.length > 10 ? ` (+${errorSummary.invalidData.length - 10} autres)` : ''}`);
+                    }
+                    if (errorSummary.other.length > 0) {
+                        console.warn(`⚠️ ${errorSummary.other.length} autre(s) erreur(s): ${errorSummary.other.slice(0, 5).map(e => e.symbol).join(', ')}${errorSummary.other.length > 5 ? ` (+${errorSummary.other.length - 5} autres)` : ''}`);
+                    }
+                    console.groupEnd();
                 }
             }
 
