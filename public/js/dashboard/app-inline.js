@@ -22841,7 +22841,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             // Charger le script TradingView Stock Heatmap (USA or TSX)
             useEffect(() => {
-                if (activeSubTab !== 'stocks') return;
+                if (activeSubTab !== 'stocks' || activeTab !== 'markets-economy') return;
                 
                 const container = heatmapSource === 'USA' ? tradingViewHeatmapRef.current : tradingViewHeatmapTSXRef.current;
                 if (!container) return;
@@ -22869,11 +22869,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 });
                 container.appendChild(script);
                 return () => { if (container) container.innerHTML = ''; };
-            }, [activeSubTab, isDarkMode, heatmapSource]);
+            }, [activeSubTab, isDarkMode, heatmapSource, activeTab, remountKey]);
 
             // Charger Market Quotes
             useEffect(() => {
-                if (activeSubTab !== 'quotes' || !tradingViewMarketQuotesRef.current) return;
+                if (activeSubTab !== 'quotes' || !tradingViewMarketQuotesRef.current || activeTab !== 'markets-economy') return;
                 const container = tradingViewMarketQuotesRef.current;
                 container.innerHTML = '';
                 const script = document.createElement('script');

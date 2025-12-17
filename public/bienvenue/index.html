@@ -2667,35 +2667,38 @@
                 setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: value } : t));
 
                 // Extraire le templateId de manière sécurisée
+                // Format taskId: "employeeId-templateId" ou "employeeId--timestamp" pour IDs temporaires négatifs
                 let originalTaskId;
                 let isTemporaryId = false;
                 
                 if (typeof taskId === 'string' && taskId.includes('-')) {
-                    const parts = taskId.split('-');
-                    // Format: "employeeId-templateId" ou "employeeId--timestamp" pour IDs temporaires
-                    if (parts.length >= 2) {
-                        const templateIdStr = parts.slice(1).join('-'); // Rejoindre au cas où il y a plusieurs tirets
-                        originalTaskId = parseInt(templateIdStr);
-                        
-                        // Vérifier si c'est un ID temporaire (négatif) AVANT de vérifier isNaN
-                        if (originalTaskId < 0) {
-                            isTemporaryId = true;
-                        } else if (isNaN(originalTaskId)) {
-                            console.error(`❌ Impossible d'extraire templateId de ${taskId} (parts: ${parts.join(', ')})`);
-                            showNotification('Erreur: ID de tâche invalide', 'error');
-                            // Rollback optimistic update
-                            if (originalValue !== null) {
-                                setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: originalValue } : t));
-                            }
-                            return;
-                        }
+                    // Gérer le cas où le templateId est négatif (double tiret: "1--1735123456789")
+                    const firstDashIndex = taskId.indexOf('-');
+                    const afterFirstDash = taskId.substring(firstDashIndex + 1);
+                    
+                    // Si le deuxième caractère après le premier tiret est aussi un tiret, c'est un ID négatif
+                    if (afterFirstDash.startsWith('-')) {
+                        // ID négatif: "1--1735123456789" -> templateId = -1735123456789
+                        originalTaskId = parseInt(afterFirstDash);
+                        isTemporaryId = true;
                     } else {
-                        console.error(`❌ Format taskId invalide: ${taskId}`);
-                        showNotification('Erreur: Format ID de tâche invalide', 'error');
+                        // ID positif normal: "1-19" -> templateId = 19
+                        originalTaskId = parseInt(afterFirstDash);
+                    }
+                    
+                    if (isNaN(originalTaskId)) {
+                        console.error(`❌ Impossible d'extraire templateId de ${taskId} (afterFirstDash: ${afterFirstDash})`);
+                        showNotification('Erreur: ID de tâche invalide', 'error');
+                        // Rollback optimistic update
                         if (originalValue !== null) {
                             setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: originalValue } : t));
                         }
                         return;
+                    }
+                    
+                    // Vérifier si c'est un ID temporaire (négatif) même si on ne l'a pas détecté avant
+                    if (originalTaskId < 0) {
+                        isTemporaryId = true;
                     }
                 } else {
                     originalTaskId = parseInt(taskId);
