@@ -139,13 +139,81 @@
     <div id="root"></div>
     
     <script type="text/babel">
+        /**
+         * ============================================================================
+         * PLATEFORME D'INTÉGRATION RH - BIENVENUE
+         * ============================================================================
+         * 
+         * ARCHITECTURE GLOBALE:
+         * ---------------------
+         * Cette application React gère le parcours d'intégration des nouveaux employés.
+         * Elle utilise Supabase pour la persistance et la synchronisation temps réel.
+         * 
+         * STRUCTURE PRINCIPALE:
+         * 1. UTILITAIRES CENTRALISÉS (lignes 144-298)
+         *    - DataMapper: Conversion DB (snake_case) ↔ React (camelCase)
+         *    - SupabaseManager: Gestion requêtes avec retry et validation
+         *    - TaskManager: Génération et sauvegarde des tâches
+         * 
+         * 2. CONFIGURATION SUPABASE (lignes 356-398)
+         *    - Initialisation client Supabase avec fallbacks
+         *    - Gestion des clés d'environnement
+         * 
+         * 3. COMPOSANT PRINCIPAL OnboardingPlatform (ligne ~1400)
+         *    - Gestion état global (employees, tasks, phases, resources)
+         *    - Chargement initial parallèle (ligne 1781)
+         *    - Subscriptions temps réel (ligne 1839)
+         *    - Génération dynamique des tâches (ligne 1995)
+         * 
+         * 4. COMPOSANTS UI:
+         *    - TaskCard: Carte de tâche avec édition inline
+         *    - AdminPanel: Gestion CRUD complète
+         *    - EmmaChatbot: Assistant virtuel RH
+         *    - KanbanView, GanttView: Vues alternatives
+         * 
+         * PATTERNS IMPORTANTS:
+         * --------------------
+         * - Optimistic Updates: Mise à jour UI immédiate, rollback si erreur DB
+         * - ID Temporaires: IDs négatifs pour éviter conflits lors de l'ajout
+         * - Format Task ID: "employeeId-templateId" pour identifier les tâches
+         * - Real-time Sync: Subscriptions Supabase pour synchronisation multi-utilisateurs
+         * 
+         * POINTS CRITIQUES:
+         * -----------------
+         * ⚠️  Ne JAMAIS utiliser Math.max() pour générer des IDs (conflits DB)
+         * ⚠️  Toujours utiliser DataMapper pour convertir DB ↔ React
+         * ⚠️  Les subscriptions temps réel doivent démarrer APRÈS le chargement initial
+         * ⚠️  showNotification doit être exposé globalement (window.showNotification)
+         * ⚠️  email-template.js doit être chargé SANS defer pour être disponible
+         * 
+         * DÉPENDANCES:
+         * -----------
+         * - React 18 (CDN)
+         * - Supabase JS v2 (CDN)
+         * - Babel Standalone (compilation JSX inline)
+         * - email-template.js (génération HTML email)
+         * 
+         * ============================================================================
+         */
+        
         const { useState, useMemo, useEffect, useRef } = React;
 
         // ============================================================================
         // 🚀 SYSTÈME OPTIMISÉ - UTILITAIRES CENTRALISÉS
         // ============================================================================
         
-        // Mapping DB ↔ React (snake_case ↔ camelCase) - UNE SEULE FOIS
+        /**
+         * DataMapper - Conversion DB ↔ React
+         * -----------------------------------
+         * Centralise toutes les conversions entre le format base de données (snake_case)
+         * et le format React (camelCase). CRITIQUE pour éviter les erreurs de mapping.
+         * 
+         * UTILISATION:
+         * - Lors du chargement depuis Supabase: DataMapper.xxxToReact(dbData)
+         * - Lors de la sauvegarde vers Supabase: DataMapper.xxxToDB(reactData)
+         * 
+         * ⚠️  Ne jamais mapper manuellement - toujours utiliser DataMapper
+         */
         const DataMapper = {
             // Employee
             employeeToReact: (db) => ({
@@ -206,7 +274,18 @@
             })
         };
 
-        // Gestionnaire Supabase unifié avec retry et validation
+        /**
+         * SupabaseManager - Gestionnaire de requêtes robuste
+         * --------------------------------------------------
+         * Fournit des méthodes pour exécuter des requêtes Supabase avec:
+         * - Retry automatique en cas d'erreur temporaire
+         * - Validation optionnelle avant upsert
+         * - Gestion d'erreurs centralisée
+         * 
+         * MÉTHODES:
+         * - queryWithRetry: Exécute une requête avec retry (3 tentatives par défaut)
+         * - upsertWithValidation: Upsert avec validation et retry automatique
+         */
         const SupabaseManager = {
             async queryWithRetry(supabaseClient, queryFn, retries = 3, delay = 1000) {
                 for (let i = 0; i < retries; i++) {
@@ -240,9 +319,34 @@
             }
         };
 
-        // Task Manager unifié - UNE SEULE SOURCE DE VÉRITÉ
+        /**
+         * TaskManager - Gestion centralisée des tâches
+         * ---------------------------------------------
+         * UNE SEULE SOURCE DE VÉRITÉ pour la génération et sauvegarde des tâches.
+         * 
+         * LOGIQUE DE GÉNÉRATION:
+         * 1. Prend les taskTemplates (templates de base)
+         * 2. Fusionne avec employeeTasks (statuts sauvegardés par employé)
+         * 3. Calcule les dates d'échéance basées sur startDate + dayOffset
+         * 4. Génère un ID composite: "employeeId-templateId"
+         * 
+         * FORMAT TASK ID:
+         * - Format: "employeeId-templateId" (ex: "1-19")
+         * - Permet d'identifier à la fois l'employé et le template
+         * - templateId est extrait pour les requêtes DB
+         * 
+         * MÉTHODES:
+         * - generateTasks: Génère les tâches pour un employé (fusion template + statuts)
+         * - saveTaskStatus: Sauvegarde le statut d'une tâche avec retry
+         */
         const TaskManager = {
-            // Génère les tâches pour un employé (fusion template + statuts)
+            /**
+             * Génère les tâches pour un employé en fusionnant templates et statuts sauvegardés
+             * @param {Object} employee - Employé sélectionné
+             * @param {Array} taskTemplates - Templates de tâches depuis la DB
+             * @param {Object} employeeTasks - Map des statuts sauvegardés {employeeId: {templateId: status}}
+             * @returns {Array} Tâches générées avec ID composite et statuts fusionnés
+             */
             generateTasks(employee, taskTemplates, employeeTasks) {
                 if (!employee || !employee.id) return [];
                 
@@ -265,7 +369,17 @@
                 });
             },
             
-            // Sauvegarde le statut d'une tâche (robuste avec retry)
+            /**
+             * Sauvegarde le statut d'une tâche dans employee_tasks
+             * Utilise upsert pour créer ou mettre à jour le statut
+             * @param {Object} supabaseClient - Client Supabase
+             * @param {number} employeeId - ID de l'employé
+             * @param {number} templateId - ID du template de tâche
+             * @param {string} newStatus - Nouveau statut ('pending', 'inProgress', 'completed')
+             * @param {Function} onSuccess - Callback en cas de succès
+             * @param {Function} onError - Callback en cas d'erreur
+             * @returns {boolean} true si succès, false sinon
+             */
             async saveTaskStatus(supabaseClient, employeeId, templateId, newStatus, onSuccess, onError) {
                 if (!supabaseClient || !employeeId || !templateId) {
                     onError?.('Paramètres invalides');
@@ -495,25 +609,39 @@
         // Chatbot Emma RH
         // Chatbot Emma RH
         // Chatbot Ultra-Intelligent Emma RH
-        // ============================================================================
-        // MODULE: ULTRA-INTELLIGENT EMMA CHATBOT
-        // ============================================================================
-        //
-        // ARCHITECTURE NOTE:
-        // This component simulates an advanced AI assistant entirely in the browser.
-        // It relies on "Context Injection" - passing the raw state (tasks, phases, employees)
-        // directly into the analysis logic (`getEmmaResponse`).
-        //
-        // WHY NO BACKEND?
-        // To keep the deployment simple (static HTML), we use heuristic logic instead of a real LLM.
-        // The `getEmmaResponse` function parses keywords and checks data arrays to generate "smart" answers.
-        //
-        // KNOWN ISSUES & LEARNINGS:
-        // 1. JSX Syntax: Ensure all adjacent elements are wrapped in a fragment <> or <div>.
-        // 2. React Minification: If using CDN, inline scripts must be perfectly valid.
-        // 3. State Injection: Passing too much data (e.g. full objects) is fine here but verify performance if scaling.
-        //
-        // ============================================================================
+        /**
+         * ============================================================================
+         * MODULE: ULTRA-INTELLIGENT EMMA CHATBOT
+         * ============================================================================
+         * 
+         * ARCHITECTURE:
+         * ------------
+         * Assistant virtuel RH entièrement côté client (browser).
+         * Utilise "Context Injection" - passe l'état brut (tasks, phases, employees)
+         * directement dans la logique d'analyse (getEmmaResponse).
+         * 
+         * POURQUOI PAS DE BACKEND?
+         * -------------------------
+         * Pour garder le déploiement simple (HTML statique), on utilise une logique
+         * heuristique au lieu d'un vrai LLM. La fonction getEmmaResponse parse les
+         * mots-clés et vérifie les tableaux de données pour générer des réponses "intelligentes".
+         * 
+         * FONCTIONNALITÉS:
+         * ---------------
+         * - Réponses contextuelles basées sur l'état actuel (tâches, phases, employé)
+         * - Suggestions pré-définies pour guider l'utilisateur
+         * - Intégration avec EmmaClient SDK (si disponible) pour réponses avancées
+         * - Fallback local pour questions HR spécifiques (données sensibles)
+         * 
+         * CONNAISSANCES & APPRENTISSAGES:
+         * -------------------------------
+         * 1. Syntaxe JSX: Tous les éléments adjacents doivent être wrappés dans <> ou <div>
+         * 2. Minification React: Avec CDN, les scripts inline doivent être parfaitement valides
+         * 3. Injection d'état: Passer beaucoup de données (objets complets) fonctionne ici
+         *    mais vérifier les performances si on scale
+         * 
+         * ============================================================================
+         */
         
         const EmmaChatbot = ({ employee, tasks, phases, resources }) => {
             // State to control chatbot visibility
@@ -910,7 +1038,26 @@
             }
         };
 
-        // FONCTION D'ENVOI EMAIL VIA RESEND (Réelle API) - VERSION FONCTIONNELLE
+        /**
+         * Envoie un email via l'API Resend avec le plan d'intégration
+         * ------------------------------------------------------------
+         * DÉPENDANCES:
+         * - window.generateEmailHTML: Doit être chargé depuis email-template.js
+         * - window.showNotification: Exposé globalement par le composant React
+         * 
+         * FLOW:
+         * 1. Vérifie que generateEmailHTML est disponible
+         * 2. Génère le HTML de l'email
+         * 3. Demande l'adresse email via prompt()
+         * 4. Envoie via /api/send-email
+         * 
+         * ⚠️  email-template.js doit être chargé SANS defer pour être disponible
+         * 
+         * @param {Object} employee - Employé sélectionné
+         * @param {Array} phases - Phases d'intégration
+         * @param {Array} tasks - Tâches de l'employé
+         * @param {Array} resources - Responsables/contacts
+         */
         const sendEmailViaResend = async (employee, phases, tasks, resources) => {
              // Utiliser window.showNotification si disponible, sinon fallback
              const notify = window.showNotification || ((msg, type) => {
@@ -975,7 +1122,25 @@
              }
         };
 
-        // ADMIN PANEL COMPONENT (Top Level pour éviter re-render)
+        /**
+         * AdminPanel - Panneau d'administration complet
+         * ----------------------------------------------
+         * Composant de niveau supérieur pour gérer toutes les entités:
+         * - Employees: CRUD complet avec upload d'avatar
+         * - Resources: Gestion des responsables/contacts
+         * - Phases: Gestion des phases d'intégration
+         * - Task Templates: Gestion des templates de tâches
+         * 
+         * OPTIMISATION: Défini au niveau supérieur pour éviter re-renders
+         * inutiles du composant parent.
+         * 
+         * FONCTIONS INTERNES:
+         * - saveTaskField: Sauvegarde un champ de template (définie dans AdminPanel)
+         * - updateEmp, deleteEmp: Gestion employés
+         * - updateRes, deleteRes: Gestion ressources
+         * - updatePhase, deletePhase: Gestion phases
+         * - deleteTask: Suppression de template (avec cleanup employee_tasks)
+         */
         const AdminPanel = ({ 
             employees, setEmployees, 
             resources, setResources, 
@@ -1755,7 +1920,11 @@
                 }
             };
 
-            // Fonction réutilisable pour charger les tâches depuis Supabase
+            /**
+             * Recharge les task_templates depuis Supabase
+             * Utilisée après un conflit ou pour synchroniser l'état local avec la DB
+             * @returns {Promise<void>}
+             */
             const reloadTaskTemplates = async () => {
                 if (!useSupabase || !supabase) return;
                 
@@ -1778,7 +1947,21 @@
                 }
             };
 
-            // Chargement initial des données (OPTIMISÉ - Requêtes en parallèle)
+            /**
+             * Chargement initial des données depuis Supabase
+             * ------------------------------------------------
+             * OPTIMISATION: Toutes les requêtes sont exécutées en parallèle avec Promise.all
+             * Réduit le temps de chargement de ~800ms à ~200ms
+             * 
+             * TABLES CHARGÉES:
+             * - employees: Liste des employés
+             * - resources: Contacts clés (responsables)
+             * - phases: Phases d'intégration
+             * - task_templates: Templates de tâches
+             * - employee_tasks: Statuts des tâches par employé
+             * 
+             * ⚠️  Ne s'exécute qu'une fois au montage (dépendances vides [])
+             */
             useEffect(() => {
                 const fetchData = async () => {
                     if (!useSupabase || !supabase) return;
@@ -1836,10 +2019,25 @@
                 fetchData();
             }, []);
 
-            // ============================================================================
-            // REAL-TIME SUBSCRIPTIONS - Live sync across all connected users
-            // OPTIMISÉ: Démarre APRÈS le chargement initial pour ne pas ralentir
-            // ============================================================================
+            /**
+             * REAL-TIME SUBSCRIPTIONS - Synchronisation temps réel
+             * -----------------------------------------------------
+             * Écoute les changements dans Supabase pour synchroniser automatiquement
+             * l'interface entre tous les utilisateurs connectés.
+             * 
+             * OPTIMISATION: Démarre APRÈS le chargement initial (300ms de délai)
+             * pour ne pas ralentir le rendu initial.
+             * 
+             * SUBSCRIPTIONS:
+             * - employees: Ajout/modification/suppression d'employés
+             * - employee_tasks: Changements de statut des tâches
+             * - resources: Ajout/modification de responsables
+             * 
+             * CLEANUP: Les subscriptions sont automatiquement nettoyées au démontage
+             * 
+             * ⚠️  CRITIQUE: Ne pas démarrer si isLoading === true
+             * ⚠️  Les channels sont stockés dans window._realtimeChannels pour cleanup
+             */
             useEffect(() => {
                 if (!useSupabase || !supabase || isLoading) return; // Attendre la fin du chargement
                 
@@ -1972,7 +2170,19 @@
                 return isNaN(d.getTime()) ? new Date() : d;
             };
 
-            // Générer les phases et tâches pour l'employé sélectionné
+            /**
+             * phases - Phases calculées pour l'employé sélectionné
+             * -----------------------------------------------------
+             * Calcule les dates de début/fin de chaque phase basées sur:
+             * - startDate de l'employé
+             * - startOffset de la phase (jours après le début)
+             * - duration de la phase (durée en jours)
+             * 
+             * FORMAT RETOURNÉ:
+             * - startDate: Date de début calculée (ISO string)
+             * - endDate: Date de fin calculée (ISO string)
+             * - Toutes les propriétés de phaseTemplates
+             */
             const phases = useMemo(() => {
                 if (!selectedEmployee) return [];
                 const startDate = getValidDate(selectedEmployee.startDate);
@@ -1992,7 +2202,25 @@
 
             const [tasks, setTasks] = useState([]);
 
-            // Génération des tâches avec TaskManager (OPTIMISÉ - UNE SEULE SOURCE DE VÉRITÉ)
+            /**
+             * Génération des tâches pour l'employé sélectionné
+             * -------------------------------------------------
+             * Utilise TaskManager.generateTasks pour fusionner:
+             * - taskTemplates: Templates de base depuis la DB
+             * - employeeTasks: Statuts sauvegardés pour cet employé
+             * 
+             * OPTIMISATION: Ne met à jour que si les tâches ont réellement changé
+             * (comparaison des IDs + statuts) pour éviter les re-renders inutiles.
+             * 
+             * DÉPENDANCES CRITIQUES:
+             * - selectedEmployee?.id: Change quand on sélectionne un autre employé
+             * - selectedEmployee?.startDate: Change si la date de début est modifiée
+             * - taskTemplates.length: Change quand des templates sont ajoutés/supprimés
+             * - employeeTasks: Change quand les statuts sont sauvegardés
+             * 
+             * ⚠️  CRITIQUE: employeeTasks DOIT être dans les dépendances pour recharger
+             *     les statuts après sauvegarde
+             */
             useEffect(() => {
                 if (!selectedEmployee || !selectedEmployee.id) return;
                 
@@ -2053,7 +2281,27 @@
                 showNotification(`Erreur sauvegarde (${context})`, 'error');
             };
 
-            // Helper function to save task field to Supabase - OPTIMISÉ avec logs et feedback
+            /**
+             * Sauvegarde un champ d'une tâche (template) dans Supabase
+             * ----------------------------------------------------------
+             * Gère la conversion du format React vers DB et l'extraction du templateId.
+             * 
+             * FORMAT TASK ID:
+             * - Peut être un nombre (templateId direct) ou "employeeId-templateId"
+             * - Extrait automatiquement le templateId pour la requête DB
+             * 
+             * MAPPING DES CHAMPS:
+             * - phaseId → phase_id
+             * - dayOffset → day_offset
+             * - assignedTo → assigned_to
+             * - Autres champs: utilisent le nom tel quel
+             * 
+             * @param {string|number} taskId - ID de la tâche (format "employeeId-templateId" ou nombre)
+             * @param {string} field - Nom du champ en format React (camelCase)
+             * @param {any} value - Nouvelle valeur
+             * @param {string|null} dbFieldName - Nom du champ en DB (optionnel, auto-mappé si null)
+             * @returns {Promise<boolean>} true si succès, false sinon
+             */
             const saveTaskField = async (taskId, field, value, dbFieldName = null) => {
                 if (!useSupabase || !supabase) {
                     console.warn('⚠️ Supabase non disponible pour sauvegarder', field);
@@ -2110,7 +2358,20 @@
                 }
             };
 
-            // Toggle Task Status - OPTIMISÉ avec TaskManager (robuste et simple)
+            /**
+             * Change le statut d'une tâche (cycle: pending → inProgress → completed → pending)
+             * ---------------------------------------------------------------------------------
+             * PATTERN OPTIMISTIC UPDATE:
+             * 1. Mise à jour UI immédiate (setTasks + setEmployeeTasks)
+             * 2. Sauvegarde en arrière-plan via TaskManager.saveTaskStatus
+             * 3. Rollback automatique si erreur
+             * 
+             * FORMAT TASK ID:
+             * - Format: "employeeId-templateId" (ex: "1-19")
+             * - templateId est extrait pour la requête DB
+             * 
+             * @param {string} taskId - ID de la tâche au format "employeeId-templateId"
+             */
             const toggleTaskStatus = async (taskId) => {
                 if (!selectedEmployee || !selectedEmployee.id) {
                     showNotification('Erreur: Aucun employé sélectionné', 'error');
@@ -2245,9 +2506,27 @@
                 }
             };
 
+            /**
+             * Ajoute une nouvelle tâche (template) à une phase
+             * --------------------------------------------------
+             * PATTERN OPTIMISTIC UPDATE avec ID temporaire:
+             * 1. Génère un ID temporaire négatif (-Date.now()) pour éviter conflits DB
+             * 2. Ajoute immédiatement à l'UI (optimistic update)
+             * 3. Insère dans Supabase (sans spécifier l'ID - laisse DB générer)
+             * 4. Remplace l'ID temporaire par l'ID réel retourné par la DB
+             * 5. Rollback si erreur (supprime l'item avec ID temporaire)
+             * 
+             * GESTION CONFLITS:
+             * - Détecte les erreurs 409 (conflit clé primaire)
+             * - Recharge automatiquement les tâches depuis la DB
+             * 
+             * ⚠️  CRITIQUE: Ne JAMAIS utiliser Math.max() pour générer des IDs
+             *     (risque de conflit avec IDs existants non chargés)
+             * 
+             * @param {number} phaseId - ID de la phase à laquelle ajouter la tâche
+             */
             const addTask = async (phaseId) => {
-                // Utiliser un ID temporaire négatif pour éviter les conflits avec les IDs de la DB
-                // Les IDs négatifs n'existent jamais dans la DB (auto-increment commence à 1)
+                // ID temporaire négatif: évite conflits car auto-increment DB commence à 1
                 const tempId = -Date.now(); // ID temporaire unique et négatif
                 const newTaskTemplate = {
                     id: tempId, // ID temporaire négatif, sera remplacé par l'ID de la DB
@@ -2602,7 +2881,21 @@
                 );
             };
 
-            // GANTT VIEW COMPONENT
+            /**
+             * GanttView - Vue Gantt (diagramme de Gantt)
+             * --------------------------------------------
+             * Affiche les phases et tâches sur une timeline horizontale.
+             * 
+             * CALCULS:
+             * - totalDuration: Durée totale du parcours (max des phases)
+             * - Position des phases: Basée sur startOffset et duration
+             * - Position des tâches: Basée sur dayOffset
+             * 
+             * AFFICHAGE:
+             * - Barres de phase: Couleur de la phase, opacité 30%
+             * - Points de tâche: Positionnés selon dayOffset
+             * - Timeline: J+0, J+10, J+20, J+30
+             */
             const GanttView = () => {
                 if (!selectedEmployee) return null;
                 const startDate = new Date(selectedEmployee.startDate);
