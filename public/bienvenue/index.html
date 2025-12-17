@@ -912,9 +912,16 @@
 
         // FONCTION D'ENVOI EMAIL VIA RESEND (Réelle API) - VERSION FONCTIONNELLE
         const sendEmailViaResend = async (employee, phases, tasks, resources) => {
+             // Utiliser window.showNotification si disponible, sinon fallback
+             const notify = window.showNotification || ((msg, type) => {
+                 if (type === 'error') console.error(msg);
+                 else console.log(msg);
+                 alert(msg);
+             });
+             
              // Vérifier que generateEmailHTML est disponible
              if (typeof window.generateEmailHTML !== 'function') {
-                 showNotification('⚠️ Le générateur d\'email n\'est pas encore chargé. Attendez quelques secondes et réessayez.', 'error');
+                 notify('⚠️ Le générateur d\'email n\'est pas encore chargé. Attendez quelques secondes et réessayez.', 'error');
                  console.error('window.generateEmailHTML is not a function. email-template.js may not be loaded yet.');
                  return;
              }
@@ -923,12 +930,12 @@
              try {
                 html = window.generateEmailHTML(employee, phases, tasks, resources);
                 if (!html) {
-                    showNotification('Erreur: Impossible de générer l\'email. Vérifiez les données.', 'error');
+                    notify('Erreur: Impossible de générer l\'email. Vérifiez les données.', 'error');
                     return;
                 }
              } catch (e) {
                 console.error("Erreur génération email:", e);
-                showNotification(`Erreur: ${e.message || "Le modèle d'email ne s'est pas chargé correctement. Rechargez la page."}`, 'error');
+                notify(`Erreur: ${e.message || "Le modèle d'email ne s'est pas chargé correctement. Rechargez la page."}`, 'error');
                 return;
              }
              
@@ -955,14 +962,14 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    showNotification('✅ Email envoyé avec succès !', 'success');
+                    notify('✅ Email envoyé avec succès !', 'success');
                 } else {
                     console.error('Erreur envoi email:', data);
-                    showNotification(`❌ Erreur lors de l'envoi : ${data.message || 'Erreur inconnue'}`, 'error');
+                    notify(`❌ Erreur lors de l'envoi : ${data.message || 'Erreur inconnue'}`, 'error');
                 }
              } catch (error) {
                 console.error('Erreur réseau:', error);
-                showNotification('❌ Erreur réseau lors de l\'envoi de l\'email.', 'error');
+                notify(`❌ Erreur réseau lors de l'envoi de l'email: ${error.message}`, 'error');
              } finally {
                 if (document.activeElement) document.activeElement.innerText = originalText;
              }
@@ -2289,6 +2296,8 @@
             // Helper to show notifications
             const showNotification = (message, type = 'success') => {
                 setNotification({ message, type });
+                // Exposer globalement pour que sendEmailViaResend puisse l'utiliser
+                window.showNotification = showNotification;
             };
 
             const statusColors = { pending: 'bg-gray-100 text-gray-700', inProgress: 'bg-blue-100 text-blue-700', completed: 'bg-green-100 text-green-700' };
