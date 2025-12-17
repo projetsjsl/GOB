@@ -116,6 +116,15 @@ const ProgressBar = ({ current, total }: { current: number; total: number }) => 
 };
 
 export default function App() {
+    // --- VERSION INDICATOR ---
+    useEffect(() => {
+        console.log('🚀 3p1 App v2.1.0 - Filtres/Tri & Rapports Visuels activés');
+        console.log('✅ Modifications disponibles:');
+        console.log('   - Section "Filtres et Tri" en bas de sidebar');
+        console.log('   - Bouton 📊 Rapports dans Header');
+        console.log('   - Bouton ⚙️ Settings fonctionnel');
+    }, []);
+
     // --- GLOBAL STATE & PERSISTENCE ---
     const [showLanding, setShowLanding] = useState(true); // Show landing page by default
     const [library, setLibrary] = useState<Record<string, AnalysisProfile>>({});
