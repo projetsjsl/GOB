@@ -1147,7 +1147,8 @@
             phaseTemplates, setPhaseTemplates, 
             taskTemplates, setTaskTemplates,
             supabase, useSupabase, 
-            showNotification, uploadAvatar, onClose
+            showNotification, uploadAvatar, onClose,
+            selectedEmployee // Ajout de selectedEmployee en prop
         }) => {
             const [activeTab, setActiveTab] = useState('employees');
             
@@ -3559,6 +3560,7 @@
                             showNotification={showNotification}
                             uploadAvatar={uploadAvatar}
                             onClose={() => setShowAdmin(false)}
+                            selectedEmployee={selectedEmployee}
                         />
                     )}
 
