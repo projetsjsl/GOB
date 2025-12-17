@@ -58,6 +58,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
   const [logoClickCount, setLogoClickCount] = useState(0);
   const logoClickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
+  // Cleanup du timeout au démontage
+  React.useEffect(() => {
+    return () => {
+      if (logoClickTimeoutRef.current) {
+        clearTimeout(logoClickTimeoutRef.current);
+      }
+    };
+  }, []);
+  
   const handleLogoClick = () => {
     if (logoClickTimeoutRef.current) {
       clearTimeout(logoClickTimeoutRef.current);

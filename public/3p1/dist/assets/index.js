@@ -32990,6 +32990,13 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
   const [isFiltersExpanded, setIsFiltersExpanded] = reactExports.useState(true);
   const [logoClickCount, setLogoClickCount] = reactExports.useState(0);
   const logoClickTimeoutRef = reactExports.useRef(null);
+  React.useEffect(() => {
+    return () => {
+      if (logoClickTimeoutRef.current) {
+        clearTimeout(logoClickTimeoutRef.current);
+      }
+    };
+  }, []);
   const handleLogoClick = () => {
     if (logoClickTimeoutRef.current) {
       clearTimeout(logoClickTimeoutRef.current);
