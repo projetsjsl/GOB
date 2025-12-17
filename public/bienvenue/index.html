@@ -1160,6 +1160,12 @@
                 }
                 
                 try {
+                    // ✅ FIX: dueDate n'existe pas en DB, ne jamais essayer de le sauvegarder
+                    if (field === 'dueDate') {
+                        console.error('❌ [AdminPanel] Tentative de sauvegarder dueDate qui n\'existe pas en DB. Utilisez dayOffset à la place.');
+                        return false;
+                    }
+                    
                     const dbField = dbFieldName || (field === 'phaseId' ? 'phase_id' : 
                                                      field === 'dayOffset' ? 'day_offset' : 
                                                      field === 'assignedTo' ? 'assigned_to' : field);
