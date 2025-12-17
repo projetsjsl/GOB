@@ -278,7 +278,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
       {/* Ticker List */}
       <div className="flex-1 overflow-y-auto px-2 pb-4 space-y-1 custom-scrollbar pt-2">
         <h3 className="text-xs font-semibold text-slate-500 uppercase px-2 mb-2 tracking-wider flex justify-between items-center">
-          <span className="cursor-help" title={`Liste de vos tickers\n\n📊 Statistiques:\n• Portefeuille (⭐): ${tickerStats.portfolio} tickers\n• Watchlist (👁️): ${tickerStats.watchlist} tickers\n• Total: ${tickerStats.total} tickers\n\nUtilisez la barre de recherche pour filtrer par symbole ou nom.`}>Portefeuille</span>
+          <span className="cursor-help" title={`Liste de vos tickers\n\n📊 Statistiques:\n• ⭐ Portefeuille (détenus): ${tickerStats.portfolio} tickers\n• 👁️ Watchlist (surveillés): ${tickerStats.watchlist} tickers\n• Total: ${tickerStats.total} tickers\n\n⚠️ IMPORTANT:\n• ⭐ Étoile = Portefeuille (titres DÉTENUS)\n• 👁️ Œil = Watchlist (titres SURVEILLÉS)\n• Point coloré = Recommandation (ACHAT/CONSERVER/VENTE)\n\nUtilisez la barre de recherche pour filtrer par symbole ou nom.`}>Portefeuille</span>
           <div className="flex items-center gap-1.5">
             {filterBy === 'all' && (
               <>
@@ -308,8 +308,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
                   }`}
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  {/* Recommendation Dot */}
-                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getRecommendationColor(recommendation)} cursor-help`} title={`Signal: ${recommendation}\n\nBasé sur:\n• Prix actuel vs Limite d'achat/vente\n• Calculé automatiquement selon vos hypothèses\n\nVert = ACHAT\nJaune = CONSERVER\nRouge = VENTE`}></div>
+                  {/* Recommendation Dot (PAS une étoile - c'est la recommandation) */}
+                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getRecommendationColor(recommendation)} cursor-help`} title={`📊 Recommandation: ${recommendation}\n\nBasé sur:\n• Prix actuel vs Limite d'achat/vente\n• Calculé automatiquement selon vos hypothèses\n\n🟢 Vert = ACHAT\n🟡 Jaune = CONSERVER\n🔴 Rouge = VENTE\n\n⚠️ Note: Ce point coloré = Recommandation\n⭐ L'étoile jaune = Portefeuille (titres détenus)`}></div>
 
                   {/* Logo - Masqué immédiatement si erreur pour éviter 404 */}
                   <img 
@@ -358,8 +358,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
                       onToggleWatchlist(profile.id);
                     }}
                     title={profile.isWatchlist 
-                      ? "Dans la Watchlist (Non détenu)\n\n👁️ Cliquez pour déplacer vers le Portefeuille\n\nLa watchlist contient les titres que vous surveillez mais ne détenez pas encore."
-                      : "Dans le Portefeuille\n\n⭐ Cliquez pour déplacer vers la Watchlist\n\nLe portefeuille contient les titres que vous détenez actuellement."}
+                      ? "👁️ Watchlist (Non détenu)\n\nCe titre est dans votre watchlist (surveillé mais non détenu).\n\nCliquez pour déplacer vers le Portefeuille (⭐).\n\nLa watchlist contient les titres que vous surveillez mais ne détenez pas encore."
+                      : "⭐ Portefeuille (Détenu)\n\nCe titre est dans votre portefeuille (vous le détenez actuellement).\n\nCliquez pour déplacer vers la Watchlist (👁️).\n\nLe portefeuille contient les titres que vous détenez actuellement.\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation."}
                     className={`p-1.5 rounded transition-colors ${profile.isWatchlist ? 'text-blue-400 hover:bg-slate-700' : 'text-yellow-500 hover:text-yellow-400 hover:bg-slate-700'}`}
                   >
                     {profile.isWatchlist ? (
@@ -462,7 +462,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
           <option value="lastModified-desc">📅 Date modif. (Ancien)</option>
           <option value="alphabetical">🔤 Alphabétique (A-Z)</option>
           <option value="alphabetical-desc">🔤 Alphabétique (Z-A)</option>
-          <option value="recommendation">⭐ Recommandation</option>
+          <option value="recommendation">📊 Recommandation</option>
           <option value="sector">🏢 Secteur</option>
         </select>
 

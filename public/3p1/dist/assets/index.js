@@ -33253,9 +33253,14 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cursor-help", title: `Liste de vos tickers
 
 📊 Statistiques:
-• Portefeuille (⭐): ${tickerStats.portfolio} tickers
-• Watchlist (👁️): ${tickerStats.watchlist} tickers
+• ⭐ Portefeuille (détenus): ${tickerStats.portfolio} tickers
+• 👁️ Watchlist (surveillés): ${tickerStats.watchlist} tickers
 • Total: ${tickerStats.total} tickers
+
+⚠️ IMPORTANT:
+• ⭐ Étoile = Portefeuille (titres DÉTENUS)
+• 👁️ Œil = Watchlist (titres SURVEILLÉS)
+• Point coloré = Recommandation (ACHAT/CONSERVER/VENTE)
 
 Utilisez la barre de recherche pour filtrer par symbole ou nom.`, children: "Portefeuille" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
@@ -33285,15 +33290,18 @@ ${filterBy !== "all" ? `(Filtre: ${filterBy === "portfolio" ? "Portefeuille" : "
             className: `group flex items-center justify-between p-2 rounded cursor-pointer transition-all ${currentId === profile.id ? "bg-blue-900/30 border border-blue-800 text-blue-100" : "hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-transparent"}`,
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 min-w-0", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `w-2 h-2 rounded-full flex-shrink-0 ${getRecommendationColor(recommendation)} cursor-help`, title: `Signal: ${recommendation}
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `w-2 h-2 rounded-full flex-shrink-0 ${getRecommendationColor(recommendation)} cursor-help`, title: `📊 Recommandation: ${recommendation}
 
 Basé sur:
 • Prix actuel vs Limite d'achat/vente
 • Calculé automatiquement selon vos hypothèses
 
-Vert = ACHAT
-Jaune = CONSERVER
-Rouge = VENTE` }),
+🟢 Vert = ACHAT
+🟡 Jaune = CONSERVER
+🔴 Rouge = VENTE
+
+⚠️ Note: Ce point coloré = Recommandation
+⭐ L'étoile jaune = Portefeuille (titres détenus)` }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   "img",
                   {
@@ -33342,7 +33350,7 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
                       e.stopPropagation();
                       onToggleWatchlist(profile.id);
                     },
-                    title: profile.isWatchlist ? "Dans la Watchlist (Non détenu)\n\n👁️ Cliquez pour déplacer vers le Portefeuille\n\nLa watchlist contient les titres que vous surveillez mais ne détenez pas encore." : "Dans le Portefeuille\n\n⭐ Cliquez pour déplacer vers la Watchlist\n\nLe portefeuille contient les titres que vous détenez actuellement.",
+                    title: profile.isWatchlist ? "👁️ Watchlist (Non détenu)\n\nCe titre est dans votre watchlist (surveillé mais non détenu).\n\nCliquez pour déplacer vers le Portefeuille (⭐).\n\nLa watchlist contient les titres que vous surveillez mais ne détenez pas encore." : "⭐ Portefeuille (Détenu)\n\nCe titre est dans votre portefeuille (vous le détenez actuellement).\n\nCliquez pour déplacer vers la Watchlist (👁️).\n\nLe portefeuille contient les titres que vous détenez actuellement.\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation.",
                     className: `p-1.5 rounded transition-colors ${profile.isWatchlist ? "text-blue-400 hover:bg-slate-700" : "text-yellow-500 hover:text-yellow-400 hover:bg-slate-700"}`,
                     children: profile.isWatchlist ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-4 h-4 fill-current", style: { fill: "#eab308" } })
                   }
@@ -33434,7 +33442,7 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "lastModified-desc", children: "📅 Date modif. (Ancien)" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "alphabetical", children: "🔤 Alphabétique (A-Z)" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "alphabetical-desc", children: "🔤 Alphabétique (Z-A)" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "recommendation", children: "⭐ Recommandation" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "recommendation", children: "📊 Recommandation" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "sector", children: "🏢 Secteur" })
           ]
         }
