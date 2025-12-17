@@ -38647,7 +38647,13 @@ const loadAllTickersFromSupabase = async () => {
             }
           }
         });
-        console.log(`✅ ${tickers.length} tickers chargés depuis /api/admin/tickers (dont ${normalizedTeamTickers.length} team tickers)`);
+        const uniqueTeamTickers = /* @__PURE__ */ new Set();
+        tickers.forEach((t) => {
+          if (t.source === "team" || t.source === "both") {
+            uniqueTeamTickers.add(t.ticker.toUpperCase());
+          }
+        });
+        console.log(`✅ ${tickers.length} tickers chargés depuis /api/admin/tickers (dont ${uniqueTeamTickers.size} team tickers uniques)`);
         return {
           success: true,
           tickers
