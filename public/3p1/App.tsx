@@ -325,6 +325,21 @@ export default function App() {
         }
     }, []);
 
+    // ✅ Fonction cachée pour toggle admin mode (double-clic sur logo)
+    const handleToggleAdmin = () => {
+        const newAdminState = !isAdmin;
+        setIsAdmin(newAdminState);
+        if (newAdminState) {
+            localStorage.setItem('3p1-admin', 'true');
+            console.log('🔐 Mode admin activé (double-clic sur logo)');
+            showNotification('🔐 Mode admin activé', 'success');
+        } else {
+            localStorage.removeItem('3p1-admin');
+            console.log('🔓 Mode admin désactivé (double-clic sur logo)');
+            showNotification('🔓 Mode admin désactivé', 'info');
+        }
+    };
+
 
     const handleAdminRepair = async (tickerToRepair: string) => {
         setIsRepairing(tickerToRepair);
@@ -2925,6 +2940,7 @@ export default function App() {
                         bulkSyncProgress={bulkSyncProgress}
                         onOpenAdmin={() => setShowAdmin(true)}
                         isAdmin={isAdmin}
+                        onToggleAdmin={handleToggleAdmin}
                     />
                 </div>
             </div>

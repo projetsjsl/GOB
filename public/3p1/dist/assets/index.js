@@ -32980,7 +32980,7 @@ const ValuationCharts = ({
     ] })
   ] });
 };
-const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, isAdmin = false }) => {
+const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, isAdmin = false, onToggleAdmin }) => {
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [sortBy2, setSortBy] = reactExports.useState("lastModified");
   const [filterBy, setFilterBy] = reactExports.useState("all");
@@ -32988,6 +32988,25 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
   const [filterExchange, setFilterExchange] = reactExports.useState("all");
   const [filterMarketCap, setFilterMarketCap] = reactExports.useState("all");
   const [isFiltersExpanded, setIsFiltersExpanded] = reactExports.useState(true);
+  const [logoClickCount, setLogoClickCount] = reactExports.useState(0);
+  const logoClickTimeoutRef = reactExports.useRef(null);
+  const handleLogoClick = () => {
+    if (logoClickTimeoutRef.current) {
+      clearTimeout(logoClickTimeoutRef.current);
+    }
+    const newCount = logoClickCount + 1;
+    setLogoClickCount(newCount);
+    if (newCount === 2) {
+      if (onToggleAdmin) {
+        onToggleAdmin();
+      }
+      setLogoClickCount(0);
+    } else {
+      logoClickTimeoutRef.current = setTimeout(() => {
+        setLogoClickCount(0);
+      }, 500);
+    }
+  };
   const recommendationCacheRef = reactExports.useRef(/* @__PURE__ */ new Map());
   const getCachedRecommendation = (profile) => {
     const cacheKey = `${profile.id}-${profile.lastModified}`;
@@ -33113,8 +33132,16 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-900 text-white flex flex-col h-full border-r border-slate-800 shadow-xl w-full", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-3 sm:p-4 border-b border-slate-800 bg-slate-950 cursor-help", title: "Finance Pro 3p1\\n\\nApplication d'analyse fondamentale pour la gestion de portefeuille.\\n\\nFonctionnalités:\\n• Analyse de valorisation sur 5 ans\\n• Triangulation de la valeur (4 métriques)\\n• KPI Dashboard multi-tickers\\n• Snapshots et historique\\n• Synchronisation avec FMP API", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-blue-400 font-bold text-base sm:text-lg", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-5 h-5 sm:w-6 sm:h-6" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "FinancePro" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          ForwardRef$y,
+          {
+            className: `w-5 h-5 sm:w-6 sm:h-6 transition-all ${isAdmin ? "text-yellow-400" : ""} ${onToggleAdmin ? "cursor-pointer hover:scale-110" : ""}`,
+            onClick: onToggleAdmin ? handleLogoClick : void 0,
+            title: onToggleAdmin ? isAdmin ? "🔐 Mode admin actif\n\nDouble-cliquez pour désactiver" : "Double-cliquez pour activer le mode admin" : void 0
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "FinancePro" }),
+        isAdmin && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$9, { className: "w-4 h-4 text-yellow-400", title: "Mode admin actif" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500 mt-1", children: "Gestion de Portefeuille" })
     ] }),
@@ -51867,6 +51894,19 @@ function App() {
       console.warn("Failed to parse user role", e);
     }
   }, []);
+  const handleToggleAdmin = () => {
+    const newAdminState = !isAdmin;
+    setIsAdmin(newAdminState);
+    if (newAdminState) {
+      localStorage.setItem("3p1-admin", "true");
+      console.log("🔐 Mode admin activé (double-clic sur logo)");
+      showNotification("🔐 Mode admin activé", "success");
+    } else {
+      localStorage.removeItem("3p1-admin");
+      console.log("🔓 Mode admin désactivé (double-clic sur logo)");
+      showNotification("🔓 Mode admin désactivé", "info");
+    }
+  };
   const handleAdminRepair = async (tickerToRepair) => {
     setIsRepairing(tickerToRepair);
     try {
@@ -53887,7 +53927,8 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
             isBulkSyncing,
             bulkSyncProgress,
             onOpenAdmin: () => setShowAdmin(true),
-            isAdmin
+            isAdmin,
+            onToggleAdmin: handleToggleAdmin
           }
         ) })
       }
