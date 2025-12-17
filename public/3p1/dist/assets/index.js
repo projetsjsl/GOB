@@ -51524,6 +51524,13 @@ const ProgressBar = ({ current, total }) => {
 };
 function App() {
   var _a3, _b2;
+  reactExports.useEffect(() => {
+    console.log("🚀 3p1 App v2.1.0 - Filtres/Tri & Rapports Visuels activés");
+    console.log("✅ Modifications disponibles:");
+    console.log('   - Section "Filtres et Tri" en bas de sidebar');
+    console.log("   - Bouton 📊 Rapports dans Header");
+    console.log("   - Bouton ⚙️ Settings fonctionnel");
+  }, []);
   const [showLanding, setShowLanding] = reactExports.useState(true);
   const [library, setLibrary] = reactExports.useState({});
   const [activeId, setActiveId] = reactExports.useState("");
