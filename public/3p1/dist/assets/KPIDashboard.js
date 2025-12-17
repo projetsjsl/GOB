@@ -1,4 +1,4 @@
-import { r as reactExports, c as calculateRecommendation, j as jsxRuntimeExports, F as ForwardRef$6, a as ForwardRef$7, b as ForwardRef$8, d as ForwardRef$9, e as ForwardRef$a, f as ForwardRef$b, g as ForwardRef$c, h as ForwardRef$d, i as ForwardRef$e, R as React, k as ForwardRef$f, l as ForwardRef$g, A as AdditionalMetrics, E as EvaluationDetails, m as ForwardRef$h, n as listSnapshots } from "./index.js";
+import { r as reactExports, c as calculateRecommendation, j as jsxRuntimeExports, F as ForwardRef$5, a as ForwardRef$6, b as ForwardRef$7, d as ForwardRef$8, e as ForwardRef$9, f as ForwardRef$a, g as ForwardRef$b, h as ForwardRef$c, i as ForwardRef$d, k as ForwardRef$e, R as React, l as ForwardRef$f, m as ForwardRef$g, n as ForwardRef$h, A as AdditionalMetrics, E as EvaluationDetails, o as ForwardRef$i, p as listSnapshots } from "./index.js";
 function ArrowsPointingOutIcon({
   title,
   titleId,
@@ -22,31 +22,7 @@ function ArrowsPointingOutIcon({
     d: "M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
   }));
 }
-const ForwardRef$5 = /* @__PURE__ */ reactExports.forwardRef(ArrowsPointingOutIcon);
-function FunnelIcon({
-  title,
-  titleId,
-  ...props
-}, svgRef) {
-  return /* @__PURE__ */ reactExports.createElement("svg", Object.assign({
-    xmlns: "http://www.w3.org/2000/svg",
-    fill: "none",
-    viewBox: "0 0 24 24",
-    strokeWidth: 1.5,
-    stroke: "currentColor",
-    "aria-hidden": "true",
-    "data-slot": "icon",
-    ref: svgRef,
-    "aria-labelledby": titleId
-  }, props), title ? /* @__PURE__ */ reactExports.createElement("title", {
-    id: titleId
-  }, title) : null, /* @__PURE__ */ reactExports.createElement("path", {
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-    d: "M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
-  }));
-}
-const ForwardRef$4 = /* @__PURE__ */ reactExports.forwardRef(FunnelIcon);
+const ForwardRef$4 = /* @__PURE__ */ reactExports.forwardRef(ArrowsPointingOutIcon);
 function MagnifyingGlassMinusIcon({
   title,
   titleId,
@@ -95,6 +71,52 @@ function MagnifyingGlassPlusIcon({
   }));
 }
 const ForwardRef$2 = /* @__PURE__ */ reactExports.forwardRef(MagnifyingGlassPlusIcon);
+function EyeIcon({
+  title,
+  titleId,
+  ...props
+}, svgRef) {
+  return /* @__PURE__ */ reactExports.createElement("svg", Object.assign({
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: "0 0 24 24",
+    fill: "currentColor",
+    "aria-hidden": "true",
+    "data-slot": "icon",
+    ref: svgRef,
+    "aria-labelledby": titleId
+  }, props), title ? /* @__PURE__ */ reactExports.createElement("title", {
+    id: titleId
+  }, title) : null, /* @__PURE__ */ reactExports.createElement("path", {
+    d: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+  }), /* @__PURE__ */ reactExports.createElement("path", {
+    fillRule: "evenodd",
+    d: "M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z",
+    clipRule: "evenodd"
+  }));
+}
+const ForwardRef$1 = /* @__PURE__ */ reactExports.forwardRef(EyeIcon);
+function StarIcon({
+  title,
+  titleId,
+  ...props
+}, svgRef) {
+  return /* @__PURE__ */ reactExports.createElement("svg", Object.assign({
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: "0 0 24 24",
+    fill: "currentColor",
+    "aria-hidden": "true",
+    "data-slot": "icon",
+    ref: svgRef,
+    "aria-labelledby": titleId
+  }, props), title ? /* @__PURE__ */ reactExports.createElement("title", {
+    id: titleId
+  }, title) : null, /* @__PURE__ */ reactExports.createElement("path", {
+    fillRule: "evenodd",
+    d: "M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z",
+    clipRule: "evenodd"
+  }));
+}
+const ForwardRef = /* @__PURE__ */ reactExports.forwardRef(StarIcon);
 const useKeyboardShortcuts = ({
   onSyncAll,
   onSyncNA,
@@ -144,52 +166,6 @@ const useKeyboardShortcuts = ({
     }
   }, [enabled, handleKeyDown]);
 };
-function EyeIcon({
-  title,
-  titleId,
-  ...props
-}, svgRef) {
-  return /* @__PURE__ */ reactExports.createElement("svg", Object.assign({
-    xmlns: "http://www.w3.org/2000/svg",
-    viewBox: "0 0 24 24",
-    fill: "currentColor",
-    "aria-hidden": "true",
-    "data-slot": "icon",
-    ref: svgRef,
-    "aria-labelledby": titleId
-  }, props), title ? /* @__PURE__ */ reactExports.createElement("title", {
-    id: titleId
-  }, title) : null, /* @__PURE__ */ reactExports.createElement("path", {
-    d: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-  }), /* @__PURE__ */ reactExports.createElement("path", {
-    fillRule: "evenodd",
-    d: "M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z",
-    clipRule: "evenodd"
-  }));
-}
-const ForwardRef$1 = /* @__PURE__ */ reactExports.forwardRef(EyeIcon);
-function StarIcon({
-  title,
-  titleId,
-  ...props
-}, svgRef) {
-  return /* @__PURE__ */ reactExports.createElement("svg", Object.assign({
-    xmlns: "http://www.w3.org/2000/svg",
-    viewBox: "0 0 24 24",
-    fill: "currentColor",
-    "aria-hidden": "true",
-    "data-slot": "icon",
-    ref: svgRef,
-    "aria-labelledby": titleId
-  }, props), title ? /* @__PURE__ */ reactExports.createElement("title", {
-    id: titleId
-  }, title) : null, /* @__PURE__ */ reactExports.createElement("path", {
-    fillRule: "evenodd",
-    d: "M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z",
-    clipRule: "evenodd"
-  }));
-}
-const ForwardRef = /* @__PURE__ */ reactExports.forwardRef(StarIcon);
 const SyncSelectionDialog = ({
   isOpen,
   profiles,
@@ -426,11 +402,11 @@ const SyncSelectionDialog = ({
         onClick: onClose,
         className: "absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors",
         disabled: isSyncing,
-        children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$6, { className: "w-5 h-5" })
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-5 h-5" })
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 mb-6", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-6 h-6 text-blue-600" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$6, { className: "w-6 h-6 text-blue-600" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-bold text-gray-900", children: "Synchronisation avec critères avancés" })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-4 flex items-center justify-between", children: [
@@ -1027,7 +1003,7 @@ const GuideDialog = ({ isOpen, onClose }) => {
       {
         onClick: onClose,
         className: "absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10",
-        children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$6, { className: "w-6 h-6" })
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-6 h-6" })
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 mb-6 pb-4 border-b border-gray-200", children: [
@@ -1372,7 +1348,7 @@ const StatusBadge = ({
     }
   );
 };
-const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isBulkSyncing = false, onUpdateProfile }) => {
+const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isBulkSyncing = false, onUpdateProfile, onOpenSettings }) => {
   var _a, _b, _c;
   const [sortConfig, setSortConfig] = reactExports.useState({ key: "totalReturnPercent", direction: "desc" });
   const [showSyncDialog, setShowSyncDialog] = reactExports.useState(false);
@@ -2923,6 +2899,18 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-400 hidden sm:inline", title: "Raccourcis clavier disponibles", children: "⌨️ Ctrl+Shift+F: Filtre N/A | Ctrl+Shift+E: Export | Ctrl+Shift+D: Sync critères" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 flex-wrap", children: [
+            onOpenSettings && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "button",
+              {
+                onClick: onOpenSettings,
+                className: "px-3 py-1 text-xs rounded transition-colors bg-gray-100 hover:bg-blue-100 hover:text-blue-600 text-gray-700 flex items-center gap-1",
+                title: "⚙️ Configuration Complète : Guardrails, Validation, Ajustements\\n\\nOuvre le panneau de configuration unifié pour gérer tous les paramètres de l'application.\\n\\n🛡️ Guardrails (Limites d'affichage):\\n• Limites de croissance (min/max pour toutes les métriques)\\n• Limites de ratios (P/E, P/CF, P/BV min/max)\\n• Multiplicateur maximum raisonnable pour les projections\\n• Contrôlent l'affichage des graphiques et tableaux\\n• Stockés dans localStorage (navigateur)\\n• Affectent uniquement l'affichage, pas les calculs\\n\\n✅ Validation (Paramètres de sanitisation):\\n• Limites de croissance par métrique (EPS, CF, BV, DIV)\\n• Limites de ratios cibles (P/E, P/CF, P/BV, Yield)\\n• Précision des calculs (décimales)\\n• Automatisation de la sanitisation lors de la sync FMP\\n• Cohérence des données\\n• Stockés dans Supabase (partagés entre utilisateurs)\\n• Affectent les calculs et la sauvegarde\\n\\n📊 Ajustements:\\n• Paramètres généraux de l'application\\n• Comportement par défaut\\n• Options d'affichage\\n\\n💡 Impact:\\n• Les Guardrails affectent l'affichage uniquement\\n• La Validation affecte les calculs et la sauvegarde\\n• Les changements sont appliqués immédiatement\\n• Les paramètres sont persistants (localStorage ou Supabase)",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$h, { className: "w-3 h-3" }),
+                  "Paramètres"
+                ]
+              }
+            ),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "button",
               {
@@ -2930,7 +2918,7 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
                   setFilters((prev) => ({ ...prev, showOnlyNA: !prev.showOnlyNA }));
                 },
                 className: `px-3 py-1 text-xs rounded transition-colors ${filters.showOnlyNA ? "bg-orange-600 hover:bg-orange-700 text-white" : "bg-gray-100 hover:bg-orange-100 hover:text-orange-600 text-gray-700"}`,
-                title: filters.showOnlyNA ? "Afficher tous les tickers\n\nDésactive le filtre N/A pour voir tous les tickers.\n\nRaccourci: Ctrl+Shift+F" : "Afficher uniquement les N/A\n\nFiltre pour ne voir que les tickers avec des données invalides (N/A).\n\nUtile pour identifier rapidement les tickers nécessitant une synchronisation.\n\nRaccourci: Ctrl+Shift+F",
+                title: filters.showOnlyNA ? "👁️ Afficher tous les tickers\n\nDésactive le filtre N/A pour voir tous les tickers de votre portefeuille et watchlist.\n\n📊 Affichage:\n• Tous les tickers (valides et avec N/A)\n• Métriques complètes pour les tickers valides\n• Indicateurs N/A pour les tickers incomplets\n\n⌨️ Raccourci: Ctrl+Shift+F (Cmd+Shift+F sur Mac)" : "⚠️ Afficher uniquement les tickers avec N/A\n\nFiltre pour ne voir que les tickers avec des données invalides ou manquantes.\n\n🔍 Utilité:\n• Identifier rapidement les tickers nécessitant une synchronisation\n• Voir quels tickers ont des problèmes de données\n• Faciliter le nettoyage et la maintenance\n• Permet de synchroniser uniquement les tickers problématiques\n\n📊 Indicateurs N/A:\n• Prix actuel invalide ou manquant\n• Données historiques incomplètes\n• Métriques impossibles à calculer\n• Tickers non synchronisés depuis FMP\n\n⌨️ Raccourci: Ctrl+Shift+F (Cmd+Shift+F sur Mac)",
                 "aria-label": filters.showOnlyNA ? "Afficher tous les tickers" : "Afficher uniquement les tickers avec N/A",
                 "aria-pressed": filters.showOnlyNA ? "true" : "false",
                 tabIndex: 0,
@@ -2951,11 +2939,31 @@ Tickers: ${naTickers.slice(0, 10).join(", ")}${naTickers.length > 10 ? `
                 },
                 disabled: isBulkSyncing,
                 className: "px-3 py-1 text-xs bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded transition-colors flex items-center gap-1",
-                title: `Synchroniser uniquement les ${filteredMetrics.length} ticker(s) avec N/A
+                title: `🔄 Synchroniser uniquement les ${filteredMetrics.length} ticker(s) avec N/A
 
-Synchronise uniquement les tickers affichés (ceux avec N/A).
+Synchronise uniquement les tickers affichés (ceux avec des données invalides ou manquantes).
 
-Plus rapide que de synchroniser tous les tickers.`,
+⚡ Avantages:
+• Plus rapide que de synchroniser tous les tickers
+• Cible uniquement les tickers problématiques
+• Économise les appels API FMP
+• Permet de corriger rapidement les données manquantes
+
+📊 Processus:
+• Récupère les données FMP Premium pour chaque ticker
+• Met à jour les données historiques (30 ans)
+• Recalcule les hypothèses automatiquement
+• Préserve les modifications manuelles existantes
+• Sauvegarde un snapshot avant et après la sync
+
+⏱️ Durée:
+• Environ 2-3 secondes par ticker
+• Traitement en batch (3 tickers en parallèle)
+• Barre de progression affichée
+
+💡 Astuce:
+• Utilisez ce bouton après avoir filtré les N/A
+• Plus efficace que 'Sync Warehouse (Deep)' si vous avez beaucoup de tickers`,
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: `w-3 h-3 ${isBulkSyncing ? "animate-spin" : ""}` }),
                   "Sync N/A (",
@@ -3015,7 +3023,7 @@ Tous les ${result.validTickers} tickers ont des données valides.`);
                 },
                 disabled: isBulkSyncing || isAnalyzingNA,
                 className: "px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded transition-colors flex items-center gap-1",
-                title: "Analyser et synchroniser automatiquement les tickers avec N/A depuis le backend\\n\\nCet outil:\\n1. Analyse tous les tickers depuis Supabase\\n2. Identifie ceux avec des valeurs N/A\\n3. Propose de les synchroniser automatiquement",
+                title: "🔍 Analyser les tickers avec N/A\\n\\nAnalyse tous les tickers de votre portefeuille et watchlist pour identifier ceux avec des données invalides ou manquantes.\\n\\n📊 Résultats de l'analyse:\\n• Nombre total de tickers analysés\\n• Nombre de tickers valides (données complètes)\\n• Nombre de tickers avec N/A (données manquantes)\\n• Nombre d'erreurs rencontrées\\n• Liste des tickers problématiques\\n\\n⚡ Fonctionnalités:\\n• Analyse rapide via l'API backend\\n• Limite de 200 tickers par analyse\\n• Propose automatiquement de synchroniser les N/A\\n• Affiche un résumé détaillé\\n\\n💡 Utilisation:\\n• Cliquez pour lancer l'analyse\\n• Attendez quelques secondes\\n• Si des N/A sont trouvés, vous pouvez les synchroniser automatiquement\\n• Plus efficace que de vérifier manuellement chaque ticker",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: `w-3 h-3 ${isAnalyzingNA ? "animate-spin" : ""}` }),
                   isAnalyzingNA ? "Analyse..." : "Auto-Sync N/A"
@@ -3309,14 +3317,14 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                 },
                 className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
                 title: "Réinitialiser la vue",
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-4 h-4 text-gray-600" })
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] })
         ] })
       ] }),
       sectionsVisibility.scatterPlot && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: filteredMetrics.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: "Aucun titre à afficher sur le graphique." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "overflow-x-auto bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "min-w-[600px] sm:min-w-[700px] md:min-w-[800px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full", style: { minWidth: "100%" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
           "svg",
           {
             ref: svgJPEGYRef,
@@ -3590,14 +3598,14 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                 },
                 className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
                 title: "Réinitialiser la vue",
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-4 h-4 text-gray-600" })
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] })
         ] })
       ] }),
       sectionsVisibility.scatterPlotRatio31 && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: filteredMetrics.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: "Aucun titre à afficher sur le graphique." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "overflow-x-auto bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "min-w-[600px] sm:min-w-[700px] md:min-w-[800px]", children: (() => {
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full", style: { minWidth: "100%" }, children: (() => {
           const validMetricsForRatio31Chart = filteredMetrics.filter(
             (m) => !m.hasInvalidData && m.totalReturnPercent >= -100 && m.totalReturnPercent <= 1e3 && m.ratio31 >= 0 && m.ratio31 <= 100 && isFinite(m.totalReturnPercent) && isFinite(m.ratio31)
           );
@@ -4256,7 +4264,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           )
         ] })
       ] }),
-      sectionsVisibility.detailedTable && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: filteredMetrics.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: "Aucun titre ne correspond aux filtres sélectionnés." }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto -mx-3 sm:mx-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-xs sm:text-sm min-w-[800px]", children: [
+      sectionsVisibility.detailedTable && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: filteredMetrics.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: "Aucun titre ne correspond aux filtres sélectionnés." }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto -mx-3 sm:mx-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-xs sm:text-sm", style: { minWidth: "100%" }, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-gradient-to-r from-slate-100 to-slate-50 sticky top-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "th",
@@ -4421,7 +4429,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   ((_g = metric.volatility) == null ? void 0 : _g.toFixed(1)) || "N/A",
                   "%"
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-2 sm:p-3 text-center ${!displayOptions.visibleColumns.approved ? "hidden" : ""}`, children: metric.hasApprovedVersion ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$e, { className: "w-4 h-4 sm:w-5 sm:h-5 text-green-500 mx-auto" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$h, { className: "w-4 h-4 sm:w-5 sm:h-5 text-gray-300 mx-auto" }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-2 sm:p-3 text-center ${!displayOptions.visibleColumns.approved ? "hidden" : ""}`, children: metric.hasApprovedVersion ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$e, { className: "w-4 h-4 sm:w-5 sm:h-5 text-green-500 mx-auto" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$i, { className: "w-4 h-4 sm:w-5 sm:h-5 text-gray-300 mx-auto" }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "p-2 sm:p-3 text-center text-xs sm:text-sm", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                     StatusBadge,

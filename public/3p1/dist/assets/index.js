@@ -33032,6 +33032,20 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [sortBy2, setSortBy] = reactExports.useState("lastModified");
   const [filterBy, setFilterBy] = reactExports.useState("all");
+  const recommendationCacheRef = reactExports.useRef(/* @__PURE__ */ new Map());
+  const getCachedRecommendation = (profile) => {
+    const cacheKey = `${profile.id}-${profile.lastModified}`;
+    if (recommendationCacheRef.current.has(cacheKey)) {
+      return recommendationCacheRef.current.get(cacheKey);
+    }
+    const rec = calculateRecommendation(profile.data, profile.assumptions).recommendation;
+    recommendationCacheRef.current.set(cacheKey, rec);
+    if (recommendationCacheRef.current.size > 1e3) {
+      const firstKey = recommendationCacheRef.current.keys().next().value;
+      recommendationCacheRef.current.delete(firstKey);
+    }
+    return rec;
+  };
   const filteredAndSortedProfiles = reactExports.useMemo(() => {
     let filtered = profiles.filter(
       (p) => p.id.toLowerCase().includes(searchTerm.toLowerCase()) || p.info.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -33052,8 +33066,8 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
         case "lastModified-desc":
           return a2.lastModified - b.lastModified;
         case "recommendation": {
-          const recA = calculateRecommendation(a2.data, a2.assumptions).recommendation;
-          const recB = calculateRecommendation(b.data, b.assumptions).recommendation;
+          const recA = getCachedRecommendation(a2);
+          const recB = getCachedRecommendation(b);
           const order = { [Recommendation.BUY]: 0, [Recommendation.HOLD]: 1, [Recommendation.SELL]: 2 };
           return (order[recA] ?? 1) - (order[recB] ?? 1);
         }
@@ -51440,7 +51454,10 @@ function getSupabaseClient() {
 }
 const supabase = getSupabaseClient();
 function useRealtimeSync(tableName, onDataChange, options) {
-  const handleChange = reactExports.useCallback(onDataChange, []);
+  const onDataChangeRef = reactExports.useRef(onDataChange);
+  reactExports.useEffect(() => {
+    onDataChangeRef.current = onDataChange;
+  }, [onDataChange]);
   reactExports.useEffect(() => {
     if (!supabase) {
       console.warn("Supabase not initialized, skipping realtime subscription");
@@ -51448,6 +51465,7 @@ function useRealtimeSync(tableName, onDataChange, options) {
     }
     const channelName = `realtime-${tableName}-${Date.now()}`;
     console.log(`📡 Subscribing to ${tableName} changes...`);
+    let isMounted = true;
     const channel = supabase.channel(channelName).on(
       "postgres_changes",
       {
@@ -51457,21 +51475,29 @@ function useRealtimeSync(tableName, onDataChange, options) {
         filter: options == null ? void 0 : options.filter
       },
       (payload) => {
+        if (!isMounted) return;
         console.log(`📡 [${tableName}] ${payload.eventType}:`, payload);
-        handleChange({
+        onDataChangeRef.current({
           eventType: payload.eventType,
           new: payload.new,
           old: payload.old
         });
       }
     ).subscribe((status) => {
-      console.log(`📡 [${tableName}] Subscription status:`, status);
+      if (isMounted) {
+        console.log(`📡 [${tableName}] Subscription status:`, status);
+      }
     });
     return () => {
+      isMounted = false;
       console.log(`🔌 Unsubscribing from ${tableName}`);
-      supabase.removeChannel(channel);
+      try {
+        supabase.removeChannel(channel);
+      } catch (error) {
+        console.warn(`⚠️ Error removing channel ${channelName}:`, error);
+      }
     };
-  }, [tableName, handleChange, options == null ? void 0 : options.schema, options == null ? void 0 : options.filter, options == null ? void 0 : options.enabled]);
+  }, [tableName, options == null ? void 0 : options.schema, options == null ? void 0 : options.filter, options == null ? void 0 : options.enabled]);
 }
 const KPIDashboard = React.lazy(() => __vitePreload(() => import("./KPIDashboard.js"), true ? [] : void 0, import.meta.url).then((m) => ({ default: m.KPIDashboard })));
 const AdminDashboard = React.lazy(() => __vitePreload(() => import("./AdminDashboard.js"), true ? [] : void 0, import.meta.url).then((m) => ({ default: m.AdminDashboard })));
@@ -51584,18 +51610,24 @@ function App() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+  const realtimeTimeoutRef = reactExports.useRef(null);
   useRealtimeSync("tickers", (payload) => {
     var _a4, _b3, _c, _d, _e;
     console.log("📡 [3p1] Realtime ticker change:", payload.eventType, ((_a4 = payload.new) == null ? void 0 : _a4.ticker) || ((_b3 = payload.old) == null ? void 0 : _b3.ticker));
+    if (realtimeTimeoutRef.current) {
+      clearTimeout(realtimeTimeoutRef.current);
+      realtimeTimeoutRef.current = null;
+    }
     if (payload.eventType === "INSERT" && payload.new) {
       const symbol = (_c = payload.new.ticker) == null ? void 0 : _c.toUpperCase();
       if (symbol) {
         showNotification(`📡 Nouveau ticker ajouté par un autre utilisateur: ${symbol}`, "info");
         hasLoadedTickersRef.current = false;
         supabaseTickersCacheRef.current = null;
-        setTimeout(() => {
+        realtimeTimeoutRef.current = setTimeout(() => {
+          realtimeTimeoutRef.current = null;
           loadTickersFromSupabase();
-        }, 500);
+        }, 300);
       }
     } else if (payload.eventType === "DELETE" && payload.old) {
       const symbol = (_d = payload.old.ticker) == null ? void 0 : _d.toUpperCase();
@@ -51609,42 +51641,50 @@ function App() {
         });
         hasLoadedTickersRef.current = false;
         supabaseTickersCacheRef.current = null;
-        setTimeout(() => {
+        realtimeTimeoutRef.current = setTimeout(() => {
+          realtimeTimeoutRef.current = null;
           loadTickersFromSupabase();
-        }, 500);
+        }, 300);
       }
     } else if (payload.eventType === "UPDATE" && payload.new) {
       const symbol = (_e = payload.new.ticker) == null ? void 0 : _e.toUpperCase();
       if (symbol) {
         showNotification(`📡 Ticker mis à jour: ${symbol}`, "info");
-        if (library[symbol]) {
-          setLibrary((prev) => {
-            if (!prev[symbol]) return prev;
-            return {
-              ...prev,
-              [symbol]: {
-                ...prev[symbol],
-                isWatchlist: mapSourceToIsWatchlist(payload.new.source),
-                info: {
-                  ...prev[symbol].info,
-                  securityRank: payload.new.security_rank !== null && payload.new.security_rank !== void 0 ? payload.new.security_rank : prev[symbol].info.securityRank,
-                  earningsPredictability: payload.new.earnings_predictability !== null && payload.new.earnings_predictability !== void 0 ? payload.new.earnings_predictability : prev[symbol].info.earningsPredictability,
-                  priceGrowthPersistence: payload.new.price_growth_persistence !== null && payload.new.price_growth_persistence !== void 0 ? payload.new.price_growth_persistence : prev[symbol].info.priceGrowthPersistence,
-                  priceStability: payload.new.price_stability !== null && payload.new.price_stability !== void 0 ? payload.new.price_stability : prev[symbol].info.priceStability,
-                  beta: payload.new.beta !== null && payload.new.beta !== void 0 ? payload.new.beta : prev[symbol].info.beta
-                }
+        setLibrary((prev) => {
+          if (!prev[symbol]) return prev;
+          return {
+            ...prev,
+            [symbol]: {
+              ...prev[symbol],
+              isWatchlist: mapSourceToIsWatchlist(payload.new.source),
+              info: {
+                ...prev[symbol].info,
+                securityRank: payload.new.security_rank !== null && payload.new.security_rank !== void 0 ? payload.new.security_rank : prev[symbol].info.securityRank,
+                earningsPredictability: payload.new.earnings_predictability !== null && payload.new.earnings_predictability !== void 0 ? payload.new.earnings_predictability : prev[symbol].info.earningsPredictability,
+                priceGrowthPersistence: payload.new.price_growth_persistence !== null && payload.new.price_growth_persistence !== void 0 ? payload.new.price_growth_persistence : prev[symbol].info.priceGrowthPersistence,
+                priceStability: payload.new.price_stability !== null && payload.new.price_stability !== void 0 ? payload.new.price_stability : prev[symbol].info.priceStability,
+                beta: payload.new.beta !== null && payload.new.beta !== void 0 ? payload.new.beta : prev[symbol].info.beta
               }
-            };
-          });
-        }
+            }
+          };
+        });
         hasLoadedTickersRef.current = false;
         supabaseTickersCacheRef.current = null;
-        setTimeout(() => {
+        realtimeTimeoutRef.current = setTimeout(() => {
+          realtimeTimeoutRef.current = null;
           loadTickersFromSupabase();
-        }, 1e3);
+        }, 500);
       }
     }
   });
+  reactExports.useEffect(() => {
+    return () => {
+      if (realtimeTimeoutRef.current) {
+        clearTimeout(realtimeTimeoutRef.current);
+        realtimeTimeoutRef.current = null;
+      }
+    };
+  }, []);
   const [isAdmin, setIsAdmin] = reactExports.useState(false);
   reactExports.useEffect(() => {
     try {

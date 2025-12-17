@@ -187,8 +187,17 @@ export default function App() {
 
     // --- SUPABASE REALTIME SUBSCRIPTIONS ---
     // Live sync: when any user adds/updates/deletes tickers, all clients see it instantly
+    // ✅ OPTIMISATION: Utiliser useRef pour éviter les closures stale et les race conditions
+    const realtimeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    
     useRealtimeSync('tickers', (payload) => {
         console.log('📡 [3p1] Realtime ticker change:', payload.eventType, payload.new?.ticker || payload.old?.ticker);
+        
+        // ✅ FIX: Annuler le timeout précédent pour éviter les race conditions
+        if (realtimeTimeoutRef.current) {
+            clearTimeout(realtimeTimeoutRef.current);
+            realtimeTimeoutRef.current = null;
+        }
         
         if (payload.eventType === 'INSERT' && payload.new) {
             const symbol = payload.new.ticker?.toUpperCase();
@@ -197,10 +206,11 @@ export default function App() {
                 // ✅ FORCER le rechargement complet depuis Supabase pour synchronisation
                 hasLoadedTickersRef.current = false;
                 supabaseTickersCacheRef.current = null; // Invalider le cache
-                // Recharger immédiatement
-                setTimeout(() => {
+                // ✅ FIX: Utiliser un timeout avec nettoyage pour éviter les fuites mémoire
+                realtimeTimeoutRef.current = setTimeout(() => {
+                    realtimeTimeoutRef.current = null;
                     loadTickersFromSupabase();
-                }, 500);
+                }, 300); // Réduit à 300ms pour réactivité
             }
         } else if (payload.eventType === 'DELETE' && payload.old) {
             const symbol = payload.old.ticker?.toUpperCase();
@@ -216,54 +226,64 @@ export default function App() {
                 // Recharger depuis Supabase pour être sûr
                 hasLoadedTickersRef.current = false;
                 supabaseTickersCacheRef.current = null;
-                setTimeout(() => {
+                realtimeTimeoutRef.current = setTimeout(() => {
+                    realtimeTimeoutRef.current = null;
                     loadTickersFromSupabase();
-                }, 500);
+                }, 300);
             }
         } else if (payload.eventType === 'UPDATE' && payload.new) {
             const symbol = payload.new.ticker?.toUpperCase();
             if (symbol) {
                 showNotification(`📡 Ticker mis à jour: ${symbol}`, 'info');
                 // ✅ Mettre à jour les métriques ValueLine ET recharger pour cohérence
-                if (library[symbol]) {
-                    setLibrary(prev => {
-                        if (!prev[symbol]) return prev;
-                        return {
-                            ...prev,
-                            [symbol]: {
-                                ...prev[symbol],
-                                isWatchlist: mapSourceToIsWatchlist(payload.new.source),
-                                info: {
-                                    ...prev[symbol].info,
-                                    securityRank: payload.new.security_rank !== null && payload.new.security_rank !== undefined
-                                        ? payload.new.security_rank
-                                        : prev[symbol].info.securityRank,
-                                    earningsPredictability: payload.new.earnings_predictability !== null && payload.new.earnings_predictability !== undefined
-                                        ? payload.new.earnings_predictability
-                                        : prev[symbol].info.earningsPredictability,
-                                    priceGrowthPersistence: payload.new.price_growth_persistence !== null && payload.new.price_growth_persistence !== undefined
-                                        ? payload.new.price_growth_persistence
-                                        : prev[symbol].info.priceGrowthPersistence,
-                                    priceStability: payload.new.price_stability !== null && payload.new.price_stability !== undefined
-                                        ? payload.new.price_stability
-                                        : prev[symbol].info.priceStability,
-                                    beta: payload.new.beta !== null && payload.new.beta !== undefined
-                                        ? payload.new.beta
-                                        : prev[symbol].info.beta
-                                }
+                setLibrary(prev => {
+                    if (!prev[symbol]) return prev;
+                    return {
+                        ...prev,
+                        [symbol]: {
+                            ...prev[symbol],
+                            isWatchlist: mapSourceToIsWatchlist(payload.new.source),
+                            info: {
+                                ...prev[symbol].info,
+                                securityRank: payload.new.security_rank !== null && payload.new.security_rank !== undefined
+                                    ? payload.new.security_rank
+                                    : prev[symbol].info.securityRank,
+                                earningsPredictability: payload.new.earnings_predictability !== null && payload.new.earnings_predictability !== undefined
+                                    ? payload.new.earnings_predictability
+                                    : prev[symbol].info.earningsPredictability,
+                                priceGrowthPersistence: payload.new.price_growth_persistence !== null && payload.new.price_growth_persistence !== undefined
+                                    ? payload.new.price_growth_persistence
+                                    : prev[symbol].info.priceGrowthPersistence,
+                                priceStability: payload.new.price_stability !== null && payload.new.price_stability !== undefined
+                                    ? payload.new.price_stability
+                                    : prev[symbol].info.priceStability,
+                                beta: payload.new.beta !== null && payload.new.beta !== undefined
+                                    ? payload.new.beta
+                                    : prev[symbol].info.beta
                             }
-                        };
-                    });
-                }
+                        }
+                    };
+                });
                 // Recharger depuis Supabase pour synchronisation complète
                 hasLoadedTickersRef.current = false;
                 supabaseTickersCacheRef.current = null;
-                setTimeout(() => {
+                realtimeTimeoutRef.current = setTimeout(() => {
+                    realtimeTimeoutRef.current = null;
                     loadTickersFromSupabase();
-                }, 1000);
+                }, 500); // Réduit à 500ms pour réactivité
             }
         }
     });
+    
+    // ✅ FIX: Nettoyer le timeout au démontage pour éviter les fuites mémoire
+    useEffect(() => {
+        return () => {
+            if (realtimeTimeoutRef.current) {
+                clearTimeout(realtimeTimeoutRef.current);
+                realtimeTimeoutRef.current = null;
+            }
+        };
+    }, []);
 
     // --- USER ROLE MANAGEMENT ---
     const [isAdmin, setIsAdmin] = useState(false);

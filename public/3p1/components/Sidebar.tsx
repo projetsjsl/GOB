@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   PlusIcon,
   TrashIcon,
@@ -44,6 +44,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
   const [sortBy, setSortBy] = useState<SortOption>('lastModified');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
 
+  // ✅ OPTIMISATION: Cache des recommandations pour éviter les recalculs coûteux
+  const recommendationCacheRef = useRef<Map<string, Recommendation>>(new Map());
+  
+  // Fonction helper pour obtenir la recommandation (avec cache)
+  const getCachedRecommendation = (profile: AnalysisProfile): Recommendation => {
+    const cacheKey = `${profile.id}-${profile.lastModified}`;
+    if (recommendationCacheRef.current.has(cacheKey)) {
+      return recommendationCacheRef.current.get(cacheKey)!;
+    }
+    const rec = calculateRecommendation(profile.data, profile.assumptions).recommendation;
+    recommendationCacheRef.current.set(cacheKey, rec);
+    // Limiter la taille du cache à 1000 entrées pour éviter les fuites mémoire
+    if (recommendationCacheRef.current.size > 1000) {
+      const firstKey = recommendationCacheRef.current.keys().next().value;
+      recommendationCacheRef.current.delete(firstKey);
+    }
+    return rec;
+  };
+
   const filteredAndSortedProfiles = useMemo(() => {
     // Filtrage par recherche
     let filtered = profiles.filter(p =>
@@ -70,8 +89,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
         case 'lastModified-desc':
           return a.lastModified - b.lastModified;
         case 'recommendation': {
-          const recA = calculateRecommendation(a.data, a.assumptions).recommendation;
-          const recB = calculateRecommendation(b.data, b.assumptions).recommendation;
+          // ✅ OPTIMISATION: Utiliser le cache au lieu de recalculer
+          const recA = getCachedRecommendation(a);
+          const recB = getCachedRecommendation(b);
           const order = { [Recommendation.BUY]: 0, [Recommendation.HOLD]: 1, [Recommendation.SELL]: 2 };
           return (order[recA] ?? 1) - (order[recB] ?? 1);
         }
