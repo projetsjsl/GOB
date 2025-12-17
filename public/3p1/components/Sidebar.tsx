@@ -44,6 +44,11 @@ type SortOption = 'alphabetical' | 'alphabetical-desc' | 'lastModified' | 'lastM
 type FilterOption = 'all' | 'portfolio' | 'watchlist';
 
 export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, isAdmin = false, onToggleAdmin }) => {
+  // ✅ DEBUG: Log pour vérifier que les profils sont bien reçus
+  React.useEffect(() => {
+    console.log(`📋 Sidebar: ${profiles.length} profil(s) reçu(s)`, profiles.map(p => p.id).slice(0, 10));
+  }, [profiles.length]);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('lastModified');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');

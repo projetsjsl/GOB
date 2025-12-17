@@ -32981,6 +32981,9 @@ const ValuationCharts = ({
   ] });
 };
 const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, isAdmin = false, onToggleAdmin }) => {
+  React.useEffect(() => {
+    console.log(`📋 Sidebar: ${profiles.length} profil(s) reçu(s)`, profiles.map((p) => p.id).slice(0, 10));
+  }, [profiles.length]);
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [sortBy2, setSortBy] = reactExports.useState("lastModified");
   const [filterBy, setFilterBy] = reactExports.useState("all");
@@ -52319,6 +52322,7 @@ Vérifiez votre connexion et réessayez.`,
           });
           setLibrary((prev) => {
             const updated = { ...prev, ...skeletonProfiles };
+            console.log(`📊 ${Object.keys(skeletonProfiles).length} profils squelettes ajoutés à library (total: ${Object.keys(updated).length})`);
             saveToCache(updated).catch((e) => console.warn("Failed to save to cache:", e));
             return updated;
           });
@@ -54085,7 +54089,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
         children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-72 h-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
           Sidebar,
           {
-            profiles: Object.values(library),
+            profiles: Object.values(library).filter((p) => p.id !== DEFAULT_PROFILE.id),
             currentId: activeId,
             onSelect: setActiveId,
             onAdd: handleAddTicker,

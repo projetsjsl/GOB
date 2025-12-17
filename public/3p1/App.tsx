@@ -905,9 +905,9 @@ export default function App() {
                     });
 
                     // Ajouter les profils squelettes immédiatement pour affichage
-                    // Ajouter les profils squelettes immédiatement pour affichage
                     setLibrary(prev => {
                         const updated = { ...prev, ...skeletonProfiles };
+                        console.log(`📊 ${Object.keys(skeletonProfiles).length} profils squelettes ajoutés à library (total: ${Object.keys(updated).length})`);
                         // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp
                         saveToCache(updated).catch(e => console.warn('Failed to save to cache:', e));
                         return updated;
@@ -3197,7 +3197,7 @@ export default function App() {
             >
                 <div className="w-72 h-full">
                     <Sidebar
-                        profiles={Object.values(library)}
+                        profiles={Object.values(library).filter(p => p.id !== DEFAULT_PROFILE.id)}
                         currentId={activeId}
                         onSelect={setActiveId}
                         onAdd={handleAddTicker}
