@@ -2966,9 +2966,7 @@
                                          className="flex -space-x-1 cursor-pointer" 
                                          onClick={(e) => {
                                              e.stopPropagation();
-                                             console.log('🖱️ Clic sur modifier ressources, editing actuel:', editing);
                                              setEditing(editing === 'resources' ? null : 'resources');
-                                             console.log('🖱️ Nouveau editing:', editing === 'resources' ? null : 'resources');
                                          }}
                                      >
                                         {/* Toujours afficher le bouton + Resp pour permettre l'édition */}
@@ -2995,18 +2993,12 @@
                                              {/* Overlay invisible pour fermer en cliquant à l'extérieur */}
                                              <div 
                                                  className="fixed inset-0 z-[9997]"
-                                                 onClick={() => {
-                                                     console.log('🖱️ Clic sur overlay, fermeture dropdown');
-                                                     setEditing(null);
-                                                 }}
+                                                 onClick={() => setEditing(null)}
                                              />
                                              {/* Dropdown menu - positionné relativement au bouton */}
                                              <div 
                                                  className="absolute right-0 top-full mt-2 bg-white shadow-xl rounded-lg border border-gray-200 w-72 max-h-[400px] overflow-hidden z-[9999]"
-                                                 onClick={(e) => {
-                                                     console.log('🖱️ Clic dans dropdown, stopPropagation');
-                                                     e.stopPropagation();
-                                                 }}
+                                                 onClick={(e) => e.stopPropagation()}
                                              >
                                                  {/* Header */}
                                                  <div className="px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
