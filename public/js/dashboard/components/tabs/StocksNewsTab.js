@@ -5,6 +5,7 @@ const StocksNewsTab = (props) => {
         const dashboard = typeof window !== 'undefined' ? window.BetaCombinedDashboard || {} : {};
         const isDarkMode = props.isDarkMode ?? dashboard.isDarkMode ?? true;
         const tickers = (props.tickers && props.tickers.length > 0 ? props.tickers : dashboard.tickers) ?? [];
+        const teamTickers = (props.teamTickers && props.teamTickers.length > 0 ? props.teamTickers : dashboard.teamTickers) ?? [];
         const stockData = (props.stockData && Object.keys(props.stockData).length > 0 ? props.stockData : dashboard.stockData) ?? {};
         const newsData = (props.newsData && props.newsData.length > 0 ? props.newsData : dashboard.newsData) ?? [];
         const tickerLatestNews = props.tickerLatestNews ?? dashboard.tickerLatestNews ?? {};
@@ -29,6 +30,12 @@ const StocksNewsTab = (props) => {
                           (typeof window !== 'undefined' ? window.DASHBOARD_UTILS?.LucideIcon : undefined) || 
                           (({ name, className = '' }) => <span className={`icon-${name} ${className}`}></span>);
 
+        // Fix for undefined IconoirIcon ensuring it resolves from props, window, or fallback
+        const IconoirIcon = props.IconoirIcon || 
+                           (typeof window !== 'undefined' ? window.IconoirIcon : undefined) || 
+                           (typeof window !== 'undefined' ? window.DASHBOARD_UTILS?.IconoirIcon : undefined) || 
+                           (({ name, className = '' }) => <i className={`iconoir-${name.toLowerCase()} ${className}`}></i>);
+
         // Safe async wrappers to avoid runtime errors if globals are missing
         const safeLoadTickers = typeof loadTickersFromSupabase === 'function' ? loadTickersFromSupabase : async () => {};
         const safeFetchNews = typeof fetchNews === 'function' ? fetchNews : async () => {};
@@ -39,6 +46,7 @@ const StocksNewsTab = (props) => {
 
         const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
         const [expandedStock, setExpandedStock] = useState(null);
+        const [expandedArticle, setExpandedArticle] = useState(null); // Article expandu avec iframe
 
         // Refs pour les widgets TradingView
         const marketOverviewRef = useRef(null);
@@ -101,10 +109,17 @@ const StocksNewsTab = (props) => {
 
             // Heatmap Widget
             if (heatmapRef.current) {
+                console.log('🔄 [Heatmap SPX500] Chargement du widget TradingView...');
                 heatmapRef.current.innerHTML = '';
                 const script = document.createElement('script');
                 script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
                 script.async = true;
+                script.onload = () => {
+                    console.log('✅ [Heatmap SPX500] Widget TradingView chargé');
+                };
+                script.onerror = (error) => {
+                    console.error('❌ [Heatmap SPX500] Erreur chargement widget:', error);
+                };
                 script.innerHTML = JSON.stringify({
                     "exchanges": [],
                     "dataSource": "SPX500",
@@ -122,6 +137,8 @@ const StocksNewsTab = (props) => {
                     "height": "100%"
                 });
                 heatmapRef.current.appendChild(script);
+            } else {
+                console.warn('⚠️ [Heatmap SPX500] heatmapRef.current is null');
             }
 
             // Screener Widget
@@ -402,16 +419,20 @@ const StocksNewsTab = (props) => {
             {tickers.length > 0 && (
                 <div className={`mt-6 p-6 rounded-xl transition-colors duration-300 ${
                     isDarkMode
-                        ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
-                        : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
+                        ? 'bg-gradient-to-br from-gray-800/95 to-gray-900/95 border-2 border-gray-600 shadow-xl'
+                        : 'bg-gradient-to-br from-white to-gray-50 border-2 border-gray-300 shadow-xl'
                 }`}>
-                    <h3 className={`text-xl font-bold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        <LucideIcon name="Fire" className="w-6 h-6 text-orange-500" />
+                    <h3 className={`text-2xl font-bold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        <LucideIcon name="Fire" className="w-7 h-7 text-orange-500" />
                         Top Movers du Jour
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Top Gainers */}
-                        <div className={`p-3 sm:p-4 rounded-lg relative overflow-hidden ${isDarkMode ? 'bg-gradient-to-br from-green-500/10 via-green-500/5 to-transparent border border-green-500/30' : 'bg-gradient-to-br from-green-50 via-green-100/50 to-transparent border border-green-200'}`}>
+                        <div className={`p-4 sm:p-5 rounded-lg relative overflow-hidden shadow-lg ${
+                            isDarkMode 
+                                ? 'bg-gradient-to-br from-green-900/70 via-green-800/50 to-gray-800/70 border-2 border-green-400/80' 
+                                : 'bg-gradient-to-br from-green-200 via-green-100 to-white border-2 border-green-500'
+                        }`}>
                             {/* Bull Image Background - More Visible */}
                             <div className="absolute top-0 right-0 w-40 h-40 opacity-20 pointer-events-none transform rotate-12">
                                 <svg viewBox="0 0 200 200" className="w-full h-full">
@@ -440,13 +461,15 @@ const StocksNewsTab = (props) => {
                             }}></div>
                             
                             <div className="relative z-10">
-                                <div className="flex items-center justify-between mb-3">
-                                    <h4 className={`text-base sm:text-sm font-bold flex items-center gap-3 ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>
+                                <div className="flex items-center justify-between mb-4">
+                                    <h4 className={`text-lg sm:text-base font-bold flex items-center gap-3 ${
+                                        isDarkMode ? 'text-green-300' : 'text-green-800'
+                                    }`}>
                                         <div className="relative">
-                                            <LucideIcon name="TrendingUp" className="w-5 h-5" />
+                                            <LucideIcon name="TrendingUp" className="w-6 h-6" />
                                         </div>
                                         {renderMarketBadge('bull')}
-                                        <span>Top Gainers</span>
+                                        <span className="drop-shadow-sm">Top Gainers</span>
                                     </h4>
                                     {/* Bull Illustration */}
                                     <div className="flex-shrink-0 relative">
@@ -462,13 +485,13 @@ const StocksNewsTab = (props) => {
                                     </div>
                                 </div>
                             <div className="space-y-2.5 sm:space-y-2">
-                                {tickers
+                                {(teamTickers.length > 0 ? teamTickers : tickers)
                                     .map(ticker => ({
                                         ticker,
                                         change: stockData[ticker]?.dp || 0,
                                         price: stockData[ticker]?.c || 0
                                     }))
-                                    .filter(item => item.change > 0)
+                                    .filter(item => item.change > 0 && stockData[item.ticker]) // Filtrer seulement ceux avec données
                                     .sort((a, b) => b.change - a.change)
                                     .slice(0, 5)
                                     .map((item, idx) => (
@@ -484,36 +507,56 @@ const StocksNewsTab = (props) => {
                                         >
                                             <div className="flex-1 min-w-0 pr-2">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                                                        isDarkMode ? 'bg-green-500/30 text-green-300' : 'bg-green-100 text-green-700'
+                                                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 shadow-md ${
+                                                        isDarkMode ? 'bg-green-500/50 text-green-100 border border-green-400/50' : 'bg-green-200 text-green-800 border border-green-400'
                                                     }`}>
                                                         {idx + 1}
                                                     </div>
                                                     <img
                                                         src={getCompanyLogo(item.ticker)}
                                                         alt={item.ticker}
-                                                        className="w-6 h-6 rounded flex-shrink-0"
-                                                        onError={(e) => e.target.style.display = 'none'}
+                                                        className="w-6 h-6 rounded flex-shrink-0 object-contain bg-gray-800/20"
+                                                        onError={(e) => {
+                                                            const ticker = item.ticker.split('.')[0].toUpperCase();
+                                                            const currentSrc = e.target.src;
+                                                            
+                                                            // Essayer les fallbacks dans l'ordre
+                                                            if (currentSrc.includes('image-stock')) {
+                                                                // Essayer format alternatif FMP
+                                                                e.target.src = `https://images.financialmodelingprep.com/symbol/${ticker}.png`;
+                                                            } else if (currentSrc.includes('financialmodelingprep.com')) {
+                                                                // Essayer Companies Logo
+                                                                e.target.src = `https://companieslogo.com/img/orig/${ticker}.png`;
+                                                            } else if (currentSrc.includes('companieslogo.com')) {
+                                                                // Essayer SeekingAlpha
+                                                                e.target.src = `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${ticker}.svg`;
+                                                            } else {
+                                                                // Tous les fallbacks ont échoué, masquer l'image
+                                                                e.target.style.display = 'none';
+                                                            }
+                                                        }}
                                                     />
-                                                    <span className={`font-mono font-bold text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'} flex-shrink-0`}>
+                                                    <span className={`font-mono font-bold text-base ${isDarkMode ? 'text-white' : 'text-gray-900'} flex-shrink-0 drop-shadow-sm`}>
                                                         {item.ticker}
                                                     </span>
-                                                    <div className="text-green-500 font-bold text-sm ml-auto flex-shrink-0">
+                                                    <div className={`font-bold text-base ml-auto flex-shrink-0 ${
+                                                        isDarkMode ? 'text-green-400' : 'text-green-600'
+                                                    } drop-shadow-sm`}>
                                                         +{item.change.toFixed(2)}% ↑
                                                     </div>
-                                                    <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} flex-shrink-0`}>
+                                                    <div className={`text-base font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} flex-shrink-0 drop-shadow-sm`}>
                                                         ${item.price.toFixed(2)}
                                                     </div>
                                                 </div>
                                                 
                                                 {/* Espace dédié pour les news avec placeholder */}
-                                                <div className={`mt-1 ml-8 min-h-[20px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                <div className={`mt-2 ml-8 min-h-[20px] ${isDarkMode ? 'bg-gray-900/40 rounded px-2 py-1' : 'bg-gray-50 rounded px-2 py-1'}`}>
                                                     {(() => {
                                                         const reason = extractMoveReason(item.ticker, item.change);
                                                         if (reason && reason !== '') {
                                                             return (
-                                                                <div className={`text-xs flex items-start gap-2 leading-relaxed ${
-                                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                <div className={`text-sm font-medium flex items-start gap-2 leading-relaxed ${
+                                                                    isDarkMode ? 'text-gray-100' : 'text-gray-900'
                                                                 }`}>
                                                                     {tickerMoveReasons[item.ticker]?.source === 'Finviz AI' ? (
                                                                         <span className="inline-flex items-center gap-1.5 flex-wrap">
@@ -532,7 +575,7 @@ const StocksNewsTab = (props) => {
                                                             );
                                                         }
                                                         return (
-                                                            <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                                                            <div className={`text-sm italic font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                                 Chargement des explications...
                                                             </div>
                                                         );
@@ -546,7 +589,11 @@ const StocksNewsTab = (props) => {
                         </div>
 
                         {/* Top Losers */}
-                        <div className={`p-4 rounded-lg relative overflow-hidden ${isDarkMode ? 'bg-gradient-to-br from-red-500/10 via-red-500/5 to-transparent border border-red-500/30' : 'bg-gradient-to-br from-red-50 via-red-100/50 to-transparent border border-red-200'}`}>
+                        <div className={`p-4 sm:p-5 rounded-lg relative overflow-hidden shadow-lg ${
+                            isDarkMode 
+                                ? 'bg-gradient-to-br from-red-900/70 via-red-800/50 to-gray-800/70 border-2 border-red-400/80' 
+                                : 'bg-gradient-to-br from-red-200 via-red-100 to-white border-2 border-red-500'
+                        }`}>
                             {/* Bear Image Background - More Visible */}
                             <div className="absolute top-0 right-0 w-40 h-40 opacity-20 pointer-events-none transform -rotate-12">
                                 <svg viewBox="0 0 200 200" className="w-full h-full">
@@ -580,13 +627,15 @@ const StocksNewsTab = (props) => {
                             }}></div>
                             
                             <div className="relative z-10">
-                                <div className="flex items-center justify-between mb-3">
-                                    <h4 className={`text-sm font-bold flex items-center gap-3 ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>
+                                <div className="flex items-center justify-between mb-4">
+                                    <h4 className={`text-lg sm:text-base font-bold flex items-center gap-3 ${
+                                        isDarkMode ? 'text-red-300' : 'text-red-800'
+                                    }`}>
                                         <div className="relative">
-                                            <LucideIcon name="TrendingDown" className="w-5 h-5" />
+                                            <LucideIcon name="TrendingDown" className="w-6 h-6" />
                                         </div>
                                         {renderMarketBadge('bear')}
-                                        <span>Top Losers</span>
+                                        <span className="drop-shadow-sm">Top Losers</span>
                                     </h4>
                                     {/* Bear Illustration */}
                                     <div className="flex-shrink-0 relative">
@@ -602,13 +651,13 @@ const StocksNewsTab = (props) => {
                                     </div>
                                 </div>
                             <div className="space-y-2">
-                                {tickers
+                                {(teamTickers.length > 0 ? teamTickers : tickers)
                                     .map(ticker => ({
                                         ticker,
                                         change: stockData[ticker]?.dp || 0,
                                         price: stockData[ticker]?.c || 0
                                     }))
-                                    .filter(item => item.change < 0)
+                                    .filter(item => item.change < 0 && stockData[item.ticker]) // Filtrer seulement ceux avec données
                                     .sort((a, b) => a.change - b.change)
                                     .slice(0, 5)
                                     .map((item, idx) => (
@@ -624,36 +673,56 @@ const StocksNewsTab = (props) => {
                                         >
                                             <div className="flex-1 min-w-0 pr-2">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                                                        isDarkMode ? 'bg-red-500/30 text-red-300' : 'bg-red-100 text-red-700'
+                                                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 shadow-md ${
+                                                        isDarkMode ? 'bg-red-500/50 text-red-100 border border-red-400/50' : 'bg-red-200 text-red-800 border border-red-400'
                                                     }`}>
                                                         {idx + 1}
                                                     </div>
                                                     <img
                                                         src={getCompanyLogo(item.ticker)}
                                                         alt={item.ticker}
-                                                        className="w-6 h-6 rounded flex-shrink-0"
-                                                        onError={(e) => e.target.style.display = 'none'}
+                                                        className="w-6 h-6 rounded flex-shrink-0 object-contain bg-gray-800/20"
+                                                        onError={(e) => {
+                                                            const ticker = item.ticker.split('.')[0].toUpperCase();
+                                                            const currentSrc = e.target.src;
+                                                            
+                                                            // Essayer les fallbacks dans l'ordre
+                                                            if (currentSrc.includes('image-stock')) {
+                                                                // Essayer format alternatif FMP
+                                                                e.target.src = `https://images.financialmodelingprep.com/symbol/${ticker}.png`;
+                                                            } else if (currentSrc.includes('financialmodelingprep.com')) {
+                                                                // Essayer Companies Logo
+                                                                e.target.src = `https://companieslogo.com/img/orig/${ticker}.png`;
+                                                            } else if (currentSrc.includes('companieslogo.com')) {
+                                                                // Essayer SeekingAlpha
+                                                                e.target.src = `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${ticker}.svg`;
+                                                            } else {
+                                                                // Tous les fallbacks ont échoué, masquer l'image
+                                                                e.target.style.display = 'none';
+                                                            }
+                                                        }}
                                                     />
-                                                    <span className={`font-mono font-bold text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'} flex-shrink-0`}>
+                                                    <span className={`font-mono font-bold text-base ${isDarkMode ? 'text-white' : 'text-gray-900'} flex-shrink-0 drop-shadow-sm`}>
                                                         {item.ticker}
                                                     </span>
-                                                    <div className="text-red-500 font-bold text-sm ml-auto flex-shrink-0">
+                                                    <div className={`font-bold text-base ml-auto flex-shrink-0 ${
+                                                        isDarkMode ? 'text-red-400' : 'text-red-600'
+                                                    } drop-shadow-sm`}>
                                                         {item.change.toFixed(2)}% ↓
                                                     </div>
-                                                    <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} flex-shrink-0`}>
+                                                    <div className={`text-base font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} flex-shrink-0 drop-shadow-sm`}>
                                                         ${item.price.toFixed(2)}
                                                     </div>
                                                 </div>
                                                 
                                                 {/* Espace dédié pour les news avec placeholder */}
-                                                <div className={`mt-1 ml-8 min-h-[20px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                <div className={`mt-2 ml-8 min-h-[20px] ${isDarkMode ? 'bg-gray-900/40 rounded px-2 py-1' : 'bg-gray-50 rounded px-2 py-1'}`}>
                                                     {(() => {
                                                         const reason = extractMoveReason(item.ticker, item.change);
                                                         if (reason && reason !== '') {
                                                             return (
-                                                                <div className={`text-xs flex items-start gap-2 leading-relaxed ${
-                                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                <div className={`text-sm font-medium flex items-start gap-2 leading-relaxed ${
+                                                                    isDarkMode ? 'text-gray-100' : 'text-gray-900'
                                                                 }`}>
                                                                     {tickerMoveReasons[item.ticker]?.source === 'Finviz AI' ? (
                                                                         <span className="inline-flex items-center gap-1.5 flex-wrap">
@@ -1635,19 +1704,33 @@ const StocksNewsTab = (props) => {
 
                                                 {/* Actions */}
                                                 <div className="flex gap-2 mt-5">
-                                                    <a
-                                                        href={article.url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        onClick={(e) => e.stopPropagation()}
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setExpandedArticle(article);
+                                                        }}
                                                         className={`flex-1 px-4 py-2.5 rounded-xl text-center text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-xl ${
                                                             isDarkMode
                                                                 ? 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white'
                                                                 : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white'
                                                         }`}
                                                     >
-                                                        <IconoirIcon name="ExternalLink" className="w-4 h-4 inline mr-1.5" />
-                                                        Lire
+                                                        <IconoirIcon name="Expand" className="w-4 h-4 inline mr-1.5" />
+                                                        Expand
+                                                    </button>
+                                                    <a
+                                                        href={article.url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        className={`px-4 py-2.5 rounded-xl text-center text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-xl ${
+                                                            isDarkMode
+                                                                ? 'bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-500 hover:to-gray-400 text-white'
+                                                                : 'bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white'
+                                                        }`}
+                                                        title="Ouvrir dans un nouvel onglet"
+                                                    >
+                                                        <IconoirIcon name="ExternalLink" className="w-4 h-4 inline" />
                                                     </a>
                                                     <button
                                                         onClick={(event) => {
@@ -1669,6 +1752,67 @@ const StocksNewsTab = (props) => {
                                     );
                                 })}
                             </div>
+
+                            {/* Modal pour afficher l'article dans une iframe */}
+                            {expandedArticle && (
+                                <div 
+                                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 backdrop-blur-sm"
+                                    onClick={() => setExpandedArticle(null)}
+                                >
+                                    <div 
+                                        className={`w-full h-full max-w-7xl max-h-[90vh] m-4 rounded-xl shadow-2xl overflow-hidden ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        {/* Header */}
+                                        <div className={`flex items-center justify-between p-4 border-b ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
+                                            <div className="flex-1 min-w-0 pr-4">
+                                                <h3 className={`text-lg font-semibold truncate ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                    {expandedArticle.title}
+                                                </h3>
+                                                <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                    {expandedArticle.source?.name || 'Source inconnue'} • {new Date(expandedArticle.publishedAt).toLocaleDateString('fr-FR', {
+                                                        month: 'long',
+                                                        day: 'numeric',
+                                                        year: 'numeric',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit'
+                                                    })}
+                                                </p>
+                                            </div>
+                                            <button
+                                                onClick={() => setExpandedArticle(null)}
+                                                className={`p-2 rounded-lg transition-colors ${isDarkMode 
+                                                    ? 'hover:bg-gray-700 text-gray-400 hover:text-white' 
+                                                    : 'hover:bg-gray-200 text-gray-600 hover:text-gray-900'
+                                                }`}
+                                                aria-label="Fermer"
+                                            >
+                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        
+                                        {/* Iframe Content - Chargé seulement quand la modal est ouverte */}
+                                        <div className="relative w-full h-[calc(90vh-80px)]">
+                                            {expandedArticle.url ? (
+                                                <iframe
+                                                    src={expandedArticle.url}
+                                                    className="w-full h-full border-0"
+                                                    allow="fullscreen"
+                                                    allowTransparency="true"
+                                                    title={expandedArticle.title}
+                                                    loading="lazy"
+                                                />
+                                            ) : (
+                                                <div className={`flex items-center justify-center h-full ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                    <p>URL de l'article non disponible</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
                             {newsData.length > 12 && (
                                 <div className="text-center mt-8">

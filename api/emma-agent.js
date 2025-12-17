@@ -312,6 +312,7 @@ class SmartAgent {
                 conversation_length: this.conversationHistory.length,
                 is_reliable: toolResults.every(r => r.is_reliable) && (dataValidation?.passed !== false),
                 model: modelUsed || 'unknown',  // Modèle utilisé pour générer la réponse
+                model_reason: modelReason || 'Unknown reason',  // Raison de sélection du modèle
                 model_reason: modelReason || 'Unknown reason'  // Raison du choix du modèle
             };
 
@@ -1818,6 +1819,7 @@ class SmartAgent {
                 );
             } else {
                 // PERPLEXITY: Données factuelles avec sources (default)
+                console.log(`🔮 [Perplexity] Début appel Perplexity pour intent: ${intentData?.intent || 'unknown'}`);
                 const perplexityResult = await this._call_perplexity(
                     prompt, 
                     outputMode, 
@@ -1828,6 +1830,7 @@ class SmartAgent {
                     context, 
                     modelSelection.modelConfig
                 );
+                console.log(`✅ [Perplexity] Appel terminé, réponse reçue (${typeof perplexityResult === 'object' ? perplexityResult.content?.length || 0 : perplexityResult?.length || 0} caractères)`);
 
                 // Extraire contenu et citations
                 if (typeof perplexityResult === 'object' && perplexityResult.content) {

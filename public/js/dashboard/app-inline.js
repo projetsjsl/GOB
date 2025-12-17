@@ -108,7 +108,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 };
             }
 
-            const response = await fetch(apiUrl);
+            const response = await fetchWithTimeoutAndRetry(apiUrl, {}, 8000, 1);
             if (!response.ok) {
                 throw new Error(`API ${dataType} échouée: ${response.status}`);
             }
@@ -869,6 +869,62 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
         // Configuration API
         const API_BASE_URL = (window.location && window.location.origin) ? window.location.origin : '';
+        
+        // Helper function pour fetch avec timeout et retry
+        const fetchWithTimeoutAndRetry = async (url, options = {}, timeoutMs = 10000, maxRetries = 2) => {
+            for (let attempt = 0; attempt <= maxRetries; attempt++) {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+                
+                try {
+                    const response = await fetch(url, {
+                        ...options,
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+                    
+                    if (!response.ok && response.status >= 500 && attempt < maxRetries) {
+                        // Retry on server errors
+                        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+                        continue;
+                    }
+                    
+                    return response;
+                } catch (error) {
+                    clearTimeout(timeoutId);
+                    
+                    if (error.name === 'AbortError') {
+                        if (attempt < maxRetries) {
+                            await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+                            continue;
+                        }
+                        throw new Error(`Timeout après ${timeoutMs}ms pour ${url}`);
+                    }
+                    
+                    if (attempt < maxRetries) {
+                        // Retry on network errors
+                        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+                        continue;
+                    }
+                    
+                    throw error;
+                }
+            }
+        };
+        
+        // Helper pour Promise.allSettled avec timeout individuel
+        const fetchAllSettledWithTimeout = async (promises, timeoutMs = 10000) => {
+            return Promise.allSettled(
+                promises.map(promise => 
+                    Promise.race([
+                        promise,
+                        new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('Timeout')), timeoutMs)
+                        )
+                    ]).catch(err => ({ status: 'rejected', reason: err }))
+                )
+            );
+        };
         const globalUtils = (typeof window !== 'undefined' && window.DASHBOARD_UTILS) ? window.DASHBOARD_UTILS : {};
 
         // Configuration GitHub
@@ -1045,63 +1101,43 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
         // Fonction pour extraire le logo depuis les données de scraping
         const getCompanyLogo = (ticker) => {
+            if (!ticker) return '';
+            
             try {
-                // Chercher dans les  données de scraping
-                const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
+                // Nettoyer le ticker (enlever .TO, .V, etc.)
+                const cleanTicker = ticker.split('.')[0].toUpperCase();
+                const tickerLower = cleanTicker.toLowerCase();
+                
+                // 1. Chercher dans les données de scraping SeekingAlpha
+                const seekingAlphaItem = seekingAlphaData?.stocks?.find(s => s.ticker === ticker || s.ticker === cleanTicker);
                 if (seekingAlphaItem?.raw_text) {
-                    // Extraire le logo depuis le JSON dans raw_text
                     const logoMatch = seekingAlphaItem.raw_text.match(/"logo":"([^"]+)"/);
-                    if (logoMatch && logoMatch[1]) {
+                    if (logoMatch && logoMatch[1] && !logoMatch[1].includes('placeholder')) {
                         return logoMatch[1];
                     }
                 }
 
-                // Fallback vers des logos par défaut
-                const defaultLogos = {
-                    // Tickers US
-                    'GOOGL': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/GOOGL.svg',
-                    'T': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/T.svg',
-                    'CSCO': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/CSCO.svg',
-                    'CVS': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/CVS.svg',
-                    'DEO': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/DEO.svg',
-                    'MDT': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/MDT.svg',
-                    'JNJ': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/JNJ.svg',
-                    'JPM': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/JPM.svg',
-                    'LVMHF': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/LVMHF.svg',
-                    'MU': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/MU.svg',
-                    'NSRGY': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/NSRGY.svg',
-                    'NKE': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/NKE.svg',
-                    'PFE': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/PFE.svg',
-                    'UNH': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/UNH.svg',
-                    'UL': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/UL.svg',
-                    'VZ': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/VZ.svg',
-                    'WFC': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/WFC.svg',
-
-                    // Tickers TSX (Canada)
-                    'BNS': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/BNS.svg',
-                    'TD': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/TD.svg',
-                    'BCE': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/BCE.svg',
-                    'CNR': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/CNR.svg',
-                    'MG': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/MG.svg',
-                    'MFC': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/MFC.svg',
-                    'NTR': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/NTR.svg',
-                    'TRP': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/TRP.svg',
-
-                    // Autres tickers populaires
-                    'AAPL': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/AAPL.svg',
-                    'MSFT': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/MSFT.svg',
-                    'AMZN': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/AMZN.svg',
-                    'TSLA': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/TSLA.svg',
-                    'NVDA': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/NVDA.svg',
-                    'META': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/META.svg'
-                };
-
-                // Strip suffix for Seeking Alpha logos (e.g. MFC.TO -> MFC)
-                const cleanTicker = ticker.split('.')[0];
-                return defaultLogos[ticker] || `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${cleanTicker}.svg`;
+                // 2. Financial Modeling Prep (FMP) - Source principale fiable
+                // Format 1: image-stock (standard)
+                const fmpUrl1 = `https://financialmodelingprep.com/image-stock/${cleanTicker}.png`;
+                
+                // Format 2: images/symbol (alternatif)
+                const fmpUrl2 = `https://images.financialmodelingprep.com/symbol/${cleanTicker}.png`;
+                
+                // 3. Companies Logo API (gratuit, bon fallback)
+                const companiesLogoUrl = `https://companieslogo.com/img/orig/${cleanTicker}.png`;
+                
+                // 4. SeekingAlpha (garder comme fallback)
+                const seekingAlphaUrl = `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${cleanTicker}.svg`;
+                
+                // Retourner FMP en premier (le plus fiable)
+                return fmpUrl1;
+                
             } catch (error) {
                 console.error(`Erreur extraction logo pour ${ticker}:`, error?.message || String(error));
-                return `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${ticker}.svg`;
+                // Fallback ultime vers FMP
+                const cleanTicker = (ticker || '').split('.')[0].toUpperCase();
+                return `https://financialmodelingprep.com/image-stock/${cleanTicker}.png`;
             }
         };
 
@@ -1270,8 +1306,10 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                     return null;
                 });
 
-                // Attendre tous les appels en parallèle
-                const tickerResults = (await Promise.all(tickerPromises)).filter(Boolean);
+                // Attendre tous les appels en parallèle avec timeout
+                const tickerResults = (await fetchAllSettledWithTimeout(tickerPromises, 8000))
+                    .map((result, index) => result.status === 'fulfilled' ? result.value : null)
+                    .filter(Boolean);
                 setTickerData(tickerResults);
                 addLog(`✅ Ticker chargé: ${tickerResults.length} instruments`, 'success');
             } catch (error) {
@@ -1284,12 +1322,17 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         const fetchStockData = async (ticker) => {
             try {
                 // Essayer d'abord la nouvelle API unifiée avec Yahoo Finance (gratuit)
-                const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=${ticker}&source=auto`);
+                const response = await fetchWithTimeoutAndRetry(
+                    `${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=${ticker}&source=auto`,
+                    {},
+                    8000, // 8 secondes timeout
+                    1 // 1 retry
+                );
                 if (!response.ok) throw new Error(`API error: ${response.status}`);
                 return await response.json();
             } catch (error) {
-                console.error('Erreur fetch stock data (marketdata):', error?.message || String(error));
-                // Rester sur marketdata; l’API gère déjà ses fallbacks internes
+                console.error(`Erreur fetch stock data pour ${ticker}:`, error?.message || String(error));
+                // Rester sur marketdata; l'API gère déjà ses fallbacks internes
                 return null;
             }
         };
@@ -1300,7 +1343,12 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
             const newsPromises = tickers.map(async (ticker) => {
                 try {
-                    const response = await fetch(`${API_BASE_URL}/api/finviz-news?ticker=${ticker}`);
+                    const response = await fetchWithTimeoutAndRetry(
+                        `${API_BASE_URL}/api/finviz-news?ticker=${ticker}`,
+                        {},
+                        5000, // 5 secondes timeout
+                        1 // 1 retry
+                    );
                     const data = await response.json();
 
                     if (data.success && data.latestNews) {
@@ -1308,15 +1356,21 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                     }
                     return { ticker, news: null };
                 } catch (error) {
-                    console.error(`Error fetching Finviz news for ${ticker}:`, error);
+                    console.error(`Error fetching Finviz news for ${ticker}:`, error?.message || String(error));
                     return { ticker, news: null };
                 }
             });
 
-            const results = await Promise.all(newsPromises);
+            const results = await fetchAllSettledWithTimeout(newsPromises, 5000);
+            const resolvedResults = results.map((result, index) => {
+                if (result.status === 'fulfilled') {
+                    return result.value;
+                }
+                return { ticker: tickers[index], news: null };
+            });
 
             const newsMap = {};
-            results.forEach(({ ticker, news }) => {
+            resolvedResults.forEach(({ ticker, news }) => {
                 newsMap[ticker] = news;
             });
 
@@ -1418,7 +1472,12 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
                     // PRIORITÉ 2: API unifiée /api/news qui agrège FMP, Finnhub, Finviz, RSS
                     // Cette API fait déjà tout le travail d'agrégation et de déduplication
-                    const unifiedNewsResponse = await fetch(`${API_BASE_URL}/api/news?ticker=${ticker}&limit=5`);
+                    const unifiedNewsResponse = await fetchWithTimeoutAndRetry(
+                        `${API_BASE_URL}/api/news?ticker=${ticker}&limit=5`,
+                        {},
+                        6000, // 6 secondes timeout
+                        1 // 1 retry
+                    );
                     if (unifiedNewsResponse.ok) {
                         const unifiedNewsData = await unifiedNewsResponse.json();
                         if (unifiedNewsData.success && unifiedNewsData.articles && unifiedNewsData.articles.length > 0) {
@@ -1506,18 +1565,23 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             // Sauvegarder dans le cache Supabase (write-through)
             if (Object.keys(newsMap).length > 0 || Object.keys(moveReasonsMap).length > 0) {
                 try {
-                    await fetch(`${API_BASE_URL}/api/supabase-daily-cache`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            type: 'ticker_news',
-                            date: new Date().toISOString().split('T')[0],
-                            data: {
-                                newsMap,
-                                moveReasonsMap
-                            }
-                        })
-                    });
+                    await fetchWithTimeoutAndRetry(
+                        `${API_BASE_URL}/api/supabase-daily-cache`,
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                type: 'ticker_news',
+                                date: new Date().toISOString().split('T')[0],
+                                data: {
+                                    newsMap,
+                                    moveReasonsMap
+                                }
+                            })
+                        },
+                        8000, // 8 secondes timeout
+                        1 // 1 retry
+                    );
                     console.log('✅ Nouvelles par ticker sauvegardées dans cache Supabase');
                 } catch (error) {
                     console.warn('⚠️ Erreur sauvegarde cache (non bloquant):', error.message);
@@ -1727,7 +1791,12 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 try {
                     const [data, fundamentalsResp] = await Promise.allSettled([
                         fetchStockData(ticker),
-                        fetch(`${API_BASE_URL}/api/marketdata?endpoint=fundamentals&symbol=${ticker}&source=auto`)
+                        fetchWithTimeoutAndRetry(
+                            `${API_BASE_URL}/api/marketdata?endpoint=fundamentals&symbol=${ticker}&source=auto`,
+                            {},
+                            8000,
+                            1
+                        )
                     ]);
 
                     const stockData = data.status === 'fulfilled' ? data.value : null;
@@ -1787,8 +1856,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
             // 1. Vérifier le cache Supabase d'abord
             try {
-                const cacheResponse = await fetch(
-                    `${API_BASE_URL}/api/supabase-daily-cache?type=general_news&date=${new Date().toISOString().split('T')[0]}&maxAgeHours=${cacheSettings.maxAgeHours || 4}`
+                const cacheResponse = await fetchWithTimeoutAndRetry(
+                    `${API_BASE_URL}/api/supabase-daily-cache?type=general_news&date=${new Date().toISOString().split('T')[0]}&maxAgeHours=${cacheSettings.maxAgeHours || 4}`,
+                    {},
+                    5000,
+                    1
                 );
 
                 if (cacheResponse.ok) {
@@ -1814,8 +1886,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 // Utiliser l'endpoint unifié qui agrège toutes les sources avec déduplication et scoring
                 addLog(`🔍 Récupération depuis endpoint unifié (contexte: ${newsContext})...`, 'info');
 
-                const response = await fetch(
-                    `${API_BASE_URL}/api/news?q=${encodeURIComponent(tickersQuery)}&limit=100&context=${newsContext}`
+                const response = await fetchWithTimeoutAndRetry(
+                    `${API_BASE_URL}/api/news?q=${encodeURIComponent(tickersQuery)}&limit=100&context=${newsContext}`,
+                    {},
+                    10000, // 10 secondes pour news (peut être long)
+                    1
                 );
 
                 if (!response.ok) {
@@ -1852,15 +1927,20 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
                     // Sauvegarder dans le cache Supabase (write-through)
                     try {
-                        await fetch(`${API_BASE_URL}/api/supabase-daily-cache`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                type: 'general_news',
-                                date: new Date().toISOString().split('T')[0],
-                                data: sortedNews
-                            })
-                        });
+                        await fetchWithTimeoutAndRetry(
+                            `${API_BASE_URL}/api/supabase-daily-cache`,
+                            {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    type: 'general_news',
+                                    date: new Date().toISOString().split('T')[0],
+                                    data: sortedNews
+                                })
+                            },
+                            8000, // 8 secondes timeout
+                            1 // 1 retry
+                        );
                         console.log('✅ Nouvelles sauvegardées dans cache Supabase');
                     } catch (error) {
                         console.warn('⚠️ Erreur sauvegarde cache (non bloquant):', error.message);
@@ -1888,8 +1968,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
             try {
                 // 1. Vérifier le cache Supabase d'abord
-                const cacheResponse = await fetch(
-                    `${API_BASE_URL}/api/supabase-daily-cache?type=top_movers_news&date=${new Date().toISOString().split('T')[0]}&maxAgeHours=${cacheSettings.maxAgeHours || 4}`
+                const cacheResponse = await fetchWithTimeoutAndRetry(
+                    `${API_BASE_URL}/api/supabase-daily-cache?type=top_movers_news&date=${new Date().toISOString().split('T')[0]}&maxAgeHours=${cacheSettings.maxAgeHours || 4}`,
+                    {},
+                    5000,
+                    1
                 );
 
                 if (cacheResponse.ok) {
@@ -1944,10 +2027,12 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 // 4. Sauvegarder dans le cache Supabase (write-through)
                 if (Object.keys(newsMap).length > 0) {
                     try {
-                        await fetch(`${API_BASE_URL}/api/supabase-daily-cache`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
+                        await fetchWithTimeoutAndRetry(
+                            `${API_BASE_URL}/api/supabase-daily-cache`,
+                            {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
                                 type: 'top_movers_news',
                                 date: new Date().toISOString().split('T')[0],
                                 data: newsMap
@@ -2020,10 +2105,12 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 if (result.success) {
                     // Sauvegarder dans le cache Supabase (write-through)
                     try {
-                        await fetch(`${API_BASE_URL}/api/supabase-daily-cache`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
+                        await fetchWithTimeoutAndRetry(
+                            `${API_BASE_URL}/api/supabase-daily-cache`,
+                            {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
                                 type: 'gemini_analysis',
                                 date: new Date().toISOString().split('T')[0],
                                 data: {
@@ -2957,7 +3044,12 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             // Test FMP API (Financial Modeling Prep)
             try {
                 const startTime = Date.now();
-                const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=fundamentals&symbol=AAPL&source=auto`);
+                const response = await fetchWithTimeoutAndRetry(
+                    `${API_BASE_URL}/api/marketdata?endpoint=fundamentals&symbol=AAPL&source=auto`,
+                    {},
+                    8000,
+                    1
+                );
                 const responseTime = Date.now() - startTime;
 
                 if (response.ok) {
@@ -3188,7 +3280,12 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 }
 
                 console.log('📊 Chargement des tickers depuis Supabase...');
-                const response = await fetch('/api/config/tickers');
+                const response = await fetchWithTimeoutAndRetry(
+                    '/api/config/tickers',
+                    {},
+                    8000,
+                    1
+                );
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -3303,6 +3400,29 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             window.addEventListener('tickersUpdated', handleRealtimeUpdate);
             return () => window.removeEventListener('tickersUpdated', handleRealtimeUpdate);
         }, []); // Using empty deps - loadTickersFromSupabase from initial render is safe here
+
+        // Exposer les états dans l'objet dashboard global pour les composants enfants
+        useEffect(() => {
+            if (typeof window !== 'undefined') {
+                window.BetaCombinedDashboard = window.BetaCombinedDashboard || {};
+                window.BetaCombinedDashboard.teamTickers = teamTickers;
+                window.BetaCombinedDashboard.tickers = tickers;
+                window.BetaCombinedDashboard.stockData = stockData;
+                window.BetaCombinedDashboard.newsData = newsData;
+                window.BetaCombinedDashboard.isDarkMode = isDarkMode;
+                window.BetaCombinedDashboard.loadTickersFromSupabase = loadTickersFromSupabase;
+                window.BetaCombinedDashboard.fetchNews = fetchNews;
+                window.BetaCombinedDashboard.refreshAllStocks = refreshAllStocks;
+                window.BetaCombinedDashboard.fetchLatestNewsForTickers = fetchLatestNewsForTickers;
+                window.BetaCombinedDashboard.setActiveTab = setActiveTab;
+                window.BetaCombinedDashboard.setSelectedStock = setSelectedStock;
+                window.BetaCombinedDashboard.getCompanyLogo = getCompanyLogo;
+                window.BetaCombinedDashboard.loading = loading;
+                window.BetaCombinedDashboard.lastUpdate = lastUpdate;
+                window.BetaCombinedDashboard.tickerLatestNews = tickerLatestNews;
+                window.BetaCombinedDashboard.tickerMoveReasons = tickerMoveReasons;
+            }
+        }, [teamTickers, tickers, stockData, newsData, isDarkMode, loading, lastUpdate, tickerLatestNews, tickerMoveReasons]);
 
         // Charger les news par ticker quand les tickers changent ET que les news générales sont disponibles
         useEffect(() => {
@@ -10025,7 +10145,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(marketDataRequest),
-                        signal: AbortSignal.timeout(120000) // 120 secondes timeout pour Perplexity
+                        signal: AbortSignal.timeout(60000) // 60 secondes timeout pour Perplexity (réduit de 120s)
                     });
 
                     addLogEntry('MARKET_DATA', 'Réponse reçue', {
@@ -10111,7 +10231,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(newsRequest),
-                        signal: AbortSignal.timeout(120000) // 120 secondes timeout pour Perplexity
+                        signal: AbortSignal.timeout(60000) // 60 secondes timeout pour Perplexity (réduit de 120s)
                     });
 
                     addLogEntry('NEWS', 'Réponse actualités reçue', {
@@ -10178,7 +10298,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(analysisRequest),
-                        signal: AbortSignal.timeout(120000) // 120 secondes timeout pour l'analyse Perplexity
+                        signal: AbortSignal.timeout(60000) // 60 secondes timeout pour l'analyse Perplexity (réduit de 120s)
                     });
 
                     addLogEntry('ANALYSIS', 'Réponse analyse reçue', {
@@ -12938,8 +13058,24 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         tools_used: data.tools_used,
                         is_reliable: data.is_reliable,
                         responseLength: data.response?.length || 0,
-                        channel: channelSim
+                        channel: channelSim,
+                        model: data.model || 'unknown',
+                        model_reason: data.model_reason || 'Unknown reason'
                     });
+                    
+                    // 🔍 Log détaillé du modèle utilisé
+                    if (data.model) {
+                        console.log(`🤖 Modèle utilisé: ${data.model} (${data.model_reason || 'Unknown reason'})`);
+                        if (data.model === 'perplexity') {
+                            console.log('✅ Perplexity utilisé pour générer la réponse');
+                        } else if (data.model === 'gemini') {
+                            console.log('⚠️ Gemini utilisé au lieu de Perplexity');
+                        } else if (data.model === 'claude') {
+                            console.log('💎 Claude utilisé au lieu de Perplexity');
+                        }
+                    } else {
+                        console.warn('⚠️ Modèle non spécifié dans la réponse');
+                    }
 
                     if (!data.success) {
                         throw new Error(data.error || 'Erreur inconnue de Emma Agent');
@@ -20951,79 +21087,111 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             // Charger le script TradingView Stock Heatmap
             useEffect(() => {
-                const container = tradingViewHeatmapRef.current;
-                if (!container) return;
+                // Attendre un peu pour s'assurer que le DOM est prêt
+                const timer = setTimeout(() => {
+                    const container = tradingViewHeatmapRef.current;
+                    if (!container) {
+                        console.log('⚠️ [Heatmap USA] Container ref not ready après délai');
+                        return;
+                    }
 
-                container.innerHTML = '';
+                    console.log('🔄 [Heatmap USA] Chargement du widget TradingView (AllUSA)...');
+                    container.innerHTML = '';
 
-                const script = document.createElement('script');
-                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
-                script.type = 'text/javascript';
-                script.async = true;
-                script.innerHTML = JSON.stringify({
-                    dataSource: 'AllUSA',
-                    blockSize: 'market_cap_basic',
-                    blockColor: 'change',
-                    grouping: 'sector',
-                    locale: 'fr',
-                    symbolUrl: '',
-                    colorTheme: 'dark',
-                    exchanges: [],
-                    hasTopBar: true,
-                    isDataSetEnabled: true,
-                    isZoomEnabled: true,
-                    hasSymbolTooltip: true,
-                    isMonoSize: false,
-                    width: '100%',
-                    height: '100%'
-                });
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+                    script.type = 'text/javascript';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        dataSource: 'AllUSA',
+                        blockSize: 'market_cap_basic',
+                        blockColor: 'change',
+                        grouping: 'sector',
+                        locale: 'fr',
+                        symbolUrl: '',
+                        colorTheme: isDarkMode ? 'dark' : 'light',
+                        exchanges: [],
+                        hasTopBar: true,
+                        isDataSetEnabled: true,
+                        isZoomEnabled: true,
+                        hasSymbolTooltip: true,
+                        isMonoSize: false,
+                        width: '100%',
+                        height: '100%'
+                    });
 
-                container.appendChild(script);
+                    script.onload = () => {
+                        console.log('✅ [Heatmap USA] Widget TradingView chargé avec succès');
+                    };
+                    script.onerror = (error) => {
+                        console.error('❌ [Heatmap USA] Erreur chargement widget:', error);
+                    };
+
+                    container.appendChild(script);
+                }, 500); // Délai de 500ms pour s'assurer que le DOM est prêt
 
                 return () => {
+                    clearTimeout(timer);
+                    const container = tradingViewHeatmapRef.current;
                     if (container) {
                         container.innerHTML = '';
                     }
                 };
-            }, []);
+            }, [isDarkMode]);
 
             // Charger le script TradingView Stock Heatmap TSX
             useEffect(() => {
-                const container = tradingViewHeatmapTSXRef.current;
-                if (!container) return;
+                // Attendre un peu pour s'assurer que le DOM est prêt
+                const timer = setTimeout(() => {
+                    const container = tradingViewHeatmapTSXRef.current;
+                    if (!container) {
+                        console.log('⚠️ [Heatmap TSX] Container ref not ready après délai');
+                        return;
+                    }
 
-                container.innerHTML = '';
+                    console.log('🔄 [Heatmap TSX] Chargement du widget TradingView (TSX)...');
+                    container.innerHTML = '';
 
-                const script = document.createElement('script');
-                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
-                script.type = 'text/javascript';
-                script.async = true;
-                script.innerHTML = JSON.stringify({
-                    dataSource: 'TSX',
-                    blockSize: 'market_cap_basic',
-                    blockColor: 'change',
-                    grouping: 'sector',
-                    locale: 'fr',
-                    symbolUrl: '',
-                    colorTheme: 'dark',
-                    exchanges: [],
-                    hasTopBar: true,
-                    isDataSetEnabled: true,
-                    isZoomEnabled: true,
-                    hasSymbolTooltip: true,
-                    isMonoSize: false,
-                    width: '100%',
-                    height: '100%'
-                });
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+                    script.type = 'text/javascript';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        dataSource: 'TSX',
+                        blockSize: 'market_cap_basic',
+                        blockColor: 'change',
+                        grouping: 'sector',
+                        locale: 'fr',
+                        symbolUrl: '',
+                        colorTheme: isDarkMode ? 'dark' : 'light',
+                        exchanges: [],
+                        hasTopBar: true,
+                        isDataSetEnabled: true,
+                        isZoomEnabled: true,
+                        hasSymbolTooltip: true,
+                        isMonoSize: false,
+                        width: '100%',
+                        height: '100%'
+                    });
 
-                container.appendChild(script);
+                    script.onload = () => {
+                        console.log('✅ [Heatmap TSX] Widget TradingView chargé avec succès');
+                    };
+                    script.onerror = (error) => {
+                        console.error('❌ [Heatmap TSX] Erreur chargement widget:', error);
+                    };
+
+                    container.appendChild(script);
+                }, 500); // Délai de 500ms pour s'assurer que le DOM est prêt
 
                 return () => {
+                    clearTimeout(timer);
+                    const container = tradingViewHeatmapTSXRef.current;
                     if (container) {
                         container.innerHTML = '';
                     }
                 };
-            }, []);
+            }, [isDarkMode]);
 
             // Charger le script TradingView Advanced Chart (synchronisé)
             useEffect(() => {
@@ -22839,13 +23007,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     display: true,
                                     text: 'Maturité',
                                     color: isDarkMode ? '#9ca3af' : '#6b7280',
-                                    font: { size: 14, weight: 'bold' }
+                                    font: { size: 16, weight: 'bold' }
                                 },
                                 grid: {
-                                    color: isDarkMode ? '#374151' : '#e5e7eb'
+                                    color: isDarkMode ? '#374151' : '#e5e7eb',
+                                    lineWidth: 1
                                 },
                                 ticks: {
-                                    color: isDarkMode ? '#9ca3af' : '#6b7280'
+                                    color: isDarkMode ? '#9ca3af' : '#6b7280',
+                                    font: { size: 12 }
                                 }
                             },
                             y: {
@@ -22853,13 +23023,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     display: true,
                                     text: 'Taux (%)',
                                     color: isDarkMode ? '#9ca3af' : '#6b7280',
-                                    font: { size: 14, weight: 'bold' }
+                                    font: { size: 16, weight: 'bold' }
                                 },
                                 grid: {
-                                    color: isDarkMode ? '#374151' : '#e5e7eb'
+                                    color: isDarkMode ? '#374151' : '#e5e7eb',
+                                    lineWidth: 1
                                 },
                                 ticks: {
                                     color: isDarkMode ? '#9ca3af' : '#6b7280',
+                                    font: { size: 12 },
                                     callback: function (value) {
                                         return value.toFixed(2) + '%';
                                     }
@@ -23161,14 +23333,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                     {/* Contenu des sous-onglets */}
                     {activeSubTab === 'overview' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
-                             {/* Yield Curve Section (Existing) */}
+                        <div className="space-y-6 animate-fade-in">
+                             {/* Yield Curve Section - Élargie pour utiliser tout l'espace */}
                             <ExpandableComponent title="Courbe des Taux" icon="📈" isDarkMode={isDarkMode}>
                                 <div className={`p-6 rounded-2xl ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white shadow-sm border border-gray-100'}`}>
                                     <div className="flex items-center justify-between mb-6">
                                         <div>
                                             <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Courbe des Taux</h3>
-                                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Comparaison des rendements obligataires</p>
+                                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                Comparaison des rendements obligataires US Treasury et Canada Bonds
+                                            </p>
                                         </div>
                                         <select
                                             value={selectedCountry}
@@ -23180,24 +23354,46 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             } border-2`}
                                         >
                                             <option value="both">🇺🇸 US & 🇨🇦 Canada</option>
-                                            <option value="us">🇺🇸 États-Unis</option>
-                                            <option value="canada">🇨🇦 Canada</option>
+                                            <option value="us">🇺🇸 États-Unis uniquement</option>
+                                            <option value="canada">🇨🇦 Canada uniquement</option>
                                         </select>
                                     </div>
-                                    <div className="h-[300px] relative">
+                                    <div className="h-[500px] md:h-[600px] lg:h-[700px] relative">
                                         {yieldLoading && (
                                             <div className="absolute inset-0 flex items-center justify-center z-10 bg-opacity-50 bg-black rounded-lg">
                                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                                             </div>
                                         )}
+                                        {yieldError && (
+                                            <div className={`absolute inset-0 flex items-center justify-center z-10 rounded-lg ${isDarkMode ? 'bg-red-900/20' : 'bg-red-50'}`}>
+                                                <p className={`text-sm ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
+                                                    Erreur: {yieldError}
+                                                </p>
+                                            </div>
+                                        )}
                                         <canvas ref={yieldChartRef}></canvas>
                                     </div>
+                                    {/* Informations sur les données */}
+                                    {yieldData && !yieldLoading && (
+                                        <div className="mt-4 pt-4 border-t border-gray-700 flex flex-wrap gap-4 text-xs">
+                                            {yieldData.data?.us && (
+                                                <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                    <span className="font-semibold">🇺🇸 US Treasury:</span> {yieldData.data.us.count || 0} points | 
+                                                    Source: {yieldData.data.us.source || 'N/A'} | 
+                                                    Date: {yieldData.data.us.date || 'N/A'}
+                                                </div>
+                                            )}
+                                            {yieldData.data?.canada && (
+                                                <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                    <span className="font-semibold">🇨🇦 Canada Bonds:</span> {yieldData.data.canada.count || 0} points | 
+                                                    Source: {yieldData.data.canada.source || 'N/A'} | 
+                                                    Date: {yieldData.data.canada.date || 'N/A'}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </ExpandableComponent>
-                            
-                            <div className={`p-6 rounded-2xl flex flex-col items-center justify-center ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white shadow-sm border border-gray-100'}`}>
-                                <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Utilisez les onglets pour explorer les marchés (Cotations, Calendriers, Forex, Heatmaps).</p>
-                            </div>
                         </div>
                     )}
 

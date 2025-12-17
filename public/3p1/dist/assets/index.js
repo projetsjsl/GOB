@@ -53207,64 +53207,72 @@ Vérifiez les logs de la console pour plus de détails.`;
     }
   };
   const handleSelectTicker = async (symbol) => {
+    var _a4, _b3, _c, _d, _e, _f, _g;
     const upperSymbol = symbol.toUpperCase();
     if (library[upperSymbol]) {
       const existingProfile = library[upperSymbol];
-      try {
-        let supabaseTickers = [];
-        const now = Date.now();
-        if (supabaseTickersCacheRef.current && now - supabaseTickersCacheRef.current.timestamp < SUPABASE_CACHE_TTL) {
-          supabaseTickers = supabaseTickersCacheRef.current.data;
-        } else {
-          const supabaseResult = await loadAllTickersFromSupabase();
-          if (supabaseResult.success) {
-            supabaseTickers = supabaseResult.tickers;
-            supabaseTickersCacheRef.current = {
-              data: supabaseTickers,
-              timestamp: now
-            };
+      const isSkeleton = existingProfile._isSkeleton === true;
+      const hasNoData = !existingProfile.data || existingProfile.data.length === 0;
+      const hasNoPrice = !((_a4 = existingProfile.assumptions) == null ? void 0 : _a4.currentPrice) || existingProfile.assumptions.currentPrice === 0;
+      if (isSkeleton || hasNoData || hasNoPrice) {
+        console.log(`🔄 ${upperSymbol}: Profil squelette ou données vides détectées - Chargement FMP...`);
+      } else {
+        try {
+          let supabaseTickers = [];
+          const now = Date.now();
+          if (supabaseTickersCacheRef.current && now - supabaseTickersCacheRef.current.timestamp < SUPABASE_CACHE_TTL) {
+            supabaseTickers = supabaseTickersCacheRef.current.data;
+          } else {
+            const supabaseResult = await loadAllTickersFromSupabase();
+            if (supabaseResult.success) {
+              supabaseTickers = supabaseResult.tickers;
+              supabaseTickersCacheRef.current = {
+                data: supabaseTickers,
+                timestamp: now
+              };
+            }
           }
-        }
-        if (supabaseTickers.length > 0) {
-          const supabaseTicker = supabaseTickers.find((t) => t.ticker.toUpperCase() === upperSymbol);
-          if (supabaseTicker) {
-            const updatedInfo = {
-              ...existingProfile.info,
-              securityRank: supabaseTicker.security_rank !== null && supabaseTicker.security_rank !== void 0 ? supabaseTicker.security_rank : existingProfile.info.securityRank || "N/A",
-              earningsPredictability: supabaseTicker.earnings_predictability !== null && supabaseTicker.earnings_predictability !== void 0 ? supabaseTicker.earnings_predictability : existingProfile.info.earningsPredictability,
-              priceGrowthPersistence: supabaseTicker.price_growth_persistence !== null && supabaseTicker.price_growth_persistence !== void 0 ? supabaseTicker.price_growth_persistence : existingProfile.info.priceGrowthPersistence,
-              priceStability: supabaseTicker.price_stability !== null && supabaseTicker.price_stability !== void 0 ? supabaseTicker.price_stability : existingProfile.info.priceStability,
-              beta: supabaseTicker.beta !== null && supabaseTicker.beta !== void 0 ? supabaseTicker.beta : existingProfile.info.beta
-            };
-            if (JSON.stringify(existingProfile.info) !== JSON.stringify(updatedInfo)) {
-              setLibrary((prev) => ({
-                ...prev,
-                [upperSymbol]: {
-                  ...existingProfile,
-                  info: updatedInfo
-                }
-              }));
-              setInfo(updatedInfo);
-              console.log(`✅ Métriques ValueLine mises à jour depuis Supabase pour ${upperSymbol}`);
+          if (supabaseTickers.length > 0) {
+            const supabaseTicker = supabaseTickers.find((t) => t.ticker.toUpperCase() === upperSymbol);
+            if (supabaseTicker) {
+              const updatedInfo = {
+                ...existingProfile.info,
+                securityRank: supabaseTicker.security_rank !== null && supabaseTicker.security_rank !== void 0 ? supabaseTicker.security_rank : existingProfile.info.securityRank || "N/A",
+                earningsPredictability: supabaseTicker.earnings_predictability !== null && supabaseTicker.earnings_predictability !== void 0 ? supabaseTicker.earnings_predictability : existingProfile.info.earningsPredictability,
+                priceGrowthPersistence: supabaseTicker.price_growth_persistence !== null && supabaseTicker.price_growth_persistence !== void 0 ? supabaseTicker.price_growth_persistence : existingProfile.info.priceGrowthPersistence,
+                priceStability: supabaseTicker.price_stability !== null && supabaseTicker.price_stability !== void 0 ? supabaseTicker.price_stability : existingProfile.info.priceStability,
+                beta: supabaseTicker.beta !== null && supabaseTicker.beta !== void 0 ? supabaseTicker.beta : existingProfile.info.beta
+              };
+              if (JSON.stringify(existingProfile.info) !== JSON.stringify(updatedInfo)) {
+                setLibrary((prev) => ({
+                  ...prev,
+                  [upperSymbol]: {
+                    ...existingProfile,
+                    info: updatedInfo
+                  }
+                }));
+                setInfo(updatedInfo);
+                console.log(`✅ Métriques ValueLine mises à jour depuis Supabase pour ${upperSymbol}`);
+              } else {
+                setInfo(existingProfile.info);
+              }
             } else {
               setInfo(existingProfile.info);
             }
           } else {
             setInfo(existingProfile.info);
           }
-        } else {
+        } catch (error) {
+          console.warn(`⚠️ Impossible de charger les métriques ValueLine depuis Supabase pour ${upperSymbol}:`, error);
           setInfo(existingProfile.info);
         }
-      } catch (error) {
-        console.warn(`⚠️ Impossible de charger les métriques ValueLine depuis Supabase pour ${upperSymbol}:`, error);
-        setInfo(existingProfile.info);
+        setActiveId(upperSymbol);
+        setData(existingProfile.data);
+        setAssumptions(existingProfile.assumptions);
+        setNotes(existingProfile.notes);
+        console.log(`✅ Loaded existing profile for ${upperSymbol}`);
+        return;
       }
-      setActiveId(upperSymbol);
-      setData(existingProfile.data);
-      setAssumptions(existingProfile.assumptions);
-      setNotes(existingProfile.notes);
-      console.log(`✅ Loaded existing profile for ${upperSymbol}`);
-      return;
     }
     try {
       showNotification(`Chargement des données pour ${upperSymbol}...`, "info");
@@ -53284,53 +53292,103 @@ Vérifiez les logs de la console pour plus de détails.`;
         }
         throw new Error(`Aucune donnée financière valide pour ${upperSymbol}`);
       }
+      const existingProfile = library[upperSymbol];
+      const isUpdatingSkeleton = existingProfile && (existingProfile._isSkeleton === true || !existingProfile.data || existingProfile.data.length === 0);
+      const existingData = (existingProfile == null ? void 0 : existingProfile.data) || [];
+      const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
+      const mergedData = existingData.map((existingRow) => {
+        const newRow = newDataByYear.get(existingRow.year);
+        if (!newRow) {
+          return existingRow;
+        }
+        if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
+          return existingRow;
+        }
+        return {
+          ...newRow,
+          autoFetched: true
+        };
+      });
+      result.data.forEach((newRow) => {
+        const exists = mergedData.some((row) => row.year === newRow.year);
+        if (!exists) {
+          mergedData.push({
+            ...newRow,
+            autoFetched: true
+          });
+        }
+      });
+      mergedData.sort((a2, b) => a2.year - b.year);
       const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-        result.data,
+        mergedData,
+        // ✅ Utiliser mergedData au lieu de result.data
         result.currentPrice,
-        INITIAL_ASSUMPTIONS
+        (existingProfile == null ? void 0 : existingProfile.assumptions) || INITIAL_ASSUMPTIONS
       );
-      const newProfile = {
+      const tempAssumptions = {
+        ...(existingProfile == null ? void 0 : existingProfile.assumptions) || INITIAL_ASSUMPTIONS,
+        ...autoFilledAssumptions
+      };
+      const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
+      if (outlierDetection.detectedOutliers.length > 0) {
+        console.log(`⚠️ ${upperSymbol}: Outliers détectés: ${outlierDetection.detectedOutliers.join(", ")}`);
+      }
+      const finalAssumptions = sanitizeAssumptionsSync({
+        ...tempAssumptions,
+        excludeEPS: outlierDetection.excludeEPS,
+        excludeCF: outlierDetection.excludeCF,
+        excludeBV: outlierDetection.excludeBV,
+        excludeDIV: outlierDetection.excludeDIV
+      });
+      const updatedProfile = {
         id: upperSymbol,
         lastModified: Date.now(),
-        data: result.data,
-        assumptions: {
-          ...INITIAL_ASSUMPTIONS,
-          ...autoFilledAssumptions
-        },
+        data: mergedData,
+        // ✅ Utiliser mergedData au lieu de result.data
+        assumptions: finalAssumptions,
+        // ✅ Utiliser finalAssumptions avec guardrails
         info: {
+          ...(existingProfile == null ? void 0 : existingProfile.info) || {},
           symbol,
           name: result.info.name || symbol,
-          sector: result.info.sector || "",
-          securityRank: result.info.securityRank || "N/A",
-          marketCap: result.info.marketCap || "N/A",
+          sector: result.info.sector || ((_b3 = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _b3.sector) || "",
+          securityRank: result.info.securityRank || ((_c = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _c.securityRank) || "N/A",
+          marketCap: result.info.marketCap || ((_d = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _d.marketCap) || "N/A",
           ...result.info
         },
-        notes: "",
-        isWatchlist: false
+        notes: (existingProfile == null ? void 0 : existingProfile.notes) || "",
+        isWatchlist: (existingProfile == null ? void 0 : existingProfile.isWatchlist) ?? false
       };
+      delete updatedProfile._isSkeleton;
       setLibrary((prev) => {
         const updated = {
           ...prev,
-          [upperSymbol]: newProfile
+          [upperSymbol]: updatedProfile
         };
         saveToCache(updated).catch((e) => console.warn("Failed to save to cache:", e));
         return updated;
       });
       setActiveId(upperSymbol);
-      setData(result.data);
-      setAssumptions(newProfile.assumptions);
+      setData(mergedData);
+      setAssumptions(updatedProfile.assumptions);
       const completeInfo = {
         symbol,
         name: result.info.name || symbol,
-        sector: result.info.sector || "",
-        securityRank: result.info.securityRank || "N/A",
-        marketCap: result.info.marketCap || "N/A",
-        ...result.info
+        sector: result.info.sector || ((_e = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _e.sector) || "",
+        securityRank: result.info.securityRank || ((_f = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _f.securityRank) || "N/A",
+        marketCap: result.info.marketCap || ((_g = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _g.marketCap) || "N/A",
+        ...result.info,
+        ...(existingProfile == null ? void 0 : existingProfile.info) || {}
       };
       setInfo(completeInfo);
-      setNotes("");
-      showNotification(`✅ ${upperSymbol} chargé avec succès`, "success");
-      console.log(`✅ ${upperSymbol}: Profil créé avec données FMP valides`);
+      setNotes((existingProfile == null ? void 0 : existingProfile.notes) || "");
+      if (isUpdatingSkeleton) {
+        showNotification(`✅ ${upperSymbol} chargé avec succès (profil mis à jour)`, "success");
+        console.log(`✅ ${upperSymbol}: Profil squelette mis à jour avec données FMP valides`);
+      } else {
+        showNotification(`✅ ${upperSymbol} chargé avec succès`, "success");
+        console.log(`✅ ${upperSymbol}: Profil créé avec données FMP valides`);
+      }
     } catch (e) {
       const error = e;
       console.error(`❌ ${upperSymbol}: Erreur FMP - profil NON créé:`, error);

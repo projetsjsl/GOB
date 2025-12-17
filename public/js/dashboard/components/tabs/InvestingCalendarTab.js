@@ -218,14 +218,24 @@ const InvestingCalendarTab = () => {
     // Charger le script TradingView Stock Heatmap TSX
     useEffect(() => {
         const container = tradingViewHeatmapTSXRef.current;
-        if (!container) return;
+        if (!container) {
+            console.log('⚠️ [Heatmap TSX InvestingCalendar] Container ref not ready');
+            return;
+        }
 
+        console.log('🔄 [Heatmap TSX InvestingCalendar] Chargement du widget TradingView...');
         container.innerHTML = '';
 
         const script = document.createElement('script');
         script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
         script.type = 'text/javascript';
         script.async = true;
+        script.onload = () => {
+            console.log('✅ [Heatmap TSX InvestingCalendar] Widget TradingView chargé');
+        };
+        script.onerror = (error) => {
+            console.error('❌ [Heatmap TSX InvestingCalendar] Erreur chargement widget:', error);
+        };
         script.innerHTML = JSON.stringify({
             dataSource: 'TSX',
             blockSize: 'market_cap_basic',
@@ -233,7 +243,7 @@ const InvestingCalendarTab = () => {
             grouping: 'sector',
             locale: 'fr',
             symbolUrl: '',
-            colorTheme: 'dark',
+            colorTheme: 'dark', // InvestingCalendarTab utilise toujours dark mode
             exchanges: [],
             hasTopBar: true,
             isDataSetEnabled: true,

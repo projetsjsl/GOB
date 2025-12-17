@@ -2000,82 +2000,93 @@ export default function App() {
             // Load existing profile data
             const existingProfile = library[upperSymbol];
             
-            // Vérifier et mettre à jour les métriques ValueLine depuis Supabase si disponibles
-            // Utiliser le cache pour éviter les appels répétés
-            try {
-                let supabaseTickers: any[] = [];
-                const now = Date.now();
-                
-                // Vérifier si le cache est valide
-                if (supabaseTickersCacheRef.current && (now - supabaseTickersCacheRef.current.timestamp) < SUPABASE_CACHE_TTL) {
-                    supabaseTickers = supabaseTickersCacheRef.current.data;
-                } else {
-                    // Charger depuis Supabase et mettre à jour le cache
-                    const supabaseResult = await loadAllTickersFromSupabase();
-                    if (supabaseResult.success) {
-                        supabaseTickers = supabaseResult.tickers;
-                        supabaseTickersCacheRef.current = {
-                            data: supabaseTickers,
-                            timestamp: now
-                        };
+            // ✅ VÉRIFICATION CRITIQUE : Si c'est un profil squelette ou si les données sont vides, charger depuis FMP
+            const isSkeleton = (existingProfile as any)._isSkeleton === true;
+            const hasNoData = !existingProfile.data || existingProfile.data.length === 0;
+            const hasNoPrice = !existingProfile.assumptions?.currentPrice || existingProfile.assumptions.currentPrice === 0;
+            
+            if (isSkeleton || hasNoData || hasNoPrice) {
+                console.log(`🔄 ${upperSymbol}: Profil squelette ou données vides détectées - Chargement FMP...`);
+                // Ne pas return ici, continuer pour charger les données FMP
+            } else {
+                // ✅ Profil valide avec données - Charger normalement
+                // Vérifier et mettre à jour les métriques ValueLine depuis Supabase si disponibles
+                // Utiliser le cache pour éviter les appels répétés
+                try {
+                    let supabaseTickers: any[] = [];
+                    const now = Date.now();
+                    
+                    // Vérifier si le cache est valide
+                    if (supabaseTickersCacheRef.current && (now - supabaseTickersCacheRef.current.timestamp) < SUPABASE_CACHE_TTL) {
+                        supabaseTickers = supabaseTickersCacheRef.current.data;
+                    } else {
+                        // Charger depuis Supabase et mettre à jour le cache
+                        const supabaseResult = await loadAllTickersFromSupabase();
+                        if (supabaseResult.success) {
+                            supabaseTickers = supabaseResult.tickers;
+                            supabaseTickersCacheRef.current = {
+                                data: supabaseTickers,
+                                timestamp: now
+                            };
+                        }
                     }
-                }
-                
-                if (supabaseTickers.length > 0) {
-                    const supabaseTicker = supabaseTickers.find(t => t.ticker.toUpperCase() === upperSymbol);
-                    if (supabaseTicker) {
-                        // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
-                        // Toujours utiliser Supabase si disponible, sinon garder valeur existante
-                        const updatedInfo = {
-                            ...existingProfile.info,
-                            securityRank: supabaseTicker.security_rank !== null && supabaseTicker.security_rank !== undefined
-                                ? supabaseTicker.security_rank
-                                : (existingProfile.info.securityRank || 'N/A'),
-                            earningsPredictability: supabaseTicker.earnings_predictability !== null && supabaseTicker.earnings_predictability !== undefined
-                                ? supabaseTicker.earnings_predictability
-                                : existingProfile.info.earningsPredictability,
-                            priceGrowthPersistence: supabaseTicker.price_growth_persistence !== null && supabaseTicker.price_growth_persistence !== undefined
-                                ? supabaseTicker.price_growth_persistence
-                                : existingProfile.info.priceGrowthPersistence,
-                            priceStability: supabaseTicker.price_stability !== null && supabaseTicker.price_stability !== undefined
-                                ? supabaseTicker.price_stability
-                                : existingProfile.info.priceStability,
-                            beta: supabaseTicker.beta !== null && supabaseTicker.beta !== undefined
-                                ? supabaseTicker.beta
-                                : existingProfile.info.beta
-                        };
-                        
-                        // Mettre à jour dans la library si les métriques ont changé
-                        if (JSON.stringify(existingProfile.info) !== JSON.stringify(updatedInfo)) {
-                            setLibrary(prev => ({
-                                ...prev,
-                                [upperSymbol]: {
-                                    ...existingProfile,
-                                    info: updatedInfo
-                                }
-                            }));
-                            setInfo(updatedInfo);
-                            console.log(`✅ Métriques ValueLine mises à jour depuis Supabase pour ${upperSymbol}`);
+                    
+                    if (supabaseTickers.length > 0) {
+                        const supabaseTicker = supabaseTickers.find(t => t.ticker.toUpperCase() === upperSymbol);
+                        if (supabaseTicker) {
+                            // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
+                            // Toujours utiliser Supabase si disponible, sinon garder valeur existante
+                            const updatedInfo = {
+                                ...existingProfile.info,
+                                securityRank: supabaseTicker.security_rank !== null && supabaseTicker.security_rank !== undefined
+                                    ? supabaseTicker.security_rank
+                                    : (existingProfile.info.securityRank || 'N/A'),
+                                earningsPredictability: supabaseTicker.earnings_predictability !== null && supabaseTicker.earnings_predictability !== undefined
+                                    ? supabaseTicker.earnings_predictability
+                                    : existingProfile.info.earningsPredictability,
+                                priceGrowthPersistence: supabaseTicker.price_growth_persistence !== null && supabaseTicker.price_growth_persistence !== undefined
+                                    ? supabaseTicker.price_growth_persistence
+                                    : existingProfile.info.priceGrowthPersistence,
+                                priceStability: supabaseTicker.price_stability !== null && supabaseTicker.price_stability !== undefined
+                                    ? supabaseTicker.price_stability
+                                    : existingProfile.info.priceStability,
+                                beta: supabaseTicker.beta !== null && supabaseTicker.beta !== undefined
+                                    ? supabaseTicker.beta
+                                    : existingProfile.info.beta
+                            };
+                            
+                            // Mettre à jour dans la library si les métriques ont changé
+                            if (JSON.stringify(existingProfile.info) !== JSON.stringify(updatedInfo)) {
+                                setLibrary(prev => ({
+                                    ...prev,
+                                    [upperSymbol]: {
+                                        ...existingProfile,
+                                        info: updatedInfo
+                                    }
+                                }));
+                                setInfo(updatedInfo);
+                                console.log(`✅ Métriques ValueLine mises à jour depuis Supabase pour ${upperSymbol}`);
+                            } else {
+                                setInfo(existingProfile.info);
+                            }
                         } else {
                             setInfo(existingProfile.info);
                         }
                     } else {
                         setInfo(existingProfile.info);
                     }
-                } else {
+                } catch (error) {
+                    console.warn(`⚠️ Impossible de charger les métriques ValueLine depuis Supabase pour ${upperSymbol}:`, error);
                     setInfo(existingProfile.info);
                 }
-            } catch (error) {
-                console.warn(`⚠️ Impossible de charger les métriques ValueLine depuis Supabase pour ${upperSymbol}:`, error);
-                setInfo(existingProfile.info);
+                
+                setActiveId(upperSymbol);
+                setData(existingProfile.data);
+                setAssumptions(existingProfile.assumptions);
+                setNotes(existingProfile.notes);
+                console.log(`✅ Loaded existing profile for ${upperSymbol}`);
+                return;
             }
-            
-            setActiveId(upperSymbol);
-            setData(existingProfile.data);
-            setAssumptions(existingProfile.assumptions);
-            setNotes(existingProfile.notes);
-            console.log(`✅ Loaded existing profile for ${upperSymbol}`);
-            return;
         }
 
         // ⚠️ RIGUEUR 100% : Ne pas créer de profil placeholder
@@ -2106,39 +2117,103 @@ export default function App() {
                 throw new Error(`Aucune donnée financière valide pour ${upperSymbol}`);
             }
 
-            // ✅ TOUTES LES VALIDATIONS PASSÉES - Créer le profil avec les données réelles
+            // ✅ DÉTECTION : Profil existant (squelette ou vide) ou nouveau profil
+            const existingProfile = library[upperSymbol];
+            const isUpdatingSkeleton = existingProfile && ((existingProfile as any)._isSkeleton === true || !existingProfile.data || existingProfile.data.length === 0);
+            const existingData = existingProfile?.data || [];
+
+            // ✅ MERGE INTELLIGENT : Préserver les données manuelles (orange) comme dans performSync
+            const newDataByYear = new Map(result.data.map(row => [row.year, row]));
+            
+            const mergedData = existingData.map((existingRow) => {
+                const newRow = newDataByYear.get(existingRow.year);
+                
+                // Si pas de nouvelle donnée pour cette année, garder l'existant
+                if (!newRow) {
+                    return existingRow;
+                }
+
+                // ✅ CRITIQUE : Si la donnée existante est manuelle (autoFetched: false ou undefined), la garder
+                if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
+                    return existingRow; // Préserver la donnée manuelle (orange)
+                }
+
+                // Sinon, utiliser la nouvelle donnée avec autoFetched: true
+                return {
+                    ...(newRow as AnnualData),
+                    autoFetched: true
+                };
+            });
+
+            // Ajouter les nouvelles années qui n'existent pas dans les données existantes
+            result.data.forEach(newRow => {
+                const exists = mergedData.some(row => row.year === newRow.year);
+                if (!exists) {
+                    mergedData.push({
+                        ...(newRow as AnnualData),
+                        autoFetched: true
+                    });
+                }
+            });
+
+            // Trier par année
+            mergedData.sort((a, b) => a.year - b.year);
+
+            // ✅ IMPORTANT : Utiliser les données mergées (avec préservation des données manuelles) pour le calcul
             // Auto-fill assumptions basées sur les données historiques FMP (fonction centralisée)
+            // ⚠️ CRITIQUE : Préserver les hypothèses existantes (orange) sauf currentPrice
             const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-                result.data,
+                mergedData, // ✅ Utiliser mergedData au lieu de result.data
                 result.currentPrice,
-                INITIAL_ASSUMPTIONS
+                existingProfile?.assumptions || INITIAL_ASSUMPTIONS
             );
 
-            const newProfile: AnalysisProfile = {
+            // ✅ Détecter et exclure automatiquement les métriques avec prix cibles aberrants (guardrails)
+            const tempAssumptions = {
+                ...(existingProfile?.assumptions || INITIAL_ASSUMPTIONS),
+                ...autoFilledAssumptions
+            } as Assumptions;
+            const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
+            
+            if (outlierDetection.detectedOutliers.length > 0) {
+                console.log(`⚠️ ${upperSymbol}: Outliers détectés: ${outlierDetection.detectedOutliers.join(', ')}`);
+            }
+
+            // ✅ SANITISER les assumptions finales pour appliquer les guardrails
+            const finalAssumptions = sanitizeAssumptionsSync({
+                ...tempAssumptions,
+                excludeEPS: outlierDetection.excludeEPS,
+                excludeCF: outlierDetection.excludeCF,
+                excludeBV: outlierDetection.excludeBV,
+                excludeDIV: outlierDetection.excludeDIV
+            }) as Assumptions;
+
+            const updatedProfile: AnalysisProfile = {
                 id: upperSymbol,
                 lastModified: Date.now(),
-                data: result.data,
-                assumptions: {
-                    ...INITIAL_ASSUMPTIONS,
-                    ...autoFilledAssumptions
-                } as Assumptions,
+                data: mergedData, // ✅ Utiliser mergedData au lieu de result.data
+                assumptions: finalAssumptions, // ✅ Utiliser finalAssumptions avec guardrails
                 info: {
+                    ...(existingProfile?.info || {}),
                     symbol: symbol,
                     name: result.info.name || symbol,
-                    sector: result.info.sector || '',
-                    securityRank: result.info.securityRank || 'N/A',
-                    marketCap: result.info.marketCap || 'N/A',
+                    sector: result.info.sector || existingProfile?.info?.sector || '',
+                    securityRank: result.info.securityRank || existingProfile?.info?.securityRank || 'N/A',
+                    marketCap: result.info.marketCap || existingProfile?.info?.marketCap || 'N/A',
                     ...result.info
                 },
-                notes: '',
-                isWatchlist: false
+                notes: existingProfile?.notes || '',
+                isWatchlist: existingProfile?.isWatchlist ?? false
             };
             
-            // Créer le profil UNIQUEMENT avec des données valides
+            // ✅ RETIRER LE FLAG SQUELETTE si présent
+            delete (updatedProfile as any)._isSkeleton;
+            
+            // Mettre à jour ou créer le profil
             setLibrary(prev => {
                 const updated = {
                     ...prev,
-                    [upperSymbol]: newProfile
+                    [upperSymbol]: updatedProfile
                 };
                 
                 // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp (fire and forget)
@@ -2148,22 +2223,28 @@ export default function App() {
             });
             
             setActiveId(upperSymbol);
-            setData(result.data);
-            setAssumptions(newProfile.assumptions);
+            setData(mergedData); // ✅ Utiliser mergedData pour préserver les données orange
+            setAssumptions(updatedProfile.assumptions);
             // Ensure required fields are present
             const completeInfo: CompanyInfo = {
                 symbol: symbol,
                 name: result.info.name || symbol,
-                sector: result.info.sector || '',
-                securityRank: result.info.securityRank || 'N/A',
-                marketCap: result.info.marketCap || 'N/A',
-                ...result.info
+                sector: result.info.sector || existingProfile?.info?.sector || '',
+                securityRank: result.info.securityRank || existingProfile?.info?.securityRank || 'N/A',
+                marketCap: result.info.marketCap || existingProfile?.info?.marketCap || 'N/A',
+                ...result.info,
+                ...(existingProfile?.info || {})
             };
             setInfo(completeInfo);
-            setNotes('');
+            setNotes(existingProfile?.notes || '');
             
-            showNotification(`✅ ${upperSymbol} chargé avec succès`, 'success');
-            console.log(`✅ ${upperSymbol}: Profil créé avec données FMP valides`);
+            if (isUpdatingSkeleton) {
+                showNotification(`✅ ${upperSymbol} chargé avec succès (profil mis à jour)`, 'success');
+                console.log(`✅ ${upperSymbol}: Profil squelette mis à jour avec données FMP valides`);
+            } else {
+                showNotification(`✅ ${upperSymbol} chargé avec succès`, 'success');
+                console.log(`✅ ${upperSymbol}: Profil créé avec données FMP valides`);
+            }
         } catch (e) {
             const error = e as Error;
             console.error(`❌ ${upperSymbol}: Erreur FMP - profil NON créé:`, error);
