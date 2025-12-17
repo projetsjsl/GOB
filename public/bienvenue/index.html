@@ -2283,7 +2283,7 @@
                                 // Conflict: task might already exist, reload from DB
                                 console.warn('Conflit lors de l\'ajout de tâche, rechargement depuis la DB...', error);
                                 // Remove optimistic update and reload
-                                setTaskTemplates(prev => prev.filter(t => t.id !== tempId));
+                                setTaskTemplates(prev => prev.filter(t => t.id !== newId));
                                 // Optionally reload tasks from DB
                                 showNotification('Tâche déjà existante ou conflit détecté. Rechargement...', 'error');
                                 // Reload tasks after a short delay
