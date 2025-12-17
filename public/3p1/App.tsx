@@ -536,11 +536,35 @@ export default function App() {
                 const result = await loadAllTickersFromSupabase();
 
                 if (!result.success) {
-                    setTickersLoadError(result.error || 'Erreur lors du chargement des tickers');
+                    const errorMsg = result.error || 'Erreur lors du chargement des tickers';
+                    console.error('❌ Échec chargement tickers:', errorMsg);
+                    setTickersLoadError(errorMsg);
                     setIsLoadingTickers(false);
                     hasLoadedTickersRef.current = false; // Réessayer au prochain render
+                    
+                    // ✅ Afficher notification d'erreur visible
+                    showNotification(
+                        `❌ Impossible de charger les tickers: ${errorMsg}\n\nVérifiez votre connexion et réessayez.`,
+                        'error'
+                    );
                     return;
                 }
+                
+                // ✅ Vérifier qu'on a bien des tickers
+                if (!result.tickers || result.tickers.length === 0) {
+                    console.warn('⚠️ Aucun ticker retourné par l\'API');
+                    setTickersLoadError('Aucun ticker trouvé dans la base de données');
+                    setIsLoadingTickers(false);
+                    hasLoadedTickersRef.current = false;
+                    
+                    showNotification(
+                        '⚠️ Aucun ticker trouvé dans la base de données.\n\nVérifiez que des tickers sont actifs dans Supabase.',
+                        'warning'
+                    );
+                    return;
+                }
+                
+                console.log(`✅ ${result.tickers.length} tickers chargés depuis Supabase`);
 
                 // Mettre à jour le cache pour handleSelectTicker
                 supabaseTickersCacheRef.current = {

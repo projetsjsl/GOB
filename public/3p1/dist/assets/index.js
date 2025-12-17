@@ -51929,11 +51929,31 @@ function App() {
       try {
         const result = await loadAllTickersFromSupabase();
         if (!result.success) {
-          setTickersLoadError(result.error || "Erreur lors du chargement des tickers");
+          const errorMsg = result.error || "Erreur lors du chargement des tickers";
+          console.error("❌ Échec chargement tickers:", errorMsg);
+          setTickersLoadError(errorMsg);
           setIsLoadingTickers(false);
           hasLoadedTickersRef.current = false;
+          showNotification(
+            `❌ Impossible de charger les tickers: ${errorMsg}
+
+Vérifiez votre connexion et réessayez.`,
+            "error"
+          );
           return;
         }
+        if (!result.tickers || result.tickers.length === 0) {
+          console.warn("⚠️ Aucun ticker retourné par l'API");
+          setTickersLoadError("Aucun ticker trouvé dans la base de données");
+          setIsLoadingTickers(false);
+          hasLoadedTickersRef.current = false;
+          showNotification(
+            "⚠️ Aucun ticker trouvé dans la base de données.\n\nVérifiez que des tickers sont actifs dans Supabase.",
+            "warning"
+          );
+          return;
+        }
+        console.log(`✅ ${result.tickers.length} tickers chargés depuis Supabase`);
         supabaseTickersCacheRef.current = {
           data: result.tickers,
           timestamp: Date.now()
