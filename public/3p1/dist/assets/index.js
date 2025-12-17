@@ -52211,12 +52211,23 @@ Vérifiez votre connexion et réessayez.`,
             const symbol = t.ticker.toUpperCase();
             return updated[symbol] && updated[symbol].isWatchlist === false;
           });
+          const missingTickers = teamTickersInSupabase.filter((t) => {
+            const symbol = t.ticker.toUpperCase();
+            return !updated[symbol];
+          });
+          const incorrectTickers = teamTickersInSupabase.filter((t) => {
+            const symbol = t.ticker.toUpperCase();
+            return updated[symbol] && updated[symbol].isWatchlist !== false;
+          });
           if (teamTickersInSupabase.length !== teamTickersInLibrary.length) {
-            const missing = teamTickersInSupabase.filter((t) => {
-              const symbol = t.ticker.toUpperCase();
-              return !updated[symbol] || updated[symbol].isWatchlist !== false;
-            });
-            console.warn(`⚠️ ${teamTickersInSupabase.length - teamTickersInLibrary.length} team ticker(s) manquant(s) ou incorrect(s):`, missing.map((t) => t.ticker));
+            console.warn(`⚠️ ${teamTickersInSupabase.length - teamTickersInLibrary.length} team ticker(s) manquant(s) ou incorrect(s) sur ${teamTickersInSupabase.length} attendus:`);
+            if (missingTickers.length > 0) {
+              console.warn(`   📋 ${missingTickers.length} ticker(s) non chargé(s) depuis FMP:`, missingTickers.map((t) => t.ticker).join(", "));
+            }
+            if (incorrectTickers.length > 0) {
+              console.warn(`   ❌ ${incorrectTickers.length} ticker(s) avec isWatchlist incorrect:`, incorrectTickers.map((t) => t.ticker).join(", "));
+            }
+            console.log(`   ✅ ${teamTickersInLibrary.length} ticker(s) correctement configuré(s) dans localStorage`);
           } else {
             console.log(`✅ Tous les ${teamTickersInSupabase.length} team tickers ont isWatchlist=false`);
           }
@@ -53686,12 +53697,23 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
           const symbol = t.ticker.toUpperCase();
           return updated[symbol] && updated[symbol].isWatchlist === false;
         });
+        const missingTickers = teamTickersInSupabase.filter((t) => {
+          const symbol = t.ticker.toUpperCase();
+          return !updated[symbol];
+        });
+        const incorrectTickers = teamTickersInSupabase.filter((t) => {
+          const symbol = t.ticker.toUpperCase();
+          return updated[symbol] && updated[symbol].isWatchlist !== false;
+        });
         if (teamTickersInSupabase.length !== teamTickersInLibrary.length) {
-          const missing = teamTickersInSupabase.filter((t) => {
-            const symbol = t.ticker.toUpperCase();
-            return !updated[symbol] || updated[symbol].isWatchlist !== false;
-          });
-          console.warn(`⚠️ ${teamTickersInSupabase.length - teamTickersInLibrary.length} team ticker(s) manquant(s) ou incorrect(s):`, missing.map((t) => t.ticker));
+          console.warn(`⚠️ ${teamTickersInSupabase.length - teamTickersInLibrary.length} team ticker(s) manquant(s) ou incorrect(s) sur ${teamTickersInSupabase.length} attendus:`);
+          if (missingTickers.length > 0) {
+            console.warn(`   📋 ${missingTickers.length} ticker(s) non chargé(s) depuis FMP:`, missingTickers.map((t) => t.ticker).join(", "));
+          }
+          if (incorrectTickers.length > 0) {
+            console.warn(`   ❌ ${incorrectTickers.length} ticker(s) avec isWatchlist incorrect:`, incorrectTickers.map((t) => t.ticker).join(", "));
+          }
+          console.log(`   ✅ ${teamTickersInLibrary.length} ticker(s) correctement configuré(s) dans localStorage`);
         } else {
           console.log(`✅ Tous les ${teamTickersInSupabase.length} team tickers ont isWatchlist=false`);
         }
