@@ -2090,24 +2090,35 @@
              * @returns {Promise<void>}
              */
             const reloadTaskTemplates = async () => {
-                if (!useSupabase || !supabase) return;
-                
+                if (!useSupabase || !supabase) {
+                    console.warn('⚠️ Supabase non disponible pour recharger les tâches');
+                    return;
+                }
                 try {
+                    console.log('🔄 Rechargement des task templates depuis Supabase...');
                     const { data, error } = await supabase
                         .from('task_templates')
-                        .select('*');
+                        .select('*')
+                        .order('id', { ascending: true });
                     
                     if (error) {
-                        console.error('Erreur rechargement tâches:', error);
+                        console.error('❌ Erreur Supabase lors du rechargement:', error);
+                        showNotification(`Erreur rechargement: ${error.message || 'Erreur inconnue'}`, 'error');
                         return;
                     }
                     
-                    if (data) {
-                        setTaskTemplates(data.map(DataMapper.taskTemplateToReact));
-                        console.log(`✅ ${data.length} tâches rechargées depuis la DB`);
+                    if (!data || data.length === 0) {
+                        console.warn('⚠️ Aucune tâche trouvée dans la base de données');
+                        setTaskTemplates([]);
+                        return;
                     }
+                    
+                    const mappedTasks = data.map(DataMapper.taskTemplateToReact);
+                    setTaskTemplates(mappedTasks);
+                    console.log(`✅ ${mappedTasks.length} tâches rechargées depuis la DB.`);
                 } catch (error) {
-                    console.error("Erreur rechargement tâches:", error);
+                    console.error("❌ Exception lors du rechargement des tâches:", error);
+                    showNotification(`Erreur rechargement: ${error.message || 'Erreur inconnue'}`, 'error');
                 }
             };
 
@@ -2862,7 +2873,7 @@
                 
                 return (
                     <div 
-                        className="bg-white border-2 rounded-lg mb-3 task-hover transition-all flex overflow-hidden"
+                        className="bg-white border-2 rounded-lg mb-3 task-hover transition-all flex overflow-visible"
                         draggable="true"
                         onDragStart={(e) => { e.dataTransfer.setData('taskId', task.id); setDragging(true); }}
                         onDragEnd={() => setDragging(false)}
@@ -2950,12 +2961,14 @@
                                 )}
                                 
                                 {/* Resource Quick Add/Remove - Dropdown simple et stable */}
-                                <div className="relative flex items-center gap-1 ml-auto">
+                                <div className="relative flex items-center gap-1 ml-auto" style={{ zIndex: editing === 'resources' ? 10000 : 'auto' }}>
                                      <div 
                                          className="flex -space-x-1 cursor-pointer" 
                                          onClick={(e) => {
                                              e.stopPropagation();
+                                             console.log('🖱️ Clic sur modifier ressources, editing actuel:', editing);
                                              setEditing(editing === 'resources' ? null : 'resources');
+                                             console.log('🖱️ Nouveau editing:', editing === 'resources' ? null : 'resources');
                                          }}
                                      >
                                         {/* Toujours afficher le bouton + Resp pour permettre l'édition */}
@@ -2982,12 +2995,18 @@
                                              {/* Overlay invisible pour fermer en cliquant à l'extérieur */}
                                              <div 
                                                  className="fixed inset-0 z-[9997]"
-                                                 onClick={() => setEditing(null)}
+                                                 onClick={() => {
+                                                     console.log('🖱️ Clic sur overlay, fermeture dropdown');
+                                                     setEditing(null);
+                                                 }}
                                              />
                                              {/* Dropdown menu - positionné relativement au bouton */}
                                              <div 
-                                                 className="absolute right-0 top-full mt-2 bg-white shadow-xl rounded-lg border border-gray-200 w-72 max-h-[400px] overflow-hidden z-[9998]"
-                                                 onClick={(e) => e.stopPropagation()}
+                                                 className="absolute right-0 top-full mt-2 bg-white shadow-xl rounded-lg border border-gray-200 w-72 max-h-[400px] overflow-hidden z-[9999]"
+                                                 onClick={(e) => {
+                                                     console.log('🖱️ Clic dans dropdown, stopPropagation');
+                                                     e.stopPropagation();
+                                                 }}
                                              >
                                                  {/* Header */}
                                                  <div className="px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
@@ -3494,7 +3513,7 @@
                                     return (
                                         <div 
                                             key={phase.id} 
-                                            className={`bg-white rounded-xl shadow-sm border transition-all duration-300 ${dragging ? 'opacity-50' : ''}`}
+                                            className={`bg-white rounded-xl shadow-sm border transition-all duration-300`}
                                             onDragOver={(e) => {
                                                 e.preventDefault();
                                                 e.currentTarget.classList.add('drop-zone');
