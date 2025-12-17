@@ -11,7 +11,8 @@ import {
   ShieldCheckIcon,
   FunnelIcon,
   BarsArrowUpIcon,
-  BarsArrowDownIcon
+  BarsArrowDownIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 import { AnalysisProfile, Recommendation } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
@@ -43,6 +44,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('lastModified');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
+  // ✅ Nouveaux filtres
+  const [filterCountry, setFilterCountry] = useState<string>('all');
+  const [filterExchange, setFilterExchange] = useState<string>('all');
+  const [filterMarketCap, setFilterMarketCap] = useState<string>('all');
 
   // ✅ OPTIMISATION: Cache des recommandations pour éviter les recalculs coûteux
   const recommendationCacheRef = useRef<Map<string, Recommendation>>(new Map());
@@ -71,6 +76,42 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
     return { portfolio, watchlist, total };
   }, [profiles]);
 
+  // ✅ Extraire les valeurs uniques pour les filtres
+  const availableCountries = useMemo(() => {
+    const countries = new Set<string>();
+    profiles.forEach(p => {
+      if (p.info.country && p.info.country.trim() !== '') {
+        countries.add(p.info.country);
+      }
+    });
+    return Array.from(countries).sort();
+  }, [profiles]);
+
+  const availableExchanges = useMemo(() => {
+    const exchanges = new Set<string>();
+    profiles.forEach(p => {
+      if (p.info.exchange && p.info.exchange.trim() !== '') {
+        exchanges.add(p.info.exchange);
+      }
+    });
+    return Array.from(exchanges).sort();
+  }, [profiles]);
+
+  // ✅ Fonction helper pour parser marketCap en nombre
+  const parseMarketCapToNumber = (marketCapStr: string): number => {
+    if (!marketCapStr || marketCapStr === 'N/A' || marketCapStr.trim() === '') return 0;
+    const cleaned = marketCapStr.replace(/[^0-9.BMKmk]/g, '').toUpperCase();
+    if (!cleaned) return 0;
+    
+    const num = parseFloat(cleaned.replace(/[BMKmk]/g, ''));
+    if (isNaN(num)) return 0;
+    
+    if (cleaned.includes('B')) return num * 1000000000; // Billions
+    if (cleaned.includes('M')) return num * 1000000; // Millions
+    if (cleaned.includes('K')) return num * 1000; // Thousands
+    return num;
+  };
+
   const filteredAndSortedProfiles = useMemo(() => {
     // Filtrage par recherche
     let filtered = profiles.filter(p =>
@@ -83,6 +124,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
       filtered = filtered.filter(p => !p.isWatchlist);
     } else if (filterBy === 'watchlist') {
       filtered = filtered.filter(p => p.isWatchlist);
+    }
+
+    // ✅ Filtrage par Pays
+    if (filterCountry !== 'all') {
+      filtered = filtered.filter(p => p.info.country === filterCountry);
+    }
+
+    // ✅ Filtrage par Bourse
+    if (filterExchange !== 'all') {
+      filtered = filtered.filter(p => p.info.exchange === filterExchange);
+    }
+
+    // ✅ Filtrage par Capitalisation
+    if (filterMarketCap !== 'all') {
+      filtered = filtered.filter(p => {
+        const marketCapNum = parseMarketCapToNumber(p.info.marketCap || '');
+        switch (filterMarketCap) {
+          case 'micro': return marketCapNum > 0 && marketCapNum < 300000000; // < 300M
+          case 'small': return marketCapNum >= 300000000 && marketCapNum < 2000000000; // 300M - 2B
+          case 'mid': return marketCapNum >= 2000000000 && marketCapNum < 10000000000; // 2B - 10B
+          case 'large': return marketCapNum >= 10000000000 && marketCapNum < 200000000000; // 10B - 200B
+          case 'mega': return marketCapNum >= 200000000000; // > 200B
+          default: return true;
+        }
+      });
     }
 
     // Tri
@@ -111,7 +177,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
     });
 
     return sorted;
-  }, [profiles, searchTerm, sortBy, filterBy]);
+  }, [profiles, searchTerm, sortBy, filterBy, filterCountry, filterExchange, filterMarketCap]);
 
   const getRecommendationColor = (rec: Recommendation) => {
     switch (rec) {
@@ -389,7 +455,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as SortOption)}
-          className="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer"
+          className="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer mb-2"
           title="Trier les tickers\n\nOptions de tri:\n• Alphabétique (A-Z): Par symbole croissant\n• Alphabétique (Z-A): Par symbole décroissant\n• Date modif. (Récent): Plus récemment modifiés en premier\n• Date modif. (Ancien): Plus anciennement modifiés en premier\n• Recommandation: Achat → Conserver → Vente\n• Secteur: Par secteur d'activité"
         >
           <option value="lastModified">📅 Date modif. (Récent)</option>
@@ -399,6 +465,81 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
           <option value="recommendation">⭐ Recommandation</option>
           <option value="sector">🏢 Secteur</option>
         </select>
+
+        {/* ✅ Filtres Avancés */}
+        <div className="space-y-2 mt-3 pt-3 border-t border-slate-700">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] font-semibold text-slate-400 uppercase">Filtres Avancés</span>
+            {(filterCountry !== 'all' || filterExchange !== 'all' || filterMarketCap !== 'all') && (
+              <button
+                onClick={() => {
+                  setFilterCountry('all');
+                  setFilterExchange('all');
+                  setFilterMarketCap('all');
+                }}
+                className="text-[9px] text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                title="Réinitialiser tous les filtres avancés"
+              >
+                <XMarkIcon className="w-3 h-3" />
+                Réinitialiser
+              </button>
+            )}
+          </div>
+
+          {/* Filtre Pays */}
+          {availableCountries.length > 0 && (
+            <div>
+              <label className="block text-[9px] text-slate-400 mb-1">🌍 Pays</label>
+              <select
+                value={filterCountry}
+                onChange={(e) => setFilterCountry(e.target.value)}
+                className="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer"
+                title="Filtrer par pays d'origine de l'entreprise"
+              >
+                <option value="all">Tous les pays ({availableCountries.length})</option>
+                {availableCountries.map(country => (
+                  <option key={country} value={country}>{country}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Filtre Bourse */}
+          {availableExchanges.length > 0 && (
+            <div>
+              <label className="block text-[9px] text-slate-400 mb-1">📈 Bourse</label>
+              <select
+                value={filterExchange}
+                onChange={(e) => setFilterExchange(e.target.value)}
+                className="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer"
+                title="Filtrer par bourse où l'action est cotée"
+              >
+                <option value="all">Toutes les bourses ({availableExchanges.length})</option>
+                {availableExchanges.map(exchange => (
+                  <option key={exchange} value={exchange}>{exchange}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Filtre Capitalisation */}
+          <div>
+            <label className="block text-[9px] text-slate-400 mb-1">💰 Capitalisation</label>
+            <select
+              value={filterMarketCap}
+              onChange={(e) => setFilterMarketCap(e.target.value)}
+              className="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer"
+              title="Filtrer par capitalisation boursière\n\n• Micro: < 300M USD\n• Small: 300M - 2B USD\n• Mid: 2B - 10B USD\n• Large: 10B - 200B USD\n• Mega: > 200B USD"
+            >
+              <option value="all">Toutes les capitalisations</option>
+              <option value="micro">Micro Cap (&lt; 300M)</option>
+              <option value="small">Small Cap (300M - 2B)</option>
+              <option value="mid">Mid Cap (2B - 10B)</option>
+              <option value="large">Large Cap (10B - 200B)</option>
+              <option value="mega">Mega Cap (&gt; 200B)</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
   );

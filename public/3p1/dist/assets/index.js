@@ -33032,6 +33032,9 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [sortBy2, setSortBy] = reactExports.useState("lastModified");
   const [filterBy, setFilterBy] = reactExports.useState("all");
+  const [filterCountry, setFilterCountry] = reactExports.useState("all");
+  const [filterExchange, setFilterExchange] = reactExports.useState("all");
+  const [filterMarketCap, setFilterMarketCap] = reactExports.useState("all");
   const recommendationCacheRef = reactExports.useRef(/* @__PURE__ */ new Map());
   const getCachedRecommendation = (profile) => {
     const cacheKey = `${profile.id}-${profile.lastModified}`;
@@ -33052,6 +33055,35 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
     const total = profiles.length;
     return { portfolio, watchlist, total };
   }, [profiles]);
+  const availableCountries = reactExports.useMemo(() => {
+    const countries = /* @__PURE__ */ new Set();
+    profiles.forEach((p) => {
+      if (p.info.country && p.info.country.trim() !== "") {
+        countries.add(p.info.country);
+      }
+    });
+    return Array.from(countries).sort();
+  }, [profiles]);
+  const availableExchanges = reactExports.useMemo(() => {
+    const exchanges = /* @__PURE__ */ new Set();
+    profiles.forEach((p) => {
+      if (p.info.exchange && p.info.exchange.trim() !== "") {
+        exchanges.add(p.info.exchange);
+      }
+    });
+    return Array.from(exchanges).sort();
+  }, [profiles]);
+  const parseMarketCapToNumber = (marketCapStr) => {
+    if (!marketCapStr || marketCapStr === "N/A" || marketCapStr.trim() === "") return 0;
+    const cleaned = marketCapStr.replace(/[^0-9.BMKmk]/g, "").toUpperCase();
+    if (!cleaned) return 0;
+    const num = parseFloat(cleaned.replace(/[BMKmk]/g, ""));
+    if (isNaN(num)) return 0;
+    if (cleaned.includes("B")) return num * 1e9;
+    if (cleaned.includes("M")) return num * 1e6;
+    if (cleaned.includes("K")) return num * 1e3;
+    return num;
+  };
   const filteredAndSortedProfiles = reactExports.useMemo(() => {
     let filtered = profiles.filter(
       (p) => p.id.toLowerCase().includes(searchTerm.toLowerCase()) || p.info.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -33060,6 +33092,36 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
       filtered = filtered.filter((p) => !p.isWatchlist);
     } else if (filterBy === "watchlist") {
       filtered = filtered.filter((p) => p.isWatchlist);
+    }
+    if (filterCountry !== "all") {
+      filtered = filtered.filter((p) => p.info.country === filterCountry);
+    }
+    if (filterExchange !== "all") {
+      filtered = filtered.filter((p) => p.info.exchange === filterExchange);
+    }
+    if (filterMarketCap !== "all") {
+      filtered = filtered.filter((p) => {
+        const marketCapNum = parseMarketCapToNumber(p.info.marketCap || "");
+        switch (filterMarketCap) {
+          case "micro":
+            return marketCapNum > 0 && marketCapNum < 3e8;
+          // < 300M
+          case "small":
+            return marketCapNum >= 3e8 && marketCapNum < 2e9;
+          // 300M - 2B
+          case "mid":
+            return marketCapNum >= 2e9 && marketCapNum < 1e10;
+          // 2B - 10B
+          case "large":
+            return marketCapNum >= 1e10 && marketCapNum < 2e11;
+          // 10B - 200B
+          case "mega":
+            return marketCapNum >= 2e11;
+          // > 200B
+          default:
+            return true;
+        }
+      });
     }
     const sorted = [...filtered].sort((a2, b) => {
       switch (sortBy2) {
@@ -33084,7 +33146,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
       }
     });
     return sorted;
-  }, [profiles, searchTerm, sortBy2, filterBy]);
+  }, [profiles, searchTerm, sortBy2, filterBy, filterCountry, filterExchange, filterMarketCap]);
   const getRecommendationColor = (rec) => {
     switch (rec) {
       case Recommendation.BUY:
@@ -33365,7 +33427,7 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
         {
           value: sortBy2,
           onChange: (e) => setSortBy(e.target.value),
-          className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer",
+          className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer mb-2",
           title: "Trier les tickers\\n\\nOptions de tri:\\n• Alphabétique (A-Z): Par symbole croissant\\n• Alphabétique (Z-A): Par symbole décroissant\\n• Date modif. (Récent): Plus récemment modifiés en premier\\n• Date modif. (Ancien): Plus anciennement modifiés en premier\\n• Recommandation: Achat → Conserver → Vente\\n• Secteur: Par secteur d'activité",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "lastModified", children: "📅 Date modif. (Récent)" }),
@@ -33376,7 +33438,88 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "sector", children: "🏢 Secteur" })
           ]
         }
-      )
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 mt-3 pt-3 border-t border-slate-700", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] font-semibold text-slate-400 uppercase", children: "Filtres Avancés" }),
+          (filterCountry !== "all" || filterExchange !== "all" || filterMarketCap !== "all") && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
+              onClick: () => {
+                setFilterCountry("all");
+                setFilterExchange("all");
+                setFilterMarketCap("all");
+              },
+              className: "text-[9px] text-blue-400 hover:text-blue-300 flex items-center gap-1",
+              title: "Réinitialiser tous les filtres avancés",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-3 h-3" }),
+                "Réinitialiser"
+              ]
+            }
+          )
+        ] }),
+        availableCountries.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-[9px] text-slate-400 mb-1", children: "🌍 Pays" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "select",
+            {
+              value: filterCountry,
+              onChange: (e) => setFilterCountry(e.target.value),
+              className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer",
+              title: "Filtrer par pays d'origine de l'entreprise",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "all", children: [
+                  "Tous les pays (",
+                  availableCountries.length,
+                  ")"
+                ] }),
+                availableCountries.map((country) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: country, children: country }, country))
+              ]
+            }
+          )
+        ] }),
+        availableExchanges.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-[9px] text-slate-400 mb-1", children: "📈 Bourse" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "select",
+            {
+              value: filterExchange,
+              onChange: (e) => setFilterExchange(e.target.value),
+              className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer",
+              title: "Filtrer par bourse où l'action est cotée",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "all", children: [
+                  "Toutes les bourses (",
+                  availableExchanges.length,
+                  ")"
+                ] }),
+                availableExchanges.map((exchange) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: exchange, children: exchange }, exchange))
+              ]
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-[9px] text-slate-400 mb-1", children: "💰 Capitalisation" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "select",
+            {
+              value: filterMarketCap,
+              onChange: (e) => setFilterMarketCap(e.target.value),
+              className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer",
+              title: "Filtrer par capitalisation boursière\\n\\n• Micro: < 300M USD\\n• Small: 300M - 2B USD\\n• Mid: 2B - 10B USD\\n• Large: 10B - 200B USD\\n• Mega: > 200B USD",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: "Toutes les capitalisations" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "micro", children: "Micro Cap (< 300M)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "small", children: "Small Cap (300M - 2B)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "mid", children: "Mid Cap (2B - 10B)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "large", children: "Large Cap (10B - 200B)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "mega", children: "Mega Cap (> 200B)" })
+              ]
+            }
+          )
+        ] })
+      ] })
     ] })
   ] });
 };
