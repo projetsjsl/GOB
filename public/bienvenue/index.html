@@ -3004,11 +3004,11 @@
                                 </div>
                                 
                                 {/* Panneau latéral droit pour assignation de responsables */}
-                                {editing === 'resources' && ReactDOM.createPortal(
+                                {editing === 'resources' && (
                                     <>
                                         {/* Overlay semi-transparent pour fermer en cliquant à l'extérieur */}
                                         <div 
-                                            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[10000] transition-opacity"
+                                            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[10000]"
                                             onClick={() => setEditing(null)}
                                         />
                                         {/* Panneau latéral droit - style slide-in */}
