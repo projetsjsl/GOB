@@ -2296,7 +2296,7 @@
                         } else if (data && data[0]) {
                             // Replace optimistic item with real DB item (mostly for ID)
                             const realId = data[0].id;
-                            setTaskTemplates(prev => prev.map(t => t.id === tempId ? DataMapper.taskTemplateToReact(data[0]) : t));
+                            setTaskTemplates(prev => prev.map(t => t.id === newId ? DataMapper.taskTemplateToReact(data[0]) : t));
                             showNotification('Nouvelle tâche ajoutée', 'success');
                         }
                    } catch (e) {
