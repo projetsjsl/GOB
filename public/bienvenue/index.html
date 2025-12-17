@@ -2497,6 +2497,12 @@
                 if (useSupabase && supabase) {
                     try {
                         // ✅ FIX: Mapper le champ React vers le champ DB
+                        // dueDate n'existe pas en DB, ne jamais essayer de le sauvegarder
+                        if (field === 'dueDate') {
+                            console.error('❌ Tentative de sauvegarder dueDate qui n\'existe pas en DB. Utilisez dayOffset à la place.');
+                            return;
+                        }
+                        
                         const dbField = field === 'phaseId' ? 'phase_id' : 
                                        field === 'dayOffset' ? 'day_offset' : 
                                        field === 'assignedTo' ? 'assigned_to' : field;
@@ -2738,8 +2744,22 @@
                 
                 const startEdit = (field, value) => { setEditing(field); setEditValue(value); };
                 const saveEdit = (field) => {
-                    if (editValue !== task[field]) {
-                        onUpdate(task.id, field, editValue);
+                    if (field === 'dueDate') {
+                        // ✅ FIX: dueDate n'existe pas en DB, on doit calculer dayOffset
+                        if (!selectedEmployee || !selectedEmployee.startDate) {
+                            console.warn('⚠️ Impossible de calculer dayOffset: selectedEmployee ou startDate manquant');
+                            setEditing(null);
+                            return;
+                        }
+                        const empStart = new Date(selectedEmployee.startDate);
+                        const selectedDate = new Date(editValue);
+                        const diffDays = Math.round((selectedDate.getTime() - empStart.getTime()) / (1000 * 60 * 60 * 24));
+                        // Mettre à jour avec dayOffset au lieu de dueDate
+                        onUpdate(task.id, 'dayOffset', diffDays);
+                    } else {
+                        if (editValue !== task[field]) {
+                            onUpdate(task.id, field, editValue);
+                        }
                     }
                     setEditing(null);
                 };
