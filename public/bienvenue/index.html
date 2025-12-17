@@ -1755,6 +1755,29 @@
                 }
             };
 
+            // Fonction réutilisable pour charger les tâches depuis Supabase
+            const reloadTaskTemplates = async () => {
+                if (!useSupabase || !supabase) return;
+                
+                try {
+                    const { data, error } = await supabase
+                        .from('task_templates')
+                        .select('*');
+                    
+                    if (error) {
+                        console.error('Erreur rechargement tâches:', error);
+                        return;
+                    }
+                    
+                    if (data) {
+                        setTaskTemplates(data.map(DataMapper.taskTemplateToReact));
+                        console.log(`✅ ${data.length} tâches rechargées depuis la DB`);
+                    }
+                } catch (error) {
+                    console.error("Erreur rechargement tâches:", error);
+                }
+            };
+
             // Chargement initial des données (OPTIMISÉ - Requêtes en parallèle)
             useEffect(() => {
                 const fetchData = async () => {
@@ -2256,16 +2279,16 @@
 
                         if (error) {
                             // Handle 409 conflict specifically
-                            if (error.code === '23505' || error.message?.includes('duplicate') || error.status === 409) {
+                            if (error.code === '23505' || error.message?.includes('duplicate') || error.status === 409 || error.code === 'PGRST116') {
                                 // Conflict: task might already exist, reload from DB
-                                console.warn('Conflit lors de l\'ajout de tâche, rechargement depuis la DB...');
+                                console.warn('Conflit lors de l\'ajout de tâche, rechargement depuis la DB...', error);
                                 // Remove optimistic update and reload
-                                setTaskTemplates(prev => prev.filter(t => t.id !== newId));
+                                setTaskTemplates(prev => prev.filter(t => t.id !== tempId));
                                 // Optionally reload tasks from DB
                                 showNotification('Tâche déjà existante ou conflit détecté. Rechargement...', 'error');
                                 // Reload tasks after a short delay
                                 setTimeout(() => {
-                                    loadData();
+                                    reloadTaskTemplates();
                                 }, 1000);
                             } else {
                                 throw error;
@@ -2273,13 +2296,15 @@
                         } else if (data && data[0]) {
                             // Replace optimistic item with real DB item (mostly for ID)
                             const realId = data[0].id;
-                            setTaskTemplates(prev => prev.map(t => t.id === newId ? { ...t, id: realId } : t));
+                            setTaskTemplates(prev => prev.map(t => t.id === tempId ? DataMapper.taskTemplateToReact(data[0]) : t));
                             showNotification('Nouvelle tâche ajoutée', 'success');
                         }
                    } catch (e) {
+                       console.error('Erreur ajout tâche:', e);
                        handleSupabaseError(e, 'Add Task');
                        // Remove optimistic update on error
-                       setTaskTemplates(prev => prev.filter(t => t.id !== newId));
+                       setTaskTemplates(prev => prev.filter(t => t.id !== tempId));
+                       showNotification(`Erreur lors de l'ajout: ${e.message || 'Erreur inconnue'}`, 'error');
                    }
                 } else {
                      showNotification('Nouvelle tâche ajoutée (Local)', 'success');
