@@ -1,13 +1,7 @@
 import React from 'react';
 import {
-  ChartBarIcon,
-  CalculatorIcon,
-  CurrencyDollarIcon,
-  ClockIcon,
   ArrowRightIcon,
-  SparklesIcon,
-  ShieldCheckIcon,
-  BoltIcon
+  SparklesIcon
 } from '@heroicons/react/24/outline';
 
 interface LandingPageProps {
@@ -50,102 +44,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             <span>Commencer l'analyse</span>
             <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
-
-          {/* Social Proof */}
-          <p className="mt-6 text-sm text-slate-400">
-            ✓ Données en temps réel · ✓ Analyses professionnelles · ✓ Gratuit pour commencer
-          </p>
-        </div>
-      </div>
-
-      {/* Features Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Feature 1 */}
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700 hover:border-blue-500 transition-colors">
-            <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
-              <ChartBarIcon className="w-6 h-6 text-blue-400" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">Analyse DCF</h3>
-            <p className="text-slate-400">
-              Valorisation par flux de trésorerie actualisés avec modèles personnalisables
-            </p>
-          </div>
-
-          {/* Feature 2 */}
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700 hover:border-purple-500 transition-colors">
-            <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
-              <CalculatorIcon className="w-6 h-6 text-purple-400" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">Scénarios Multiples</h3>
-            <p className="text-slate-400">
-              Créez et comparez différents scénarios de valorisation (optimiste, pessimiste, base)
-            </p>
-          </div>
-
-          {/* Feature 3 */}
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700 hover:border-green-500 transition-colors">
-            <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-4">
-              <CurrencyDollarIcon className="w-6 h-6 text-green-400" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">Données Temps Réel</h3>
-            <p className="text-slate-400">
-              Données financières actualisées depuis Financial Modeling Prep et Supabase
-            </p>
-          </div>
-
-          {/* Feature 4 */}
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700 hover:border-yellow-500 transition-colors">
-            <div className="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center mb-4">
-              <ClockIcon className="w-6 h-6 text-yellow-400" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">Historique 20 Ans</h3>
-            <p className="text-slate-400">
-              Analysez les tendances historiques avec jusqu'à 20 ans de données financières
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Key Benefits Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12">
-          Pourquoi choisir 3P1?
-        </h2>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Benefit 1 */}
-          <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <BoltIcon className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-3">Rapide et Intuitif</h3>
-            <p className="text-slate-400">
-              Interface moderne et épurée pour une analyse efficace sans courbe d'apprentissage
-            </p>
-          </div>
-
-          {/* Benefit 2 */}
-          <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <ShieldCheckIcon className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-3">Fiable et Précis</h3>
-            <p className="text-slate-400">
-              Sources de données professionnelles avec validation automatique des métriques
-            </p>
-          </div>
-
-          {/* Benefit 3 */}
-          <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <SparklesIcon className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-3">Personnalisable</h3>
-            <p className="text-slate-400">
-              Ajustez tous les paramètres pour créer vos propres modèles de valorisation
-            </p>
-          </div>
         </div>
       </div>
 
