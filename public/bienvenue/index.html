@@ -3644,9 +3644,14 @@
                     
                     {/* Panneau latéral droit pour assignation de responsables - RENDU UNE SEULE FOIS AU NIVEAU SUPÉRIEUR */}
                     {resourcePanelTaskId && (() => {
+                        // Trouver la tâche actuelle dans tasks (qui se met à jour automatiquement)
                         const selectedTask = tasks.find(t => t.id === resourcePanelTaskId);
-                        if (!selectedTask) return null;
-                        const assignedResources = resources.filter(r => selectedTask.assignedTo.includes(r.id));
+                        if (!selectedTask) {
+                            // Si la tâche n'existe plus, fermer le panneau
+                            setTimeout(() => setResourcePanelTaskId(null), 0);
+                            return null;
+                        }
+                        const assignedResources = resources.filter(r => (selectedTask.assignedTo || []).includes(r.id));
                         
                         return (
                             <div style={{ position: 'fixed', inset: 0, zIndex: 10000, pointerEvents: 'none' }}>
