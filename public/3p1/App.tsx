@@ -740,8 +740,35 @@ export default function App() {
                         console.log(`✅ ${newTickersCount} nouveaux tickers chargés depuis Supabase`);
                     }
 
+                    // ✅ DEBUG: Compter les profils avec isWatchlist=false après migration
+                    const portfolioCount = Object.values(updated).filter((p: any) => p.isWatchlist === false).length;
+                    const watchlistCount = Object.values(updated).filter((p: any) => p.isWatchlist === true).length;
+                    const normalCount = Object.values(updated).filter((p: any) => p.isWatchlist === null || p.isWatchlist === undefined).length;
+                    
                     if (migrationCount > 0) {
                         console.log(`🔄 Migration: ${migrationCount} profil(s) mis à jour avec isWatchlist depuis Supabase`);
+                    }
+                    
+                    console.log(`📊 Après migration - Portefeuille (⭐): ${portfolioCount}, Watchlist (👁️): ${watchlistCount}, Normaux: ${normalCount}, Total: ${Object.keys(updated).length}`);
+                    
+                    // ✅ VÉRIFICATION: S'assurer que tous les team tickers ont isWatchlist=false
+                    const teamTickersInSupabase = result.tickers.filter(t => {
+                        const mapped = mapSourceToIsWatchlist(t.source);
+                        return mapped === false; // Portefeuille
+                    });
+                    const teamTickersInLibrary = teamTickersInSupabase.filter(t => {
+                        const symbol = t.ticker.toUpperCase();
+                        return updated[symbol] && updated[symbol].isWatchlist === false;
+                    });
+                    
+                    if (teamTickersInSupabase.length !== teamTickersInLibrary.length) {
+                        const missing = teamTickersInSupabase.filter(t => {
+                            const symbol = t.ticker.toUpperCase();
+                            return !updated[symbol] || updated[symbol].isWatchlist !== false;
+                        });
+                        console.warn(`⚠️ ${teamTickersInSupabase.length - teamTickersInLibrary.length} team ticker(s) manquant(s) ou incorrect(s):`, missing.map(t => t.ticker));
+                    } else {
+                        console.log(`✅ Tous les ${teamTickersInSupabase.length} team tickers ont isWatchlist=false`);
                     }
 
                     return updated;
@@ -2640,8 +2667,35 @@ export default function App() {
                     console.warn('Failed to save to LocalStorage:', e);
                 }
 
+                // ✅ DEBUG: Compter les profils avec isWatchlist=false après migration
+                const portfolioCount = Object.values(updated).filter((p: any) => p.isWatchlist === false).length;
+                const watchlistCount = Object.values(updated).filter((p: any) => p.isWatchlist === true).length;
+                const normalCount = Object.values(updated).filter((p: any) => p.isWatchlist === null || p.isWatchlist === undefined).length;
+                
                 if (migrationCount > 0) {
                     console.log(`🔄 Migration: ${migrationCount} profil(s) mis à jour avec isWatchlist depuis Supabase`);
+                }
+                
+                console.log(`📊 Après migration (handleSyncFromSupabase) - Portefeuille (⭐): ${portfolioCount}, Watchlist (👁️): ${watchlistCount}, Normaux: ${normalCount}, Total: ${Object.keys(updated).length}`);
+                
+                // ✅ VÉRIFICATION: S'assurer que tous les team tickers ont isWatchlist=false
+                const teamTickersInSupabase = result.tickers.filter(t => {
+                    const mapped = mapSourceToIsWatchlist(t.source);
+                    return mapped === false; // Portefeuille
+                });
+                const teamTickersInLibrary = teamTickersInSupabase.filter(t => {
+                    const symbol = t.ticker.toUpperCase();
+                    return updated[symbol] && updated[symbol].isWatchlist === false;
+                });
+                
+                if (teamTickersInSupabase.length !== teamTickersInLibrary.length) {
+                    const missing = teamTickersInSupabase.filter(t => {
+                        const symbol = t.ticker.toUpperCase();
+                        return !updated[symbol] || updated[symbol].isWatchlist !== false;
+                    });
+                    console.warn(`⚠️ ${teamTickersInSupabase.length - teamTickersInLibrary.length} team ticker(s) manquant(s) ou incorrect(s):`, missing.map(t => t.ticker));
+                } else {
+                    console.log(`✅ Tous les ${teamTickersInSupabase.length} team tickers ont isWatchlist=false`);
                 }
 
                 return updated;
