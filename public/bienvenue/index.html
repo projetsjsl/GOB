@@ -2652,37 +2652,67 @@
              * @param {any} value - Nouvelle valeur
              */
             const updateTask = async (taskId, field, value) => {
-                // Optimistic UI
+                // ✅ FIX: dueDate n'existe pas en DB, ne jamais essayer de le sauvegarder
+                if (field === 'dueDate') {
+                    console.error('❌ Tentative de sauvegarder dueDate qui n\'existe pas en DB. Utilisez dayOffset à la place.');
+                    showNotification('Erreur: dueDate ne peut pas être sauvegardé directement. Utilisez le calendrier pour modifier la date.', 'error');
+                    return;
+                }
+                
+                // Optimistic UI - Mise à jour immédiate pour réactivité
                 setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: value } : t));
 
-                const originalTaskId = parseInt(taskId.split('-')[1]);
+                // Extraire le templateId de manière sécurisée
+                let originalTaskId;
+                if (typeof taskId === 'string' && taskId.includes('-')) {
+                    originalTaskId = parseInt(taskId.split('-')[1]);
+                    if (isNaN(originalTaskId)) {
+                        console.error(`❌ Impossible d'extraire templateId de ${taskId}`);
+                        showNotification('Erreur: ID de tâche invalide', 'error');
+                        // Rollback optimistic update
+                        setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: task[field] } : t));
+                        return;
+                    }
+                } else {
+                    originalTaskId = parseInt(taskId);
+                    if (isNaN(originalTaskId)) {
+                        console.error(`❌ taskId invalide: ${taskId}`);
+                        showNotification('Erreur: ID de tâche invalide', 'error');
+                        return;
+                    }
+                }
+                
+                // Mettre à jour les templates localement
                 const updatedTemplates = taskTemplates.map(t => t.id === originalTaskId ? { ...t, [field]: value } : t);
                 setTaskTemplates(updatedTemplates);
 
+                // Sauvegarder dans Supabase en utilisant saveTaskField pour une meilleure gestion d'erreur
                 if (useSupabase && supabase) {
                     try {
-                        // ✅ FIX: Mapper le champ React vers le champ DB
-                        // dueDate n'existe pas en DB, ne jamais essayer de le sauvegarder
-                        if (field === 'dueDate') {
-                            console.error('❌ Tentative de sauvegarder dueDate qui n\'existe pas en DB. Utilisez dayOffset à la place.');
-                            return;
+                        const success = await saveTaskField(taskId, field, value);
+                        if (success) {
+                            showNotification('Modification sauvegardée !', 'success');
+                        } else {
+                            // Rollback optimistic update en cas d'échec
+                            const originalTask = taskTemplates.find(t => t.id === originalTaskId);
+                            if (originalTask) {
+                                setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: originalTask[field] } : t));
+                                setTaskTemplates(taskTemplates); // Restaurer l'état précédent
+                            }
                         }
-                        
-                        const dbField = field === 'phaseId' ? 'phase_id' : 
-                                       field === 'dayOffset' ? 'day_offset' : 
-                                       field === 'assignedTo' ? 'assigned_to' : field;
-                        
-                        // Special handling for JSON fields if needed, but Supabase handles standard types well
-                        const { error } = await supabase
-                            .from('task_templates')
-                            .update({ [dbField]: value })
-                            .eq('id', originalTaskId);
-                            
-                        if (error) throw error;
-                        showNotification('Modification sauvegardée !', 'success');
                     } catch (e) {
-                         handleSupabaseError(e, 'Update Task');
+                        console.error('❌ Exception dans updateTask:', e);
+                        handleSupabaseError(e, 'Update Task');
+                        // Rollback optimistic update
+                        const originalTask = taskTemplates.find(t => t.id === originalTaskId);
+                        if (originalTask) {
+                            setTasks(prev => prev.map(t => t.id === taskId ? { ...t, [field]: originalTask[field] } : t));
+                            setTaskTemplates(taskTemplates);
+                        }
                     }
+                } else {
+                    // Mode local seulement
+                    showNotification('Modification enregistrée (mode local)', 'success');
                 }
             };
 
