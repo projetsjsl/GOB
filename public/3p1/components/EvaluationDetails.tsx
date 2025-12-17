@@ -494,7 +494,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
       </h3>
 
       <div className="overflow-x-auto -mx-3 sm:mx-0">
-        <table className="w-full text-xs sm:text-sm text-right border-collapse min-w-[650px] md:min-w-[700px]">
+        <table className="w-full text-xs sm:text-sm text-right border-collapse" style={{ minWidth: '100%' }}>
           <thead className="bg-slate-100 text-gray-600 uppercase text-xs">
             <tr>
               <th className="p-2 text-left">Métrique</th>
@@ -753,7 +753,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
           </div>
         </div>
 
-        <div className="bg-green-50 p-2.5 sm:p-3 md:p-4 rounded-lg border border-green-200 text-right w-full sm:w-auto sm:min-w-[180px] md:min-w-[200px]">
+        <div className="bg-green-50 p-2.5 sm:p-3 md:p-4 rounded-lg border border-green-200 text-right w-full">
           <div className="text-xs text-green-800 uppercase font-bold mb-1 cursor-help" title="Rendement Total Potentiel (5 ans)\n\nInclut:\n• Appréciation du prix (Prix Cible - Prix Actuel)\n• Dividendes cumulés sur 5 ans\n\nFormule:\n((Prix Cible Moyen + Dividendes Totaux - Prix Actuel) / Prix Actuel) × 100\n\n= ${totalReturnPercent.toFixed(2)}%\n\n⚠️ Basé sur vos hypothèses, pas une garantie de performance.">
             Rendement Total Potentiel
           </div>

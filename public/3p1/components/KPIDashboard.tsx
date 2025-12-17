@@ -4,7 +4,7 @@ import { StarIcon, EyeIcon } from '@heroicons/react/24/solid';
 import { AnalysisProfile, Recommendation } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
 import { formatCurrency, formatPercent } from '../utils/calculations';
-import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon, ExclamationCircleIcon, ChevronDownIcon, ChevronUpIcon, MagnifyingGlassPlusIcon, MagnifyingGlassMinusIcon, ArrowsPointingOutIcon, ArrowPathIcon, BookOpenIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon, ExclamationCircleIcon, ChevronDownIcon, ChevronUpIcon, MagnifyingGlassPlusIcon, MagnifyingGlassMinusIcon, ArrowsPointingOutIcon, ArrowPathIcon, BookOpenIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import { listSnapshots } from '../services/snapshotApi';
 import { SyncSelectionDialog } from './SyncSelectionDialog';
 import { GuideDialog } from './GuideDialog';
@@ -21,9 +21,10 @@ interface KPIDashboardProps {
   onSyncNA?: (tickers: string[]) => void; // Optionnel : fonction pour synchroniser uniquement les N/A
   isBulkSyncing?: boolean; // Optionnel : état de la synchronisation
   onUpdateProfile?: (id: string, newProfile: AnalysisProfile) => void;
+  onOpenSettings?: () => void; // Optionnel : fonction pour ouvrir le panneau de paramètres
 }
 
-export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isBulkSyncing = false, onUpdateProfile }) => {
+export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isBulkSyncing = false, onUpdateProfile, onOpenSettings }) => {
   const [sortConfig, setSortConfig] = useState<{
     key: string;
     direction: 'asc' | 'desc';
@@ -1824,6 +1825,16 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 </span>
               </div>
               <div className="flex gap-2 flex-wrap">
+                {onOpenSettings && (
+                  <button
+                    onClick={onOpenSettings}
+                    className="px-3 py-1 text-xs rounded transition-colors bg-gray-100 hover:bg-blue-100 hover:text-blue-600 text-gray-700 flex items-center gap-1"
+                    title="⚙️ Configuration Complète : Guardrails, Validation, Ajustements\n\nOuvre le panneau de configuration unifié pour gérer tous les paramètres de l'application.\n\n🛡️ Guardrails (Limites d'affichage):\n• Limites de croissance (min/max pour toutes les métriques)\n• Limites de ratios (P/E, P/CF, P/BV min/max)\n• Multiplicateur maximum raisonnable pour les projections\n• Contrôlent l'affichage des graphiques et tableaux\n• Stockés dans localStorage (navigateur)\n• Affectent uniquement l'affichage, pas les calculs\n\n✅ Validation (Paramètres de sanitisation):\n• Limites de croissance par métrique (EPS, CF, BV, DIV)\n• Limites de ratios cibles (P/E, P/CF, P/BV, Yield)\n• Précision des calculs (décimales)\n• Automatisation de la sanitisation lors de la sync FMP\n• Cohérence des données\n• Stockés dans Supabase (partagés entre utilisateurs)\n• Affectent les calculs et la sauvegarde\n\n📊 Ajustements:\n• Paramètres généraux de l'application\n• Comportement par défaut\n• Options d'affichage\n\n💡 Impact:\n• Les Guardrails affectent l'affichage uniquement\n• La Validation affecte les calculs et la sauvegarde\n• Les changements sont appliqués immédiatement\n• Les paramètres sont persistants (localStorage ou Supabase)"
+                  >
+                    <Cog6ToothIcon className="w-3 h-3" />
+                    Paramètres
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setFilters(prev => ({ ...prev, showOnlyNA: !prev.showOnlyNA }));
@@ -1834,8 +1845,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                       : 'bg-gray-100 hover:bg-orange-100 hover:text-orange-600 text-gray-700'
                   }`}
                   title={filters.showOnlyNA 
-                    ? "Afficher tous les tickers\n\nDésactive le filtre N/A pour voir tous les tickers.\n\nRaccourci: Ctrl+Shift+F" 
-                    : "Afficher uniquement les N/A\n\nFiltre pour ne voir que les tickers avec des données invalides (N/A).\n\nUtile pour identifier rapidement les tickers nécessitant une synchronisation.\n\nRaccourci: Ctrl+Shift+F"}
+                    ? "👁️ Afficher tous les tickers\n\nDésactive le filtre N/A pour voir tous les tickers de votre portefeuille et watchlist.\n\n📊 Affichage:\n• Tous les tickers (valides et avec N/A)\n• Métriques complètes pour les tickers valides\n• Indicateurs N/A pour les tickers incomplets\n\n⌨️ Raccourci: Ctrl+Shift+F (Cmd+Shift+F sur Mac)" 
+                    : "⚠️ Afficher uniquement les tickers avec N/A\n\nFiltre pour ne voir que les tickers avec des données invalides ou manquantes.\n\n🔍 Utilité:\n• Identifier rapidement les tickers nécessitant une synchronisation\n• Voir quels tickers ont des problèmes de données\n• Faciliter le nettoyage et la maintenance\n• Permet de synchroniser uniquement les tickers problématiques\n\n📊 Indicateurs N/A:\n• Prix actuel invalide ou manquant\n• Données historiques incomplètes\n• Métriques impossibles à calculer\n• Tickers non synchronisés depuis FMP\n\n⌨️ Raccourci: Ctrl+Shift+F (Cmd+Shift+F sur Mac)"}
                   aria-label={filters.showOnlyNA ? "Afficher tous les tickers" : "Afficher uniquement les tickers avec N/A"}
                   aria-pressed={filters.showOnlyNA ? "true" : "false"}
                   tabIndex={0}
@@ -1852,7 +1863,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     }}
                     disabled={isBulkSyncing}
                     className="px-3 py-1 text-xs bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded transition-colors flex items-center gap-1"
-                    title={`Synchroniser uniquement les ${filteredMetrics.length} ticker(s) avec N/A\n\nSynchronise uniquement les tickers affichés (ceux avec N/A).\n\nPlus rapide que de synchroniser tous les tickers.`}
+                    title={`🔄 Synchroniser uniquement les ${filteredMetrics.length} ticker(s) avec N/A\n\nSynchronise uniquement les tickers affichés (ceux avec des données invalides ou manquantes).\n\n⚡ Avantages:\n• Plus rapide que de synchroniser tous les tickers\n• Cible uniquement les tickers problématiques\n• Économise les appels API FMP\n• Permet de corriger rapidement les données manquantes\n\n📊 Processus:\n• Récupère les données FMP Premium pour chaque ticker\n• Met à jour les données historiques (30 ans)\n• Recalcule les hypothèses automatiquement\n• Préserve les modifications manuelles existantes\n• Sauvegarde un snapshot avant et après la sync\n\n⏱️ Durée:\n• Environ 2-3 secondes par ticker\n• Traitement en batch (3 tickers en parallèle)\n• Barre de progression affichée\n\n💡 Astuce:\n• Utilisez ce bouton après avoir filtré les N/A\n• Plus efficace que 'Sync Warehouse (Deep)' si vous avez beaucoup de tickers`}
                   >
                     <ArrowPathIcon className={`w-3 h-3 ${isBulkSyncing ? 'animate-spin' : ''}`} />
                     Sync N/A ({filteredMetrics.length})
@@ -1905,7 +1916,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   }}
                   disabled={isBulkSyncing || isAnalyzingNA}
                   className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded transition-colors flex items-center gap-1"
-                  title="Analyser et synchroniser automatiquement les tickers avec N/A depuis le backend\n\nCet outil:\n1. Analyse tous les tickers depuis Supabase\n2. Identifie ceux avec des valeurs N/A\n3. Propose de les synchroniser automatiquement"
+                  title="🔍 Analyser les tickers avec N/A\n\nAnalyse tous les tickers de votre portefeuille et watchlist pour identifier ceux avec des données invalides ou manquantes.\n\n📊 Résultats de l'analyse:\n• Nombre total de tickers analysés\n• Nombre de tickers valides (données complètes)\n• Nombre de tickers avec N/A (données manquantes)\n• Nombre d'erreurs rencontrées\n• Liste des tickers problématiques\n\n⚡ Fonctionnalités:\n• Analyse rapide via l'API backend\n• Limite de 200 tickers par analyse\n• Propose automatiquement de synchroniser les N/A\n• Affiche un résumé détaillé\n\n💡 Utilisation:\n• Cliquez pour lancer l'analyse\n• Attendez quelques secondes\n• Si des N/A sont trouvés, vous pouvez les synchroniser automatiquement\n• Plus efficace que de vérifier manuellement chaque ticker"
                 >
                   <ArrowPathIcon className={`w-3 h-3 ${isAnalyzingNA ? 'animate-spin' : ''}`} />
                   {isAnalyzingNA ? 'Analyse...' : 'Auto-Sync N/A'}
@@ -2299,7 +2310,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           </div>
         ) : (
           <div className="overflow-x-auto bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg">
-            <div className="min-w-[600px] sm:min-w-[700px] md:min-w-[800px]">
+            <div className="w-full" style={{ minWidth: '100%' }}>
               <svg 
                 ref={svgJPEGYRef}
                 width={chartWidth} 
@@ -2587,7 +2598,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           </div>
         ) : (
           <div className="overflow-x-auto bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg">
-            <div className="min-w-[600px] sm:min-w-[700px] md:min-w-[800px]">
+            <div className="w-full" style={{ minWidth: '100%' }}>
               {(() => {
                 // Calculer les échelles pour Ratio 3:1
                 const validMetricsForRatio31Chart = filteredMetrics.filter(m => 
@@ -3391,7 +3402,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           </div>
         ) : (
           <div className="overflow-x-auto -mx-3 sm:mx-0">
-            <table className="w-full text-xs sm:text-sm min-w-[800px]">
+            <table className="w-full text-xs sm:text-sm" style={{ minWidth: '100%' }}>
               <thead className="bg-gradient-to-r from-slate-100 to-slate-50 sticky top-0">
                 <tr>
                   <th 

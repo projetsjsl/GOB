@@ -909,31 +909,21 @@
             }
         };
 
-        // FONCTION D'ENVOI EMAIL VIA RESEND (Réelle API)
-        const sendEmailViaResend = async (employee, phases, tasks, resources, showNotificationFn) => {
+        // FONCTION D'ENVOI EMAIL VIA RESEND (Réelle API) - VERSION FONCTIONNELLE
+        const sendEmailViaResend = async (employee, phases, tasks, resources) => {
              let html;
              try {
                 if (typeof window.generateEmailHTML !== 'function') throw new Error("Le générateur d'email n'est pas chargé.");
                 html = window.generateEmailHTML(employee, phases, tasks, resources);
              } catch (e) {
                 console.error("Erreur génération email:", e);
-                const notifyFn = showNotificationFn || (typeof showNotification !== 'undefined' ? showNotification : console.error);
-                if (typeof notifyFn === 'function') {
-                    notifyFn("Erreur: Le modèle d'email ne s'est pas chargé correctement. Rechargez la page.", 'error');
-                } else {
-                    console.error("Erreur: Le modèle d'email ne s'est pas chargé correctement. Rechargez la page.");
-                }
+                showNotification("Erreur: Le modèle d'email ne s'est pas chargé correctement. Rechargez la page.", 'error');
                 return;
              }
              
-             const subject = `Plan d'Intégration - ${employee?.name || 'Nouveau'}`;
-             // Use modal instead of prompt()
-             setEmailPromptCallback((email) => {
-                 if (email) {
-                     sendEmailWithAddress(email, subject, html, employee, showNotificationFn);
-                 }
-             });
-             setShowEmailPrompt(true);
+             const subject = `Plan d'Intégration - ${employee?.name || employee.name || 'Nouveau'}`;
+             const to = prompt("Entrez l'adresse email du destinataire:", "projetsjsl@gmail.com"); 
+             if (!to) return;
              
              // Feedback UI
              const originalText = document.activeElement ? document.activeElement.innerText : '';
@@ -954,14 +944,14 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    alert('✅ Email envoyé avec succès !');
+                    showNotification('✅ Email envoyé avec succès !', 'success');
                 } else {
                     console.error('Erreur envoi email:', data);
-                    alert(`❌ Erreur lors de l'envoi : ${data.message || 'Erreur inconnue'}`);
+                    showNotification(`❌ Erreur lors de l'envoi : ${data.message || 'Erreur inconnue'}`, 'error');
                 }
              } catch (error) {
                 console.error('Erreur réseau:', error);
-                alert('❌ Erreur réseau lors de l\'envoi de l\'email.');
+                showNotification('❌ Erreur réseau lors de l\'envoi de l\'email.', 'error');
              } finally {
                 if (document.activeElement) document.activeElement.innerText = originalText;
              }
@@ -2819,42 +2809,21 @@
                                 <Icons.Eye /> <span className="hidden md:inline">Aperçu Email</span>
                             </button>
 
-                            <button onClick={async () => {
+                            <button onClick={() => {
                                 const html = window.generateEmailHTML(selectedEmployee, phases, filteredTasks, resources);
-                                try {
-                                    // Try modern ClipboardItem API first (for HTML)
-                                    if (typeof ClipboardItem !== 'undefined') {
-                                        const blob = new Blob([html], { type: 'text/html' });
-                                        const item = new ClipboardItem({ 'text/html': blob });
-                                        await navigator.clipboard.write([item]);
-                                        showNotification('Email copié dans le presse-papier ! Collez-le dans Outlook/Gmail.', 'success');
-                                    } else {
-                                        // Fallback: copy as plain text
-                                        await navigator.clipboard.writeText(html);
-                                        showNotification('Email copié (texte). Utilisez "Aperçu" pour le format HTML.', 'success');
-                                    }
-                                } catch (err) {
+                                const blob = new Blob([html], { type: 'text/html' });
+                                const item = new ClipboardItem({ 'text/html': blob });
+                                navigator.clipboard.write([item]).then(() => {
+                                    showNotification('Email copié dans le presse-papier ! Collez-le dans Outlook/Gmail.', 'success');
+                                }).catch(err => {
                                     console.error('Erreur copie:', err);
-                                    // Final fallback: create temporary textarea
-                                    try {
-                                        const textarea = document.createElement('textarea');
-                                        textarea.value = html;
-                                        textarea.style.position = 'fixed';
-                                        textarea.style.opacity = '0';
-                                        document.body.appendChild(textarea);
-                                        textarea.select();
-                                        document.execCommand('copy');
-                                        document.body.removeChild(textarea);
-                                        showNotification('Email copié (méthode alternative)', 'success');
-                                    } catch (fallbackErr) {
-                                        showNotification('Erreur lors de la copie. Utilisez "Aperçu" et copiez manuellement.', 'error');
-                                    }
-                                }
+                                    showNotification('Erreur lors de la copie. Utilisez "Aperçu" et copiez manuellement.', 'error');
+                                });
                             }} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg flex items-center gap-2 transition-colors" title="Copier pour Outlook/Gmail">
                                 <Icons.Send /> <span className="hidden md:inline">Copier l'email</span>
                             </button>
 
-                            <button onClick={() => sendEmailViaResend(selectedEmployee, phases, filteredTasks, resources, showNotification)} className="p-2 text-green-600 hover:bg-green-50 rounded-lg flex items-center gap-2 transition-colors" title="Envoyer via Resend">
+                            <button onClick={() => sendEmailViaResend(selectedEmployee, phases, filteredTasks, resources)} className="p-2 text-green-600 hover:bg-green-50 rounded-lg flex items-center gap-2 transition-colors" title="Envoyer via Resend">
                                 <Icons.Send /> <span className="font-bold">Envoyer (Resend)</span>
                             </button>
                         </div>
