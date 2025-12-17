@@ -3693,7 +3693,7 @@
                                     <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
                                         <div className="space-y-2">
                                             {resources.map(r => {
-                                                const isSelected = selectedTask.assignedTo.includes(r.id);
+                                                const isSelected = (selectedTask.assignedTo || []).includes(r.id);
                                                 return (
                                                     <div 
                                                         key={r.id} 
