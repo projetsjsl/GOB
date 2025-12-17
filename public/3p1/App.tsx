@@ -614,6 +614,12 @@ export default function App() {
                 // Identifier les nouveaux tickers AVANT la mise à jour (utiliser setLibrary avec fonction)
                 let newTickers: typeof result.tickers = [];
 
+                // ✅ MIGRATION : Créer un Map de source pour tous les tickers Supabase
+                const sourceMap = new Map<string, 'team' | 'watchlist' | 'both' | 'manual'>();
+                result.tickers.forEach(t => {
+                    sourceMap.set(t.ticker.toUpperCase(), t.source);
+                });
+
                 // Merge intelligent : ne pas écraser les profils existants
                 setLibrary(prev => {
                     const existingSymbols = new Set(Object.keys(prev));
@@ -633,6 +639,22 @@ export default function App() {
 
                     const updated = { ...prev };
                     let newTickersCount = 0;
+                    let migrationCount = 0;
+
+                    // ✅ MIGRATION : Corriger TOUS les profils existants qui ne sont pas dans Supabase
+                    // Si un profil existe dans localStorage mais pas dans Supabase, le marquer comme 'manual' (null)
+                    Object.keys(updated).forEach(symbol => {
+                        if (!sourceMap.has(symbol)) {
+                            // Ticker existe localement mais pas dans Supabase → Normal (pas d'icône)
+                            if (updated[symbol].isWatchlist !== null && updated[symbol].isWatchlist !== undefined) {
+                                updated[symbol] = {
+                                    ...updated[symbol],
+                                    isWatchlist: null // Tickers normaux (hors Supabase)
+                                };
+                                migrationCount++;
+                            }
+                        }
+                    });
 
                     result.tickers.forEach(supabaseTicker => {
                         const tickerSymbol = supabaseTicker.ticker.toUpperCase();
@@ -678,24 +700,24 @@ export default function App() {
                                             : updated[tickerSymbol].info.beta
                                     }
                                 };
+                                migrationCount++;
                                 
                                 // Si c'est le profil actif, mettre à jour aussi le state local
                                 if (tickerSymbol === activeIdRef.current) {
                                     setInfo(updated[tickerSymbol].info);
                                     setIsWatchlist(shouldBeWatchlist ?? false);
                                 }
-                            } else {
+                            } else if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist) {
                                 // ✅ Même si pas d'autres updates, forcer isWatchlist pour migration
-                                if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist) {
-                                    updated[tickerSymbol] = {
-                                        ...updated[tickerSymbol],
-                                        isWatchlist: shouldBeWatchlist
-                                    };
-                                    
-                                    // Si c'est le profil actif, mettre à jour aussi le state local
-                                    if (tickerSymbol === activeIdRef.current) {
-                                        setIsWatchlist(shouldBeWatchlist ?? false);
-                                    }
+                                updated[tickerSymbol] = {
+                                    ...updated[tickerSymbol],
+                                    isWatchlist: shouldBeWatchlist
+                                };
+                                migrationCount++;
+                                
+                                // Si c'est le profil actif, mettre à jour aussi le state local
+                                if (tickerSymbol === activeIdRef.current) {
+                                    setIsWatchlist(shouldBeWatchlist ?? false);
                                 }
                             }
                             return;

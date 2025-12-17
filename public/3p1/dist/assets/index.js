@@ -52115,6 +52115,10 @@ Vérifiez votre connexion et réessayez.`,
           timestamp: Date.now()
         };
         let newTickers = [];
+        const sourceMap = /* @__PURE__ */ new Map();
+        result.tickers.forEach((t) => {
+          sourceMap.set(t.ticker.toUpperCase(), t.source);
+        });
         setLibrary((prev) => {
           const existingSymbols = new Set(Object.keys(prev));
           newTickers = result.tickers.filter((t) => {
@@ -52130,6 +52134,19 @@ Vérifiez votre connexion et réessayez.`,
           });
           const updated = { ...prev };
           let newTickersCount = 0;
+          let migrationCount = 0;
+          Object.keys(updated).forEach((symbol) => {
+            if (!sourceMap.has(symbol)) {
+              if (updated[symbol].isWatchlist !== null && updated[symbol].isWatchlist !== void 0) {
+                updated[symbol] = {
+                  ...updated[symbol],
+                  isWatchlist: null
+                  // Tickers normaux (hors Supabase)
+                };
+                migrationCount++;
+              }
+            }
+          });
           result.tickers.forEach((supabaseTicker) => {
             const tickerSymbol = supabaseTicker.ticker.toUpperCase();
             if (updated[tickerSymbol]) {
@@ -52152,19 +52169,19 @@ Vérifiez votre connexion et réessayez.`,
                     beta: supabaseTicker.beta !== null && supabaseTicker.beta !== void 0 ? supabaseTicker.beta : updated[tickerSymbol].info.beta
                   }
                 };
+                migrationCount++;
                 if (tickerSymbol === activeIdRef.current) {
                   setInfo(updated[tickerSymbol].info);
                   setIsWatchlist(shouldBeWatchlist ?? false);
                 }
-              } else {
-                if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist) {
-                  updated[tickerSymbol] = {
-                    ...updated[tickerSymbol],
-                    isWatchlist: shouldBeWatchlist
-                  };
-                  if (tickerSymbol === activeIdRef.current) {
-                    setIsWatchlist(shouldBeWatchlist ?? false);
-                  }
+              } else if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist) {
+                updated[tickerSymbol] = {
+                  ...updated[tickerSymbol],
+                  isWatchlist: shouldBeWatchlist
+                };
+                migrationCount++;
+                if (tickerSymbol === activeIdRef.current) {
+                  setIsWatchlist(shouldBeWatchlist ?? false);
                 }
               }
               return;
@@ -53579,7 +53596,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
       });
       setLibrary((prev) => {
         const updated = { ...prev };
-        let migrationCount2 = 0;
+        let migrationCount = 0;
         Object.keys(updated).forEach((symbol) => {
           if (!sourceMap.has(symbol)) {
             if (updated[symbol].isWatchlist !== null && updated[symbol].isWatchlist !== void 0) {
@@ -53588,7 +53605,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 isWatchlist: null
                 // Tickers normaux (hors Supabase)
               };
-              migrationCount2++;
+              migrationCount++;
             }
           }
         });
@@ -53613,7 +53630,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 }
               };
               updatedTickersCount++;
-              migrationCount2++;
+              migrationCount++;
               if (tickerSymbol === activeId) {
                 setInfo(updated[tickerSymbol].info);
                 setIsWatchlist(shouldBeWatchlist ?? false);
@@ -53623,7 +53640,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 ...updated[tickerSymbol],
                 isWatchlist: shouldBeWatchlist
               };
-              migrationCount2++;
+              migrationCount++;
               if (tickerSymbol === activeId) {
                 setIsWatchlist(shouldBeWatchlist ?? false);
               }
@@ -53637,8 +53654,8 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
         } catch (e) {
           console.warn("Failed to save to LocalStorage:", e);
         }
-        if (migrationCount2 > 0) {
-          console.log(`🔄 Migration: ${migrationCount2} profil(s) mis à jour avec isWatchlist depuis Supabase`);
+        if (migrationCount > 0) {
+          console.log(`🔄 Migration: ${migrationCount} profil(s) mis à jour avec isWatchlist depuis Supabase`);
         }
         return updated;
       });
