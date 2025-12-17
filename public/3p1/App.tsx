@@ -119,7 +119,7 @@ export default function App() {
     // --- GLOBAL STATE & PERSISTENCE ---
     const [showLanding, setShowLanding] = useState(true); // Show landing page by default
     const [library, setLibrary] = useState<Record<string, AnalysisProfile>>({});
-    const [activeId, setActiveId] = useState<string>('ACN');
+    const [activeId, setActiveId] = useState<string>('');
     const [isInitialized, setIsInitialized] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
@@ -376,7 +376,11 @@ export default function App() {
                     
                     if (Object.keys(cleaned).length > 0) {
                         setLibrary(cleaned);
-                        setActiveId(Object.keys(cleaned)[0]);
+                        // Sélectionner le premier ticker en ordre alphabétique
+                        const sortedKeys = Object.keys(cleaned).sort((a, b) => 
+                            (cleaned[a].info.preferredSymbol || a).localeCompare(cleaned[b].info.preferredSymbol || b)
+                        );
+                        setActiveId(sortedKeys[0]);
                     } else {
                         setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
                         setActiveId(DEFAULT_PROFILE.id);
@@ -1794,7 +1798,11 @@ export default function App() {
         if (activeId === id) {
             const remaining = Object.keys(newLib);
             if (remaining.length > 0) {
-                setActiveId(remaining[0]);
+                // Sélectionner le premier ticker en ordre alphabétique
+                const sortedRemaining = remaining.sort((a, b) => 
+                    (library[a]?.info?.preferredSymbol || a).localeCompare(library[b]?.info?.preferredSymbol || b)
+                );
+                setActiveId(sortedRemaining[0]);
             } else {
                 setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
                 setActiveId(DEFAULT_PROFILE.id);
