@@ -2829,6 +2829,21 @@
             };
 
             // KANBAN VIEW COMPONENT
+            /**
+             * KanbanView - Vue Kanban des tâches
+             * -----------------------------------
+             * Affiche les tâches dans 3 colonnes (À faire, En cours, Terminé).
+             * Support drag & drop pour changer le statut.
+             * 
+             * COLONNES:
+             * - pending: À faire
+             * - inProgress: En cours
+             * - completed: Terminé
+             * 
+             * DRAG & DROP:
+             * - Utilise dataTransfer pour passer le taskId
+             * - handleDrop met à jour le statut via toggleTaskStatus
+             */
             const KanbanView = () => {
                 const columns = [
                     { id: 'pending', title: 'À faire', icon: <Icons.Circle />, bg: 'bg-gray-50', border: 'border-gray-200' },
@@ -2881,6 +2896,21 @@
                 );
             };
 
+            /**
+             * GanttView - Vue Gantt (diagramme de Gantt)
+             * --------------------------------------------
+             * Affiche les phases et tâches sur une timeline horizontale.
+             * 
+             * CALCULS:
+             * - totalDuration: Durée totale du parcours (max des phases)
+             * - Position des phases: Basée sur startOffset et duration
+             * - Position des tâches: Basée sur dayOffset
+             * 
+             * AFFICHAGE:
+             * - Barres de phase: Couleur de la phase, opacité 30%
+             * - Points de tâche: Positionnés selon dayOffset
+             * - Timeline: J+0, J+10, J+20, J+30
+             */
             /**
              * GanttView - Vue Gantt (diagramme de Gantt)
              * --------------------------------------------

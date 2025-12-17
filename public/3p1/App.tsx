@@ -718,6 +718,10 @@ export default function App() {
                         console.log(`✅ ${newTickersCount} nouveaux tickers chargés depuis Supabase`);
                     }
 
+                    if (migrationCount > 0) {
+                        console.log(`🔄 Migration: ${migrationCount} profil(s) mis à jour avec isWatchlist depuis Supabase`);
+                    }
+
                     return updated;
                 });
 
