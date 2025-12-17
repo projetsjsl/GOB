@@ -8708,11 +8708,11 @@ CONSERVER: Entre limite d'achat et vente
 VENTE: Prix actuel ≥ Limite de vente`
             }
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+          isWatchlist !== null && isWatchlist !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
             "div",
             {
               className: "absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow-sm border border-blue-100 z-10",
-              title: isWatchlist ? "👁️ Watchlist (Non détenu)\n\nCe titre est dans votre watchlist (surveillé mais non détenu).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation." : "⭐ Portefeuille (Détenu)\n\nCe titre est dans votre portefeuille (vous le détenez actuellement).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation.\n• Point coloré = Recommandation (ACHAT/CONSERVER/VENTE)",
+              title: isWatchlist ? "👁️ Watchlist (Non détenu)\n\nCe titre est dans votre watchlist (surveillé mais non détenu).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation." : "⭐ Portefeuille (Détenu)\n\nCe titre est dans votre portefeuille (team ticker, vous le détenez actuellement).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation.\n• Point coloré = Recommandation (ACHAT/CONSERVER/VENTE)",
               children: isWatchlist ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-3.5 h-3.5 text-blue-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-3.5 h-3.5 text-yellow-500 fill-yellow-500", style: { fill: "#eab308" } })
             }
           )
@@ -33029,10 +33029,11 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
     return rec;
   };
   const tickerStats = reactExports.useMemo(() => {
-    const portfolio = profiles.filter((p) => !p.isWatchlist).length;
-    const watchlist = profiles.filter((p) => p.isWatchlist).length;
+    const portfolio = profiles.filter((p) => p.isWatchlist === false).length;
+    const watchlist = profiles.filter((p) => p.isWatchlist === true).length;
+    const normal = profiles.filter((p) => p.isWatchlist === null || p.isWatchlist === void 0).length;
     const total = profiles.length;
-    return { portfolio, watchlist, total };
+    return { portfolio, watchlist, normal, total };
   }, [profiles]);
   const availableCountries = reactExports.useMemo(() => {
     const countries = /* @__PURE__ */ new Set();
@@ -33068,9 +33069,9 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
       (p) => p.id.toLowerCase().includes(searchTerm.toLowerCase()) || p.info.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     if (filterBy === "portfolio") {
-      filtered = filtered.filter((p) => !p.isWatchlist);
+      filtered = filtered.filter((p) => p.isWatchlist === false);
     } else if (filterBy === "watchlist") {
-      filtered = filtered.filter((p) => p.isWatchlist);
+      filtered = filtered.filter((p) => p.isWatchlist === true);
     }
     if (filterCountry !== "all") {
       filtered = filtered.filter((p) => p.info.country === filterCountry);
@@ -33240,25 +33241,31 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cursor-help", title: `Liste de vos tickers
 
 📊 Statistiques:
-• ⭐ Portefeuille (détenus): ${tickerStats.portfolio} tickers
+• ⭐ Portefeuille (team tickers): ${tickerStats.portfolio} tickers
 • 👁️ Watchlist (surveillés): ${tickerStats.watchlist} tickers
+• 📋 Normaux (hors team/watchlist): ${tickerStats.normal} tickers
 • Total: ${tickerStats.total} tickers
 
 ⚠️ IMPORTANT:
-• ⭐ Étoile = Portefeuille (titres DÉTENUS)
+• ⭐ Étoile = Portefeuille (team tickers DÉTENUS)
 • 👁️ Œil = Watchlist (titres SURVEILLÉS)
+• Pas d'icône = Tickers normaux (hors team/watchlist)
 • Point coloré = Recommandation (ACHAT/CONSERVER/VENTE)
 
 Utilisez la barre de recherche pour filtrer par symbole ou nom.`, children: "Portefeuille" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
           filterBy === "all" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[9px] bg-yellow-900/50 px-1.5 py-0.5 rounded text-yellow-400", title: `Portefeuille: ${tickerStats.portfolio} tickers`, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[9px] bg-yellow-900/50 px-1.5 py-0.5 rounded text-yellow-400", title: `Portefeuille (team tickers): ${tickerStats.portfolio} tickers`, children: [
               "⭐ ",
               tickerStats.portfolio
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[9px] bg-blue-900/50 px-1.5 py-0.5 rounded text-blue-400", title: `Watchlist: ${tickerStats.watchlist} tickers`, children: [
               "👁️ ",
               tickerStats.watchlist
+            ] }),
+            tickerStats.normal > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[9px] bg-slate-700/50 px-1.5 py-0.5 rounded text-slate-400", title: `Tickers normaux (hors team/watchlist): ${tickerStats.normal} tickers`, children: [
+              "📋 ",
+              tickerStats.normal
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] bg-slate-800 px-1.5 py-0.5 rounded-full text-slate-400 cursor-help", title: `Nombre de tickers affichés: ${filteredAndSortedProfiles.length} / ${profiles.length}
@@ -33330,7 +33337,7 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
                 ] })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                profile.isWatchlist !== null && profile.isWatchlist !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
                   "button",
                   {
                     onClick: (e) => {
@@ -38667,9 +38674,10 @@ const loadAllTickersFromSupabase = async () => {
   }
 };
 const mapSourceToIsWatchlist = (source) => {
-  if (!source) return true;
+  if (!source || source === "manual") return null;
   if (source === "team") return false;
-  return true;
+  if (source === "watchlist" || source === "both") return true;
+  return null;
 };
 async function fetchMarketDataBatch(tickers) {
   if (tickers.length === 0) {

@@ -104,19 +104,21 @@ export const Header: React.FC<HeaderProps> = ({
               title={`Signal: ${recommendation}\n\nACHAT: Prix actuel ≤ Limite d'achat\nCONSERVER: Entre limite d'achat et vente\nVENTE: Prix actuel ≥ Limite de vente`}
             ></div>
 
-            {/* Status Icon: Eye (Watchlist) or Star (Portfolio) */}
-            <div
-              className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow-sm border border-blue-100 z-10"
-              title={isWatchlist 
-                ? "👁️ Watchlist (Non détenu)\n\nCe titre est dans votre watchlist (surveillé mais non détenu).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation."
-                : "⭐ Portefeuille (Détenu)\n\nCe titre est dans votre portefeuille (vous le détenez actuellement).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation.\n• Point coloré = Recommandation (ACHAT/CONSERVER/VENTE)"}
-            >
-              {isWatchlist ? (
-                <EyeIcon className="w-3.5 h-3.5 text-blue-600" />
-              ) : (
-                <StarIcon className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" style={{ fill: '#eab308' }} />
-              )}
-            </div>
+            {/* Status Icon: Eye (Watchlist) or Star (Portfolio) - Affiché seulement si team ou watchlist */}
+            {isWatchlist !== null && isWatchlist !== undefined && (
+              <div
+                className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow-sm border border-blue-100 z-10"
+                title={isWatchlist 
+                  ? "👁️ Watchlist (Non détenu)\n\nCe titre est dans votre watchlist (surveillé mais non détenu).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation."
+                  : "⭐ Portefeuille (Détenu)\n\nCe titre est dans votre portefeuille (team ticker, vous le détenez actuellement).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation.\n• Point coloré = Recommandation (ACHAT/CONSERVER/VENTE)"}
+              >
+                {isWatchlist ? (
+                  <EyeIcon className="w-3.5 h-3.5 text-blue-600" />
+                ) : (
+                  <StarIcon className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" style={{ fill: '#eab308' }} />
+                )}
+              </div>
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <h1 className="text-base sm:text-xl md:text-2xl font-bold text-gray-800 uppercase truncate flex items-center gap-2 cursor-help" title={`${info.name}\n\nNom complet de l'entreprise.\n\nSource: FMP API (company-profile)\n\nSymbole: ${info.preferredSymbol || info.symbol}\nSecteur: ${info.sector || 'N/A'}\nPays: ${info.country || 'N/A'}\nBourse: ${info.exchange || 'N/A'}`}>

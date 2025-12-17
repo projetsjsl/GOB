@@ -165,16 +165,17 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
  * Mappe le champ source de Supabase vers isWatchlist pour Finance Pro
  * 
  * @param source - Le champ source depuis Supabase ('team', 'watchlist', 'both', 'manual')
- * @returns true si watchlist (icône œil), false si portefeuille (icône étoile)
+ * @returns true si watchlist (icône œil), false si portefeuille (icône étoile), null si normal (pas d'icône)
  * 
- * ⚠️ IMPORTANT: Seuls les tickers avec source='team' sont considérés comme Portefeuille (⭐)
- * Tous les autres (watchlist, both, manual, null, undefined) sont considérés comme Watchlist (👁️)
+ * ⚠️ IMPORTANT: 
+ * - source='team' → false (⭐ Portefeuille)
+ * - source='watchlist' ou 'both' → true (👁️ Watchlist)
+ * - source='manual' ou null/undefined → null (tickers normaux, pas d'icône)
  */
-export const mapSourceToIsWatchlist = (source: string | null | undefined): boolean => {
-  // ✅ Seuls les tickers avec source='team' sont Portefeuille (⭐)
-  // Tous les autres (watchlist, both, manual, null, undefined) sont Watchlist (👁️)
-  if (!source) return true; // null/undefined → Watchlist par défaut
+export const mapSourceToIsWatchlist = (source: string | null | undefined): boolean | null => {
+  if (!source || source === 'manual') return null; // Tickers normaux, pas d'icône
   if (source === 'team') return false; // ⭐ Portefeuille
-  return true; // watchlist, both, manual → 👁️ Watchlist
+  if (source === 'watchlist' || source === 'both') return true; // 👁️ Watchlist
+  return null; // Par défaut, tickers normaux
 };
 

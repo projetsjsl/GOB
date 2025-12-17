@@ -101,7 +101,7 @@ export interface AnalysisProfile {
   assumptions: Assumptions;
   info: CompanyInfo;
   notes?: string;
-  isWatchlist?: boolean; // New field to distinguish Watchlist vs Portfolio
+  isWatchlist?: boolean | null; // true = Watchlist (👁️), false = Portefeuille (⭐), null = Normal (pas d'icône)
   // Corridor ValueLine (pour Phase 3 - Validation)
   valuelineCorridor?: ValueLineCorridor;
   // Métriques ValueLine initiales (pour Phase 1 - Initialisation)
