@@ -102,6 +102,19 @@ interface CacheEntry {
     timestamp: number;
 }
 
+// ✅ Helper function pour sauvegarder avec timestamp (Supabase = source de vérité, localStorage = cache)
+const saveToCache = async (data: Record<string, AnalysisProfile>): Promise<void> => {
+    try {
+        const cacheEntry: CacheEntry = {
+            data,
+            timestamp: Date.now()
+        };
+        await storage.setItem(STORAGE_KEY, cacheEntry);
+    } catch (e) {
+        console.warn('Failed to save to cache:', e);
+    }
+};
+
 const ProgressBar = ({ current, total }: { current: number; total: number }) => {
     const progressRef = useRef<HTMLDivElement>(null);
     const percent = total > 0 ? (current / total) * 100 : 0;
@@ -507,7 +520,7 @@ export default function App() {
                     
                     if (removedMutualFunds.length > 0) {
                         console.log(`🧹 ${removedMutualFunds.length} fonds mutuel(s) supprimé(s) automatiquement`);
-                        await storage.setItem(STORAGE_KEY, cleaned);
+                        await saveToCache(cleaned);
                     }
                     
                     if (Object.keys(cleaned).length > 0) {
@@ -769,16 +782,8 @@ export default function App() {
                         newTickersCount++;
                     });
 
-                    // ✅ NOUVEAU : Sauvegarder dans localStorage avec timestamp
-                    try {
-                        const cacheEntry: CacheEntry = {
-                            data: updated,
-                            timestamp: Date.now()
-                        };
-                        await storage.setItem(STORAGE_KEY, cacheEntry);
-                    } catch (e) {
-                        console.warn('Failed to save to LocalStorage:', e);
-                    }
+                    // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp (fire and forget)
+                    saveToCache(updated).catch(e => console.warn('Failed to save to cache:', e));
 
                     if (newTickersCount > 0) {
                         console.log(`✅ ${newTickersCount} nouveaux tickers chargés depuis Supabase`);
@@ -883,8 +888,8 @@ export default function App() {
                     // Ajouter les profils squelettes immédiatement pour affichage
                     setLibrary(prev => {
                         const updated = { ...prev, ...skeletonProfiles };
-                        // Fire and forget async save
-                        storage.setItem(STORAGE_KEY, updated).catch(e => console.warn('Failed to save to Storage:', e));
+                        // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp
+                        saveToCache(updated).catch(e => console.warn('Failed to save to cache:', e));
                         return updated;
                     });
 
@@ -1064,7 +1069,8 @@ export default function App() {
                                                 _isSkeleton: false
                                             }
                                         };
-                                        storage.setItem(STORAGE_KEY, updated).catch(e => console.warn('Failed to save to Storage:', e));
+                                        // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp
+                                        saveToCache(updated).catch(e => console.warn('Failed to save to cache:', e));
                                         return updated;
                                     });
                                     
@@ -2039,11 +2045,8 @@ export default function App() {
                     [upperSymbol]: newProfile
                 };
                 
-                try {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-                } catch (e) {
-                    console.warn('Failed to save to LocalStorage:', e);
-                }
+                // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp (fire and forget)
+                saveToCache(updated).catch(e => console.warn('Failed to save to cache:', e));
                 
                 return updated;
             });
@@ -2718,11 +2721,8 @@ export default function App() {
                     newTickersCount++;
                 });
 
-                try {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-                } catch (e) {
-                    console.warn('Failed to save to LocalStorage:', e);
-                }
+                // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp (fire and forget)
+                saveToCache(updated).catch(e => console.warn('Failed to save to cache:', e));
 
                 // ✅ DEBUG: Compter les profils avec isWatchlist=false après migration
                 const portfolioCount = Object.values(updated).filter((p: any) => p.isWatchlist === false).length;
@@ -3144,12 +3144,13 @@ export default function App() {
             };
             
             // Persister les changements
+            // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp
             if (typeof requestIdleCallback !== 'undefined') {
                 requestIdleCallback(() => {
-                    storage.setItem(STORAGE_KEY, updatedLibrary).catch(e => console.warn('Failed to save to Storage:', e));
+                    saveToCache(updatedLibrary).catch(e => console.warn('Failed to save to cache:', e));
                 });
             } else {
-                storage.setItem(STORAGE_KEY, updatedLibrary).catch(e => console.warn('Failed to save to Storage:', e));
+                saveToCache(updatedLibrary).catch(e => console.warn('Failed to save to cache:', e));
             }
             
             return updatedLibrary;

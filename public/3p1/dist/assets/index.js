@@ -51740,6 +51740,18 @@ const DEFAULT_PROFILE = {
   isWatchlist: false
 };
 const STORAGE_KEY = "finance_pro_profiles";
+const CACHE_MAX_AGE_MS = 5 * 60 * 1e3;
+const saveToCache = async (data) => {
+  try {
+    const cacheEntry = {
+      data,
+      timestamp: Date.now()
+    };
+    await storage.setItem(STORAGE_KEY, cacheEntry);
+  } catch (e) {
+    console.warn("Failed to save to cache:", e);
+  }
+};
 const ProgressBar = ({ current, total }) => {
   const progressRef = reactExports.useRef(null);
   const percent = total > 0 ? current / total * 100 : 0;
@@ -51818,6 +51830,7 @@ function App() {
       const symbol = (_c = payload.new.ticker) == null ? void 0 : _c.toUpperCase();
       if (symbol) {
         showNotification(`📡 Nouveau ticker ajouté par un autre utilisateur: ${symbol}`, "info");
+        storage.removeItem(STORAGE_KEY).catch(console.warn);
         hasLoadedTickersRef.current = false;
         supabaseTickersCacheRef.current = null;
         realtimeTimeoutRef.current = setTimeout(() => {
@@ -51831,10 +51844,10 @@ function App() {
       const symbol = (_d = payload.old.ticker) == null ? void 0 : _d.toUpperCase();
       if (symbol) {
         showNotification(`📡 Ticker supprimé par un autre utilisateur: ${symbol}`, "warning");
+        storage.removeItem(STORAGE_KEY).catch(console.warn);
         setLibrary((prev) => {
           const updated = { ...prev };
           delete updated[symbol];
-          storage.setItem(STORAGE_KEY, updated).catch(console.warn);
           return updated;
         });
         hasLoadedTickersRef.current = false;
@@ -51850,6 +51863,7 @@ function App() {
       const symbol = (_e = payload.new.ticker) == null ? void 0 : _e.toUpperCase();
       if (symbol) {
         showNotification(`📡 Ticker mis à jour: ${symbol}`, "info");
+        storage.removeItem(STORAGE_KEY).catch(console.warn);
         setLibrary((prev) => {
           if (!prev[symbol]) return prev;
           return {
@@ -51995,7 +52009,21 @@ function App() {
         const saved = await storage.getItem(STORAGE_KEY);
         if (saved) {
           let parsed = saved;
-          if (typeof saved === "string") {
+          let cacheTimestamp = null;
+          if (saved && typeof saved === "object" && "data" in saved && "timestamp" in saved) {
+            const cacheEntry = saved;
+            cacheTimestamp = cacheEntry.timestamp;
+            parsed = cacheEntry.data;
+            const now = Date.now();
+            const cacheAge = now - cacheTimestamp;
+            if (cacheAge > CACHE_MAX_AGE_MS) {
+              console.log(`🔄 Cache obsolète (${Math.round(cacheAge / 1e3 / 60)} min) - Rechargement depuis Supabase...`);
+              await storage.removeItem(STORAGE_KEY);
+              parsed = {};
+            } else {
+              console.log(`✅ Cache valide (${Math.round(cacheAge / 1e3)}s) - Utilisation cache localStorage`);
+            }
+          } else if (typeof saved === "string") {
             try {
               parsed = JSON.parse(saved);
             } catch (e) {
@@ -52015,7 +52043,7 @@ function App() {
           }
           if (removedMutualFunds.length > 0) {
             console.log(`🧹 ${removedMutualFunds.length} fonds mutuel(s) supprimé(s) automatiquement`);
-            await storage.setItem(STORAGE_KEY, cleaned);
+            await saveToCache(cleaned);
           }
           if (Object.keys(cleaned).length > 0) {
             setLibrary(cleaned);
@@ -52196,11 +52224,7 @@ Vérifiez votre connexion et réessayez.`,
             }
             newTickersCount++;
           });
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-          } catch (e) {
-            console.warn("Failed to save to LocalStorage:", e);
-          }
+          saveToCache(updated).catch((e) => console.warn("Failed to save to cache:", e));
           if (newTickersCount > 0) {
             console.log(`✅ ${newTickersCount} nouveaux tickers chargés depuis Supabase`);
           }
@@ -52285,7 +52309,7 @@ Vérifiez votre connexion et réessayez.`,
           });
           setLibrary((prev) => {
             const updated = { ...prev, ...skeletonProfiles };
-            storage.setItem(STORAGE_KEY, updated).catch((e) => console.warn("Failed to save to Storage:", e));
+            saveToCache(updated).catch((e) => console.warn("Failed to save to cache:", e));
             return updated;
           });
           setIsLoadingTickers(false);
@@ -52422,7 +52446,7 @@ Vérifiez votre connexion et réessayez.`,
                           _isSkeleton: false
                         }
                       };
-                      storage.setItem(STORAGE_KEY, updated).catch((e) => console.warn("Failed to save to Storage:", e));
+                      saveToCache(updated).catch((e) => console.warn("Failed to save to cache:", e));
                       return updated;
                     });
                     console.log(`✅ ${symbol}: Profil mis à jour depuis ${result2.source === "supabase" ? "Supabase" : "FMP"}`);
@@ -53163,11 +53187,7 @@ Vérifiez les logs de la console pour plus de détails.`;
           ...prev,
           [upperSymbol]: newProfile
         };
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-        } catch (e) {
-          console.warn("Failed to save to LocalStorage:", e);
-        }
+        saveToCache(updated).catch((e) => console.warn("Failed to save to cache:", e));
         return updated;
       });
       setActiveId(upperSymbol);
@@ -53685,11 +53705,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
           }
           newTickersCount++;
         });
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-        } catch (e) {
-          console.warn("Failed to save to LocalStorage:", e);
-        }
+        saveToCache(updated).catch((e) => console.warn("Failed to save to cache:", e));
         const portfolioCount = Object.values(updated).filter((p) => p.isWatchlist === false).length;
         const watchlistCount = Object.values(updated).filter((p) => p.isWatchlist === true).length;
         const normalCount = Object.values(updated).filter((p) => p.isWatchlist === null || p.isWatchlist === void 0).length;
@@ -54036,10 +54052,10 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
       };
       if (typeof requestIdleCallback !== "undefined") {
         requestIdleCallback(() => {
-          storage.setItem(STORAGE_KEY, updatedLibrary).catch((e) => console.warn("Failed to save to Storage:", e));
+          saveToCache(updatedLibrary).catch((e) => console.warn("Failed to save to cache:", e));
         });
       } else {
-        storage.setItem(STORAGE_KEY, updatedLibrary).catch((e) => console.warn("Failed to save to Storage:", e));
+        saveToCache(updatedLibrary).catch((e) => console.warn("Failed to save to cache:", e));
       }
       return updatedLibrary;
     });
