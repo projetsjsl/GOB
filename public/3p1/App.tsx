@@ -467,6 +467,17 @@ export default function App() {
             try {
                 // Vérifier si le cache est frais (< 15 minutes) avec un ticker exemple
                 const response = await fetch('/api/market-data-batch?tickers=AAPL&checkOnly=true');
+                
+                // Si l'endpoint n'existe pas (404), ignorer silencieusement
+                if (response.status === 404) {
+                    console.log('ℹ️ Endpoint market-data-batch non disponible - Ignoré');
+                    return;
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
                 const result = await response.json();
                 
                 // Si le cache est expiré ou manquant, déclencher la mise à jour
@@ -479,7 +490,12 @@ export default function App() {
                 } else {
                     console.log('✅ Cache prix frais - Pas de mise à jour nécessaire');
                 }
-            } catch (error) {
+            } catch (error: any) {
+                // Ignorer les erreurs 404 (endpoint non disponible)
+                if (error.message?.includes('404') || error.message?.includes('The page c')) {
+                    console.log('ℹ️ Endpoint market-data-batch non disponible - Ignoré');
+                    return;
+                }
                 console.warn('⚠️ Erreur vérification cache prix:', error);
                 // Non-bloquant - continuer le chargement même si la vérification échoue
             }
