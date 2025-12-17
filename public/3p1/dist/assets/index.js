@@ -53573,18 +53573,34 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
       }
       let newTickersCount = 0;
       let updatedTickersCount = 0;
+      const sourceMap = /* @__PURE__ */ new Map();
+      result.tickers.forEach((t) => {
+        sourceMap.set(t.ticker.toUpperCase(), t.source);
+      });
       setLibrary((prev) => {
         const updated = { ...prev };
+        let migrationCount2 = 0;
+        Object.keys(updated).forEach((symbol) => {
+          if (!sourceMap.has(symbol)) {
+            if (updated[symbol].isWatchlist !== null && updated[symbol].isWatchlist !== void 0) {
+              updated[symbol] = {
+                ...updated[symbol],
+                isWatchlist: null
+                // Tickers normaux (hors Supabase)
+              };
+              migrationCount2++;
+            }
+          }
+        });
         result.tickers.forEach((supabaseTicker) => {
           const tickerSymbol = supabaseTicker.ticker.toUpperCase();
           const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
           if (updated[tickerSymbol]) {
-            const shouldBeWatchlist2 = mapSourceToIsWatchlist(supabaseTicker.source);
             const hasValueLineUpdates = supabaseTicker.security_rank || supabaseTicker.earnings_predictability || supabaseTicker.price_growth_persistence || supabaseTicker.price_stability;
-            if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist2 || hasValueLineUpdates) {
+            if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist || hasValueLineUpdates) {
               updated[tickerSymbol] = {
                 ...updated[tickerSymbol],
-                isWatchlist: shouldBeWatchlist2,
+                isWatchlist: shouldBeWatchlist,
                 // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
                 // Toujours utiliser Supabase si disponible, sinon garder valeur existante
                 info: {
@@ -53597,19 +53613,19 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 }
               };
               updatedTickersCount++;
-              migrationCount++;
+              migrationCount2++;
               if (tickerSymbol === activeId) {
                 setInfo(updated[tickerSymbol].info);
-                setIsWatchlist(shouldBeWatchlist2 ?? false);
+                setIsWatchlist(shouldBeWatchlist ?? false);
               }
-            } else if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist2) {
+            } else if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist) {
               updated[tickerSymbol] = {
                 ...updated[tickerSymbol],
-                isWatchlist: shouldBeWatchlist2
+                isWatchlist: shouldBeWatchlist
               };
-              migrationCount++;
+              migrationCount2++;
               if (tickerSymbol === activeId) {
-                setIsWatchlist(shouldBeWatchlist2 ?? false);
+                setIsWatchlist(shouldBeWatchlist ?? false);
               }
             }
             return;
@@ -53621,8 +53637,8 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
         } catch (e) {
           console.warn("Failed to save to LocalStorage:", e);
         }
-        if (migrationCount > 0) {
-          console.log(`🔄 Migration: ${migrationCount} profil(s) mis à jour avec isWatchlist depuis Supabase`);
+        if (migrationCount2 > 0) {
+          console.log(`🔄 Migration: ${migrationCount2} profil(s) mis à jour avec isWatchlist depuis Supabase`);
         }
         return updated;
       });

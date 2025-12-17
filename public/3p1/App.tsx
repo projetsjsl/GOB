@@ -2522,17 +2522,39 @@ export default function App() {
             let newTickersCount = 0;
             let updatedTickersCount = 0;
 
+            // ✅ MIGRATION : Créer un Map de source pour tous les tickers Supabase
+            const sourceMap = new Map<string, 'team' | 'watchlist' | 'both' | 'manual'>();
+            result.tickers.forEach(t => {
+                sourceMap.set(t.ticker.toUpperCase(), t.source);
+            });
+
             // Merge intelligent : ne pas écraser les profils existants
             setLibrary(prev => {
                 const updated = { ...prev };
+                let migrationCount = 0;
+
+                // ✅ MIGRATION : Corriger TOUS les profils existants qui ne sont pas dans Supabase
+                // Si un profil existe dans localStorage mais pas dans Supabase, le marquer comme 'manual' (null)
+                Object.keys(updated).forEach(symbol => {
+                    if (!sourceMap.has(symbol)) {
+                        // Ticker existe localement mais pas dans Supabase → Normal (pas d'icône)
+                        if (updated[symbol].isWatchlist !== null && updated[symbol].isWatchlist !== undefined) {
+                            updated[symbol] = {
+                                ...updated[symbol],
+                                isWatchlist: null // Tickers normaux (hors Supabase)
+                            };
+                            migrationCount++;
+                        }
+                    }
+                });
 
                 result.tickers.forEach(supabaseTicker => {
                     const tickerSymbol = supabaseTicker.ticker.toUpperCase();
                     const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
                     
                     if (updated[tickerSymbol]) {
-                        // Mettre à jour isWatchlist et métriques ValueLine si nécessaire
-                        const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
+                        // ✅ MIGRATION FORCÉE : Toujours mettre à jour isWatchlist depuis Supabase
+                        // Les profils existants peuvent avoir un ancien isWatchlist incorrect
                         const hasValueLineUpdates = supabaseTicker.security_rank || 
                                                    supabaseTicker.earnings_predictability || 
                                                    supabaseTicker.price_growth_persistence || 
