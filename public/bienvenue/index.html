@@ -2805,61 +2805,7 @@
             const statusColors = { pending: 'bg-gray-100 text-gray-700', inProgress: 'bg-blue-100 text-blue-700', completed: 'bg-green-100 text-green-700' };
             const priorityColors = { low: 'bg-gray-100', medium: 'bg-yellow-100 text-yellow-700', high: 'bg-orange-100 text-orange-700' };
 
-            /**
-             * DatePicker - Composant calendrier simple et réutilisable
-             * ---------------------------------------------------------
-             * Affiche un input date natif avec un style amélioré et gestion d'ouverture/fermeture
-             */
-            const DatePicker = ({ value, onChange, onBlur, placeholder, className = '', min = null, max = null, showIcon = true }) => {
-                const [isOpen, setIsOpen] = useState(false);
-                const inputRef = useRef(null);
-
-                const handleClick = () => {
-                    setIsOpen(true);
-                    // Focus sur l'input pour ouvrir le calendrier natif
-                    setTimeout(() => {
-                        if (inputRef.current) {
-                            inputRef.current.showPicker?.();
-                            inputRef.current.focus();
-                        }
-                    }, 10);
-                };
-
-                const formatDate = (dateStr) => {
-                    if (!dateStr) return placeholder || 'Sélectionner date';
-                    const date = new Date(dateStr);
-                    return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                };
-
-                return (
-                    <div className="relative inline-block">
-                        <input
-                            ref={inputRef}
-                            type="date"
-                            value={value || ''}
-                            onChange={(e) => {
-                                onChange(e.target.value);
-                                setIsOpen(false);
-                            }}
-                            onBlur={(e) => {
-                                setIsOpen(false);
-                                if (onBlur) onBlur(e);
-                            }}
-                            min={min}
-                            max={max}
-                            className="absolute opacity-0 w-full h-full cursor-pointer"
-                            style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
-                        />
-                        <div
-                            onClick={handleClick}
-                            className={`${className} cursor-pointer flex items-center gap-1 hover:bg-blue-50 transition-colors rounded px-2 py-1 border border-transparent hover:border-blue-300`}
-                        >
-                            {showIcon && <span>📅</span>}
-                            <span className="text-xs whitespace-nowrap">{formatDate(value)}</span>
-                        </div>
-                    </div>
-                );
-            };
+            // DatePicker est maintenant défini au niveau supérieur (avant AdminPanel), accessible partout
 
             const TaskCard = ({ task, onUpdate, onDelete }) => {
                 const [expanded, setExpanded] = useState(false);
