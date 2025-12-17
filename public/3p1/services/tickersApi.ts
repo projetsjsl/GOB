@@ -169,13 +169,14 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
  * 
  * ⚠️ IMPORTANT: 
  * - source='team' → false (⭐ Portefeuille)
- * - source='watchlist' ou 'both' → true (👁️ Watchlist)
+ * - source='both' → false (⭐ Portefeuille) - car "both" = portefeuille ET watchlist, donc priorité portefeuille
+ * - source='watchlist' → true (👁️ Watchlist)
  * - source='manual' ou null/undefined → null (tickers normaux, pas d'icône)
  */
 export const mapSourceToIsWatchlist = (source: string | null | undefined): boolean | null => {
   if (!source || source === 'manual') return null; // Tickers normaux, pas d'icône
-  if (source === 'team') return false; // ⭐ Portefeuille
-  if (source === 'watchlist' || source === 'both') return true; // 👁️ Watchlist
+  if (source === 'team' || source === 'both') return false; // ⭐ Portefeuille (both = portefeuille + watchlist, priorité portefeuille)
+  if (source === 'watchlist') return true; // 👁️ Watchlist
   return null; // Par défaut, tickers normaux
 };
 
