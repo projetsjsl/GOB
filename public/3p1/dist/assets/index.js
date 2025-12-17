@@ -8760,7 +8760,7 @@ VENTE: Prix actuel ≥ Limite de vente`
             "div",
             {
               className: "absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow-sm border border-blue-100 z-10",
-              title: isWatchlist ? "Liste de surveillance (Non détenu)" : "En Portefeuille",
+              title: isWatchlist ? "👁️ Watchlist (Non détenu)\n\nCe titre est dans votre watchlist (surveillé mais non détenu).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation." : "⭐ Portefeuille (Détenu)\n\nCe titre est dans votre portefeuille (vous le détenez actuellement).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation.\n• Point coloré = Recommandation (ACHAT/CONSERVER/VENTE)",
               children: isWatchlist ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-3.5 h-3.5 text-blue-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-3.5 h-3.5 text-yellow-500 fill-yellow-500", style: { fill: "#eab308" } })
             }
           )
