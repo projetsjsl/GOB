@@ -3006,19 +3006,22 @@
                             
                             {/* Panneau latéral droit pour assignation de responsables - RENDU EN DEHORS DU CONTENEUR */}
                             {editing === 'resources' && (
-                                <>
+                                <div style={{ position: 'fixed', inset: 0, zIndex: 10000, pointerEvents: 'none' }}>
                                     {/* Overlay semi-transparent pour fermer en cliquant à l'extérieur */}
                                     <div 
-                                        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[10000]"
+                                        className="fixed inset-0 bg-black/20 backdrop-blur-sm"
+                                        style={{ pointerEvents: 'auto' }}
                                         onClick={() => setEditing(null)}
                                     />
                                     {/* Panneau latéral droit - style slide-in */}
                                     <div 
-                                        className="fixed right-0 top-0 h-full w-80 bg-white z-[10001] flex flex-col"
-                                        onClick={(e) => e.stopPropagation()}
+                                        className="fixed right-0 top-0 h-full w-80 bg-white flex flex-col"
                                         style={{
-                                            boxShadow: '-4px 0 20px rgba(0, 0, 0, 0.15)'
+                                            boxShadow: '-4px 0 20px rgba(0, 0, 0, 0.15)',
+                                            pointerEvents: 'auto',
+                                            zIndex: 10001
                                         }}
+                                        onClick={(e) => e.stopPropagation()}
                                     >
                                         {/* Header fixe */}
                                         <div className="px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between flex-shrink-0">
