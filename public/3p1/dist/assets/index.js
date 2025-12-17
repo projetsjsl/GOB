@@ -52236,6 +52236,7 @@ Vérifiez votre connexion et réessayez.`,
               return;
             }
             const isWatchlist2 = mapSourceToIsWatchlist(supabaseTicker.source);
+            const isTeamTicker = supabaseTicker.source === "team" || supabaseTicker.source === "both";
             updated[tickerSymbol] = {
               id: tickerSymbol,
               lastModified: Date.now(),
@@ -52259,6 +52260,9 @@ Vérifiez votre connexion et réessayez.`,
               _isSkeleton: true
               // Flag pour indiquer que c'est un profil incomplet
             };
+            if (isTeamTicker) {
+              console.log(`   ⭐ Création profil squelette team ticker: ${tickerSymbol} (source: ${supabaseTicker.source}, isWatchlist: ${isWatchlist2})`);
+            }
             newTickersCount++;
           });
           saveToCache(updated).catch((e) => console.warn("Failed to save to cache:", e));
@@ -52271,8 +52275,28 @@ Vérifiez votre connexion et réessayez.`,
           const portfolioCount = Object.values(updated).filter((p) => p.isWatchlist === false).length;
           const watchlistCount = Object.values(updated).filter((p) => p.isWatchlist === true).length;
           const normalCount = Object.values(updated).filter((p) => p.isWatchlist === null || p.isWatchlist === void 0).length;
+          const teamTickersInSupabaseAfter = result.tickers.filter((t) => {
+            const source = t.source;
+            return source === "team" || source === "both";
+          });
+          const teamTickersInLibraryAfter = Object.values(updated).filter((p) => {
+            const symbol = p.id.toUpperCase();
+            return teamTickersInSupabaseAfter.some((t) => t.ticker.toUpperCase() === symbol) && p.isWatchlist === false;
+          });
+          const missingTeamTickersAfter = teamTickersInSupabaseAfter.filter((t) => {
+            const symbol = t.ticker.toUpperCase();
+            return !updated[symbol] || updated[symbol].isWatchlist !== false;
+          });
           if (migrationCount > 0) {
             console.log(`🔄 Migration: ${migrationCount} profil(s) mis à jour avec isWatchlist depuis Supabase`);
+          }
+          if (teamTickersInSupabaseAfter.length !== teamTickersInLibraryAfter.length) {
+            console.warn(`⚠️ ${teamTickersInSupabaseAfter.length} team tickers dans Supabase, mais seulement ${teamTickersInLibraryAfter.length} avec ⭐ dans library`);
+            if (missingTeamTickersAfter.length > 0) {
+              console.warn(`   📋 ${missingTeamTickersAfter.length} team ticker(s) manquant(s) ou incorrect(s):`, missingTeamTickersAfter.map((t) => `${t.ticker} (source: ${t.source})`).join(", "));
+            }
+          } else {
+            console.log(`✅ Tous les ${teamTickersInSupabaseAfter.length} team tickers ont ⭐ (isWatchlist=false)`);
           }
           console.log(`📊 Après migration - Portefeuille (⭐): ${portfolioCount}, Watchlist (👁️): ${watchlistCount}, Normaux: ${normalCount}, Total: ${Object.keys(updated).length}`);
           const teamTickersInSupabase = result.tickers.filter((t) => {
