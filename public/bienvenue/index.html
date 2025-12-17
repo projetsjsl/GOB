@@ -3424,14 +3424,15 @@
                                                             value={phase.startDate}
                                                             onChange={(dateStr) => {
                                                                 // Calculate offset relative to employee start date
-                                                                const empStart = new Date(selectedEmployee.startDate);
+                                                                const emp = selectedEmployee || employees[0];
+                                                                const empStart = new Date(emp?.startDate || '2026-01-01');
                                                                 const newStart = new Date(dateStr);
                                                                 const diffDays = Math.round((newStart - empStart) / (1000 * 60 * 60 * 24));
                                                                 updatePhaseDirect(phase.id, 'startOffset', diffDays);
                                                             }}
                                                             placeholder="Date début"
                                                             className="bg-transparent border-b border-dashed border-gray-300 hover:border-blue-500 focus:border-blue-500 outline-none"
-                                                            min={selectedEmployee?.startDate}
+                                                            min={(selectedEmployee || employees[0])?.startDate || '2026-01-01'}
                                                             showIcon={false}
                                                         />
                                                         <span>→</span>
