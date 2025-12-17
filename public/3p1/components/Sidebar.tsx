@@ -153,6 +153,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
     return num;
   };
 
+  /**
+   * Filtrage et tri des profils pour affichage dans la sidebar.
+   * 
+   * Processus :
+   * 1. Filtrage par recherche (symbole ou nom)
+   * 2. Filtrage par source (portfolio/watchlist/all)
+   * 3. Filtrage par pays (si défini)
+   * 4. Filtrage par bourse (si défini)
+   * 5. Filtrage par capitalisation (si défini)
+   * 6. Tri selon sortBy (alphabétique, date, recommandation, secteur)
+   * 
+   * Notes importantes :
+   * - filterBy='portfolio' → isWatchlist === false (team tickers uniquement)
+   * - filterBy='watchlist' → isWatchlist === true (watchlist uniquement)
+   * - filterBy='all' → Tous (portfolio + watchlist + normal)
+   * - Tri par recommandation utilise le cache pour performance
+   * 
+   * @see getCachedRecommendation pour l'optimisation du tri
+   */
   const filteredAndSortedProfiles = useMemo(() => {
     // Filtrage par recherche
     let filtered = profiles.filter(p =>

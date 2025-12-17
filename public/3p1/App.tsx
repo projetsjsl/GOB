@@ -185,7 +185,31 @@ export default function App() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
-    // --- SUPABASE REALTIME SUBSCRIPTIONS ---
+    /**
+     * --- SUPABASE REALTIME SUBSCRIPTIONS ---
+     * 
+     * Synchronisation temps réel via Supabase Realtime pour cohérence multi-utilisateurs.
+     * 
+     * Architecture :
+     * - Écoute les changements sur la table 'tickers'
+     * - INSERT/DELETE → Force rechargement complet (invalide cache)
+     * - UPDATE → Met à jour métriques ValueLine directement
+     * - Synchronisation périodique (2 min) comme fallback
+     * 
+     * Gestion des race conditions :
+     * - useRef pour onDataChange (évite closures stale)
+     * - isMounted check (évite updates sur unmounted)
+     * - Timeout avec cleanup (évite fuites mémoire)
+     * - Invalidation cache explicite
+     * 
+     * Performance :
+     * - Délai de 100ms pour batch updates (évite rapid re-renders)
+     * - Cache invalidation seulement si nécessaire
+     * - Cleanup automatique au démontage
+     * 
+     * @see useRealtimeSync hook pour l'implémentation
+     * @see loadTickersFromSupabase pour le rechargement
+     */
     // Live sync: when any user adds/updates/deletes tickers, all clients see it instantly
     // ✅ OPTIMISATION: Utiliser useRef pour éviter les closures stale et les race conditions
     const realtimeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -2436,7 +2460,28 @@ export default function App() {
         showNotification(`Synchronisation terminée: ${successCount} réussies, ${errorCount} erreurs`, successCount > 0 ? 'success' : 'error');
     };
 
-    // --- SYNC FROM SUPABASE HANDLER ---
+    /**
+     * --- SYNC FROM SUPABASE HANDLER ---
+     * 
+     * Synchronise les tickers depuis Supabase vers l'application locale.
+     * 
+     * Processus :
+     * 1. Charge tous les tickers actifs depuis Supabase (avec fallback sur plusieurs APIs)
+     * 2. Filtre par capitalisation minimale (2B USD) pour éviter les small caps
+     * 3. Exclut les fonds mutuels (isMutualFund check)
+     * 4. Crée des profils "squelettes" pour affichage immédiat
+     * 5. Charge les données FMP en arrière-plan par batch (5 tickers/batch)
+     * 6. Collecte les erreurs par type et affiche un résumé groupé
+     * 
+     * Gestion des erreurs :
+     * - Tickers introuvables dans FMP → Résumé groupé
+     * - Capitalisation < 2B → Résumé groupé
+     * - Données invalides → Résumé groupé
+     * - Autres erreurs → Résumé groupé
+     * 
+     * @see loadAllTickersFromSupabase pour la stratégie de fallback API
+     * @see mapSourceToIsWatchlist pour le mapping source → isWatchlist
+     */
     const handleSyncFromSupabase = async () => {
         setIsLoadingTickers(true);
         setTickersLoadError(null);
