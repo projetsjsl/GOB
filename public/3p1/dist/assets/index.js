@@ -38447,31 +38447,83 @@ const ReportsPanel = ({
 };
 const loadAllTickersFromSupabase = async () => {
   try {
-    const response = await fetch("/api/admin/tickers?is_active=true&limit=1000");
-    if (!response.ok) {
-      throw new Error(`API Supabase error: ${response.status} ${response.statusText}`);
-    }
-    const result = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || "Erreur lors du chargement des tickers");
-    }
-    const tickers = (result.tickers || []).map((ticker2) => {
-      if (ticker2.source) return ticker2;
-      if (ticker2.category) {
-        return { ...ticker2, source: ticker2.category };
+    let response = await fetch("/api/admin/tickers?is_active=true&limit=1000");
+    let result = null;
+    if (response.ok) {
+      result = await response.json();
+      if (result.success && result.tickers && result.tickers.length > 0) {
+        const tickers = (result.tickers || []).map((ticker2) => {
+          if (ticker2.source) return ticker2;
+          if (ticker2.category) {
+            return { ...ticker2, source: ticker2.category };
+          }
+          if (Array.isArray(ticker2.categories)) {
+            const hasTeam = ticker2.categories.includes("team");
+            const hasWatchlist = ticker2.categories.includes("watchlist");
+            const derived = hasTeam && hasWatchlist ? "both" : hasWatchlist ? "watchlist" : hasTeam ? "team" : "manual";
+            return { ...ticker2, source: derived };
+          }
+          return { ...ticker2, source: "manual" };
+        });
+        console.log(`✅ ${tickers.length} tickers chargés depuis /api/admin/tickers`);
+        return {
+          success: true,
+          tickers
+        };
       }
-      if (Array.isArray(ticker2.categories)) {
-        const hasTeam = ticker2.categories.includes("team");
-        const hasWatchlist = ticker2.categories.includes("watchlist");
-        const derived = hasTeam && hasWatchlist ? "both" : hasWatchlist ? "watchlist" : hasTeam ? "team" : "manual";
-        return { ...ticker2, source: derived };
+    }
+    console.warn("⚠️ API admin/tickers échouée, tentative avec /api/team-tickers");
+    response = await fetch("/api/team-tickers?limit=1000");
+    if (response.ok) {
+      result = await response.json();
+      if (result.success && result.tickers && result.tickers.length > 0) {
+        const tickers = (result.tickers || []).map((ticker2) => {
+          const source = ticker2.source || ticker2.category || (Array.isArray(ticker2.categories) && ticker2.categories.includes("team") ? "team" : "manual");
+          return { ...ticker2, source };
+        });
+        console.log(`✅ ${tickers.length} tickers chargés depuis /api/team-tickers (fallback)`);
+        return {
+          success: true,
+          tickers
+        };
       }
-      return { ...ticker2, source: "manual" };
-    });
-    return {
-      success: true,
-      tickers
-    };
+    }
+    console.warn("⚠️ API team-tickers échouée, tentative avec /api/tickers-config");
+    response = await fetch("/api/tickers-config");
+    if (response.ok) {
+      result = await response.json();
+      if (result.success) {
+        const allTickers = [];
+        if (result.team_tickers && Array.isArray(result.team_tickers)) {
+          result.team_tickers.forEach((ticker2) => {
+            allTickers.push({
+              ticker: ticker2.toUpperCase(),
+              source: "team",
+              is_active: true
+            });
+          });
+        }
+        if (result.watchlist_tickers && Array.isArray(result.watchlist_tickers)) {
+          result.watchlist_tickers.forEach((ticker2) => {
+            if (!allTickers.find((t) => t.ticker === ticker2.toUpperCase())) {
+              allTickers.push({
+                ticker: ticker2.toUpperCase(),
+                source: "watchlist",
+                is_active: true
+              });
+            }
+          });
+        }
+        if (allTickers.length > 0) {
+          console.log(`✅ ${allTickers.length} tickers chargés depuis /api/tickers-config (fallback)`);
+          return {
+            success: true,
+            tickers: allTickers
+          };
+        }
+      }
+    }
+    throw new Error("Aucune API disponible pour charger les tickers");
   } catch (error) {
     console.error("❌ Erreur chargement tickers Supabase:", error);
     return {
