@@ -52240,6 +52240,9 @@ Vérifiez votre connexion et réessayez.`,
           saveToCache(updated).catch((e) => console.warn("Failed to save to cache:", e));
           if (newTickersCount > 0) {
             console.log(`✅ ${newTickersCount} nouveaux tickers chargés depuis Supabase`);
+            console.log(`📊 Library après migration: ${Object.keys(updated).length} profils (dont ${Object.keys(updated).filter((k2) => k2 !== DEFAULT_PROFILE.id).length} réels)`);
+          } else {
+            console.log(`ℹ️ Aucun nouveau ticker - ${Object.keys(updated).length} profils déjà dans library`);
           }
           const portfolioCount = Object.values(updated).filter((p) => p.isWatchlist === false).length;
           const watchlistCount = Object.values(updated).filter((p) => p.isWatchlist === true).length;

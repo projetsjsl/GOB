@@ -807,6 +807,9 @@ export default function App() {
 
                     if (newTickersCount > 0) {
                         console.log(`✅ ${newTickersCount} nouveaux tickers chargés depuis Supabase`);
+                        console.log(`📊 Library après migration: ${Object.keys(updated).length} profils (dont ${Object.keys(updated).filter(k => k !== DEFAULT_PROFILE.id).length} réels)`);
+                    } else {
+                        console.log(`ℹ️ Aucun nouveau ticker - ${Object.keys(updated).length} profils déjà dans library`);
                     }
 
                     // ✅ DEBUG: Compter les profils avec isWatchlist=false après migration
