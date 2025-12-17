@@ -53441,49 +53441,18 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
     const FMP_BATCH_SIZE = 5;
     const delayBetweenBatches = 500;
     const delayBetweenTickersInBatch = 100;
-    for (let i = 0; i < allTickers.length; i += FMP_BATCH_SIZE) {
-      if (abortSync.current) {
-        console.log("🛑 Synchronisation arrêtée par l'utilisateur.");
-        break;
-      }
-      while (isSyncPaused.current) {
-        if (abortSync.current) break;
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      }
-      if (abortSync.current) break;
-      const batch = allTickers.slice(i, i + FMP_BATCH_SIZE);
-      const fmpResults = await Promise.allSettled(
-        batch.map(async (tickerSymbol) => {
-          try {
-            const profile2 = library[tickerSymbol];
-            if (!profile2) {
-              return { tickerSymbol, success: false, error: "Profil non trouvé", result: null };
-            }
-            console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
-            await saveSnapshot(
-              tickerSymbol,
-              profile2.data,
-              profile2.assumptions,
-              profile2.info,
-              `Avant synchronisation globale - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
-              false,
-              false
-            );
-            console.log(`🔄 Synchronisation ${tickerSymbol}...`);
-            const result = await fetchCompanyData(tickerSymbol);
-            return { tickerSymbol, success: true, result, profile: profile2 };
-          } catch (error) {
-            return {
-              tickerSymbol,
-              success: false,
-              error: error.message || "Erreur inconnue",
-              result: null,
-              profile: library[tickerSymbol] || null
-            };
-          }
-        })
-      );
-      for (const fmpResult of fmpResults) {
+    const FMP_TIMEOUT_MS = 3e4;
+    const fetchCompanyDataWithTimeout = async (tickerSymbol) => {
+      return Promise.race([
+        fetchCompanyData(tickerSymbol),
+        new Promise(
+          (_, reject) => setTimeout(() => reject(new Error(`Timeout après ${FMP_TIMEOUT_MS}ms`)), FMP_TIMEOUT_MS)
+        )
+      ]);
+    };
+    try {
+      console.log(`🚀 Début synchronisation: ${allTickers.length} tickers en ${Math.ceil(allTickers.length / FMP_BATCH_SIZE)} batches`);
+      for (let i = 0; i < allTickers.length; i += FMP_BATCH_SIZE) {
         if (abortSync.current) {
           console.log("🛑 Synchronisation arrêtée par l'utilisateur.");
           break;
@@ -53493,112 +53462,160 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
           await new Promise((resolve) => setTimeout(resolve, 500));
         }
         if (abortSync.current) break;
-        if (fmpResult.status === "fulfilled") {
-          const { tickerSymbol, success, result, error, profile: profile2 } = fmpResult.value;
-          if (!success || !result || !profile2) {
-            errorCount++;
-            setSyncStats({ successCount, errorCount });
-            const errorMsg = `${tickerSymbol}: ${error || "Erreur inconnue"}`;
-            errors.push(errorMsg);
-            console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
-            setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
-            continue;
-          }
-          try {
-            const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
-            const mergedData = profile2.data.map((existingRow) => {
-              const newRow = newDataByYear.get(existingRow.year);
-              if (!newRow) return existingRow;
-              if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
-                return existingRow;
+        const batch = allTickers.slice(i, i + FMP_BATCH_SIZE);
+        const fmpResults = await Promise.allSettled(
+          batch.map(async (tickerSymbol) => {
+            try {
+              const profile2 = library[tickerSymbol];
+              if (!profile2) {
+                return { tickerSymbol, success: false, error: "Profil non trouvé", result: null };
               }
-              return { ...newRow, autoFetched: true };
-            });
-            result.data.forEach((newRow) => {
-              const exists = mergedData.some((row) => row.year === newRow.year);
-              if (!exists) {
-                mergedData.push({ ...newRow, autoFetched: true });
-              }
-            });
-            mergedData.sort((a2, b) => a2.year - b.year);
-            const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-              mergedData,
-              result.currentPrice,
-              profile2.assumptions
-            );
-            const tempAssumptions = { ...profile2.assumptions, ...autoFilledAssumptions };
-            const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
-            if (outlierDetection.detectedOutliers.length > 0) {
-              console.log(`⚠️ ${tickerSymbol}: Outliers détectés: ${outlierDetection.detectedOutliers.join(", ")}`);
-            }
-            const finalAssumptions = {
-              ...tempAssumptions,
-              excludeEPS: outlierDetection.excludeEPS,
-              excludeCF: outlierDetection.excludeCF,
-              excludeBV: outlierDetection.excludeBV,
-              excludeDIV: outlierDetection.excludeDIV
-            };
-            setLibrary((prev) => {
-              const updated = {
-                ...prev,
-                [tickerSymbol]: {
-                  ...profile2,
-                  data: mergedData,
-                  info: {
-                    ...profile2.info,
-                    ...result.info,
-                    name: result.info.name || profile2.info.name
-                  },
-                  assumptions: finalAssumptions,
-                  lastModified: Date.now()
-                }
+              console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
+              await saveSnapshot(
+                tickerSymbol,
+                profile2.data,
+                profile2.assumptions,
+                profile2.info,
+                `Avant synchronisation globale - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
+                false,
+                false
+              );
+              console.log(`🔄 Synchronisation ${tickerSymbol}...`);
+              const result = await fetchCompanyDataWithTimeout(tickerSymbol);
+              return { tickerSymbol, success: true, result, profile: profile2 };
+            } catch (error) {
+              return {
+                tickerSymbol,
+                success: false,
+                error: error.message || "Erreur inconnue",
+                result: null,
+                profile: library[tickerSymbol] || null
               };
-              try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-              } catch (e) {
-                console.warn(e);
+            }
+          })
+        );
+        for (const fmpResult of fmpResults) {
+          if (abortSync.current) {
+            console.log("🛑 Synchronisation arrêtée par l'utilisateur.");
+            break;
+          }
+          while (isSyncPaused.current) {
+            if (abortSync.current) break;
+            await new Promise((resolve) => setTimeout(resolve, 500));
+          }
+          if (abortSync.current) break;
+          if (fmpResult.status === "fulfilled") {
+            const { tickerSymbol, success, result, error, profile: profile2 } = fmpResult.value;
+            if (!success || !result || !profile2) {
+              errorCount++;
+              setSyncStats({ successCount, errorCount });
+              const errorMsg = `${tickerSymbol}: ${error || "Erreur inconnue"}`;
+              errors.push(errorMsg);
+              console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
+              setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
+              continue;
+            }
+            try {
+              const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
+              const mergedData = profile2.data.map((existingRow) => {
+                const newRow = newDataByYear.get(existingRow.year);
+                if (!newRow) return existingRow;
+                if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
+                  return existingRow;
+                }
+                return { ...newRow, autoFetched: true };
+              });
+              result.data.forEach((newRow) => {
+                const exists = mergedData.some((row) => row.year === newRow.year);
+                if (!exists) {
+                  mergedData.push({ ...newRow, autoFetched: true });
+                }
+              });
+              mergedData.sort((a2, b) => a2.year - b.year);
+              const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                mergedData,
+                result.currentPrice,
+                profile2.assumptions
+              );
+              const tempAssumptions = { ...profile2.assumptions, ...autoFilledAssumptions };
+              const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
+              if (outlierDetection.detectedOutliers.length > 0) {
+                console.log(`⚠️ ${tickerSymbol}: Outliers détectés: ${outlierDetection.detectedOutliers.join(", ")}`);
               }
-              return updated;
-            });
-            await saveSnapshot(
-              tickerSymbol,
-              mergedData,
-              finalAssumptions,
-              { ...profile2.info, ...result.info },
-              `Synchronisation globale - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
-              true,
-              true
-            );
-            successCount++;
-            setSyncStats({ successCount, errorCount });
-            console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
-            setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
-            await new Promise((resolve) => setTimeout(resolve, delayBetweenTickersInBatch));
-          } catch (error2) {
+              const finalAssumptions = {
+                ...tempAssumptions,
+                excludeEPS: outlierDetection.excludeEPS,
+                excludeCF: outlierDetection.excludeCF,
+                excludeBV: outlierDetection.excludeBV,
+                excludeDIV: outlierDetection.excludeDIV
+              };
+              setLibrary((prev) => {
+                const updated = {
+                  ...prev,
+                  [tickerSymbol]: {
+                    ...profile2,
+                    data: mergedData,
+                    info: {
+                      ...profile2.info,
+                      ...result.info,
+                      name: result.info.name || profile2.info.name
+                    },
+                    assumptions: finalAssumptions,
+                    lastModified: Date.now()
+                  }
+                };
+                try {
+                  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                } catch (e) {
+                  console.warn(e);
+                }
+                return updated;
+              });
+              await saveSnapshot(
+                tickerSymbol,
+                mergedData,
+                finalAssumptions,
+                { ...profile2.info, ...result.info },
+                `Synchronisation globale - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
+                true,
+                true
+              );
+              successCount++;
+              setSyncStats({ successCount, errorCount });
+              console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
+              setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
+              await new Promise((resolve) => setTimeout(resolve, delayBetweenTickersInBatch));
+            } catch (error2) {
+              errorCount++;
+              setSyncStats({ successCount, errorCount });
+              const errorMsg = `${tickerSymbol}: ${error2.message || "Erreur inconnue"}`;
+              errors.push(errorMsg);
+              console.error(`❌ Erreur traitement ${tickerSymbol}:`, error2);
+              setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
+            }
+          } else {
+            const tickerSymbol = batch[fmpResults.indexOf(fmpResult)] || "UNKNOWN";
             errorCount++;
             setSyncStats({ successCount, errorCount });
-            const errorMsg = `${tickerSymbol}: ${error2.message || "Erreur inconnue"}`;
+            const errorMsg = `${tickerSymbol}: ${((_a4 = fmpResult.reason) == null ? void 0 : _a4.message) || "Erreur inconnue"}`;
             errors.push(errorMsg);
-            console.error(`❌ Erreur traitement ${tickerSymbol}:`, error2);
+            console.error(`❌ Erreur sync ${tickerSymbol}:`, fmpResult.reason);
             setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
           }
-        } else {
-          const tickerSymbol = batch[fmpResults.indexOf(fmpResult)] || "UNKNOWN";
-          errorCount++;
-          setSyncStats({ successCount, errorCount });
-          const errorMsg = `${tickerSymbol}: ${((_a4 = fmpResult.reason) == null ? void 0 : _a4.message) || "Erreur inconnue"}`;
-          errors.push(errorMsg);
-          console.error(`❌ Erreur sync ${tickerSymbol}:`, fmpResult.reason);
-          setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
+        }
+        if (i + FMP_BATCH_SIZE < allTickers.length && !abortSync.current) {
+          await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
         }
       }
-      if (i + FMP_BATCH_SIZE < allTickers.length && !abortSync.current) {
-        await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
-      }
-    }
-    setIsBulkSyncing(false);
-    setBulkSyncProgress({ current: 0, total: 0 });
-    const message = `Synchronisation terminée
+      console.log(`✅ Synchronisation terminée: ${successCount} succès, ${errorCount} erreurs`);
+    } catch (error) {
+      console.error("❌ Erreur fatale pendant la synchronisation:", error);
+      errorCount++;
+      errors.push(`Erreur fatale: ${error.message || "Erreur inconnue"}`);
+    } finally {
+      setIsBulkSyncing(false);
+      setBulkSyncProgress({ current: 0, total: 0 });
+      const message = `Synchronisation terminée
 
 Réussies: ${successCount}
 Erreurs: ${errorCount}` + (errors.length > 0 ? `
@@ -53606,12 +53623,13 @@ Erreurs: ${errorCount}` + (errors.length > 0 ? `
 Erreurs:
 ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
 ... et ${errors.length - 5} autres` : ""}` : "");
-    if (!abortSync.current) {
-      showNotification(message, errorCount > 0 ? "warning" : "success");
-    } else {
-      showNotification("Synchronisation arrêtée manuellement.", "warning");
+      if (!abortSync.current) {
+        showNotification(message, errorCount > 0 ? "warning" : "success");
+      } else {
+        showNotification("Synchronisation arrêtée manuellement.", "warning");
+      }
+      console.log(`✅ ${message}`);
     }
-    console.log(`✅ ${message}`);
   };
   const handleSyncSpecificTickers = async (tickersToSync) => {
     if (tickersToSync.length === 0) {
@@ -53635,124 +53653,141 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
     const errors = [];
     const batchSize = 3;
     const delayBetweenBatches = 1e3;
-    for (let i = 0; i < tickersToSync.length; i += batchSize) {
-      const batch = tickersToSync.slice(i, i + batchSize);
-      if (i > 0) {
-        await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
-      }
-      await Promise.allSettled(
-        batch.map(async (tickerSymbol) => {
-          try {
-            setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
-            const profile2 = library[tickerSymbol];
-            if (!profile2) {
-              console.warn(`⚠️ ${tickerSymbol}: Profil non trouvé`);
-              return;
-            }
-            console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
-            await saveSnapshot(
-              tickerSymbol,
-              profile2.data,
-              profile2.assumptions,
-              profile2.info,
-              `Avant synchronisation (N/A) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
-              false,
-              false
-            );
-            console.log(`🔄 Synchronisation ${tickerSymbol}...`);
-            const result = await fetchCompanyData(tickerSymbol);
-            const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
-            const mergedData = profile2.data.map((existingRow) => {
-              const newRow = newDataByYear.get(existingRow.year);
-              if (!newRow) return existingRow;
-              if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
-                return existingRow;
+    const FMP_TIMEOUT_MS = 3e4;
+    const fetchCompanyDataWithTimeout = async (tickerSymbol) => {
+      return Promise.race([
+        fetchCompanyData(tickerSymbol),
+        new Promise(
+          (_, reject) => setTimeout(() => reject(new Error(`Timeout après ${FMP_TIMEOUT_MS}ms`)), FMP_TIMEOUT_MS)
+        )
+      ]);
+    };
+    try {
+      console.log(`🚀 Début synchronisation spécifique: ${tickersToSync.length} tickers`);
+      for (let i = 0; i < tickersToSync.length; i += batchSize) {
+        const batch = tickersToSync.slice(i, i + batchSize);
+        if (i > 0) {
+          await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
+        }
+        await Promise.allSettled(
+          batch.map(async (tickerSymbol) => {
+            try {
+              setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
+              const profile2 = library[tickerSymbol];
+              if (!profile2) {
+                console.warn(`⚠️ ${tickerSymbol}: Profil non trouvé`);
+                return;
               }
-              return {
-                ...newRow,
-                autoFetched: true
-              };
-            });
-            result.data.forEach((newRow) => {
-              const exists = mergedData.some((row) => row.year === newRow.year);
-              if (!exists) {
-                mergedData.push({
+              console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
+              await saveSnapshot(
+                tickerSymbol,
+                profile2.data,
+                profile2.assumptions,
+                profile2.info,
+                `Avant synchronisation (N/A) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
+                false,
+                false
+              );
+              console.log(`🔄 Synchronisation ${tickerSymbol}...`);
+              const result = await fetchCompanyDataWithTimeout(tickerSymbol);
+              const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
+              const mergedData = profile2.data.map((existingRow) => {
+                const newRow = newDataByYear.get(existingRow.year);
+                if (!newRow) return existingRow;
+                if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
+                  return existingRow;
+                }
+                return {
                   ...newRow,
                   autoFetched: true
-                });
-              }
-            });
-            mergedData.sort((a2, b) => a2.year - b.year);
-            const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-              mergedData,
-              result.currentPrice,
-              profile2.assumptions
-            );
-            const tempAssumptions = {
-              ...profile2.assumptions,
-              ...autoFilledAssumptions
-            };
-            const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
-            if (outlierDetection.detectedOutliers.length > 0) {
-              console.log(`⚠️ ${tickerSymbol}: Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(", ")}`);
-            }
-            const finalAssumptions = {
-              ...tempAssumptions,
-              excludeEPS: outlierDetection.excludeEPS,
-              excludeCF: outlierDetection.excludeCF,
-              excludeBV: outlierDetection.excludeBV,
-              excludeDIV: outlierDetection.excludeDIV
-            };
-            setLibrary((prev) => {
-              const updated = {
-                ...prev,
-                [tickerSymbol]: {
-                  ...profile2,
-                  data: mergedData,
-                  info: {
-                    ...profile2.info,
-                    ...result.info,
-                    name: result.info.name || profile2.info.name
-                  },
-                  assumptions: finalAssumptions,
-                  lastModified: Date.now()
+                };
+              });
+              result.data.forEach((newRow) => {
+                const exists = mergedData.some((row) => row.year === newRow.year);
+                if (!exists) {
+                  mergedData.push({
+                    ...newRow,
+                    autoFetched: true
+                  });
                 }
+              });
+              mergedData.sort((a2, b) => a2.year - b.year);
+              const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                mergedData,
+                result.currentPrice,
+                profile2.assumptions
+              );
+              const tempAssumptions = {
+                ...profile2.assumptions,
+                ...autoFilledAssumptions
               };
-              try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-              } catch (e) {
-                console.warn("Failed to save to LocalStorage:", e);
+              const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
+              if (outlierDetection.detectedOutliers.length > 0) {
+                console.log(`⚠️ ${tickerSymbol}: Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(", ")}`);
               }
-              return updated;
-            });
-            await saveSnapshot(
-              tickerSymbol,
-              mergedData,
-              finalAssumptions,
-              {
-                ...profile2.info,
-                ...result.info
-              },
-              `Synchronisation (N/A) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
-              true,
-              true
-            );
-            successCount++;
-            setSyncStats({ successCount, errorCount });
-            console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
-          } catch (error) {
-            errorCount++;
-            setSyncStats({ successCount, errorCount });
-            const errorMsg = `${tickerSymbol}: ${error.message || "Erreur inconnue"}`;
-            errors.push(errorMsg);
-            console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
-          }
-        })
-      );
-    }
-    setIsBulkSyncing(false);
-    setBulkSyncProgress({ current: 0, total: 0 });
-    const message = `Synchronisation terminée
+              const finalAssumptions = {
+                ...tempAssumptions,
+                excludeEPS: outlierDetection.excludeEPS,
+                excludeCF: outlierDetection.excludeCF,
+                excludeBV: outlierDetection.excludeBV,
+                excludeDIV: outlierDetection.excludeDIV
+              };
+              setLibrary((prev) => {
+                const updated = {
+                  ...prev,
+                  [tickerSymbol]: {
+                    ...profile2,
+                    data: mergedData,
+                    info: {
+                      ...profile2.info,
+                      ...result.info,
+                      name: result.info.name || profile2.info.name
+                    },
+                    assumptions: finalAssumptions,
+                    lastModified: Date.now()
+                  }
+                };
+                try {
+                  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                } catch (e) {
+                  console.warn("Failed to save to LocalStorage:", e);
+                }
+                return updated;
+              });
+              await saveSnapshot(
+                tickerSymbol,
+                mergedData,
+                finalAssumptions,
+                {
+                  ...profile2.info,
+                  ...result.info
+                },
+                `Synchronisation (N/A) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
+                true,
+                true
+              );
+              successCount++;
+              setSyncStats({ successCount, errorCount });
+              console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
+            } catch (error) {
+              errorCount++;
+              setSyncStats({ successCount, errorCount });
+              const errorMsg = `${tickerSymbol}: ${error.message || "Erreur inconnue"}`;
+              errors.push(errorMsg);
+              console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
+            }
+          })
+        );
+      }
+      console.log(`✅ Synchronisation spécifique terminée: ${successCount} succès, ${errorCount} erreurs`);
+    } catch (error) {
+      console.error("❌ Erreur fatale pendant la synchronisation spécifique:", error);
+      errorCount++;
+      errors.push(`Erreur fatale: ${error.message || "Erreur inconnue"}`);
+    } finally {
+      setIsBulkSyncing(false);
+      setBulkSyncProgress({ current: 0, total: 0 });
+      const message = `Synchronisation terminée
 
 Réussies: ${successCount}
 Erreurs: ${errorCount}` + (errors.length > 0 ? `
@@ -53760,8 +53795,9 @@ Erreurs: ${errorCount}` + (errors.length > 0 ? `
 Erreurs:
 ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
 ... et ${errors.length - 5} autres` : ""}` : "");
-    alert(message);
-    showNotification(`Synchronisation terminée: ${successCount} réussies, ${errorCount} erreurs`, successCount > 0 ? "success" : "error");
+      showNotification(message, errorCount > 0 ? "warning" : "success");
+      console.log(`✅ ${message}`);
+    }
   };
   const handleSyncFromSupabase = async () => {
     setIsLoadingTickers(true);

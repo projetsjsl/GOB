@@ -2299,9 +2299,24 @@ export default function App() {
         const delayBetweenBatches = 500;
         // ✅ OPTIMISATION: Délai réduit entre tickers dans un batch (100ms)
         const delayBetweenTickersInBatch = 100;
+        // ✅ TIMEOUT: Timeout pour chaque appel FMP (30 secondes)
+        const FMP_TIMEOUT_MS = 30000;
 
-        // Traiter par batch pour optimiser les appels FMP
-        for (let i = 0; i < allTickers.length; i += FMP_BATCH_SIZE) {
+        // ✅ FONCTION HELPER: fetchCompanyData avec timeout
+        const fetchCompanyDataWithTimeout = async (tickerSymbol: string): Promise<any> => {
+            return Promise.race([
+                fetchCompanyData(tickerSymbol),
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error(`Timeout après ${FMP_TIMEOUT_MS}ms`)), FMP_TIMEOUT_MS)
+                )
+            ]);
+        };
+
+        try {
+            console.log(`🚀 Début synchronisation: ${allTickers.length} tickers en ${Math.ceil(allTickers.length / FMP_BATCH_SIZE)} batches`);
+            
+            // Traiter par batch pour optimiser les appels FMP
+            for (let i = 0; i < allTickers.length; i += FMP_BATCH_SIZE) {
             // 0. Check for Pause or Abort
             if (abortSync.current) {
                 console.log('🛑 Synchronisation arrêtée par l\'utilisateur.');
@@ -2338,9 +2353,9 @@ export default function App() {
                             false 
                         );
 
-                        // 2. Charger les nouvelles données FMP
+                        // 2. Charger les nouvelles données FMP avec timeout
                         console.log(`🔄 Synchronisation ${tickerSymbol}...`);
-                        const result = await fetchCompanyData(tickerSymbol);
+                        const result = await fetchCompanyDataWithTimeout(tickerSymbol);
                         
                         return { tickerSymbol, success: true, result, profile };
                     } catch (error: any) {
@@ -2488,23 +2503,32 @@ export default function App() {
             if (i + FMP_BATCH_SIZE < allTickers.length && !abortSync.current) {
                 await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
             }
-        }
+            }
 
-        setIsBulkSyncing(false);
-        setBulkSyncProgress({ current: 0, total: 0 });
-
-        // Afficher le résultat
-        const message = `Synchronisation terminée\n\n` +
-            `Réussies: ${successCount}\n` +
-            `Erreurs: ${errorCount}` +
-            (errors.length > 0 ? `\n\nErreurs:\n${errors.slice(0, 5).join('\n')}${errors.length > 5 ? `\n... et ${errors.length - 5} autres` : ''}` : '');
-        
-        if (!abortSync.current) {
-             showNotification(message, errorCount > 0 ? 'warning' : 'success');
-        } else {
-             showNotification("Synchronisation arrêtée manuellement.", 'warning');
+            console.log(`✅ Synchronisation terminée: ${successCount} succès, ${errorCount} erreurs`);
+        } catch (error: any) {
+            // ✅ GESTION ERREUR GLOBALE: S'assurer que le sync se termine même en cas d'erreur fatale
+            console.error('❌ Erreur fatale pendant la synchronisation:', error);
+            errorCount++;
+            errors.push(`Erreur fatale: ${error.message || 'Erreur inconnue'}`);
+        } finally {
+            // ✅ GARANTIE: Toujours réinitialiser l'état, même en cas d'erreur
+            setIsBulkSyncing(false);
+            setBulkSyncProgress({ current: 0, total: 0 });
+            
+            // Afficher le résultat
+            const message = `Synchronisation terminée\n\n` +
+                `Réussies: ${successCount}\n` +
+                `Erreurs: ${errorCount}` +
+                (errors.length > 0 ? `\n\nErreurs:\n${errors.slice(0, 5).join('\n')}${errors.length > 5 ? `\n... et ${errors.length - 5} autres` : ''}` : '');
+            
+            if (!abortSync.current) {
+                 showNotification(message, errorCount > 0 ? 'warning' : 'success');
+            } else {
+                 showNotification("Synchronisation arrêtée manuellement.", 'warning');
+            }
+            console.log(`✅ ${message}`);
         }
-        console.log(`✅ ${message}`);
     };
 
     // Synchroniser uniquement une liste spécifique de tickers (ex: ceux avec N/A)
@@ -2529,8 +2553,23 @@ export default function App() {
         // Traiter par batch pour éviter de surcharger
         const batchSize = 3;
         const delayBetweenBatches = 1000;
+        // ✅ TIMEOUT: Timeout pour chaque appel FMP (30 secondes)
+        const FMP_TIMEOUT_MS = 30000;
 
-        for (let i = 0; i < tickersToSync.length; i += batchSize) {
+        // ✅ FONCTION HELPER: fetchCompanyData avec timeout
+        const fetchCompanyDataWithTimeout = async (tickerSymbol: string): Promise<any> => {
+            return Promise.race([
+                fetchCompanyData(tickerSymbol),
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error(`Timeout après ${FMP_TIMEOUT_MS}ms`)), FMP_TIMEOUT_MS)
+                )
+            ]);
+        };
+
+        try {
+            console.log(`🚀 Début synchronisation spécifique: ${tickersToSync.length} tickers`);
+            
+            for (let i = 0; i < tickersToSync.length; i += batchSize) {
             const batch = tickersToSync.slice(i, i + batchSize);
 
             // Attendre entre les batches
@@ -2562,9 +2601,9 @@ export default function App() {
                             false
                         );
 
-                        // 2. Charger les nouvelles données FMP
+                        // 2. Charger les nouvelles données FMP avec timeout
                         console.log(`🔄 Synchronisation ${tickerSymbol}...`);
-                        const result = await fetchCompanyData(tickerSymbol);
+                        const result = await fetchCompanyDataWithTimeout(tickerSymbol);
 
                         // 3. Merge intelligent : préserver les données manuelles
                         const newDataByYear = new Map(result.data.map(row => [row.year, row]));
@@ -2673,19 +2712,28 @@ export default function App() {
                     }
                 })
             );
+            }
+
+            console.log(`✅ Synchronisation spécifique terminée: ${successCount} succès, ${errorCount} erreurs`);
+        } catch (error: any) {
+            // ✅ GESTION ERREUR GLOBALE: S'assurer que le sync se termine même en cas d'erreur fatale
+            console.error('❌ Erreur fatale pendant la synchronisation spécifique:', error);
+            errorCount++;
+            errors.push(`Erreur fatale: ${error.message || 'Erreur inconnue'}`);
+        } finally {
+            // ✅ GARANTIE: Toujours réinitialiser l'état, même en cas d'erreur
+            setIsBulkSyncing(false);
+            setBulkSyncProgress({ current: 0, total: 0 });
+
+            // Afficher le résultat
+            const message = `Synchronisation terminée\n\n` +
+                `Réussies: ${successCount}\n` +
+                `Erreurs: ${errorCount}` +
+                (errors.length > 0 ? `\n\nErreurs:\n${errors.slice(0, 5).join('\n')}${errors.length > 5 ? `\n... et ${errors.length - 5} autres` : ''}` : '');
+            
+            showNotification(message, errorCount > 0 ? 'warning' : 'success');
+            console.log(`✅ ${message}`);
         }
-
-        setIsBulkSyncing(false);
-        setBulkSyncProgress({ current: 0, total: 0 });
-
-        // Afficher le résultat
-        const message = `Synchronisation terminée\n\n` +
-            `Réussies: ${successCount}\n` +
-            `Erreurs: ${errorCount}` +
-            (errors.length > 0 ? `\n\nErreurs:\n${errors.slice(0, 5).join('\n')}${errors.length > 5 ? `\n... et ${errors.length - 5} autres` : ''}` : '');
-        
-        alert(message);
-        showNotification(`Synchronisation terminée: ${successCount} réussies, ${errorCount} erreurs`, successCount > 0 ? 'success' : 'error');
     };
 
     /**
