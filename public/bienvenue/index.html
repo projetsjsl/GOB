@@ -2792,13 +2792,23 @@
                             // Replace optimistic item with real DB item (with correct ID from DB)
                             setTaskTemplates(prev => prev.map(t => t.id === tempId ? DataMapper.taskTemplateToReact(data[0]) : t));
                             showNotification('Nouvelle tâche ajoutée', 'success');
+                        } else {
+                            // Pas de données retournées, recharger pour synchroniser
+                            console.warn('⚠️ Aucune donnée retournée après insertion, rechargement...');
+                            setTimeout(() => reloadTaskTemplates(), 500);
                         }
                    } catch (e) {
-                       console.error('Erreur ajout tâche:', e);
+                       console.error('❌ Erreur ajout tâche:', e);
                        // Remove optimistic update on error
                        setTaskTemplates(prev => prev.filter(t => t.id !== tempId));
+                       const errorMessage = e.message || e.details || 'Erreur inconnue lors de l\'ajout de la tâche';
                        handleSupabaseError(e, 'Add Task');
-                       showNotification(`Erreur lors de l'ajout: ${e.message || 'Erreur inconnue'}`, 'error');
+                       showNotification(`Erreur lors de l'ajout: ${errorMessage}`, 'error');
+                       
+                       // En cas d'erreur, recharger pour synchroniser
+                       setTimeout(() => {
+                           reloadTaskTemplates();
+                       }, 500);
                    }
                 } else {
                      showNotification('Nouvelle tâche ajoutée (Local)', 'success');
