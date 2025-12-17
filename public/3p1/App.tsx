@@ -2582,10 +2582,16 @@ export default function App() {
                                                    supabaseTicker.price_growth_persistence || 
                                                    supabaseTicker.price_stability;
                         
-                        if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist || hasValueLineUpdates) {
+                        // ✅ MIGRATION FORCÉE : Toujours mettre à jour isWatchlist depuis Supabase
+                        // Même si isWatchlist semble déjà correct, forcer la mise à jour pour garantir la cohérence
+                        const needsValueLineUpdate = hasValueLineUpdates;
+                        const needsIsWatchlistUpdate = updated[tickerSymbol].isWatchlist !== shouldBeWatchlist;
+                        
+                        // ✅ FORCER la mise à jour si isWatchlist est différent OU s'il y a des mises à jour ValueLine
+                        if (needsIsWatchlistUpdate || needsValueLineUpdate) {
                             updated[tickerSymbol] = {
                                 ...updated[tickerSymbol],
-                                isWatchlist: shouldBeWatchlist,
+                                isWatchlist: shouldBeWatchlist, // ✅ FORCER mise à jour depuis Supabase
                                 // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
                                 // Toujours utiliser Supabase si disponible, sinon garder valeur existante
                                 info: {
@@ -2607,24 +2613,15 @@ export default function App() {
                                         : updated[tickerSymbol].info.beta
                                 }
                             };
+                            
+                            if (needsIsWatchlistUpdate) {
+                                migrationCount++;
+                            }
                             updatedTickersCount++;
-                            migrationCount++;
                             
                             // Si c'est le profil actif, mettre à jour aussi le state local
                             if (tickerSymbol === activeId) {
                                 setInfo(updated[tickerSymbol].info);
-                                setIsWatchlist(shouldBeWatchlist ?? false);
-                            }
-                        } else if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist) {
-                            // ✅ Même si pas d'autres updates, forcer isWatchlist pour migration
-                            updated[tickerSymbol] = {
-                                ...updated[tickerSymbol],
-                                isWatchlist: shouldBeWatchlist
-                            };
-                            migrationCount++;
-                            
-                            // Si c'est le profil actif, mettre à jour aussi le state local
-                            if (tickerSymbol === activeId) {
                                 setIsWatchlist(shouldBeWatchlist ?? false);
                             }
                         }

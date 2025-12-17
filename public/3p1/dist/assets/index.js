@@ -53614,10 +53614,13 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
           const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
           if (updated[tickerSymbol]) {
             const hasValueLineUpdates = supabaseTicker.security_rank || supabaseTicker.earnings_predictability || supabaseTicker.price_growth_persistence || supabaseTicker.price_stability;
-            if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist || hasValueLineUpdates) {
+            const needsValueLineUpdate = hasValueLineUpdates;
+            const needsIsWatchlistUpdate = updated[tickerSymbol].isWatchlist !== shouldBeWatchlist;
+            if (needsIsWatchlistUpdate || needsValueLineUpdate) {
               updated[tickerSymbol] = {
                 ...updated[tickerSymbol],
                 isWatchlist: shouldBeWatchlist,
+                // ✅ FORCER mise à jour depuis Supabase
                 // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
                 // Toujours utiliser Supabase si disponible, sinon garder valeur existante
                 info: {
@@ -53629,19 +53632,12 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                   beta: supabaseTicker.beta !== null && supabaseTicker.beta !== void 0 ? supabaseTicker.beta : updated[tickerSymbol].info.beta
                 }
               };
+              if (needsIsWatchlistUpdate) {
+                migrationCount++;
+              }
               updatedTickersCount++;
-              migrationCount++;
               if (tickerSymbol === activeId) {
                 setInfo(updated[tickerSymbol].info);
-                setIsWatchlist(shouldBeWatchlist ?? false);
-              }
-            } else if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist) {
-              updated[tickerSymbol] = {
-                ...updated[tickerSymbol],
-                isWatchlist: shouldBeWatchlist
-              };
-              migrationCount++;
-              if (tickerSymbol === activeId) {
                 setIsWatchlist(shouldBeWatchlist ?? false);
               }
             }
