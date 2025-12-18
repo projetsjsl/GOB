@@ -16801,40 +16801,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             <div ref={marketOverviewRef} style={{height: '400px'}}></div>
                         </div>
 
-                        {/* Investing.com Economic Calendar */}
-                        <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
-                            isDarkMode
-                                ? 'bg-gray-800/50 border-orange-500/30'
-                                : 'bg-white border-orange-400/40'
-                        }`}>
-                            <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                                <h3 className={`text-lg font-bold transition-colors duration-300 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>
-                                    📅 Calendrier Économique (Investing.com)
-                                </h3>
-                                <p className={`text-sm transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }`}>
-                                     Événements économiques majeurs à surveiller
-                                </p>
-                            </div>
-                            <div className="h-[500px] w-full relative">
-                                 <iframe
-                                    src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&importance=1,2,3&features=datepicker,timezone,timeselector,filters&countries=6,5&calType=day&timeZone=8&lang=5&transparentBackground=1"
-                                    width="100%"
-                                    height="100%"
-                                    frameBorder="0"
-                                    allowTransparency="true"
-                                    marginWidth="0"
-                                    marginHeight="0"
-                                    sandbox="allow-scripts allow-same-origin allow-forms"
-                                    className="relative z-0"
-                                    style={{ minWidth: '100%', background: 'transparent' }}
-                                />
-                            </div>
-                        </div>
-
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Stock Heatmap Widget */}
                             <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
@@ -25374,7 +25340,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         {(window.RolesPermissions && window.userPermissions 
                             ? window.RolesPermissions.filterTabsByPermissions(tabs)
                             : tabs
-                        ).map(tab => {
+                        ).filter(tab => tab.id !== 'finance-pro' && tab.id !== 'advanced-analysis').map(tab => {
                             // Gérer le menu "Plus" spécialement
                             if (tab.id === 'plus' && tab.hiddenTabs) {
                                 return (
@@ -25463,98 +25429,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             )}
                                                             <span className="font-medium">{hiddenTab.label}</span>
                                                             {isActive && (
-                                                                <span className={`ml-auto w-2 h-2 rounded-full ${isDarkMode ? 'bg-green-400' : 'bg-green-600'}`}></span>
-                                                            )}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            }
-                            
-                            // Sous-menu pour l'onglet "Titres" avec options Portefeuille et Dan's Watchlist
-                            if (tab.id === 'advanced-analysis') {
-                                const iconClass = tab.icon || getTabIcon(tab.id);
-                                const isActive = activeTab === 'advanced-analysis' || activeTab === 'dans-watchlist';
-                                const titresSubmenus = [
-                                    { id: 'advanced-analysis', label: 'Titres en portefeuille', icon: 'iconoir-wallet' },
-                                    { id: 'dans-watchlist', label: "Dan's watchlist", icon: 'iconoir-star' }
-                                ];
-                                return (
-                                    <div key="titres-menu" className="relative flex-shrink-0">
-                                        <button
-                                            ref={el => { if (el) tabRefs.current[tab.id] = el; }}
-                                            onMouseDown={withRipple}
-                                            onClick={() => {
-                                                setShowTitresSubmenu(!showTitresSubmenu);
-                                                setShowPlusMenu(false);
-                                            }}
-                                            className={`flex flex-col items-center justify-center py-2.5 px-3 min-w-[70px] btn-ripple relative transition-all duration-300 group rounded-lg ${
-                                                isActive || showTitresSubmenu
-                                                    ? (isDarkMode
-                                                        ? 'text-green-400 bg-gradient-to-b from-green-500/20 to-green-600/10'
-                                                        : 'text-green-600 bg-gradient-to-b from-green-50 to-green-100/50')
-                                                    : (isDarkMode
-                                                        ? 'text-gray-400 hover:text-green-300 hover:bg-gray-800/50'
-                                                        : 'text-gray-600 hover:text-green-700 hover:bg-gray-100')
-                                            }`}
-                                            title="Titres - Cliquez pour voir les options"
-                                        >
-                                            {isActive && (
-                                                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 rounded-b transition-all duration-300 ${isDarkMode
-                                                    ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]'
-                                                    : 'bg-green-600 shadow-[0_0_6px_rgba(22,163,74,0.4)]'
-                                                    }`}></div>
-                                            )}
-                                            <div className={`relative mb-1 transition-all duration-300 ${isActive ? 'scale-110' : 'scale-100 group-hover:scale-105'}`}>
-                                                {isActive && (
-                                                    <div className={`absolute inset-0 rounded-full blur-md opacity-40 transition-all duration-300 ${isDarkMode ? 'bg-green-500' : 'bg-green-400'}`} 
-                                                         style={{ transform: 'scale(1.8)', filter: 'blur(10px)' }}></div>
-                                                )}
-                                                <i className={`${iconClass} text-xl relative z-10 transition-all duration-300 ${isActive
-                                                    ? (isDarkMode ? 'drop-shadow-[0_0_8px_rgba(34,197,94,0.9)]' : 'drop-shadow-[0_0_6px_rgba(22,163,74,0.7)]')
-                                                    : 'drop-shadow-none'
-                                                }`} style={{ display: 'inline-block' }}></i>
-                                            </div>
-                                            <span className={`text-[10px] font-semibold text-center leading-tight transition-all duration-300 whitespace-nowrap flex items-center gap-0.5 ${isActive ? 'font-bold' : ''}`}>
-                                                Titres
-                                                <i className={`iconoir-nav-arrow-down text-[8px] transition-transform duration-200 ${showTitresSubmenu ? 'rotate-180' : ''}`}></i>
-                                            </span>
-                                            {(isActive || showTitresSubmenu) && (
-                                                <span className={`absolute top-1 right-1 w-2 h-2 rounded-full transition-all duration-300 ${isDarkMode
-                                                    ? 'bg-green-400 shadow-[0_0_6px_rgba(34,197,94,0.8)]'
-                                                    : 'bg-green-600 shadow-[0_0_4px_rgba(22,163,74,0.6)]'
-                                                    } animate-pulse`}></span>
-                                            )}
-                                        </button>
-
-                                        {/* Dropdown menu pour Titres */}
-                                        {showTitresSubmenu && (
-                                            <div 
-                                                className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 rounded-lg shadow-2xl border overflow-hidden z-50 min-w-[200px] ${
-                                                    isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
-                                                }`}
-                                            >
-                                                {titresSubmenus.map(submenu => {
-                                                    const isSubmenuActive = activeTab === submenu.id;
-                                                    return (
-                                                        <button
-                                                            key={submenu.id}
-                                                            onClick={() => {
-                                                                handleTabChange(submenu.id);
-                                                                setShowTitresSubmenu(false);
-                                                            }}
-                                                            className={`w-full text-left px-4 py-3 flex items-center gap-3 transition-colors ${
-                                                                isSubmenuActive
-                                                                    ? (isDarkMode ? 'bg-green-500/20 text-green-400' : 'bg-green-50 text-green-600')
-                                                                    : (isDarkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100')
-                                                            }`}
-                                                        >
-                                                            <i className={`${submenu.icon} text-lg`}></i>
-                                                            <span className="font-medium">{submenu.label}</span>
-                                                            {isSubmenuActive && (
                                                                 <span className={`ml-auto w-2 h-2 rounded-full ${isDarkMode ? 'bg-green-400' : 'bg-green-600'}`}></span>
                                                             )}
                                                         </button>

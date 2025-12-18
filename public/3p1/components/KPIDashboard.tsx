@@ -749,7 +749,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         m.profile.id,
         `"${m.profile.info.name}"`,
         m.profile.info.sector,
-        m.jpegy !== null ? m.jpegy.toFixed(2) : 'N/A',
+        m.jpegy !== null && m.jpegy !== undefined ? m.jpegy.toFixed(2) : 'N/A',
         m.totalReturnPercent !== null && m.totalReturnPercent !== undefined ? m.totalReturnPercent.toFixed(2) : 'N/A',
         m.ratio31 !== null && m.ratio31 !== undefined ? m.ratio31.toFixed(2) : 'N/A',
         m.upsidePotential !== null && m.upsidePotential !== undefined ? m.upsidePotential.toFixed(2) : 'N/A',
@@ -1979,9 +1979,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     } ${getReturnBgClass(metric.totalReturnPercent)} ${currentId === metric.profile.id ? 'opacity-100' : 'opacity-85'}`}
                     title={`${metric.profile.info.name || metric.profile.id}
 Rendement: ${metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A (données invalides)' : `${metric.totalReturnPercent.toFixed(1)}%`}
-JPEGY: ${metric.jpegy !== null ? (metric.jpegy?.toFixed(2) ?? 'N/A') : 'N/A (non calculable)'}
-Ratio 3:1: ${metric.hasInvalidData || metric.ratio31 === null || metric.ratio31 === undefined ? 'N/A' : (metric.ratio31?.toFixed(2) ?? 'N/A')}
-P/E: ${metric.currentPE !== null && metric.currentPE !== undefined ? (metric.currentPE?.toFixed(1) ?? 'N/A') : 'N/A'}x
+JPEGY: ${metric.jpegy !== null && metric.jpegy !== undefined ? metric.jpegy.toFixed(2) : 'N/A (non calculable)'}
+Ratio 3:1: ${metric.hasInvalidData || metric.ratio31 === null || metric.ratio31 === undefined ? 'N/A' : metric.ratio31.toFixed(2)}
+P/E: ${metric.currentPE !== null && metric.currentPE !== undefined ? metric.currentPE.toFixed(1) : 'N/A'}x
 Secteur: ${metric.profile.info.sector}
 ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}
 ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
@@ -2108,7 +2108,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                           metric.ratio31 >= 1 ? 'text-yellow-600' :
                           'text-red-600'
                         }`}>
-                          {metric.hasInvalidData || metric.ratio31 === null || metric.ratio31 === undefined ? 'N/A' : metric.ratio31.toFixed(2)}
+                          {metric.hasInvalidData || metric.ratio31 === null || metric.ratio31 === undefined ? 'N/A' : (metric.ratio31 !== null && metric.ratio31 !== undefined ? metric.ratio31.toFixed(2) : 'N/A')}
                         </div>
                         <div className="text-xs text-gray-500">Ratio 3:1</div>
                       </div>

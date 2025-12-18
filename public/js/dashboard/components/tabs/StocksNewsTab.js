@@ -351,7 +351,7 @@ const StocksNewsTab = (props) => {
                         isDarkMode
                             ? 'bg-gray-800/50 border-purple-500/30'
                             : 'bg-white border-purple-400/40'
-                    }`}>
+                    }`} style={{width: '1047px', height: '800px'}}>
                         <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                             <h3 className={`text-lg font-bold transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'

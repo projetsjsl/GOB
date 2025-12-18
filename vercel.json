@@ -98,12 +98,6 @@
     "api/groupchat/test.js": {
       "maxDuration": 30
     },
-    "api/sector.js": {
-      "maxDuration": 15
-    },
-    "api/sector-index.js": {
-      "maxDuration": 15
-    },
     "api/jslai-proxy.js": {
       "maxDuration": 30
     },

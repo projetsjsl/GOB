@@ -8758,18 +8758,17 @@ const Header = ({
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "img",
           {
-            src: info.logo || (info.preferredSymbol || info.symbol ? `https://financialmodelingprep.com/image-stock/${info.preferredSymbol || info.symbol}.png` : ""),
+            src: info.logo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
             alt: info.name,
             className: "w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200 cursor-help",
             title: `Logo de ${info.name}
 
-Source: FMP API (image-stock)
+Source: FMP API
 
-Le logo est chargé automatiquement depuis l'API Financial Modeling Prep.`,
+Chargé via: ${info.logo || "Non disponible"}`,
             onError: (e) => {
               e.currentTarget.style.display = "none";
               e.currentTarget.onerror = null;
-              e.currentTarget.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
             },
             onLoad: createLogoLoadHandler(),
             loading: "lazy"
@@ -34025,6 +34024,7 @@ const saveConfig = (config2) => {
   }
 };
 const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector, config: config2 = DEFAULT_CONFIG }) => {
+  var _a3, _b2, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x;
   const [expandedMetrics, setExpandedMetrics] = reactExports.useState({
     eps: false,
     cf: false,
@@ -34284,12 +34284,14 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     };
   }, [sectorRanges]);
   const formatRange = (range3, suffix = "") => {
+    var _a4, _b3, _c2;
     if (!range3) return "N/A";
-    return `${range3.min.toFixed(1)} - ${range3.max.toFixed(1)}${suffix} (Med: ${range3.median.toFixed(1)}${suffix})`;
+    return `${((_a4 = range3.min) == null ? void 0 : _a4.toFixed(1)) ?? "0.0"} - ${((_b3 = range3.max) == null ? void 0 : _b3.toFixed(1)) ?? "0.0"}${suffix} (Med: ${((_c2 = range3.median) == null ? void 0 : _c2.toFixed(1)) ?? "0.0"}${suffix})`;
   };
   const formatGrowthRange = (range3) => {
+    var _a4, _b3, _c2;
     if (!range3) return "N/A";
-    return `${range3.min.toFixed(1)}% - ${range3.max.toFixed(1)}% (Med: ${range3.median.toFixed(1)}%)`;
+    return `${((_a4 = range3.min) == null ? void 0 : _a4.toFixed(1)) ?? "0.0"}% - ${((_b3 = range3.max) == null ? void 0 : _b3.toFixed(1)) ?? "0.0"}% (Med: ${((_c2 = range3.median) == null ? void 0 : _c2.toFixed(1)) ?? "0.0"}%)`;
   };
   const MetricReferenceRanges = ({ metric }) => {
     if (!calculateHistoricalRanges) return null;
@@ -34432,12 +34434,12 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `BPA (EPS) Actuel: ${baseValues.eps.toFixed(2)} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `BPA (EPS) Actuel: ${((_a3 = baseValues.eps) == null ? void 0 : _a3.toFixed(2)) ?? "0.00"} $
 
 Valeur de l'année de base ({assumptions.baseYear}).
 Source: Données historiques FMP (vert = officiel).
 
-Utilisée comme point de départ pour la projection à 5 ans.`, children: baseValues.eps.toFixed(2) }),
+Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_b2 = baseValues.eps) == null ? void 0 : _b2.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeEPS ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -34458,14 +34460,14 @@ Auto-rempli avec le CAGR historique.
 Formule projection: BPA × (1 + Taux/100)⁵`
             }
           ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `BPA (EPS) Projeté (5 ans): ${futureValues.eps.toFixed(2)} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `BPA (EPS) Projeté (5 ans): ${((_c = futureValues.eps) == null ? void 0 : _c.toFixed(2)) ?? "0.00"} $
 
 Calculé avec:
-BPA Actuel (${baseValues.eps.toFixed(2)}) × (1 + ${assumptions.growthRateEPS}%)⁵
+BPA Actuel (${((_d = baseValues.eps) == null ? void 0 : _d.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateEPS}%)⁵
 
-= ${futureValues.eps.toFixed(2)} $
+= ${((_e = futureValues.eps) == null ? void 0 : _e.toFixed(2)) ?? "0.00"} $
 
-Valeur projetée utilisée pour calculer le prix cible.`, children: futureValues.eps.toFixed(2) }),
+Valeur projetée utilisée pour calculer le prix cible.`, children: ((_f = futureValues.eps) == null ? void 0 : _f.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeEPS ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -34489,7 +34491,7 @@ Prix Cible = BPA Projeté × P/E Cible`
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-bold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`, title: `Prix Cible BPA (EPS): ${formatCurrency(targets.eps)}
 
 Calculé avec:
-BPA Projeté (${futureValues.eps.toFixed(2)}) × P/E Cible (${assumptions.targetPE}x)
+BPA Projeté (${(futureValues.eps || 0).toFixed(2)}) × P/E Cible (${assumptions.targetPE}x)
 
 = ${formatCurrency(targets.eps)}
 
@@ -34519,12 +34521,12 @@ ${assumptions.excludeEPS ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `CFA (Cash Flow) Actuel: ${baseValues.cf.toFixed(2)} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `CFA (Cash Flow) Actuel: ${((_g = baseValues.cf) == null ? void 0 : _g.toFixed(2)) ?? "0.00"} $
 
 Valeur de l'année de base ({assumptions.baseYear}).
 Source: Données historiques FMP (vert = officiel).
 
-Utilisée comme point de départ pour la projection à 5 ans.`, children: baseValues.cf.toFixed(2) }),
+Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_h = baseValues.cf) == null ? void 0 : _h.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeCF ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -34545,14 +34547,14 @@ Auto-rempli avec le CAGR historique.
 Formule projection: CF × (1 + Taux/100)⁵`
             }
           ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `CFA (Cash Flow) Projeté (5 ans): ${futureValues.cf.toFixed(2)} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `CFA (Cash Flow) Projeté (5 ans): ${((_i = futureValues.cf) == null ? void 0 : _i.toFixed(2)) ?? "0.00"} $
 
 Calculé avec:
-CF Actuel (${baseValues.cf.toFixed(2)}) × (1 + ${assumptions.growthRateCF}%)⁵
+CF Actuel (${((_j = baseValues.cf) == null ? void 0 : _j.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateCF}%)⁵
 
-= ${futureValues.cf.toFixed(2)} $
+= ${((_k = futureValues.cf) == null ? void 0 : _k.toFixed(2)) ?? "0.00"} $
 
-Valeur projetée utilisée pour calculer le prix cible.`, children: futureValues.cf.toFixed(2) }),
+Valeur projetée utilisée pour calculer le prix cible.`, children: ((_l = futureValues.cf) == null ? void 0 : _l.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeCF ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -34576,7 +34578,7 @@ Prix Cible = CF Projeté × P/CF Cible`
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-bold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`, title: `Prix Cible CFA (Cash Flow): ${formatCurrency(targets.cf)}
 
 Calculé avec:
-CF Projeté (${futureValues.cf.toFixed(2)}) × P/CF Cible (${assumptions.targetPCF}x)
+CF Projeté (${(futureValues.cf || 0).toFixed(2)}) × P/CF Cible (${assumptions.targetPCF}x)
 
 = ${formatCurrency(targets.cf)}
 
@@ -34606,12 +34608,12 @@ ${assumptions.excludeCF ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `BV (Book Value) Actuel: ${baseValues.bv.toFixed(2)} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `BV (Book Value) Actuel: ${((_m = baseValues.bv) == null ? void 0 : _m.toFixed(2)) ?? "0.00"} $
 
 Valeur de l'année de base ({assumptions.baseYear}).
 Source: Données historiques FMP (vert = officiel).
 
-Utilisée comme point de départ pour la projection à 5 ans.`, children: baseValues.bv.toFixed(2) }),
+Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_n = baseValues.bv) == null ? void 0 : _n.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeBV ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -34632,14 +34634,14 @@ Auto-rempli avec le CAGR historique.
 Formule projection: BV × (1 + Taux/100)⁵`
             }
           ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `BV (Book Value) Projeté (5 ans): ${futureValues.bv.toFixed(2)} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `BV (Book Value) Projeté (5 ans): ${((_o = futureValues.bv) == null ? void 0 : _o.toFixed(2)) ?? "0.00"} $
 
 Calculé avec:
-BV Actuel (${baseValues.bv.toFixed(2)}) × (1 + ${assumptions.growthRateBV}%)⁵
+BV Actuel (${((_p = baseValues.bv) == null ? void 0 : _p.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateBV}%)⁵
 
-= ${futureValues.bv.toFixed(2)} $
+= ${((_q = futureValues.bv) == null ? void 0 : _q.toFixed(2)) ?? "0.00"} $
 
-Valeur projetée utilisée pour calculer le prix cible.`, children: futureValues.bv.toFixed(2) }),
+Valeur projetée utilisée pour calculer le prix cible.`, children: ((_r = futureValues.bv) == null ? void 0 : _r.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeBV ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -34663,7 +34665,7 @@ Prix Cible = BV Projeté × P/BV Cible`
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-bold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`, title: `Prix Cible BV (Book Value): ${formatCurrency(targets.bv)}
 
 Calculé avec:
-BV Projeté (${futureValues.bv.toFixed(2)}) × P/BV Cible (${assumptions.targetPBV}x)
+BV Projeté (${(futureValues.bv || 0).toFixed(2)}) × P/BV Cible (${assumptions.targetPBV}x)
 
 = ${formatCurrency(targets.bv)}
 
@@ -34693,12 +34695,12 @@ ${assumptions.excludeBV ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `DIV (Dividende) Actuel: ${baseValues.div.toFixed(2)} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `DIV (Dividende) Actuel: ${((_s = baseValues.div) == null ? void 0 : _s.toFixed(2)) ?? "0.00"} $
 
 Valeur de l'année de base ({assumptions.baseYear}).
 Source: Données historiques FMP (vert = officiel).
 
-Utilisée comme point de départ pour la projection à 5 ans.`, children: baseValues.div.toFixed(2) }),
+Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_t = baseValues.div) == null ? void 0 : _t.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeDIV ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -34719,14 +34721,14 @@ Auto-rempli avec le CAGR historique.
 Formule projection: DIV × (1 + Taux/100)⁵`
             }
           ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `DIV (Dividende) Projeté (5 ans): ${futureValues.div.toFixed(2)} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `DIV (Dividende) Projeté (5 ans): ${((_u = futureValues.div) == null ? void 0 : _u.toFixed(2)) ?? "0.00"} $
 
 Calculé avec:
-DIV Actuel (${baseValues.div.toFixed(2)}) × (1 + ${assumptions.growthRateDiv}%)⁵
+DIV Actuel (${((_v = baseValues.div) == null ? void 0 : _v.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateDiv}%)⁵
 
-= ${futureValues.div.toFixed(2)} $
+= ${((_w = futureValues.div) == null ? void 0 : _w.toFixed(2)) ?? "0.00"} $
 
-Valeur projetée utilisée pour calculer le prix cible.`, children: futureValues.div.toFixed(2) }),
+Valeur projetée utilisée pour calculer le prix cible.`, children: ((_x = futureValues.div) == null ? void 0 : _x.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeDIV ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "input",
@@ -34754,7 +34756,7 @@ Prix Cible = DIV Projeté / (Yield Cible / 100)`
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-bold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`, title: `Prix Cible DIV (Dividende): ${formatCurrency(targets.div)}
 
 Calculé avec:
-DIV Projeté (${futureValues.div.toFixed(2)}) / (Yield Cible (${assumptions.targetYield}%) / 100)
+DIV Projeté (${(futureValues.div || 0).toFixed(2)}) / (Yield Cible (${assumptions.targetYield}%) / 100)
 
 = ${formatCurrency(targets.div)}
 
@@ -35399,7 +35401,7 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
               {
                 className: "absolute top-0 bottom-0 w-1 bg-black z-10 transition-all duration-300",
                 style: { left: `${jpegyColor.position}%` },
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-6 left-1/2 -translate-x-1/2 bg-black text-white text-xs font-bold px-2 py-1 rounded whitespace-nowrap", children: jpegy.toFixed(2) })
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-6 left-1/2 -translate-x-1/2 bg-black text-white text-xs font-bold px-2 py-1 rounded whitespace-nowrap", children: (jpegy == null ? void 0 : jpegy.toFixed(2)) ?? "N/A" })
               }
             )
           ] }),
@@ -35410,7 +35412,7 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: jpegy !== null ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
             "Growth: ",
-            assumptions.growthRateEPS.toFixed(1),
+            (assumptions.growthRateEPS || 0).toFixed(1),
             "% + Yield: ",
             currentYield.toFixed(2),
             "% = ",
@@ -35427,7 +35429,7 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
               " JPEGY = ",
               currentPE > 0 ? currentPE.toFixed(2) : "P/E",
               " ÷ (",
-              assumptions.growthRateEPS.toFixed(1),
+              (assumptions.growthRateEPS || 0).toFixed(1),
               "% + ",
               currentYield.toFixed(2),
               "%) = ",
@@ -35458,7 +35460,7 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
               {
                 className: "absolute top-0 bottom-0 w-1 bg-black z-10 transition-all duration-300",
                 style: { left: `${forwardJpegyColor.position}%` },
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-6 left-1/2 -translate-x-1/2 bg-black text-white text-xs font-bold px-2 py-1 rounded whitespace-nowrap", children: forwardJpegy.toFixed(2) })
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-6 left-1/2 -translate-x-1/2 bg-black text-white text-xs font-bold px-2 py-1 rounded whitespace-nowrap", children: (forwardJpegy == null ? void 0 : forwardJpegy.toFixed(2)) ?? "N/A" })
               }
             )
           ] }),
@@ -35469,7 +35471,7 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: forwardJpegy !== null ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
             "Growth: ",
-            assumptions.growthRateEPS.toFixed(1),
+            (assumptions.growthRateEPS || 0).toFixed(1),
             "% + Yield: ",
             currentYield.toFixed(2),
             "% = ",
@@ -35486,7 +35488,7 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
               " Forward JPEGY = ",
               forwardPE > 0 ? forwardPE.toFixed(2) : "Forward P/E",
               " ÷ (",
-              assumptions.growthRateEPS.toFixed(1),
+              (assumptions.growthRateEPS || 0).toFixed(1),
               "% + ",
               currentYield.toFixed(2),
               "%) = ",
@@ -35548,12 +35550,12 @@ Prix Actuel / BPA Actuel
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 text-right cursor-help", title: `P/E Historique Moyen: ${avgPE.toFixed(2)}x
 
 Moyenne des ratios P/E historiques calculée à partir des données des 10 dernières années.`, children: avgPE.toFixed(2) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${currentPE < avgPE ? "text-green-600" : "text-red-600"}`, title: `Écart: ${((currentPE / avgPE - 1) * 100).toFixed(1)}%
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${currentPE < avgPE ? "text-green-600" : "text-red-600"}`, title: `Écart: ${avgPE > 0 ? ((currentPE / avgPE - 1) * 100).toFixed(1) : "0.0"}%
 
 ${currentPE < avgPE ? "✅ Sous-évalué par rapport à la moyenne historique" : "⚠️ Surévalué par rapport à la moyenne historique"}
 
 Un P/E inférieur à la moyenne historique peut indiquer une opportunité d'achat.`, children: [
-              ((currentPE / avgPE - 1) * 100).toFixed(1),
+              avgPE > 0 ? ((currentPE / avgPE - 1) * 100).toFixed(1) : "0.0",
               "%"
             ] })
           ] }),
@@ -35566,10 +35568,10 @@ Prix Actuel / Cash Flow par Action Actuel`, children: currentPCF.toFixed(2) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 text-right cursor-help", title: `P/CF Historique Moyen: ${avgPCF.toFixed(2)}x
 
 Moyenne des ratios P/CF historiques calculée à partir des données des 10 dernières années.`, children: avgPCF.toFixed(2) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${currentPCF < avgPCF ? "text-green-600" : "text-red-600"}`, title: `Écart: ${((currentPCF / avgPCF - 1) * 100).toFixed(1)}%
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${currentPCF < avgPCF ? "text-green-600" : "text-red-600"}`, title: `Écart: ${avgPCF > 0 ? ((currentPCF / avgPCF - 1) * 100).toFixed(1) : "0.0"}%
 
 ${currentPCF < avgPCF ? "✅ Sous-évalué par rapport à la moyenne historique" : "⚠️ Surévalué par rapport à la moyenne historique"}`, children: [
-              ((currentPCF / avgPCF - 1) * 100).toFixed(1),
+              avgPCF > 0 ? ((currentPCF / avgPCF - 1) * 100).toFixed(1) : "0.0",
               "%"
             ] })
           ] }),
@@ -35579,14 +35581,14 @@ ${currentPCF < avgPCF ? "✅ Sous-évalué par rapport à la moyenne historique"
 
 Calculé avec:
 Prix Actuel / Book Value par Action Actuel`, children: currentPBV.toFixed(2) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 text-right cursor-help", title: `P/BV Cible: ${assumptions.targetPBV.toFixed(2)}x
+            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 text-right cursor-help", title: `P/BV Cible: ${(assumptions.targetPBV || 0).toFixed(2)}x
 
 Ratio P/BV cible utilisé pour vos projections à 5 ans.
-Auto-rempli avec la moyenne historique.`, children: assumptions.targetPBV.toFixed(2) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${currentPBV < assumptions.targetPBV ? "text-green-600" : "text-red-600"}`, title: `Écart: ${((currentPBV / assumptions.targetPBV - 1) * 100).toFixed(1)}%
+Auto-rempli avec la moyenne historique.`, children: (assumptions.targetPBV || 0).toFixed(2) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${currentPBV < assumptions.targetPBV ? "text-green-600" : "text-red-600"}`, title: `Écart: ${assumptions.targetPBV > 0 ? ((currentPBV / assumptions.targetPBV - 1) * 100).toFixed(1) : "0.0"}%
 
 ${currentPBV < assumptions.targetPBV ? "✅ Sous-évalué par rapport au ratio cible" : "⚠️ Surévalué par rapport au ratio cible"}`, children: [
-              ((currentPBV / assumptions.targetPBV - 1) * 100).toFixed(1),
+              assumptions.targetPBV > 0 ? ((currentPBV / assumptions.targetPBV - 1) * 100).toFixed(1) : "0.0",
               "%"
             ] })
           ] }),
@@ -35599,19 +35601,19 @@ Calculé avec:
               currentYield.toFixed(2),
               "%"
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "p-2 text-right cursor-help", title: `Yield Cible: ${assumptions.targetYield.toFixed(2)}%
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "p-2 text-right cursor-help", title: `Yield Cible: ${(assumptions.targetYield || 0).toFixed(2)}%
 
 Rendement en dividendes cible utilisé pour vos projections à 5 ans.
 Auto-rempli avec la moyenne historique.`, children: [
-              assumptions.targetYield.toFixed(2),
+              (assumptions.targetYield || 0).toFixed(2),
               "%"
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${currentYield > assumptions.targetYield ? "text-green-600" : "text-red-600"}`, title: `Écart: ${((currentYield / assumptions.targetYield - 1) * 100).toFixed(1)}%
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${currentYield > assumptions.targetYield ? "text-green-600" : "text-red-600"}`, title: `Écart: ${assumptions.targetYield > 0 ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : "0.0"}%
 
 ${currentYield > assumptions.targetYield ? "✅ Rendement supérieur au rendement cible" : "⚠️ Rendement inférieur au rendement cible"}
 
 Un rendement supérieur au cible peut indiquer une opportunité.`, children: [
-              ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1),
+              assumptions.targetYield > 0 ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : "0.0",
               "%"
             ] })
           ] })
@@ -35760,7 +35762,7 @@ Inclut les dividendes perçus sur 5 ans.`, children: [
 Calculé avec:
 (Dividende Actuel / Prix Actuel) × 100
 
-= (${assumptions.currentDividend.toFixed(2)} / ${formatCurrency(assumptions.currentPrice)}) × 100
+= (${(assumptions.currentDividend || 0).toFixed(2)} / ${formatCurrency(assumptions.currentPrice)}) × 100
 
 = ${currentYield.toFixed(1)}% / an`, children: [
             "Incluant dividendes: ",
@@ -38831,10 +38833,7 @@ async function fetchMarketDataBatch(tickers) {
   }
   try {
     const tickersStr = tickers.join(",");
-    let response = await fetch(`/api/market-data-batch?tickers=${encodeURIComponent(tickersStr)}`);
-    if (response.status === 404) {
-      response = await fetch(`/api/marketdata/batch?tickers=${encodeURIComponent(tickersStr)}`);
-    }
+    const response = await fetch(`/api/marketdata/batch?symbols=${encodeURIComponent(tickersStr)}&endpoints=quote`);
     if (!response.ok) {
       if (response.status === 404) {
         console.warn("⚠️ Endpoint market-data-batch non disponible - Retour vide");

@@ -1349,7 +1349,7 @@ const StatusBadge = ({
   );
 };
 const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isBulkSyncing = false, onUpdateProfile, onOpenSettings }) => {
-  var _a, _b, _c;
+  var _a, _b, _c, _d;
   const [sortConfig, setSortConfig] = reactExports.useState({ key: "totalReturnPercent", direction: "desc" });
   const [showSyncDialog, setShowSyncDialog] = reactExports.useState(false);
   const [showGuideDialog, setShowGuideDialog] = reactExports.useState(false);
@@ -1906,7 +1906,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
         m.profile.id,
         `"${m.profile.info.name}"`,
         m.profile.info.sector,
-        m.jpegy !== null ? m.jpegy.toFixed(2) : "N/A",
+        m.jpegy !== null && m.jpegy !== void 0 ? m.jpegy.toFixed(2) : "N/A",
         m.totalReturnPercent !== null && m.totalReturnPercent !== void 0 ? m.totalReturnPercent.toFixed(2) : "N/A",
         m.ratio31 !== null && m.ratio31 !== void 0 ? m.ratio31.toFixed(2) : "N/A",
         m.upsidePotential !== null && m.upsidePotential !== void 0 ? m.upsidePotential.toFixed(2) : "N/A",
@@ -2121,7 +2121,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-1", children: "JPEGY Moyen" }),
           globalStats.avgJPEGY != null && isFinite(globalStats.avgJPEGY) ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-2xl font-bold ${getJpegyTextClass(globalStats.avgJPEGY)}`, children: globalStats.avgJPEGY.toFixed(2) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-2xl font-bold ${getJpegyTextClass(globalStats.avgJPEGY)}`, children: ((_a = globalStats.avgJPEGY) == null ? void 0 : _a.toFixed(2)) ?? "N/A" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 mt-1", children: [
               "Médiane: ",
               globalStats.medianJPEGY != null && isFinite(globalStats.medianJPEGY) ? globalStats.medianJPEGY.toFixed(2) : "N/A"
@@ -2182,7 +2182,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
         ] })
       ] }),
       sectionsVisibility.comparison && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4", children: selectedForComparison.map((ticker) => {
-        var _a2, _b2;
+        var _a2, _b2, _c2;
         const metric = filteredMetrics.find((m) => m.profile.id === ticker);
         if (!metric) return null;
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
@@ -2208,7 +2208,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-start", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "JPEGY:" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-right", children: metric.jpegy !== null ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `font-bold ${getJpegyTextClass(metric.jpegy)}`, children: metric.jpegy.toFixed(2) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `font-bold ${getJpegyTextClass(metric.jpegy)}`, children: ((_a2 = metric.jpegy) == null ? void 0 : _a2.toFixed(2)) ?? "N/A" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1 pt-1 border-t border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-[9px] text-gray-400 space-y-0.5 text-left", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Source:" }),
@@ -2231,14 +2231,14 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "P/E:" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-bold", children: [
-                ((_a2 = metric.currentPE) == null ? void 0 : _a2.toFixed(1)) || "N/A",
+                ((_b2 = metric.currentPE) == null ? void 0 : _b2.toFixed(1)) ?? "N/A",
                 "x"
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Yield:" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-bold", children: [
-                ((_b2 = metric.currentYield) == null ? void 0 : _b2.toFixed(2)) || "N/A",
+                ((_c2 = metric.currentYield) == null ? void 0 : _c2.toFixed(2)) ?? "N/A",
                 "%"
               ] })
             ] }),
@@ -3078,7 +3078,7 @@ Tous les ${result.validTickers} tickers ont des données valides.`);
             className: `p-1.5 sm:p-2 md:p-2.5 lg:p-3 rounded-lg cursor-pointer transition-all hover:scale-105 sm:hover:scale-110 hover:shadow-xl border-2 ${currentId === metric.profile.id ? "border-blue-600 ring-4 ring-blue-300 shadow-xl" : comparisonMode && selectedForComparison.includes(metric.profile.id) ? "border-purple-600 ring-4 ring-purple-300 shadow-xl" : "border-gray-200"} ${getReturnBgClass(metric.totalReturnPercent)} ${currentId === metric.profile.id ? "opacity-100" : "opacity-85"}`,
             title: `${metric.profile.info.name || metric.profile.id}
 Rendement: ${metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === void 0 ? "N/A (données invalides)" : `${metric.totalReturnPercent.toFixed(1)}%`}
-JPEGY: ${metric.jpegy !== null ? metric.jpegy.toFixed(2) : "N/A (non calculable)"}
+JPEGY: ${metric.jpegy !== null && metric.jpegy !== void 0 ? metric.jpegy.toFixed(2) : "N/A (non calculable)"}
 Ratio 3:1: ${metric.hasInvalidData || metric.ratio31 === null || metric.ratio31 === void 0 ? "N/A" : metric.ratio31.toFixed(2)}
 P/E: ${metric.currentPE !== null && metric.currentPE !== void 0 ? metric.currentPE.toFixed(1) : "N/A"}x
 Secteur: ${metric.profile.info.sector}
@@ -3094,7 +3094,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-[10px] font-semibold mb-1 ${metric.hasInvalidData ? "opacity-50" : ""}`, children: metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === void 0 ? "N/A" : `${metric.totalReturnPercent.toFixed(0)}%` }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `text-[8px] opacity-90 ${metric.hasInvalidData || metric.jpegy === null ? "opacity-50" : ""}`, children: [
                 "JPEGY: ",
-                metric.jpegy !== null ? metric.jpegy.toFixed(1) : "N/A",
+                metric.jpegy !== null && metric.jpegy !== void 0 ? metric.jpegy.toFixed(1) : "N/A",
                 metric.jpegy === null && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-1 text-red-400", children: "⚠️" })
               ] }),
               metric.hasApprovedVersion && !metric.hasInvalidData && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$e, { className: "w-4 h-4 mt-1 text-white" })
@@ -3149,7 +3149,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-right", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `font-semibold flex items-center justify-end gap-1 ${metric.jpegy === null ? "text-gray-400" : getJpegyTextClass(metric.jpegy)}`, children: [
-                    metric.jpegy !== null ? metric.jpegy.toFixed(2) : "N/A",
+                    metric.jpegy !== null && metric.jpegy !== void 0 ? metric.jpegy.toFixed(2) : "N/A",
                     metric.jpegy === null && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-3 h-3 text-orange-500", title: "JPEGY non calculable" })
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: "JPEGY" }),
@@ -3165,7 +3165,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   ] }) })
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-right", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `font-semibold ${metric.hasInvalidData ? "text-gray-400" : metric.ratio31 >= 3 ? "text-green-600" : metric.ratio31 >= 1 ? "text-yellow-600" : "text-red-600"}`, children: metric.hasInvalidData || metric.ratio31 === null ? "N/A" : metric.ratio31.toFixed(2) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `font-semibold ${metric.hasInvalidData ? "text-gray-400" : metric.ratio31 >= 3 ? "text-green-600" : metric.ratio31 >= 1 ? "text-yellow-600" : "text-red-600"}`, children: metric.hasInvalidData || metric.ratio31 === null || metric.ratio31 === void 0 ? "N/A" : metric.ratio31 !== null && metric.ratio31 !== void 0 ? metric.ratio31.toFixed(2) : "N/A" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: "Ratio 3:1" })
                 ] })
               ] }),
@@ -3217,7 +3217,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-blue-600", children: currentId }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-normal text-gray-500 ml-2", children: [
             "(",
-            ((_b = (_a = profiles.find((p) => p.id === currentId)) == null ? void 0 : _a.info) == null ? void 0 : _b.name) || "Inconnu",
+            ((_c = (_b = profiles.find((p) => p.id === currentId)) == null ? void 0 : _b.info) == null ? void 0 : _c.name) || "Inconnu",
             ")"
           ] })
         ] }),
@@ -3231,7 +3231,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           }
         )
       ] }),
-      sectionsVisibility.detailedAnalysis && profiles.find((p) => p.id === currentId) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: ((_c = profiles.find((p) => p.id === currentId)) == null ? void 0 : _c.data) && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+      sectionsVisibility.detailedAnalysis && profiles.find((p) => p.id === currentId) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: ((_d = profiles.find((p) => p.id === currentId)) == null ? void 0 : _d.data) && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           AdditionalMetrics,
           {
@@ -3930,7 +3930,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           filteredMetrics.length > 0 ? (() => {
             const validReturns = filteredMetrics.map((m) => m.totalReturnPercent).filter((r) => r !== null && r !== void 0);
             if (validReturns.length === 0) return "N/A";
-            return `${Math.min(...validReturns).toFixed(0)}% à ${Math.max(...validReturns).toFixed(0)}%`;
+            return `${(Math.min(...validReturns) ?? 0).toFixed(0)}% à ${(Math.max(...validReturns) ?? 0).toFixed(0)}%`;
           })() : "N/A"
         ] })
       ] })
@@ -3996,7 +3996,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                     "span",
                     {
                       className: `text-xs font-semibold px-2 py-0.5 rounded text-white ${getJpegyBgClass(avgJPEGY)}`,
-                      children: avgJPEGY.toFixed(2)
+                      children: (avgJPEGY == null ? void 0 : avgJPEGY.toFixed(2)) ?? "N/A"
                     }
                   ) : /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs font-semibold px-2 py-0.5 rounded bg-gray-400 text-white flex items-center gap-1", children: [
                     "N/A ",
@@ -4208,8 +4208,8 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   {
                     className: "p-2 text-center font-semibold",
                     style: cellStyle,
-                    title: `Corrélation: ${corr.toFixed(3)}`,
-                    children: corr.toFixed(2)
+                    title: `Corrélation: ${(corr == null ? void 0 : corr.toFixed(3)) ?? "0.000"}`,
+                    children: (corr == null ? void 0 : corr.toFixed(2)) ?? "0.00"
                   },
                   otherMetric
                 );
@@ -4343,7 +4343,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           )
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { className: "divide-y divide-gray-100", children: filteredMetrics.map((metric) => {
-          var _a2, _b2, _c2, _d, _e, _f, _g;
+          var _a2, _b2, _c2, _d2, _e, _f, _g, _h, _i;
           return /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "tr",
             {
@@ -4365,12 +4365,12 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                         className: `inline-block w-4 h-4 rounded-full mr-2 ${getJpegyBgClass(metric.jpegy)}`
                       }
                     ),
-                    metric.jpegy !== null && metric.jpegy !== void 0 ? metric.jpegy.toFixed(2) : "N/A"
+                    ((_a2 = metric.jpegy) == null ? void 0 : _a2.toFixed(2)) ?? "N/A"
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute right-0 top-full mt-1 w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "font-semibold mb-1", children: [
                       "JPEGY: ",
-                      metric.jpegy !== null && metric.jpegy !== void 0 ? metric.jpegy.toFixed(2) : "N/A"
+                      ((_b2 = metric.jpegy) == null ? void 0 : _b2.toFixed(2)) ?? "N/A"
                     ] }),
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1 text-[10px]", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -4380,11 +4380,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Formule:" }),
                         " JPEGY = ",
-                        ((_a2 = metric.currentPE) == null ? void 0 : _a2.toFixed(2)) || "P/E",
+                        ((_c2 = metric.currentPE) == null ? void 0 : _c2.toFixed(2)) ?? "P/E",
                         " ÷ (",
-                        ((_b2 = metric.historicalGrowth) == null ? void 0 : _b2.toFixed(1)) || "Growth",
+                        ((_d2 = metric.historicalGrowth) == null ? void 0 : _d2.toFixed(1)) ?? "Growth",
                         "% + ",
-                        ((_c2 = metric.currentYield) == null ? void 0 : _c2.toFixed(2)) || "Yield",
+                        ((_e = metric.currentYield) == null ? void 0 : _e.toFixed(2)) ?? "Yield",
                         "%)"
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -4414,19 +4414,19 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px]", children: "..." })
                 ] }) : metric.downsideRisk !== null && metric.downsideRisk !== void 0 ? `${metric.downsideRisk.toFixed(1)}%` : "N/A" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-2 sm:p-3 text-center ${!displayOptions.visibleColumns.pe ? "hidden" : ""} ${displayOptions.density === "compact" ? "hidden lg:table-cell" : "lg:table-cell"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs sm:text-sm", children: [
-                  ((_d = metric.currentPE) == null ? void 0 : _d.toFixed(1)) || "N/A",
+                  ((_f = metric.currentPE) == null ? void 0 : _f.toFixed(1)) ?? "N/A",
                   "x"
                 ] }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-2 sm:p-3 text-center ${!displayOptions.visibleColumns.yield ? "hidden" : ""} ${displayOptions.density === "compact" ? "hidden lg:table-cell" : "lg:table-cell"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs sm:text-sm", children: [
-                  ((_e = metric.currentYield) == null ? void 0 : _e.toFixed(2)) || "N/A",
+                  ((_g = metric.currentYield) == null ? void 0 : _g.toFixed(2)) ?? "N/A",
                   "%"
                 ] }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 sm:p-3 text-right text-xs sm:text-sm ${!displayOptions.visibleColumns.growth ? "hidden" : ""} ${displayOptions.density === "compact" ? "hidden lg:table-cell" : "lg:table-cell"}`, children: [
-                  ((_f = metric.historicalGrowth) == null ? void 0 : _f.toFixed(1)) || "N/A",
+                  ((_h = metric.historicalGrowth) == null ? void 0 : _h.toFixed(1)) ?? "N/A",
                   "%"
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 sm:p-3 text-right text-xs sm:text-sm ${!displayOptions.visibleColumns.volatility ? "hidden" : ""} hidden xl:table-cell`, children: [
-                  ((_g = metric.volatility) == null ? void 0 : _g.toFixed(1)) || "N/A",
+                  ((_i = metric.volatility) == null ? void 0 : _i.toFixed(1)) ?? "N/A",
                   "%"
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-2 sm:p-3 text-center ${!displayOptions.visibleColumns.approved ? "hidden" : ""}`, children: metric.hasApprovedVersion ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$e, { className: "w-4 h-4 sm:w-5 sm:h-5 text-green-500 mx-auto" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$i, { className: "w-4 h-4 sm:w-5 sm:h-5 text-gray-300 mx-auto" }) }),
