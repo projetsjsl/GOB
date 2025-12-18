@@ -120,7 +120,8 @@ export default async function handler(req, res) {
           debug: {
             openai_key: process.env.OPENAI_API_KEY ? `sk-...${process.env.OPENAI_API_KEY.slice(-4)}` : 'NOT_FOUND',
             anthropic_key: process.env.ANTHROPIC_API_KEY ? `sk-ant-...${process.env.ANTHROPIC_API_KEY.slice(-4)}` : 'NOT_FOUND',
-            perplexity_key: process.env.PERPLEXITY_API_KEY ? `pplx-...${process.env.PERPLEXITY_API_KEY.slice(-4)}` : 'NOT_FOUND'
+            perplexity_key: (process.env.PERPLEXITY_API_KEY || process.env.NEXT_PUBLIC_PERPLEXITY_API_KEY) ? `pplx-...${(process.env.PERPLEXITY_API_KEY || process.env.NEXT_PUBLIC_PERPLEXITY_API_KEY).slice(-4)}` : 'NOT_FOUND',
+            env_vars: Object.keys(process.env).filter(k => k.includes('PERPLEXITY') || k.includes('API_KEY')).slice(0, 10)
           }
         });
       } else if (service && service !== 'monitoring') {
@@ -296,15 +297,22 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
     }
 
     // Vérifier les clés API disponibles pour les actualités
-    const perplexityKey = process.env.PERPLEXITY_API_KEY;
+    const perplexityKey = process.env.PERPLEXITY_API_KEY || process.env.NEXT_PUBLIC_PERPLEXITY_API_KEY;
     const twelveDataKey = process.env.TWELVE_DATA_API_KEY;
     
+    // Debug: Log les variables d'environnement disponibles (sans exposer les valeurs)
     if (!perplexityKey) {
+      console.error('❌ PERPLEXITY_API_KEY missing. Available env vars:', {
+        hasPerplexityKey: !!process.env.PERPLEXITY_API_KEY,
+        hasNextPublicPerplexityKey: !!process.env.NEXT_PUBLIC_PERPLEXITY_API_KEY,
+        envKeys: Object.keys(process.env).filter(k => k.includes('PERPLEXITY') || k.includes('API'))
+      });
       return res.status(400).json({
         success: false,
-        error: 'Clé API Perplexity manquante. Configurez PERPLEXITY_API_KEY dans Vercel.',
+        error: 'Perplexity API key not configured (PERPLEXITY_API_KEY)',
         model: 'error',
-        fallback: false
+        fallback: false,
+        details: 'Configurez PERPLEXITY_API_KEY dans Vercel Environment Variables'
       });
     }
 
