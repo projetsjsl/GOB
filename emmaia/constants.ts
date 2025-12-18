@@ -154,15 +154,15 @@ export const AKOOL_REGIONS = [
 
 // Unified Avatar Images
 export const AVATAR_IMAGES = {
-    chat: "/images/ia.png?v=3",
-    vocal: "/images/audio.png?v=3",
-    natural: "/images/emma-avatar-new.jpg?v=3",
-    ceo: "/images/entrepreneur.png?v=3",
-    researcher: "/images/chercheur.png?v=3",
-    writer: "/images/ecrivain_auteur.png?v=3",
-    critic: "/images/avocat.png?v=3",
-    geek: "/images/data.png?v=3",
-    professional: "/images/analyste_financier.png?v=3" // Fallback
+    chat: "/public/images/ia.png",
+    vocal: "/public/images/audio.png",
+    natural: "/public/images/emma-avatar-new.jpg",
+    ceo: "/public/images/entrepreneur.png",
+    researcher: "/public/images/chercheur.png",
+    writer: "/public/images/ecrivain_auteur.png",
+    critic: "/public/images/avocat.png",
+    geek: "/public/images/data.png",
+    professional: "/public/images/analyste_financier.png" // Fallback
 };
 
 // --- EMMA VARIATIONS (Brunette, 40 ans, yeux bleus, professionnelle) ---
