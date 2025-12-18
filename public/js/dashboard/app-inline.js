@@ -22938,9 +22938,48 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             // Créer/mettre à jour le graphique Chart.js pour yield curve
             React.useEffect(() => {
-                if (!yieldData || !yieldChartRef.current) return;
+                // Vérifier que Chart.js est chargé
                 if (typeof Chart === 'undefined') {
-                    console.error('❌ Chart.js n\'est pas chargé');
+                    console.error('❌ Chart.js n\'est pas chargé - tentative de chargement...');
+                    // Essayer de charger Chart.js dynamiquement
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+                    script.onload = () => {
+                        console.log('✅ Chart.js chargé dynamiquement');
+                        // Réessayer après un court délai
+                        setTimeout(() => {
+                            if (yieldData && yieldChartRef.current) {
+                                // Déclencher un re-render en forçant la mise à jour
+                                window.dispatchEvent(new Event('yield-chart-update'));
+                            }
+                        }, 100);
+                    };
+                    script.onerror = () => {
+                        console.error('❌ Impossible de charger Chart.js');
+                    };
+                    document.head.appendChild(script);
+                    return;
+                }
+                
+                if (!yieldData || !yieldChartRef.current) {
+                    console.log('⏳ En attente des données ou du canvas:', { 
+                        hasYieldData: !!yieldData, 
+                        hasCanvas: !!yieldChartRef.current 
+                    });
+                    return;
+                }
+                
+                // Vérifier que le canvas est visible et a une taille
+                const canvas = yieldChartRef.current;
+                const rect = canvas.getBoundingClientRect();
+                if (rect.width === 0 || rect.height === 0) {
+                    console.warn('⚠️ Canvas a une taille de 0, attente du rendu...');
+                    // Réessayer après un court délai
+                    setTimeout(() => {
+                        if (yieldData && yieldChartRef.current) {
+                            window.dispatchEvent(new Event('yield-chart-update'));
+                        }
+                    }, 500);
                     return;
                 }
 
@@ -23100,15 +23139,22 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     return;
                 }
 
-                yieldChartInstance.current = new Chart(ctx, {
-                    type: 'line',
-                    data: { 
-                        labels: maturityOrder,
-                        datasets 
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
+                console.log('🎨 Création du graphique Chart.js avec', datasets.length, 'datasets');
+                console.log('📐 Taille du canvas:', { width: canvas.width, height: canvas.height, rect: rect });
+                
+                try {
+                    yieldChartInstance.current = new Chart(ctx, {
+                        type: 'line',
+                        data: { 
+                            labels: maturityOrder,
+                            datasets 
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: {
+                                duration: 750
+                            },
                         plugins: {
                             legend: {
                                 display: true,
@@ -23174,13 +23220,43 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         }
                     }
                 });
+                
+                console.log('✅ Graphique Chart.js créé avec succès');
+                
+                // Forcer un update après création
+                setTimeout(() => {
+                    if (yieldChartInstance.current) {
+                        yieldChartInstance.current.update('none'); // Update sans animation
+                        console.log('🔄 Graphique mis à jour');
+                    }
+                }, 100);
+                
+                } catch (error) {
+                    console.error('❌ Erreur lors de la création du graphique:', error);
+                    console.error('Stack:', error.stack);
+                }
 
                 return () => {
                     if (yieldChartInstance.current) {
                         yieldChartInstance.current.destroy();
+                        yieldChartInstance.current = null;
                     }
                 };
             }, [yieldData, historicalDataUS, historicalDataCanada, historicalDateUS, historicalDateCanada, isDarkMode]);
+            
+            // Écouter l'événement de mise à jour forcée
+            React.useEffect(() => {
+                const handleUpdate = () => {
+                    if (yieldData && yieldChartRef.current && typeof Chart !== 'undefined') {
+                        // Déclencher un re-render en modifiant légèrement une dépendance
+                        // Cela forcera le useEffect à se réexécuter
+                        const event = new CustomEvent('force-yield-chart-update');
+                        window.dispatchEvent(event);
+                    }
+                };
+                window.addEventListener('yield-chart-update', handleUpdate);
+                return () => window.removeEventListener('yield-chart-update', handleUpdate);
+            }, [yieldData]);
 
             // -----------------------------------------------------------
 
@@ -23637,7 +23713,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 </p>
                                             </div>
                                         )}
-                                        <canvas ref={yieldChartRef}></canvas>
+                                        <canvas 
+                                            ref={yieldChartRef}
+                                            style={{ 
+                                                width: '100%', 
+                                                height: '100%',
+                                                display: 'block'
+                                            }}
+                                        ></canvas>
                                     </div>
                                     {/* Informations sur les données */}
                                     {yieldData && !yieldLoading && (
