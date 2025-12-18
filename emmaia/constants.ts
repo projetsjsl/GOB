@@ -154,9 +154,15 @@ export const AKOOL_REGIONS = [
 
 // Unified Avatar Images
 export const AVATAR_IMAGES = {
-    natural: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=600&auto=format&fit=crop", 
-    professional: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=600&auto=format&fit=crop",
-    geek: "https://images.unsplash.com/photo-1607746882042-944635dfe10e?q=80&w=600&auto=format&fit=crop"
+    chat: "/images/ia.png",
+    vocal: "/images/audio.png",
+    natural: "/images/emma-avatar-new.jpg",
+    ceo: "/images/entrepreneur.png",
+    researcher: "/images/chercheur.png",
+    writer: "/images/ecrivain%20auteur.png",
+    critic: "/images/avocat.png",
+    geek: "/images/data.png",
+    professional: "/images/analyste%20financier.png" // Fallback
 };
 
 // --- EMMA VARIATIONS (Brunette, 40 ans, yeux bleus, professionnelle) ---
@@ -215,13 +221,18 @@ const CURATED_WOMEN_PROFESSIONAL = [
 // Generate 100+ unique URLs using base curated list + random signatures for diversity
 // Les variations d'Emma sont placées en premier pour être prioritaires dans la galerie
 export const AVATAR_GALLERY = [
+    // Nouvelles images locales du repo
+    AVATAR_IMAGES.chat,
+    AVATAR_IMAGES.vocal,
+    AVATAR_IMAGES.natural,
+    AVATAR_IMAGES.ceo,
+    AVATAR_IMAGES.researcher,
+    AVATAR_IMAGES.writer,
+    AVATAR_IMAGES.critic,
+    AVATAR_IMAGES.geek,
     // Variations d'Emma en premier (brunette, 40 ans, yeux bleus, professionnelle)
     ...EMMA_VARIATIONS.map(id => `https://images.unsplash.com/photo-${id}?q=80&w=600&auto=format&fit=crop`),
     // Images de base
-    AVATAR_IMAGES.natural,
-    AVATAR_IMAGES.professional,
-    AVATAR_IMAGES.geek,
-    // Autres images professionnelles
     ...CURATED_WOMEN_PROFESSIONAL.map(id => `https://images.unsplash.com/photo-${id}?q=80&w=600&auto=format&fit=crop`),
     // Fill the rest to reach 100+ with query variations
     ...Array.from({ length: 70 }).map((_, i) => 
@@ -230,13 +241,13 @@ export const AVATAR_GALLERY = [
 ];
 
 export const AVATAR_DISPLAY_MAP = {
-    finance: AVATAR_IMAGES.professional,
+    finance: AVATAR_IMAGES.chat,
     economy: AVATAR_IMAGES.professional,
     politics: AVATAR_IMAGES.professional,
-    researcher: AVATAR_IMAGES.professional,
-    writer: AVATAR_IMAGES.professional,
-    ceo: AVATAR_IMAGES.professional,
-    critic: AVATAR_IMAGES.professional, 
+    researcher: AVATAR_IMAGES.researcher,
+    writer: AVATAR_IMAGES.writer,
+    ceo: AVATAR_IMAGES.ceo,
+    critic: AVATAR_IMAGES.critic, 
     geek: AVATAR_IMAGES.geek,
     tavus: AVATAR_IMAGES.natural
 };
@@ -257,7 +268,7 @@ export const PROFESSION_PRESETS = [
         id: 'finance',
         name: 'Emma IA • BOURSE',
         role: 'Analyste Boursier & Financier',
-        image: AVATAR_IMAGES.professional,
+        image: AVATAR_IMAGES.chat,
         description: 'Module spécialisé dans l\'analyse technique et les marchés boursiers.',
         avatarId: 'Angela-inT-20220820',
         voiceName: 'Zephyr',
@@ -271,7 +282,7 @@ export const PROFESSION_PRESETS = [
         description: 'Module spécialisé dans les tendances globales et taux directeurs.',
         avatarId: 'Tyler-incasualsuit-20220721',
         voiceName: 'Fenrir',
-        systemPrompt: DEFAULT_SYSTEM_INSTRUCTION // Simplified for file size
+        systemPrompt: DEFAULT_SYSTEM_INSTRUCTION 
     },
     {
         id: 'politics',
@@ -287,7 +298,7 @@ export const PROFESSION_PRESETS = [
         id: 'researcher',
         name: 'Dr. Emma',
         role: 'Emma IA • RECHERCHE',
-        image: AVATAR_IMAGES.professional,
+        image: AVATAR_IMAGES.researcher,
         description: 'Module académique et scientifique.',
         avatarId: 'Angela-inT-20220820',
         voiceName: 'Puck',

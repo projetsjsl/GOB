@@ -98,7 +98,7 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
           title="Chat Expert"
           desc="Analyse textuelle profonde avec Gemini 2.0 Pro."
           icon={MessageSquareText}
-          image={customImages['finance'] || AVATAR_IMAGES.professional}
+          image={customImages['finance'] || AVATAR_IMAGES.chat}
           delay="animate-in fade-in slide-in-from-bottom-4 duration-700"
           filterClass="grayscale group-hover:grayscale-0"
         />
@@ -109,7 +109,7 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
           title="Live Vocal"
           desc="Communication vocale avec HeyGen & Akool."
           icon={Mic2}
-          image={customImages['finance'] || AVATAR_IMAGES.natural}
+          image={customImages['finance'] || AVATAR_IMAGES.vocal}
           delay="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100"
           filterClass="grayscale-0"
         />
@@ -131,7 +131,7 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
             title="CEO Simulator"
             desc="Simulez une rencontre avec un dirigeant d'entreprise."
             icon={Building2}
-            image={customImages['ceo'] || AVATAR_IMAGES.professional}
+            image={customImages['ceo'] || AVATAR_IMAGES.ceo}
             delay="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300"
             filterClass="grayscale group-hover:grayscale-0"
         />
@@ -142,7 +142,7 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
             title="Recherchiste"
             desc="Veille stratégique 24/7 et alertes marchés."
             icon={Globe}
-            image={customImages['researcher'] || AVATAR_IMAGES.professional}
+            image={customImages['researcher'] || AVATAR_IMAGES.researcher}
             delay="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400"
             filterClass="sepia-[.3] group-hover:sepia-0"
         />
@@ -153,7 +153,7 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
             title="Rédactrice"
             desc="Création collaborative de documents financiers."
             icon={FileText}
-            image={customImages['writer'] || AVATAR_IMAGES.professional}
+            image={customImages['writer'] || AVATAR_IMAGES.writer}
             delay="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500"
             filterClass="grayscale contrast-125"
         />
@@ -164,7 +164,7 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
             title="L'Avocat du Diable"
             desc="Challengez vos idées avec une critique impitoyable."
             icon={Scale}
-            image={customImages['critic'] || AVATAR_IMAGES.professional}
+            image={customImages['critic'] || AVATAR_IMAGES.critic}
             delay="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-600"
             filterClass="grayscale contrast-150 brightness-75"
         />
