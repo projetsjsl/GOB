@@ -67,15 +67,27 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   // Determine base values from selected base year
   // MÊME LOGIQUE QUE KPIDashboard pour cohérence
   // ✅ CRITIQUE : Si baseYear n'est pas défini ou n'existe pas, utiliser la dernière année avec données valides
-  let baseYearData = data.find(d => d.year === assumptions.baseYear);
+  
+  // ✅ CRITIQUE : Vérifier d'abord si data est vide
+  if (!data || data.length === 0) {
+    console.warn('⚠️ EvaluationDetails: Aucune donnée disponible', {
+      dataLength: data?.length || 0,
+      assumptions: assumptions
+    });
+  }
+  
+  let baseYearData = data && data.length > 0 ? data.find(d => d.year === assumptions.baseYear) : null;
   if (!baseYearData || (baseYearData.earningsPerShare <= 0 && baseYearData.cashFlowPerShare <= 0 && baseYearData.bookValuePerShare <= 0)) {
     // Chercher la dernière année avec au moins une valeur positive
-    baseYearData = [...data].reverse().find(d => 
-      d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
-    ) || data[data.length - 1];
+    if (data && data.length > 0) {
+      baseYearData = [...data].reverse().find(d => 
+        d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
+      ) || data[data.length - 1];
+    }
   }
   
   // ✅ CRITIQUE : Utiliser les valeurs de baseYearData, pas 0 par défaut
+  // Si baseYearData est null/undefined, utiliser 0 mais logger l'erreur
   const baseEPS = baseYearData?.earningsPerShare > 0 ? baseYearData.earningsPerShare : 0;
   const baseCF = baseYearData?.cashFlowPerShare > 0 ? baseYearData.cashFlowPerShare : 0;
   const baseBV = baseYearData?.bookValuePerShare > 0 ? baseYearData.bookValuePerShare : 0;
@@ -93,10 +105,12 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
     console.warn('⚠️ EvaluationDetails: Toutes les valeurs de base sont à 0', {
       baseYear: assumptions.baseYear,
       baseYearData,
-      dataLength: data.length,
-      dataYears: data.map(d => d.year),
+      dataLength: data?.length || 0,
+      dataYears: data?.map(d => d.year) || [],
       baseValues,
-      allDataEPS: data.map(d => ({ year: d.year, eps: d.earningsPerShare, cf: d.cashFlowPerShare, bv: d.bookValuePerShare }))
+      allDataEPS: data?.map(d => ({ year: d.year, eps: d.earningsPerShare, cf: d.cashFlowPerShare, bv: d.bookValuePerShare })) || [],
+      hasData: !!data,
+      dataIsArray: Array.isArray(data)
     });
   }
 

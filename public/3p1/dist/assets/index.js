@@ -34078,11 +34078,19 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
       [metric]: !prev[metric]
     }));
   };
-  let baseYearData = data.find((d) => d.year === assumptions.baseYear);
+  if (!data || data.length === 0) {
+    console.warn("⚠️ EvaluationDetails: Aucune donnée disponible", {
+      dataLength: (data == null ? void 0 : data.length) || 0,
+      assumptions
+    });
+  }
+  let baseYearData = data && data.length > 0 ? data.find((d) => d.year === assumptions.baseYear) : null;
   if (!baseYearData || baseYearData.earningsPerShare <= 0 && baseYearData.cashFlowPerShare <= 0 && baseYearData.bookValuePerShare <= 0) {
-    baseYearData = [...data].reverse().find(
-      (d) => d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
-    ) || data[data.length - 1];
+    if (data && data.length > 0) {
+      baseYearData = [...data].reverse().find(
+        (d) => d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
+      ) || data[data.length - 1];
+    }
   }
   const baseEPS = (baseYearData == null ? void 0 : baseYearData.earningsPerShare) > 0 ? baseYearData.earningsPerShare : 0;
   const baseCF = (baseYearData == null ? void 0 : baseYearData.cashFlowPerShare) > 0 ? baseYearData.cashFlowPerShare : 0;
@@ -34098,10 +34106,12 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     console.warn("⚠️ EvaluationDetails: Toutes les valeurs de base sont à 0", {
       baseYear: assumptions.baseYear,
       baseYearData,
-      dataLength: data.length,
-      dataYears: data.map((d) => d.year),
+      dataLength: (data == null ? void 0 : data.length) || 0,
+      dataYears: (data == null ? void 0 : data.map((d) => d.year)) || [],
       baseValues,
-      allDataEPS: data.map((d) => ({ year: d.year, eps: d.earningsPerShare, cf: d.cashFlowPerShare, bv: d.bookValuePerShare }))
+      allDataEPS: (data == null ? void 0 : data.map((d) => ({ year: d.year, eps: d.earningsPerShare, cf: d.cashFlowPerShare, bv: d.bookValuePerShare }))) || [],
+      hasData: !!data,
+      dataIsArray: Array.isArray(data)
     });
   }
   const projectFutureValueSafe = (current, rate, years) => {
