@@ -129,37 +129,43 @@ async function generateWithOpenAI(options: GenerateOptions): Promise<GenerateRes
 
 async function generateWithAnthropic(options: GenerateOptions): Promise<GenerateResponse> {
     const { modelId, prompt, systemInstruction } = options;
-    const apiKey = process.env.ANTHROPIC_API_KEY;
     
-    if (!apiKey) {
-        throw new Error('Anthropic API key not configured (ANTHROPIC_API_KEY)');
-    }
+    // Construire le prompt complet avec l'instruction système si fournie
+    const fullPrompt = systemInstruction 
+        ? `${systemInstruction}\n\n${prompt}`
+        : prompt;
     
-    const messages: any[] = [{ role: 'user', content: prompt }];
-    
-    const response = await fetch(ANTHROPIC_API_URL, {
+    // Utiliser l'endpoint backend qui gère Anthropic via le service 'openai'
+    // (l'endpoint détecte automatiquement si ANTHROPIC_API_KEY est configurée)
+    const response = await fetch('/api/ai-services', {
         method: 'POST',
         headers: {
-            'x-api-key': apiKey,
-            'anthropic-version': '2023-06-01',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            model: modelId,
-            max_tokens: 4096,
-            system: systemInstruction || '',
-            messages
+            service: 'openai', // L'endpoint utilise 'openai' mais route vers Anthropic si la clé est configurée
+            prompt: fullPrompt,
+            marketData: {}, // Optionnel pour l'endpoint
+            news: '' // Optionnel pour l'endpoint
         })
     });
     
     if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(`Anthropic: ${error.error?.message || response.statusText}`);
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || errorData.message || response.statusText;
+        
+        // Message d'erreur plus explicite si la clé API n'est pas configurée
+        if (errorMessage.includes('ANTHROPIC_API_KEY') || 
+            errorMessage.includes('not configured') || 
+            errorMessage.includes('Aucune clé API configurée')) {
+            throw new Error('Anthropic API key not configured (ANTHROPIC_API_KEY). Veuillez configurer la clé API dans les variables d\'environnement Vercel.');
+        }
+        
+        throw new Error(`Anthropic: ${errorMessage}`);
     }
     
     const data = await response.json();
-    const textContent = data.content?.find((c: any) => c.type === 'text');
-    return { text: textContent?.text || '' };
+    return { text: data.content || data.text || '' };
 }
 
 function extractGeminiCitations(response: any): string[] {
