@@ -5246,107 +5246,8 @@ STRUCTURE JSON OBLIGATOIRE:
             const [newTicker, setNewTicker] = useState('');
             const [watchlistStockData, setWatchlistStockData] = useState({});
             const [watchlistLoading, setWatchlistLoading] = useState(false);
-            const [showScreener, setShowScreener] = useState(false);
-            const [loadingScreener, setLoadingScreener] = useState(false);
-            const [screenerResults, setScreenerResults] = useState([]);
-            const [screenerFilters, setScreenerFilters] = useState({
-                minMarketCap: 0,
-                maxPE: 50,
-                minROE: 0,
-                sector: 'all'
-            });
             const WATCHLIST_FILE = '/dans-watchlist.json'; // servi depuis /public
 
-            // Fonction pour exécuter le screener sur la watchlist
-            const runWatchlistScreener = async () => {
-                // Convertir les tickers en format attendu par le screener
-                const watchlistStocks = watchlistTickers.map(ticker => ({
-                    symbol: ticker,
-                    name: ticker // Le nom sera récupéré par l'API
-                }));
-
-                setLoadingScreener(true);
-                try {
-                    const results = [];
-
-                    for (const stock of watchlistStocks) {
-                        try {
-                            const [quoteRes, profileRes, ratiosRes] = await Promise.allSettled([
-                                fetch(`/api/marketdata?endpoint=quote&symbol=${stock.symbol}&source=auto`),
-                                fetch(`/api/fmp?endpoint=profile&symbol=${stock.symbol}`),
-                                fetch(`/api/fmp?endpoint=ratios&symbol=${stock.symbol}`)
-                            ]);
-
-                            const quote = quoteRes.status === 'fulfilled' && quoteRes.value.ok
-                                ? await quoteRes.value.json() : null;
-                            const profile = profileRes.status === 'fulfilled' && profileRes.value.ok
-                                ? await profileRes.value.json() : null;
-                            const ratios = ratiosRes.status === 'fulfilled' && ratiosRes.value.ok
-                                ? await ratiosRes.value.json() : null;
-
-                            const stockData = {
-                                symbol: stock.symbol,
-                                name: profile?.data?.[0]?.companyName || profile?.companyName || stock.symbol,
-                                price: quote?.c || 0,
-                                change: quote?.dp || 0,
-                                marketCap: profile?.data?.[0]?.mktCap || profile?.mktCap || 0,
-                                pe: ratios?.data?.[0]?.peRatioTTM || ratios?.peRatioTTM || null,
-                                roe: ratios?.data?.[0]?.returnOnEquityTTM || ratios?.returnOnEquityTTM || null,
-                                debtEquity: ratios?.data?.[0]?.debtEquityRatioTTM || ratios?.debtEquityRatioTTM || null,
-                                sector: profile?.data?.[0]?.sector || profile?.sector || 'Unknown'
-                            };
-
-                            // Appliquer les filtres
-                            if (stockData.marketCap >= screenerFilters.minMarketCap &&
-                                (!stockData.pe || stockData.pe <= screenerFilters.maxPE) &&
-                                (!stockData.roe || (stockData.roe * 100) >= screenerFilters.minROE) &&
-                                (!stockData.debtEquity || stockData.debtEquity <= screenerFilters.maxDebtEquity) &&
-                                (screenerFilters.sector === 'all' || stockData.sector === screenerFilters.sector)) {
-                                results.push(stockData);
-                            }
-                        } catch (error) {
-                            console.error(`Erreur pour ${stock.symbol}:`, error);
-                        }
-                    }
-
-                    setScreenerResults(results);
-                    console.log(`✅ Screener Watchlist: ${results.length} résultats trouvés sur ${watchlistStocks.length} titres`);
-                } catch (error) {
-                    console.error('Erreur screener:', error);
-                } finally {
-                    setLoadingScreener(false);
-                }
-            };
-
-            // Fonctions utilitaires
-            const getMetricColor = (metric, value) => {
-                if (value == null || value === 'N/A') return 'text-gray-400';
-                const v = typeof value === 'string' ? parseFloat(value) : value;
-                if (isNaN(v)) return 'text-gray-400';
-
-                switch (metric) {
-                    case 'PE':
-                        if (v < 0) return 'text-red-500';
-                        if (v < 15) return 'text-emerald-500';
-                        if (v < 25) return 'text-blue-500';
-                        if (v < 35) return 'text-yellow-500';
-                        return 'text-red-500';
-                    case 'ROE':
-                        if (v < 0) return 'text-red-500';
-                        if (v < 10) return 'text-green-500';
-                        if (v < 15) return 'text-yellow-500';
-                        if (v < 20) return 'text-blue-500';
-                        return 'text-emerald-500';
-                    case 'DE':
-                        if (v < 0.3) return 'text-emerald-500';
-                        if (v < 0.7) return 'text-blue-500';
-                        if (v < 1.5) return 'text-yellow-500';
-                        if (v < 2.5) return 'text-green-500';
-                        return 'text-red-500';
-                    default:
-                        return 'text-gray-400';
-                }
-            };
 
             const formatNumber = (window.DASHBOARD_UTILS && window.DASHBOARD_UTILS.formatNumberCompact) || ((num, prefix = '', suffix = '') => {
                 if (!num && num !== 0) return 'N/A';
@@ -5636,261 +5537,136 @@ STRUCTURE JSON OBLIGATOIRE:
             }
         }, [activeTab]);
 
-            // Effet pour initialiser le TradingView Ticker Tape avec les tickers de la watchlist
-            useEffect(() => {
-                if (watchlistTickers.length > 0) {
-                    // Supprimer le widget existant s'il existe
-                    const existingWidget = document.getElementById('tradingview-ticker-dan-watchlist');
-                    if (existingWidget) {
-                        existingWidget.innerHTML = '';
-                    }
+            // Récupérer les données depuis window.BetaCombinedDashboard pour les sections Top Movers, Analyses et Vue Liste
+            const dashboard = typeof window !== 'undefined' ? (window.BetaCombinedDashboard || {}) : {};
+            const stockData = dashboard.stockData || watchlistStockData || {};
+            const tickers = watchlistTickers; // Utiliser watchlistTickers pour les sections
+            const tickerMoveReasons = dashboard.tickerMoveReasons || {};
+            const companyNames = (window.DASHBOARD_CONSTANTS && window.DASHBOARD_CONSTANTS.companyNames) || {};
+            const getCompanyLogo = dashboard.getCompanyLogo || ((ticker) => `https://logo.clearbit.com/${ticker.toLowerCase()}.com`);
+            const setSelectedStock = dashboard.setSelectedStock || (() => {});
+            const setActiveTab = dashboard.setActiveTab || (() => {});
+            const LucideIcon = typeof window !== 'undefined' ? (window.LucideIcon || window.IconoirIcon) : (({ name, className = '' }) => <span className={className}>{name}</span>);
+            
+            // Fonction pour extraire la raison du mouvement
+            const extractMoveReason = (ticker, change) => {
+                const reason = tickerMoveReasons[ticker];
+                if (reason && typeof reason === 'string') return reason;
+                if (reason && reason.reason) return reason.reason;
+                return '';
+            };
 
-                    // Créer les symboles formatés pour TradingView (EXCHANGE:TICKER)
-                    // Par défaut, on assume que les tickers US sont sur NASDAQ ou NYSE
-                    const tvSymbols = watchlistTickers.map(ticker => {
-                        // Détecter les tickers canadiens (qui se terminent souvent par .TO, .V, etc.)
-                        if (ticker.includes('.TO') || ticker.includes('.V')) {
-                            return { "proName": `TSX:${ticker.replace(/\.(TO|V)/, '')}`, "title": ticker };
-                        }
-                        // Par défaut, utiliser NASDAQ pour les tickers US
-                        return { "proName": `NASDAQ:${ticker}`, "title": ticker };
+            // Fonction pour render market badge
+            const renderMarketBadge = (type) => {
+                const isBull = type === 'bull';
+                return (
+                    <span
+                        className={`w-9 h-9 rounded-full flex items-center justify-center text-xl font-semibold shadow-inner border ${isBull
+                            ? isDarkMode
+                                ? 'bg-lime-900/70 border-lime-500/40 text-lime-300'
+                                : 'bg-lime-100 border-lime-400 text-lime-700'
+                            : isDarkMode
+                                ? 'bg-rose-900/70 border-rose-500/40 text-rose-200'
+                                : 'bg-rose-100 border-rose-300 text-rose-700'
+                            }`}
+                    >
+                        {isBull ? '🐂' : '🐻'}
+                    </span>
+                );
+            };
+
+            // Composant TickerNewsList (simplifié pour la vue liste)
+            const TickerNewsList = ({ ticker, maxItems = 5 }) => {
+                const newsData = dashboard.newsData || [];
+                const tickerLatestNews = dashboard.tickerLatestNews || {};
+                
+                const tickerNews = (() => {
+                    const latestNews = tickerLatestNews[ticker];
+                    const filteredNews = newsData.filter(article => {
+                        const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
+                        return text.includes(ticker.toLowerCase());
                     });
-
-                    // Créer le script TradingView
-                    const script = document.createElement('script');
-                    script.type = 'text/javascript';
-                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
-                    script.async = true;
-                    script.textContent = JSON.stringify({
-                        "symbols": tvSymbols.slice(0, 20), // Limiter à 20 symboles pour performance
-                        "showSymbolLogo": true,
-                        "isTransparent": isDarkMode,
-                        "displayMode": "adaptive",
-                        "colorTheme": isDarkMode ? "dark" : "light",
-                        "locale": "fr"
+                    
+                    const sortedNews = filteredNews.sort((a, b) => {
+                        const dateA = new Date(a.publishedAt || a.publishedDate || 0);
+                        const dateB = new Date(b.publishedAt || b.publishedDate || 0);
+                        return dateB - dateA;
                     });
-
-                    const widgetContainer = document.getElementById('tradingview-ticker-dan-watchlist');
-                    if (widgetContainer) {
-                        widgetContainer.appendChild(script);
+                    
+                    if (latestNews && !sortedNews.some(n => n.url === latestNews.url || n.title === latestNews.title)) {
+                        sortedNews.unshift(latestNews);
                     }
+                    
+                    return sortedNews.slice(0, maxItems);
+                })();
+
+                if (tickerNews.length === 0) {
+                    return (
+                        <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                            Aucune nouvelle disponible
+                        </div>
+                    );
                 }
-            }, [watchlistTickers, isDarkMode]);
+
+                const formatTimeAgo = (dateString) => {
+                    if (!dateString) return '';
+                    const date = new Date(dateString);
+                    const now = new Date();
+                    const diffMs = now - date;
+                    const diffMins = Math.floor(diffMs / 60000);
+                    const diffHours = Math.floor(diffMs / 3600000);
+                    const diffDays = Math.floor(diffMs / 86400000);
+
+                    if (diffMins < 1) return 'À l\'instant';
+                    if (diffMins < 60) return `Il y a ${diffMins} min`;
+                    if (diffHours < 24) return `Il y a ${diffHours}h`;
+                    if (diffDays < 7) return `Il y a ${diffDays}j`;
+                    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+                };
+
+                return (
+                    <div className="flex flex-col gap-1 max-w-xs max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
+                        {tickerNews.map((article, index) => (
+                            <a
+                                key={index}
+                                href={article.url || '#'}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`text-xs p-1.5 rounded transition-all hover:scale-[1.02] ${isDarkMode
+                                    ? 'bg-gray-700/50 hover:bg-gray-700/70 border border-gray-600/50'
+                                    : 'bg-gray-100 hover:bg-gray-200 border border-gray-200'
+                                    }`}
+                                onClick={(e) => {
+                                    if (article.url) {
+                                        e.stopPropagation();
+                                    }
+                                }}
+                            >
+                                <div className="flex items-start justify-between gap-2">
+                                    <div className="flex-1 min-w-0">
+                                        <div className={`font-semibold truncate text-[11px] leading-tight ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                                            {article.title?.length > 50 ? article.title.substring(0, 50) + '...' : article.title}
+                                        </div>
+                                        <div className="flex items-center gap-1.5 mt-0.5">
+                                            {article.source?.name && (
+                                                <span className={`text-[9px] px-1 py-0.5 rounded ${isDarkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-600'}`}>
+                                                    {article.source.name.length > 10 ? article.source.name.substring(0, 10) + '...' : article.source.name}
+                                                </span>
+                                            )}
+                                            <span className={`text-[9px] ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                                                {formatTimeAgo(article.publishedAt || article.publishedDate)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        ))}
+                    </div>
+                );
+            };
 
             return (
                 <div className="space-y-6">
-                    {/* TradingView Ticker Tape - VAGUE 2: Quick Wins */}
-                    {watchlistTickers.length > 0 && (
-                        <div className={`rounded-lg overflow-hidden border transition-colors duration-300 ${isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'
-                            }`}>
-                            <div className="tradingview-widget-container" style={{ height: '62px' }}>
-                                <div id="tradingview-ticker-dan-watchlist" style={{ height: '100%' }}></div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Screener pour Dan's Watchlist - Identique à celui d'IntelliStocks */}
-                    {showScreener && (
-                        <div className={`border rounded-lg p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
-                            }`}>
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xl">🔍</span>
-                                    <h3 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                        Screener - Dan's Watchlist
-                                    </h3>
-                                    <span className="text-xs text-gray-500">({watchlistTickers.length} titres)</span>
-                                </div>
-                                <button
-                                    onClick={() => setShowScreener(false)}
-                                    className={`p-1 rounded ${isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
-                                >
-                                    <span className="text-gray-500">✕</span>
-                                </button>
-                            </div>
-
-                            {/* Filtres - Mêmes que IntelliStocks */}
-                            <div className="grid grid-cols-5 gap-2 mb-3">
-                                <div>
-                                    <label className="text-[9px] text-gray-500 mb-1 block">Market Cap Min (B$)</label>
-                                    <input
-                                        type="number"
-                                        value={screenerFilters.minMarketCap / 1e9}
-                                        onChange={(e) => setScreenerFilters({ ...screenerFilters, minMarketCap: parseFloat(e.target.value || 0) * 1e9 })}
-                                        className={`w-full px-2 py-1 text-xs rounded border ${isDarkMode
-                                            ? 'bg-gray-800 border-gray-700 text-white'
-                                            : 'bg-white border-gray-300 text-gray-900'
-                                            }`}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-[9px] text-gray-500 mb-1 block">P/E Max</label>
-                                    <input
-                                        type="number"
-                                        value={screenerFilters.maxPE}
-                                        onChange={(e) => setScreenerFilters({ ...screenerFilters, maxPE: parseFloat(e.target.value || 50) })}
-                                        className={`w-full px-2 py-1 text-xs rounded border ${isDarkMode
-                                            ? 'bg-gray-800 border-gray-700 text-white'
-                                            : 'bg-white border-gray-300 text-gray-900'
-                                            }`}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-[9px] text-gray-500 mb-1 block">ROE Min (%)</label>
-                                    <input
-                                        type="number"
-                                        value={screenerFilters.minROE}
-                                        onChange={(e) => setScreenerFilters({ ...screenerFilters, minROE: parseFloat(e.target.value || 0) })}
-                                        className={`w-full px-2 py-1 text-xs rounded border ${isDarkMode
-                                            ? 'bg-gray-800 border-gray-700 text-white'
-                                            : 'bg-white border-gray-300 text-gray-900'
-                                            }`}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-[9px] text-gray-500 mb-1 block">D/E Max</label>
-                                    <input
-                                        type="number"
-                                        step="0.1"
-                                        value={screenerFilters.maxDebtEquity}
-                                        onChange={(e) => setScreenerFilters({ ...screenerFilters, maxDebtEquity: parseFloat(e.target.value || 2) })}
-                                        className={`w-full px-2 py-1 text-xs rounded border ${isDarkMode
-                                            ? 'bg-gray-800 border-gray-700 text-white'
-                                            : 'bg-white border-gray-300 text-gray-900'
-                                            }`}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-[9px] text-gray-500 mb-1 block">Secteur</label>
-                                    <select
-                                        value={screenerFilters.sector}
-                                        onChange={(e) => setScreenerFilters({ ...screenerFilters, sector: e.target.value })}
-                                        className={`w-full px-2 py-1 text-xs rounded border ${isDarkMode
-                                            ? 'bg-gray-800 border-gray-700 text-white'
-                                            : 'bg-white border-gray-300 text-gray-900'
-                                            }`}
-                                    >
-                                        <option value="all">Tous</option>
-                                        <option value="Technology">Technologie</option>
-                                        <option value="Consumer Cyclical">Consommation</option>
-                                        <option value="Healthcare">Santé</option>
-                                        <option value="Financial">Finance</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={runWatchlistScreener}
-                                disabled={loadingScreener || watchlistTickers.length === 0}
-                                className={`w-full py-2 rounded text-sm font-semibold transition-colors ${loadingScreener
-                                    ? 'bg-gray-400 cursor-not-allowed'
-                                    : 'bg-gray-800 hover:bg-gray-700 text-white'
-                                    }`}
-                            >
-                                {loadingScreener ? '⏳ Analyse en cours...' : `🔍 Analyser ma Watchlist (${watchlistTickers.length} titres)`}
-                            </button>
-
-                            {/* Résultats */}
-                            {screenerResults.length > 0 && (
-                                <div className="mt-3">
-                                    <div className="text-xs text-gray-500 mb-2">
-                                        {screenerResults.length} titre(s) correspondant aux critères
-                                    </div>
-                                    <div className={`max-h-64 overflow-y-auto border rounded ${isDarkMode ? 'border-gray-700' : 'border-gray-300'
-                                        }`}>
-                                        <table className="w-full text-xs">
-                                            <thead className={`sticky top-0 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
-                                                <tr>
-                                                    <th className="text-left p-2 text-gray-500">Symbole</th>
-                                                    <th className="text-right p-2 text-gray-500">Prix</th>
-                                                    <th className="text-right p-2 text-gray-500">Var %</th>
-                                                    <th className="text-right p-2 text-gray-500">Cap.</th>
-                                                    <th className="text-right p-2 text-gray-500">P/E</th>
-                                                    <th className="text-right p-2 text-gray-500">ROE</th>
-                                                    <th className="text-right p-2 text-gray-500">D/E</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {screenerResults.map((stock) => (
-                                                    <tr key={stock.symbol} className={`border-t ${isDarkMode ? 'border-gray-700 hover:bg-gray-800' : 'border-gray-200 hover:bg-gray-50'
-                                                        }`}>
-                                                        <td className="p-2">
-                                                            <div className={`font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{stock.symbol}</div>
-                                                            <div className="text-[9px] text-gray-500">{stock.name}</div>
-                                                        </td>
-                                                        <td className={`text-right p-2 font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                            ${stock.price.toFixed(2)}
-                                                        </td>
-                                                        <td className={`text-right p-2 font-semibold ${stock.change >= 0 ? 'text-emerald-500' : 'text-red-500'
-                                                            }`}>
-                                                            {(() => {
-                                                                const change = stock.change;
-                                                                if (!change) return '0.00%';
-                                                                const value = typeof change === 'number' ? change :
-                                                                    typeof change === 'object' ? (change.raw || change.fmt || 0) :
-                                                                        parseFloat(change) || 0;
-                                                                return (value >= 0 ? '+' : '') + value.toFixed(2) + '%';
-                                                            })()}
-                                                        </td>
-                                                        <td className="text-right p-2 text-gray-400">
-                                                            {formatNumber(stock.marketCap)}
-                                                        </td>
-                                                        <td className={`text-right p-2 font-semibold ${getMetricColor('PE', stock.pe)}`}>
-                                                            {stock.pe ? stock.pe.toFixed(1) : 'N/A'}
-                                                        </td>
-                                                        <td className={`text-right p-2 font-semibold ${getMetricColor('ROE', stock.roe ? stock.roe * 100 : null)}`}>
-                                                            {stock.roe ? (stock.roe * 100).toFixed(1) + '%' : 'N/A'}
-                                                        </td>
-                                                        <td className={`text-right p-2 font-semibold ${getMetricColor('DE', stock.debtEquity)}`}>
-                                                            {stock.debtEquity ? stock.debtEquity.toFixed(2) : 'N/A'}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    <div className="flex justify-between items-center">
-                        <h2 className={`text-2xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>👀 Dan's Watchlist</h2>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => setShowScreener(!showScreener)}
-                                className={`px-4 py-2 rounded transition-colors ${showScreener
-                                    ? 'bg-gray-800 text-white'
-                                    : (isDarkMode
-                                        ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                                        : 'bg-gray-200 hover:bg-gray-300 text-gray-900')
-                                    }`}
-                            >
-                                {showScreener ? '✕ Fermer Screener' : '🔍 Ouvrir Screener'}
-                            </button>
-                            <button
-                                onClick={refreshWatchlist}
-                                disabled={watchlistLoading || watchlistTickers.length === 0}
-                                className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 disabled:opacity-50 transition-colors"
-                            >
-                                {watchlistLoading ? 'Actualisation...' : '🔄 Actualiser'}
-                            </button>
-                            <button
-                                onClick={emmaPopulateWatchlist}
-                                disabled={watchlistLoading}
-                                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2"
-                            >
-                                <span>🤖</span>
-                                Emma Populate
-                            </button>
-                            <div className={`text-sm px-4 py-2 rounded ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
-                                }`}>
-                                {!initialLoadComplete ? '⏳ Chargement initial...' : '🚀 Supabase + Arrière-plan silencieux'}
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Section d'ajout de ticker */}
                     <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
                         ? 'bg-gray-900 border-gray-700'
@@ -5923,115 +5699,454 @@ STRUCTURE JSON OBLIGATOIRE:
                         </p>
                     </div>
 
-                    {/* Liste des tickers de la watchlist */}
-                    {watchlistTickers.length > 0 ? (
-                        <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
-                            ? 'bg-gray-900 border-gray-700'
-                            : 'bg-gray-50 border-gray-200'
-                            }`}>
-                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>
-                                📊 Tickers de la Watchlist ({watchlistTickers.length})
+                    {/* TOP MOVERS - Vue rapide */}
+                    {watchlistTickers.length > 0 && (
+                        <div 
+                            className="mt-6 p-6 rounded-xl transition-colors duration-300 border"
+                            style={{
+                                background: `linear-gradient(135deg, var(--theme-surface) 0%, var(--theme-surface-light) 100%)`,
+                                borderColor: 'var(--theme-border)',
+                                color: 'var(--theme-text)'
+                            }}
+                        >
+                            <h3 className={`text-xl font-bold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                <LucideIcon name="Fire" className="w-6 h-6 text-orange-500" />
+                                Top Movers du Jour
                             </h3>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {watchlistTickers.map(ticker => {
-                                    const data = watchlistStockData[ticker];
-                                    const change = data?.dp ? (data.dp >= 0 ? '+' : '') + data.dp.toFixed(2) + '%' : 'N/A';
-                                    const changeColor = data?.dp >= 0 ? 'text-green-400' : 'text-red-400';
-                                    const changeBgColor = data?.dp >= 0 ? 'bg-green-500' : 'bg-red-500';
-
-                                    return (
-                                        <div key={ticker} className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode
-                                            ? 'bg-gray-800 border-gray-600 hover:border-blue-400/50'
-                                            : 'bg-white border-gray-300 hover:border-blue-300'
-                                            }`}>
-                                            <div className="flex justify-between items-start mb-3">
-                                                <div className="flex items-center gap-2">
-                                                    <img
-                                                        src={getCompanyLogo(ticker)}
-                                                        alt={`${ticker} logo`}
-                                                        className="w-8 h-8 rounded"
-                                                        onError={(e) => {
-                                                            e.target.style.display = 'none';
-                                                        }}
-                                                    />
-                                                    <h4 className={`font-bold text-lg transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                                        }`}>{ticker}</h4>
-                                                </div>
-                                                <button
-                                                    onClick={() => removeTickerFromWatchlist(ticker)}
-                                                    className={`p-1 rounded transition-colors duration-300 ${isDarkMode
-                                                        ? 'text-gray-400 hover:text-red-400 hover:bg-red-900/20'
-                                                        : 'text-gray-500 hover:text-red-600 hover:bg-red-50'
-                                                        }`}
-                                                    title="Supprimer de la watchlist"
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Top Gainers */}
+                                <div 
+                                    className="p-3 sm:p-4 rounded-lg border"
+                                    style={{
+                                        backgroundColor: 'rgba(var(--theme-success-rgb, 16, 185, 129), 0.1)',
+                                        borderColor: 'rgba(var(--theme-success-rgb, 16, 185, 129), 0.3)'
+                                    }}
+                                >
+                                    <h4 
+                                        className="text-base sm:text-sm font-bold mb-3 sm:mb-3 flex items-center gap-3"
+                                        style={{ color: 'var(--theme-success)' }}
+                                    >
+                                        <LucideIcon name="TrendingUp" className="w-5 h-5" />
+                                        {renderMarketBadge('bull')}
+                                        Top Gainers
+                                    </h4>
+                                    <div className="space-y-2.5 sm:space-y-2">
+                                        {watchlistTickers
+                                            .map(ticker => ({
+                                                ticker,
+                                                change: stockData[ticker]?.dp || stockData[ticker]?.changePercent || 0,
+                                                price: stockData[ticker]?.c || stockData[ticker]?.price || 0
+                                            }))
+                                            .filter(item => item.change > 0)
+                                            .sort((a, b) => b.change - a.change)
+                                            .slice(0, 5)
+                                            .map((item, idx) => (
+                                                <div
+                                                    key={item.ticker}
+                                                    className="flex items-start justify-between p-2 sm:p-2 rounded cursor-pointer transition-all hover:scale-[1.02]"
+                                                    style={{
+                                                        backgroundColor: 'transparent',
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        e.currentTarget.style.backgroundColor = 'rgba(var(--theme-success-rgb, 16, 185, 129), 0.2)';
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                                    }}
+                                                    onClick={() => {
+                                                        setSelectedStock(item.ticker);
+                                                        setActiveTab('intellistocks');
+                                                    }}
                                                 >
-                                                    ✕
-                                                </button>
-                                            </div>
-
-                                            {data ? (
-                                                <>
-                                                    <div className={`rounded-lg p-3 mb-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
-                                                        }`}>
-                                                        <div className={`text-2xl font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                                            }`}>
-                                                            ${data.c?.toFixed(2) || 'N/A'}
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                            <div className={`w-3 h-3 ${changeBgColor} rounded`}></div>
-                                                            <span className={`text-sm font-medium ${changeColor}`}>
-                                                                {change}
+                                                    <div className="flex-1 min-w-0 pr-2">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <div 
+                                                                className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                                                                style={{
+                                                                    backgroundColor: 'rgba(var(--theme-success-rgb, 16, 185, 129), 0.3)',
+                                                                    color: 'var(--theme-success)'
+                                                                }}
+                                                            >
+                                                                {idx + 1}
+                                                            </div>
+                                                            <img
+                                                                src={getCompanyLogo(item.ticker)}
+                                                                alt={item.ticker}
+                                                                className="w-6 h-6 rounded flex-shrink-0"
+                                                                onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }}
+                                                            />
+                                                            <span className={`font-mono font-bold text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'} flex-shrink-0`}>
+                                                                {item.ticker}
                                                             </span>
+                                                            <div className="text-green-500 font-bold text-sm ml-auto flex-shrink-0">
+                                                                +{item.change.toFixed(2)}% ↑
+                                                            </div>
+                                                            <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} flex-shrink-0`}>
+                                                                ${item.price.toFixed(2)}
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                    <div className="space-y-2 text-sm">
-                                                        <div className="flex justify-between">
-                                                            <span className={`transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                                                }`}>Volume:</span>
-                                                            <span className={`transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                                                }`}>{data.v?.toLocaleString() || 'N/A'}</span>
-                                                        </div>
-                                                        <div className="flex justify-between">
-                                                            <span className={`transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                                                }`}>High:</span>
-                                                            <span className={`transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                                                }`}>${data.h?.toFixed(2) || 'N/A'}</span>
-                                                        </div>
-                                                        <div className="flex justify-between">
-                                                            <span className={`transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                                                }`}>Low:</span>
-                                                            <span className={`transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                                                }`}>${data.l?.toFixed(2) || 'N/A'}</span>
+                                                        {/* Espace dédié pour les news avec placeholder */}
+                                                        <div className={`mt-1 ml-8 min-h-[20px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                            {(() => {
+                                                                const reason = extractMoveReason(item.ticker, item.change);
+                                                                if (reason && reason !== '') {
+                                                                    return (
+                                                                        <div className={`text-xs flex items-start gap-2 leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                            }`}>
+                                                                            {tickerMoveReasons[item.ticker]?.source === 'Finviz AI' ? (
+                                                                                <span className="inline-flex items-center gap-1.5 flex-wrap">
+                                                                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30 flex-shrink-0">
+                                                                                        AI
+                                                                                    </span>
+                                                                                    <span className="leading-relaxed break-words">{reason}</span>
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span className="inline-flex items-start gap-1.5">
+                                                                                    <span className="text-blue-400 flex-shrink-0 text-sm">📰</span>
+                                                                                    <span className="leading-relaxed break-words">{reason}</span>
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                                return (
+                                                                    <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                                                                        Chargement des explications...
+                                                                    </div>
+                                                                );
+                                                            })()}
                                                         </div>
                                                     </div>
-                                                </>
-                                            ) : (
-                                                <div className={`text-center py-4 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                                    }`}>
-                                                    <div className="animate-spin w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full mx-auto mb-2"></div>
-                                                    <span className="text-sm">Chargement...</span>
                                                 </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
+                                            ))}
+                                    </div>
+                                </div>
+
+                                {/* Top Losers */}
+                                <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-red-500/10 border border-red-500/30' : 'bg-red-50 border border-red-200'}`}>
+                                    <h4 className={`text-sm font-bold mb-3 flex items-center gap-3 ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>
+                                        <LucideIcon name="TrendingDown" className="w-5 h-5" />
+                                        {renderMarketBadge('bear')}
+                                        Top Losers
+                                    </h4>
+                                    <div className="space-y-2">
+                                        {watchlistTickers
+                                            .map(ticker => ({
+                                                ticker,
+                                                change: stockData[ticker]?.dp || stockData[ticker]?.changePercent || 0,
+                                                price: stockData[ticker]?.c || stockData[ticker]?.price || 0
+                                            }))
+                                            .filter(item => item.change < 0)
+                                            .sort((a, b) => a.change - b.change)
+                                            .slice(0, 5)
+                                            .map((item, idx) => (
+                                                <div
+                                                    key={item.ticker}
+                                                    className={`flex items-start justify-between p-2 rounded cursor-pointer transition-all hover:scale-[1.02] ${isDarkMode ? 'hover:bg-red-500/20' : 'hover:bg-red-100'
+                                                        }`}
+                                                    onClick={() => {
+                                                        setSelectedStock(item.ticker);
+                                                        setActiveTab('intellistocks');
+                                                    }}
+                                                >
+                                                    <div className="flex-1 min-w-0 pr-2">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${isDarkMode ? 'bg-red-500/30 text-red-300' : 'bg-red-100 text-red-700'
+                                                                }`}>
+                                                                {idx + 1}
+                                                            </div>
+                                                            <img
+                                                                src={getCompanyLogo(item.ticker)}
+                                                                alt={item.ticker}
+                                                                className="w-6 h-6 rounded flex-shrink-0"
+                                                                onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }}
+                                                            />
+                                                            <span className={`font-mono font-bold text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'} flex-shrink-0`}>
+                                                                {item.ticker}
+                                                            </span>
+                                                            <div className="text-red-500 font-bold text-sm ml-auto flex-shrink-0">
+                                                                {item.change.toFixed(2)}% ↓
+                                                            </div>
+                                                            <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} flex-shrink-0`}>
+                                                                ${item.price.toFixed(2)}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Espace dédié pour les news avec placeholder */}
+                                                        <div className={`mt-1 ml-8 min-h-[20px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                            {(() => {
+                                                                const reason = extractMoveReason(item.ticker, item.change);
+                                                                if (reason && reason !== '') {
+                                                                    return (
+                                                                        <div className={`text-xs flex items-start gap-2 leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                            }`}>
+                                                                            {tickerMoveReasons[item.ticker]?.source === 'Finviz AI' ? (
+                                                                                <span className="inline-flex items-center gap-1.5 flex-wrap">
+                                                                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30 flex-shrink-0">
+                                                                                        AI
+                                                                                    </span>
+                                                                                    <span className="leading-relaxed break-words">{reason}</span>
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span className="inline-flex items-start gap-1.5">
+                                                                                    <span className="text-blue-400 flex-shrink-0 text-sm">📰</span>
+                                                                                    <span className="leading-relaxed break-words">{reason}</span>
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                                return (
+                                                                    <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                                                                        Chargement des explications...
+                                                                    </div>
+                                                                );
+                                                            })()}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    ) : (
-                        <div className={`backdrop-blur-sm rounded-lg p-8 border transition-colors duration-300 ${isDarkMode
-                            ? 'bg-gray-900 border-gray-700'
-                            : 'bg-gray-50 border-gray-200'
-                            } text-center`}>
-                            <div className="text-6xl mb-4">👀</div>
-                            <h3 className={`text-xl font-semibold mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>Watchlist Vide</h3>
-                            <p className={`transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                    )}
+
+                    {/* ANALYSES & OPINIONS D'ANALYSTES */}
+                    {watchlistTickers.length > 0 && Object.keys(stockData).length > 0 && (
+                        <div className={`mt-6 p-6 rounded-xl transition-colors duration-300 ${isDarkMode
+                            ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
+                            : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
+                            }`}>
+                            <h3 className={`text-xl font-bold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                <LucideIcon name="Target" className="w-6 h-6 text-indigo-500" />
+                                Analyses & Opinions d'Analystes
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {watchlistTickers
+                                    .map(ticker => {
+                                        const finnhubData = stockData[ticker];
+                                        const recommendation = finnhubData?.recommendation?.[0];
+
+                                        if (!recommendation) return null;
+
+                                        const totalAnalysts = (recommendation.buy || 0) +
+                                            (recommendation.hold || 0) +
+                                            (recommendation.sell || 0) +
+                                            (recommendation.strongBuy || 0) +
+                                            (recommendation.strongSell || 0);
+
+                                        if (totalAnalysts === 0) return null;
+
+                                        const buyScore = (recommendation.strongBuy || 0) * 2 + (recommendation.buy || 0);
+                                        const sellScore = (recommendation.strongSell || 0) * 2 + (recommendation.sell || 0);
+                                        const holdScore = recommendation.hold || 0;
+
+                                        let consensus = 'Hold';
+                                        let consensusColor = 'yellow';
+                                        if (buyScore > sellScore && buyScore > holdScore) {
+                                            consensus = 'Buy';
+                                            consensusColor = 'green';
+                                        } else if (sellScore > buyScore && sellScore > holdScore) {
+                                            consensus = 'Sell';
+                                            consensusColor = 'red';
+                                        }
+
+                                        return {
+                                            ticker,
+                                            totalAnalysts,
+                                            consensus,
+                                            consensusColor,
+                                            buyScore,
+                                            sellScore,
+                                            holdScore,
+                                            recommendation
+                                        };
+                                    })
+                                    .filter(item => item !== null)
+                                    .sort((a, b) => b.totalAnalysts - a.totalAnalysts)
+                                    .slice(0, 6)
+                                    .map((item) => (
+                                        <div
+                                            key={item.ticker}
+                                            className={`p-4 rounded-lg cursor-pointer transition-all hover:scale-[1.02] ${isDarkMode
+                                                ? 'bg-gray-700/50 hover:bg-gray-700/70 border border-gray-600'
+                                                : 'bg-white hover:bg-gray-50 border border-gray-200'
+                                                }`}
+                                            onClick={() => {
+                                                setSelectedStock(item.ticker);
+                                                setActiveTab('intellistocks');
+                                            }}
+                                        >
+                                            <div className="flex items-center justify-between mb-3">
+                                                <div className="flex items-center gap-2">
+                                                    <img
+                                                        src={getCompanyLogo(item.ticker)}
+                                                        alt={item.ticker}
+                                                        className="w-8 h-8 rounded"
+                                                        onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }}
+                                                    />
+                                                    <span className={`font-mono font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                        {item.ticker}
+                                                    </span>
+                                                </div>
+                                                <div className={`px-3 py-1 rounded-full text-xs font-bold ${item.consensusColor === 'green'
+                                                    ? 'bg-green-500/20 text-green-500 border border-green-500/30'
+                                                    : item.consensusColor === 'red'
+                                                        ? 'bg-red-500/20 text-red-500 border border-red-500/30'
+                                                        : 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30'
+                                                    }`}>
+                                                    {item.consensus === 'Buy' ? 'ACHAT' : item.consensus === 'Sell' ? 'VENTE' : 'CONSERVER'}
+                                                </div>
+                                            </div>
+
+                                            <div className={`text-sm mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                                                {item.totalAnalysts} analyste{item.totalAnalysts > 1 ? 's' : ''}
+                                            </div>
+
+                                            <div className="space-y-1.5">
+                                                {item.recommendation.strongBuy > 0 && (
+                                                    <div className="flex items-center justify-between text-xs">
+                                                        <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Strong Buy</span>
+                                                        <span className="font-bold text-green-500">{item.recommendation.strongBuy}</span>
+                                                    </div>
+                                                )}
+                                                {item.recommendation.buy > 0 && (
+                                                    <div className="flex items-center justify-between text-xs">
+                                                        <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Buy</span>
+                                                        <span className="font-bold text-green-400">{item.recommendation.buy}</span>
+                                                    </div>
+                                                )}
+                                                {item.recommendation.hold > 0 && (
+                                                    <div className="flex items-center justify-between text-xs">
+                                                        <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Hold</span>
+                                                        <span className="font-bold text-yellow-500">{item.recommendation.hold}</span>
+                                                    </div>
+                                                )}
+                                                {item.recommendation.sell > 0 && (
+                                                    <div className="flex items-center justify-between text-xs">
+                                                        <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Sell</span>
+                                                        <span className="font-bold text-red-400">{item.recommendation.sell}</span>
+                                                    </div>
+                                                )}
+                                                {item.recommendation.strongSell > 0 && (
+                                                    <div className="flex items-center justify-between text-xs">
+                                                        <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Strong Sell</span>
+                                                        <span className="font-bold text-red-500">{item.recommendation.strongSell}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className={`mt-3 pt-3 border-t ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
+                                                <div className="flex items-center gap-2">
+                                                    <LucideIcon name="ArrowUpRight" className="w-3 h-3 text-gray-400" />
+                                                    <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                        Cliquer pour analyse complète
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                            </div>
+
+                            {watchlistTickers.filter(ticker => {
+                                const finnhubData = stockData[ticker];
+                                const recommendation = finnhubData?.recommendation?.[0];
+                                return recommendation && (
+                                    (recommendation.buy || 0) +
+                                    (recommendation.hold || 0) +
+                                    (recommendation.sell || 0) +
+                                    (recommendation.strongBuy || 0) +
+                                    (recommendation.strongSell || 0)
+                                ) > 0;
+                            }).length === 0 && (
+                                    <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        <LucideIcon name="AlertCircle" className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                                        <p>Aucune recommandation d'analyste disponible pour le moment</p>
+                                        <p className="text-sm mt-2">Les données seront chargées lors de la prochaine actualisation</p>
+                                    </div>
+                                )}
+                        </div>
+                    )}
+
+                    {/* Vue LIST - Compacte */}
+                    {watchlistTickers.length > 0 && (
+                        <div className="mt-8">
+                            <div className={`backdrop-blur-sm rounded-2xl p-8 border-2 shadow-2xl transition-colors duration-300 ${isDarkMode
+                                ? 'bg-gradient-to-br from-gray-800/90 to-gray-900/90 border-blue-500/30 shadow-blue-500/10'
+                                : 'bg-gradient-to-br from-white/95 to-gray-50/95 border-blue-400/40 shadow-blue-400/10'
                                 }`}>
-                                Ajoutez des tickers pour commencer à suivre vos investissements personnalisés
-                            </p>
+                                <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>📊 Titres - Vue Liste</h2>
+
+                                {watchlistTickers.length === 0 ? (
+                                    <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        <p className="text-lg font-semibold mb-2">Aucun titre disponible</p>
+                                        <p className="text-sm">Les données sont en cours de chargement...</p>
+                                    </div>
+                                ) : Object.keys(stockData).length === 0 ? (
+                                    <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        <p className="text-lg font-semibold mb-2">Chargement des données de marché...</p>
+                                        <p className="text-sm">Veuillez patienter quelques instants</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {watchlistTickers.map((ticker) => {
+                                            const data = stockData[ticker] || {};
+                                            const price = data.c || data.price || 0;
+                                            const change = data.d || data.change || 0;
+                                            const changePercent = data.dp || data.changePercent || 0;
+                                            const isPositive = changePercent >= 0;
+
+                                            return (
+                                                <div
+                                                    key={ticker}
+                                                    className={`flex items-start justify-between p-4 rounded-xl cursor-pointer transition-all hover:scale-[1.01] ${isDarkMode
+                                                        ? 'bg-gray-700/50 hover:bg-gray-700/70 border border-gray-600'
+                                                        : 'bg-white hover:bg-gray-50 border border-gray-200'
+                                                        }`}
+                                                    onClick={() => {
+                                                        setSelectedStock(ticker);
+                                                        setActiveTab('intellistocks');
+                                                    }}
+                                                >
+                                                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                                                        <img
+                                                            src={getCompanyLogo(ticker)}
+                                                            alt={ticker}
+                                                            className="w-12 h-12 rounded-lg flex-shrink-0"
+                                                            onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }}
+                                                        />
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className={`font-mono font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                                {ticker}
+                                                            </div>
+                                                            <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                                {companyNames[ticker] || ticker}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Nouvelles à droite */}
+                                                    <div className="flex-shrink-0 ml-4 mr-4">
+                                                        <TickerNewsList ticker={ticker} maxItems={5} />
+                                                    </div>
+
+                                                    <div className="text-right flex-shrink-0">
+                                                        <div className={`font-bold text-xl ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                            ${price.toFixed(2)}
+                                                        </div>
+                                                        <div className={`font-semibold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                                                            {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>
