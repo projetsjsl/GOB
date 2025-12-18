@@ -26,6 +26,10 @@
         // Row Level Security (RLS) protects the data, not this key
         SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJveXV4Z2RwbGJwa2tucGx4YnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzMzU5MTQsImV4cCI6MjA3NTkxMTkxNH0.-M-QdpBFlDtg1CeA00VepQCNzGzvU-tISyVA0yCLBdw',
         
+        // API Keys (Designated as public for these specific frontend apps)
+        GEMINI_API_KEY: 'AIzaSyCQxlKZCgsjAytjEYz2EyKYhacPSJdGaVY',
+        TAVUS_API_KEY: '28eb5b8a711a4abd9c82e77a7279f9ca',
+        
         // API endpoints
         EMMA_API_ENDPOINT: '/api/emma-agent',
         

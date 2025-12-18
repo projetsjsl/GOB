@@ -289,22 +289,22 @@ const performDeepAnalysis = async (symbol: string, question: string, lang: 'fr-C
       model: 'gemini-3-pro-preview',
       contents: prompt,
       config: {
-        thinkingConfig: { thinkingBudget: 32768 }, // Max thinking budget
+        thinkingConfig: { thinkingBudget: 65536 }, // Enhanced thinking budget for G3
       }
     });
     return response.text || (lang === 'fr-CA' ? "Analyse terminée." : "Analysis complete.");
   } catch (error) {
     console.warn("Deep analysis (Pro) failed, falling back to Flash...", error);
     try {
-      // Attempt 2: Gemini 2.5 Flash (Fallback - Standard)
+      // Attempt 2: Gemini 3 Flash (Fallback - Standard)
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3-flash-preview',
         contents: prompt,
-        // No thinking config for Flash standard
+        // No thinking config for Flash standard unless specified
       });
       const note = lang === 'fr-CA'
-        ? "\n\n*(Note: Généré avec le modèle de secours Gemini 2.5 Flash)*"
-        : "\n\n*(Note: Generated with fallback model Gemini 2.5 Flash)*";
+        ? "\n\n*(Note: Généré avec le modèle de secours Gemini 3 Flash)*"
+        : "\n\n*(Note: Generated with fallback model Gemini 3 Flash)*";
       return (response.text || (lang === 'fr-CA' ? "Analyse terminée." : "Analysis complete.")) + note;
     } catch (fallbackError) {
       console.error("Deep analysis fallback failed", fallbackError);
@@ -397,13 +397,15 @@ export const useGeminiLive = () => {
         }
       });
       audioStreamRef.current = stream;
+      const apiKey = process.env.API_KEY || (window as any).ENV_CONFIG?.GEMINI_API_KEY;
+      if (!apiKey) throw new Error("Clé API Gemini manquante.");
 
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+      const ai = new GoogleGenAI({ apiKey });
 
       const responseModalities = isTtsEnabled ? [Modality.AUDIO] : [Modality.TEXT];
 
       const sessionPromise = ai.live.connect({
-        model: 'gemini-2.5-flash-native-audio-preview-09-2025',
+        model: 'gemini-2.5-flash-native-audio-preview-12-2025',
         config: {
           responseModalities: responseModalities,
           speechConfig: isTtsEnabled ? {

@@ -141,7 +141,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
     };
 
     const callGemini = async (prompt) => {
-        const apiKey = config.gemini?.apiKey;
+        const apiKey = config.gemini?.apiKey || (window.ENV_CONFIG?.GEMINI_API_KEY);
 
         if (!apiKey || apiKey === 'YOUR_GEMINI_API_KEY') {
             // Mock response if no key
@@ -150,7 +150,8 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
         }
 
         try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${config.gemini.model || 'gemini-pro'}:generateContent?key=${apiKey}`, {
+            const model = config.gemini?.model || 'gemini-3-flash-preview';
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -197,7 +198,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
      */
     const connectTavus = async () => {
         const tavusConfig = config.tavus || {};
-        const apiKey = tavusConfig.apiKey;
+        const apiKey = tavusConfig.apiKey || (window.ENV_CONFIG?.TAVUS_API_KEY);
 
         if (!apiKey || apiKey === 'YOUR_TAVUS_API_KEY') {
             alert('Veuillez configurer votre clé API Tavus dans emma-config.js');
@@ -318,7 +319,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
                         </div>
                         <div>
                             <h3 className={`font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>JSL Assistant</h3>
-                            <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Propulsé par Gemini 2.0</p>
+                            <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Propulsé par Gemini 3 Flash</p>
                         </div>
                     </div>
                     <button

@@ -7,36 +7,36 @@ import { BrainCircuit, TrendingUp, Globe, Building2, Scale, FileText, Activity, 
 export const AVAILABLE_MODELS = [
     // Gemini Models
     {
-        id: 'gemini-2.5-flash',
-        name: 'Gemini 2.5 Flash',
+        id: 'gemini-3-flash-preview',
+        name: 'Gemini 3 Flash',
         type: 'directional',
         provider: 'gemini',
         capabilities: ['Text', 'Image', 'Fast'],
-        description: 'Le modèle le plus rapide et économique. Idéal pour les tâches simples et le chat rapide.'
+        description: 'Le tout nouveau modèle default de Google. Ultra-rapide et multimodal.'
     },
     {
-        id: 'gemini-2.0-pro-exp-02-05',
-        name: 'Gemini 2.0 Pro',
+        id: 'gemini-3-pro-preview',
+        name: 'Gemini 3 Pro',
         type: 'directional',
         provider: 'gemini',
         capabilities: ['Reasoning', 'Complex Context', 'Code'],
-        description: 'Modèle de raisonnement avancé. Parfait pour l\'analyse financière profonde et la rédaction.'
+        description: 'Modèle de raisonnement de pointe. Parfait pour l\'analyse financière profonde.'
     },
     {
-        id: 'gemini-2.5-flash-thinking',
-        name: 'Gemini 2.5 Thinking',
+        id: 'gemini-3-flash-preview', // Gemini 3 doesn't have native audio live yet, so we use it for text-based directional logic
+        name: 'Gemini 3 Logic',
         type: 'directional',
         provider: 'gemini',
-        capabilities: ['Deep Reasoning', 'Chain of Thought'],
-        description: 'Modèle expérimental qui "réfléchit" avant de répondre. Idéal pour les cas complexes.'
+        capabilities: ['Reasoning', 'Chain of Thought'],
+        description: 'Modèle de raisonnement expérimental ultra rapide.'
     },
     {
-        id: 'gemini-2.5-flash-native-audio-preview-09-2025',
+        id: 'gemini-2.5-flash-native-audio-preview-12-2025',
         name: 'Gemini Live (Audio Native)',
         type: 'bidirectional',
         provider: 'gemini',
         capabilities: ['Realtime Audio', 'Interruption', 'Low Latency'],
-        description: 'Le moteur exclusif pour les avatars vocaux. Latence ultra-faible.'
+        description: 'Moteur Gemini 2.5 Live pour les avatars vocaux. Latence ultra-faible.'
     },
     // Perplexity Models
     {
@@ -102,14 +102,14 @@ export const AVAILABLE_MODELS = [
 // Default model configs per mode (can be overridden via emma-config)
 export const DEFAULT_MODE_CONFIGS = {
     researcher: { modelId: 'sonar-pro', googleSearch: true },
-    writer: { modelId: 'gemini-2.0-pro-exp-02-05', googleSearch: false },
+    writer: { modelId: 'gemini-3-pro-preview', googleSearch: false },
     critic: { modelId: 'claude-3-5-sonnet-20241022', googleSearch: true },
-    technical: { modelId: 'gemini-2.5-flash', googleSearch: false }
+    technical: { modelId: 'gemini-3-flash-preview', googleSearch: false }
 };
 
-export const MODEL_FLASH = 'gemini-2.5-flash-native-audio-preview-09-2025'; 
-export const MODEL_TEXT_DEFAULT = 'gemini-2.5-flash'; 
-export const MODEL_PRO = 'gemini-2.0-pro-exp-02-05';
+export const MODEL_FLASH = 'gemini-2.5-flash-native-audio-preview-12-2025'; 
+export const MODEL_TEXT_DEFAULT = 'gemini-3-flash-preview'; 
+export const MODEL_PRO = 'gemini-3-pro-preview';
 
 
 export const DEFAULT_INTEGRATION_CONFIG = {

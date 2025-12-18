@@ -62,9 +62,10 @@ const App: React.FC = () => {
     setVoiceName(voiceId);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+      const apiKey = process.env.API_KEY || (window as any).ENV_CONFIG?.GEMINI_API_KEY;
+      const ai = new GoogleGenAI({ apiKey: apiKey as string });
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-preview-tts',
+        model: 'gemini-3-flash-preview',
         contents: {
           parts: [{ text: "Bonjour, je suis votre assistante FinVox. Je suis prête à analyser les marchés pour vous." }]
         },

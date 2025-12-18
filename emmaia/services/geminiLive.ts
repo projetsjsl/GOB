@@ -82,8 +82,8 @@ export const useGeminiLive = () => {
       setConnectionState(ConnectionState.CONNECTING);
       setError(null);
 
-      const apiKey = process.env.API_KEY;
-      if (!apiKey) throw new Error("API Key is missing in environment variables.");
+      const apiKey = process.env.API_KEY || (window as any).ENV_CONFIG?.GEMINI_API_KEY;
+      if (!apiKey) throw new Error("Clé API Gemini manquante. Veuillez la configurer dans .env ou env-config.js.");
 
       inputContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: SAMPLE_RATE_INPUT });
       outputContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: SAMPLE_RATE_OUTPUT });

@@ -29,7 +29,7 @@ import { EcosystemMap } from './components/EcosystemMap';
 import { AvatarGalleryModal } from './components/AvatarGalleryModal';
 import { PersonaSelector } from './components/PersonaSelector';
 
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Play, X, Video } from 'lucide-react';
 import { AvatarConfig, PersonalityAnalysis, ConnectionState, ContextItem, SpeakerStats, QuickAction, AppMode, SmartSuggestion, ModeConfigMap } from './types';
 import { HEYGEN_AVATAR_ID, AKOOL_AVATAR_ID, DEFAULT_SYSTEM_INSTRUCTION, MODEL_FLASH, VOICE_NAME, DEFAULT_INTEGRATION_CONFIG, PANEL_SYSTEM_INSTRUCTION, DEFAULT_QUICK_ACTIONS, DEFAULT_TAVUS_REPLICA_ID, DEFAULT_TAVUS_PERSONA_NAME, DEFAULT_TAVUS_CONTEXT, CEO_SYSTEM_INSTRUCTION_TEMPLATE, PROFESSION_PRESETS } from './constants';
 
@@ -58,7 +58,7 @@ const App: React.FC = () => {
     llmTemperature: 0.6,
     geminiVoice: VOICE_NAME,
     chatMode: 'solo',
-    heygenToken: process.env.HEYGEN_API_KEY || '',
+    heygenToken: process.env.HEYGEN_API_KEY || (window as any).ENV_CONFIG?.HEYGEN_API_KEY || '',
     heygenAvatarId: HEYGEN_AVATAR_ID,
     heygenQuality: 'medium',
     heygenEmotion: 'Friendly',
@@ -87,6 +87,7 @@ const App: React.FC = () => {
 
   const [ceoPrompt, setCeoPrompt] = useState<string | null>(null);
   const [customImages, setCustomImages] = useState<Record<string, string>>({});
+  const [showIntroVideo, setShowIntroVideo] = useState(false);
 
   // Load configs on mount
   useEffect(() => {
@@ -291,6 +292,14 @@ const App: React.FC = () => {
                 <div className="absolute top-0 left-0 right-0 p-6 z-20 flex justify-between items-start pointer-events-none">
                     <div className="pointer-events-auto flex items-center gap-4">
                         <button onClick={handleBackToMenu} className="text-xs bg-slate-800/80 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded-lg border border-white/10 backdrop-blur transition-colors">← Menu</button>
+                        <button 
+                            onClick={() => setShowIntroVideo(true)} 
+                            className="group flex items-center gap-2 text-xs bg-blue-600/80 hover:bg-blue-500 text-white px-4 py-1.5 rounded-lg border border-white/20 backdrop-blur transition-all shadow-lg hover:shadow-blue-500/20 active:scale-95"
+                            title="Voir la vidéo de présentation Emma IA"
+                        >
+                            <Video className="w-3.5 h-3.5" /> 
+                            <span>Présentation</span>
+                        </button>
                     </div>
                     <div className="flex flex-col items-end gap-2 pointer-events-auto">
                         <StatusBadge state={gemini.connectionState} temperature={avatarConfig.llmTemperature} latencyMs={24} isSpeaking={gemini.volume > 10} />
@@ -346,6 +355,37 @@ const App: React.FC = () => {
       {showMap && <EcosystemMap onClose={() => setShowMap(false)} />}
       {showGallery && <AvatarGalleryModal onClose={() => setShowGallery(false)} onSelect={(section, url) => setCustomImages({...customImages, [section]: url})} />}
       {showEmailModal && <EmailInputModal onClose={() => setShowEmailModal(false)} onProcess={(text) => { setShowEmailModal(false); gemini.sendText(`[ANALYSE CE COURRIEL]: ${text}`); }} />}
+
+      {showIntroVideo && (
+          <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4">
+              <div className="relative w-full max-w-4xl aspect-video bg-slate-900 rounded-3xl overflow-hidden shadow-[0_0_100px_rgba(37,99,235,0.2)] border border-white/10 animate-in zoom-in-95 duration-300">
+                  <div className="absolute top-0 left-0 right-0 p-4 z-20 flex justify-between items-center pointer-events-none">
+                      <div className="bg-black/40 backdrop-blur px-4 py-1.5 rounded-full border border-white/10 flex items-center gap-2">
+                          <Video className="w-4 h-4 text-blue-400" />
+                          <span className="text-xs font-bold text-white tracking-widest uppercase">Emma IA Presentation</span>
+                      </div>
+                      <button 
+                          onClick={() => setShowIntroVideo(false)}
+                          className="pointer-events-auto p-2 bg-black/50 hover:bg-red-500 text-white rounded-full transition-all border border-white/10 group active:scale-90"
+                          title="Fermer la vidéo"
+                          aria-label="Fermer"
+                      >
+                          <X className="w-6 h-6 group-hover:rotate-90 transition-transform" />
+                      </button>
+                  </div>
+                  <iframe 
+                      width="100%" 
+                      height="100%" 
+                      src="https://app.heygen.com/embedded-player/5738e23b0cd747b7b934ca31546b9e41" 
+                      title="HeyGen video player" 
+                      frameBorder="0" 
+                      allow="encrypted-media; fullscreen;" 
+                      allowFullScreen
+                      className="w-full h-full"
+                  ></iframe>
+              </div>
+          </div>
+      )}
 
       {renderMode()}
     </>
