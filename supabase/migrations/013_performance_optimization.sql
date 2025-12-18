@@ -140,10 +140,8 @@ CREATE POLICY "Allow users to view their own invitations" ON public.sms_invitati
 -- But we'll do this carefully after verifying query patterns
 
 -- For now, we'll keep all indexes but add comments for future cleanup
-COMMENT ON INDEX IF EXISTS idx_sms_invitations_sent_by IS 'Potentially unused - monitor usage';
-COMMENT ON INDEX IF EXISTS idx_sms_invitations_status IS 'Potentially unused - monitor usage';
-COMMENT ON INDEX IF EXISTS idx_sms_invitations_sent_at IS 'Potentially unused - monitor usage';
-COMMENT ON INDEX IF EXISTS idx_sms_invitations_twilio_sid IS 'Potentially unused - monitor usage';
+-- Note: COMMENT ON INDEX doesn't support IF EXISTS, so we'll skip these comments
+-- These indexes are potentially unused but we'll monitor their usage before removing them
 
 -- ============================================
 -- 5. ADD STATISTICS FOR QUERY OPTIMIZATION
