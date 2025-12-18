@@ -5275,23 +5275,42 @@ STRUCTURE JSON OBLIGATOIRE:
                             const json = await res.json();
                             const tickers = Array.isArray(json.tickers) ? json.tickers : [];
                             console.log('✅ Watchlist chargée depuis Supabase:', tickers);
-                            setWatchlistTickers(tickers);
-                            localStorage.setItem('dans-watchlist', JSON.stringify(tickers));
-                            loadWatchlistData(tickers);
+                            console.log('📊 Nombre de tickers:', tickers.length);
+                            if (tickers.length > 0) {
+                                setWatchlistTickers(tickers);
+                                localStorage.setItem('dans-watchlist', JSON.stringify(tickers));
+                                await loadWatchlistData(tickers);
+                                console.log('✅ Données chargées pour', tickers.length, 'tickers');
+                            } else {
+                                console.warn('⚠️ Aucun ticker trouvé dans Supabase');
+                            }
                             setWatchlistLoaded(true);
                             return;
+                        } else {
+                            console.warn('⚠️ Erreur HTTP lors du chargement depuis Supabase:', res.status);
                         }
                     } catch (e) {
+                        console.error('❌ Erreur lors du chargement depuis Supabase:', e);
                         console.log('⚠️ Supabase non disponible, utilisation du localStorage');
                     }
 
                     // Fallback: charger depuis localStorage
                     const savedWatchlist = localStorage.getItem('dans-watchlist');
                     if (savedWatchlist) {
-                        const tickers = JSON.parse(savedWatchlist);
-                        console.log('📦 Watchlist chargée depuis localStorage:', tickers);
-                        setWatchlistTickers(tickers);
-                        loadWatchlistData(tickers);
+                        try {
+                            const tickers = JSON.parse(savedWatchlist);
+                            console.log('📦 Watchlist chargée depuis localStorage:', tickers);
+                            console.log('📊 Nombre de tickers:', tickers.length);
+                            if (tickers.length > 0) {
+                                setWatchlistTickers(tickers);
+                                await loadWatchlistData(tickers);
+                                console.log('✅ Données chargées pour', tickers.length, 'tickers');
+                            }
+                        } catch (e) {
+                            console.error('❌ Erreur lors du parsing du localStorage:', e);
+                        }
+                    } else {
+                        console.warn('⚠️ Aucune watchlist trouvée dans localStorage');
                     }
                     setWatchlistLoaded(true);
                 };
@@ -5539,7 +5558,9 @@ STRUCTURE JSON OBLIGATOIRE:
 
             // Récupérer les données depuis window.BetaCombinedDashboard pour les sections Top Movers, Analyses et Vue Liste
             const dashboard = typeof window !== 'undefined' ? (window.BetaCombinedDashboard || {}) : {};
-            const stockData = dashboard.stockData || watchlistStockData || {};
+            // Fusionner stockData global et watchlistStockData pour afficher tous les tickers
+            const globalStockData = dashboard.stockData || {};
+            const stockData = { ...globalStockData, ...watchlistStockData };
             const tickers = watchlistTickers; // Utiliser watchlistTickers pour les sections
             const tickerMoveReasons = dashboard.tickerMoveReasons || {};
             const companyNames = (window.DASHBOARD_CONSTANTS && window.DASHBOARD_CONSTANTS.companyNames) || {};
@@ -6082,22 +6103,24 @@ STRUCTURE JSON OBLIGATOIRE:
 
                                 {watchlistTickers.length === 0 ? (
                                     <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        <p className="text-lg font-semibold mb-2">Aucun titre disponible</p>
-                                        <p className="text-sm">Les données sont en cours de chargement...</p>
-                                    </div>
-                                ) : Object.keys(stockData).length === 0 ? (
-                                    <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        <p className="text-lg font-semibold mb-2">Chargement des données de marché...</p>
-                                        <p className="text-sm">Veuillez patienter quelques instants</p>
+                                        <p className="text-lg font-semibold mb-2">Aucun titre dans la watchlist</p>
+                                        <p className="text-sm">Utilisez le formulaire ci-dessus pour ajouter des tickers à votre watchlist</p>
                                     </div>
                                 ) : (
                                     <div className="space-y-3">
                                         {watchlistTickers.map((ticker) => {
-                                            const data = stockData[ticker] || {};
+                                            // Prioriser watchlistStockData, puis stockData global
+                                            const watchlistData = watchlistStockData[ticker] || {};
+                                            const globalData = globalStockData[ticker] || {};
+                                            const data = { ...globalData, ...watchlistData };
+                                            
                                             const price = data.c || data.price || 0;
                                             const change = data.d || data.change || 0;
                                             const changePercent = data.dp || data.changePercent || 0;
                                             const isPositive = changePercent >= 0;
+                                            
+                                            // Afficher un état de chargement si les données ne sont pas encore disponibles
+                                            const isLoading = !data.timestamp && watchlistLoading;
 
                                             return (
                                                 <div
@@ -6134,12 +6157,24 @@ STRUCTURE JSON OBLIGATOIRE:
                                                     </div>
 
                                                     <div className="text-right flex-shrink-0">
-                                                        <div className={`font-bold text-xl ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                            ${price.toFixed(2)}
-                                                        </div>
-                                                        <div className={`font-semibold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
-                                                            {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
-                                                        </div>
+                                                        {isLoading ? (
+                                                            <div className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                                                Chargement...
+                                                            </div>
+                                                        ) : price > 0 ? (
+                                                            <>
+                                                                <div className={`font-bold text-xl ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                                    ${price.toFixed(2)}
+                                                                </div>
+                                                                <div className={`font-semibold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                                                                    {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
+                                                                </div>
+                                                            </>
+                                                        ) : (
+                                                            <div className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                                                Données indisponibles
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             );
