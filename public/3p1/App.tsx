@@ -1530,7 +1530,13 @@ export default function App() {
                     mergedDataYears: mergedData.map(d => d.year),
                     lastYearEPS: mergedData[mergedData.length - 1]?.earningsPerShare,
                     lastYearCF: mergedData[mergedData.length - 1]?.cashFlowPerShare,
-                    lastYearBV: mergedData[mergedData.length - 1]?.bookValuePerShare
+                    lastYearBV: mergedData[mergedData.length - 1]?.bookValuePerShare,
+                    allMergedData: mergedData.map(d => ({
+                        year: d.year,
+                        eps: d.earningsPerShare,
+                        cf: d.cashFlowPerShare,
+                        bv: d.bookValuePerShare
+                    }))
                 });
                 
                 setData(mergedData);
@@ -1622,16 +1628,32 @@ export default function App() {
                 assumptions // Préserver les valeurs existantes (excludeEPS, excludeCF, etc.)
             );
 
-            setAssumptions(prev => ({
-                ...prev,
-                ...autoFilledAssumptions // Mettre à jour avec les nouvelles valeurs calculées
-            }));
-
-            console.log('✅ Auto-filled assumptions in performSync:', {
+            console.log('✅ Auto-filled assumptions in performSync (AVANT setAssumptions):', {
                 growthEPS: autoFilledAssumptions.growthRateEPS,
+                growthCF: autoFilledAssumptions.growthRateCF,
+                growthBV: autoFilledAssumptions.growthRateBV,
+                growthDiv: autoFilledAssumptions.growthRateDiv,
                 targetPE: autoFilledAssumptions.targetPE,
                 targetPCF: autoFilledAssumptions.targetPCF,
-                targetPBV: autoFilledAssumptions.targetPBV
+                targetPBV: autoFilledAssumptions.targetPBV,
+                baseYear: autoFilledAssumptions.baseYear,
+                currentPrice: autoFilledAssumptions.currentPrice,
+                allAutoFilled: autoFilledAssumptions
+            });
+
+            setAssumptions(prev => {
+                const updated = {
+                    ...prev,
+                    ...autoFilledAssumptions // Mettre à jour avec les nouvelles valeurs calculées
+                };
+                console.log('✅ setAssumptions: Assumptions mises à jour', {
+                    prevGrowthEPS: prev.growthRateEPS,
+                    newGrowthEPS: updated.growthRateEPS,
+                    prevTargetPE: prev.targetPE,
+                    newTargetPE: updated.targetPE,
+                    allUpdated: updated
+                });
+                return updated;
             });
 
             // Détecter et exclure automatiquement les métriques avec prix cibles aberrants

@@ -53055,7 +53055,13 @@ Vérifiez votre connexion et réessayez.`,
           mergedDataYears: mergedData.map((d) => d.year),
           lastYearEPS: (_a4 = mergedData[mergedData.length - 1]) == null ? void 0 : _a4.earningsPerShare,
           lastYearCF: (_b3 = mergedData[mergedData.length - 1]) == null ? void 0 : _b3.cashFlowPerShare,
-          lastYearBV: (_c = mergedData[mergedData.length - 1]) == null ? void 0 : _c.bookValuePerShare
+          lastYearBV: (_c = mergedData[mergedData.length - 1]) == null ? void 0 : _c.bookValuePerShare,
+          allMergedData: mergedData.map((d) => ({
+            year: d.year,
+            eps: d.earningsPerShare,
+            cf: d.cashFlowPerShare,
+            bv: d.bookValuePerShare
+          }))
         });
         setData(mergedData);
       } else {
@@ -53126,16 +53132,32 @@ Vérifiez votre connexion et réessayez.`,
         assumptions
         // Préserver les valeurs existantes (excludeEPS, excludeCF, etc.)
       );
-      setAssumptions((prev) => ({
-        ...prev,
-        ...autoFilledAssumptions
-        // Mettre à jour avec les nouvelles valeurs calculées
-      }));
-      console.log("✅ Auto-filled assumptions in performSync:", {
+      console.log("✅ Auto-filled assumptions in performSync (AVANT setAssumptions):", {
         growthEPS: autoFilledAssumptions.growthRateEPS,
+        growthCF: autoFilledAssumptions.growthRateCF,
+        growthBV: autoFilledAssumptions.growthRateBV,
+        growthDiv: autoFilledAssumptions.growthRateDiv,
         targetPE: autoFilledAssumptions.targetPE,
         targetPCF: autoFilledAssumptions.targetPCF,
-        targetPBV: autoFilledAssumptions.targetPBV
+        targetPBV: autoFilledAssumptions.targetPBV,
+        baseYear: autoFilledAssumptions.baseYear,
+        currentPrice: autoFilledAssumptions.currentPrice,
+        allAutoFilled: autoFilledAssumptions
+      });
+      setAssumptions((prev) => {
+        const updated = {
+          ...prev,
+          ...autoFilledAssumptions
+          // Mettre à jour avec les nouvelles valeurs calculées
+        };
+        console.log("✅ setAssumptions: Assumptions mises à jour", {
+          prevGrowthEPS: prev.growthRateEPS,
+          newGrowthEPS: updated.growthRateEPS,
+          prevTargetPE: prev.targetPE,
+          newTargetPE: updated.targetPE,
+          allUpdated: updated
+        });
+        return updated;
       });
       const finalData = mergedData.length > 0 ? mergedData : result.data;
       const finalAssumptions = {
