@@ -65,7 +65,7 @@
         "endpoint": "/api/fmp?endpoint=profile&symbol={ticker}",
         "api_key_env": "FMP_API_KEY"
       },
-      "fallback_tools": ["alpha-vantage-ratios"],
+      "fallback_tools": [],
       "usage_context": ["fundamentals", "company", "profile", "fundamentaux", "entreprise"],
       "keywords": ["fundamentals", "company", "profile", "fundamentaux", "entreprise", "financials", "financier"]
     },
@@ -88,7 +88,7 @@
         "endpoint": "/api/fmp?endpoint=ratios&symbol={ticker}",
         "api_key_env": "FMP_API_KEY"
       },
-      "fallback_tools": ["alpha-vantage-ratios"],
+      "fallback_tools": [],
       "usage_context": ["ratios", "financial", "metrics", "ratios", "financier", "métriques", "valuation"],
       "keywords": ["ratios", "pe", "pb", "roe", "roa", "debt", "equity", "current ratio", "valorisation", "valuation"]
     },
@@ -216,29 +216,7 @@
       "usage_context": ["technical", "indicator", "analysis", "technique", "indicateur", "analyse"],
       "keywords": ["technical", "indicator", "analysis", "technique", "indicateur", "analyse", "rsi", "macd", "sma", "ema"]
     },
-    {
-      "id": "alpha-vantage-ratios",
-      "name": "Alpha Vantage Ratios",
-      "description": "Ratios financiers avancés via Alpha Vantage (fallback)",
-      "category": "financial_data",
-      "priority": 10,
-      "enabled": true,
-      "parameters": {
-        "ticker": {
-          "type": "string",
-          "required": true,
-          "description": "Symbole de l'action"
-        }
-      },
-      "implementation": {
-        "file": "alpha-vantage-ratios-tool.js",
-        "endpoint": "https://www.alphavantage.co/query",
-        "api_key_env": "ALPHA_VANTAGE_API_KEY"
-      },
-      "fallback_tools": ["fmp-fundamentals"],
-      "usage_context": ["ratios", "financial", "metrics", "ratios", "financier", "métriques"],
-      "keywords": ["ratios", "financial", "metrics", "ratios", "financier", "métriques", "pe", "pb", "roe", "roa"]
-    },
+
     {
       "id": "finnhub-news",
       "name": "Finnhub News",

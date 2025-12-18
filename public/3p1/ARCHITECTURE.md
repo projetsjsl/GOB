@@ -192,3 +192,4 @@ Supabase (source) → mapSourceToIsWatchlist() → isWatchlist
 - `CLAUDE.md` : Guide principal projet
 
 
+

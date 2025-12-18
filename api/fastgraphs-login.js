@@ -7,14 +7,6 @@
  * 3. Exécute les actions de login de manière fiable
  */
 
-/**
- * API Endpoint pour se connecter à FastGraphs.com via Playwright Core + Browserbase
- * 
- * Ce endpoint exécute un workflow automatisé robuste qui:
- * 1. Crée une session Browserbase
- * 2. Se connecte via Playwright (CDP)
- * 3. Exécute les actions de login de manière fiable
- */
 
 // Note: On utilise l'import dynamique pour éviter les crashs au démarrage si playwright-core a des soucis de dépendances
 // import { chromium } from 'playwright-core'; 

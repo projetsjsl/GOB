@@ -54,14 +54,7 @@ const API_KEYS_REQUIRED = {
     },
     
     // Alpha Vantage
-    'ALPHA_VANTAGE_API_KEY': {
-        endpoints: ['/api/sector', '/api/sector-index'],
-        description: 'Clé API Alpha Vantage pour données sectorielles',
-        provider: 'Alpha Vantage',
-        url: 'https://www.alphavantage.co/support/#api-key',
-        critical: false, // A un fallback avec cache
-        note: 'Quota limité (5 requêtes/min, 500/jour)'
-    },
+
     
     // Resend (Email)
     'RESEND_API_KEY': {

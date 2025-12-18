@@ -57,13 +57,8 @@ export async function fetchMarketDataBatch(tickers: string[]): Promise<MarketDat
 
   try {
     const tickersStr = tickers.join(',');
-    // Essayer d'abord /api/market-data-batch, puis /api/marketdata/batch en fallback
-    let response = await fetch(`/api/market-data-batch?tickers=${encodeURIComponent(tickersStr)}`);
-    
-    // Si 404, essayer l'autre endpoint
-    if (response.status === 404) {
-      response = await fetch(`/api/marketdata/batch?tickers=${encodeURIComponent(tickersStr)}`);
-    }
+    // Utiliser l'endpoint correct /api/marketdata/batch avec le paramètre 'symbols' attendu par le serveur
+    const response = await fetch(`/api/marketdata/batch?symbols=${encodeURIComponent(tickersStr)}&endpoints=quote`);
 
     if (!response.ok) {
       // Si les deux endpoints échouent, retourner un résultat vide plutôt que d'échouer

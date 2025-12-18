@@ -191,3 +191,4 @@ Ces temps sont **normaux et attendus** pour des fichiers de cette taille et comp
 **Recommandation**: Accepter ces temps ou prioriser la modularisation pour réduire la complexité.
 
 
+

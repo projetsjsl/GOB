@@ -4105,6 +4105,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             console.log(`[${timestamp}] ${message}`);
         };
 
+        const clearScrapingLogs = () => {
+            setScrapingLogs([]);
+             addScrapingLog('🧹 Logs effacés', 'info');
+        };
+
         const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
         const scrapeTicker = async (ticker) => {

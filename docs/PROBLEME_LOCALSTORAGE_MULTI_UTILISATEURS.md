@@ -195,3 +195,4 @@ async function saveProfile(profile: AnalysisProfile) {
 Supabase doit être la source de vérité unique pour garantir la cohérence multi-utilisateurs en temps réel.
 
 
+

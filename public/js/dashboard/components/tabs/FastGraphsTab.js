@@ -63,18 +63,26 @@ const FastGraphsTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                 body: JSON.stringify(requestBody)
             });
 
-            const data = await response.json();
-
             if (!response.ok) {
-                // Afficher les infos de debug si disponibles
-                if (data.debug) {
-                    setDebugInfo(data.debug);
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    const errorData = await response.json();
+                     // Afficher les infos de debug si disponibles
+                    if (errorData.debug) {
+                        setDebugInfo(errorData.debug);
+                    }
+                    const errorMessage = errorData.error || errorData.details || 'Erreur lors de la connexion';
+                    const hint = errorData.hint ? `\n\n💡 ${errorData.hint}` : '';
+                    throw new Error(errorMessage + hint);
+                } else {
+                    const errorText = await response.text();
+                    console.error('FastGraphs API returned 500 HTML:', errorText);
+                    // Try to extract useful info/title from HTML if possible, otherwise generic error
+                    throw new Error(`Erreur serveur interne (${response.status}). Voir console pour détails.`);
                 }
-                
-                const errorMessage = data.error || data.details || 'Erreur lors de la connexion';
-                const hint = data.hint ? `\n\n💡 ${data.hint}` : '';
-                throw new Error(errorMessage + hint);
             }
+
+            const data = await response.json();
 
             if (data.success && data.session) {
                 setSessionUrl(data.session.url);
