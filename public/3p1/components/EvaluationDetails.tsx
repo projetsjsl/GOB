@@ -33,10 +33,16 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
         lastYearBV: lastData.bookValuePerShare,
         baseYear: assumptions.baseYear,
         growthRateEPS: assumptions.growthRateEPS,
-        targetPE: assumptions.targetPE
+        growthRateCF: assumptions.growthRateCF,
+        growthRateBV: assumptions.growthRateBV,
+        targetPE: assumptions.targetPE,
+        targetPCF: assumptions.targetPCF,
+        targetPBV: assumptions.targetPBV,
+        currentPrice: assumptions.currentPrice,
+        allAssumptions: assumptions
       });
     }
-  }, [data, assumptions.baseYear]);
+  }, [data, assumptions]);
 
   // États pour gérer l'affichage/réduction des intervalles de référence
   const [expandedMetrics, setExpandedMetrics] = useState<{
@@ -62,17 +68,24 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   // MÊME LOGIQUE QUE KPIDashboard pour cohérence
   // ✅ CRITIQUE : Si baseYear n'est pas défini ou n'existe pas, utiliser la dernière année avec données valides
   let baseYearData = data.find(d => d.year === assumptions.baseYear);
-  if (!baseYearData || baseYearData.earningsPerShare <= 0) {
-    // Chercher la dernière année avec EPS > 0
-    baseYearData = [...data].reverse().find(d => d.earningsPerShare > 0) || data[data.length - 1];
+  if (!baseYearData || (baseYearData.earningsPerShare <= 0 && baseYearData.cashFlowPerShare <= 0 && baseYearData.bookValuePerShare <= 0)) {
+    // Chercher la dernière année avec au moins une valeur positive
+    baseYearData = [...data].reverse().find(d => 
+      d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
+    ) || data[data.length - 1];
   }
-  const baseEPS = Math.max(baseYearData?.earningsPerShare || 0, 0);
+  
+  // ✅ CRITIQUE : Utiliser les valeurs de baseYearData, pas 0 par défaut
+  const baseEPS = baseYearData?.earningsPerShare > 0 ? baseYearData.earningsPerShare : 0;
+  const baseCF = baseYearData?.cashFlowPerShare > 0 ? baseYearData.cashFlowPerShare : 0;
+  const baseBV = baseYearData?.bookValuePerShare > 0 ? baseYearData.bookValuePerShare : 0;
+  const baseDiv = assumptions.currentDividend > 0 ? assumptions.currentDividend : 0;
 
   const baseValues = {
-    eps: Math.max(baseEPS, 0),
-    cf: Math.max(baseYearData?.cashFlowPerShare || 0, 0),
-    bv: Math.max(baseYearData?.bookValuePerShare || 0, 0),
-    div: Math.max(assumptions.currentDividend || 0, 0)
+    eps: baseEPS,
+    cf: baseCF,
+    bv: baseBV,
+    div: baseDiv
   };
 
   // ✅ DEBUG : Log pour diagnostiquer pourquoi les prix sont N/A
@@ -82,23 +95,37 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
       baseYearData,
       dataLength: data.length,
       dataYears: data.map(d => d.year),
-      baseValues
+      baseValues,
+      allDataEPS: data.map(d => ({ year: d.year, eps: d.earningsPerShare, cf: d.cashFlowPerShare, bv: d.bookValuePerShare }))
     });
   }
 
   // Projections (5 Years) - MÊME VALIDATION QUE KPIDashboard
   // ✅ CRITIQUE : Gérer undefined pour éviter les valeurs inventées (0)
   const projectFutureValueSafe = (current: number, rate: number | undefined, years: number): number | undefined => {
-    // ✅ Si le taux est undefined, retourner undefined (pas 0)
-    if (rate === undefined) return undefined;
-    // Valider les entrées - Si current est 0, retourner undefined (pas 0) pour indiquer données manquantes
-    if (current <= 0 || !isFinite(current)) return undefined;
-    if (!isFinite(rate)) return undefined;
+    // ✅ Si le taux est undefined ou null, retourner undefined (pas 0)
+    if (rate === undefined || rate === null) {
+      console.warn('⚠️ projectFutureValueSafe: rate is undefined/null', { current, rate, years });
+      return undefined;
+    }
+    // Valider les entrées - Si current est 0 ou négatif, retourner undefined (pas 0) pour indiquer données manquantes
+    if (current <= 0 || !isFinite(current)) {
+      console.warn('⚠️ projectFutureValueSafe: current is invalid', { current, rate, years });
+      return undefined;
+    }
+    if (!isFinite(rate)) {
+      console.warn('⚠️ projectFutureValueSafe: rate is not finite', { current, rate, years });
+      return undefined;
+    }
     // Limiter le taux de croissance (Configurable)
     const { min, max } = config.growth;
     const safeRate = Math.max(min, Math.min(rate, max));
     const result = current * Math.pow(1 + safeRate / 100, years);
-    return isFinite(result) && result > 0 ? result : undefined;
+    const finalResult = isFinite(result) && result > 0 ? result : undefined;
+    if (finalResult === undefined) {
+      console.warn('⚠️ projectFutureValueSafe: result is invalid', { current, rate, years, safeRate, result });
+    }
+    return finalResult;
   };
 
   // Valider et limiter les taux de croissance (Configurable)

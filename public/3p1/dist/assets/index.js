@@ -34056,10 +34056,16 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
         lastYearBV: lastData.bookValuePerShare,
         baseYear: assumptions.baseYear,
         growthRateEPS: assumptions.growthRateEPS,
-        targetPE: assumptions.targetPE
+        growthRateCF: assumptions.growthRateCF,
+        growthRateBV: assumptions.growthRateBV,
+        targetPE: assumptions.targetPE,
+        targetPCF: assumptions.targetPCF,
+        targetPBV: assumptions.targetPBV,
+        currentPrice: assumptions.currentPrice,
+        allAssumptions: assumptions
       });
     }
-  }, [data, assumptions.baseYear]);
+  }, [data, assumptions]);
   const [expandedMetrics, setExpandedMetrics] = reactExports.useState({
     eps: false,
     cf: false,
@@ -34073,15 +34079,20 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     }));
   };
   let baseYearData = data.find((d) => d.year === assumptions.baseYear);
-  if (!baseYearData || baseYearData.earningsPerShare <= 0) {
-    baseYearData = [...data].reverse().find((d) => d.earningsPerShare > 0) || data[data.length - 1];
+  if (!baseYearData || baseYearData.earningsPerShare <= 0 && baseYearData.cashFlowPerShare <= 0 && baseYearData.bookValuePerShare <= 0) {
+    baseYearData = [...data].reverse().find(
+      (d) => d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
+    ) || data[data.length - 1];
   }
-  const baseEPS = Math.max((baseYearData == null ? void 0 : baseYearData.earningsPerShare) || 0, 0);
+  const baseEPS = (baseYearData == null ? void 0 : baseYearData.earningsPerShare) > 0 ? baseYearData.earningsPerShare : 0;
+  const baseCF = (baseYearData == null ? void 0 : baseYearData.cashFlowPerShare) > 0 ? baseYearData.cashFlowPerShare : 0;
+  const baseBV = (baseYearData == null ? void 0 : baseYearData.bookValuePerShare) > 0 ? baseYearData.bookValuePerShare : 0;
+  const baseDiv = assumptions.currentDividend > 0 ? assumptions.currentDividend : 0;
   const baseValues = {
-    eps: Math.max(baseEPS, 0),
-    cf: Math.max((baseYearData == null ? void 0 : baseYearData.cashFlowPerShare) || 0, 0),
-    bv: Math.max((baseYearData == null ? void 0 : baseYearData.bookValuePerShare) || 0, 0),
-    div: Math.max(assumptions.currentDividend || 0, 0)
+    eps: baseEPS,
+    cf: baseCF,
+    bv: baseBV,
+    div: baseDiv
   };
   if (baseValues.eps === 0 && baseValues.cf === 0 && baseValues.bv === 0) {
     console.warn("⚠️ EvaluationDetails: Toutes les valeurs de base sont à 0", {
@@ -34089,17 +34100,31 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
       baseYearData,
       dataLength: data.length,
       dataYears: data.map((d) => d.year),
-      baseValues
+      baseValues,
+      allDataEPS: data.map((d) => ({ year: d.year, eps: d.earningsPerShare, cf: d.cashFlowPerShare, bv: d.bookValuePerShare }))
     });
   }
   const projectFutureValueSafe = (current, rate, years) => {
-    if (rate === void 0) return void 0;
-    if (current <= 0 || !isFinite(current)) return void 0;
-    if (!isFinite(rate)) return void 0;
+    if (rate === void 0 || rate === null) {
+      console.warn("⚠️ projectFutureValueSafe: rate is undefined/null", { current, rate, years });
+      return void 0;
+    }
+    if (current <= 0 || !isFinite(current)) {
+      console.warn("⚠️ projectFutureValueSafe: current is invalid", { current, rate, years });
+      return void 0;
+    }
+    if (!isFinite(rate)) {
+      console.warn("⚠️ projectFutureValueSafe: rate is not finite", { current, rate, years });
+      return void 0;
+    }
     const { min: min2, max: max2 } = config2.growth;
     const safeRate = Math.max(min2, Math.min(rate, max2));
     const result = current * Math.pow(1 + safeRate / 100, years);
-    return isFinite(result) && result > 0 ? result : void 0;
+    const finalResult = isFinite(result) && result > 0 ? result : void 0;
+    if (finalResult === void 0) {
+      console.warn("⚠️ projectFutureValueSafe: result is invalid", { current, rate, years, safeRate, result });
+    }
+    return finalResult;
   };
   const growthMin = config2.growth.min;
   const growthMax = config2.growth.max;
