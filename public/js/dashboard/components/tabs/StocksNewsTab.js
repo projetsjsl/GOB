@@ -345,58 +345,7 @@ const StocksNewsTab = (props) => {
                     <div ref={marketOverviewRef} style={{height: '400px'}}></div>
                 </div>
 
-                {/* Investing.com Economic Calendar */}
-                <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
-                    isDarkMode
-                        ? 'bg-gray-800/50 border-orange-500/30'
-                        : 'bg-white border-orange-400/40'
-                }`}>
-                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                        <h3 className={`text-lg font-bold transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>
-                            📅 Calendrier Économique (Investing.com)
-                        </h3>
-                        <p className={`text-sm transition-colors duration-300 ${
-                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                        }`}>
-                             Événements économiques majeurs à surveiller
-                        </p>
-                    </div>
-                    <div className="h-[500px] w-full relative">
-                        {/* Overlay to hide potential ads or header if needed, though sandbox helps */}
-                         <iframe
-                            src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&importance=1,2,3&features=datepicker,timezone,timeselector,filters&countries=6,5&calType=day&timeZone=8&lang=5&transparentBackground=1"
-                            width="100%"
-                            height="100%"
-                            frameBorder="0"
-                            allowTransparency="true"
-                            marginWidth="0"
-                            marginHeight="0"
-                            sandbox="allow-scripts allow-same-origin allow-forms"
-                            className="relative z-0"
-                            style={{ minWidth: '100%', background: 'transparent' }}
-                        />
-                    </div>
-                </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Stock Heatmap Widget */}
-                    <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
-                        isDarkMode
-                            ? 'bg-gray-800/50 border-green-500/30'
-                            : 'bg-white border-green-400/40'
-                    }`}>
-                        <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                            <h3 className={`text-lg font-bold transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>
-                                🔥 Heatmap Boursière
-                            </h3>
-                        </div>
-                        <div ref={heatmapRef} style={{height: '400px'}}></div>
-                    </div>
-
                     {/* Screener Widget */}
                     <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
                         isDarkMode
@@ -423,7 +372,7 @@ const StocksNewsTab = (props) => {
                         : 'bg-gradient-to-br from-white to-gray-50 border-2 border-gray-300 shadow-xl'
                 }`}>
                     <h3 className={`text-2xl font-bold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        <LucideIcon name="Fire" className="w-7 h-7 text-orange-500" />
+                        <LucideIcon name="Fire" className="w-7 h-7" style={{ color: 'var(--theme-text)' }} />
                         Top Movers du Jour
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -468,7 +417,6 @@ const StocksNewsTab = (props) => {
                                         <div className="relative">
                                             <LucideIcon name="TrendingUp" className="w-6 h-6" />
                                         </div>
-                                        {renderMarketBadge('bull')}
                                         <span className="drop-shadow-sm">Top Gainers</span>
                                     </h4>
                                     {/* Bull Illustration */}
@@ -634,7 +582,6 @@ const StocksNewsTab = (props) => {
                                         <div className="relative">
                                             <LucideIcon name="TrendingDown" className="w-6 h-6" />
                                         </div>
-                                        {renderMarketBadge('bear')}
                                         <span className="drop-shadow-sm">Top Losers</span>
                                     </h4>
                                     {/* Bear Illustration */}

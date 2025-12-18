@@ -2030,51 +2030,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         {message.cached && <span className="ml-2 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-bold">💾 Cache</span>}
                                                     </div>
                                                     {/* Indicateur de paramètres pour les messages d'Emma et SMS */}
-                                                    {(message.type === 'emma' || message.type === 'sms') && (
-                                                        <div className={`text-xs mt-2 px-2 py-1 rounded ${
-                                                            message.type === 'sms' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                                                        }`}>
-                                                            <div className="flex items-center gap-2 flex-wrap">
-                                                                <span className="font-medium flex items-center gap-1">
-                                                                    <Icon emoji="⚙️" size={16} />
-                                                                    Paramètres:
-                                                                </span>
-                                                                {message.model && message.model !== 'cached' && (
-                                                                    <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${
-                                                                        message.model === 'sonar-pro' ? 'bg-blue-100 text-blue-700 border border-blue-300' :
-                                                                        message.model === 'claude' ? 'bg-purple-100 text-purple-700 border border-purple-300' :
-                                                                        message.model === 'gemini' ? 'bg-green-100 text-green-700 border border-green-300' :
-                                                                        'bg-gray-200 text-gray-700'
-                                                                    }`}>
-                                                                        🤖 {message.model === 'sonar-pro' ? 'Sonar Pro' : message.model === 'claude' ? 'Claude' : message.model === 'gemini' ? 'Gemini' : message.model}
-                                                                    </span>
-                                                                )}
-                                                                {message.cached && (
-                                                                    <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700 border border-blue-300">
-                                                                        💾 Cache (instantané)
-                                                                    </span>
-                                                                )}
-                                                                <span className={`px-1.5 py-0.5 rounded text-xs ${
-                                                                    emmaTemperature <= 0.3 ? 'bg-green-100 text-green-700' :
-                                                                    emmaTemperature <= 0.5 ? 'bg-gray-700 text-gray-200' :
-                                                                    emmaTemperature <= 0.7 ? 'bg-yellow-100 text-yellow-700' :
-                                                                    'bg-green-100 text-green-700'
-                                                                }`}>
-                                                                    Temp: {emmaTemperature} ({emmaTemperature <= 0.3 ? 'Précis' : emmaTemperature <= 0.5 ? 'Équilibré' : emmaTemperature <= 0.7 ? 'Naturel' : 'Créatif'})
-                                                                </span>
-                                                                <span className={`px-1.5 py-0.5 rounded text-xs ${
-                                                                    emmaMaxTokens <= 2048 ? 'bg-purple-100 text-purple-700' :
-                                                                    emmaMaxTokens <= 4096 ? 'bg-indigo-100 text-indigo-700' :
-                                                                    'bg-pink-100 text-pink-700'
-                                                                }`}>
-                                                                    Longueur: {emmaMaxTokens} ({emmaMaxTokens <= 2048 ? 'Concis' : emmaMaxTokens <= 4096 ? 'Détaillé' : 'Très détaillé'})
-                                                                </span>
-                                                            </div>
-                                                            {message.modelReason && (
-                                                                <div className="text-xs mt-1 text-gray-500 italic">
-                                                                    💡 {message.modelReason}
-                                                                </div>
-                                                            )}
+                                                    {(message.type === 'emma' || message.type === 'sms') && message.modelReason && (
+                                                        <div className="text-xs mt-1 text-gray-500 italic">
+                                                            💡 {message.modelReason}
                                                         </div>
                                                     )}
                                                 </div>
