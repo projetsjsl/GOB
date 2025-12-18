@@ -386,6 +386,14 @@ const YieldCurveTab = () => {
                     </div>
                 </div>
 
+                {/* Grid Cards (US / Canada) - Remonté juste après le titre */}
+                {!loading && !error && yieldData && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        {yieldData.data.us && renderRateTable('US Treasury', yieldData.data.us, '🇺🇸')}
+                        {yieldData.data.canada && renderRateTable('Obligations Canada', yieldData.data.canada, '🇨🇦')}
+                    </div>
+                )}
+
                 {/* Indicateur de récession (spread 10Y-2Y) */}
                 {yieldData?.data?.us?.spread_10y_2y !== undefined && (
                     <div className={`p-4 rounded-lg border-l-4 ${
@@ -449,12 +457,6 @@ const YieldCurveTab = () => {
 
             {!loading && !error && yieldData && (
                 <>
-                    {/* Grid Cards (US / Canada) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                        {yieldData.data.us && renderRateTable('US Treasury', yieldData.data.us, '🇺🇸')}
-                        {yieldData.data.canada && renderRateTable('Obligations Canada', yieldData.data.canada, '🇨🇦')}
-                    </div>
-
                     {/* Tableau des maturités */}
                     <div className={`p-6 rounded-lg transition-colors duration-300 mb-6 ${
                         darkMode ? 'bg-gray-800' : 'bg-white'

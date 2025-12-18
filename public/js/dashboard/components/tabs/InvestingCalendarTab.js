@@ -922,30 +922,6 @@ const InvestingCalendarTab = () => {
             <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                 isDarkMode ? 'bg-gray-800' : 'bg-white'
             }`}>
-                <div className="mb-3 md:mb-6">
-                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
-                        isDarkMode ? 'text-white' : 'text-gray-900'
-                    }`}>
-                        📊 FastGraphs - Analyse Fondamentale
-                    </h2>
-                    <p className={`text-xs md:text-sm transition-colors duration-300 ${
-                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                    }`}>
-                        Outil d'analyse fondamentale pour investisseurs à long terme. Visualisez la valeur intrinsèque, les bénéfices, revenus, dividendes et ratios de valorisation.
-                    </p>
-                    <p className={`text-xs mt-2 transition-colors duration-300 ${
-                        isDarkMode ? 'text-orange-300' : 'text-orange-600'
-                    }`}>
-                        💡 <a 
-                            href="https://fastgraphs.com/blog/if-you-are-a-long-term-investor-you-need-to-watch-this-introducing-fast-graphs/" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="underline hover:opacity-80"
-                        >
-                            En savoir plus sur FastGraphs
-                        </a>
-                    </p>
-                </div>
 
                 <div className="mb-4">
                     <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-start md:items-center">
