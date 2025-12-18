@@ -8741,7 +8741,7 @@ const Header = ({
   onOpenSettings,
   onOpenReports
 }) => {
-  const [isLoading2, setIsLoading] = reactExports.useState(false);
+  const [isLoading, setIsLoading] = reactExports.useState(false);
   const handleNumericChange = (e, key, min2 = -Infinity) => {
     const inputValue = e.target.value;
     if (inputValue === "") {
@@ -8910,12 +8910,12 @@ Source: FMP key-metrics`, children: [
             "button",
             {
               onClick: handleSyncClick,
-              disabled: isLoading2,
-              className: `flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading2 ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-blue-50 text-blue-600 hover:bg-blue-100"}`,
+              disabled: isLoading,
+              className: `flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-blue-50 text-blue-600 hover:bg-blue-100"}`,
               title: "🔄 Options de Synchronisation Avancées\\n\\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options configurables.\\n\\n📊 Le dialogue vous permet de:\\n• Choisir quelles données synchroniser (historiques, assumptions, infos)\\n• Décider si vous voulez remplacer les données oranges\\n• Configurer des options avancées (nouvelles années uniquement, métriques manquantes, etc.)\\n• Voir des explications détaillées avec exemples concrets pour chaque option\\n\\n💡 Chaque option inclut une section d'aide avec:\\n• Comportement attendu\\n• Exemples concrets\\n• Outils et APIs utilisés\\n• Formules et algorithmes\\n• Recommandations d'utilisation",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: `w-3 h-3 sm:w-4 sm:h-4 ${isLoading2 ? "animate-spin" : ""}` }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: isLoading2 ? "Sync..." : "⚙️ Options Sync" })
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: `w-3 h-3 sm:w-4 sm:h-4 ${isLoading ? "animate-spin" : ""}` }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: isLoading ? "Sync..." : "⚙️ Options Sync" })
               ]
             }
           ),
@@ -8923,8 +8923,8 @@ Source: FMP key-metrics`, children: [
             "button",
             {
               onClick: onRestoreData,
-              disabled: isLoading2,
-              className: `flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading2 ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-purple-50 text-purple-600 hover:bg-purple-100"}`,
+              disabled: isLoading,
+              className: `flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-purple-50 text-purple-600 hover:bg-purple-100"}`,
               title: "📥 Restaurer les données\\n\\nOuvre un dialogue de restauration avec 2 options principales:\\n\\n1️⃣ Charger le dernier snapshot:\\n   • Restaure la dernière sauvegarde complète\\n   • Inclut toutes les données historiques\\n   • Inclut toutes les hypothèses\\n   • Mode lecture seule (sécurisé)\\n   • Permet de comparer avec la version actuelle\\n\\n2️⃣ Recalculer depuis FMP:\\n   • Recharge les données FMP Premium (30 ans)\\n   • Réapplique automatiquement les hypothèses auto-fill\\n   • Préserve vos exclusions de métriques\\n   • Préserve les métriques ValueLine\\n   • Met à jour uniquement les données auto-fetchées\\n\\n💡 Utilisation:\\n• Utilisez 'Charger snapshot' pour revenir à une version précédente\\n• Utilisez 'Recalculer FMP' pour actualiser avec les dernières données\\n• Les modifications manuelles sont toujours préservées",
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$L, { className: "w-3 h-3 sm:w-4 sm:h-4" }),
@@ -33726,7 +33726,7 @@ function hasManualEdits(data) {
 }
 const RightSidebar = ({ ticker: ticker2, onLoadVersion, isOpen, onToggle }) => {
   const [snapshots, setSnapshots] = reactExports.useState([]);
-  const [isLoading2, setIsLoading] = reactExports.useState(false);
+  const [isLoading, setIsLoading] = reactExports.useState(false);
   const [deletingId, setDeletingId] = reactExports.useState(null);
   reactExports.useEffect(() => {
     if (isOpen && ticker2) {
@@ -33875,7 +33875,7 @@ Cette action est irréversible.`)) {
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-y-auto p-3 sm:p-4 space-y-2 sm:space-y-3", children: isLoading2 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center text-slate-500 py-8", children: "Chargement..." }) : snapshots.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center text-slate-500 py-8", children: "Aucun historique disponible" }) : snapshots.map((snapshot) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-y-auto p-3 sm:p-4 space-y-2 sm:space-y-3", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center text-slate-500 py-8", children: "Chargement..." }) : snapshots.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center text-slate-500 py-8", children: "Aucun historique disponible" }) : snapshots.map((snapshot) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "div",
             {
               className: "bg-slate-800 rounded-lg p-3 sm:p-4 border border-slate-700 hover:border-blue-500 transition-colors cursor-pointer relative group",
@@ -36373,7 +36373,7 @@ const InfoTab = () => {
 const TickerSearch = ({ onSelect, onClose }) => {
   const [query, setQuery] = reactExports.useState("");
   const [results, setResults] = reactExports.useState([]);
-  const [isLoading2, setIsLoading] = reactExports.useState(false);
+  const [isLoading, setIsLoading] = reactExports.useState(false);
   const [selectedIndex, setSelectedIndex] = reactExports.useState(0);
   const inputRef = reactExports.useRef(null);
   reactExports.useEffect(() => {
@@ -36445,7 +36445,7 @@ const TickerSearch = ({ onSelect, onClose }) => {
           className: "flex-1 outline-none text-lg"
         }
       ),
-      isLoading2 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" }),
+      isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
         {
@@ -36456,7 +36456,7 @@ const TickerSearch = ({ onSelect, onClose }) => {
       )
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-h-96 overflow-y-auto", children: [
-      results.length === 0 && query.length > 0 && !isLoading2 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-8 text-center text-gray-500", children: [
+      results.length === 0 && query.length > 0 && !isLoading && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-8 text-center text-gray-500", children: [
         'Aucun résultat trouvé pour "',
         query,
         '"'
@@ -37965,7 +37965,7 @@ const RestoreDataDialog = ({
   onRestoreFromSnapshot,
   onRecalculateFromFMP,
   latestSnapshotDate,
-  isLoading: isLoading2 = false
+  isLoading = false
 }) => {
   if (!isOpen) return null;
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-xl max-w-md w-full p-6 relative", children: [
@@ -37974,7 +37974,7 @@ const RestoreDataDialog = ({
       {
         onClick: onClose,
         className: "absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors",
-        disabled: isLoading2,
+        disabled: isLoading,
         children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-5 h-5" })
       }
     ),
@@ -37988,7 +37988,7 @@ const RestoreDataDialog = ({
             onRestoreFromSnapshot();
             onClose();
           },
-          disabled: isLoading2,
+          disabled: isLoading,
           className: "w-full p-4 border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed",
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-blue-100 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-6 h-6 text-blue-600" }) }),
@@ -38010,7 +38010,7 @@ const RestoreDataDialog = ({
             onRecalculateFromFMP();
             onClose();
           },
-          disabled: isLoading2,
+          disabled: isLoading,
           className: "w-full p-4 border-2 border-green-200 rounded-lg hover:border-green-400 hover:bg-green-50 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed",
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-green-100 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-6 h-6 text-green-600" }) }),
@@ -38027,7 +38027,7 @@ const RestoreDataDialog = ({
       "button",
       {
         onClick: onClose,
-        disabled: isLoading2,
+        disabled: isLoading,
         className: "px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
         children: "Annuler"
       }
@@ -38134,7 +38134,7 @@ const UnifiedSettingsPanel = ({
   const [activeTab, setActiveTab] = reactExports.useState("overview");
   const [guardrailConfig, setGuardrailConfig] = reactExports.useState(() => loadConfig());
   const [validationSettings, setValidationSettings] = reactExports.useState(getDefaultValidationSettings());
-  const [isLoading2, setIsLoading] = reactExports.useState(false);
+  const [isLoading, setIsLoading] = reactExports.useState(false);
   const [isSaving, setIsSaving] = reactExports.useState(false);
   const [saveStatus, setSaveStatus] = reactExports.useState("idle");
   const [hasChanges, setHasChanges] = reactExports.useState(false);
@@ -38257,7 +38257,7 @@ const UnifiedSettingsPanel = ({
       },
       tab.id
     )) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-y-auto p-4", children: isLoading2 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-64", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600" }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-y-auto p-4", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-64", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600" }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
       activeTab === "overview" && /* @__PURE__ */ jsxRuntimeExports.jsx(
         OverviewTab,
         {
@@ -53050,6 +53050,7 @@ function App() {
   const [showConfirmSync, setShowConfirmSync] = reactExports.useState(false);
   const [showAdvancedSyncDialog, setShowAdvancedSyncDialog] = reactExports.useState(false);
   const [isAdvancedSyncForBulk, setIsAdvancedSyncForBulk] = reactExports.useState(false);
+  const [isLoading, setIsLoading] = reactExports.useState(false);
   const [showRestoreDialog, setShowRestoreDialog] = reactExports.useState(false);
   const [latestSnapshotDate, setLatestSnapshotDate] = reactExports.useState(void 0);
   const [notifications, setNotifications] = reactExports.useState([]);
@@ -54293,6 +54294,8 @@ Vérifiez les logs de la console pour plus de détails.`;
       }
       console.error("❌ Erreur synchronisation:", error);
       showNotification(`Erreur lors de la récupération des données : ${errorMessage}`, "error");
+    } finally {
+      setIsLoading(false);
     }
   };
   const handleUpdateRow = (index2, field, value) => {

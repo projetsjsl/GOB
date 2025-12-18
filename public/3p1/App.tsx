@@ -158,6 +158,7 @@ export default function App() {
     const [showConfirmSync, setShowConfirmSync] = useState(false);
     const [showAdvancedSyncDialog, setShowAdvancedSyncDialog] = useState(false);
     const [isAdvancedSyncForBulk, setIsAdvancedSyncForBulk] = useState(false);
+    const [isLoading, setIsLoading] = useState(false); // État pour la synchronisation d'un seul ticker
     const [showRestoreDialog, setShowRestoreDialog] = useState(false);
     const [latestSnapshotDate, setLatestSnapshotDate] = useState<string | undefined>(undefined);
     const [notifications, setNotifications] = useState<Array<{ id: string; message: string; type: 'success' | 'error' | 'warning' | 'info' }>>([]);
@@ -1796,6 +1797,8 @@ export default function App() {
             
             console.error('❌ Erreur synchronisation:', error);
             showNotification(`Erreur lors de la récupération des données : ${errorMessage}`, 'error');
+        } finally {
+            setIsLoading(false);
         }
     };
 
