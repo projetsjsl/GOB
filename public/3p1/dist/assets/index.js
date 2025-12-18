@@ -34045,6 +34045,21 @@ const saveConfig = (config2) => {
 };
 const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector, config: config2 = DEFAULT_CONFIG }) => {
   var _a3, _b2, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x;
+  React.useEffect(() => {
+    if (data && data.length > 0) {
+      const lastData = data[data.length - 1];
+      console.log("📊 EvaluationDetails: Données reçues", {
+        dataLength: data.length,
+        lastYear: lastData.year,
+        lastYearEPS: lastData.earningsPerShare,
+        lastYearCF: lastData.cashFlowPerShare,
+        lastYearBV: lastData.bookValuePerShare,
+        baseYear: assumptions.baseYear,
+        growthRateEPS: assumptions.growthRateEPS,
+        targetPE: assumptions.targetPE
+      });
+    }
+  }, [data, assumptions.baseYear]);
   const [expandedMetrics, setExpandedMetrics] = reactExports.useState({
     eps: false,
     cf: false,
@@ -52955,7 +52970,7 @@ Vérifiez votre connexion et réessayez.`,
     }
   };
   const performSync = async (saveCurrentVersion) => {
-    var _a4, _b3, _c, _d;
+    var _a4, _b3, _c, _d, _e, _f, _g;
     try {
       if (saveCurrentVersion) {
         const hasValidData = data && data.length > 0;
@@ -53010,15 +53025,27 @@ Vérifiez votre connexion et réessayez.`,
           }
         });
         mergedData.sort((a2, b) => a2.year - b.year);
+        console.log("✅ performSync: Données mergées prêtes", {
+          mergedDataLength: mergedData.length,
+          mergedDataYears: mergedData.map((d) => d.year),
+          lastYearEPS: (_a4 = mergedData[mergedData.length - 1]) == null ? void 0 : _a4.earningsPerShare,
+          lastYearCF: (_b3 = mergedData[mergedData.length - 1]) == null ? void 0 : _b3.cashFlowPerShare,
+          lastYearBV: (_c = mergedData[mergedData.length - 1]) == null ? void 0 : _c.bookValuePerShare
+        });
         setData(mergedData);
+      } else {
+        console.warn("⚠️ performSync: Aucune donnée dans result.data", {
+          resultDataLength: result.data.length,
+          currentDataLength: data.length
+        });
       }
       if (result.info) {
         const existingProfile = library[activeId];
         let preservedValueLineMetrics = {
-          securityRank: ((_a4 = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _a4.securityRank) || result.info.securityRank || "N/A",
-          earningsPredictability: ((_b3 = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _b3.earningsPredictability) || result.info.earningsPredictability,
-          priceGrowthPersistence: ((_c = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _c.priceGrowthPersistence) || result.info.priceGrowthPersistence,
-          priceStability: ((_d = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _d.priceStability) || result.info.priceStability
+          securityRank: ((_d = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _d.securityRank) || result.info.securityRank || "N/A",
+          earningsPredictability: ((_e = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _e.earningsPredictability) || result.info.earningsPredictability,
+          priceGrowthPersistence: ((_f = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _f.priceGrowthPersistence) || result.info.priceGrowthPersistence,
+          priceStability: ((_g = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _g.priceStability) || result.info.priceStability
         };
         try {
           const supabaseResult = await loadAllTickersFromSupabase();

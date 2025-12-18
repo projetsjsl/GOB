@@ -21,6 +21,23 @@ interface Range {
 }
 
 export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assumptions, onUpdateAssumption, info, sector, config = DEFAULT_CONFIG }) => {
+  // ✅ DEBUG : Log pour vérifier que les données sont bien passées
+  React.useEffect(() => {
+    if (data && data.length > 0) {
+      const lastData = data[data.length - 1];
+      console.log('📊 EvaluationDetails: Données reçues', {
+        dataLength: data.length,
+        lastYear: lastData.year,
+        lastYearEPS: lastData.earningsPerShare,
+        lastYearCF: lastData.cashFlowPerShare,
+        lastYearBV: lastData.bookValuePerShare,
+        baseYear: assumptions.baseYear,
+        growthRateEPS: assumptions.growthRateEPS,
+        targetPE: assumptions.targetPE
+      });
+    }
+  }, [data, assumptions.baseYear]);
+
   // États pour gérer l'affichage/réduction des intervalles de référence
   const [expandedMetrics, setExpandedMetrics] = useState<{
     eps: boolean;

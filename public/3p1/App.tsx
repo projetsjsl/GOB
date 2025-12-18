@@ -1525,7 +1525,20 @@ export default function App() {
                 // Trier par année
                 mergedData.sort((a, b) => a.year - b.year);
                 
+                console.log('✅ performSync: Données mergées prêtes', {
+                    mergedDataLength: mergedData.length,
+                    mergedDataYears: mergedData.map(d => d.year),
+                    lastYearEPS: mergedData[mergedData.length - 1]?.earningsPerShare,
+                    lastYearCF: mergedData[mergedData.length - 1]?.cashFlowPerShare,
+                    lastYearBV: mergedData[mergedData.length - 1]?.bookValuePerShare
+                });
+                
                 setData(mergedData);
+            } else {
+                console.warn('⚠️ performSync: Aucune donnée dans result.data', {
+                    resultDataLength: result.data.length,
+                    currentDataLength: data.length
+                });
             }
 
             // Update Info (including logo and beta, but preserve ValueLine metrics)
