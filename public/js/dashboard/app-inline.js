@@ -22956,14 +22956,26 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 console.log('📊 Création graphique - Données historiques US:', historicalDataUS);
                 console.log('📊 Création graphique - Données historiques Canada:', historicalDataCanada);
 
+                // Ordre des maturités pour l'axe X (category)
+                const maturityOrder = ['1M', '2M', '3M', '6M', '1Y', '2Y', '3Y', '5Y', '7Y', '10Y', '20Y', '30Y'];
+                
+                // Fonction helper pour mapper les données aux labels
+                const mapRatesToLabels = (rates) => {
+                    const rateMap = {};
+                    rates.forEach(r => {
+                        if (r.maturity && (typeof r.rate === 'number' || !isNaN(parseFloat(r.rate)))) {
+                            rateMap[r.maturity] = typeof r.rate === 'number' ? r.rate : parseFloat(r.rate);
+                        }
+                    });
+                    return maturityOrder.map(maturity => rateMap[maturity] ?? null);
+                };
+
                 // Données US actuelles
                 if (yieldData.data?.us?.rates) {
+                    const usData = mapRatesToLabels(yieldData.data.us.rates);
                     datasets.push({
                         label: 'US Treasury (Actuel)',
-                        data: yieldData.data.us.rates.map(r => ({
-                            x: r.maturity,
-                            y: r.rate
-                        })),
+                        data: usData,
                         borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         borderWidth: 3,
@@ -22981,14 +22993,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 if (historicalDataUS?.data?.us?.rates && historicalDataUS.data.us.rates.length > 0) {
                     console.log('✅ Ajout courbe historique US avec', historicalDataUS.data.us.rates.length, 'points');
                     console.log('📊 Données brutes US historiques:', historicalDataUS.data.us.rates);
-                    const historicalUSData = historicalDataUS.data.us.rates.map(r => ({
-                        x: r.maturity,
-                        y: typeof r.rate === 'number' ? r.rate : parseFloat(r.rate || 0)
-                    })).filter(d => !isNaN(d.y) && d.y !== null && d.y !== undefined); // Filtrer les valeurs invalides
+                    const historicalUSData = mapRatesToLabels(historicalDataUS.data.us.rates);
                     
                     console.log('📊 Données US historiques transformées:', historicalUSData);
                     
-                    if (historicalUSData.length > 0) {
+                    // Vérifier qu'il y a au moins une valeur non-null
+                    if (historicalUSData.some(v => v !== null)) {
                         datasets.push({
                             label: `US Treasury (${historicalDateUS})`,
                             data: historicalUSData,
@@ -23004,11 +23014,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             pointBorderWidth: 2,
                             fill: false, // Ne pas remplir sous la courbe
                             order: 1, // Afficher après les courbes actuelles
-                            showLine: true // S'assurer que la ligne est affichée
+                            showLine: true, // S'assurer que la ligne est affichée
+                            spanGaps: true // Connecter les points même s'il y a des valeurs null
                         });
                         console.log('✅ Dataset historique US ajouté au graphique');
                     } else {
-                        console.warn('⚠️ Aucune donnée US historique valide après filtrage');
+                        console.warn('⚠️ Aucune donnée US historique valide après transformation');
                     }
                 } else if (historicalDataUS) {
                     console.warn('⚠️ Données historiques US présentes mais pas de rates:', historicalDataUS);
@@ -23019,12 +23030,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                 // Données Canada actuelles
                 if (yieldData.data?.canada?.rates) {
+                    const canadaData = mapRatesToLabels(yieldData.data.canada.rates);
                     datasets.push({
                         label: 'Canada Bonds (Actuel)',
-                        data: yieldData.data.canada.rates.map(r => ({
-                            x: r.maturity,
-                            y: r.rate
-                        })),
+                        data: canadaData,
                         borderColor: '#ef4444',
                         backgroundColor: 'rgba(239, 68, 68, 0.1)',
                         borderWidth: 3,
@@ -23042,14 +23051,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 if (historicalDataCanada?.data?.canada?.rates && historicalDataCanada.data.canada.rates.length > 0) {
                     console.log('✅ Ajout courbe historique Canada avec', historicalDataCanada.data.canada.rates.length, 'points');
                     console.log('📊 Données brutes Canada historiques:', historicalDataCanada.data.canada.rates);
-                    const historicalCanadaData = historicalDataCanada.data.canada.rates.map(r => ({
-                        x: r.maturity,
-                        y: typeof r.rate === 'number' ? r.rate : parseFloat(r.rate || 0)
-                    })).filter(d => !isNaN(d.y) && d.y !== null && d.y !== undefined); // Filtrer les valeurs invalides
+                    const historicalCanadaData = mapRatesToLabels(historicalDataCanada.data.canada.rates);
                     
                     console.log('📊 Données Canada historiques transformées:', historicalCanadaData);
                     
-                    if (historicalCanadaData.length > 0) {
+                    // Vérifier qu'il y a au moins une valeur non-null
+                    if (historicalCanadaData.some(v => v !== null)) {
                         datasets.push({
                             label: `Canada Bonds (${historicalDateCanada})`,
                             data: historicalCanadaData,
@@ -23065,11 +23072,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             pointBorderWidth: 2,
                             fill: false, // Ne pas remplir sous la courbe
                             order: 1, // Afficher après les courbes actuelles
-                            showLine: true // S'assurer que la ligne est affichée
+                            showLine: true, // S'assurer que la ligne est affichée
+                            spanGaps: true // Connecter les points même s'il y a des valeurs null
                         });
                         console.log('✅ Dataset historique Canada ajouté au graphique');
                     } else {
-                        console.warn('⚠️ Aucune donnée Canada historique valide après filtrage');
+                        console.warn('⚠️ Aucune donnée Canada historique valide après transformation');
                     }
                 } else if (historicalDataCanada) {
                     console.warn('⚠️ Données historiques Canada présentes mais pas de rates:', historicalDataCanada);
@@ -23094,7 +23102,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                 yieldChartInstance.current = new Chart(ctx, {
                     type: 'line',
-                    data: { datasets },
+                    data: { 
+                        labels: maturityOrder,
+                        datasets 
+                    },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
