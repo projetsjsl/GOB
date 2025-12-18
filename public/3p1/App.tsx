@@ -4137,7 +4137,7 @@ export default function App() {
                         await performSync(options.saveBeforeSync, options);
                     }
                 }}
-                isSyncing={isLoading}
+                isSyncing={isAdvancedSyncForBulk ? isBulkSyncing : isLoading}
             />
 
             {/* Restore Data Dialog */}

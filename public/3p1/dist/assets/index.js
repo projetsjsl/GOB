@@ -56173,7 +56173,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
             await performSync(options.saveBeforeSync, options);
           }
         },
-        isSyncing: isLoading
+        isSyncing: isAdvancedSyncForBulk ? isBulkSyncing : isLoading
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
