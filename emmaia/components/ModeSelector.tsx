@@ -25,7 +25,17 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
     >
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
-          <img src={image} alt={title} className={clsx("w-full h-full object-cover transition-transform duration-700 group-hover:scale-110", filterClass)} />
+          <img 
+            src={image} 
+            alt={title} 
+            className={clsx("w-full h-full object-cover transition-transform duration-700 group-hover:scale-110", filterClass)} 
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              if (!target.src.includes('emma-avatar-new.jpg')) {
+                 target.src = AVATAR_IMAGES.natural; // Fallback to known working image
+              }
+            }}
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent opacity-90 group-hover:opacity-80 transition-opacity"></div>
       </div>
       

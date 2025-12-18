@@ -220,12 +220,14 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
                     persona_id: tavusConfig.personaId || 'p68d02f5eb54',
                     conversation_name: `Session ${new Date().toLocaleString('fr-FR')}`,
                     custom_greeting: tavusConfig.customGreeting || 'Bonjour ! Je suis votre assistant virtuel. Comment puis-je vous aider ?',
-                    properties: tavusConfig.options || {}
+                    properties: {} // tavusConfig.options contains client-side flags (enableVideo) that cause 400 API errors
                 })
             });
 
             if (!response.ok) {
-                throw new Error(`Tavus API error: ${response.status}`);
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Tavus API Error Details:', errorData);
+                throw new Error(`Tavus API error: ${response.status} - ${JSON.stringify(errorData)}`);
             }
 
             const data = await response.json();

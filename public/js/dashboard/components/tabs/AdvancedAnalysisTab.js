@@ -358,15 +358,31 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
     // 4. Timeline Widget
     useEffect(() => {
         if (activeTab !== 'timeline' || !timelineContainerRef.current) return;
+        
         const container = timelineContainerRef.current;
         container.innerHTML = '';
+        
+        // Construct fully qualified symbol if possible to resolve "No data here yet"
+        let widgetSymbol = selectedStock;
+        if (stockData && stockData.profile && stockData.profile.exchangeShortName) {
+            // Map FMP exchange names to TradingView if necessary
+            let exchange = stockData.profile.exchangeShortName;
+            if (exchange === 'NAS') exchange = 'NASDAQ';
+            if (exchange === 'NYS') exchange = 'NYSE';
+            
+            widgetSymbol = `${exchange}:${selectedStock}`;
+        } else if (['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'NFLX'].includes(selectedStock)) {
+            // Fallback for common tech stocks if profile not yet loaded
+             widgetSymbol = `NASDAQ:${selectedStock}`;
+        }
+
         const script = document.createElement('script');
         script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js';
         script.type = 'text/javascript';
         script.async = true;
         script.innerHTML = JSON.stringify({
             feedMode: 'symbol',
-            symbol: selectedStock,
+            symbol: widgetSymbol,
             colorTheme: isDarkMode ? 'dark' : 'light',
             isTransparent: false,
             displayMode: 'regular',
@@ -376,7 +392,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
         });
         container.appendChild(script);
         return () => { if (container) container.innerHTML = ''; };
-    }, [activeTab, selectedStock, isDarkMode]);
+    }, [activeTab, selectedStock, isDarkMode, stockData?.profile?.exchangeShortName]);
 
     return (
         <div className={`min-h-screen p-6 ${isDarkMode ? 'bg-neutral-950 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
