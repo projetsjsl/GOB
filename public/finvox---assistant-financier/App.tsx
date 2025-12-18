@@ -372,8 +372,11 @@ const App: React.FC = () => {
 
       </main>
 
-      <footer className="py-6 text-center text-slate-600 text-xs">
+      <footer className="py-6 text-center text-slate-600 text-xs relative">
         <p>Propulsé par Google Gemini 2.5 Flash Live API & Gemini 3 Pro</p>
+        <div style={{ position: 'absolute', bottom: 5, right: 5, background: 'rgba(0,0,0,0.7)', color: '#fff', padding: '2px 6px', fontSize: '10px', borderRadius: '4px', pointerEvents: 'none', opacity: 0.6 }}>
+          FILE: public/finvox---assistant-financier/App.tsx
+        </div>
       </footer>
     </div>
   );
