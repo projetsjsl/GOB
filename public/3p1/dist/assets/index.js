@@ -37006,6 +37006,10 @@ const fetchCompanyData = async (symbol) => {
     throw error;
   }
 };
+const financeApi = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  fetchCompanyData
+}, Symbol.toStringTag, { value: "Module" }));
 const RestoreDataDialog = ({
   isOpen,
   onClose,
@@ -39026,6 +39030,50 @@ async function loadCurrentSnapshotFromSupabase(ticker2) {
     return null;
   }
 }
+async function loadProfileFromSupabase(ticker2, fallbackToFMP = true) {
+  var _a3, _b2;
+  const upperTicker = ticker2.toUpperCase();
+  const snapshot = await loadCurrentSnapshotFromSupabase(upperTicker);
+  if (snapshot && snapshot.annual_data && snapshot.annual_data.length > 0) {
+    const marketData = await fetchMarketData(upperTicker);
+    const currentPrice = ((marketData == null ? void 0 : marketData.currentPrice) || 0) > 0 ? marketData.currentPrice : ((_a3 = snapshot.assumptions) == null ? void 0 : _a3.currentPrice) || 0;
+    const updatedAssumptions = sanitizeAssumptionsSync({
+      ...snapshot.assumptions,
+      currentPrice: currentPrice > 0 ? currentPrice : ((_b2 = snapshot.assumptions) == null ? void 0 : _b2.currentPrice) || 0
+    });
+    console.log(`✅ ${upperTicker}: Chargé depuis Supabase (snapshot du ${snapshot.snapshot_date})`);
+    return {
+      data: snapshot.annual_data,
+      info: snapshot.company_info,
+      currentPrice,
+      assumptions: updatedAssumptions,
+      source: "supabase"
+    };
+  }
+  if (fallbackToFMP) {
+    console.log(`⚠️ ${upperTicker}: Pas de snapshot Supabase, fallback sur FMP`);
+    const { fetchCompanyData: fetchCompanyData2 } = await __vitePreload(async () => {
+      const { fetchCompanyData: fetchCompanyData3 } = await Promise.resolve().then(() => financeApi);
+      return { fetchCompanyData: fetchCompanyData3 };
+    }, true ? void 0 : void 0, import.meta.url);
+    try {
+      const fmpResult = await fetchCompanyData2(upperTicker);
+      return {
+        ...fmpResult,
+        source: "fmp"
+      };
+    } catch (error) {
+      console.error(`❌ ${upperTicker}: Erreur FMP fallback:`, error);
+      return {
+        data: [],
+        info: {},
+        currentPrice: 0,
+        source: "error"
+      };
+    }
+  }
+  return null;
+}
 async function loadProfilesBatchFromSupabase(tickers) {
   const results = {};
   const snapshotPromises = tickers.map(
@@ -39066,6 +39114,12 @@ async function loadProfilesBatchFromSupabase(tickers) {
   });
   return results;
 }
+const supabaseDataLoader = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  loadCurrentSnapshotFromSupabase,
+  loadProfileFromSupabase,
+  loadProfilesBatchFromSupabase
+}, Symbol.toStringTag, { value: "Module" }));
 const DB_NAME = "3p1_FinanceDB";
 const STORE_NAME = "profiles";
 const DB_VERSION = 1;
@@ -53505,7 +53559,45 @@ Vérifiez les logs de la console pour plus de détails.`;
       const hasNoData = !existingProfile.data || existingProfile.data.length === 0;
       const hasNoPrice = !((_a4 = existingProfile.assumptions) == null ? void 0 : _a4.currentPrice) || existingProfile.assumptions.currentPrice === 0;
       if (isSkeleton || hasNoData || hasNoPrice) {
-        console.log(`🔄 ${upperSymbol}: Profil squelette ou données vides détectées - Chargement FMP...`);
+        console.log(`🔄 ${upperSymbol}: Profil squelette ou données vides détectées - Tentative chargement Supabase puis FMP...`);
+        try {
+          const { loadProfileFromSupabase: loadProfileFromSupabase2 } = await __vitePreload(async () => {
+            const { loadProfileFromSupabase: loadProfileFromSupabase22 } = await Promise.resolve().then(() => supabaseDataLoader);
+            return { loadProfileFromSupabase: loadProfileFromSupabase22 };
+          }, true ? void 0 : void 0, import.meta.url);
+          const supabaseProfile = await loadProfileFromSupabase2(upperSymbol, false);
+          if (supabaseProfile && supabaseProfile.source === "supabase" && supabaseProfile.data && supabaseProfile.data.length > 0) {
+            console.log(`✅ ${upperSymbol}: Chargé depuis Supabase (snapshot)`);
+            const updatedProfile = {
+              id: upperSymbol,
+              lastModified: Date.now(),
+              data: supabaseProfile.data,
+              assumptions: supabaseProfile.assumptions || existingProfile.assumptions || INITIAL_ASSUMPTIONS,
+              info: {
+                ...existingProfile.info,
+                ...supabaseProfile.info
+              },
+              notes: existingProfile.notes || "",
+              isWatchlist: existingProfile.isWatchlist ?? false
+            };
+            delete updatedProfile._isSkeleton;
+            setLibrary((prev) => ({
+              ...prev,
+              [upperSymbol]: updatedProfile
+            }));
+            setActiveId(upperSymbol);
+            setData(supabaseProfile.data);
+            setAssumptions(updatedProfile.assumptions);
+            setInfo(updatedProfile.info);
+            setNotes(updatedProfile.notes || "");
+            showNotification(`✅ ${upperSymbol} chargé depuis Supabase`, "success");
+            return;
+          } else {
+            console.log(`⚠️ ${upperSymbol}: Pas de snapshot Supabase disponible - Fallback FMP...`);
+          }
+        } catch (supabaseError) {
+          console.warn(`⚠️ ${upperSymbol}: Erreur chargement Supabase (non bloquant):`, supabaseError);
+        }
       } else {
         try {
           let supabaseTickers = [];

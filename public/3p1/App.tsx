@@ -2085,13 +2085,63 @@ export default function App() {
             // Load existing profile data
             const existingProfile = library[upperSymbol];
             
-            // ✅ VÉRIFICATION CRITIQUE : Si c'est un profil squelette ou si les données sont vides, charger depuis FMP
+            // ✅ VÉRIFICATION CRITIQUE : Si c'est un profil squelette ou si les données sont vides, charger depuis Supabase puis FMP
             const isSkeleton = (existingProfile as any)._isSkeleton === true;
             const hasNoData = !existingProfile.data || existingProfile.data.length === 0;
             const hasNoPrice = !existingProfile.assumptions?.currentPrice || existingProfile.assumptions.currentPrice === 0;
             
             if (isSkeleton || hasNoData || hasNoPrice) {
-                console.log(`🔄 ${upperSymbol}: Profil squelette ou données vides détectées - Chargement FMP...`);
+                console.log(`🔄 ${upperSymbol}: Profil squelette ou données vides détectées - Tentative chargement Supabase puis FMP...`);
+                
+                // ✅ NOUVEAU : Essayer d'abord de charger depuis Supabase (snapshot)
+                try {
+                    const { loadProfileFromSupabase } = await import('./services/supabaseDataLoader');
+                    const supabaseProfile = await loadProfileFromSupabase(upperSymbol, false); // Ne pas fallback FMP ici
+                    
+                    if (supabaseProfile && supabaseProfile.source === 'supabase' && supabaseProfile.data && supabaseProfile.data.length > 0) {
+                        console.log(`✅ ${upperSymbol}: Chargé depuis Supabase (snapshot)`);
+                        
+                        // Mettre à jour le profil avec les données Supabase
+                        const updatedProfile: AnalysisProfile = {
+                            id: upperSymbol,
+                            lastModified: Date.now(),
+                            data: supabaseProfile.data,
+                            assumptions: supabaseProfile.assumptions || existingProfile.assumptions || INITIAL_ASSUMPTIONS,
+                            info: {
+                                ...existingProfile.info,
+                                ...supabaseProfile.info
+                            } as CompanyInfo,
+                            notes: existingProfile.notes || '',
+                            isWatchlist: existingProfile.isWatchlist ?? false
+                        };
+                        
+                        // Retirer le flag squelette
+                        delete (updatedProfile as any)._isSkeleton;
+                        
+                        // Mettre à jour la library
+                        setLibrary(prev => ({
+                            ...prev,
+                            [upperSymbol]: updatedProfile
+                        }));
+                        
+                        // Mettre à jour les states
+                        setActiveId(upperSymbol);
+                        setData(supabaseProfile.data);
+                        setAssumptions(updatedProfile.assumptions);
+                        setInfo(updatedProfile.info);
+                        setNotes(updatedProfile.notes || '');
+                        
+                        showNotification(`✅ ${upperSymbol} chargé depuis Supabase`, 'success');
+                        return; // ✅ Succès - ne pas continuer vers FMP
+                    } else {
+                        console.log(`⚠️ ${upperSymbol}: Pas de snapshot Supabase disponible - Fallback FMP...`);
+                        // Continuer vers FMP ci-dessous
+                    }
+                } catch (supabaseError) {
+                    console.warn(`⚠️ ${upperSymbol}: Erreur chargement Supabase (non bloquant):`, supabaseError);
+                    // Continuer vers FMP ci-dessous
+                }
+                
                 // Ne pas return ici, continuer pour charger les données FMP
             } else {
                 // ✅ Profil valide avec données - Charger normalement
