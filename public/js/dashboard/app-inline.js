@@ -21113,67 +21113,76 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             // Charger le script TradingView Advanced Chart (synchronisé)
             useEffect(() => {
-                const container = tradingViewChartSPYRef.current;
-                if (!container) return;
+                // Attendre que le conteneur soit disponible dans le DOM
+                const timer = setTimeout(() => {
+                    const container = tradingViewChartSPYRef.current;
+                    if (!container) {
+                        console.warn('⚠️ Advanced Chart container not found');
+                        return;
+                    }
 
-                container.innerHTML = '';
+                    container.innerHTML = '';
 
-                const script = document.createElement('script');
-                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-                script.type = 'text/javascript';
-                script.async = true;
-                script.innerHTML = JSON.stringify({
-                    allow_symbol_change: true,
-                    calendar: false,
-                    details: true,
-                    hide_side_toolbar: false,
-                    hide_top_toolbar: false,
-                    hide_legend: false,
-                    hide_volume: false,
-                    hotlist: false,
-                    interval: 'D',
-                    locale: 'fr',
-                    save_image: true,
-                    style: '3',
-                    symbol: timelineSymbol,
-                    theme: 'dark',
-                    timezone: 'America/Toronto',
-                    backgroundColor: '#0F0F0F',
-                    gridColor: 'rgba(242, 242, 242, 0.06)',
-                    watchlist: [
-                        'FOREXCOM:SPXUSD',
-                        'FOREXCOM:NSXUSD',
-                        'FOREXCOM:DJI',
-                        'NASDAQ:AAPL',
-                        'NASDAQ:MSFT',
-                        'NASDAQ:GOOGL',
-                        'NASDAQ:AMZN',
-                        'NASDAQ:NVDA',
-                        'NASDAQ:TSLA',
-                        'NASDAQ:META',
-                        'BITSTAMP:BTCUSD',
-                        'BITSTAMP:ETHUSD',
-                        'NYSE:JPM',
-                        'NYSE:BAC',
-                        'NYSE:GS'
-                    ],
-                    withdateranges: true,
-                    range: 'YTD',
-                    compareSymbols: [],
-                    show_popup_button: true,
-                    popup_height: '800',
-                    popup_width: '1200',
-                    studies: [
-                        'STD;Smoothed%1Moving%1Average',
-                        'STD;RSI'
-                    ],
-                    width: 1200,
-                    height: 1200
-                });
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+                    script.type = 'text/javascript';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        allow_symbol_change: true,
+                        calendar: false,
+                        details: true,
+                        hide_side_toolbar: false,
+                        hide_top_toolbar: false,
+                        hide_legend: false,
+                        hide_volume: false,
+                        hotlist: false,
+                        interval: 'D',
+                        locale: 'fr',
+                        save_image: true,
+                        style: '3',
+                        symbol: timelineSymbol,
+                        theme: 'dark',
+                        timezone: 'America/Toronto',
+                        backgroundColor: '#0F0F0F',
+                        gridColor: 'rgba(242, 242, 242, 0.06)',
+                        watchlist: [
+                            'FOREXCOM:SPXUSD',
+                            'FOREXCOM:NSXUSD',
+                            'FOREXCOM:DJI',
+                            'NASDAQ:AAPL',
+                            'NASDAQ:MSFT',
+                            'NASDAQ:GOOGL',
+                            'NASDAQ:AMZN',
+                            'NASDAQ:NVDA',
+                            'NASDAQ:TSLA',
+                            'NASDAQ:META',
+                            'BITSTAMP:BTCUSD',
+                            'BITSTAMP:ETHUSD',
+                            'NYSE:JPM',
+                            'NYSE:BAC',
+                            'NYSE:GS'
+                        ],
+                        withdateranges: true,
+                        range: 'YTD',
+                        compareSymbols: [],
+                        show_popup_button: true,
+                        popup_height: '800',
+                        popup_width: '1200',
+                        studies: [
+                            'STD;Smoothed%1Moving%1Average',
+                            'STD;RSI'
+                        ],
+                        width: 1200,
+                        height: 1200
+                    });
 
-                container.appendChild(script);
+                    container.appendChild(script);
+                    console.log('✅ Advanced Chart script loaded for symbol:', timelineSymbol);
+                }, 500); // Délai de 500ms pour s'assurer que le DOM est prêt
 
                 return () => {
+                    clearTimeout(timer);
+                    const container = tradingViewChartSPYRef.current;
                     if (container) {
                         container.innerHTML = '';
                     }
@@ -21719,20 +21728,22 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </ExpandableComponent>
 
                                 {/* 2. Advanced Chart - PLEINE LARGEUR */}
-                                <div className="col-span-1 lg:col-span-2 bg-yellow-200 text-black text-xs font-mono p-1 font-bold border border-yellow-400 mt-4">REF: ADVANCED_CHART_TV</div>
-                                <ExpandableComponent title={`${timelineSymbol.split(':')[1]} - Graphique Avancé`} icon="📊" className="lg:col-span-2" isDarkMode={isDarkMode}>
-                                    <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'}`}>
-                                        <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                            📊 {timelineSymbol.split(':')[1]} - Graphique Avancé
-                                        </h3>
-                                        <p className={`text-xs mb-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                            Cliquez sur un symbole dans la watchlist pour changer tous les widgets
-                                        </p>
-                                        <div className="h-[400px] md:h-[650px] lg:h-[750px]">
-                                            <div className="tradingview-widget-container h-full" ref={tradingViewChartSPYRef}></div>
+                                <div className="col-span-1 lg:col-span-2">
+                                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 font-bold border border-yellow-400 mt-4 mb-2">REF: ADVANCED_CHART_TV</div>
+                                    <ExpandableComponent title={`${timelineSymbol.split(':')[1]} - Graphique Avancé`} icon="📊" className="lg:col-span-2" isDarkMode={isDarkMode}>
+                                        <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'}`}>
+                                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                📊 {timelineSymbol.split(':')[1]} - Graphique Avancé
+                                            </h3>
+                                            <p className={`text-xs mb-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                Cliquez sur un symbole dans la watchlist pour changer tous les widgets
+                                            </p>
+                                            <div className="h-[400px] md:h-[650px] lg:h-[750px]">
+                                                <div className="tradingview-widget-container h-full" ref={tradingViewChartSPYRef}></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </ExpandableComponent>
+                                    </ExpandableComponent>
+                                </div>
 
                                 {/* 3. Symbol Profile - 1 COLONNE */}
                                 <div className="bg-yellow-200 text-black text-xs font-mono p-1 font-bold border border-yellow-400 mt-4">REF: COMPANY_PROFILE</div>
