@@ -311,13 +311,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
               onClick={onBulkSyncAll}
               disabled={isBulkSyncing || isLoadingTickers}
               className="w-full bg-green-700 hover:bg-green-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors"
-              title="Strategic Warehouse Sync (Deep Data)\n\nSynchronise TOUS les tickers avec historique COMPLET (30 ans).\n\nInclus maintenant:\n• États Financiers Complets (Bilan, Compte de résultat, Flux de trésorerie)\n• Historique Prix 20 ans\n• Métriques 30 ans\n\nC'est l'option recommandée pour construire votre base de données."
+              title="🔄 Options de Synchronisation Avancées\n\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options:\n\n📊 Options principales:\n• Sauvegarder avant sync\n• Remplacer données oranges\n• Forcer remplacement\n\n⚙️ Options détaillées:\n• Synchroniser données historiques\n• Synchroniser uniquement nouvelles années\n• Synchroniser uniquement métriques manquantes\n• Synchroniser assumptions\n• Préserver exclusions\n• Recalculer outliers\n• Mettre à jour prix actuel\n• Synchroniser métriques ValueLine\n\n💡 Chaque option inclut des explications détaillées, exemples concrets et informations sur les outils utilisés."
             >
               <ArrowPathIcon className={`w-4 h-4 ${isBulkSyncing ? 'animate-spin' : ''}`} />
               <span className="flex-1 text-left">
                 {isBulkSyncing && bulkSyncProgress
                   ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}`
-                  : 'Sync Warehouse (Deep)'}
+                  : '⚙️ Options Sync Avancées'}
               </span>
             </button>
             

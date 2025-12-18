@@ -196,10 +196,10 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={handleSyncClick}
                 disabled={isLoading}
                 className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
-                title="🔄 Synchroniser les données (Sync. Données)\n\nRécupère les dernières données depuis l'API FMP Premium pour le ticker actuellement sélectionné.\n\n📊 Données mises à jour:\n• États financiers complets (30 ans d'historique)\n• Prix historiques (20 ans)\n• Métriques clés (30 années)\n• Dividendes et ratios\n• Informations de profil (secteur, pays, bourse)\n\n✅ Comportement intelligent:\n• Met à jour uniquement les données auto-fetchées (autoFetched: true)\n• Préserve toutes vos modifications manuelles (autoFetched: false)\n• Ajoute automatiquement les nouvelles années disponibles\n• Recalcule les hypothèses basées sur les nouvelles données\n• Préserve vos exclusions de métriques (EPS, CF, BV, DIV)\n• Préserve les métriques ValueLine (Security Rank, etc.)\n\n⚠️ Important:\n• Ne synchronise QUE le ticker actuellement sélectionné\n• Pour synchroniser tous les tickers, utilisez 'Sync Warehouse (Deep)' dans la sidebar\n• Les données manuelles (en orange) ne sont jamais écrasées"
+                title="🔄 Options de Synchronisation Avancées\n\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options configurables.\n\n📊 Le dialogue vous permet de:\n• Choisir quelles données synchroniser (historiques, assumptions, infos)\n• Décider si vous voulez remplacer les données oranges\n• Configurer des options avancées (nouvelles années uniquement, métriques manquantes, etc.)\n• Voir des explications détaillées avec exemples concrets pour chaque option\n\n💡 Chaque option inclut une section d'aide avec:\n• Comportement attendu\n• Exemples concrets\n• Outils et APIs utilisés\n• Formules et algorithmes\n• Recommandations d'utilisation"
               >
                 <ArrowPathIcon className={`w-3 h-3 sm:w-4 sm:h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                <span className="hidden xs:inline">{isLoading ? 'Sync...' : 'Sync. Données'}</span>
+                <span className="hidden xs:inline">{isLoading ? 'Sync...' : '⚙️ Options Sync'}</span>
               </button>
             )}
 
