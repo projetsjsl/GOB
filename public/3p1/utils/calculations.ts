@@ -50,8 +50,13 @@ export const calculateCAGR = (startValue: number, endValue: number, years: numbe
 };
 
 
-export const formatCurrency = (val: number) => 
-  new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(val);
+export const formatCurrency = (val: number | undefined | null) => {
+  // ✅ CRITIQUE : Gérer undefined/null pour éviter d'afficher "0,00 $" pour des valeurs non chargées
+  if (val === undefined || val === null || !isFinite(val) || val === 0) {
+    return 'N/A';
+  }
+  return new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(val);
+};
 
 export const formatPercent = (val: number) => 
   new Intl.NumberFormat('fr-CA', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 2 }).format(val / 100);

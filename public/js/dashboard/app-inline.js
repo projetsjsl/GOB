@@ -12251,7 +12251,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
             const [supabaseClient, setSupabaseClient] = useState(null);
             // emmaConnected, showPromptEditor, showTemperatureEditor, showLengthEditor maintenant dans le parent
             const [emmaTemperature, setEmmaTemperature] = useState(0.3); // Température par défaut pour analyses financières
-            const [emmaMaxTokens, setEmmaMaxTokens] = useState(4096); // Longueur de réponse par défaut
+            const [emmaMaxTokens, setEmmaMaxTokens] = useState(8192); // Longueur de réponse par défaut (augmenté pour réponses plus longues)
             const [useFunctionCalling, setUseFunctionCalling] = useState(true); // Utiliser function calling par défaut
             const [useValidatedMode, setUseValidatedMode] = useState(false); // Mode validation en 3 étapes
             const [showScrollToBottom, setShowScrollToBottom] = useState(false); // Bouton scroll vers le bas
@@ -14671,9 +14671,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                 </span>
                                                                 <span className={`px-1.5 py-0.5 rounded text-xs ${emmaMaxTokens <= 2048 ? 'bg-purple-100 text-purple-700' :
                                                                     emmaMaxTokens <= 4096 ? 'bg-indigo-100 text-indigo-700' :
+                                                                    emmaMaxTokens <= 8192 ? 'bg-blue-100 text-blue-700' :
                                                                         'bg-pink-100 text-pink-700'
                                                                     }`}>
-                                                                    Longueur: {emmaMaxTokens} ({emmaMaxTokens <= 2048 ? 'Concis' : emmaMaxTokens <= 4096 ? 'Détaillé' : 'Très détaillé'})
+                                                                    Longueur: {emmaMaxTokens} ({emmaMaxTokens <= 2048 ? 'Concis' : emmaMaxTokens <= 4096 ? 'Détaillé' : emmaMaxTokens <= 8192 ? 'Très détaillé' : 'Ultra détaillé'})
                                                                 </span>
                                                             </div>
                                                             {message.modelReason && (
@@ -14722,6 +14723,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             </span>
                                                             <span className={`px-1.5 py-0.5 rounded text-xs ${emmaMaxTokens <= 2048 ? 'bg-purple-100 text-purple-700' :
                                                                 emmaMaxTokens <= 4096 ? 'bg-indigo-100 text-indigo-700' :
+                                                                emmaMaxTokens <= 8192 ? 'bg-blue-100 text-blue-700' :
                                                                     'bg-pink-100 text-pink-700'
                                                                 }`}>
                                                                 {emmaMaxTokens} tokens
@@ -15923,7 +15925,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     <input
                                         type="range"
                                         min="1024"
-                                        max="8192"
+                                        max="20000"
                                         step="1024"
                                         value={emmaMaxTokens}
                                         onChange={(e) => setEmmaMaxTokens(parseInt(e.target.value))}

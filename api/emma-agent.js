@@ -3070,9 +3070,9 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
         } else if (complexityScore <= 5) {
             return { level: 'moyenne', tokens: 6000, description: 'Question modérément complexe - analyse détaillée (1200-1500 mots)' };
         } else if (complexityScore <= 8) {
-            return { level: 'complexe', tokens: 8000, description: 'Analyse détaillée avec données temps réel (1000-1500 mots recommandé)' };
+            return { level: 'complexe', tokens: 12000, description: 'Analyse détaillée avec données temps réel (3000-4000 mots recommandé)' };
         } else {
-            return { level: 'très_complexe', tokens: 10000, description: 'Analyse exhaustive multi-dimensionnelle (2000-2500 mots)' };
+            return { level: 'très_complexe', tokens: 16000, description: 'Analyse exhaustive multi-dimensionnelle (5000-6000 mots)' };
         }
     }
 
@@ -3169,7 +3169,7 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
         try {
             // 🚀🚀🚀 RÉPONSES ULTRA-LONGUES PAR DÉFAUT (MAXIMUM DÉTAIL)
             // RÈGLE: Plus c'est long, mieux c'est!
-            let maxTokens = modelConfig?.max_tokens || 4000;  // 🎯 DEFAULT ULTRA-AUGMENTÉ: 4000 tokens (~3000 mots = ULTRA-DÉTAILLÉ)
+            let maxTokens = modelConfig?.max_tokens || 8000;  // 🎯 DEFAULT ULTRA-AUGMENTÉ: 8000 tokens (~5600 mots = RÉPONSES TRÈS LONGUES)
             let complexityInfo = null;
 
             // 📱 SMS: Contenu complet mais optimisé pour éviter timeouts
@@ -3281,7 +3281,7 @@ Cible: 520$ (+9%)
                             systemPrompt += `
 
 💻 FORMAT WEB/EMAIL OBLIGATOIRE:
-- MINIMUM 2000 mots (analyse détaillée exhaustive)
+- MINIMUM 3000 mots (analyse détaillée exhaustive - réponses TRÈS LONGUES encouragées)
 - Markdown activé (** pour gras, ## pour titres)
 - Chaque section = 1-2 paragraphes complets
 - Explications narratives professionnelles
@@ -3694,6 +3694,60 @@ ACHETER < 340$ (marge 25%+)
                     console.warn(`⚠️ [Perplexity] Réponse très courte pour comprehensive_analysis: ${wordCount} mots (attendu: 2000+ mots)`);
                 }
 
+                // ✅ VÉRIFICATION POST-RÉPONSE: S'assurer que les 12 sections sont présentes pour comprehensive_analysis
+                if (intentData?.intent === 'comprehensive_analysis') {
+                    const requiredSections = [
+                        'VUE D\'ENSEMBLE', 'OVERVIEW', 'APERÇU',
+                        'VALORISATION',
+                        'FONDAMENTAUX',
+                        'CROISSANCE',
+                        'MOAT',
+                        'VALEUR INTRINSÈQUE', 'DCF', 'FAIR VALUE',
+                        'RÉSULTATS', 'EARNINGS', 'Q1', 'Q2', 'Q3', 'Q4',
+                        'MACRO', 'FED', 'INFLATION', 'TAUX',
+                        'DIVIDENDE',
+                        'RISQUES',
+                        'NEWS', 'CATALYSTS', 'ACTUALITÉS',
+                        'RECOMMANDATION', 'RECO', 'AVIS'
+                    ];
+                    
+                    const responseUpper = result.content.toUpperCase();
+                    const foundSections = requiredSections.filter(section => 
+                        responseUpper.includes(section.toUpperCase())
+                    );
+                    
+                    // Vérifier présence des sections clés (au moins 10/12)
+                    const sectionGroups = [
+                        ['VUE D\'ENSEMBLE', 'OVERVIEW', 'APERÇU'], // Section 1
+                        ['VALORISATION'], // Section 2
+                        ['FONDAMENTAUX'], // Section 3
+                        ['CROISSANCE'], // Section 4
+                        ['MOAT'], // Section 5
+                        ['VALEUR INTRINSÈQUE', 'DCF', 'FAIR VALUE'], // Section 6
+                        ['RÉSULTATS', 'EARNINGS', 'Q1', 'Q2', 'Q3', 'Q4'], // Section 7
+                        ['MACRO', 'FED', 'INFLATION', 'TAUX'], // Section 8
+                        ['DIVIDENDE'], // Section 9
+                        ['RISQUES'], // Section 10
+                        ['NEWS', 'CATALYSTS', 'ACTUALITÉS'], // Section 11
+                        ['RECOMMANDATION', 'RECO', 'AVIS'] // Section 12
+                    ];
+                    
+                    const sectionsFound = sectionGroups.filter(group => 
+                        group.some(section => responseUpper.includes(section.toUpperCase()))
+                    ).length;
+                    
+                    if (sectionsFound < 10) {
+                        console.error(`❌ [Perplexity] Réponse INCOMPLÈTE pour comprehensive_analysis: ${sectionsFound}/12 sections trouvées`);
+                        console.error(`   → Sections manquantes probables: ${12 - sectionsFound}`);
+                        console.error(`   → Longueur réponse: ${wordCount} mots, ${charCount} caractères`);
+                        console.error(`   → Tokens utilisés: ${tokensUsed}/${tokensRequested}`);
+                    } else if (sectionsFound < 12) {
+                        console.warn(`⚠️ [Perplexity] Réponse partiellement complète: ${sectionsFound}/12 sections trouvées`);
+                    } else {
+                        console.log(`✅ [Perplexity] Réponse COMPLÈTE: ${sectionsFound}/12 sections trouvées`);
+                    }
+                }
+
                 // Retourner contenu + citations pour formatage ultérieur
                 return {
                     content: result.content,
@@ -3843,7 +3897,7 @@ ACHETER < 340$ (marge 25%+)
             }
 
             // 🚀🚀🚀 RÉPONSES ULTRA-LONGUES PAR DÉFAUT
-            let maxTokens = modelConfig?.max_tokens || 4000;  // 🎯 DEFAULT ULTRA-AUGMENTÉ: 4000 tokens (~3000 mots)
+            let maxTokens = modelConfig?.max_tokens || 8000;  // 🎯 DEFAULT ULTRA-AUGMENTÉ: 8000 tokens (~5600 mots)
             if (context.user_channel === 'sms') {
                 maxTokens = 2000;  // 📱 SMS: MAX 2000 tokens (4-5 SMS)
                 console.log('📱 Gemini SMS mode: FORCED 2000 tokens max (4-5 SMS détaillés)');

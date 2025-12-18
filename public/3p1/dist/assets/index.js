@@ -8332,7 +8332,8 @@ const sanitizeAssumptionsSync = (assumptions) => {
     excludeDIV: false
   };
   const clamp = (value, min2, max2, defaultVal) => {
-    if (value === void 0 || value === null || !isFinite(value)) return defaultVal;
+    if (value === void 0) return void 0;
+    if (value === null || !isFinite(value)) return defaultVal;
     return Math.max(min2, Math.min(value, max2));
   };
   const round2 = (value, decimals = 2) => {
@@ -8361,15 +8362,44 @@ const sanitizeAssumptionsSync = (assumptions) => {
     currentPrice: assumptions.currentPrice && assumptions.currentPrice > 0 && isFinite(assumptions.currentPrice) ? round2(assumptions.currentPrice, 2) : safeDefaults.currentPrice,
     currentDividend: assumptions.currentDividend && assumptions.currentDividend >= 0 && isFinite(assumptions.currentDividend) ? round2(assumptions.currentDividend, 4) : safeDefaults.currentDividend,
     baseYear: assumptions.baseYear && assumptions.baseYear >= 2015 && assumptions.baseYear <= (/* @__PURE__ */ new Date()).getFullYear() + 1 ? assumptions.baseYear : safeDefaults.baseYear,
-    growthRateEPS: round2(clamp(assumptions.growthRateEPS, settings.growth_min, settings.growth_max, safeDefaults.growthRateEPS), settings.growth_precision),
-    growthRateSales: round2(clamp(assumptions.growthRateSales, settings.growth_min, settings.growth_max, safeDefaults.growthRateSales), settings.growth_precision),
-    growthRateCF: round2(clamp(assumptions.growthRateCF, settings.growth_min, settings.growth_max, safeDefaults.growthRateCF), settings.growth_precision),
-    growthRateBV: round2(clamp(assumptions.growthRateBV, settings.growth_min, settings.growth_max, safeDefaults.growthRateBV), settings.growth_precision),
-    growthRateDiv: round2(clamp(assumptions.growthRateDiv, settings.growth_min, settings.growth_max, safeDefaults.growthRateDiv), settings.growth_precision),
-    targetPE: round2(clamp(assumptions.targetPE, settings.target_pe_min, settings.target_pe_max, safeDefaults.targetPE), settings.ratio_precision),
-    targetPCF: round2(clamp(assumptions.targetPCF, settings.target_pcf_min, settings.target_pcf_max, safeDefaults.targetPCF), settings.ratio_precision),
-    targetPBV: round2(clamp(assumptions.targetPBV, settings.target_pbv_min, settings.target_pbv_max, safeDefaults.targetPBV), settings.ratio_precision),
-    targetYield: round2(clamp(assumptions.targetYield, settings.target_yield_min, settings.target_yield_max, safeDefaults.targetYield), settings.yield_precision),
+    // ✅ CRITIQUE : Préserver undefined pour éviter les valeurs inventées (0) dans les profils squelettes
+    growthRateEPS: assumptions.growthRateEPS !== void 0 ? (() => {
+      const clamped = clamp(assumptions.growthRateEPS, settings.growth_min, settings.growth_max, safeDefaults.growthRateEPS);
+      return clamped !== void 0 ? round2(clamped, settings.growth_precision) : void 0;
+    })() : void 0,
+    growthRateSales: assumptions.growthRateSales !== void 0 ? (() => {
+      const clamped = clamp(assumptions.growthRateSales, settings.growth_min, settings.growth_max, safeDefaults.growthRateSales);
+      return clamped !== void 0 ? round2(clamped, settings.growth_precision) : void 0;
+    })() : void 0,
+    growthRateCF: assumptions.growthRateCF !== void 0 ? (() => {
+      const clamped = clamp(assumptions.growthRateCF, settings.growth_min, settings.growth_max, safeDefaults.growthRateCF);
+      return clamped !== void 0 ? round2(clamped, settings.growth_precision) : void 0;
+    })() : void 0,
+    growthRateBV: assumptions.growthRateBV !== void 0 ? (() => {
+      const clamped = clamp(assumptions.growthRateBV, settings.growth_min, settings.growth_max, safeDefaults.growthRateBV);
+      return clamped !== void 0 ? round2(clamped, settings.growth_precision) : void 0;
+    })() : void 0,
+    growthRateDiv: assumptions.growthRateDiv !== void 0 ? (() => {
+      const clamped = clamp(assumptions.growthRateDiv, settings.growth_min, settings.growth_max, safeDefaults.growthRateDiv);
+      return clamped !== void 0 ? round2(clamped, settings.growth_precision) : void 0;
+    })() : void 0,
+    // ✅ CRITIQUE : Préserver undefined pour éviter les valeurs inventées (0)
+    targetPE: assumptions.targetPE !== void 0 ? (() => {
+      const clamped = clamp(assumptions.targetPE, settings.target_pe_min, settings.target_pe_max, safeDefaults.targetPE);
+      return clamped !== void 0 ? round2(clamped, settings.ratio_precision) : void 0;
+    })() : void 0,
+    targetPCF: assumptions.targetPCF !== void 0 ? (() => {
+      const clamped = clamp(assumptions.targetPCF, settings.target_pcf_min, settings.target_pcf_max, safeDefaults.targetPCF);
+      return clamped !== void 0 ? round2(clamped, settings.ratio_precision) : void 0;
+    })() : void 0,
+    targetPBV: assumptions.targetPBV !== void 0 ? (() => {
+      const clamped = clamp(assumptions.targetPBV, settings.target_pbv_min, settings.target_pbv_max, safeDefaults.targetPBV);
+      return clamped !== void 0 ? round2(clamped, settings.ratio_precision) : void 0;
+    })() : void 0,
+    targetYield: assumptions.targetYield !== void 0 ? (() => {
+      const clamped = clamp(assumptions.targetYield, settings.target_yield_min, settings.target_yield_max, safeDefaults.targetYield);
+      return clamped !== void 0 ? round2(clamped, settings.yield_precision) : void 0;
+    })() : void 0,
     requiredReturn: round2(clamp(assumptions.requiredReturn, settings.required_return_min, settings.required_return_max, safeDefaults.requiredReturn), settings.ratio_precision),
     dividendPayoutRatio: round2(clamp(assumptions.dividendPayoutRatio, settings.dividend_payout_ratio_min, settings.dividend_payout_ratio_max, safeDefaults.dividendPayoutRatio), settings.ratio_precision),
     excludeEPS: assumptions.excludeEPS ?? safeDefaults.excludeEPS,
@@ -8416,7 +8446,12 @@ const calculateCAGR = (startValue, endValue, years) => {
   const result = (Math.pow(endValue / startValue, 1 / years) - 1) * 100;
   return isFinite(result) ? result : 0;
 };
-const formatCurrency = (val) => new Intl.NumberFormat("fr-CA", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(val);
+const formatCurrency = (val) => {
+  if (val === void 0 || val === null || !isFinite(val) || val === 0) {
+    return "N/A";
+  }
+  return new Intl.NumberFormat("fr-CA", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(val);
+};
 const formatPercent = (val) => new Intl.NumberFormat("fr-CA", { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 2 }).format(val / 100);
 const isMutualFund = (symbol, companyName) => {
   const symbolUpper = symbol.toUpperCase().trim();
@@ -34011,6 +34046,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     div: Math.max(assumptions.currentDividend || 0, 0)
   };
   const projectFutureValueSafe = (current, rate, years) => {
+    if (rate === void 0) return void 0;
     if (current <= 0 || !isFinite(current) || !isFinite(rate)) return 0;
     const { min: min2, max: max2 } = config2.growth;
     const safeRate = Math.max(min2, Math.min(rate, max2));
@@ -34018,36 +34054,36 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
   };
   const growthMin = config2.growth.min;
   const growthMax = config2.growth.max;
-  const safeGrowthEPS = Math.max(growthMin, Math.min(assumptions.growthRateEPS || 0, growthMax));
-  const safeGrowthCF = Math.max(growthMin, Math.min(assumptions.growthRateCF || 0, growthMax));
-  const safeGrowthBV = Math.max(growthMin, Math.min(assumptions.growthRateBV || 0, growthMax));
-  const safeGrowthDiv = Math.max(growthMin, Math.min(assumptions.growthRateDiv || 0, growthMax));
+  const safeGrowthEPS = assumptions.growthRateEPS !== void 0 ? Math.max(growthMin, Math.min(assumptions.growthRateEPS, growthMax)) : void 0;
+  const safeGrowthCF = assumptions.growthRateCF !== void 0 ? Math.max(growthMin, Math.min(assumptions.growthRateCF, growthMax)) : void 0;
+  const safeGrowthBV = assumptions.growthRateBV !== void 0 ? Math.max(growthMin, Math.min(assumptions.growthRateBV, growthMax)) : void 0;
+  const safeGrowthDiv = assumptions.growthRateDiv !== void 0 ? Math.max(growthMin, Math.min(assumptions.growthRateDiv, growthMax)) : void 0;
   const futureValues = {
     eps: projectFutureValueSafe(baseValues.eps, safeGrowthEPS, 5),
     cf: projectFutureValueSafe(baseValues.cf, safeGrowthCF, 5),
     bv: projectFutureValueSafe(baseValues.bv, safeGrowthBV, 5),
     div: projectFutureValueSafe(baseValues.div, safeGrowthDiv, 5)
   };
-  const safeTargetPE = Math.max(config2.ratios.pe.min, Math.min(assumptions.targetPE || 0, config2.ratios.pe.max));
-  const safeTargetPCF = Math.max(config2.ratios.pcf.min, Math.min(assumptions.targetPCF || 0, config2.ratios.pcf.max));
-  const safeTargetPBV = Math.max(config2.ratios.pbv.min, Math.min(assumptions.targetPBV || 0, config2.ratios.pbv.max));
-  const safeTargetYield = Math.max(config2.ratios.yield.min, Math.min(assumptions.targetYield || 0, config2.ratios.yield.max));
+  const safeTargetPE = assumptions.targetPE !== void 0 ? Math.max(config2.ratios.pe.min, Math.min(assumptions.targetPE, config2.ratios.pe.max)) : void 0;
+  const safeTargetPCF = assumptions.targetPCF !== void 0 ? Math.max(config2.ratios.pcf.min, Math.min(assumptions.targetPCF, config2.ratios.pcf.max)) : void 0;
+  const safeTargetPBV = assumptions.targetPBV !== void 0 ? Math.max(config2.ratios.pbv.min, Math.min(assumptions.targetPBV, config2.ratios.pbv.max)) : void 0;
+  const safeTargetYield = assumptions.targetYield !== void 0 ? Math.max(config2.ratios.yield.min, Math.min(assumptions.targetYield, config2.ratios.yield.max)) : void 0;
   const targets = {
-    eps: futureValues.eps > 0 && safeTargetPE > 0 && safeTargetPE <= 100 ? futureValues.eps * safeTargetPE : 0,
-    cf: futureValues.cf > 0 && safeTargetPCF > 0 && safeTargetPCF <= 100 ? futureValues.cf * safeTargetPCF : 0,
-    bv: futureValues.bv > 0 && safeTargetPBV > 0 && safeTargetPBV <= 50 ? futureValues.bv * safeTargetPBV : 0,
-    div: futureValues.div > 0 && safeTargetYield > 0 && safeTargetYield <= 20 ? futureValues.div / (safeTargetYield / 100) : 0
+    eps: futureValues.eps !== void 0 && safeTargetPE !== void 0 && futureValues.eps > 0 && safeTargetPE > 0 && safeTargetPE <= 100 ? futureValues.eps * safeTargetPE : void 0,
+    cf: futureValues.cf !== void 0 && safeTargetPCF !== void 0 && futureValues.cf > 0 && safeTargetPCF > 0 && safeTargetPCF <= 100 ? futureValues.cf * safeTargetPCF : void 0,
+    bv: futureValues.bv !== void 0 && safeTargetPBV !== void 0 && futureValues.bv > 0 && safeTargetPBV > 0 && safeTargetPBV <= 50 ? futureValues.bv * safeTargetPBV : void 0,
+    div: futureValues.div !== void 0 && safeTargetYield !== void 0 && futureValues.div > 0 && safeTargetYield > 0 && safeTargetYield <= 20 ? futureValues.div / (safeTargetYield / 100) : void 0
   };
   const currentPrice = Math.max(assumptions.currentPrice || 0, 0.01);
   const maxReasonableTarget = currentPrice * config2.projections.maxReasonableTargetMultiplier;
   const minReasonableTarget = currentPrice * config2.projections.minReasonableTargetMultiplier;
   const validTargets = [
-    !assumptions.excludeEPS && targets.eps > 0 && targets.eps >= minReasonableTarget && targets.eps <= maxReasonableTarget && isFinite(targets.eps) ? targets.eps : null,
-    !assumptions.excludeCF && targets.cf > 0 && targets.cf >= minReasonableTarget && targets.cf <= maxReasonableTarget && isFinite(targets.cf) ? targets.cf : null,
-    !assumptions.excludeBV && targets.bv > 0 && targets.bv >= minReasonableTarget && targets.bv <= maxReasonableTarget && isFinite(targets.bv) ? targets.bv : null,
-    !assumptions.excludeDIV && targets.div > 0 && targets.div >= minReasonableTarget && targets.div <= maxReasonableTarget && isFinite(targets.div) ? targets.div : null
+    !assumptions.excludeEPS && targets.eps !== void 0 && targets.eps > 0 && targets.eps >= minReasonableTarget && targets.eps <= maxReasonableTarget && isFinite(targets.eps) ? targets.eps : null,
+    !assumptions.excludeCF && targets.cf !== void 0 && targets.cf > 0 && targets.cf >= minReasonableTarget && targets.cf <= maxReasonableTarget && isFinite(targets.cf) ? targets.cf : null,
+    !assumptions.excludeBV && targets.bv !== void 0 && targets.bv > 0 && targets.bv >= minReasonableTarget && targets.bv <= maxReasonableTarget && isFinite(targets.bv) ? targets.bv : null,
+    !assumptions.excludeDIV && targets.div !== void 0 && targets.div > 0 && targets.div >= minReasonableTarget && targets.div <= maxReasonableTarget && isFinite(targets.div) ? targets.div : null
   ].filter((t) => t !== null && t > 0 && isFinite(t));
-  const avgTargetPrice = validTargets.length > 0 ? validTargets.reduce((a2, b) => a2 + b, 0) / validTargets.length : 0;
+  const avgTargetPrice = validTargets.length > 0 ? validTargets.reduce((a2, b) => a2 + b, 0) / validTargets.length : void 0;
   let totalDividends = 0;
   let currentD = Math.max(0, baseValues.div);
   const maxReasonableDividends = currentPrice * config2.projections.maxDividendMultiplier;
@@ -34221,15 +34257,18 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
   }, [sector, info == null ? void 0 : info.sector]);
   const title5YearProjections = reactExports.useMemo(() => {
     if (!calculateHistoricalRanges) return null;
+    if (assumptions.targetPE === void 0 || assumptions.growthRateEPS === void 0) {
+      return null;
+    }
     return {
-      pe: { min: assumptions.targetPE * 0.9, max: assumptions.targetPE * 1.1, avg: assumptions.targetPE, median: assumptions.targetPE },
-      pcf: { min: assumptions.targetPCF * 0.9, max: assumptions.targetPCF * 1.1, avg: assumptions.targetPCF, median: assumptions.targetPCF },
-      pbv: { min: assumptions.targetPBV * 0.9, max: assumptions.targetPBV * 1.1, avg: assumptions.targetPBV, median: assumptions.targetPBV },
-      yield: { min: assumptions.targetYield * 0.9, max: assumptions.targetYield * 1.1, avg: assumptions.targetYield, median: assumptions.targetYield },
-      epsGrowth: { min: assumptions.growthRateEPS * 0.8, max: assumptions.growthRateEPS * 1.2, avg: assumptions.growthRateEPS, median: assumptions.growthRateEPS },
-      cfGrowth: { min: assumptions.growthRateCF * 0.8, max: assumptions.growthRateCF * 1.2, avg: assumptions.growthRateCF, median: assumptions.growthRateCF },
-      bvGrowth: { min: assumptions.growthRateBV * 0.8, max: assumptions.growthRateBV * 1.2, avg: assumptions.growthRateBV, median: assumptions.growthRateBV },
-      divGrowth: { min: assumptions.growthRateDiv * 0.8, max: assumptions.growthRateDiv * 1.2, avg: assumptions.growthRateDiv, median: assumptions.growthRateDiv }
+      pe: assumptions.targetPE !== void 0 ? { min: assumptions.targetPE * 0.9, max: assumptions.targetPE * 1.1, avg: assumptions.targetPE, median: assumptions.targetPE } : null,
+      pcf: assumptions.targetPCF !== void 0 ? { min: assumptions.targetPCF * 0.9, max: assumptions.targetPCF * 1.1, avg: assumptions.targetPCF, median: assumptions.targetPCF } : null,
+      pbv: assumptions.targetPBV !== void 0 ? { min: assumptions.targetPBV * 0.9, max: assumptions.targetPBV * 1.1, avg: assumptions.targetPBV, median: assumptions.targetPBV } : null,
+      yield: assumptions.targetYield !== void 0 ? { min: assumptions.targetYield * 0.9, max: assumptions.targetYield * 1.1, avg: assumptions.targetYield, median: assumptions.targetYield } : null,
+      epsGrowth: assumptions.growthRateEPS !== void 0 ? { min: assumptions.growthRateEPS * 0.8, max: assumptions.growthRateEPS * 1.2, avg: assumptions.growthRateEPS, median: assumptions.growthRateEPS } : null,
+      cfGrowth: assumptions.growthRateCF !== void 0 ? { min: assumptions.growthRateCF * 0.8, max: assumptions.growthRateCF * 1.2, avg: assumptions.growthRateCF, median: assumptions.growthRateCF } : null,
+      bvGrowth: assumptions.growthRateBV !== void 0 ? { min: assumptions.growthRateBV * 0.8, max: assumptions.growthRateBV * 1.2, avg: assumptions.growthRateBV, median: assumptions.growthRateBV } : null,
+      divGrowth: assumptions.growthRateDiv !== void 0 ? { min: assumptions.growthRateDiv * 0.8, max: assumptions.growthRateDiv * 1.2, avg: assumptions.growthRateDiv, median: assumptions.growthRateDiv } : null
     };
   }, [calculateHistoricalRanges, assumptions]);
   const sector5YearProjections = reactExports.useMemo(() => {

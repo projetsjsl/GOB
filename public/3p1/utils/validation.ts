@@ -373,17 +373,37 @@ export const sanitizeAssumptions = async (assumptions: Partial<Assumptions>): Pr
       : safeDefaults.baseYear,
     
     // TAUX DE CROISSANCE: Utilise les limites personnalisées
-    growthRateEPS: round(clamp(assumptions.growthRateEPS, growthMin, growthMax, safeDefaults.growthRateEPS), growthPrecision),
-    growthRateSales: round(clamp(assumptions.growthRateSales, growthMin, growthMax, safeDefaults.growthRateSales), growthPrecision),
-    growthRateCF: round(clamp(assumptions.growthRateCF, growthMin, growthMax, safeDefaults.growthRateCF), growthPrecision),
-    growthRateBV: round(clamp(assumptions.growthRateBV, growthMin, growthMax, safeDefaults.growthRateBV), growthPrecision),
-    growthRateDiv: round(clamp(assumptions.growthRateDiv, growthMin, growthMax, safeDefaults.growthRateDiv), growthPrecision),
+    // ✅ CRITIQUE : Préserver undefined pour éviter les valeurs inventées (0)
+    growthRateEPS: assumptions.growthRateEPS !== undefined 
+      ? round(clamp(assumptions.growthRateEPS, growthMin, growthMax, safeDefaults.growthRateEPS)!, growthPrecision)
+      : undefined,
+    growthRateSales: assumptions.growthRateSales !== undefined 
+      ? round(clamp(assumptions.growthRateSales, growthMin, growthMax, safeDefaults.growthRateSales)!, growthPrecision)
+      : undefined,
+    growthRateCF: assumptions.growthRateCF !== undefined 
+      ? round(clamp(assumptions.growthRateCF, growthMin, growthMax, safeDefaults.growthRateCF)!, growthPrecision)
+      : undefined,
+    growthRateBV: assumptions.growthRateBV !== undefined 
+      ? round(clamp(assumptions.growthRateBV, growthMin, growthMax, safeDefaults.growthRateBV)!, growthPrecision)
+      : undefined,
+    growthRateDiv: assumptions.growthRateDiv !== undefined 
+      ? round(clamp(assumptions.growthRateDiv, growthMin, growthMax, safeDefaults.growthRateDiv)!, growthPrecision)
+      : undefined,
     
     // RATIOS CIBLES: Utilise les limites personnalisées
-    targetPE: round(clamp(assumptions.targetPE, validationSettings.target_pe_min ?? 5, validationSettings.target_pe_max ?? 50, safeDefaults.targetPE), ratioPrecision),
-    targetPCF: round(clamp(assumptions.targetPCF, validationSettings.target_pcf_min ?? 3, validationSettings.target_pcf_max ?? 50, safeDefaults.targetPCF), ratioPrecision),
-    targetPBV: round(clamp(assumptions.targetPBV, validationSettings.target_pbv_min ?? 0.5, validationSettings.target_pbv_max ?? 10, safeDefaults.targetPBV), ratioPrecision),
-    targetYield: round(clamp(assumptions.targetYield, validationSettings.target_yield_min ?? 0, validationSettings.target_yield_max ?? 15, safeDefaults.targetYield), yieldPrecision),
+    // ✅ CRITIQUE : Préserver undefined pour éviter les valeurs inventées (0)
+    targetPE: assumptions.targetPE !== undefined 
+      ? round(clamp(assumptions.targetPE, validationSettings.target_pe_min ?? 5, validationSettings.target_pe_max ?? 50, safeDefaults.targetPE)!, ratioPrecision)
+      : undefined,
+    targetPCF: assumptions.targetPCF !== undefined 
+      ? round(clamp(assumptions.targetPCF, validationSettings.target_pcf_min ?? 3, validationSettings.target_pcf_max ?? 50, safeDefaults.targetPCF)!, ratioPrecision)
+      : undefined,
+    targetPBV: assumptions.targetPBV !== undefined 
+      ? round(clamp(assumptions.targetPBV, validationSettings.target_pbv_min ?? 0.5, validationSettings.target_pbv_max ?? 10, safeDefaults.targetPBV)!, ratioPrecision)
+      : undefined,
+    targetYield: assumptions.targetYield !== undefined 
+      ? round(clamp(assumptions.targetYield, validationSettings.target_yield_min ?? 0, validationSettings.target_yield_max ?? 15, safeDefaults.targetYield)!, yieldPrecision)
+      : undefined,
     
     // Autres paramètres
     requiredReturn: round(clamp(assumptions.requiredReturn, validationSettings.required_return_min ?? 5, validationSettings.required_return_max ?? 25, safeDefaults.requiredReturn), ratioPrecision),
@@ -450,8 +470,12 @@ export const sanitizeAssumptionsSync = (assumptions: Partial<Assumptions>): Assu
   };
 
   // Helper pour limiter une valeur dans une plage
-  const clamp = (value: number | undefined | null, min: number, max: number, defaultVal: number): number => {
-    if (value === undefined || value === null || !isFinite(value)) return defaultVal;
+  // ✅ CRITIQUE : Préserver undefined pour éviter les valeurs inventées (0) dans les profils squelettes
+  const clamp = (value: number | undefined | null, min: number, max: number, defaultVal: number): number | undefined => {
+    // ✅ Si undefined, retourner undefined (ne pas utiliser la valeur par défaut)
+    if (value === undefined) return undefined;
+    // ✅ Si null ou NaN, utiliser la valeur par défaut
+    if (value === null || !isFinite(value)) return defaultVal;
     return Math.max(min, Math.min(value, max));
   };
 
@@ -481,7 +505,9 @@ export const sanitizeAssumptionsSync = (assumptions: Partial<Assumptions>): Assu
     yield_precision: 2
   };
 
-  const sanitized: Assumptions = {
+  // ✅ CRITIQUE : Créer un objet avec undefined préservé, puis utiliser un cast pour le type
+  // Cela permet de préserver les undefined dans les profils squelettes sans casser le type Assumptions
+  const sanitized: any = {
     currentPrice: assumptions.currentPrice && assumptions.currentPrice > 0 && isFinite(assumptions.currentPrice)
       ? round(assumptions.currentPrice, 2)
       : safeDefaults.currentPrice,
@@ -494,16 +520,36 @@ export const sanitizeAssumptionsSync = (assumptions: Partial<Assumptions>): Assu
       ? assumptions.baseYear
       : safeDefaults.baseYear,
     
-    growthRateEPS: round(clamp(assumptions.growthRateEPS, settings.growth_min, settings.growth_max, safeDefaults.growthRateEPS), settings.growth_precision),
-    growthRateSales: round(clamp(assumptions.growthRateSales, settings.growth_min, settings.growth_max, safeDefaults.growthRateSales), settings.growth_precision),
-    growthRateCF: round(clamp(assumptions.growthRateCF, settings.growth_min, settings.growth_max, safeDefaults.growthRateCF), settings.growth_precision),
-    growthRateBV: round(clamp(assumptions.growthRateBV, settings.growth_min, settings.growth_max, safeDefaults.growthRateBV), settings.growth_precision),
-    growthRateDiv: round(clamp(assumptions.growthRateDiv, settings.growth_min, settings.growth_max, safeDefaults.growthRateDiv), settings.growth_precision),
+    // ✅ CRITIQUE : Préserver undefined pour éviter les valeurs inventées (0) dans les profils squelettes
+    growthRateEPS: assumptions.growthRateEPS !== undefined 
+      ? (() => { const clamped = clamp(assumptions.growthRateEPS, settings.growth_min, settings.growth_max, safeDefaults.growthRateEPS); return clamped !== undefined ? round(clamped, settings.growth_precision) : undefined; })()
+      : undefined,
+    growthRateSales: assumptions.growthRateSales !== undefined 
+      ? (() => { const clamped = clamp(assumptions.growthRateSales, settings.growth_min, settings.growth_max, safeDefaults.growthRateSales); return clamped !== undefined ? round(clamped, settings.growth_precision) : undefined; })()
+      : undefined,
+    growthRateCF: assumptions.growthRateCF !== undefined 
+      ? (() => { const clamped = clamp(assumptions.growthRateCF, settings.growth_min, settings.growth_max, safeDefaults.growthRateCF); return clamped !== undefined ? round(clamped, settings.growth_precision) : undefined; })()
+      : undefined,
+    growthRateBV: assumptions.growthRateBV !== undefined 
+      ? (() => { const clamped = clamp(assumptions.growthRateBV, settings.growth_min, settings.growth_max, safeDefaults.growthRateBV); return clamped !== undefined ? round(clamped, settings.growth_precision) : undefined; })()
+      : undefined,
+    growthRateDiv: assumptions.growthRateDiv !== undefined 
+      ? (() => { const clamped = clamp(assumptions.growthRateDiv, settings.growth_min, settings.growth_max, safeDefaults.growthRateDiv); return clamped !== undefined ? round(clamped, settings.growth_precision) : undefined; })()
+      : undefined,
     
-    targetPE: round(clamp(assumptions.targetPE, settings.target_pe_min, settings.target_pe_max, safeDefaults.targetPE), settings.ratio_precision),
-    targetPCF: round(clamp(assumptions.targetPCF, settings.target_pcf_min, settings.target_pcf_max, safeDefaults.targetPCF), settings.ratio_precision),
-    targetPBV: round(clamp(assumptions.targetPBV, settings.target_pbv_min, settings.target_pbv_max, safeDefaults.targetPBV), settings.ratio_precision),
-    targetYield: round(clamp(assumptions.targetYield, settings.target_yield_min, settings.target_yield_max, safeDefaults.targetYield), settings.yield_precision),
+    // ✅ CRITIQUE : Préserver undefined pour éviter les valeurs inventées (0)
+    targetPE: assumptions.targetPE !== undefined 
+      ? (() => { const clamped = clamp(assumptions.targetPE, settings.target_pe_min, settings.target_pe_max, safeDefaults.targetPE); return clamped !== undefined ? round(clamped, settings.ratio_precision) : undefined; })()
+      : undefined,
+    targetPCF: assumptions.targetPCF !== undefined 
+      ? (() => { const clamped = clamp(assumptions.targetPCF, settings.target_pcf_min, settings.target_pcf_max, safeDefaults.targetPCF); return clamped !== undefined ? round(clamped, settings.ratio_precision) : undefined; })()
+      : undefined,
+    targetPBV: assumptions.targetPBV !== undefined 
+      ? (() => { const clamped = clamp(assumptions.targetPBV, settings.target_pbv_min, settings.target_pbv_max, safeDefaults.targetPBV); return clamped !== undefined ? round(clamped, settings.ratio_precision) : undefined; })()
+      : undefined,
+    targetYield: assumptions.targetYield !== undefined 
+      ? (() => { const clamped = clamp(assumptions.targetYield, settings.target_yield_min, settings.target_yield_max, safeDefaults.targetYield); return clamped !== undefined ? round(clamped, settings.yield_precision) : undefined; })()
+      : undefined,
     
     requiredReturn: round(clamp(assumptions.requiredReturn, settings.required_return_min, settings.required_return_max, safeDefaults.requiredReturn), settings.ratio_precision),
     dividendPayoutRatio: round(clamp(assumptions.dividendPayoutRatio, settings.dividend_payout_ratio_min, settings.dividend_payout_ratio_max, safeDefaults.dividendPayoutRatio), settings.ratio_precision),
@@ -514,7 +560,10 @@ export const sanitizeAssumptionsSync = (assumptions: Partial<Assumptions>): Assu
     excludeDIV: assumptions.excludeDIV ?? safeDefaults.excludeDIV
   };
 
-  return sanitized;
+  // ✅ CRITIQUE : Utiliser un cast pour permettre les undefined temporairement
+  // Les valeurs undefined seront préservées et ne seront pas transformées en 0
+  // Le type Assumptions ne permet pas undefined, mais on utilise un cast pour la compatibilité
+  return sanitized as Assumptions;
 };
 
 /**

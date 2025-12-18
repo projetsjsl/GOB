@@ -53,7 +53,10 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   };
 
   // Projections (5 Years) - MÊME VALIDATION QUE KPIDashboard
-  const projectFutureValueSafe = (current: number, rate: number, years: number): number => {
+  // ✅ CRITIQUE : Gérer undefined pour éviter les valeurs inventées (0)
+  const projectFutureValueSafe = (current: number, rate: number | undefined, years: number): number | undefined => {
+    // ✅ Si le taux est undefined, retourner undefined (pas 0)
+    if (rate === undefined) return undefined;
     // Valider les entrées
     if (current <= 0 || !isFinite(current) || !isFinite(rate)) return 0;
     // Limiter le taux de croissance (Configurable)
@@ -63,12 +66,22 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   };
 
   // Valider et limiter les taux de croissance (Configurable)
+  // ✅ CRITIQUE : Ne pas utiliser || 0 pour éviter les valeurs inventées
+  // Si undefined, utiliser undefined (pas 0) pour indiquer que la valeur n'est pas encore chargée
   const growthMin = config.growth.min;
   const growthMax = config.growth.max;
-  const safeGrowthEPS = Math.max(growthMin, Math.min(assumptions.growthRateEPS || 0, growthMax));
-  const safeGrowthCF = Math.max(growthMin, Math.min(assumptions.growthRateCF || 0, growthMax));
-  const safeGrowthBV = Math.max(growthMin, Math.min(assumptions.growthRateBV || 0, growthMax));
-  const safeGrowthDiv = Math.max(growthMin, Math.min(assumptions.growthRateDiv || 0, growthMax));
+  const safeGrowthEPS = assumptions.growthRateEPS !== undefined 
+    ? Math.max(growthMin, Math.min(assumptions.growthRateEPS, growthMax))
+    : undefined;
+  const safeGrowthCF = assumptions.growthRateCF !== undefined 
+    ? Math.max(growthMin, Math.min(assumptions.growthRateCF, growthMax))
+    : undefined;
+  const safeGrowthBV = assumptions.growthRateBV !== undefined 
+    ? Math.max(growthMin, Math.min(assumptions.growthRateBV, growthMax))
+    : undefined;
+  const safeGrowthDiv = assumptions.growthRateDiv !== undefined 
+    ? Math.max(growthMin, Math.min(assumptions.growthRateDiv, growthMax))
+    : undefined;
 
   const futureValues = {
     eps: projectFutureValueSafe(baseValues.eps, safeGrowthEPS, 5),
@@ -78,17 +91,35 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   };
 
   // Valider et limiter les ratios cibles (Configurable)
-  const safeTargetPE = Math.max(config.ratios.pe.min, Math.min(assumptions.targetPE || 0, config.ratios.pe.max));
-  const safeTargetPCF = Math.max(config.ratios.pcf.min, Math.min(assumptions.targetPCF || 0, config.ratios.pcf.max));
-  const safeTargetPBV = Math.max(config.ratios.pbv.min, Math.min(assumptions.targetPBV || 0, config.ratios.pbv.max));
-  const safeTargetYield = Math.max(config.ratios.yield.min, Math.min(assumptions.targetYield || 0, config.ratios.yield.max));
+  // ✅ CRITIQUE : Ne pas utiliser || 0 pour éviter les valeurs inventées
+  const safeTargetPE = assumptions.targetPE !== undefined 
+    ? Math.max(config.ratios.pe.min, Math.min(assumptions.targetPE, config.ratios.pe.max))
+    : undefined;
+  const safeTargetPCF = assumptions.targetPCF !== undefined 
+    ? Math.max(config.ratios.pcf.min, Math.min(assumptions.targetPCF, config.ratios.pcf.max))
+    : undefined;
+  const safeTargetPBV = assumptions.targetPBV !== undefined 
+    ? Math.max(config.ratios.pbv.min, Math.min(assumptions.targetPBV, config.ratios.pbv.max))
+    : undefined;
+  const safeTargetYield = assumptions.targetYield !== undefined 
+    ? Math.max(config.ratios.yield.min, Math.min(assumptions.targetYield, config.ratios.yield.max))
+    : undefined;
 
   // Target Prices - MÊME VALIDATION QUE KPIDashboard
+  // ✅ CRITIQUE : Gérer undefined pour éviter les valeurs inventées (0)
   const targets = {
-    eps: futureValues.eps > 0 && safeTargetPE > 0 && safeTargetPE <= 100 ? futureValues.eps * safeTargetPE : 0,
-    cf: futureValues.cf > 0 && safeTargetPCF > 0 && safeTargetPCF <= 100 ? futureValues.cf * safeTargetPCF : 0,
-    bv: futureValues.bv > 0 && safeTargetPBV > 0 && safeTargetPBV <= 50 ? futureValues.bv * safeTargetPBV : 0,
-    div: futureValues.div > 0 && safeTargetYield > 0 && safeTargetYield <= 20 ? futureValues.div / (safeTargetYield / 100) : 0
+    eps: futureValues.eps !== undefined && safeTargetPE !== undefined && futureValues.eps > 0 && safeTargetPE > 0 && safeTargetPE <= 100 
+      ? futureValues.eps * safeTargetPE 
+      : undefined,
+    cf: futureValues.cf !== undefined && safeTargetPCF !== undefined && futureValues.cf > 0 && safeTargetPCF > 0 && safeTargetPCF <= 100 
+      ? futureValues.cf * safeTargetPCF 
+      : undefined,
+    bv: futureValues.bv !== undefined && safeTargetPBV !== undefined && futureValues.bv > 0 && safeTargetPBV > 0 && safeTargetPBV <= 50 
+      ? futureValues.bv * safeTargetPBV 
+      : undefined,
+    div: futureValues.div !== undefined && safeTargetYield !== undefined && futureValues.div > 0 && safeTargetYield > 0 && safeTargetYield <= 20 
+      ? futureValues.div / (safeTargetYield / 100) 
+      : undefined
   };
 
   // Average Target Price (excluding disabled metrics) - MÊME VALIDATION QUE KPIDashboard
@@ -96,16 +127,18 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   const maxReasonableTarget = currentPrice * config.projections.maxReasonableTargetMultiplier;
   const minReasonableTarget = currentPrice * config.projections.minReasonableTargetMultiplier;
   
+  // ✅ CRITIQUE : Gérer undefined pour éviter les valeurs inventées
   const validTargets = [
-    !assumptions.excludeEPS && targets.eps > 0 && targets.eps >= minReasonableTarget && targets.eps <= maxReasonableTarget && isFinite(targets.eps) ? targets.eps : null,
-    !assumptions.excludeCF && targets.cf > 0 && targets.cf >= minReasonableTarget && targets.cf <= maxReasonableTarget && isFinite(targets.cf) ? targets.cf : null,
-    !assumptions.excludeBV && targets.bv > 0 && targets.bv >= minReasonableTarget && targets.bv <= maxReasonableTarget && isFinite(targets.bv) ? targets.bv : null,
-    !assumptions.excludeDIV && targets.div > 0 && targets.div >= minReasonableTarget && targets.div <= maxReasonableTarget && isFinite(targets.div) ? targets.div : null
+    !assumptions.excludeEPS && targets.eps !== undefined && targets.eps > 0 && targets.eps >= minReasonableTarget && targets.eps <= maxReasonableTarget && isFinite(targets.eps) ? targets.eps : null,
+    !assumptions.excludeCF && targets.cf !== undefined && targets.cf > 0 && targets.cf >= minReasonableTarget && targets.cf <= maxReasonableTarget && isFinite(targets.cf) ? targets.cf : null,
+    !assumptions.excludeBV && targets.bv !== undefined && targets.bv > 0 && targets.bv >= minReasonableTarget && targets.bv <= maxReasonableTarget && isFinite(targets.bv) ? targets.bv : null,
+    !assumptions.excludeDIV && targets.div !== undefined && targets.div > 0 && targets.div >= minReasonableTarget && targets.div <= maxReasonableTarget && isFinite(targets.div) ? targets.div : null
   ].filter((t): t is number => t !== null && t > 0 && isFinite(t));
   
+  // ✅ Si aucun target valide, retourner undefined au lieu de 0
   const avgTargetPrice = validTargets.length > 0
     ? validTargets.reduce((a, b) => a + b, 0) / validTargets.length
-    : 0;
+    : undefined;
 
   // Dividend Accumulation - MÊME VALIDATION QUE KPIDashboard
   let totalDividends = 0;
@@ -341,17 +374,38 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   }, [sector, info?.sector]);
 
   // Projections 5 ans pour le titre
+  // ✅ CRITIQUE : Gérer undefined pour éviter les valeurs inventées (NaN)
   const title5YearProjections = useMemo(() => {
     if (!calculateHistoricalRanges) return null;
+    // ✅ Si les valeurs sont undefined, retourner null au lieu de calculer avec NaN
+    if (assumptions.targetPE === undefined || assumptions.growthRateEPS === undefined) {
+      return null;
+    }
     return {
-      pe: { min: assumptions.targetPE * 0.9, max: assumptions.targetPE * 1.1, avg: assumptions.targetPE, median: assumptions.targetPE },
-      pcf: { min: assumptions.targetPCF * 0.9, max: assumptions.targetPCF * 1.1, avg: assumptions.targetPCF, median: assumptions.targetPCF },
-      pbv: { min: assumptions.targetPBV * 0.9, max: assumptions.targetPBV * 1.1, avg: assumptions.targetPBV, median: assumptions.targetPBV },
-      yield: { min: assumptions.targetYield * 0.9, max: assumptions.targetYield * 1.1, avg: assumptions.targetYield, median: assumptions.targetYield },
-      epsGrowth: { min: assumptions.growthRateEPS * 0.8, max: assumptions.growthRateEPS * 1.2, avg: assumptions.growthRateEPS, median: assumptions.growthRateEPS },
-      cfGrowth: { min: assumptions.growthRateCF * 0.8, max: assumptions.growthRateCF * 1.2, avg: assumptions.growthRateCF, median: assumptions.growthRateCF },
-      bvGrowth: { min: assumptions.growthRateBV * 0.8, max: assumptions.growthRateBV * 1.2, avg: assumptions.growthRateBV, median: assumptions.growthRateBV },
-      divGrowth: { min: assumptions.growthRateDiv * 0.8, max: assumptions.growthRateDiv * 1.2, avg: assumptions.growthRateDiv, median: assumptions.growthRateDiv }
+      pe: assumptions.targetPE !== undefined 
+        ? { min: assumptions.targetPE * 0.9, max: assumptions.targetPE * 1.1, avg: assumptions.targetPE, median: assumptions.targetPE }
+        : null,
+      pcf: assumptions.targetPCF !== undefined 
+        ? { min: assumptions.targetPCF * 0.9, max: assumptions.targetPCF * 1.1, avg: assumptions.targetPCF, median: assumptions.targetPCF }
+        : null,
+      pbv: assumptions.targetPBV !== undefined 
+        ? { min: assumptions.targetPBV * 0.9, max: assumptions.targetPBV * 1.1, avg: assumptions.targetPBV, median: assumptions.targetPBV }
+        : null,
+      yield: assumptions.targetYield !== undefined 
+        ? { min: assumptions.targetYield * 0.9, max: assumptions.targetYield * 1.1, avg: assumptions.targetYield, median: assumptions.targetYield }
+        : null,
+      epsGrowth: assumptions.growthRateEPS !== undefined 
+        ? { min: assumptions.growthRateEPS * 0.8, max: assumptions.growthRateEPS * 1.2, avg: assumptions.growthRateEPS, median: assumptions.growthRateEPS }
+        : null,
+      cfGrowth: assumptions.growthRateCF !== undefined 
+        ? { min: assumptions.growthRateCF * 0.8, max: assumptions.growthRateCF * 1.2, avg: assumptions.growthRateCF, median: assumptions.growthRateCF }
+        : null,
+      bvGrowth: assumptions.growthRateBV !== undefined 
+        ? { min: assumptions.growthRateBV * 0.8, max: assumptions.growthRateBV * 1.2, avg: assumptions.growthRateBV, median: assumptions.growthRateBV }
+        : null,
+      divGrowth: assumptions.growthRateDiv !== undefined 
+        ? { min: assumptions.growthRateDiv * 0.8, max: assumptions.growthRateDiv * 1.2, avg: assumptions.growthRateDiv, median: assumptions.growthRateDiv }
+        : null
     };
   }, [calculateHistoricalRanges, assumptions]);
 

@@ -17,8 +17,69 @@ interface CeoModeProps {
 export const CeoMode: React.FC<CeoModeProps> = ({ onBack, onInjectPrompt, avatarImage, onOpenGallery }) => {
   const [step, setStep] = useState<'config' | 'live'>('config');
   const [company, setCompany] = useState<CompanyInfo>({ name: '', ticker: '', industry: '' });
+  const [logoError, setLogoError] = useState(false);
   const gemini = useGeminiLive();
-  const logoUrl = company.name ? `https://logo.clearbit.com/${company.name.replace(/\s+/g, '').toLowerCase()}.com` : '';
+  
+  // Fonction pour obtenir l'URL du logo avec plusieurs fallbacks
+  const getLogoUrl = (companyName: string, ticker: string): string => {
+    if (!companyName) return '';
+    
+    // Mapping de tickers vers domaines connus
+    const tickerToDomain: Record<string, string> = {
+      'TSLA': 'tesla.com',
+      'AAPL': 'apple.com',
+      'MSFT': 'microsoft.com',
+      'GOOGL': 'google.com',
+      'AMZN': 'amazon.com',
+      'META': 'meta.com',
+      'NVDA': 'nvidia.com',
+      'NFLX': 'netflix.com',
+      'DIS': 'disney.com',
+      'JPM': 'jpmorgan.com',
+      'BAC': 'bankofamerica.com',
+      'WMT': 'walmart.com',
+      'V': 'visa.com',
+      'MA': 'mastercard.com',
+      'JNJ': 'jnj.com',
+      'PG': 'pg.com',
+      'KO': 'coca-cola.com',
+      'PEP': 'pepsico.com',
+    };
+    
+    // Essayer d'abord avec le ticker si disponible
+    if (ticker && tickerToDomain[ticker.toUpperCase()]) {
+      return `https://logo.clearbit.com/${tickerToDomain[ticker.toUpperCase()]}`;
+    }
+    
+    // Extraire le domaine du nom de l'entreprise
+    // Supprimer les suffixes d'entreprise courants
+    const suffixes = [
+      ' inc', ' inc.', ' corp', ' corp.', ' corporation', ' ltd', ' ltd.', 
+      ' limited', ' llc', ' llc.', ' co', ' co.', ' company', ' companies',
+      ' technologies', ' tech', ' systems', ' group', ' holdings', ' international',
+      ' intl', ' solutions', ' services', ' industries', ' enterprises', ' partners',
+      ' ventures', ' capital', ' fund', ' management', ' advisors', ' consulting',
+      ' associates'
+    ];
+    
+    let cleanName = companyName.toLowerCase().trim();
+    
+    // Supprimer les suffixes
+    for (const suffix of suffixes) {
+      if (cleanName.endsWith(suffix)) {
+        cleanName = cleanName.slice(0, -suffix.length).trim();
+        break;
+      }
+    }
+    
+    // Nettoyer les espaces et caractères spéciaux
+    cleanName = cleanName.replace(/\s+/g, '').replace(/[^a-z0-9]/g, '');
+    
+    // Construire l'URL Clearbit
+    return `https://logo.clearbit.com/${cleanName}.com`;
+  };
+  
+  const logoUrl = getLogoUrl(company.name, company.ticker);
 
   const startSession = () => {
       const prompt = CEO_SYSTEM_INSTRUCTION_TEMPLATE.replace('{{COMPANY_NAME}}', company.name).replace('{{TICKER}}', company.ticker);
@@ -54,14 +115,26 @@ export const CeoMode: React.FC<CeoModeProps> = ({ onBack, onInjectPrompt, avatar
               <div className="w-full max-w-lg bg-slate-900/60 border border-white/10 rounded-3xl p-10 shadow-2xl relative backdrop-blur-xl">
                   <div className="text-center mb-10">
                       <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10 shadow-inner overflow-hidden backdrop-blur-md">
-                          {company.name ? <img src={logoUrl} alt={`Logo ${company.name}`} className="w-full h-full object-contain p-3" onError={(e) => (e.currentTarget.src = '')} /> : <Building2 className="w-10 h-10 text-cyan-400 opacity-50" />}
+                          {company.name && logoUrl && !logoError ? (
+                              <img 
+                                  src={logoUrl} 
+                                  alt={`Logo ${company.name}`} 
+                                  className="w-full h-full object-contain p-3" 
+                                  onError={(e) => {
+                                      setLogoError(true);
+                                      e.currentTarget.style.display = 'none';
+                                  }} 
+                              />
+                          ) : (
+                              <Building2 className="w-10 h-10 text-cyan-400 opacity-50" />
+                          )}
                       </div>
                       <h1 className="text-3xl font-bold text-white tracking-tight">CEO Simulator</h1>
                       <p className="text-sm text-cyan-200/60 mt-2">Simulation de haute fidélité. Entrez les paramètres.</p>
                   </div>
                   <div className="space-y-6">
-                      <div><label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Entreprise</label><input type="text" value={company.name} onChange={e => setCompany({...company, name: e.target.value})} className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white mt-2 focus:border-cyan-500 outline-none transition-all focus:bg-black/60" placeholder="Ex: Tesla Inc." /></div>
-                      <div><label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Ticker</label><input type="text" value={company.ticker} onChange={e => setCompany({...company, ticker: e.target.value})} className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white mt-2 focus:border-cyan-500 outline-none font-mono transition-all focus:bg-black/60" placeholder="Ex: TSLA" /></div>
+                      <div><label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Entreprise</label><input type="text" value={company.name} onChange={e => { setCompany({...company, name: e.target.value}); setLogoError(false); }} className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white mt-2 focus:border-cyan-500 outline-none transition-all focus:bg-black/60" placeholder="Ex: Tesla Inc." /></div>
+                      <div><label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Ticker</label><input type="text" value={company.ticker} onChange={e => { setCompany({...company, ticker: e.target.value}); setLogoError(false); }} className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white mt-2 focus:border-cyan-500 outline-none font-mono transition-all focus:bg-black/60" placeholder="Ex: TSLA" /></div>
                       <button onClick={startSession} disabled={!company.name || !company.ticker} className="w-full py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:scale-[1.02] text-white rounded-xl font-bold transition-all disabled:opacity-50 mt-6 shadow-xl shadow-cyan-900/20">Entrer dans la Board Room</button>
                   </div>
               </div>
@@ -77,7 +150,21 @@ export const CeoMode: React.FC<CeoModeProps> = ({ onBack, onInjectPrompt, avatar
               <div className="flex items-center gap-6">
                   <button onClick={handleDisconnect} className="bg-white/5 hover:bg-white/10 p-3 rounded-full text-white border border-white/10 backdrop-blur transition-all" title="Retour à la configuration"><ArrowLeft className="w-5 h-5" /></button>
                   <div className="flex items-center gap-4 bg-white/5 px-6 py-2 rounded-2xl border border-white/10 backdrop-blur-md">
-                      <img src={logoUrl} alt={`${company.name} logo`} className="w-8 h-8 rounded bg-white p-1 object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                      {logoUrl && !logoError ? (
+                          <img 
+                              src={logoUrl} 
+                              alt={`${company.name} logo`} 
+                              className="w-8 h-8 rounded bg-white p-1 object-contain" 
+                              onError={(e) => {
+                                  setLogoError(true);
+                                  e.currentTarget.style.display = 'none';
+                              }} 
+                          />
+                      ) : (
+                          <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center">
+                              <Building2 className="w-5 h-5 text-cyan-400" />
+                          </div>
+                      )}
                       <div><h1 className="text-xl font-bold text-white leading-none">{company.name}</h1><div className="flex items-center gap-2 text-[10px] font-mono text-cyan-300 mt-1 uppercase tracking-widest"><span>{company.ticker}</span> • <span className="text-green-400 animate-pulse">LIVE CONNECTED</span></div></div>
                   </div>
               </div>
