@@ -26,9 +26,6 @@
     "api/supabase-watchlist.js": {
       "maxDuration": 15
     },
-    "api/calendar-economic.js": {
-      "maxDuration": 15
-    },
     "api/calendar-earnings.js": {
       "maxDuration": 15
     },
