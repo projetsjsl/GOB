@@ -2,12 +2,15 @@
  * Yield Curve API Endpoint
  *
  * Récupère les données de la courbe des taux (yield curve) pour US et Canada
- * Sources de données: FRED API et FMP API
+ * Sources de données: FRED API, Bank of Canada API, FMP API
+ * Stockage: Supabase pour cache et données historiques
  *
  * Endpoints:
  * - GET /api/yield-curve?country=us (ou canada)
  * - GET /api/yield-curve?country=both (défaut)
+ * - GET /api/yield-curve?country=us&date=2024-01-15 (données historiques)
  */
+import { createSupabaseClient } from '../lib/supabase-config.js';
 
 // Configuration des taux par maturité
 const US_TREASURY_RATES = {
@@ -62,58 +65,14 @@ function maturityToMonths(maturity) {
   return 0;
 }
 
-/**
- * Récupère les données depuis Bank of Canada Valet API
- * Récupère l'historique pour calculer la variation sur 1 mois
- */
-async function fetchFromBoC(seriesId) {
-  try {
-    // Récupérer les 30 derniers jours pour trouver la comparaison M-1
-    const url = `https://www.bankofcanada.ca/valet/observations/${seriesId}/json?recent=30`;
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      console.warn(`⚠️ BoC API erreur pour ${seriesId}: ${response.status}`);
-      return null;
-    }
-
-    const data = await response.json();
-
-    if (data.observations && data.observations.length > 0) {
-      // Trier par date décroissante (le plus récent en premier)
-      const sortedObs = data.observations.sort((a, b) => new Date(b.d) - new Date(a.d));
-      
-      const latestObservation = sortedObs[0];
-      const value = latestObservation[seriesId]?.v;
-
-      if (!value || value === null) return null;
-
-      // Chercher la valeur il y a environ 1 mois (~20-22 jours de trading)
-      // On prend l'index 21 si dispo (env 1 mois), sinon le dernier dispo
-      const prevIndex = Math.min(21, sortedObs.length - 1);
-      const prevObservation = sortedObs[prevIndex];
-      const prevValue = prevObservation ? prevObservation[seriesId]?.v : null;
-
-      return {
-        value: parseFloat(value),
-        date: latestObservation.d,
-        prevValue: prevValue ? parseFloat(prevValue) : null,
-        change1M: prevValue ? (parseFloat(value) - parseFloat(prevValue)) : null
-      };
-    }
-
-    return null;
-  } catch (error) {
-    console.error(`❌ Erreur BoC pour ${seriesId}:`, error.message);
-    return null;
-  }
-}
 
 /**
  * Récupère les données depuis FRED API
  * Récupère l'historique pour calculer la variation sur 1 mois
+ * @param {string} seriesId - ID de la série FRED
+ * @param {string} targetDate - Date cible au format YYYY-MM-DD (optionnel, pour données historiques)
  */
-async function fetchFromFRED(seriesId) {
+async function fetchFromFRED(seriesId, targetDate = null) {
   const FRED_API_KEY = process.env.FRED_API_KEY;
 
   if (!FRED_API_KEY) {
@@ -122,8 +81,22 @@ async function fetchFromFRED(seriesId) {
   }
 
   try {
-    // Récupérer les 30 dernières observations
-    const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json&sort_order=desc&limit=30`;
+    let url;
+    
+    if (targetDate) {
+      // Récupérer les données pour une date spécifique (historique)
+      // FRED nécessite une plage de dates, on prend 30 jours autour de la date cible
+      const target = new Date(targetDate);
+      const startDate = new Date(target);
+      startDate.setDate(startDate.getDate() - 15);
+      const endDate = new Date(target);
+      endDate.setDate(endDate.getDate() + 15);
+      
+      url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json&observation_start=${startDate.toISOString().split('T')[0]}&observation_end=${endDate.toISOString().split('T')[0]}&sort_order=desc`;
+    } else {
+      // Récupérer les 30 dernières observations (données actuelles)
+      url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json&sort_order=desc&limit=30`;
+    }
 
     const response = await fetch(url);
 
@@ -140,17 +113,34 @@ async function fetchFromFRED(seriesId) {
       
       if (validObs.length === 0) return null;
 
-      const latestObs = validObs[0];
+      let targetObs;
       
-      // Chercher ~1 mois en arrière
-      const prevIndex = Math.min(21, validObs.length - 1);
-      const prevObs = validObs[prevIndex];
+      if (targetDate) {
+        // Pour données historiques, trouver l'observation la plus proche de la date cible
+        const target = new Date(targetDate);
+        targetObs = validObs.find(obs => {
+          const obsDate = new Date(obs.date);
+          return obsDate <= target;
+        }) || validObs[validObs.length - 1]; // Prendre la plus récente disponible si pas d'exact match
+      } else {
+        // Pour données actuelles, prendre la plus récente
+        targetObs = validObs[0];
+      }
+
+      if (!targetObs) return null;
+
+      // Chercher ~1 mois en arrière (seulement pour données actuelles)
+      let prevObs = null;
+      if (!targetDate) {
+        const prevIndex = Math.min(21, validObs.length - 1);
+        prevObs = validObs[prevIndex];
+      }
 
       return {
-        value: parseFloat(latestObs.value),
-        date: latestObs.date,
+        value: parseFloat(targetObs.value),
+        date: targetObs.date,
         prevValue: prevObs ? parseFloat(prevObs.value) : null,
-        change1M: prevObs ? (parseFloat(latestObs.value) - parseFloat(prevObs.value)) : null
+        change1M: prevObs ? (parseFloat(targetObs.value) - parseFloat(prevObs.value)) : null
       };
     }
 
@@ -214,9 +204,10 @@ async function fetchFromFMP() {
 
 /**
  * Récupère la courbe des taux US Treasury
+ * @param {string} targetDate - Date cible au format YYYY-MM-DD (optionnel, pour données historiques)
  */
-async function getUSTreasury() {
-  console.log('📊 Récupération des taux US Treasury...');
+async function getUSTreasury(targetDate = null) {
+  console.log(`📊 Récupération des taux US Treasury${targetDate ? ` pour la date ${targetDate}` : ' (actuels)'}...`);
 
   const rates = {};
   let source = 'FRED';
@@ -224,7 +215,7 @@ async function getUSTreasury() {
 
   // Essayer FRED en premier
   for (const [maturity, seriesId] of Object.entries(US_TREASURY_RATES)) {
-    const data = await fetchFromFRED(seriesId);
+    const data = await fetchFromFRED(seriesId, targetDate);
     if (data) {
       rates[maturity] = data; // Stocker l'objet complet {value, change1M...}
       if (!fetchDate) fetchDate = data.date;
@@ -272,17 +263,97 @@ async function getUSTreasury() {
 }
 
 /**
- * Récupère la courbe des taux Canada
+ * Récupère les données depuis Bank of Canada Valet API pour une date spécifique
+ * @param {string} seriesId - ID de la série BoC
+ * @param {string} targetDate - Date cible au format YYYY-MM-DD (optionnel)
  */
-async function getCanadaRates() {
-  console.log('📊 Récupération des taux Canada (via Bank of Canada)...');
+async function fetchFromBoC(seriesId, targetDate = null) {
+  try {
+    let url;
+    
+    if (targetDate) {
+      // Pour données historiques, récupérer une plage autour de la date cible
+      const target = new Date(targetDate);
+      const startDate = new Date(target);
+      startDate.setDate(startDate.getDate() - 30);
+      const endDate = new Date(target);
+      endDate.setDate(endDate.getDate() + 5);
+      
+      url = `https://www.bankofcanada.ca/valet/observations/${seriesId}/json?start_date=${startDate.toISOString().split('T')[0]}&end_date=${endDate.toISOString().split('T')[0]}`;
+    } else {
+      // Récupérer les 30 derniers jours pour trouver la comparaison M-1
+      url = `https://www.bankofcanada.ca/valet/observations/${seriesId}/json?recent=30`;
+    }
+    
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      console.warn(`⚠️ BoC API erreur pour ${seriesId}: ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+
+    if (data.observations && data.observations.length > 0) {
+      // Trier par date décroissante (le plus récent en premier)
+      const sortedObs = data.observations.sort((a, b) => new Date(b.d) - new Date(a.d));
+      
+      let targetObservation;
+      
+      if (targetDate) {
+        // Pour données historiques, trouver l'observation la plus proche de la date cible
+        const target = new Date(targetDate);
+        targetObservation = sortedObs.find(obs => {
+          const obsDate = new Date(obs.d);
+          return obsDate <= target;
+        }) || sortedObs[sortedObs.length - 1];
+      } else {
+        // Pour données actuelles, prendre la plus récente
+        targetObservation = sortedObs[0];
+      }
+      
+      if (!targetObservation) return null;
+      
+      const value = targetObservation[seriesId]?.v;
+
+      if (!value || value === null) return null;
+
+      // Chercher la valeur il y a environ 1 mois (~20-22 jours de trading) - seulement pour données actuelles
+      let prevValue = null;
+      if (!targetDate) {
+        const prevIndex = Math.min(21, sortedObs.length - 1);
+        const prevObservation = sortedObs[prevIndex];
+        prevValue = prevObservation ? prevObservation[seriesId]?.v : null;
+      }
+
+      return {
+        value: parseFloat(value),
+        date: targetObservation.d,
+        prevValue: prevValue ? parseFloat(prevValue) : null,
+        change1M: prevValue ? (parseFloat(value) - parseFloat(prevValue)) : null
+      };
+    }
+
+    return null;
+  } catch (error) {
+    console.error(`❌ Erreur BoC pour ${seriesId}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Récupère la courbe des taux Canada
+ * @param {string} targetDate - Date cible au format YYYY-MM-DD (optionnel, pour données historiques)
+ */
+async function getCanadaRates(targetDate = null) {
+  console.log(`📊 Récupération des taux Canada (via Bank of Canada)${targetDate ? ` pour la date ${targetDate}` : ' (actuels)'}...`);
 
   const rates = {};
   let fetchDate = null;
 
   // Récupérer depuis Bank of Canada
   for (const [maturity, seriesId] of Object.entries(CANADA_RATES)) {
-    const data = await fetchFromBoC(seriesId);
+    const data = await fetchFromBoC(seriesId, targetDate);
     if (data) {
       rates[maturity] = data; // Stocker l'objet complet
       if (!fetchDate) fetchDate = data.date;
@@ -323,6 +394,113 @@ async function getCanadaRates() {
 }
 
 /**
+ * Récupère les données depuis Supabase
+ * @param {string} country - 'us' ou 'canada'
+ * @param {string} date - Date au format YYYY-MM-DD (null pour données actuelles)
+ */
+async function getFromSupabase(country, date = null) {
+  try {
+    const supabase = createSupabaseClient(true); // Service role pour lecture
+    
+    let query = supabase
+      .from('yield_curve_data')
+      .select('*')
+      .eq('country', country)
+      .order('data_date', { ascending: false })
+      .limit(1);
+    
+    if (date) {
+      // Pour données historiques, chercher la date exacte ou la plus proche
+      query = supabase
+        .from('yield_curve_data')
+        .select('*')
+        .eq('country', country)
+        .lte('data_date', date)
+        .order('data_date', { ascending: false })
+        .limit(1);
+    }
+    
+    const { data, error } = await query;
+    
+    if (error) {
+      console.warn(`⚠️ Erreur Supabase pour ${country}:`, error.message);
+      return null;
+    }
+    
+    if (data && data.length > 0) {
+      const record = data[0];
+      console.log(`✅ Données ${country} trouvées dans Supabase pour ${record.data_date}`);
+      
+      // Convertir le format Supabase vers le format API
+      // Les rates sont stockés en JSONB et sont déjà au bon format
+      return {
+        country: record.country === 'us' ? 'US' : 'Canada',
+        currency: record.currency,
+        rates: Array.isArray(record.rates) ? record.rates : [], // S'assurer que c'est un array
+        source: record.source,
+        date: record.data_date,
+        count: record.count || (Array.isArray(record.rates) ? record.rates.length : 0),
+        spread_10y_2y: record.spread_10y_2y,
+        inverted: record.inverted || false
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    console.warn(`⚠️ Erreur Supabase pour ${country}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Stocke les données dans Supabase
+ * @param {string} country - 'us' ou 'canada'
+ * @param {object} yieldData - Données de yield curve
+ */
+async function saveToSupabase(country, yieldData) {
+  try {
+    const supabase = createSupabaseClient(true); // Service role pour écriture
+    
+    // Calculer spread_10y_2y si disponible
+    let spread_10y_2y = null;
+    let inverted = false;
+    
+    if (yieldData.rates && Array.isArray(yieldData.rates)) {
+      const rate10Y = yieldData.rates.find(r => r.maturity === '10Y');
+      const rate2Y = yieldData.rates.find(r => r.maturity === '2Y');
+      
+      if (rate10Y && rate2Y) {
+        spread_10y_2y = rate10Y.rate - rate2Y.rate;
+        inverted = spread_10y_2y < 0;
+      }
+    }
+    
+    const record = {
+      country: country.toLowerCase(),
+      data_date: yieldData.date,
+      rates: yieldData.rates,
+      source: yieldData.source,
+      currency: yieldData.currency,
+      count: yieldData.count,
+      spread_10y_2y: spread_10y_2y,
+      inverted: inverted
+    };
+    
+    const { error } = await supabase
+      .from('yield_curve_data')
+      .upsert(record, { onConflict: 'country,data_date' });
+    
+    if (error) {
+      console.warn(`⚠️ Erreur sauvegarde Supabase pour ${country}:`, error.message);
+    } else {
+      console.log(`✅ Données ${country} sauvegardées dans Supabase pour ${yieldData.date}`);
+    }
+  } catch (error) {
+    console.warn(`⚠️ Erreur sauvegarde Supabase pour ${country}:`, error.message);
+  }
+}
+
+/**
  * Handler principal Vercel
  */
 export default async function handler(req, res) {
@@ -340,26 +518,69 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { country = 'both' } = req.query;
+    const { country = 'both', date = null } = req.query;
 
-    console.log(`🔍 Requête yield curve: country=${country}`);
+    console.log(`🔍 Requête yield curve: country=${country}, date=${date || 'actuelle'}`);
 
     const result = {
       timestamp: new Date().toISOString(),
-      data: {}
+      data: {},
+      historicalDate: date || null
     };
 
     // Récupérer les données selon le pays demandé
+    // Pour les données historiques, vérifier Supabase en premier
+    // Pour les données actuelles, vérifier Supabase (cache du jour) puis API si nécessaire
+    
     if (country === 'us' || country === 'both') {
-      result.data.us = await getUSTreasury();
+      // Essayer Supabase d'abord
+      let usData = await getFromSupabase('us', date);
+      
+      // Si pas dans Supabase ou si données actuelles et plus vieilles que 1 jour, récupérer via API
+      const today = new Date().toISOString().split('T')[0];
+      const shouldFetchFromAPI = !usData || (!date && usData.date !== today);
+      
+      if (shouldFetchFromAPI) {
+        console.log('📡 Récupération US depuis API...');
+        usData = await getUSTreasury(date);
+        
+        // Sauvegarder dans Supabase si récupération réussie
+        if (usData && usData.rates && usData.rates.length > 0) {
+          await saveToSupabase('us', usData);
+        }
+      }
+      
+      if (usData) {
+        result.data.us = usData;
+      }
     }
 
     if (country === 'canada' || country === 'both') {
-      result.data.canada = await getCanadaRates();
+      // Essayer Supabase d'abord
+      let canadaData = await getFromSupabase('canada', date);
+      
+      // Si pas dans Supabase ou si données actuelles et plus vieilles que 1 jour, récupérer via API
+      const today = new Date().toISOString().split('T')[0];
+      const shouldFetchFromAPI = !canadaData || (!date && canadaData.date !== today);
+      
+      if (shouldFetchFromAPI) {
+        console.log('📡 Récupération Canada depuis API...');
+        canadaData = await getCanadaRates(date);
+        
+        // Sauvegarder dans Supabase si récupération réussie
+        if (canadaData && canadaData.rates && canadaData.rates.length > 0) {
+          await saveToSupabase('canada', canadaData);
+        }
+      }
+      
+      if (canadaData) {
+        result.data.canada = canadaData;
+      }
     }
 
-    // Calculer le spread 10Y-2Y si disponible (indicateur de récession)
-    if (result.data.us && result.data.us.rates) {
+    // Le spread est déjà calculé dans saveToSupabase et getFromSupabase
+    // Mais on peut le recalculer si nécessaire pour cohérence
+    if (result.data.us && result.data.us.rates && !result.data.us.spread_10y_2y) {
       const rate10Y = result.data.us.rates.find(r => r.maturity === '10Y');
       const rate2Y = result.data.us.rates.find(r => r.maturity === '2Y');
 

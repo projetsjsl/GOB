@@ -22366,6 +22366,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             const yieldChartRef = useRef(null);
             const yieldChartInstance = useRef(null);
             
+            // États pour les courbes historiques
+            const [historicalDateUS, setHistoricalDateUS] = useState('');
+            const [historicalDateCanada, setHistoricalDateCanada] = useState('');
+            const [historicalDataUS, setHistoricalDataUS] = useState(null);
+            const [historicalDataCanada, setHistoricalDataCanada] = useState(null);
+            const [historicalLoadingUS, setHistoricalLoadingUS] = useState(false);
+            const [historicalLoadingCanada, setHistoricalLoadingCanada] = useState(false);
+            
             // Détecter quand on revient sur cet onglet et forcer rechargement
             useEffect(() => {
                 // Vérifier si on revient sur l'onglet markets-economy
@@ -22615,6 +22623,66 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 fetchYieldCurve();
             }, []); // Charger UNE SEULE FOIS au montage - les données restent en mémoire pendant la session
 
+            // Charger les données historiques US
+            React.useEffect(() => {
+                if (!historicalDateUS) {
+                    setHistoricalDataUS(null);
+                    return;
+                }
+
+                const fetchHistoricalUS = async () => {
+                    setHistoricalLoadingUS(true);
+                    try {
+                        const response = await fetchWithTimeoutAndRetry(
+                            `/api/yield-curve?country=us&date=${historicalDateUS}`,
+                            {},
+                            30000,
+                            2
+                        );
+                        if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
+                        const data = await response.json();
+                        setHistoricalDataUS(data);
+                        setHistoricalLoadingUS(false);
+                        console.log('✅ Données historiques US chargées pour', historicalDateUS);
+                    } catch (err) {
+                        console.error('❌ Erreur chargement historique US:', err);
+                        setHistoricalDataUS(null);
+                        setHistoricalLoadingUS(false);
+                    }
+                };
+                fetchHistoricalUS();
+            }, [historicalDateUS]);
+
+            // Charger les données historiques Canada
+            React.useEffect(() => {
+                if (!historicalDateCanada) {
+                    setHistoricalDataCanada(null);
+                    return;
+                }
+
+                const fetchHistoricalCanada = async () => {
+                    setHistoricalLoadingCanada(true);
+                    try {
+                        const response = await fetchWithTimeoutAndRetry(
+                            `/api/yield-curve?country=canada&date=${historicalDateCanada}`,
+                            {},
+                            30000,
+                            2
+                        );
+                        if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
+                        const data = await response.json();
+                        setHistoricalDataCanada(data);
+                        setHistoricalLoadingCanada(false);
+                        console.log('✅ Données historiques Canada chargées pour', historicalDateCanada);
+                    } catch (err) {
+                        console.error('❌ Erreur chargement historique Canada:', err);
+                        setHistoricalDataCanada(null);
+                        setHistoricalLoadingCanada(false);
+                    }
+                };
+                fetchHistoricalCanada();
+            }, [historicalDateCanada]);
+
             // Créer/mettre à jour le graphique Chart.js pour yield curve
             React.useEffect(() => {
                 if (!yieldData || !yieldChartRef.current) return;
@@ -22631,10 +22699,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 const ctx = yieldChartRef.current.getContext('2d');
                 const datasets = [];
 
-                // Données US
+                // Données US actuelles
                 if (yieldData.data?.us?.rates) {
                     datasets.push({
-                        label: 'US Treasury',
+                        label: 'US Treasury (Actuel)',
                         data: yieldData.data.us.rates.map(r => ({
                             x: r.maturity,
                             y: r.rate
@@ -22651,10 +22719,31 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     });
                 }
 
-                // Données Canada
+                // Données US historiques (pointillé)
+                if (historicalDataUS?.data?.us?.rates) {
+                    datasets.push({
+                        label: `US Treasury (${historicalDateUS})`,
+                        data: historicalDataUS.data.us.rates.map(r => ({
+                            x: r.maturity,
+                            y: r.rate
+                        })),
+                        borderColor: '#60a5fa',
+                        backgroundColor: 'rgba(96, 165, 250, 0.05)',
+                        borderWidth: 2,
+                        borderDash: [10, 5], // Pointillé
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#60a5fa',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 1
+                    });
+                }
+
+                // Données Canada actuelles
                 if (yieldData.data?.canada?.rates) {
                     datasets.push({
-                        label: 'Canada Bonds',
+                        label: 'Canada Bonds (Actuel)',
                         data: yieldData.data.canada.rates.map(r => ({
                             x: r.maturity,
                             y: r.rate
@@ -22668,6 +22757,27 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         pointBackgroundColor: '#ef4444',
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2
+                    });
+                }
+
+                // Données Canada historiques (pointillé)
+                if (historicalDataCanada?.data?.canada?.rates) {
+                    datasets.push({
+                        label: `Canada Bonds (${historicalDateCanada})`,
+                        data: historicalDataCanada.data.canada.rates.map(r => ({
+                            x: r.maturity,
+                            y: r.rate
+                        })),
+                        borderColor: '#f87171',
+                        backgroundColor: 'rgba(248, 113, 113, 0.05)',
+                        borderWidth: 2,
+                        borderDash: [10, 5], // Pointillé
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#f87171',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 1
                     });
                 }
 
@@ -22750,7 +22860,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         yieldChartInstance.current.destroy();
                     }
                 };
-            }, [yieldData, isDarkMode]);
+            }, [yieldData, historicalDataUS, historicalDataCanada, historicalDateUS, historicalDateCanada, isDarkMode]);
 
             // -----------------------------------------------------------
 
@@ -23062,6 +23172,138 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             <option value="canada">🇨🇦 Canada uniquement</option>
                                         </select>
                                     </div>
+                                    
+                                    {/* Sélecteurs de dates historiques */}
+                                    <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                📅 Date historique US (optionnel)
+                                            </label>
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="date"
+                                                    value={historicalDateUS}
+                                                    onChange={(e) => setHistoricalDateUS(e.target.value)}
+                                                    max={new Date().toISOString().split('T')[0]}
+                                                    className={`flex-1 px-3 py-2 rounded-lg text-sm outline-none transition-colors ${
+                                                        isDarkMode
+                                                            ? 'bg-gray-700 text-white border-gray-600 focus:border-blue-500'
+                                                            : 'bg-gray-100 text-gray-900 border-gray-200 focus:border-blue-500'
+                                                    } border-2`}
+                                                />
+                                                {historicalDateUS && (
+                                                    <button
+                                                        onClick={() => setHistoricalDateUS('')}
+                                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                                            isDarkMode
+                                                                ? 'bg-red-600 hover:bg-red-700 text-white'
+                                                                : 'bg-red-500 hover:bg-red-600 text-white'
+                                                        }`}
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                )}
+                                            </div>
+                                            {historicalLoadingUS && (
+                                                <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                    Chargement...
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                📅 Date historique Canada (optionnel)
+                                            </label>
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="date"
+                                                    value={historicalDateCanada}
+                                                    onChange={(e) => setHistoricalDateCanada(e.target.value)}
+                                                    max={new Date().toISOString().split('T')[0]}
+                                                    className={`flex-1 px-3 py-2 rounded-lg text-sm outline-none transition-colors ${
+                                                        isDarkMode
+                                                            ? 'bg-gray-700 text-white border-gray-600 focus:border-blue-500'
+                                                            : 'bg-gray-100 text-gray-900 border-gray-200 focus:border-blue-500'
+                                                    } border-2`}
+                                                />
+                                                {historicalDateCanada && (
+                                                    <button
+                                                        onClick={() => setHistoricalDateCanada('')}
+                                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                                            isDarkMode
+                                                                ? 'bg-red-600 hover:bg-red-700 text-white'
+                                                                : 'bg-red-500 hover:bg-red-600 text-white'
+                                                        }`}
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                )}
+                                            </div>
+                                            {historicalLoadingCanada && (
+                                                <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                    Chargement...
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Affichage des écarts */}
+                                    {(historicalDataUS || historicalDataCanada) && (
+                                        <div className={`mb-4 p-4 rounded-lg ${isDarkMode ? 'bg-gray-700/50 border border-gray-600' : 'bg-blue-50 border border-blue-200'}`}>
+                                            <h4 className={`text-sm font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                📊 Écarts entre courbes actuelles et historiques
+                                            </h4>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                                {historicalDataUS && yieldData?.data?.us && (
+                                                    <div>
+                                                        <p className={`font-semibold mb-1 ${isDarkMode ? 'text-blue-300' : 'text-blue-700'}`}>
+                                                            🇺🇸 US Treasury
+                                                        </p>
+                                                        <div className="space-y-1">
+                                                            {yieldData.data.us.rates.map((currentRate) => {
+                                                                const historicalRate = historicalDataUS.data.us.rates.find(r => r.maturity === currentRate.maturity);
+                                                                if (!historicalRate) return null;
+                                                                const diff = currentRate.rate - historicalRate.rate;
+                                                                const diffPercent = ((diff / historicalRate.rate) * 100).toFixed(2);
+                                                                return (
+                                                                    <div key={currentRate.maturity} className={`flex justify-between ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                                        <span>{currentRate.maturity}:</span>
+                                                                        <span className={diff >= 0 ? 'text-green-500' : 'text-red-500'}>
+                                                                            {diff >= 0 ? '+' : ''}{diff.toFixed(2)}% ({diffPercent >= 0 ? '+' : ''}{diffPercent}%)
+                                                                        </span>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {historicalDataCanada && yieldData?.data?.canada && (
+                                                    <div>
+                                                        <p className={`font-semibold mb-1 ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
+                                                            🇨🇦 Canada Bonds
+                                                        </p>
+                                                        <div className="space-y-1">
+                                                            {yieldData.data.canada.rates.map((currentRate) => {
+                                                                const historicalRate = historicalDataCanada.data.canada.rates.find(r => r.maturity === currentRate.maturity);
+                                                                if (!historicalRate) return null;
+                                                                const diff = currentRate.rate - historicalRate.rate;
+                                                                const diffPercent = ((diff / historicalRate.rate) * 100).toFixed(2);
+                                                                return (
+                                                                    <div key={currentRate.maturity} className={`flex justify-between ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                                        <span>{currentRate.maturity}:</span>
+                                                                        <span className={diff >= 0 ? 'text-green-500' : 'text-red-500'}>
+                                                                            {diff >= 0 ? '+' : ''}{diff.toFixed(2)}% ({diffPercent >= 0 ? '+' : ''}{diffPercent}%)
+                                                                        </span>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <div className="h-[500px] md:h-[600px] lg:h-[700px] relative">
                                         {yieldLoading && (
                                             <div className="absolute inset-0 flex items-center justify-center z-10 bg-opacity-50 bg-black rounded-lg">
