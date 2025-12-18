@@ -21475,140 +21475,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         </div>
                     </div>
 
-                    {/* ========================================== */}
-                    {/* SECTION 1: 📅 CALENDRIERS & ÉVÉNEMENTS    */}
-                    {/* ========================================== */}
-                    <div className="mb-2 md:mb-4">
-                        <div className={`flex items-center gap-2 md:gap-3 mb-2 md:mb-4 pb-2 border-b-2 ${isDarkMode ? 'border-blue-500' : 'border-blue-600'
-                            }`}>
-                            <h3 className={`text-base md:text-lg lg:text-xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'
-                                }`}>
-                                📅 Calendriers & Événements Économiques
-                            </h3>
-                        </div>
-                    </div>
-
-
-
-                    {/* ========================================== */}
-                    {/* SECTION 2: 💱 MARCHÉS FOREX                */}
-                    {/* ========================================== */}
-                    <div className="mb-4">
-                        <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${isDarkMode ? 'border-green-500' : 'border-green-600'
-                            }`}>
-                            <h3 className={`text-xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-green-400' : 'text-green-600'
-                                }`}>
-                                💱 Marchés Forex
-                            </h3>
-                        </div>
-                    </div>
-
-                    {/* Widget TradingView Forex Heat Map */}
-                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: FOREX_HEATMAP</div>
-                    <ExpandableComponent title="Forex Heat Map" icon="💱" isDarkMode={isDarkMode}>
-                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                            <div className="mb-3 md:mb-6">
-                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                    💱 Forex Heat Map
-                                </h2>
-                                <p className={`text-xs md:text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                    Carte de chaleur des devises en temps réel (EUR, USD, JPY, GBP, CHF, AUD, CAD, CNY)
-                                </p>
-                            </div>
-
-                            <div className="h-[350px] md:h-[400px] lg:h-[450px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewForexRef}>
-                                    {/* Le widget sera injecté ici par le script */}
-                                </div>
-                            </div>
-                        </div>
-                    </ExpandableComponent>
-
-                    {/* Widget TradingView Economic Calendar Events */}
-                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: ECONOMIC_CALENDAR_EVENTS_TV</div>
-                    <ExpandableComponent title="Economic Calendar Events" icon="📅" isDarkMode={isDarkMode}>
-                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                            <div className="mb-3 md:mb-6">
-                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                    📅 Economic Calendar Events
-                                </h2>
-                                <p className={`text-xs md:text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                    Événements économiques mondiaux par TradingView
-                                </p>
-                            </div>
-
-                            <div className="h-[800px] md:h-[900px] lg:h-[1000px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewEventsRef}>
-                                    {/* Le widget sera injecté ici par le script */}
-                                </div>
-                            </div>
-                        </div>
-                    </ExpandableComponent>
-
-                    {/* Widget TradingView Forex Cross Rates */}
-                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: FOREX_CROSS_RATES</div>
-                    <ExpandableComponent title="Forex Cross Rates" icon="💱" isDarkMode={isDarkMode}>
-                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                            <div className="mb-3 md:mb-6">
-                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                    💱 Forex Cross Rates
-                                </h2>
-                                <p className={`text-xs md:text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                    Taux de change croisés pour 9 devises majeures (EUR, USD, JPY, GBP, CHF, AUD, CAD, NZD, CNY)
-                                </p>
-                            </div>
-
-                            <div className="h-[350px] md:h-[400px] lg:h-[450px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewCrossRatesRef}>
-                                    {/* Le widget sera injecté ici par le script */}
-                                </div>
-                            </div>
-                        </div>
-                    </ExpandableComponent>
-
-                    {/* ========================================== */}
-                    {/* SECTION 3: 📊 MARCHÉS BOURSIERS            */}
-                    {/* ========================================== */}
-                    <div className="mb-2 md:mb-4">
-                        <div className={`flex items-center gap-2 md:gap-3 mb-2 md:mb-4 pb-2 border-b-2 ${isDarkMode ? 'border-purple-500' : 'border-purple-600'
-                            }`}>
-                            <h3 className={`text-base md:text-lg lg:text-xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'
-                                }`}>
-                                📊 Marchés Boursiers - Vues Globales
-                            </h3>
-                        </div>
-                    </div>
-
-                    {/* Widget TradingView Stock Heatmap */}
-                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: STOCK_HEATMAP_USA</div>
-                    <ExpandableComponent title="Stock Heatmap All USA" icon="🇺🇸" isDarkMode={isDarkMode}>
-                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                            <div className="mb-3 md:mb-6">
-                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                    🇺🇸 Stock Heatmap All USA
-                                </h2>
-                                <p className={`text-xs md:text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                    Carte thermique de toutes les actions américaines - Performance par secteur et capitalisation
-                                </p>
-                            </div>
-
-                            <div className="h-[900px] md:h-[1100px] lg:h-[1300px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewHeatmapRef}>
-                                    <div className="tradingview-widget-container__widget"></div>
-                                    <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        <a
-                                            href="https://fr.tradingview.com/heatmap/stock/"
-                                            rel="noopener nofollow"
-                                            target="_blank"
-                                            className={`underline transition-colors duration-300 ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
-                                        >
-                                            <span className="blue-text">Track all markets on TradingView</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </ExpandableComponent>
 
                     {/* Widget TradingView Stock Heatmap TSX */}
                     <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: STOCK_HEATMAP_TSX</div>
@@ -21644,39 +21510,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         </div>
                     </div>
 
-                    {/* Widget TradingView Market Quotes */}
-                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: MARKET_QUOTES</div>
-                    <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'
-                        }`}>
-                        <div className="mb-3 md:mb-6">
-                            <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>
-                                📊 Market Quotes - Indices, Futures, Bonds, Forex
-                            </h2>
-                            <p className={`text-xs md:text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }`}>
-                                Cotations en temps réel organisées par catégories (Indices, Futures, Obligations US/CAN, Forex CAD)
-                            </p>
-                        </div>
-
-                        <div className="h-[1000px] md:h-[1100px] lg:h-[1200px]">
-                            <div className="tradingview-widget-container h-full" ref={tradingViewMarketQuotesRef}>
-                                <div className="tradingview-widget-container__widget"></div>
-                                <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                    }`}>
-                                    <a
-                                        href="https://fr.tradingview.com/markets/"
-                                        rel="noopener nofollow"
-                                        target="_blank"
-                                        className={`underline transition-colors duration-300 ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
-                                            }`}
-                                    >
-                                        <span className="blue-text">Track all markets on TradingView</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     {/* ========================================== */}
                     {/* SECTION: 📈 OUTILS D'ANALYSE FONDAMENTALE  */}
@@ -21696,53 +21529,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
 
-                        <div className="mb-4">
-                            <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-start md:items-center">
-                                <label className={`text-sm font-medium transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                    Symbole:
-                                </label>
-                                <input
-                                    type="text"
-                                    id="fastgraphs-symbol"
-                                    defaultValue="AAPL"
-                                    placeholder="Ex: AAPL, MSFT, GOOGL"
-                                    className={`px-3 py-2 rounded-lg border-2 text-sm md:text-base transition-all duration-300 ${isDarkMode
-                                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-orange-500'
-                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-orange-500'
-                                        } focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50`}
-                                    style={{ minWidth: '200px' }}
-                                    onKeyPress={(e) => {
-                                        if (e.key === 'Enter') {
-                                            const symbolInput = document.getElementById('fastgraphs-symbol');
-                                            const symbol = symbolInput?.value?.toUpperCase().trim() || 'AAPL';
-                                            const iframe = document.getElementById('fastgraphs-iframe');
-                                            if (iframe) {
-                                                iframe.src = `https://www.fastgraphs.com/secure/fg.php?ticker=${symbol}`;
-                                            }
-                                            window.open(`https://www.fastgraphs.com/secure/fg.php?ticker=${symbol}`, '_blank');
-                                        }
-                                    }}
-                                />
-                                <button
-                                    onClick={() => {
-                                        const symbolInput = document.getElementById('fastgraphs-symbol');
-                                        const symbol = symbolInput?.value?.toUpperCase().trim() || 'AAPL';
-                                        const iframe = document.getElementById('fastgraphs-iframe');
-                                        if (iframe) {
-                                            iframe.src = `https://www.fastgraphs.com/secure/fg.php?ticker=${symbol}`;
-                                        }
-                                        window.open(`https://www.fastgraphs.com/secure/fg.php?ticker=${symbol}`, '_blank');
-                                    }}
-                                    className={`px-4 py-2 rounded-lg font-medium text-sm md:text-base transition-all duration-300 ${isDarkMode
-                                        ? 'bg-orange-600 hover:bg-orange-700 text-white'
-                                        : 'bg-orange-500 hover:bg-orange-600 text-white'
-                                        } focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50`}
-                                >
-                                    Mettre à jour l'iframe + Ouvrir
-                                </button>
-                            </div>
-                        </div>
 
                         {/* Iframe FastGraphs */}
                         <div className="mb-4">
@@ -21789,62 +21575,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </div>
                         </div>
 
-                        {/* Boutons d'accès alternatifs */}
-                        <div className={`rounded-lg overflow-hidden relative p-6 border-2 transition-colors duration-300 ${isDarkMode
-                            ? 'bg-gradient-to-br from-gray-800 to-gray-900 border-orange-500/30'
-                            : 'bg-gradient-to-br from-orange-50 to-orange-100 border-orange-400/40'
-                            }`}>
-                            <div className="text-center">
-                                <h3 className={`text-lg md:text-xl font-bold mb-3 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>
-                                    Accès alternatif à FastGraphs
-                                </h3>
-                                <p className={`text-xs md:text-sm mb-4 transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                    Si l'iframe ne s'affiche pas, utilisez ces boutons pour ouvrir FastGraphs dans un nouvel onglet
-                                </p>
-                                <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                                    <a
-                                        href="https://www.fastgraphs.com/secure/fg.php?ticker=AAPL"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={`px-6 py-3 rounded-lg font-semibold text-sm md:text-base transition-all duration-300 ${isDarkMode
-                                            ? 'bg-orange-600 hover:bg-orange-700 text-white shadow-lg shadow-orange-500/20'
-                                            : 'bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/30'
-                                            } focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50`}
-                                    >
-                                        📈 Ouvrir FastGraphs (AAPL)
-                                    </a>
-                                    <a
-                                        href="https://www.fastgraphs.com"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={`px-6 py-3 rounded-lg font-semibold text-sm md:text-base transition-all duration-300 border-2 ${isDarkMode
-                                            ? 'bg-transparent border-orange-500 hover:bg-orange-500/20 text-orange-400'
-                                            : 'bg-transparent border-orange-500 hover:bg-orange-500/10 text-orange-600'
-                                            } focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50`}
-                                    >
-                                        🌐 Visiter FastGraphs.com
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className={`mt-4 text-xs text-center transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
-                            <p>
-                                <strong>Note:</strong> FastGraphs est un service d'abonnement qui nécessite une connexion pour accéder aux graphiques détaillés.{' '}
-                                <a
-                                    href="https://fastgraphs.com/blog/if-you-are-a-long-term-investor-you-need-to-watch-this-introducing-fast-graphs/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={`underline transition-colors duration-300 ${isDarkMode ? 'text-orange-400 hover:text-orange-300' : 'text-orange-600 hover:text-orange-800'
-                                        }`}
-                                >
-                                    En savoir plus sur FastGraphs
-                                </a>
-                            </p>
-                        </div>
                     </div>
 
                     {/* ========================================================================= */}
@@ -22060,36 +21790,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         </div>
                     </div>
 
-                    {/* Widget TradingView Screener (Non synchronisé - reste séparé) */}
-                    <div className="bg-yellow-200 text-black text-xs font-mono p-1 mb-1 font-bold border border-yellow-400">REF: SCREENER_TV</div>
-                    <ExpandableComponent title="Screener de Titres" icon="🔍" isDarkMode={isDarkMode}>
-                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                            <div className="mb-3 md:mb-6">
-                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                    🔍 Screener de Titres
-                                </h2>
-                                <p className={`text-xs md:text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                    Outil de filtrage et d'analyse des actions du marché américain avec critères personnalisables
-                                </p>
-                            </div>
-
-                            <div className="h-[1000px] md:h-[1100px] lg:h-[1200px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewScreenerRef}>
-                                    <div className="tradingview-widget-container__widget"></div>
-                                    <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        <a
-                                            href="https://fr.tradingview.com/screener/"
-                                            rel="noopener nofollow"
-                                            target="_blank"
-                                            className={`underline transition-colors duration-300 ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
-                                        >
-                                            <span className="blue-text">Track all markets on TradingView</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </ExpandableComponent>
 
 
                 </div>
