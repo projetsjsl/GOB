@@ -43,7 +43,12 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
 
   // Determine base values from selected base year
   // MÊME LOGIQUE QUE KPIDashboard pour cohérence
-  const baseYearData = data.find(d => d.year === assumptions.baseYear) || data[data.length - 1];
+  // ✅ CRITIQUE : Si baseYear n'est pas défini ou n'existe pas, utiliser la dernière année avec données valides
+  let baseYearData = data.find(d => d.year === assumptions.baseYear);
+  if (!baseYearData || baseYearData.earningsPerShare <= 0) {
+    // Chercher la dernière année avec EPS > 0
+    baseYearData = [...data].reverse().find(d => d.earningsPerShare > 0) || data[data.length - 1];
+  }
   const baseEPS = Math.max(baseYearData?.earningsPerShare || 0, 0);
 
   const baseValues = {
@@ -53,17 +58,30 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
     div: Math.max(assumptions.currentDividend || 0, 0)
   };
 
+  // ✅ DEBUG : Log pour diagnostiquer pourquoi les prix sont N/A
+  if (baseValues.eps === 0 && baseValues.cf === 0 && baseValues.bv === 0) {
+    console.warn('⚠️ EvaluationDetails: Toutes les valeurs de base sont à 0', {
+      baseYear: assumptions.baseYear,
+      baseYearData,
+      dataLength: data.length,
+      dataYears: data.map(d => d.year),
+      baseValues
+    });
+  }
+
   // Projections (5 Years) - MÊME VALIDATION QUE KPIDashboard
   // ✅ CRITIQUE : Gérer undefined pour éviter les valeurs inventées (0)
   const projectFutureValueSafe = (current: number, rate: number | undefined, years: number): number | undefined => {
     // ✅ Si le taux est undefined, retourner undefined (pas 0)
     if (rate === undefined) return undefined;
-    // Valider les entrées
-    if (current <= 0 || !isFinite(current) || !isFinite(rate)) return 0;
+    // Valider les entrées - Si current est 0, retourner undefined (pas 0) pour indiquer données manquantes
+    if (current <= 0 || !isFinite(current)) return undefined;
+    if (!isFinite(rate)) return undefined;
     // Limiter le taux de croissance (Configurable)
     const { min, max } = config.growth;
     const safeRate = Math.max(min, Math.min(rate, max));
-    return current * Math.pow(1 + safeRate / 100, years);
+    const result = current * Math.pow(1 + safeRate / 100, years);
+    return isFinite(result) && result > 0 ? result : undefined;
   };
 
   // Valider et limiter les taux de croissance (Configurable)
@@ -90,6 +108,23 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
     bv: projectFutureValueSafe(baseValues.bv, safeGrowthBV, 5),
     div: projectFutureValueSafe(baseValues.div, safeGrowthDiv, 5)
   };
+
+  // ✅ DEBUG : Log pour diagnostiquer les projections
+  if (futureValues.eps === undefined && futureValues.cf === undefined && futureValues.bv === undefined) {
+    console.warn('⚠️ EvaluationDetails: Toutes les projections sont undefined', {
+      baseValues,
+      safeGrowthEPS,
+      safeGrowthCF,
+      safeGrowthBV,
+      safeGrowthDiv,
+      assumptions: {
+        growthRateEPS: assumptions.growthRateEPS,
+        growthRateCF: assumptions.growthRateCF,
+        growthRateBV: assumptions.growthRateBV,
+        growthRateDiv: assumptions.growthRateDiv
+      }
+    });
+  }
 
   // Valider et limiter les ratios cibles (Configurable)
   // ✅ CRITIQUE : Ne pas utiliser || 0 pour éviter les valeurs inventées
@@ -122,6 +157,24 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
       ? futureValues.div / (safeTargetYield / 100) 
       : undefined
   };
+
+  // ✅ DEBUG : Log pour diagnostiquer pourquoi les prix cibles sont undefined
+  if (targets.eps === undefined && targets.cf === undefined && targets.bv === undefined && targets.div === undefined) {
+    console.warn('⚠️ EvaluationDetails: Tous les prix cibles sont undefined', {
+      futureValues,
+      safeTargetPE,
+      safeTargetPCF,
+      safeTargetPBV,
+      safeTargetYield,
+      assumptions: {
+        targetPE: assumptions.targetPE,
+        targetPCF: assumptions.targetPCF,
+        targetPBV: assumptions.targetPBV,
+        targetYield: assumptions.targetYield
+      },
+      baseValues
+    });
+  }
 
   // Average Target Price (excluding disabled metrics) - MÊME VALIDATION QUE KPIDashboard
   const currentPrice = Math.max(assumptions.currentPrice || 0, 0.01);

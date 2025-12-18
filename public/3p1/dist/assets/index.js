@@ -34057,7 +34057,10 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
       [metric]: !prev[metric]
     }));
   };
-  const baseYearData = data.find((d) => d.year === assumptions.baseYear) || data[data.length - 1];
+  let baseYearData = data.find((d) => d.year === assumptions.baseYear);
+  if (!baseYearData || baseYearData.earningsPerShare <= 0) {
+    baseYearData = [...data].reverse().find((d) => d.earningsPerShare > 0) || data[data.length - 1];
+  }
   const baseEPS = Math.max((baseYearData == null ? void 0 : baseYearData.earningsPerShare) || 0, 0);
   const baseValues = {
     eps: Math.max(baseEPS, 0),
@@ -34065,12 +34068,23 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     bv: Math.max((baseYearData == null ? void 0 : baseYearData.bookValuePerShare) || 0, 0),
     div: Math.max(assumptions.currentDividend || 0, 0)
   };
+  if (baseValues.eps === 0 && baseValues.cf === 0 && baseValues.bv === 0) {
+    console.warn("⚠️ EvaluationDetails: Toutes les valeurs de base sont à 0", {
+      baseYear: assumptions.baseYear,
+      baseYearData,
+      dataLength: data.length,
+      dataYears: data.map((d) => d.year),
+      baseValues
+    });
+  }
   const projectFutureValueSafe = (current, rate, years) => {
     if (rate === void 0) return void 0;
-    if (current <= 0 || !isFinite(current) || !isFinite(rate)) return 0;
+    if (current <= 0 || !isFinite(current)) return void 0;
+    if (!isFinite(rate)) return void 0;
     const { min: min2, max: max2 } = config2.growth;
     const safeRate = Math.max(min2, Math.min(rate, max2));
-    return current * Math.pow(1 + safeRate / 100, years);
+    const result = current * Math.pow(1 + safeRate / 100, years);
+    return isFinite(result) && result > 0 ? result : void 0;
   };
   const growthMin = config2.growth.min;
   const growthMax = config2.growth.max;
@@ -34084,6 +34098,21 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     bv: projectFutureValueSafe(baseValues.bv, safeGrowthBV, 5),
     div: projectFutureValueSafe(baseValues.div, safeGrowthDiv, 5)
   };
+  if (futureValues.eps === void 0 && futureValues.cf === void 0 && futureValues.bv === void 0) {
+    console.warn("⚠️ EvaluationDetails: Toutes les projections sont undefined", {
+      baseValues,
+      safeGrowthEPS,
+      safeGrowthCF,
+      safeGrowthBV,
+      safeGrowthDiv,
+      assumptions: {
+        growthRateEPS: assumptions.growthRateEPS,
+        growthRateCF: assumptions.growthRateCF,
+        growthRateBV: assumptions.growthRateBV,
+        growthRateDiv: assumptions.growthRateDiv
+      }
+    });
+  }
   const safeTargetPE = assumptions.targetPE !== void 0 ? Math.max(config2.ratios.pe.min, Math.min(assumptions.targetPE, config2.ratios.pe.max)) : void 0;
   const safeTargetPCF = assumptions.targetPCF !== void 0 ? Math.max(config2.ratios.pcf.min, Math.min(assumptions.targetPCF, config2.ratios.pcf.max)) : void 0;
   const safeTargetPBV = assumptions.targetPBV !== void 0 ? Math.max(config2.ratios.pbv.min, Math.min(assumptions.targetPBV, config2.ratios.pbv.max)) : void 0;
@@ -34094,6 +34123,22 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     bv: futureValues.bv !== void 0 && safeTargetPBV !== void 0 && futureValues.bv > 0 && safeTargetPBV > 0 && safeTargetPBV <= 50 ? futureValues.bv * safeTargetPBV : void 0,
     div: futureValues.div !== void 0 && safeTargetYield !== void 0 && futureValues.div > 0 && safeTargetYield > 0 && safeTargetYield <= 20 ? futureValues.div / (safeTargetYield / 100) : void 0
   };
+  if (targets.eps === void 0 && targets.cf === void 0 && targets.bv === void 0 && targets.div === void 0) {
+    console.warn("⚠️ EvaluationDetails: Tous les prix cibles sont undefined", {
+      futureValues,
+      safeTargetPE,
+      safeTargetPCF,
+      safeTargetPBV,
+      safeTargetYield,
+      assumptions: {
+        targetPE: assumptions.targetPE,
+        targetPCF: assumptions.targetPCF,
+        targetPBV: assumptions.targetPBV,
+        targetYield: assumptions.targetYield
+      },
+      baseValues
+    });
+  }
   const currentPrice = Math.max(assumptions.currentPrice || 0, 0.01);
   const maxReasonableTarget = currentPrice * config2.projections.maxReasonableTargetMultiplier;
   const minReasonableTarget = currentPrice * config2.projections.minReasonableTargetMultiplier;
