@@ -191,7 +191,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                                     style={{ left: `${jpegyColor.position}%` }}
                                 >
                                     <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black text-white text-xs font-bold px-2 py-1 rounded whitespace-nowrap">
-                                        {jpegy.toFixed(2)}
+                                        {jpegy?.toFixed(2) ?? 'N/A'}
                                     </div>
                                 </div>
                             )}
@@ -202,7 +202,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                         </div>
                         <div className="text-xs text-gray-500">
                             {jpegy !== null ? (
-                                <>Growth: {assumptions.growthRateEPS.toFixed(1)}% + Yield: {currentYield.toFixed(2)}% = {growthPlusYield.toFixed(2)}%</>
+                                <>Growth: {(assumptions.growthRateEPS || 0).toFixed(1)}% + Yield: {currentYield.toFixed(2)}% = {growthPlusYield.toFixed(2)}%</>
                             ) : (
                                 <span className="text-orange-600">⚠️ JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%</span>
                             )}
@@ -210,7 +210,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                         <div className="mt-2 pt-2 border-t border-gray-200">
                             <div className="text-[10px] text-gray-400 space-y-1">
                                 <div><strong>Source de calcul:</strong> P/E Actuel ÷ (Taux de croissance EPS % + Rendement dividende %)</div>
-                                <div><strong>Formule:</strong> JPEGY = {currentPE > 0 ? currentPE.toFixed(2) : 'P/E'} ÷ ({assumptions.growthRateEPS.toFixed(1)}% + {currentYield.toFixed(2)}%) = {jpegy !== null ? jpegy.toFixed(2) : 'N/A'}</div>
+                                <div><strong>Formule:</strong> JPEGY = {currentPE > 0 ? currentPE.toFixed(2) : 'P/E'} ÷ ({(assumptions.growthRateEPS || 0).toFixed(1)}% + {currentYield.toFixed(2)}%) = {jpegy !== null ? jpegy.toFixed(2) : 'N/A'}</div>
                                 <div><strong>Fournisseur:</strong> Métrique propriétaire développée par Jean-Sébastien (JSLAI™). Le fournisseur établit cette métrique en ajustant le ratio P/E traditionnel par la somme du taux de croissance des bénéfices et du rendement du dividende, permettant une évaluation plus nuancée de la valorisation d'une action en tenant compte de sa capacité de croissance et de sa distribution de dividendes.</div>
                             </div>
                         </div>
@@ -245,7 +245,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                                     style={{ left: `${forwardJpegyColor.position}%` }}
                                 >
                                     <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black text-white text-xs font-bold px-2 py-1 rounded whitespace-nowrap">
-                                        {forwardJpegy.toFixed(2)}
+                                        {forwardJpegy?.toFixed(2) ?? 'N/A'}
                                     </div>
                                 </div>
                             )}
@@ -256,7 +256,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                         </div>
                         <div className="text-xs text-gray-500">
                             {forwardJpegy !== null ? (
-                                <>Growth: {assumptions.growthRateEPS.toFixed(1)}% + Yield: {currentYield.toFixed(2)}% = {growthPlusYield.toFixed(2)}%</>
+                                <>Growth: {(assumptions.growthRateEPS || 0).toFixed(1)}% + Yield: {currentYield.toFixed(2)}% = {growthPlusYield.toFixed(2)}%</>
                             ) : (
                                 <span className="text-orange-600">⚠️ Forward JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%</span>
                             )}
@@ -264,7 +264,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                         <div className="mt-2 pt-2 border-t border-gray-200">
                             <div className="text-[10px] text-gray-400 space-y-1">
                                 <div><strong>Source de calcul:</strong> Forward P/E ÷ (Taux de croissance EPS % + Rendement dividende %)</div>
-                                <div><strong>Formule:</strong> Forward JPEGY = {forwardPE > 0 ? forwardPE.toFixed(2) : 'Forward P/E'} ÷ ({assumptions.growthRateEPS.toFixed(1)}% + {currentYield.toFixed(2)}%) = {forwardJpegy !== null ? forwardJpegy.toFixed(2) : 'N/A'}</div>
+                                <div><strong>Formule:</strong> Forward JPEGY = {forwardPE > 0 ? forwardPE.toFixed(2) : 'Forward P/E'} ÷ ({(assumptions.growthRateEPS || 0).toFixed(1)}% + {currentYield.toFixed(2)}%) = {forwardJpegy !== null ? forwardJpegy.toFixed(2) : 'N/A'}</div>
                                 <div><strong>Fournisseur:</strong> Métrique propriétaire développée par Jean-Sébastien (JSLAI™). Le fournisseur établit cette métrique en utilisant le Forward P/E (basé sur les bénéfices projetés) au lieu du P/E actuel, ajusté par la somme du taux de croissance des bénéfices et du rendement du dividende, offrant une perspective prospective de la valorisation.</div>
                             </div>
                         </div>
@@ -319,32 +319,32 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                                 <td className="p-2 font-semibold cursor-help" title="P/E (Price-to-Earnings)\n\nRatio Prix/Bénéfice actuel.\nSource: FMP key-metrics">P/E</td>
                                 <td className="p-2 text-right cursor-help" title={`P/E Actuel: ${currentPE.toFixed(2)}x\n\nCalculé avec:\nPrix Actuel / BPA Actuel\n\n= ${formatCurrency(assumptions.currentPrice)} / ${baseEPS.toFixed(2)}\n\n= ${currentPE.toFixed(2)}x`}>{currentPE.toFixed(2)}</td>
                                 <td className="p-2 text-right cursor-help" title={`P/E Historique Moyen: ${avgPE.toFixed(2)}x\n\nMoyenne des ratios P/E historiques calculée à partir des données des 10 dernières années.`}>{avgPE.toFixed(2)}</td>
-                                <td className={`p-2 text-right font-semibold cursor-help ${currentPE < avgPE ? 'text-green-600' : 'text-red-600'}`} title={`Écart: ${((currentPE / avgPE - 1) * 100).toFixed(1)}%\n\n${currentPE < avgPE ? '✅ Sous-évalué par rapport à la moyenne historique' : '⚠️ Surévalué par rapport à la moyenne historique'}\n\nUn P/E inférieur à la moyenne historique peut indiquer une opportunité d'achat.`}>
-                                    {((currentPE / avgPE - 1) * 100).toFixed(1)}%
+                                <td className={`p-2 text-right font-semibold cursor-help ${currentPE < avgPE ? 'text-green-600' : 'text-red-600'}`} title={`Écart: ${avgPE > 0 ? ((currentPE / avgPE - 1) * 100).toFixed(1) : '0.0'}%\n\n${currentPE < avgPE ? '✅ Sous-évalué par rapport à la moyenne historique' : '⚠️ Surévalué par rapport à la moyenne historique'}\n\nUn P/E inférieur à la moyenne historique peut indiquer une opportunité d'achat.`}>
+                                    {avgPE > 0 ? ((currentPE / avgPE - 1) * 100).toFixed(1) : '0.0'}%
                                 </td>
                             </tr>
                             <tr>
                                 <td className="p-2 font-semibold cursor-help" title="P/CF (Price-to-Cash Flow)\n\nRatio Prix/Cash Flow actuel.\nSource: FMP key-metrics">P/CF</td>
                                 <td className="p-2 text-right cursor-help" title={`P/CF Actuel: ${currentPCF.toFixed(2)}x\n\nCalculé avec:\nPrix Actuel / Cash Flow par Action Actuel`}>{currentPCF.toFixed(2)}</td>
                                 <td className="p-2 text-right cursor-help" title={`P/CF Historique Moyen: ${avgPCF.toFixed(2)}x\n\nMoyenne des ratios P/CF historiques calculée à partir des données des 10 dernières années.`}>{avgPCF.toFixed(2)}</td>
-                                <td className={`p-2 text-right font-semibold cursor-help ${currentPCF < avgPCF ? 'text-green-600' : 'text-red-600'}`} title={`Écart: ${((currentPCF / avgPCF - 1) * 100).toFixed(1)}%\n\n${currentPCF < avgPCF ? '✅ Sous-évalué par rapport à la moyenne historique' : '⚠️ Surévalué par rapport à la moyenne historique'}`}>
-                                    {((currentPCF / avgPCF - 1) * 100).toFixed(1)}%
+                                <td className={`p-2 text-right font-semibold cursor-help ${currentPCF < avgPCF ? 'text-green-600' : 'text-red-600'}`} title={`Écart: ${avgPCF > 0 ? ((currentPCF / avgPCF - 1) * 100).toFixed(1) : '0.0'}%\n\n${currentPCF < avgPCF ? '✅ Sous-évalué par rapport à la moyenne historique' : '⚠️ Surévalué par rapport à la moyenne historique'}`}>
+                                    {avgPCF > 0 ? ((currentPCF / avgPCF - 1) * 100).toFixed(1) : '0.0'}%
                                 </td>
                             </tr>
                             <tr>
                                 <td className="p-2 font-semibold cursor-help" title="P/BV (Price-to-Book Value)\n\nRatio Prix/Valeur Comptable actuel.\nSource: FMP key-metrics">P/BV</td>
                                 <td className="p-2 text-right cursor-help" title={`P/BV Actuel: ${currentPBV.toFixed(2)}x\n\nCalculé avec:\nPrix Actuel / Book Value par Action Actuel`}>{currentPBV.toFixed(2)}</td>
                                 <td className="p-2 text-right cursor-help" title={`P/BV Cible: ${assumptions.targetPBV.toFixed(2)}x\n\nRatio P/BV cible utilisé pour vos projections à 5 ans.\nAuto-rempli avec la moyenne historique.`}>{assumptions.targetPBV.toFixed(2)}</td>
-                                <td className={`p-2 text-right font-semibold cursor-help ${currentPBV < assumptions.targetPBV ? 'text-green-600' : 'text-red-600'}`} title={`Écart: ${((currentPBV / assumptions.targetPBV - 1) * 100).toFixed(1)}%\n\n${currentPBV < assumptions.targetPBV ? '✅ Sous-évalué par rapport au ratio cible' : '⚠️ Surévalué par rapport au ratio cible'}`}>
-                                    {((currentPBV / assumptions.targetPBV - 1) * 100).toFixed(1)}%
+                                <td className={`p-2 text-right font-semibold cursor-help ${currentPBV < assumptions.targetPBV ? 'text-green-600' : 'text-red-600'}`} title={`Écart: ${assumptions.targetPBV > 0 ? ((currentPBV / assumptions.targetPBV - 1) * 100).toFixed(1) : '0.0'}%\n\n${currentPBV < assumptions.targetPBV ? '✅ Sous-évalué par rapport au ratio cible' : '⚠️ Surévalué par rapport au ratio cible'}`}>
+                                    {assumptions.targetPBV > 0 ? ((currentPBV / assumptions.targetPBV - 1) * 100).toFixed(1) : '0.0'}%
                                 </td>
                             </tr>
                             <tr>
                                 <td className="p-2 font-semibold cursor-help" title="Rendement DIV (Dividend Yield)\n\nRendement en dividendes actuel.\nSource: FMP key-metrics">Rendement DIV</td>
                                 <td className="p-2 text-right cursor-help" title={`Yield Actuel: ${currentYield.toFixed(2)}%\n\nCalculé avec:\n(Dividende Actuel / Prix Actuel) × 100`}>{currentYield.toFixed(2)}%</td>
                                 <td className="p-2 text-right cursor-help" title={`Yield Cible: ${assumptions.targetYield.toFixed(2)}%\n\nRendement en dividendes cible utilisé pour vos projections à 5 ans.\nAuto-rempli avec la moyenne historique.`}>{assumptions.targetYield.toFixed(2)}%</td>
-                                <td className={`p-2 text-right font-semibold cursor-help ${currentYield > assumptions.targetYield ? 'text-green-600' : 'text-red-600'}`} title={`Écart: ${((currentYield / assumptions.targetYield - 1) * 100).toFixed(1)}%\n\n${currentYield > assumptions.targetYield ? '✅ Rendement supérieur au rendement cible' : '⚠️ Rendement inférieur au rendement cible'}\n\nUn rendement supérieur au cible peut indiquer une opportunité.`}>
-                                    {((currentYield / assumptions.targetYield - 1) * 100).toFixed(1)}%
+                                <td className={`p-2 text-right font-semibold cursor-help ${currentYield > assumptions.targetYield ? 'text-green-600' : 'text-red-600'}`} title={`Écart: ${assumptions.targetYield > 0 ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : '0.0'}%\n\n${currentYield > assumptions.targetYield ? '✅ Rendement supérieur au rendement cible' : '⚠️ Rendement inférieur au rendement cible'}\n\nUn rendement supérieur au cible peut indiquer une opportunité.`}>
+                                    {assumptions.targetYield > 0 ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : '0.0'}%
                                 </td>
                             </tr>
                         </tbody>

@@ -1020,7 +1020,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               {globalStats.avgJPEGY != null && isFinite(globalStats.avgJPEGY) ? (
                 <>
                   <div className={`text-2xl font-bold ${getJpegyTextClass(globalStats.avgJPEGY)}`}>
-                    {globalStats.avgJPEGY.toFixed(2)}
+                    {globalStats.avgJPEGY?.toFixed(2) ?? 'N/A'}
                   </div>
                   <div className="text-xs text-gray-400 mt-1">Médiane: {(globalStats.medianJPEGY != null && isFinite(globalStats.medianJPEGY)) ? globalStats.medianJPEGY.toFixed(2) : 'N/A'}</div>
                   <div className="mt-2 pt-2 border-t border-gray-200">
@@ -1112,7 +1112,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                         {metric.jpegy !== null ? (
                           <>
                             <span className={`font-bold ${getJpegyTextClass(metric.jpegy)}`}>
-                              {metric.jpegy.toFixed(2)}
+                              {metric.jpegy?.toFixed(2) ?? 'N/A'}
                             </span>
                             <div className="mt-1 pt-1 border-t border-gray-200">
                               <div className="text-[9px] text-gray-400 space-y-0.5 text-left">
@@ -1140,11 +1140,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">P/E:</span>
-                      <span className="font-bold">{metric.currentPE?.toFixed(1) || 'N/A'}x</span>
+                      <span className="font-bold">{metric.currentPE?.toFixed(1) ?? 'N/A'}x</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Yield:</span>
-                      <span className="font-bold">{metric.currentYield?.toFixed(2) || 'N/A'}%</span>
+                      <span className="font-bold">{metric.currentYield?.toFixed(2) ?? 'N/A'}%</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Signal:</span>
@@ -1979,9 +1979,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     } ${getReturnBgClass(metric.totalReturnPercent)} ${currentId === metric.profile.id ? 'opacity-100' : 'opacity-85'}`}
                     title={`${metric.profile.info.name || metric.profile.id}
 Rendement: ${metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A (données invalides)' : `${metric.totalReturnPercent.toFixed(1)}%`}
-JPEGY: ${metric.jpegy !== null ? metric.jpegy.toFixed(2) : 'N/A (non calculable)'}
-Ratio 3:1: ${metric.hasInvalidData || metric.ratio31 === null || metric.ratio31 === undefined ? 'N/A' : metric.ratio31.toFixed(2)}
-P/E: ${metric.currentPE !== null && metric.currentPE !== undefined ? metric.currentPE.toFixed(1) : 'N/A'}x
+JPEGY: ${metric.jpegy !== null ? (metric.jpegy?.toFixed(2) ?? 'N/A') : 'N/A (non calculable)'}
+Ratio 3:1: ${metric.hasInvalidData || metric.ratio31 === null || metric.ratio31 === undefined ? 'N/A' : (metric.ratio31?.toFixed(2) ?? 'N/A')}
+P/E: ${metric.currentPE !== null && metric.currentPE !== undefined ? (metric.currentPE?.toFixed(1) ?? 'N/A') : 'N/A'}x
 Secteur: ${metric.profile.info.sector}
 ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}
 ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
@@ -2008,8 +2008,8 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       <div className={`text-[10px] font-semibold mb-1 ${metric.hasInvalidData ? 'opacity-50' : ''}`}>
                         {metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`}
                       </div>
-                      <div className={`text-[8px] opacity-90 ${metric.hasInvalidData || metric.jpegy === null ? 'opacity-50' : ''}`}>
-                        JPEGY: {metric.jpegy !== null ? metric.jpegy.toFixed(1) : 'N/A'}
+                       <div className={`text-[8px] opacity-90 ${metric.hasInvalidData || metric.jpegy === null ? 'opacity-50' : ''}`}>
+                        JPEGY: {metric.jpegy !== null && metric.jpegy !== undefined ? metric.jpegy.toFixed(1) : 'N/A'}
                         {metric.jpegy === null && <span className="ml-1 text-red-400">⚠️</span>}
                       </div>
                       {metric.hasApprovedVersion && !metric.hasInvalidData && (
@@ -2088,7 +2088,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       </div>
                       <div className="text-right">
                         <div className={`font-semibold flex items-center justify-end gap-1 ${metric.jpegy === null ? 'text-gray-400' : getJpegyTextClass(metric.jpegy)}`}>
-                          {metric.jpegy !== null ? metric.jpegy.toFixed(2) : 'N/A'}
+                          {metric.jpegy !== null && metric.jpegy !== undefined ? metric.jpegy.toFixed(2) : 'N/A'}
                           {metric.jpegy === null && <ExclamationTriangleIcon className="w-3 h-3 text-orange-500" title="JPEGY non calculable" />}
                         </div>
                         <div className="text-xs text-gray-500">JPEGY</div>
@@ -2108,7 +2108,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                           metric.ratio31 >= 1 ? 'text-yellow-600' :
                           'text-red-600'
                         }`}>
-                          {metric.hasInvalidData || metric.ratio31 === null ? 'N/A' : metric.ratio31.toFixed(2)}
+                          {metric.hasInvalidData || metric.ratio31 === null || metric.ratio31 === undefined ? 'N/A' : metric.ratio31.toFixed(2)}
                         </div>
                         <div className="text-xs text-gray-500">Ratio 3:1</div>
                       </div>
@@ -2954,7 +2954,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                 ? (() => {
                     const validReturns = filteredMetrics.map(m => m.totalReturnPercent).filter((r): r is number => r !== null && r !== undefined);
                     if (validReturns.length === 0) return 'N/A';
-                    return `${Math.min(...validReturns).toFixed(0)}% à ${Math.max(...validReturns).toFixed(0)}%`;
+                    return `${(Math.min(...validReturns) ?? 0).toFixed(0)}% à ${(Math.max(...validReturns) ?? 0).toFixed(0)}%`;
                   })()
                 : 'N/A'
             }
@@ -3043,7 +3043,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         <span 
                           className={`text-xs font-semibold px-2 py-0.5 rounded text-white ${getJpegyBgClass(avgJPEGY)}`}
                         >
-                          {avgJPEGY.toFixed(2)}
+                          {avgJPEGY?.toFixed(2) ?? 'N/A'}
                         </span>
                       ) : (
                         <span className="text-xs font-semibold px-2 py-0.5 rounded bg-gray-400 text-white flex items-center gap-1">
@@ -3336,9 +3336,9 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                             key={otherMetric} 
                             className="p-2 text-center font-semibold"
                             style={cellStyle}
-                            title={`Corrélation: ${corr.toFixed(3)}`}
+                            title={`Corrélation: ${corr?.toFixed(3) ?? '0.000'}`}
                           >
-                            {corr.toFixed(2)}
+                            {corr?.toFixed(2) ?? '0.00'}
                           </td>
                         );
                       })}
@@ -3513,13 +3513,13 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                           <span
                             className={`inline-block w-4 h-4 rounded-full mr-2 ${getJpegyBgClass(metric.jpegy)}`}
                           />
-                          {metric.jpegy !== null && metric.jpegy !== undefined ? metric.jpegy.toFixed(2) : 'N/A'}
+                          {metric.jpegy?.toFixed(2) ?? 'N/A'}
                         </div>
                         <div className="absolute right-0 top-full mt-1 w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
-                          <div className="font-semibold mb-1">JPEGY: {metric.jpegy !== null && metric.jpegy !== undefined ? metric.jpegy.toFixed(2) : 'N/A'}</div>
+                          <div className="font-semibold mb-1">JPEGY: {metric.jpegy?.toFixed(2) ?? 'N/A'}</div>
                           <div className="space-y-1 text-[10px]">
                             <div><strong>Source de calcul:</strong> P/E Actuel ÷ (Taux de croissance EPS % + Rendement dividende %)</div>
-                            <div><strong>Formule:</strong> JPEGY = {metric.currentPE?.toFixed(2) || 'P/E'} ÷ ({metric.historicalGrowth?.toFixed(1) || 'Growth'}% + {metric.currentYield?.toFixed(2) || 'Yield'}%)</div>
+                            <div><strong>Formule:</strong> JPEGY = {metric.currentPE?.toFixed(2) ?? 'P/E'} ÷ ({metric.historicalGrowth?.toFixed(1) ?? 'Growth'}% + {metric.currentYield?.toFixed(2) ?? 'Yield'}%)</div>
                             <div><strong>Fournisseur:</strong> Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Le fournisseur établit cette métrique en ajustant le ratio P/E traditionnel par la somme du taux de croissance des bénéfices et du rendement du dividende, permettant une évaluation plus nuancée de la valorisation d'une action en tenant compte de sa capacité de croissance et de sa distribution de dividendes.</div>
                           </div>
                         </div>
@@ -3566,16 +3566,16 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     ) : (metric.downsideRisk !== null && metric.downsideRisk !== undefined) ? `${metric.downsideRisk.toFixed(1)}%` : 'N/A'}
                   </td>
                   <td className={`p-2 sm:p-3 text-center ${!displayOptions.visibleColumns.pe ? 'hidden' : ''} ${displayOptions.density === 'compact' ? 'hidden lg:table-cell' : 'lg:table-cell'}`}>
-                    <span className="text-xs sm:text-sm">{metric.currentPE?.toFixed(1) || 'N/A'}x</span>
+                    <span className="text-xs sm:text-sm">{metric.currentPE?.toFixed(1) ?? 'N/A'}x</span>
                   </td>
                   <td className={`p-2 sm:p-3 text-center ${!displayOptions.visibleColumns.yield ? 'hidden' : ''} ${displayOptions.density === 'compact' ? 'hidden lg:table-cell' : 'lg:table-cell'}`}>
-                    <span className="text-xs sm:text-sm">{metric.currentYield?.toFixed(2) || 'N/A'}%</span>
+                    <span className="text-xs sm:text-sm">{metric.currentYield?.toFixed(2) ?? 'N/A'}%</span>
                   </td>
                   <td className={`p-2 sm:p-3 text-right text-xs sm:text-sm ${!displayOptions.visibleColumns.growth ? 'hidden' : ''} ${displayOptions.density === 'compact' ? 'hidden lg:table-cell' : 'lg:table-cell'}`}>
-                    {metric.historicalGrowth?.toFixed(1) || 'N/A'}%
+                    {metric.historicalGrowth?.toFixed(1) ?? 'N/A'}%
                   </td>
                   <td className={`p-2 sm:p-3 text-right text-xs sm:text-sm ${!displayOptions.visibleColumns.volatility ? 'hidden' : ''} hidden xl:table-cell`}>
-                    {metric.volatility?.toFixed(1) || 'N/A'}%
+                    {metric.volatility?.toFixed(1) ?? 'N/A'}%
                   </td>
                   <td className={`p-2 sm:p-3 text-center ${!displayOptions.visibleColumns.approved ? 'hidden' : ''}`}>
                     {metric.hasApprovedVersion ? (

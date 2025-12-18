@@ -114,3 +114,4 @@
 - Garder localStorage comme fallback temporaire
 - Migrer profils existants vers Supabase
 
+

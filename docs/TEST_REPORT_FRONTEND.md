@@ -82,3 +82,4 @@ Les endpoints `/api/sector` et `/api/sector-index` peuvent retourner 500 (rate l
 
 Les applications frontend sont **100% fonctionnelles** et tous les appels API fonctionnent correctement selon leurs spécifications.
 
+

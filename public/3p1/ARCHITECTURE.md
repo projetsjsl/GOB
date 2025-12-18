@@ -191,3 +191,4 @@ Supabase (source) → mapSourceToIsWatchlist() → isWatchlist
 - `docs/api/DOCUMENTATION_APIs.md` : Documentation APIs
 - `CLAUDE.md` : Guide principal projet
 
+

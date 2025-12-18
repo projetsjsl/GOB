@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { formatCurrency, projectFutureValue, calculateCAGR } from '../utils/calculations';
 import { CalculatorIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { GuardrailConfig, DEFAULT_CONFIG } from '../config/AppConfig';
+import { AnnualData, Assumptions, CompanyInfo } from '../types';
 
 interface EvaluationDetailsProps {
   data: AnnualData[];
@@ -426,12 +427,12 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   const formatRange = (range: Range | null, suffix: string = '') => {
     if (!range) return 'N/A';
     // Afficher Min - Max (Med: X)
-    return `${range.min.toFixed(1)} - ${range.max.toFixed(1)}${suffix} (Med: ${range.median.toFixed(1)}${suffix})`;
+    return `${range.min?.toFixed(1) ?? '0.0'} - ${range.max?.toFixed(1) ?? '0.0'}${suffix} (Med: ${range.median?.toFixed(1) ?? '0.0'}${suffix})`;
   };
 
   const formatGrowthRange = (range: Range | null) => {
     if (!range) return 'N/A';
-    return `${range.min.toFixed(1)}% - ${range.max.toFixed(1)}% (Med: ${range.median.toFixed(1)}%)`;
+    return `${range.min?.toFixed(1) ?? '0.0'}% - ${range.max?.toFixed(1) ?? '0.0'}% (Med: ${range.median?.toFixed(1) ?? '0.0'}%)`;
   };
 
   // Composant pour afficher les intervalles de référence sous une métrique
@@ -589,7 +590,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   </button>
                 </div>
               </td>
-              <td className={`p-3 font-semibold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`BPA (EPS) Actuel: ${baseValues.eps.toFixed(2)} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.eps.toFixed(2)}</td>
+              <td className={`p-3 font-semibold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`BPA (EPS) Actuel: ${baseValues.eps?.toFixed(2) ?? '0.00'} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.eps?.toFixed(2) ?? '0.00'}</td>
               <td className={`p-3 ${assumptions.excludeEPS ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -600,7 +601,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   title={`Taux de croissance BPA (EPS)\n\nTaux de croissance annuel composé pour projeter le BPA sur 5 ans.\n\nPlage recommandée: 0% à 20%\nLimite système: -50% à +50%\n\nAuto-rempli avec le CAGR historique.\n\nFormule projection: BPA × (1 + Taux/100)⁵`}
                 />
               </td>
-              <td className={`p-3 font-medium ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`} title={`BPA (EPS) Projeté (5 ans): ${futureValues.eps.toFixed(2)} $\n\nCalculé avec:\nBPA Actuel (${baseValues.eps.toFixed(2)}) × (1 + ${assumptions.growthRateEPS}%)⁵\n\n= ${futureValues.eps.toFixed(2)} $\n\nValeur projetée utilisée pour calculer le prix cible.`}>{futureValues.eps.toFixed(2)}</td>
+              <td className={`p-3 font-medium ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`} title={`BPA (EPS) Projeté (5 ans): ${futureValues.eps?.toFixed(2) ?? '0.00'} $\n\nCalculé avec:\nBPA Actuel (${baseValues.eps?.toFixed(2) ?? '0.00'}) × (1 + ${assumptions.growthRateEPS}%)⁵\n\n= ${futureValues.eps?.toFixed(2) ?? '0.00'} $\n\nValeur projetée utilisée pour calculer le prix cible.`}>{futureValues.eps?.toFixed(2) ?? '0.00'}</td>
               <td className={`p-3 ${assumptions.excludeEPS ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -646,7 +647,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   </button>
                 </div>
               </td>
-              <td className={`p-3 font-semibold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`CFA (Cash Flow) Actuel: ${baseValues.cf.toFixed(2)} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.cf.toFixed(2)}</td>
+              <td className={`p-3 font-semibold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`CFA (Cash Flow) Actuel: ${baseValues.cf?.toFixed(2) ?? '0.00'} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.cf?.toFixed(2) ?? '0.00'}</td>
               <td className={`p-3 ${assumptions.excludeCF ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -657,7 +658,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   title={`Taux de croissance CFA (Cash Flow)\n\nTaux de croissance annuel composé pour projeter le Cash Flow sur 5 ans.\n\nPlage recommandée: 0% à 20%\nLimite système: -50% à +50%\n\nAuto-rempli avec le CAGR historique.\n\nFormule projection: CF × (1 + Taux/100)⁵`}
                 />
               </td>
-              <td className={`p-3 font-medium ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`} title={`CFA (Cash Flow) Projeté (5 ans): ${futureValues.cf.toFixed(2)} $\n\nCalculé avec:\nCF Actuel (${baseValues.cf.toFixed(2)}) × (1 + ${assumptions.growthRateCF}%)⁵\n\n= ${futureValues.cf.toFixed(2)} $\n\nValeur projetée utilisée pour calculer le prix cible.`}>{futureValues.cf.toFixed(2)}</td>
+              <td className={`p-3 font-medium ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`} title={`CFA (Cash Flow) Projeté (5 ans): ${futureValues.cf?.toFixed(2) ?? '0.00'} $\n\nCalculé avec:\nCF Actuel (${baseValues.cf?.toFixed(2) ?? '0.00'}) × (1 + ${assumptions.growthRateCF}%)⁵\n\n= ${futureValues.cf?.toFixed(2) ?? '0.00'} $\n\nValeur projetée utilisée pour calculer le prix cible.`}>{futureValues.cf?.toFixed(2) ?? '0.00'}</td>
               <td className={`p-3 ${assumptions.excludeCF ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -703,7 +704,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   </button>
                 </div>
               </td>
-              <td className={`p-3 font-semibold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`BV (Book Value) Actuel: ${baseValues.bv.toFixed(2)} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.bv.toFixed(2)}</td>
+              <td className={`p-3 font-semibold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`BV (Book Value) Actuel: ${baseValues.bv?.toFixed(2) ?? '0.00'} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.bv?.toFixed(2) ?? '0.00'}</td>
               <td className={`p-3 ${assumptions.excludeBV ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -714,7 +715,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   title={`Taux de croissance BV (Book Value)\n\nTaux de croissance annuel composé pour projeter la Book Value sur 5 ans.\n\nPlage recommandée: 0% à 20%\nLimite système: -50% à +50%\n\nAuto-rempli avec le CAGR historique.\n\nFormule projection: BV × (1 + Taux/100)⁵`}
                 />
               </td>
-              <td className={`p-3 font-medium ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`} title={`BV (Book Value) Projeté (5 ans): ${futureValues.bv.toFixed(2)} $\n\nCalculé avec:\nBV Actuel (${baseValues.bv.toFixed(2)}) × (1 + ${assumptions.growthRateBV}%)⁵\n\n= ${futureValues.bv.toFixed(2)} $\n\nValeur projetée utilisée pour calculer le prix cible.`}>{futureValues.bv.toFixed(2)}</td>
+              <td className={`p-3 font-medium ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`} title={`BV (Book Value) Projeté (5 ans): ${futureValues.bv?.toFixed(2) ?? '0.00'} $\n\nCalculé avec:\nBV Actuel (${baseValues.bv?.toFixed(2) ?? '0.00'}) × (1 + ${assumptions.growthRateBV}%)⁵\n\n= ${futureValues.bv?.toFixed(2) ?? '0.00'} $\n\nValeur projetée utilisée pour calculer le prix cible.`}>{futureValues.bv?.toFixed(2) ?? '0.00'}</td>
               <td className={`p-3 ${assumptions.excludeBV ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -760,7 +761,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   </button>
                 </div>
               </td>
-              <td className={`p-3 font-semibold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`DIV (Dividende) Actuel: ${baseValues.div.toFixed(2)} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.div.toFixed(2)}</td>
+              <td className={`p-3 font-semibold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`DIV (Dividende) Actuel: ${baseValues.div?.toFixed(2) ?? '0.00'} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.div?.toFixed(2) ?? '0.00'}</td>
               <td className={`p-3 ${assumptions.excludeDIV ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -771,7 +772,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   title={`Taux de croissance DIV (Dividende)\n\nTaux de croissance annuel composé pour projeter le Dividende sur 5 ans.\n\nPlage recommandée: 0% à 20%\nLimite système: -50% à +50%\n\nAuto-rempli avec le CAGR historique.\n\nFormule projection: DIV × (1 + Taux/100)⁵`}
                 />
               </td>
-              <td className={`p-3 font-medium ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`} title={`DIV (Dividende) Projeté (5 ans): ${futureValues.div.toFixed(2)} $\n\nCalculé avec:\nDIV Actuel (${baseValues.div.toFixed(2)}) × (1 + ${assumptions.growthRateDiv}%)⁵\n\n= ${futureValues.div.toFixed(2)} $\n\nValeur projetée utilisée pour calculer le prix cible.`}>{futureValues.div.toFixed(2)}</td>
+              <td className={`p-3 font-medium ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`} title={`DIV (Dividende) Projeté (5 ans): ${futureValues.div?.toFixed(2) ?? '0.00'} $\n\nCalculé avec:\nDIV Actuel (${baseValues.div?.toFixed(2) ?? '0.00'}) × (1 + ${assumptions.growthRateDiv}%)⁵\n\n= ${futureValues.div?.toFixed(2) ?? '0.00'} $\n\nValeur projetée utilisée pour calculer le prix cible.`}>{futureValues.div?.toFixed(2) ?? '0.00'}</td>
               <td className={`p-3 ${assumptions.excludeDIV ? "bg-gray-200" : "bg-orange-50"}`}>
                 <div className="flex items-center justify-end gap-1">
                   <input 
