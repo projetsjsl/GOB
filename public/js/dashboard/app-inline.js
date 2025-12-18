@@ -15982,6 +15982,24 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
         // Composant onglet Stocks & News
         const StocksNewsTab = ({ tickerSource = 'portfolio' }) => {
+            // Récupérer les données depuis window.BetaCombinedDashboard
+            const dashboard = typeof window !== 'undefined' ? (window.BetaCombinedDashboard || {}) : {};
+            const teamTickers = dashboard.teamTickers || [];
+            const watchlistTickers = dashboard.watchlistTickers || [];
+            const stockData = dashboard.stockData || {};
+            const newsData = dashboard.newsData || [];
+            const tickerLatestNews = dashboard.tickerLatestNews || {};
+            const tickerMoveReasons = dashboard.tickerMoveReasons || {};
+            const isDarkMode = dashboard.isDarkMode ?? true;
+            const loading = dashboard.loading ?? false;
+            const lastUpdate = dashboard.lastUpdate ?? null;
+            const getCompanyLogo = dashboard.getCompanyLogo || ((ticker) => `https://logo.clearbit.com/${ticker.toLowerCase()}.com`);
+            const loadTickersFromSupabase = dashboard.loadTickersFromSupabase || (async () => {});
+            const fetchNews = dashboard.fetchNews || (async () => {});
+            const refreshAllStocks = dashboard.refreshAllStocks || (async () => {});
+            const setActiveTab = dashboard.setActiveTab || (() => {});
+            const setSelectedStock = dashboard.setSelectedStock || (() => {});
+
             const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
             const [expandedStock, setExpandedStock] = useState(null);
 
@@ -15989,6 +16007,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             const marketOverviewRef = useRef(null);
             const heatmapRef = useRef(null);
             const screenerRef = useRef(null);
+
+            // Log pour diagnostic
+            useEffect(() => {
+                console.log('📊 StocksNewsTab - Données disponibles:', {
+                    tickerSource,
+                    teamTickersCount: teamTickers.length,
+                    watchlistTickersCount: watchlistTickers.length,
+                    stockDataCount: Object.keys(stockData).length,
+                    newsDataCount: newsData.length,
+                    displayedTickersCount: (tickerSource === 'watchlist' ? watchlistTickers : teamTickers).length
+                });
+            }, [tickerSource, teamTickers.length, watchlistTickers.length, Object.keys(stockData).length, newsData.length]);
 
             // Charger les widgets TradingView
             useEffect(() => {
@@ -16104,6 +16134,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             // États pour ajouter un ticker (uniquement pour watchlist)
             const [newTicker, setNewTicker] = useState('');
+
+            // Récupérer les fonctions utilitaires depuis window (seront définies plus bas dans le composant)
+            const globalUtils = typeof window !== 'undefined' ? (window.DASHBOARD_UTILS || {}) : {};
+            const LucideIcon = typeof window !== 'undefined' ? (window.LucideIcon || window.IconoirIcon) : (({ name, className = '' }) => <span className={className}>{name}</span>);
+            const IconoirIcon = typeof window !== 'undefined' ? (window.IconoirIcon || LucideIcon) : (({ name, className = '' }) => <span className={className}>{name}</span>);
 
             // Filtrer les tickers selon la source
             const displayedTickers = tickerSource === 'watchlist' ? watchlistTickers : teamTickers;
@@ -16294,21 +16329,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 return 40;
             };
 
-            const getCredibilityTier = (window.DASHBOARD_UTILS && window.DASHBOARD_UTILS.getCredibilityTier) || ((score) => {
-                if (score >= 90) return 'premium';
-                if (score >= 75) return 'high';
-                if (score >= 50) return 'medium';
-                return 'low';
-            });
-
-            // Fonction pour formater les nombres
-            const formatNumber = (window.DASHBOARD_UTILS && window.DASHBOARD_UTILS.formatNumberLocale) || ((num) => {
-                if (!num && num !== 0) return 'N/A';
-                if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
-                if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
-                if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
-                return num.toLocaleString('fr-FR');
-            });
+            // formatNumber et getCredibilityTier sont déjà définis plus haut dans le composant
 
             // Mapping des noms de compagnies pour affichage
             const companyNames = (window.DASHBOARD_CONSTANTS && window.DASHBOARD_CONSTANTS.companyNames) || {};
