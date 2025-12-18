@@ -353,26 +353,33 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
   // Projections 5 ans typiques pour le secteur (basées sur les moyennes sectorielles)
   const sector5YearProjections = useMemo(() => {
     // Utiliser les moyennes sectorielles comme base pour les projections
+    const safeAvg = (r: Range | null, defaultVal: number = 0) => (r != null && r.avg != null && isFinite(r.avg)) ? r.avg : defaultVal;
     return {
-      pe: { min: sectorRanges.pe.avg * 0.9, max: sectorRanges.pe.avg * 1.1, avg: sectorRanges.pe.avg },
-      pcf: { min: sectorRanges.pcf.avg * 0.9, max: sectorRanges.pcf.avg * 1.1, avg: sectorRanges.pcf.avg },
-      pbv: { min: sectorRanges.pbv.avg * 0.9, max: sectorRanges.pbv.avg * 1.1, avg: sectorRanges.pbv.avg },
-      yield: { min: sectorRanges.yield.avg * 0.9, max: sectorRanges.yield.avg * 1.1, avg: sectorRanges.yield.avg },
-      epsGrowth: { min: sectorRanges.epsGrowth.avg * 0.8, max: sectorRanges.epsGrowth.avg * 1.2, avg: sectorRanges.epsGrowth.avg },
-      cfGrowth: { min: sectorRanges.cfGrowth.avg * 0.8, max: sectorRanges.cfGrowth.avg * 1.2, avg: sectorRanges.cfGrowth.avg },
-      bvGrowth: { min: sectorRanges.bvGrowth.avg * 0.8, max: sectorRanges.bvGrowth.avg * 1.2, avg: sectorRanges.bvGrowth.avg },
-      divGrowth: { min: sectorRanges.divGrowth.avg * 0.8, max: sectorRanges.divGrowth.avg * 1.2, avg: sectorRanges.divGrowth.avg }
+      pe: { min: safeAvg(sectorRanges.pe, 17) * 0.9, max: safeAvg(sectorRanges.pe, 17) * 1.1, avg: safeAvg(sectorRanges.pe, 17) },
+      pcf: { min: safeAvg(sectorRanges.pcf, 14) * 0.9, max: safeAvg(sectorRanges.pcf, 14) * 1.1, avg: safeAvg(sectorRanges.pcf, 14) },
+      pbv: { min: safeAvg(sectorRanges.pbv, 4) * 0.9, max: safeAvg(sectorRanges.pbv, 4) * 1.1, avg: safeAvg(sectorRanges.pbv, 4) },
+      yield: { min: safeAvg(sectorRanges.yield, 2.5) * 0.9, max: safeAvg(sectorRanges.yield, 2.5) * 1.1, avg: safeAvg(sectorRanges.yield, 2.5) },
+      epsGrowth: { min: safeAvg(sectorRanges.epsGrowth, 10) * 0.8, max: safeAvg(sectorRanges.epsGrowth, 10) * 1.2, avg: safeAvg(sectorRanges.epsGrowth, 10) },
+      cfGrowth: { min: safeAvg(sectorRanges.cfGrowth, 10) * 0.8, max: safeAvg(sectorRanges.cfGrowth, 10) * 1.2, avg: safeAvg(sectorRanges.cfGrowth, 10) },
+      bvGrowth: { min: safeAvg(sectorRanges.bvGrowth, 7) * 0.8, max: safeAvg(sectorRanges.bvGrowth, 7) * 1.2, avg: safeAvg(sectorRanges.bvGrowth, 7) },
+      divGrowth: { min: safeAvg(sectorRanges.divGrowth, 4) * 0.8, max: safeAvg(sectorRanges.divGrowth, 4) * 1.2, avg: safeAvg(sectorRanges.divGrowth, 4) }
     };
   }, [sectorRanges]);
 
   const formatRange = (range: Range | null, suffix: string = '') => {
     if (!range) return 'N/A';
-    return `${range.min.toFixed(1)} - ${range.max.toFixed(1)}${suffix} (moy: ${range.avg.toFixed(1)}${suffix})`;
+    const safeMin = (range.min != null && isFinite(range.min)) ? range.min : 0;
+    const safeMax = (range.max != null && isFinite(range.max)) ? range.max : 0;
+    const safeAvg = (range.avg != null && isFinite(range.avg)) ? range.avg : 0;
+    return `${safeMin.toFixed(1)} - ${safeMax.toFixed(1)}${suffix} (moy: ${safeAvg.toFixed(1)}${suffix})`;
   };
 
   const formatGrowthRange = (range: Range | null) => {
     if (!range) return 'N/A';
-    return `${range.min.toFixed(1)}% - ${range.max.toFixed(1)}% (moy: ${range.avg.toFixed(1)}%)`;
+    const safeMin = (range.min != null && isFinite(range.min)) ? range.min : 0;
+    const safeMax = (range.max != null && isFinite(range.max)) ? range.max : 0;
+    const safeAvg = (range.avg != null && isFinite(range.avg)) ? range.avg : 0;
+    return `${safeMin.toFixed(1)}% - ${safeMax.toFixed(1)}% (moy: ${safeAvg.toFixed(1)}%)`;
   };
 
   if (!titleRanges) {

@@ -153,7 +153,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="font-bold text-green-600 text-sm sm:text-base">{info.securityRank}</span>
             <span className="text-[8px] sm:text-[9px] text-gray-500 hidden sm:block mt-0.5">ValueLine 3 déc 2025</span>
           </div>
-          {info.beta !== undefined && info.beta !== null && (
+          {info.beta !== undefined && info.beta !== null && isFinite(info.beta) && (
             <div className="bg-gray-100 px-2 sm:px-3 py-1 rounded text-center cursor-help" title={`Beta: ${info.beta.toFixed(2)}\n\nMesure la volatilité relative au marché:\n• Beta < 1: Moins volatile que le marché\n• Beta = 1: Volatilité égale au marché\n• Beta > 1: Plus volatile que le marché\n\nSource: FMP key-metrics`}>
               <span className="font-semibold text-gray-600 block text-[10px] sm:text-xs">BETA</span>
               <span className="font-bold text-blue-600 text-sm sm:text-base">{info.beta.toFixed(2)}</span>

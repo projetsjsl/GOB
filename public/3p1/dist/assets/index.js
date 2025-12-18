@@ -8843,7 +8843,7 @@ Source: FMP API (company-profile)`, children: info.country })
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold text-green-600 text-sm sm:text-base", children: info.securityRank }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[8px] sm:text-[9px] text-gray-500 hidden sm:block mt-0.5", children: "ValueLine 3 déc 2025" })
         ] }),
-        info.beta !== void 0 && info.beta !== null && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-100 px-2 sm:px-3 py-1 rounded text-center cursor-help", title: `Beta: ${info.beta.toFixed(2)}
+        info.beta !== void 0 && info.beta !== null && isFinite(info.beta) && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-100 px-2 sm:px-3 py-1 rounded text-center cursor-help", title: `Beta: ${info.beta.toFixed(2)}
 
 Mesure la volatilité relative au marché:
 • Beta < 1: Moins volatile que le marché
@@ -35073,24 +35073,31 @@ const HistoricalRangesTable = ({ data, info, sector, assumptions }) => {
     };
   }, [titleRanges, assumptions, data]);
   const sector5YearProjections = reactExports.useMemo(() => {
+    const safeAvg = (r2, defaultVal = 0) => r2 != null && r2.avg != null && isFinite(r2.avg) ? r2.avg : defaultVal;
     return {
-      pe: { min: sectorRanges.pe.avg * 0.9, max: sectorRanges.pe.avg * 1.1, avg: sectorRanges.pe.avg },
-      pcf: { min: sectorRanges.pcf.avg * 0.9, max: sectorRanges.pcf.avg * 1.1, avg: sectorRanges.pcf.avg },
-      pbv: { min: sectorRanges.pbv.avg * 0.9, max: sectorRanges.pbv.avg * 1.1, avg: sectorRanges.pbv.avg },
-      yield: { min: sectorRanges.yield.avg * 0.9, max: sectorRanges.yield.avg * 1.1, avg: sectorRanges.yield.avg },
-      epsGrowth: { min: sectorRanges.epsGrowth.avg * 0.8, max: sectorRanges.epsGrowth.avg * 1.2, avg: sectorRanges.epsGrowth.avg },
-      cfGrowth: { min: sectorRanges.cfGrowth.avg * 0.8, max: sectorRanges.cfGrowth.avg * 1.2, avg: sectorRanges.cfGrowth.avg },
-      bvGrowth: { min: sectorRanges.bvGrowth.avg * 0.8, max: sectorRanges.bvGrowth.avg * 1.2, avg: sectorRanges.bvGrowth.avg },
-      divGrowth: { min: sectorRanges.divGrowth.avg * 0.8, max: sectorRanges.divGrowth.avg * 1.2, avg: sectorRanges.divGrowth.avg }
+      pe: { min: safeAvg(sectorRanges.pe, 17) * 0.9, max: safeAvg(sectorRanges.pe, 17) * 1.1, avg: safeAvg(sectorRanges.pe, 17) },
+      pcf: { min: safeAvg(sectorRanges.pcf, 14) * 0.9, max: safeAvg(sectorRanges.pcf, 14) * 1.1, avg: safeAvg(sectorRanges.pcf, 14) },
+      pbv: { min: safeAvg(sectorRanges.pbv, 4) * 0.9, max: safeAvg(sectorRanges.pbv, 4) * 1.1, avg: safeAvg(sectorRanges.pbv, 4) },
+      yield: { min: safeAvg(sectorRanges.yield, 2.5) * 0.9, max: safeAvg(sectorRanges.yield, 2.5) * 1.1, avg: safeAvg(sectorRanges.yield, 2.5) },
+      epsGrowth: { min: safeAvg(sectorRanges.epsGrowth, 10) * 0.8, max: safeAvg(sectorRanges.epsGrowth, 10) * 1.2, avg: safeAvg(sectorRanges.epsGrowth, 10) },
+      cfGrowth: { min: safeAvg(sectorRanges.cfGrowth, 10) * 0.8, max: safeAvg(sectorRanges.cfGrowth, 10) * 1.2, avg: safeAvg(sectorRanges.cfGrowth, 10) },
+      bvGrowth: { min: safeAvg(sectorRanges.bvGrowth, 7) * 0.8, max: safeAvg(sectorRanges.bvGrowth, 7) * 1.2, avg: safeAvg(sectorRanges.bvGrowth, 7) },
+      divGrowth: { min: safeAvg(sectorRanges.divGrowth, 4) * 0.8, max: safeAvg(sectorRanges.divGrowth, 4) * 1.2, avg: safeAvg(sectorRanges.divGrowth, 4) }
     };
   }, [sectorRanges]);
   const formatRange = (range3, suffix = "") => {
     if (!range3) return "N/A";
-    return `${range3.min.toFixed(1)} - ${range3.max.toFixed(1)}${suffix} (moy: ${range3.avg.toFixed(1)}${suffix})`;
+    const safeMin = range3.min != null && isFinite(range3.min) ? range3.min : 0;
+    const safeMax = range3.max != null && isFinite(range3.max) ? range3.max : 0;
+    const safeAvg = range3.avg != null && isFinite(range3.avg) ? range3.avg : 0;
+    return `${safeMin.toFixed(1)} - ${safeMax.toFixed(1)}${suffix} (moy: ${safeAvg.toFixed(1)}${suffix})`;
   };
   const formatGrowthRange = (range3) => {
     if (!range3) return "N/A";
-    return `${range3.min.toFixed(1)}% - ${range3.max.toFixed(1)}% (moy: ${range3.avg.toFixed(1)}%)`;
+    const safeMin = range3.min != null && isFinite(range3.min) ? range3.min : 0;
+    const safeMax = range3.max != null && isFinite(range3.max) ? range3.max : 0;
+    const safeAvg = range3.avg != null && isFinite(range3.avg) ? range3.avg : 0;
+    return `${safeMin.toFixed(1)}% - ${safeMax.toFixed(1)}% (moy: ${safeAvg.toFixed(1)}%)`;
   };
   if (!titleRanges) {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-5 rounded-lg shadow border border-gray-200 mt-6", children: [
@@ -54595,7 +54602,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2 px-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-gray-700 flex items-center gap-2", children: [
                 "Données Historiques",
-                historicalCAGR_EPS > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs font-normal bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full", title: "Taux de croissance annuel composé des EPS sur la période affichée", children: [
+                historicalCAGR_EPS != null && isFinite(historicalCAGR_EPS) && historicalCAGR_EPS > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs font-normal bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full", title: "Taux de croissance annuel composé des EPS sur la période affichée", children: [
                   "CAGR EPS: ",
                   historicalCAGR_EPS.toFixed(1),
                   "%"
@@ -54693,7 +54700,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 formatCurrency(targetPrice),
                 "."
               ] }),
-              info.beta !== void 0 && info.beta !== null && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-700/50 p-3 rounded mt-6", children: [
+              info.beta !== void 0 && info.beta !== null && isFinite(info.beta) && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-700/50 p-3 rounded mt-6", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-slate-400 uppercase", children: "Beta" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-bold text-blue-400", children: info.beta.toFixed(2) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[10px] text-slate-500 mt-1", children: "Source: API FMP" })

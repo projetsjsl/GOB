@@ -13,7 +13,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
 
 export default async function handler(req, res) {
     // CORS headers
@@ -26,7 +26,18 @@ export default async function handler(req, res) {
     }
 
     if (!SUPABASE_URL || !SUPABASE_KEY) {
-        return res.status(500).json({ error: 'Supabase configuration missing' });
+        console.error('Supabase config missing:', { 
+            hasUrl: !!SUPABASE_URL, 
+            hasKey: !!SUPABASE_KEY,
+            envKeys: Object.keys(process.env).filter(k => k.includes('SUPABASE'))
+        });
+        return res.status(500).json({ 
+            error: 'Supabase configuration missing',
+            debug: process.env.NODE_ENV === 'development' ? {
+                hasUrl: !!SUPABASE_URL,
+                hasKey: !!SUPABASE_KEY
+            } : undefined
+        });
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -153,7 +164,12 @@ async function createSnapshot(req, res, supabase) {
 
     if (error) {
         console.error('Create snapshot error:', error);
-        return res.status(500).json({ error: 'Failed to create snapshot' });
+        return res.status(500).json({ 
+            error: 'Failed to create snapshot',
+            details: error.message,
+            code: error.code,
+            hint: error.hint
+        });
     }
 
     console.log(`✅ Created snapshot for ${cleanTicker} (version ${data.version})`);

@@ -3629,7 +3629,7 @@ export default function App() {
                                     <div className="flex items-center justify-between mb-2 px-1">
                                         <h3 className="text-lg font-bold text-gray-700 flex items-center gap-2">
                                             Données Historiques
-                                            {historicalCAGR_EPS > 0 && (
+                                            {historicalCAGR_EPS != null && isFinite(historicalCAGR_EPS) && historicalCAGR_EPS > 0 && (
                                                 <span className="text-xs font-normal bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full" title="Taux de croissance annuel composé des EPS sur la période affichée">
                                                     CAGR EPS: {historicalCAGR_EPS.toFixed(1)}%
                                                 </span>
@@ -3726,7 +3726,7 @@ export default function App() {
                                         </p>
 
                                         {/* Note: Les métriques ValueLine sont affichées dans le Header (barre supérieure) et dans la section Configuration ci-dessous */}
-                                        {info.beta !== undefined && info.beta !== null && (
+                                        {info.beta !== undefined && info.beta !== null && isFinite(info.beta) && (
                                             <div className="bg-slate-700/50 p-3 rounded mt-6">
                                                 <div className="text-xs text-slate-400 uppercase">Beta</div>
                                                 <div className="text-2xl font-bold text-blue-400">{info.beta.toFixed(2)}</div>
