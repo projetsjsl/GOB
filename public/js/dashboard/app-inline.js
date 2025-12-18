@@ -22533,33 +22533,284 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     colorTheme: isDarkMode ? 'dark' : 'light',
                     locale: 'fr',
                     width: '100%',
-                    height: 1200,
+                    height: 1800,
                     symbolsGroups: [
                         {
-                            name: 'Indices',
+                            name: '📊 Indices Principaux',
                             symbols: [
                                 { name: 'FOREXCOM:SPXUSD', displayName: 'S&P 500' },
                                 { name: 'FOREXCOM:NSXUSD', displayName: 'Nasdaq 100' },
                                 { name: 'FOREXCOM:DJI', displayName: 'Dow 30' },
                                 { name: 'TSX:TSX', displayName: 'TSX Composite' },
+                                { name: 'TSX:SPTSX', displayName: 'S&P/TSX 60' },
                                 { name: 'XETR:DAX', displayName: 'DAX Performance' },
-                                { name: 'INDEX:NKY', displayName: 'Nikkei 225' }
+                                { name: 'INDEX:NKY', displayName: 'Nikkei 225' },
+                                { name: 'FOREXCOM:UK100', displayName: 'FTSE 100' }
                             ]
                         },
                         {
-                            name: 'Futures & Commodities',
+                            name: '💻 Technology (US)',
+                            symbols: [
+                                { name: 'NASDAQ:AAPL', displayName: 'Apple' },
+                                { name: 'NASDAQ:MSFT', displayName: 'Microsoft' },
+                                { name: 'NASDAQ:GOOGL', displayName: 'Alphabet' },
+                                { name: 'NASDAQ:AMZN', displayName: 'Amazon' },
+                                { name: 'NASDAQ:NVDA', displayName: 'NVIDIA' },
+                                { name: 'NASDAQ:META', displayName: 'Meta' },
+                                { name: 'NASDAQ:TSLA', displayName: 'Tesla' },
+                                { name: 'NASDAQ:AMD', displayName: 'AMD' },
+                                { name: 'NASDAQ:INTC', displayName: 'Intel' },
+                                { name: 'NASDAQ:ORCL', displayName: 'Oracle' },
+                                { name: 'NASDAQ:CRM', displayName: 'Salesforce' },
+                                { name: 'NASDAQ:ADBE', displayName: 'Adobe' }
+                            ]
+                        },
+                        {
+                            name: '💻 Technology (Canada)',
+                            symbols: [
+                                { name: 'TSX:SHOP', displayName: 'Shopify' },
+                                { name: 'TSX:OTEX', displayName: 'OpenText' },
+                                { name: 'TSX:CGI', displayName: 'CGI Group' },
+                                { name: 'TSX:CLS', displayName: 'Celestica' },
+                                { name: 'TSX:BB', displayName: 'BlackBerry' },
+                                { name: 'TSX:DOO', displayName: 'BRP Inc' },
+                                { name: 'TSX:ATZ', displayName: 'Aritzia' }
+                            ]
+                        },
+                        {
+                            name: '🏦 Financial Services (US)',
+                            symbols: [
+                                { name: 'NYSE:JPM', displayName: 'JPMorgan Chase' },
+                                { name: 'NYSE:BAC', displayName: 'Bank of America' },
+                                { name: 'NYSE:WFC', displayName: 'Wells Fargo' },
+                                { name: 'NYSE:GS', displayName: 'Goldman Sachs' },
+                                { name: 'NYSE:MS', displayName: 'Morgan Stanley' },
+                                { name: 'NYSE:C', displayName: 'Citigroup' },
+                                { name: 'NYSE:AXP', displayName: 'American Express' },
+                                { name: 'NYSE:V', displayName: 'Visa' },
+                                { name: 'NYSE:MA', displayName: 'Mastercard' },
+                                { name: 'NYSE:BRK.B', displayName: 'Berkshire Hathaway' }
+                            ]
+                        },
+                        {
+                            name: '🏦 Financial Services (Canada)',
+                            symbols: [
+                                { name: 'TSX:RY', displayName: 'Royal Bank' },
+                                { name: 'TSX:TD', displayName: 'TD Bank' },
+                                { name: 'TSX:BNS', displayName: 'Scotiabank' },
+                                { name: 'TSX:BMO', displayName: 'BMO' },
+                                { name: 'TSX:CM', displayName: 'CIBC' },
+                                { name: 'TSX:NA', displayName: 'National Bank' },
+                                { name: 'TSX:SLF', displayName: 'Sun Life' },
+                                { name: 'TSX:MFC', displayName: 'Manulife' },
+                                { name: 'TSX:POW', displayName: 'Power Corp' }
+                            ]
+                        },
+                        {
+                            name: '⚕️ Healthcare (US)',
+                            symbols: [
+                                { name: 'NYSE:JNJ', displayName: 'Johnson & Johnson' },
+                                { name: 'NYSE:PFE', displayName: 'Pfizer' },
+                                { name: 'NYSE:UNH', displayName: 'UnitedHealth' },
+                                { name: 'NYSE:ABBV', displayName: 'AbbVie' },
+                                { name: 'NYSE:TMO', displayName: 'Thermo Fisher' },
+                                { name: 'NYSE:ABT', displayName: 'Abbott' },
+                                { name: 'NYSE:DHR', displayName: 'Danaher' },
+                                { name: 'NYSE:BMY', displayName: 'Bristol-Myers' },
+                                { name: 'NYSE:LLY', displayName: 'Eli Lilly' },
+                                { name: 'NYSE:MRK', displayName: 'Merck' }
+                            ]
+                        },
+                        {
+                            name: '⚕️ Healthcare (Canada)',
+                            symbols: [
+                                { name: 'TSX:WEED', displayName: 'Canopy Growth' },
+                                { name: 'TSX:ACB', displayName: 'Aurora Cannabis' },
+                                { name: 'TSX:VET', displayName: 'Vermilion Energy' },
+                                { name: 'TSX:ATD', displayName: 'Alimentation Couche-Tard' }
+                            ]
+                        },
+                        {
+                            name: '🛒 Consumer Discretionary (US)',
+                            symbols: [
+                                { name: 'NYSE:HD', displayName: 'Home Depot' },
+                                { name: 'NYSE:NKE', displayName: 'Nike' },
+                                { name: 'NYSE:SBUX', displayName: 'Starbucks' },
+                                { name: 'NYSE:MCD', displayName: 'McDonald\'s' },
+                                { name: 'NYSE:SBUX', displayName: 'Starbucks' },
+                                { name: 'NYSE:TGT', displayName: 'Target' },
+                                { name: 'NYSE:LOW', displayName: 'Lowe\'s' },
+                                { name: 'NYSE:NKE', displayName: 'Nike' }
+                            ]
+                        },
+                        {
+                            name: '🛒 Consumer Staples (US)',
+                            symbols: [
+                                { name: 'NYSE:WMT', displayName: 'Walmart' },
+                                { name: 'NYSE:PG', displayName: 'Procter & Gamble' },
+                                { name: 'NYSE:KO', displayName: 'Coca-Cola' },
+                                { name: 'NYSE:PEP', displayName: 'PepsiCo' },
+                                { name: 'NYSE:COST', displayName: 'Costco' },
+                                { name: 'NYSE:CL', displayName: 'Colgate-Palmolive' }
+                            ]
+                        },
+                        {
+                            name: '🛒 Consumer (Canada)',
+                            symbols: [
+                                { name: 'TSX:L', displayName: 'Loblaw' },
+                                { name: 'TSX:MRU', displayName: 'Metro' },
+                                { name: 'TSX:ATD', displayName: 'Couche-Tard' },
+                                { name: 'TSX:CTC.A', displayName: 'Canadian Tire' },
+                                { name: 'TSX:QSR', displayName: 'Restaurant Brands' }
+                            ]
+                        },
+                        {
+                            name: '⚡ Energy (US)',
+                            symbols: [
+                                { name: 'NYSE:XOM', displayName: 'Exxon Mobil' },
+                                { name: 'NYSE:CVX', displayName: 'Chevron' },
+                                { name: 'NYSE:COP', displayName: 'ConocoPhillips' },
+                                { name: 'NYSE:SLB', displayName: 'Schlumberger' },
+                                { name: 'NYSE:EOG', displayName: 'EOG Resources' },
+                                { name: 'NYSE:MPC', displayName: 'Marathon Petroleum' }
+                            ]
+                        },
+                        {
+                            name: '⚡ Energy (Canada)',
+                            symbols: [
+                                { name: 'TSX:CNQ', displayName: 'Canadian Natural' },
+                                { name: 'TSX:SU', displayName: 'Suncor Energy' },
+                                { name: 'TSX:IMO', displayName: 'Imperial Oil' },
+                                { name: 'TSX:ENB', displayName: 'Enbridge' },
+                                { name: 'TSX:TRP', displayName: 'TC Energy' },
+                                { name: 'TSX:CPG', displayName: 'Crescent Point' },
+                                { name: 'TSX:TOU', displayName: 'Tourmaline Oil' }
+                            ]
+                        },
+                        {
+                            name: '🏭 Industrials (US)',
+                            symbols: [
+                                { name: 'NYSE:BA', displayName: 'Boeing' },
+                                { name: 'NYSE:CAT', displayName: 'Caterpillar' },
+                                { name: 'NYSE:GE', displayName: 'General Electric' },
+                                { name: 'NYSE:HON', displayName: 'Honeywell' },
+                                { name: 'NYSE:UPS', displayName: 'UPS' },
+                                { name: 'NYSE:RTX', displayName: 'Raytheon' },
+                                { name: 'NYSE:DE', displayName: 'Deere & Co' }
+                            ]
+                        },
+                        {
+                            name: '🏭 Industrials (Canada)',
+                            symbols: [
+                                { name: 'TSX:CNR', displayName: 'Canadian National' },
+                                { name: 'TSX:CP', displayName: 'Canadian Pacific' },
+                                { name: 'TSX:WCN', displayName: 'Waste Connections' },
+                                { name: 'TSX:TFII', displayName: 'TFI International' },
+                                { name: 'TSX:CAE', displayName: 'CAE Inc' }
+                            ]
+                        },
+                        {
+                            name: '🏗️ Materials (US)',
+                            symbols: [
+                                { name: 'NYSE:FCX', displayName: 'Freeport-McMoRan' },
+                                { name: 'NYSE:NEM', displayName: 'Newmont' },
+                                { name: 'NYSE:VALE', displayName: 'Vale' },
+                                { name: 'NYSE:APD', displayName: 'Air Products' },
+                                { name: 'NYSE:ECL', displayName: 'Ecolab' }
+                            ]
+                        },
+                        {
+                            name: '🏗️ Materials (Canada)',
+                            symbols: [
+                                { name: 'TSX:FM', displayName: 'First Quantum' },
+                                { name: 'TSX:WPM', displayName: 'Wheaton Precious' },
+                                { name: 'TSX:FNV', displayName: 'Franco-Nevada' },
+                                { name: 'TSX:AG', displayName: 'First Majestic' },
+                                { name: 'TSX:ABX', displayName: 'Barrick Gold' },
+                                { name: 'TSX:NTR', displayName: 'Nutrien' },
+                                { name: 'TSX:WPM', displayName: 'Wheaton Precious' }
+                            ]
+                        },
+                        {
+                            name: '🏠 Real Estate (US)',
+                            symbols: [
+                                { name: 'NYSE:AMT', displayName: 'American Tower' },
+                                { name: 'NYSE:PLD', displayName: 'Prologis' },
+                                { name: 'NYSE:EQIX', displayName: 'Equinix' },
+                                { name: 'NYSE:PSA', displayName: 'Public Storage' },
+                                { name: 'NYSE:WELL', displayName: 'Welltower' }
+                            ]
+                        },
+                        {
+                            name: '🏠 Real Estate (Canada)',
+                            symbols: [
+                                { name: 'TSX:REI.UN', displayName: 'RioCan REIT' },
+                                { name: 'TSX:AP.UN', displayName: 'Allied Properties' },
+                                { name: 'TSX:SRU.UN', displayName: 'SmartCentres REIT' },
+                                { name: 'TSX:BPY.UN', displayName: 'Brookfield Property' }
+                            ]
+                        },
+                        {
+                            name: '⚡ Utilities (US)',
+                            symbols: [
+                                { name: 'NYSE:NEE', displayName: 'NextEra Energy' },
+                                { name: 'NYSE:DUK', displayName: 'Duke Energy' },
+                                { name: 'NYSE:SO', displayName: 'Southern Company' },
+                                { name: 'NYSE:D', displayName: 'Dominion Energy' }
+                            ]
+                        },
+                        {
+                            name: '⚡ Utilities (Canada)',
+                            symbols: [
+                                { name: 'TSX:EMA', displayName: 'Emera' },
+                                { name: 'TSX:FTS', displayName: 'Fortis' },
+                                { name: 'TSX:CPX', displayName: 'Capital Power' },
+                                { name: 'TSX:TRP', displayName: 'TC Energy' }
+                            ]
+                        },
+                        {
+                            name: '📡 Communication Services (US)',
+                            symbols: [
+                                { name: 'NYSE:T', displayName: 'AT&T' },
+                                { name: 'NYSE:VZ', displayName: 'Verizon' },
+                                { name: 'NYSE:CMCSA', displayName: 'Comcast' },
+                                { name: 'NYSE:DIS', displayName: 'Disney' },
+                                { name: 'NYSE:NFLX', displayName: 'Netflix' }
+                            ]
+                        },
+                        {
+                            name: '📡 Telecommunications (Canada)',
+                            symbols: [
+                                { name: 'TSX:BCE', displayName: 'BCE' },
+                                { name: 'TSX:RCI.B', displayName: 'Rogers' },
+                                { name: 'TSX:T', displayName: 'Telus' },
+                                { name: 'TSX:QBR.B', displayName: 'Quebecor' }
+                            ]
+                        },
+                        {
+                            name: '📈 Futures & Commodities',
                             symbols: [
                                 { name: 'CME_MINI:ES1!', displayName: 'S&P 500 Futures' },
                                 { name: 'COMEX:GC1!', displayName: 'Gold' },
-                                { name: 'NYMEX:CL1!', displayName: 'Crude Oil' }
+                                { name: 'NYMEX:CL1!', displayName: 'Crude Oil' },
+                                { name: 'NYMEX:NG1!', displayName: 'Natural Gas' },
+                                { name: 'COMEX:SI1!', displayName: 'Silver' },
+                                { name: 'ICEUS:KC1!', displayName: 'Coffee' },
+                                { name: 'ICEUS:CT1!', displayName: 'Cotton' }
                             ]
                         },
                         {
-                            name: 'Forex & Bonds',
+                            name: '💱 Forex & Bonds',
                             symbols: [
                                 { name: 'FX:EURUSD', displayName: 'EUR/USD' },
+                                { name: 'FX:GBPUSD', displayName: 'GBP/USD' },
+                                { name: 'FX:USDJPY', displayName: 'USD/JPY' },
+                                { name: 'FX:USDCAD', displayName: 'USD/CAD' },
+                                { name: 'FX:AUDUSD', displayName: 'AUD/USD' },
                                 { name: 'TVC:US10Y', displayName: 'US 10Y' },
-                                { name: 'TVC:CA10Y', displayName: 'CA 10Y' }
+                                { name: 'TVC:US30Y', displayName: 'US 30Y' },
+                                { name: 'TVC:CA10Y', displayName: 'CA 10Y' },
+                                { name: 'TVC:CA30Y', displayName: 'CA 30Y' }
                             ]
                         }
                     ]
@@ -22641,6 +22892,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         );
                         if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
                         const data = await response.json();
+                        console.log('📥 Données historiques US reçues:', data);
                         setHistoricalDataUS(data);
                         setHistoricalLoadingUS(false);
                         console.log('✅ Données historiques US chargées pour', historicalDateUS);
@@ -22671,6 +22923,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         );
                         if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
                         const data = await response.json();
+                        console.log('📥 Données historiques Canada reçues:', data);
                         setHistoricalDataCanada(data);
                         setHistoricalLoadingCanada(false);
                         console.log('✅ Données historiques Canada chargées pour', historicalDateCanada);
@@ -22698,6 +22951,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                 const ctx = yieldChartRef.current.getContext('2d');
                 const datasets = [];
+                
+                // Debug: vérifier les données historiques
+                console.log('📊 Création graphique - Données historiques US:', historicalDataUS);
+                console.log('📊 Création graphique - Données historiques Canada:', historicalDataCanada);
 
                 // Données US actuelles
                 if (yieldData.data?.us?.rates) {
@@ -22715,29 +22972,39 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         pointHoverRadius: 8,
                         pointBackgroundColor: '#3b82f6',
                         pointBorderColor: '#fff',
-                        pointBorderWidth: 2
+                        pointBorderWidth: 2,
+                        order: 0 // Afficher en premier (devant les historiques)
                     });
                 }
 
                 // Données US historiques (pointillé)
-                if (historicalDataUS?.data?.us?.rates) {
-                    datasets.push({
-                        label: `US Treasury (${historicalDateUS})`,
-                        data: historicalDataUS.data.us.rates.map(r => ({
-                            x: r.maturity,
-                            y: r.rate
-                        })),
-                        borderColor: '#60a5fa',
-                        backgroundColor: 'rgba(96, 165, 250, 0.05)',
-                        borderWidth: 2,
-                        borderDash: [10, 5], // Pointillé
-                        tension: 0.4,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        pointBackgroundColor: '#60a5fa',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 1
-                    });
+                if (historicalDataUS?.data?.us?.rates && historicalDataUS.data.us.rates.length > 0) {
+                    console.log('✅ Ajout courbe historique US avec', historicalDataUS.data.us.rates.length, 'points');
+                    const historicalUSData = historicalDataUS.data.us.rates.map(r => ({
+                        x: r.maturity,
+                        y: typeof r.rate === 'number' ? r.rate : parseFloat(r.rate || 0)
+                    })).filter(d => !isNaN(d.y)); // Filtrer les valeurs invalides
+                    
+                    if (historicalUSData.length > 0) {
+                        datasets.push({
+                            label: `US Treasury (${historicalDateUS})`,
+                            data: historicalUSData,
+                            borderColor: '#60a5fa',
+                            backgroundColor: 'rgba(96, 165, 250, 0.1)',
+                            borderWidth: 3, // Plus épais pour meilleure visibilité
+                            borderDash: [8, 4], // Pointillé plus visible
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            pointBackgroundColor: '#60a5fa',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            fill: false, // Ne pas remplir sous la courbe
+                            order: 1 // Afficher après les courbes actuelles
+                        });
+                    }
+                } else if (historicalDataUS) {
+                    console.warn('⚠️ Données historiques US présentes mais pas de rates:', historicalDataUS);
                 }
 
                 // Données Canada actuelles
@@ -22756,32 +23023,47 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         pointHoverRadius: 8,
                         pointBackgroundColor: '#ef4444',
                         pointBorderColor: '#fff',
-                        pointBorderWidth: 2
+                        pointBorderWidth: 2,
+                        order: 0 // Afficher en premier (devant les historiques)
                     });
                 }
 
                 // Données Canada historiques (pointillé)
-                if (historicalDataCanada?.data?.canada?.rates) {
-                    datasets.push({
-                        label: `Canada Bonds (${historicalDateCanada})`,
-                        data: historicalDataCanada.data.canada.rates.map(r => ({
-                            x: r.maturity,
-                            y: r.rate
-                        })),
-                        borderColor: '#f87171',
-                        backgroundColor: 'rgba(248, 113, 113, 0.05)',
-                        borderWidth: 2,
-                        borderDash: [10, 5], // Pointillé
-                        tension: 0.4,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        pointBackgroundColor: '#f87171',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 1
-                    });
+                if (historicalDataCanada?.data?.canada?.rates && historicalDataCanada.data.canada.rates.length > 0) {
+                    console.log('✅ Ajout courbe historique Canada avec', historicalDataCanada.data.canada.rates.length, 'points');
+                    const historicalCanadaData = historicalDataCanada.data.canada.rates.map(r => ({
+                        x: r.maturity,
+                        y: typeof r.rate === 'number' ? r.rate : parseFloat(r.rate || 0)
+                    })).filter(d => !isNaN(d.y)); // Filtrer les valeurs invalides
+                    
+                    if (historicalCanadaData.length > 0) {
+                        datasets.push({
+                            label: `Canada Bonds (${historicalDateCanada})`,
+                            data: historicalCanadaData,
+                            borderColor: '#f87171',
+                            backgroundColor: 'rgba(248, 113, 113, 0.1)',
+                            borderWidth: 3, // Plus épais pour meilleure visibilité
+                            borderDash: [8, 4], // Pointillé plus visible
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            pointBackgroundColor: '#f87171',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            fill: false, // Ne pas remplir sous la courbe
+                            order: 1 // Afficher après les courbes actuelles
+                        });
+                    }
+                } else if (historicalDataCanada) {
+                    console.warn('⚠️ Données historiques Canada présentes mais pas de rates:', historicalDataCanada);
                 }
 
-                if (datasets.length === 0) return;
+                if (datasets.length === 0) {
+                    console.warn('⚠️ Aucun dataset disponible pour le graphique');
+                    return;
+                }
+                
+                console.log('📊 Création graphique avec', datasets.length, 'datasets:', datasets.map(d => d.label));
 
                 yieldChartInstance.current = new Chart(ctx, {
                     type: 'line',
