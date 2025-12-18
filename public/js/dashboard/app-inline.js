@@ -22980,10 +22980,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 // Données US historiques (pointillé)
                 if (historicalDataUS?.data?.us?.rates && historicalDataUS.data.us.rates.length > 0) {
                     console.log('✅ Ajout courbe historique US avec', historicalDataUS.data.us.rates.length, 'points');
+                    console.log('📊 Données brutes US historiques:', historicalDataUS.data.us.rates);
                     const historicalUSData = historicalDataUS.data.us.rates.map(r => ({
                         x: r.maturity,
                         y: typeof r.rate === 'number' ? r.rate : parseFloat(r.rate || 0)
-                    })).filter(d => !isNaN(d.y)); // Filtrer les valeurs invalides
+                    })).filter(d => !isNaN(d.y) && d.y !== null && d.y !== undefined); // Filtrer les valeurs invalides
+                    
+                    console.log('📊 Données US historiques transformées:', historicalUSData);
                     
                     if (historicalUSData.length > 0) {
                         datasets.push({
@@ -23000,11 +23003,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             pointBorderColor: '#fff',
                             pointBorderWidth: 2,
                             fill: false, // Ne pas remplir sous la courbe
-                            order: 1 // Afficher après les courbes actuelles
+                            order: 1, // Afficher après les courbes actuelles
+                            showLine: true // S'assurer que la ligne est affichée
                         });
+                        console.log('✅ Dataset historique US ajouté au graphique');
+                    } else {
+                        console.warn('⚠️ Aucune donnée US historique valide après filtrage');
                     }
                 } else if (historicalDataUS) {
                     console.warn('⚠️ Données historiques US présentes mais pas de rates:', historicalDataUS);
+                    console.warn('⚠️ Structure des données:', JSON.stringify(historicalDataUS, null, 2));
+                } else {
+                    console.log('ℹ️ Pas de données historiques US à afficher');
                 }
 
                 // Données Canada actuelles
@@ -23031,10 +23041,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 // Données Canada historiques (pointillé)
                 if (historicalDataCanada?.data?.canada?.rates && historicalDataCanada.data.canada.rates.length > 0) {
                     console.log('✅ Ajout courbe historique Canada avec', historicalDataCanada.data.canada.rates.length, 'points');
+                    console.log('📊 Données brutes Canada historiques:', historicalDataCanada.data.canada.rates);
                     const historicalCanadaData = historicalDataCanada.data.canada.rates.map(r => ({
                         x: r.maturity,
                         y: typeof r.rate === 'number' ? r.rate : parseFloat(r.rate || 0)
-                    })).filter(d => !isNaN(d.y)); // Filtrer les valeurs invalides
+                    })).filter(d => !isNaN(d.y) && d.y !== null && d.y !== undefined); // Filtrer les valeurs invalides
+                    
+                    console.log('📊 Données Canada historiques transformées:', historicalCanadaData);
                     
                     if (historicalCanadaData.length > 0) {
                         datasets.push({
@@ -23051,11 +23064,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             pointBorderColor: '#fff',
                             pointBorderWidth: 2,
                             fill: false, // Ne pas remplir sous la courbe
-                            order: 1 // Afficher après les courbes actuelles
+                            order: 1, // Afficher après les courbes actuelles
+                            showLine: true // S'assurer que la ligne est affichée
                         });
+                        console.log('✅ Dataset historique Canada ajouté au graphique');
+                    } else {
+                        console.warn('⚠️ Aucune donnée Canada historique valide après filtrage');
                     }
                 } else if (historicalDataCanada) {
                     console.warn('⚠️ Données historiques Canada présentes mais pas de rates:', historicalDataCanada);
+                    console.warn('⚠️ Structure des données:', JSON.stringify(historicalDataCanada, null, 2));
+                } else {
+                    console.log('ℹ️ Pas de données historiques Canada à afficher');
                 }
 
                 if (datasets.length === 0) {
@@ -23064,6 +23084,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 }
                 
                 console.log('📊 Création graphique avec', datasets.length, 'datasets:', datasets.map(d => d.label));
+                console.log('📊 Détails des datasets:', datasets.map(d => ({ label: d.label, dataLength: d.data.length, borderDash: d.borderDash })));
+
+                // S'assurer que le canvas est visible
+                if (!yieldChartRef.current) {
+                    console.error('❌ Canvas ref est null');
+                    return;
+                }
 
                 yieldChartInstance.current = new Chart(ctx, {
                     type: 'line',
