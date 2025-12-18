@@ -334,7 +334,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                             <tr>
                                 <td className="p-2 font-semibold cursor-help" title="P/BV (Price-to-Book Value)\n\nRatio Prix/Valeur Comptable actuel.\nSource: FMP key-metrics">P/BV</td>
                                 <td className="p-2 text-right cursor-help" title={`P/BV Actuel: ${currentPBV.toFixed(2)}x\n\nCalculé avec:\nPrix Actuel / Book Value par Action Actuel`}>{currentPBV.toFixed(2)}</td>
-                                <td className="p-2 text-right cursor-help" title={`P/BV Cible: ${assumptions.targetPBV.toFixed(2)}x\n\nRatio P/BV cible utilisé pour vos projections à 5 ans.\nAuto-rempli avec la moyenne historique.`}>{assumptions.targetPBV.toFixed(2)}</td>
+                                <td className="p-2 text-right cursor-help" title={`P/BV Cible: ${(assumptions.targetPBV || 0).toFixed(2)}x\n\nRatio P/BV cible utilisé pour vos projections à 5 ans.\nAuto-rempli avec la moyenne historique.`}>{(assumptions.targetPBV || 0).toFixed(2)}</td>
                                 <td className={`p-2 text-right font-semibold cursor-help ${currentPBV < assumptions.targetPBV ? 'text-green-600' : 'text-red-600'}`} title={`Écart: ${assumptions.targetPBV > 0 ? ((currentPBV / assumptions.targetPBV - 1) * 100).toFixed(1) : '0.0'}%\n\n${currentPBV < assumptions.targetPBV ? '✅ Sous-évalué par rapport au ratio cible' : '⚠️ Surévalué par rapport au ratio cible'}`}>
                                     {assumptions.targetPBV > 0 ? ((currentPBV / assumptions.targetPBV - 1) * 100).toFixed(1) : '0.0'}%
                                 </td>
@@ -342,7 +342,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                             <tr>
                                 <td className="p-2 font-semibold cursor-help" title="Rendement DIV (Dividend Yield)\n\nRendement en dividendes actuel.\nSource: FMP key-metrics">Rendement DIV</td>
                                 <td className="p-2 text-right cursor-help" title={`Yield Actuel: ${currentYield.toFixed(2)}%\n\nCalculé avec:\n(Dividende Actuel / Prix Actuel) × 100`}>{currentYield.toFixed(2)}%</td>
-                                <td className="p-2 text-right cursor-help" title={`Yield Cible: ${assumptions.targetYield.toFixed(2)}%\n\nRendement en dividendes cible utilisé pour vos projections à 5 ans.\nAuto-rempli avec la moyenne historique.`}>{assumptions.targetYield.toFixed(2)}%</td>
+                                <td className="p-2 text-right cursor-help" title={`Yield Cible: ${(assumptions.targetYield || 0).toFixed(2)}%\n\nRendement en dividendes cible utilisé pour vos projections à 5 ans.\nAuto-rempli avec la moyenne historique.`}>{(assumptions.targetYield || 0).toFixed(2)}%</td>
                                 <td className={`p-2 text-right font-semibold cursor-help ${currentYield > assumptions.targetYield ? 'text-green-600' : 'text-red-600'}`} title={`Écart: ${assumptions.targetYield > 0 ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : '0.0'}%\n\n${currentYield > assumptions.targetYield ? '✅ Rendement supérieur au rendement cible' : '⚠️ Rendement inférieur au rendement cible'}\n\nUn rendement supérieur au cible peut indiquer une opportunité.`}>
                                     {assumptions.targetYield > 0 ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : '0.0'}%
                                 </td>
@@ -422,7 +422,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                         <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 cursor-help" title={`Rendement Total: ${expectedReturn.toFixed(1)}% / an\n\nDétail:\n• Appréciation: ${annualizedReturn.toFixed(1)}% / an\n• Dividendes: ${currentYield.toFixed(1)}% / an\n• Total: ${expectedReturn.toFixed(1)}% / an\n\nInclut les dividendes perçus sur 5 ans.`}>
                             {expectedReturn.toFixed(1)}% / an
                         </div>
-                        <div className="text-xs text-gray-500 mt-1 cursor-help" title={`Dividendes: ${currentYield.toFixed(1)}% / an\n\nCalculé avec:\n(Dividende Actuel / Prix Actuel) × 100\n\n= (${assumptions.currentDividend.toFixed(2)} / ${formatCurrency(assumptions.currentPrice)}) × 100\n\n= ${currentYield.toFixed(1)}% / an`}>
+                        <div className="text-xs text-gray-500 mt-1 cursor-help" title={`Dividendes: ${currentYield.toFixed(1)}% / an\n\nCalculé avec:\n(Dividende Actuel / Prix Actuel) × 100\n\n= (${(assumptions.currentDividend || 0).toFixed(2)} / ${formatCurrency(assumptions.currentPrice)}) × 100\n\n= ${currentYield.toFixed(1)}% / an`}>
                             Incluant dividendes: {currentYield.toFixed(1)}% / an
                         </div>
                     </div>

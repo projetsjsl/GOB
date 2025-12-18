@@ -612,7 +612,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   title={`P/E Cible (Ratio Prix/Bénéfice)\n\nRatio P/E attendu dans 5 ans.\n\nPlage recommandée: 1x à 100x\nLimite système: 1x à 100x\n\nAuto-rempli avec la moyenne historique.\n\nPrix Cible = BPA Projeté × P/E Cible`}
                 />
               </td>
-              <td className={`p-3 font-bold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`} title={`Prix Cible BPA (EPS): ${formatCurrency(targets.eps)}\n\nCalculé avec:\nBPA Projeté (${futureValues.eps.toFixed(2)}) × P/E Cible (${assumptions.targetPE}x)\n\n= ${formatCurrency(targets.eps)}\n\n${assumptions.excludeEPS ? '❌ Exclu du prix cible moyen' : '✅ Inclus dans le prix cible moyen'}`}>{formatCurrency(targets.eps)}</td>
+              <td className={`p-3 font-bold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`} title={`Prix Cible BPA (EPS): ${formatCurrency(targets.eps)}\n\nCalculé avec:\nBPA Projeté (${(futureValues.eps || 0).toFixed(2)}) × P/E Cible (${assumptions.targetPE}x)\n\n= ${formatCurrency(targets.eps)}\n\n${assumptions.excludeEPS ? '❌ Exclu du prix cible moyen' : '✅ Inclus dans le prix cible moyen'}`}>{formatCurrency(targets.eps)}</td>
             </tr>
             {expandedMetrics.eps && (
               <tr>
@@ -669,7 +669,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   title={`P/CF Cible (Ratio Prix/Cash Flow)\n\nRatio P/CF attendu dans 5 ans.\n\nPlage recommandée: 1x à 100x\nLimite système: 1x à 100x\n\nAuto-rempli avec la moyenne historique.\n\nPrix Cible = CF Projeté × P/CF Cible`}
                 />
               </td>
-              <td className={`p-3 font-bold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`} title={`Prix Cible CFA (Cash Flow): ${formatCurrency(targets.cf)}\n\nCalculé avec:\nCF Projeté (${futureValues.cf.toFixed(2)}) × P/CF Cible (${assumptions.targetPCF}x)\n\n= ${formatCurrency(targets.cf)}\n\n${assumptions.excludeCF ? '❌ Exclu du prix cible moyen' : '✅ Inclus dans le prix cible moyen'}`}>{formatCurrency(targets.cf)}</td>
+              <td className={`p-3 font-bold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`} title={`Prix Cible CFA (Cash Flow): ${formatCurrency(targets.cf)}\n\nCalculé avec:\nCF Projeté (${(futureValues.cf || 0).toFixed(2)}) × P/CF Cible (${assumptions.targetPCF}x)\n\n= ${formatCurrency(targets.cf)}\n\n${assumptions.excludeCF ? '❌ Exclu du prix cible moyen' : '✅ Inclus dans le prix cible moyen'}`}>{formatCurrency(targets.cf)}</td>
             </tr>
             {expandedMetrics.cf && (
               <tr>
@@ -726,7 +726,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   title={`P/BV Cible (Ratio Prix/Valeur Comptable)\n\nRatio P/BV attendu dans 5 ans.\n\nPlage recommandée: 0.5x à 50x\nLimite système: 0.5x à 50x\n\nAuto-rempli avec la moyenne historique.\n\nPrix Cible = BV Projeté × P/BV Cible`}
                 />
               </td>
-              <td className={`p-3 font-bold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`} title={`Prix Cible BV (Book Value): ${formatCurrency(targets.bv)}\n\nCalculé avec:\nBV Projeté (${futureValues.bv.toFixed(2)}) × P/BV Cible (${assumptions.targetPBV}x)\n\n= ${formatCurrency(targets.bv)}\n\n${assumptions.excludeBV ? '❌ Exclu du prix cible moyen' : '✅ Inclus dans le prix cible moyen'}`}>{formatCurrency(targets.bv)}</td>
+              <td className={`p-3 font-bold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`} title={`Prix Cible BV (Book Value): ${formatCurrency(targets.bv)}\n\nCalculé avec:\nBV Projeté (${(futureValues.bv || 0).toFixed(2)}) × P/BV Cible (${assumptions.targetPBV}x)\n\n= ${formatCurrency(targets.bv)}\n\n${assumptions.excludeBV ? '❌ Exclu du prix cible moyen' : '✅ Inclus dans le prix cible moyen'}`}>{formatCurrency(targets.bv)}</td>
             </tr>
             {expandedMetrics.bv && (
               <tr>
@@ -787,7 +787,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   <span className={`text-xs ${assumptions.excludeDIV ? "text-gray-400" : "text-orange-600"}`}>%</span>
                 </div>
               </td>
-              <td className={`p-3 font-bold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`} title={`Prix Cible DIV (Dividende): ${formatCurrency(targets.div)}\n\nCalculé avec:\nDIV Projeté (${futureValues.div.toFixed(2)}) / (Yield Cible (${assumptions.targetYield}%) / 100)\n\n= ${formatCurrency(targets.div)}\n\n${assumptions.excludeDIV ? '❌ Exclu du prix cible moyen' : '✅ Inclus dans le prix cible moyen'}`}>{formatCurrency(targets.div)}</td>
+              <td className={`p-3 font-bold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`} title={`Prix Cible DIV (Dividende): ${formatCurrency(targets.div)}\n\nCalculé avec:\nDIV Projeté (${(futureValues.div || 0).toFixed(2)}) / (Yield Cible (${assumptions.targetYield}%) / 100)\n\n= ${formatCurrency(targets.div)}\n\n${assumptions.excludeDIV ? '❌ Exclu du prix cible moyen' : '✅ Inclus dans le prix cible moyen'}`}>{formatCurrency(targets.div)}</td>
             </tr>
             {expandedMetrics.div && (
               <tr>
