@@ -82,8 +82,18 @@ export const useGeminiLive = () => {
       setConnectionState(ConnectionState.CONNECTING);
       setError(null);
 
-      const apiKey = process.env.API_KEY || (window as any).ENV_CONFIG?.GEMINI_API_KEY;
-      if (!apiKey) throw new Error("Clé API Gemini manquante. Veuillez la configurer dans .env ou env-config.js.");
+      // Multi-source API Key detection
+      const textKey = import.meta.env.VITE_GEMINI_API_KEY || 
+                      (window as any).emmaConfig?.gemini?.apiKey || 
+                      (window as any).ENV_CONFIG?.GEMINI_API_KEY ||
+                      '';
+      
+      const apiKey = textKey === 'YOUR_GEMINI_API_KEY' ? '' : textKey;
+
+      if (!apiKey) {
+          console.error("Gemini API Key missing. Checked import.meta.env, emmaConfig, and ENV_CONFIG.");
+          throw new Error("Clé API Gemini manquante. Veuillez la configurer dans .env ou env-config.js.");
+      }
 
       inputContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: SAMPLE_RATE_INPUT });
       outputContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: SAMPLE_RATE_OUTPUT });

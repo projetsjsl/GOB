@@ -49,6 +49,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const [tavusStatus, setTavusStatus] = useState('disconnected'); // disconnected, connecting, connected
+    const [conversationUrl, setConversationUrl] = useState(null);
     const [showSettings, setShowSettings] = useState(false);
 
     // Voice Configuration
@@ -241,16 +242,9 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
 
             console.log('Tavus conversation created:', data);
 
-            // Embed the conversation in an iframe
             if (tavusVideoRef.current && data.conversation_url) {
-                tavusVideoRef.current.innerHTML = `
-                    <iframe 
-                        src="${data.conversation_url}" 
-                        allow="camera; microphone; autoplay; display-capture; fullscreen"
-                        style="width: 100%; height: 100%; border: none; border-radius: 0;"
-                        class="tavus-video-iframe"
-                    ></iframe>
-                `;
+                // Use state to trigger re-render with iframe
+                setConversationUrl(data.conversation_url);
             }
 
             setTavusStatus('connected');
@@ -270,9 +264,14 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
             {/* Left Column: Avatar/Video Area */}
             <div className={`lg:col-span-2 flex flex-col rounded-2xl overflow-hidden shadow-2xl ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                 <div className="flex-1 relative bg-black flex items-center justify-center">
-                    {tavusStatus === 'connected' ? (
-                        <div ref={tavusVideoRef} className="w-full h-full">
-                            {/* Tavus Video Stream will be embedded here via iframe */}
+                    {tavusStatus === 'connected' && conversationUrl ? (
+                        <div className="w-full h-full">
+                            <iframe 
+                                src={conversationUrl} 
+                                allow="camera; microphone; autoplay; display-capture; fullscreen"
+                                style={{ width: '100%', height: '100%', border: 'none', borderRadius: 0 }}
+                                className="tavus-video-iframe"
+                            ></iframe>
                         </div>
                     ) : (
                         <div className="text-center p-10">
