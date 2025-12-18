@@ -64,10 +64,12 @@ function maturityToMonths(maturity) {
 
 /**
  * Récupère les données depuis Bank of Canada Valet API
+ * Récupère l'historique pour calculer la variation sur 1 mois
  */
 async function fetchFromBoC(seriesId) {
   try {
-    const url = `https://www.bankofcanada.ca/valet/observations/${seriesId}/json?recent=1`;
+    // Récupérer les 30 derniers jours pour trouver la comparaison M-1
+    const url = `https://www.bankofcanada.ca/valet/observations/${seriesId}/json?recent=30`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -78,14 +80,25 @@ async function fetchFromBoC(seriesId) {
     const data = await response.json();
 
     if (data.observations && data.observations.length > 0) {
-      const latestObservation = data.observations[0];
+      // Trier par date décroissante (le plus récent en premier)
+      const sortedObs = data.observations.sort((a, b) => new Date(b.d) - new Date(a.d));
+      
+      const latestObservation = sortedObs[0];
       const value = latestObservation[seriesId]?.v;
 
       if (!value || value === null) return null;
 
+      // Chercher la valeur il y a environ 1 mois (~20-22 jours de trading)
+      // On prend l'index 21 si dispo (env 1 mois), sinon le dernier dispo
+      const prevIndex = Math.min(21, sortedObs.length - 1);
+      const prevObservation = sortedObs[prevIndex];
+      const prevValue = prevObservation ? prevObservation[seriesId]?.v : null;
+
       return {
         value: parseFloat(value),
-        date: latestObservation.d
+        date: latestObservation.d,
+        prevValue: prevValue ? parseFloat(prevValue) : null,
+        change1M: prevValue ? (parseFloat(value) - parseFloat(prevValue)) : null
       };
     }
 
@@ -98,6 +111,7 @@ async function fetchFromBoC(seriesId) {
 
 /**
  * Récupère les données depuis FRED API
+ * Récupère l'historique pour calculer la variation sur 1 mois
  */
 async function fetchFromFRED(seriesId) {
   const FRED_API_KEY = process.env.FRED_API_KEY;
@@ -108,7 +122,8 @@ async function fetchFromFRED(seriesId) {
   }
 
   try {
-    const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json&sort_order=desc&limit=1`;
+    // Récupérer les 30 dernières observations
+    const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json&sort_order=desc&limit=30`;
 
     const response = await fetch(url);
 
@@ -120,16 +135,22 @@ async function fetchFromFRED(seriesId) {
     const data = await response.json();
 
     if (data.observations && data.observations.length > 0) {
-      const latestValue = data.observations[0].value;
+      // Nettoyer les données (' . ' valeurs manquantes)
+      const validObs = data.observations.filter(o => o.value !== '.' && o.value !== null);
+      
+      if (validObs.length === 0) return null;
 
-      // FRED retourne '.' pour les valeurs manquantes
-      if (latestValue === '.' || latestValue === null) {
-        return null;
-      }
+      const latestObs = validObs[0];
+      
+      // Chercher ~1 mois en arrière
+      const prevIndex = Math.min(21, validObs.length - 1);
+      const prevObs = validObs[prevIndex];
 
       return {
-        value: parseFloat(latestValue),
-        date: data.observations[0].date
+        value: parseFloat(latestObs.value),
+        date: latestObs.date,
+        prevValue: prevObs ? parseFloat(prevObs.value) : null,
+        change1M: prevObs ? (parseFloat(latestObs.value) - parseFloat(prevObs.value)) : null
       };
     }
 
@@ -205,7 +226,7 @@ async function getUSTreasury() {
   for (const [maturity, seriesId] of Object.entries(US_TREASURY_RATES)) {
     const data = await fetchFromFRED(seriesId);
     if (data) {
-      rates[maturity] = data.value;
+      rates[maturity] = data; // Stocker l'objet complet {value, change1M...}
       if (!fetchDate) fetchDate = data.date;
     }
   }
@@ -220,10 +241,10 @@ async function getUSTreasury() {
       source = 'FMP';
       fetchDate = fmpData.date;
 
-      // Merger les données FMP
+      // Merger les données FMP (Note: FMP ne donne pas l'historique dans cette fonction, change1M sera null)
       for (const [maturity, value] of Object.entries(fmpData)) {
         if (maturity !== 'date' && value !== null && !rates[maturity]) {
-          rates[maturity] = value;
+          rates[maturity] = { value, change1M: null, prevValue: null };
         }
       }
     }
@@ -231,9 +252,11 @@ async function getUSTreasury() {
 
   // Convertir en array et trier par maturité
   const ratesArray = Object.entries(rates)
-    .map(([maturity, rate]) => ({
+    .map(([maturity, data]) => ({
       maturity,
-      rate,
+      rate: data.value,
+      change1M: data.change1M,
+      prevValue: data.prevValue,
       months: maturityToMonths(maturity)
     }))
     .sort((a, b) => a.months - b.months);
@@ -261,16 +284,18 @@ async function getCanadaRates() {
   for (const [maturity, seriesId] of Object.entries(CANADA_RATES)) {
     const data = await fetchFromBoC(seriesId);
     if (data) {
-      rates[maturity] = data.value;
+      rates[maturity] = data; // Stocker l'objet complet
       if (!fetchDate) fetchDate = data.date;
     }
   }
 
   // Convertir en array et trier par maturité
   let ratesArray = Object.entries(rates)
-    .map(([maturity, rate]) => ({
+    .map(([maturity, data]) => ({
       maturity,
-      rate,
+      rate: data.value,
+      change1M: data.change1M,
+      prevValue: data.prevValue,
       months: maturityToMonths(maturity)
     }))
     .sort((a, b) => a.months - b.months);
@@ -280,6 +305,8 @@ async function getCanadaRates() {
     ratesArray = CANADA_FALLBACK.map(item => ({
       maturity: item.maturity,
       rate: item.rate,
+      change1M: null, // Pas de variation pour le fallback
+      prevValue: null,
       months: maturityToMonths(item.maturity)
     }));
     fetchDate = new Date().toISOString().split('T')[0];

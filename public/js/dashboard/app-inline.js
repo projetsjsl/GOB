@@ -1180,6 +1180,57 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch (_) { }
         };
 
+        // Footer Context Updater
+        useEffect(() => {
+            const footerContext = document.getElementById('footer-context');
+            if (footerContext) {
+                const tabNames = {
+                    'stocks-news': 'Titres & Nouvelles (JLab™)',
+                    'nouvelles': 'Nouvelles en direct',
+                    'intellistocks': 'IntelliStocks™ Dashboard',
+                    'email-briefings': 'Email Briefings',
+                    'watchlist': 'Ma Watchlist (Supabase)',
+                    'economic-calendar': 'Calendrier Économique',
+                    'ask-emma': 'Emma IA™ Assistant',
+                    'emma-config': 'Configuration Emma',
+                    'testonly': 'Mode Test',
+                    'admin-jslai': 'Administration Système',
+                    'plus': 'Plus d\'options',
+                    'seeking-alpha': 'Seeking Alpha Integration',
+                    'scrapping-sa': 'Scraping Seeking Alpha',
+                    'fastgraphs': 'FastGraphs™',
+                    'finance-pro': 'Finance Pro 3p1',
+                    'groupchat': 'Group Chat',
+                    'assistant-vocal': 'Assistant Vocal',
+                    'terminal-emmaia': 'Terminal Emma',
+                    'finvox': 'FinVox',
+                    'investing-calendar': 'Calendrier Investing',
+                    'dans-watchlist': 'Watchlist Dan',
+                    'markets-economy': 'Marchés & Économie'
+                };
+                
+                const tabName = tabNames[activeTab] || activeTab;
+                const tickerCount = tickers.length;
+                
+                let infoText = `${tabName}`;
+                
+                // Add context details
+                if (activeTab === 'ask-emma') {
+                    infoText += emmaConnected ? ' • Connecté' : ' • Hors ligne';
+                } else if (['stocks-news', 'intellistocks', 'watchlist'].includes(activeTab)) {
+                    infoText += ` • ${tickerCount} titres suivis`;
+                } else if (activeTab === 'nouvelles') {
+                    infoText += ` • ${newsData?.length || 0} articles`;
+                }
+                
+                footerContext.textContent = infoText;
+                
+                // Add fade animation
+                footerContext.style.opacity = '0';
+                setTimeout(() => footerContext.style.opacity = '1', 100);
+            }
+        }, [activeTab, tickers.length, emmaConnected, newsData?.length]);
+
 
         // Fonction pour revenir à l'onglet précédent (bouton Back)
         const goBack = () => {

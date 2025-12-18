@@ -3,6 +3,86 @@
 
 
 
+const SpreadChart = ({ usRates, caRates, darkMode }) => {
+    const canvasRef = useRef(null);
+    const chartInstance = useRef(null);
+
+    useEffect(() => {
+        if (!canvasRef.current || !usRates || !caRates) return;
+
+        if (chartInstance.current) {
+            chartInstance.current.destroy();
+        }
+
+        const maturityOrder = ['1M', '2M', '3M', '6M', '1Y', '2Y', '3Y', '5Y', '7Y', '10Y', '20Y', '30Y'];
+        
+        // Calculer les spreads
+        const spreads = maturityOrder.map(maturity => {
+            const us = usRates.find(r => r.maturity === maturity);
+            const ca = caRates.find(r => r.maturity === maturity);
+            if (us && ca) {
+                return (us.rate - ca.rate) * 100; // en bps
+            }
+            return null;
+        });
+
+        const ctx = canvasRef.current.getContext('2d');
+        
+        // Couleurs dynamiques selon positif/négatif
+        const bgColors = spreads.map(v => v >= 0 ? 'rgba(59, 130, 246, 0.6)' : 'rgba(239, 68, 68, 0.6)');
+        const borderColors = spreads.map(v => v >= 0 ? '#3b82f6' : '#ef4444');
+
+        chartInstance.current = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: maturityOrder,
+                datasets: [{
+                    label: 'Spread US-Canada (bps)',
+                    data: spreads,
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `Spread: ${ctx.parsed.y.toFixed(0)} bps`
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        title: { display: true, text: 'Points de base (bps)', color: darkMode ? '#9ca3af' : '#6b7280' },
+                        grid: { color: darkMode ? 'rgba(75, 85, 99, 0.2)' : 'rgba(209, 213, 219, 0.3)' },
+                        ticks: { color: darkMode ? '#9ca3af' : '#6b7280' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: darkMode ? '#9ca3af' : '#6b7280' }
+                    }
+                }
+            }
+        });
+
+        return () => {
+            if (chartInstance.current) chartInstance.current.destroy();
+        };
+    }, [usRates, caRates, darkMode]);
+
+    return (
+        <div style={{ height: '200px', width: '100%' }}>
+            <canvas ref={canvasRef}></canvas>
+        </div>
+    );
+};
+
+
 const YieldCurveTab = () => {
     const [yieldData, setYieldData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -84,118 +164,156 @@ const YieldCurveTab = () => {
             chartInstance.current.destroy();
         }
 
-        const ctx = chartRef.current.getContext('2d');
+        // Préparer les données pour l'axe X (Maturités triées)
+        // Utiliser une liste fixe pour garantir l'ordre et l'échelle
+        const maturityOrder = ['1M', '2M', '3M', '6M', '1Y', '2Y', '3Y', '5Y', '7Y', '10Y', '20Y', '30Y'];
+        
+        // Helper
+        const getRate = (dataset, maturity) => {
+            if (!dataset || !dataset.rates) return null;
+            const r = dataset.rates.find(item => item.maturity === maturity);
+            return r ? r.rate : null;
+        };
+
+        const getPrevRate = (dataset, maturity) => {
+            if (!dataset || !dataset.rates) return null;
+            const r = dataset.rates.find(item => item.maturity === maturity);
+            return r ? r.prevValue : null;
+        };
 
         const datasets = [];
 
-        // Données US
-        if (yieldData.data.us && yieldData.data.us.rates) {
+        // 🇺🇸 US Current Scale
+        if (yieldData.data.us) {
             datasets.push({
-                label: 'US Treasury',
-                data: yieldData.data.us.rates.map(r => ({
-                    x: r.maturity,
-                    y: r.rate
-                })),
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                label: '🇺🇸 US Treasury (Actuel)',
+                data: maturityOrder.map(m => getRate(yieldData.data.us, m)),
+                borderColor: '#60a5fa', // Blue 400
+                backgroundColor: 'rgba(96, 165, 250, 0.1)',
                 borderWidth: 3,
-                tension: 0.4,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                pointBackgroundColor: '#3b82f6',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2
+                tension: 0.3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                yAxisID: 'y'
+            });
+            
+             // 🇺🇸 US 1 Month Ago (Dotted)
+            datasets.push({
+                label: '🇺🇸 US Treasury (M-1)',
+                data: maturityOrder.map(m => getPrevRate(yieldData.data.us, m)),
+                borderColor: '#60a5fa',
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                borderDash: [5, 5], // Pointillés
+                tension: 0.3,
+                pointRadius: 0, // Hidden points
+                pointHoverRadius: 4,
+                yAxisID: 'y',
+                hidden: true // Hidden by default to not clutter
             });
         }
 
-        // Données Canada
-        if (yieldData.data.canada && yieldData.data.canada.rates) {
+        // 🇨🇦 Canada Current Scale
+        if (yieldData.data.canada) {
             datasets.push({
-                label: 'Canada Bonds',
-                data: yieldData.data.canada.rates.map(r => ({
-                    x: r.maturity,
-                    y: r.rate
-                })),
-                borderColor: '#ef4444',
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                label: '🇨🇦 Canada Bonds (Actuel)',
+                data: maturityOrder.map(m => getRate(yieldData.data.canada, m)),
+                borderColor: '#f87171', // Red 400
+                backgroundColor: 'rgba(248, 113, 113, 0.1)',
                 borderWidth: 3,
-                tension: 0.4,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                pointBackgroundColor: '#ef4444',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2
+                tension: 0.3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                yAxisID: 'y'
+            });
+            
+             // 🇨🇦 Canada 1 Month Ago (Dotted)
+             datasets.push({
+                label: '🇨🇦 Canada Bonds (M-1)',
+                data: maturityOrder.map(m => getPrevRate(yieldData.data.canada, m)),
+                borderColor: '#f87171',
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                tension: 0.3,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                yAxisID: 'y',
+                hidden: true
             });
         }
 
-        // Ne créer le graphique que s'il y a des données
-        if (datasets.length === 0) {
-            console.warn('⚠️ Aucune donnée disponible pour le graphique yield curve');
-            return;
-        }
-
+        const ctx = chartRef.current.getContext('2d');
         chartInstance.current = new Chart(ctx, {
             type: 'line',
-            data: { datasets },
+            data: { 
+                labels: maturityOrder,
+                datasets: datasets 
+            },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
                 plugins: {
                     legend: {
-                        display: true,
                         position: 'top',
                         labels: {
                             color: darkMode ? '#e5e7eb' : '#1f2937',
-                            font: { size: 14, weight: 'bold' },
-                            padding: 20
+                            usePointStyle: true,
+                            font: { size: 12 }
                         }
                     },
                     tooltip: {
-                        backgroundColor: darkMode ? '#1f2937' : '#fff',
-                        titleColor: darkMode ? '#e5e7eb' : '#1f2937',
-                        bodyColor: darkMode ? '#e5e7eb' : '#1f2937',
-                        borderColor: darkMode ? '#374151' : '#e5e7eb',
+                        backgroundColor: darkMode ? 'rgba(31, 41, 55, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                        titleColor: darkMode ? '#fff' : '#000',
+                        bodyColor: darkMode ? '#fff' : '#000',
+                        borderColor: darkMode ? '#4b5563' : '#e5e7eb',
                         borderWidth: 1,
-                        padding: 12,
-                        displayColors: true,
                         callbacks: {
                             label: function(context) {
-                                return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}%`;
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y.toFixed(2) + '%';
+                                    
+                                    // Add change info if comparing
+                                    // This is tricky inside tooltip callback without ref to prev data easily
+                                    // But showing the value is good enough
+                                }
+                                return label;
                             }
                         }
+                    },
+                    annotation: {
+                        // Could add recession shading if we had historical recession dates
                     }
                 },
                 scales: {
                     x: {
-                        type: 'category',
-                        title: {
-                            display: true,
-                            text: 'Maturité',
-                            color: isDarkMode ? '#9ca3af' : '#6b7280',
-                            font: { size: 14, weight: 'bold' }
-                        },
                         grid: {
-                            color: isDarkMode ? '#374151' : '#e5e7eb'
+                            color: darkMode ? 'rgba(75, 85, 99, 0.2)' : 'rgba(209, 213, 219, 0.3)',
                         },
                         ticks: {
-                            color: isDarkMode ? '#9ca3af' : '#6b7280'
+                            color: darkMode ? '#9ca3af' : '#6b7280'
                         }
                     },
                     y: {
                         title: {
                             display: true,
                             text: 'Taux (%)',
-                            color: isDarkMode ? '#9ca3af' : '#6b7280',
-                            font: { size: 14, weight: 'bold' }
+                            color: darkMode ? '#9ca3af' : '#6b7280'
                         },
                         grid: {
-                            color: isDarkMode ? '#374151' : '#e5e7eb'
+                            color: darkMode ? 'rgba(75, 85, 99, 0.2)' : 'rgba(209, 213, 219, 0.3)',
                         },
                         ticks: {
-                            color: isDarkMode ? '#9ca3af' : '#6b7280',
-                            callback: function(value) {
-                                return value.toFixed(2) + '%';
-                            }
+                            color: darkMode ? '#9ca3af' : '#6b7280',
+                            callback: function(value) { return value.toFixed(1) + '%'; }
                         }
                     }
                 }
@@ -359,24 +477,38 @@ const YieldCurveTab = () => {
                                             Maturité
                                         </th>
                                         {yieldData.data.us && (
-                                            <th className={`px-3 py-2 text-right font-bold text-xs ${
-                                                darkMode ? 'text-gray-300' : 'text-gray-700'
-                                            }`}>
-                                                🇺🇸 US Treasury (%)
-                                            </th>
+                                            <>
+                                                <th className={`px-3 py-2 text-right font-bold text-xs ${
+                                                    darkMode ? 'text-gray-300' : 'text-gray-700'
+                                                }`}>
+                                                    🇺🇸 US (%)
+                                                </th>
+                                                <th className={`px-2 py-2 text-right font-bold text-xs ${
+                                                    darkMode ? 'text-gray-400' : 'text-gray-600'
+                                                }`}>
+                                                    1M Δ (bps)
+                                                </th>
+                                            </>
                                         )}
                                         {yieldData.data.canada && (
-                                            <th className={`px-3 py-2 text-right font-bold text-xs ${
-                                                darkMode ? 'text-gray-300' : 'text-gray-700'
-                                            }`}>
-                                                🇨🇦 Canada Bonds (%)
-                                            </th>
+                                            <>
+                                                <th className={`px-3 py-2 text-right font-bold text-xs ${
+                                                    darkMode ? 'text-gray-300' : 'text-gray-700'
+                                                }`}>
+                                                    🇨🇦 CA (%)
+                                                </th>
+                                                <th className={`px-2 py-2 text-right font-bold text-xs ${
+                                                    darkMode ? 'text-gray-400' : 'text-gray-600'
+                                                }`}>
+                                                    1M Δ (bps)
+                                                </th>
+                                            </>
                                         )}
                                         {yieldData.data.us && yieldData.data.canada && (
                                             <th className={`px-3 py-2 text-right font-bold text-xs ${
                                                 darkMode ? 'text-gray-300' : 'text-gray-700'
                                             }`}>
-                                                Écart (bps)
+                                                Spread (US-CA)
                                             </th>
                                         )}
                                     </tr>
@@ -427,25 +559,43 @@ const YieldCurveTab = () => {
                                                             {maturity}
                                                         </td>
                                                         {yieldData.data.us && (
-                                                            <td className={`px-3 py-2 text-right text-xs ${
-                                                                darkMode ? 'text-blue-400' : 'text-blue-600'
-                                                            }`}>
-                                                                {usRate ? usRate.rate.toFixed(2) : '-'}
-                                                            </td>
+                                                            <>
+                                                                <td className={`px-3 py-2 text-right text-xs ${
+                                                                    darkMode ? 'text-blue-400' : 'text-blue-600'
+                                                                }`}>
+                                                                    {usRate ? usRate.rate.toFixed(2) : '-'}
+                                                                </td>
+                                                                <td className={`px-2 py-2 text-right text-xs font-mono opacity-80 ${
+                                                                    (usRate?.change1M || 0) >= 0 
+                                                                    ? (darkMode ? 'text-green-400' : 'text-green-600') 
+                                                                    : (darkMode ? 'text-red-400' : 'text-red-600')
+                                                                }`}>
+                                                                    {usRate?.change1M ? `${usRate.change1M > 0 ? '+' : ''}${(usRate.change1M * 100).toFixed(0)}` : '-'}
+                                                                </td>
+                                                            </>
                                                         )}
                                                         {yieldData.data.canada && (
-                                                            <td className={`px-3 py-2 text-right text-xs ${
-                                                                darkMode ? 'text-red-400' : 'text-red-600'
-                                                            }`}>
-                                                                {caRate ? caRate.rate.toFixed(2) : '-'}
-                                                            </td>
+                                                            <>
+                                                                <td className={`px-3 py-2 text-right text-xs ${
+                                                                    darkMode ? 'text-red-400' : 'text-red-600'
+                                                                }`}>
+                                                                    {caRate ? caRate.rate.toFixed(2) : '-'}
+                                                                </td>
+                                                                <td className={`px-2 py-2 text-right text-xs font-mono opacity-80 ${
+                                                                    (caRate?.change1M || 0) >= 0 
+                                                                    ? (darkMode ? 'text-green-400' : 'text-green-600') 
+                                                                    : (darkMode ? 'text-red-400' : 'text-red-600')
+                                                                }`}>
+                                                                    {caRate?.change1M ? `${caRate.change1M > 0 ? '+' : ''}${(caRate.change1M * 100).toFixed(0)}` : '-'}
+                                                                </td>
+                                                            </>
                                                         )}
                                                         {yieldData.data.us && yieldData.data.canada && (
-                                                            <td className={`px-3 py-2 text-right font-mono text-xs ${
+                                                            <td className={`px-3 py-2 text-right font-bold text-xs ${
                                                                 spread > 0
-                                                                    ? (darkMode ? 'text-green-400' : 'text-green-600')
+                                                                    ? (darkMode ? 'text-blue-400' : 'text-blue-600')
                                                                     : spread < 0
-                                                                    ? (darkMode ? 'text-red-400' : 'text-red-600')
+                                                                    ? (darkMode ? 'text-orange-400' : 'text-orange-600')
                                                                     : (darkMode ? 'text-gray-400' : 'text-gray-600')
                                                             }`}>
                                                                 {spread !== null ? (spread > 0 ? '+' : '') + spread : '-'}
@@ -508,15 +658,32 @@ const YieldCurveTab = () => {
                         </div>
                     </div>
 
-                    {/* Graphique */}
+                    {/* Graphique Principal : Courbes de Taux */}
                     {(yieldData.data?.us?.rates?.length > 0 || yieldData.data?.canada?.rates?.length > 0) ? (
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
-                            darkMode ? 'bg-gray-800' : 'bg-white'
-                        }`}>
-                            <div style={{ height: '400px', position: 'relative' }}>
-                                <canvas ref={chartRef} style={{ width: '100%', height: '100%' }}></canvas>
+                        <>
+                         <div className={`p-4 rounded-lg transition-colors duration-300 mb-4 ${
+                             darkMode ? 'bg-gray-800' : 'bg-white'
+                         }`}>
+                             <h4 className={`text-sm font-semibold mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Courbes de Taux (Historique M-1 en pointillés)</h4>
+                             <div style={{ height: '350px', position: 'relative' }}>
+                                 <canvas ref={chartRef} style={{ width: '100%', height: '100%' }}></canvas>
+                             </div>
+                         </div>
+
+                        {/* Graphique Secondaire : Spread US-CA (si les deux dispos) */}
+                        {yieldData.data.us && yieldData.data.canada && (
+                            <div className={`p-4 rounded-lg transition-colors duration-300 ${
+                                darkMode ? 'bg-gray-800' : 'bg-white'
+                            }`}>
+                                <h4 className={`text-sm font-semibold mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Écart de Rendement (Spread US - Canada)</h4>
+                                <SpreadChart 
+                                    usRates={yieldData.data.us.rates} 
+                                    caRates={yieldData.data.canada.rates} 
+                                    darkMode={darkMode} 
+                                />
                             </div>
-                        </div>
+                        )}
+                        </>
                     ) : (
                         <div className={`p-6 rounded-lg border-l-4 border-yellow-500 ${
                             darkMode ? 'bg-yellow-900/20' : 'bg-yellow-50'

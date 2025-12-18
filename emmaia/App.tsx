@@ -390,9 +390,7 @@ const App: React.FC = () => {
       {renderMode()}
       
       {/* Debug / Context Indicator */}
-      <div style={{ position: 'fixed', bottom: 5, right: 5, background: 'rgba(0,0,0,0.7)', color: '#fff', padding: '2px 6px', fontSize: '10px', borderRadius: '4px', zIndex: 9999, pointerEvents: 'none', opacity: 0.6 }}>
-        FILE: emmaia/App.tsx
-      </div>
+
     </>
   );
 };
