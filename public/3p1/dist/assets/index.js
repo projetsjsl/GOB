@@ -7213,7 +7213,7 @@ function ArrowDownTrayIcon({
     d: "M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
   }));
 }
-const ForwardRef$K = /* @__PURE__ */ reactExports.forwardRef(ArrowDownTrayIcon);
+const ForwardRef$L = /* @__PURE__ */ reactExports.forwardRef(ArrowDownTrayIcon);
 function ArrowPathIcon({
   title,
   titleId,
@@ -7237,7 +7237,7 @@ function ArrowPathIcon({
     d: "M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
   }));
 }
-const ForwardRef$J = /* @__PURE__ */ reactExports.forwardRef(ArrowPathIcon);
+const ForwardRef$K = /* @__PURE__ */ reactExports.forwardRef(ArrowPathIcon);
 function ArrowRightIcon({
   title,
   titleId,
@@ -7261,7 +7261,7 @@ function ArrowRightIcon({
     d: "M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
   }));
 }
-const ForwardRef$I = /* @__PURE__ */ reactExports.forwardRef(ArrowRightIcon);
+const ForwardRef$J = /* @__PURE__ */ reactExports.forwardRef(ArrowRightIcon);
 function ArrowTrendingUpIcon({
   title,
   titleId,
@@ -7285,7 +7285,7 @@ function ArrowTrendingUpIcon({
     d: "M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"
   }));
 }
-const ForwardRef$H = /* @__PURE__ */ reactExports.forwardRef(ArrowTrendingUpIcon);
+const ForwardRef$I = /* @__PURE__ */ reactExports.forwardRef(ArrowTrendingUpIcon);
 function ArrowUturnLeftIcon({
   title,
   titleId,
@@ -7309,7 +7309,7 @@ function ArrowUturnLeftIcon({
     d: "M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
   }));
 }
-const ForwardRef$G = /* @__PURE__ */ reactExports.forwardRef(ArrowUturnLeftIcon);
+const ForwardRef$H = /* @__PURE__ */ reactExports.forwardRef(ArrowUturnLeftIcon);
 function ArrowUturnRightIcon({
   title,
   titleId,
@@ -7333,7 +7333,7 @@ function ArrowUturnRightIcon({
     d: "m15 15 6-6m0 0-6-6m6 6H9a6 6 0 0 0 0 12h3"
   }));
 }
-const ForwardRef$F = /* @__PURE__ */ reactExports.forwardRef(ArrowUturnRightIcon);
+const ForwardRef$G = /* @__PURE__ */ reactExports.forwardRef(ArrowUturnRightIcon);
 function BanknotesIcon({
   title,
   titleId,
@@ -7357,7 +7357,7 @@ function BanknotesIcon({
     d: "M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"
   }));
 }
-const ForwardRef$E = /* @__PURE__ */ reactExports.forwardRef(BanknotesIcon);
+const ForwardRef$F = /* @__PURE__ */ reactExports.forwardRef(BanknotesIcon);
 function Bars3Icon({
   title,
   titleId,
@@ -7381,7 +7381,7 @@ function Bars3Icon({
     d: "M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
   }));
 }
-const ForwardRef$D = /* @__PURE__ */ reactExports.forwardRef(Bars3Icon);
+const ForwardRef$E = /* @__PURE__ */ reactExports.forwardRef(Bars3Icon);
 function BookOpenIcon({
   title,
   titleId,
@@ -7405,7 +7405,7 @@ function BookOpenIcon({
     d: "M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
   }));
 }
-const ForwardRef$C = /* @__PURE__ */ reactExports.forwardRef(BookOpenIcon);
+const ForwardRef$D = /* @__PURE__ */ reactExports.forwardRef(BookOpenIcon);
 function CalculatorIcon({
   title,
   titleId,
@@ -7429,7 +7429,7 @@ function CalculatorIcon({
     d: "M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0 0 12 2.25Z"
   }));
 }
-const ForwardRef$B = /* @__PURE__ */ reactExports.forwardRef(CalculatorIcon);
+const ForwardRef$C = /* @__PURE__ */ reactExports.forwardRef(CalculatorIcon);
 function CalendarDaysIcon({
   title,
   titleId,
@@ -7453,7 +7453,7 @@ function CalendarDaysIcon({
     d: "M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
   }));
 }
-const ForwardRef$A = /* @__PURE__ */ reactExports.forwardRef(CalendarDaysIcon);
+const ForwardRef$B = /* @__PURE__ */ reactExports.forwardRef(CalendarDaysIcon);
 function ChartBarSquareIcon({
   title,
   titleId,
@@ -7477,7 +7477,7 @@ function ChartBarSquareIcon({
     d: "M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z"
   }));
 }
-const ForwardRef$z = /* @__PURE__ */ reactExports.forwardRef(ChartBarSquareIcon);
+const ForwardRef$A = /* @__PURE__ */ reactExports.forwardRef(ChartBarSquareIcon);
 function ChartBarIcon({
   title,
   titleId,
@@ -7501,7 +7501,7 @@ function ChartBarIcon({
     d: "M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"
   }));
 }
-const ForwardRef$y = /* @__PURE__ */ reactExports.forwardRef(ChartBarIcon);
+const ForwardRef$z = /* @__PURE__ */ reactExports.forwardRef(ChartBarIcon);
 function CheckCircleIcon$1({
   title,
   titleId,
@@ -7525,7 +7525,7 @@ function CheckCircleIcon$1({
     d: "M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
   }));
 }
-const ForwardRef$x = /* @__PURE__ */ reactExports.forwardRef(CheckCircleIcon$1);
+const ForwardRef$y = /* @__PURE__ */ reactExports.forwardRef(CheckCircleIcon$1);
 function ChevronDownIcon({
   title,
   titleId,
@@ -7549,7 +7549,7 @@ function ChevronDownIcon({
     d: "m19.5 8.25-7.5 7.5-7.5-7.5"
   }));
 }
-const ForwardRef$w = /* @__PURE__ */ reactExports.forwardRef(ChevronDownIcon);
+const ForwardRef$x = /* @__PURE__ */ reactExports.forwardRef(ChevronDownIcon);
 function ChevronLeftIcon({
   title,
   titleId,
@@ -7573,7 +7573,7 @@ function ChevronLeftIcon({
     d: "M15.75 19.5 8.25 12l7.5-7.5"
   }));
 }
-const ForwardRef$v = /* @__PURE__ */ reactExports.forwardRef(ChevronLeftIcon);
+const ForwardRef$w = /* @__PURE__ */ reactExports.forwardRef(ChevronLeftIcon);
 function ChevronRightIcon({
   title,
   titleId,
@@ -7597,7 +7597,7 @@ function ChevronRightIcon({
     d: "m8.25 4.5 7.5 7.5-7.5 7.5"
   }));
 }
-const ForwardRef$u = /* @__PURE__ */ reactExports.forwardRef(ChevronRightIcon);
+const ForwardRef$v = /* @__PURE__ */ reactExports.forwardRef(ChevronRightIcon);
 function ChevronUpIcon({
   title,
   titleId,
@@ -7621,7 +7621,7 @@ function ChevronUpIcon({
     d: "m4.5 15.75 7.5-7.5 7.5 7.5"
   }));
 }
-const ForwardRef$t = /* @__PURE__ */ reactExports.forwardRef(ChevronUpIcon);
+const ForwardRef$u = /* @__PURE__ */ reactExports.forwardRef(ChevronUpIcon);
 function ClockIcon({
   title,
   titleId,
@@ -7645,7 +7645,7 @@ function ClockIcon({
     d: "M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
   }));
 }
-const ForwardRef$s = /* @__PURE__ */ reactExports.forwardRef(ClockIcon);
+const ForwardRef$t = /* @__PURE__ */ reactExports.forwardRef(ClockIcon);
 function CloudArrowDownIcon({
   title,
   titleId,
@@ -7669,7 +7669,7 @@ function CloudArrowDownIcon({
     d: "M12 9.75v6.75m0 0-3-3m3 3 3-3m-8.25 6a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
   }));
 }
-const ForwardRef$r = /* @__PURE__ */ reactExports.forwardRef(CloudArrowDownIcon);
+const ForwardRef$s = /* @__PURE__ */ reactExports.forwardRef(CloudArrowDownIcon);
 function Cog6ToothIcon({
   title,
   titleId,
@@ -7697,7 +7697,7 @@ function Cog6ToothIcon({
     d: "M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
   }));
 }
-const ForwardRef$q = /* @__PURE__ */ reactExports.forwardRef(Cog6ToothIcon);
+const ForwardRef$r = /* @__PURE__ */ reactExports.forwardRef(Cog6ToothIcon);
 function DocumentChartBarIcon({
   title,
   titleId,
@@ -7721,7 +7721,7 @@ function DocumentChartBarIcon({
     d: "M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25M9 16.5v.75m3-3v3M15 12v5.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
   }));
 }
-const ForwardRef$p = /* @__PURE__ */ reactExports.forwardRef(DocumentChartBarIcon);
+const ForwardRef$q = /* @__PURE__ */ reactExports.forwardRef(DocumentChartBarIcon);
 function DocumentDuplicateIcon({
   title,
   titleId,
@@ -7745,7 +7745,7 @@ function DocumentDuplicateIcon({
     d: "M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
   }));
 }
-const ForwardRef$o = /* @__PURE__ */ reactExports.forwardRef(DocumentDuplicateIcon);
+const ForwardRef$p = /* @__PURE__ */ reactExports.forwardRef(DocumentDuplicateIcon);
 function ExclamationTriangleIcon({
   title,
   titleId,
@@ -7769,7 +7769,7 @@ function ExclamationTriangleIcon({
     d: "M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
   }));
 }
-const ForwardRef$n = /* @__PURE__ */ reactExports.forwardRef(ExclamationTriangleIcon);
+const ForwardRef$o = /* @__PURE__ */ reactExports.forwardRef(ExclamationTriangleIcon);
 function EyeIcon({
   title,
   titleId,
@@ -7797,7 +7797,7 @@ function EyeIcon({
     d: "M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
   }));
 }
-const ForwardRef$m = /* @__PURE__ */ reactExports.forwardRef(EyeIcon);
+const ForwardRef$n = /* @__PURE__ */ reactExports.forwardRef(EyeIcon);
 function FunnelIcon({
   title,
   titleId,
@@ -7821,7 +7821,7 @@ function FunnelIcon({
     d: "M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
   }));
 }
-const ForwardRef$l = /* @__PURE__ */ reactExports.forwardRef(FunnelIcon);
+const ForwardRef$m = /* @__PURE__ */ reactExports.forwardRef(FunnelIcon);
 function InformationCircleIcon({
   title,
   titleId,
@@ -7845,7 +7845,7 @@ function InformationCircleIcon({
     d: "m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
   }));
 }
-const ForwardRef$k = /* @__PURE__ */ reactExports.forwardRef(InformationCircleIcon);
+const ForwardRef$l = /* @__PURE__ */ reactExports.forwardRef(InformationCircleIcon);
 function LightBulbIcon({
   title,
   titleId,
@@ -7869,7 +7869,7 @@ function LightBulbIcon({
     d: "M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"
   }));
 }
-const ForwardRef$j = /* @__PURE__ */ reactExports.forwardRef(LightBulbIcon);
+const ForwardRef$k = /* @__PURE__ */ reactExports.forwardRef(LightBulbIcon);
 function LockClosedIcon({
   title,
   titleId,
@@ -7893,7 +7893,7 @@ function LockClosedIcon({
     d: "M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
   }));
 }
-const ForwardRef$i = /* @__PURE__ */ reactExports.forwardRef(LockClosedIcon);
+const ForwardRef$j = /* @__PURE__ */ reactExports.forwardRef(LockClosedIcon);
 function LockOpenIcon({
   title,
   titleId,
@@ -7917,7 +7917,7 @@ function LockOpenIcon({
     d: "M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
   }));
 }
-const ForwardRef$h = /* @__PURE__ */ reactExports.forwardRef(LockOpenIcon);
+const ForwardRef$i = /* @__PURE__ */ reactExports.forwardRef(LockOpenIcon);
 function MagnifyingGlassIcon({
   title,
   titleId,
@@ -7941,7 +7941,7 @@ function MagnifyingGlassIcon({
     d: "m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
   }));
 }
-const ForwardRef$g = /* @__PURE__ */ reactExports.forwardRef(MagnifyingGlassIcon);
+const ForwardRef$h = /* @__PURE__ */ reactExports.forwardRef(MagnifyingGlassIcon);
 function PauseIcon({
   title,
   titleId,
@@ -7965,7 +7965,7 @@ function PauseIcon({
     d: "M15.75 5.25v13.5m-7.5-13.5v13.5"
   }));
 }
-const ForwardRef$f = /* @__PURE__ */ reactExports.forwardRef(PauseIcon);
+const ForwardRef$g = /* @__PURE__ */ reactExports.forwardRef(PauseIcon);
 function PencilSquareIcon({
   title,
   titleId,
@@ -7989,7 +7989,7 @@ function PencilSquareIcon({
     d: "m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
   }));
 }
-const ForwardRef$e = /* @__PURE__ */ reactExports.forwardRef(PencilSquareIcon);
+const ForwardRef$f = /* @__PURE__ */ reactExports.forwardRef(PencilSquareIcon);
 function PlayIcon({
   title,
   titleId,
@@ -8013,7 +8013,7 @@ function PlayIcon({
     d: "M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
   }));
 }
-const ForwardRef$d = /* @__PURE__ */ reactExports.forwardRef(PlayIcon);
+const ForwardRef$e = /* @__PURE__ */ reactExports.forwardRef(PlayIcon);
 function PlusIcon({
   title,
   titleId,
@@ -8037,7 +8037,7 @@ function PlusIcon({
     d: "M12 4.5v15m7.5-7.5h-15"
   }));
 }
-const ForwardRef$c = /* @__PURE__ */ reactExports.forwardRef(PlusIcon);
+const ForwardRef$d = /* @__PURE__ */ reactExports.forwardRef(PlusIcon);
 function PresentationChartBarIcon({
   title,
   titleId,
@@ -8061,7 +8061,7 @@ function PresentationChartBarIcon({
     d: "M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"
   }));
 }
-const ForwardRef$b = /* @__PURE__ */ reactExports.forwardRef(PresentationChartBarIcon);
+const ForwardRef$c = /* @__PURE__ */ reactExports.forwardRef(PresentationChartBarIcon);
 function PrinterIcon({
   title,
   titleId,
@@ -8085,7 +8085,31 @@ function PrinterIcon({
     d: "M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z"
   }));
 }
-const ForwardRef$a = /* @__PURE__ */ reactExports.forwardRef(PrinterIcon);
+const ForwardRef$b = /* @__PURE__ */ reactExports.forwardRef(PrinterIcon);
+function QuestionMarkCircleIcon({
+  title,
+  titleId,
+  ...props
+}, svgRef) {
+  return /* @__PURE__ */ reactExports.createElement("svg", Object.assign({
+    xmlns: "http://www.w3.org/2000/svg",
+    fill: "none",
+    viewBox: "0 0 24 24",
+    strokeWidth: 1.5,
+    stroke: "currentColor",
+    "aria-hidden": "true",
+    "data-slot": "icon",
+    ref: svgRef,
+    "aria-labelledby": titleId
+  }, props), title ? /* @__PURE__ */ reactExports.createElement("title", {
+    id: titleId
+  }, title) : null, /* @__PURE__ */ reactExports.createElement("path", {
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    d: "M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+  }));
+}
+const ForwardRef$a = /* @__PURE__ */ reactExports.forwardRef(QuestionMarkCircleIcon);
 function ShieldCheckIcon({
   title,
   titleId,
@@ -8717,7 +8741,7 @@ const Header = ({
   onOpenSettings,
   onOpenReports
 }) => {
-  const [isLoading, setIsLoading] = reactExports.useState(false);
+  const [isLoading2, setIsLoading] = reactExports.useState(false);
   const handleNumericChange = (e, key, min2 = -Infinity) => {
     const inputValue = e.target.value;
     if (inputValue === "") {
@@ -8798,7 +8822,7 @@ VENTE: Prix actuel ≥ Limite de vente`
             {
               className: "absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow-sm border border-blue-100 z-10",
               title: isWatchlist ? "👁️ Watchlist (Non détenu)\n\nCe titre est dans votre watchlist (surveillé mais non détenu).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation." : "⭐ Portefeuille (Détenu)\n\nCe titre est dans votre portefeuille (team ticker, vous le détenez actuellement).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation.\n• Point coloré = Recommandation (ACHAT/CONSERVER/VENTE)",
-              children: isWatchlist ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-3.5 h-3.5 text-blue-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-3.5 h-3.5 text-yellow-500 fill-yellow-500", style: { fill: "#eab308" } })
+              children: isWatchlist ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-3.5 h-3.5 text-blue-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-3.5 h-3.5 text-yellow-500 fill-yellow-500", style: { fill: "#eab308" } })
             }
           )
         ] }),
@@ -8877,7 +8901,7 @@ Source: FMP key-metrics`, children: [
               className: "flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print bg-blue-600 text-white hover:bg-blue-700",
               title: "💾 Sauvegarder une version (Snapshot)\\n\\nCrée un snapshot complet de l'analyse actuelle incluant:\\n\\n📊 Données:\\n• Toutes les données historiques (EPS, CF, BV, Dividendes)\\n• Prix historiques (High/Low par année)\\n• Données manuelles et auto-fetchées\\n\\n⚙️ Hypothèses:\\n• Tous les taux de croissance (EPS, CF, BV, DIV)\\n• Tous les ratios cibles (P/E, P/CF, P/BV, Yield)\\n• Prix actuel et dividende actuel\\n• Taux de rendement requis\\n• Exclusions de métriques (EPS, CF, BV, DIV)\\n\\n📈 Métriques:\\n• Toutes les métriques calculées\\n• Date et heure de sauvegarde\\n• Version du snapshot\\n\\n💡 Utilisation:\\n• Les snapshots sont accessibles dans la sidebar droite (icône horloge)\\n• Permet de comparer différentes versions de l'analyse\\n• Utile pour suivre l'évolution de vos hypothèses dans le temps",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$r, { className: "w-3 h-3 sm:w-4 sm:h-4" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$s, { className: "w-3 h-3 sm:w-4 sm:h-4" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Sauvegarder" })
               ]
             }
@@ -8886,12 +8910,12 @@ Source: FMP key-metrics`, children: [
             "button",
             {
               onClick: handleSyncClick,
-              disabled: isLoading,
-              className: `flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-blue-50 text-blue-600 hover:bg-blue-100"}`,
-              title: "🔄 Synchroniser les données (Sync. Données)\\n\\nRécupère les dernières données depuis l'API FMP Premium pour le ticker actuellement sélectionné.\\n\\n📊 Données mises à jour:\\n• États financiers complets (30 ans d'historique)\\n• Prix historiques (20 ans)\\n• Métriques clés (30 années)\\n• Dividendes et ratios\\n• Informations de profil (secteur, pays, bourse)\\n\\n✅ Comportement intelligent:\\n• Met à jour uniquement les données auto-fetchées (autoFetched: true)\\n• Préserve toutes vos modifications manuelles (autoFetched: false)\\n• Ajoute automatiquement les nouvelles années disponibles\\n• Recalcule les hypothèses basées sur les nouvelles données\\n• Préserve vos exclusions de métriques (EPS, CF, BV, DIV)\\n• Préserve les métriques ValueLine (Security Rank, etc.)\\n\\n⚠️ Important:\\n• Ne synchronise QUE le ticker actuellement sélectionné\\n• Pour synchroniser tous les tickers, utilisez 'Sync Warehouse (Deep)' dans la sidebar\\n• Les données manuelles (en orange) ne sont jamais écrasées",
+              disabled: isLoading2,
+              className: `flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading2 ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-blue-50 text-blue-600 hover:bg-blue-100"}`,
+              title: "🔄 Options de Synchronisation Avancées\\n\\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options configurables.\\n\\n📊 Le dialogue vous permet de:\\n• Choisir quelles données synchroniser (historiques, assumptions, infos)\\n• Décider si vous voulez remplacer les données oranges\\n• Configurer des options avancées (nouvelles années uniquement, métriques manquantes, etc.)\\n• Voir des explications détaillées avec exemples concrets pour chaque option\\n\\n💡 Chaque option inclut une section d'aide avec:\\n• Comportement attendu\\n• Exemples concrets\\n• Outils et APIs utilisés\\n• Formules et algorithmes\\n• Recommandations d'utilisation",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: `w-3 h-3 sm:w-4 sm:h-4 ${isLoading ? "animate-spin" : ""}` }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: isLoading ? "Sync..." : "Sync. Données" })
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: `w-3 h-3 sm:w-4 sm:h-4 ${isLoading2 ? "animate-spin" : ""}` }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: isLoading2 ? "Sync..." : "⚙️ Options Sync" })
               ]
             }
           ),
@@ -8899,11 +8923,11 @@ Source: FMP key-metrics`, children: [
             "button",
             {
               onClick: onRestoreData,
-              disabled: isLoading,
-              className: `flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-purple-50 text-purple-600 hover:bg-purple-100"}`,
+              disabled: isLoading2,
+              className: `flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading2 ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-purple-50 text-purple-600 hover:bg-purple-100"}`,
               title: "📥 Restaurer les données\\n\\nOuvre un dialogue de restauration avec 2 options principales:\\n\\n1️⃣ Charger le dernier snapshot:\\n   • Restaure la dernière sauvegarde complète\\n   • Inclut toutes les données historiques\\n   • Inclut toutes les hypothèses\\n   • Mode lecture seule (sécurisé)\\n   • Permet de comparer avec la version actuelle\\n\\n2️⃣ Recalculer depuis FMP:\\n   • Recharge les données FMP Premium (30 ans)\\n   • Réapplique automatiquement les hypothèses auto-fill\\n   • Préserve vos exclusions de métriques\\n   • Préserve les métriques ValueLine\\n   • Met à jour uniquement les données auto-fetchées\\n\\n💡 Utilisation:\\n• Utilisez 'Charger snapshot' pour revenir à une version précédente\\n• Utilisez 'Recalculer FMP' pour actualiser avec les dernières données\\n• Les modifications manuelles sont toujours préservées",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-3 h-3 sm:w-4 sm:h-4" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$L, { className: "w-3 h-3 sm:w-4 sm:h-4" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Restaurer" })
               ]
             }
@@ -8914,7 +8938,7 @@ Source: FMP key-metrics`, children: [
               onClick: handlePrint,
               className: "p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors no-print",
               title: "🖨️ Imprimer la fiche d'analyse\\n\\nGénère une version imprimable de l'analyse complète incluant:\\n\\n📊 Contenu imprimé:\\n• En-tête avec informations de l'entreprise\\n• Tableau des données historiques\\n• Graphiques de valorisation\\n• Matrices de sensibilité (P/E et P/CF)\\n• Évaluation détaillée (4 métriques)\\n• Notes de l'analyste\\n• Résumé exécutif\\n\\n💡 Conseils:\\n• Utilisez Ctrl+P (Cmd+P sur Mac) pour ouvrir le dialogue d'impression\\n• Les éléments avec la classe 'no-print' sont automatiquement masqués\\n• Optimisé pour impression en format A4\\n• Les couleurs sont préservées pour une meilleure lisibilité",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-4 h-4 sm:w-6 sm:h-6" })
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: "w-4 h-4 sm:w-6 sm:h-6" })
             }
           ),
           onOpenReports && /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -8923,7 +8947,7 @@ Source: FMP key-metrics`, children: [
               onClick: onOpenReports,
               className: "p-1.5 sm:p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-full transition-colors no-print",
               title: "📊 Rapports Visuels et Analyse de Données\\n\\nOuvre le panneau de rapports visuels complets incluant:\\n\\n📈 Qualité des Données:\\n• Visualisation des données aberrantes détectées\\n• Métriques exclues et raisons d'exclusion\\n• Analyse des outliers dans les données historiques\\n• Graphiques des prix cibles par métrique\\n• Statistiques détaillées (médiane, écart-type)\\n\\n✅ Rapport de Sanitisation:\\n• Comparaison avant/après sanitisation\\n• Détails de toutes les corrections appliquées\\n• Raisons des corrections par paramètre\\n• Statistiques par catégorie (croissance, ratios, prix)\\n\\n📊 Visualisation Complète:\\n• Graphiques de toutes les données historiques\\n• Évolution des prix (High/Low/Avg)\\n• Ratios de valorisation (P/E, P/CF, P/BV)\\n• Taux de croissance annuel\\n• Corrélations et statistiques",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-4 h-4 sm:w-6 sm:h-6" })
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$q, { className: "w-4 h-4 sm:w-6 sm:h-6" })
             }
           ),
           onOpenSettings && /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -8932,7 +8956,7 @@ Source: FMP key-metrics`, children: [
               onClick: onOpenSettings,
               className: "p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors no-print",
               title: "⚙️ Configuration Complète : Guardrails, Validation, Ajustements\\n\\nOuvre le panneau de configuration unifié pour gérer tous les paramètres de l'application.\\n\\n🛡️ Guardrails (Limites d'affichage):\\n• Limites de croissance (min/max)\\n• Limites de ratios (P/E, P/CF, P/BV)\\n• Multiplicateur maximum raisonnable\\n• Contrôlent l'affichage des graphiques et tableaux\\n• Stockés dans localStorage (navigateur)\\n\\n✅ Validation (Paramètres de sanitisation):\\n• Limites de croissance par métrique\\n• Limites de ratios cibles\\n• Précision des calculs\\n• Automatisation de la sanitisation\\n• Cohérence des données\\n• Stockés dans Supabase (partagés)\\n\\n📊 Ajustements:\\n• Paramètres généraux de l'application\\n• Comportement par défaut\\n• Options d'affichage\\n\\n💡 Impact:\\n• Les Guardrails affectent l'affichage uniquement\\n• La Validation affecte les calculs et la sauvegarde\\n• Les changements sont appliqués immédiatement",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$q, { className: "w-4 h-4 sm:w-6 sm:h-6" })
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$r, { className: "w-4 h-4 sm:w-6 sm:h-6" })
             }
           )
         ] })
@@ -8959,7 +8983,7 @@ Source: FMP key-metrics`, children: [
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Dividende annuel versé par action", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$E, { className: "w-3 h-3" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$F, { className: "w-3 h-3" }),
           " Dividende (Act.)"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -8977,7 +9001,7 @@ Source: FMP key-metrics`, children: [
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Rendement du dividende (Dividende / Prix)", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$H, { className: "w-3 h-3" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$I, { className: "w-3 h-3" }),
           " Rendement (Yield)"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-2 py-1 text-base sm:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help", title: `Rendement du dividende: ${formatPercent(assumptions.currentDividend / assumptions.currentPrice * 100)}
@@ -8995,7 +9019,7 @@ Prix Actuel × Nombre d'actions en circulation`, children: info.marketCap })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Année de départ pour les projections à 5 ans", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$A, { className: "w-3 h-3" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-3 h-3" }),
           " Année de Base"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -33229,7 +33253,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-3 sm:p-4 border-b border-slate-800 bg-slate-950 cursor-help", title: "Finance Pro 3p1\\n\\nApplication d'analyse fondamentale pour la gestion de portefeuille.\\n\\nFonctionnalités:\\n• Analyse de valorisation sur 5 ans\\n• Triangulation de la valeur (4 métriques)\\n• KPI Dashboard multi-tickers\\n• Snapshots et historique\\n• Synchronisation avec FMP API", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-blue-400 font-bold text-base sm:text-lg", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(
-          ForwardRef$y,
+          ForwardRef$z,
           {
             className: `w-5 h-5 sm:w-6 sm:h-6 transition-all ${isAdmin ? "text-yellow-400" : ""} ${onToggleAdmin ? "cursor-pointer hover:scale-110" : ""}`,
             onClick: onToggleAdmin ? handleLogoClick : void 0,
@@ -33244,7 +33268,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-2 sm:p-3 md:p-4 border-b border-slate-800/50", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1.5 sm:gap-2 mb-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex-1 min-w-0", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-4 h-4 absolute left-2 sm:left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-slate-500 flex-shrink-0" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$h, { className: "w-4 h-4 absolute left-2 sm:left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-slate-500 flex-shrink-0" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -33264,7 +33288,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
             className: "bg-blue-600 hover:bg-blue-500 text-white px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm font-bold transition-colors shadow-lg hover:shadow-blue-500/20 whitespace-nowrap flex-shrink-0",
             title: "Ajouter un nouveau ticker\\n\\nOuvre une boîte de recherche pour ajouter une nouvelle entreprise à analyser.\\n\\nLe système va:\\n1. Rechercher le ticker via l'API FMP\\n2. Charger les données historiques (10 dernières années)\\n3. Auto-remplir les hypothèses (CAGR, ratios moyens)\\n4. Charger les métriques ValueLine si disponibles\\n\\nLe nouveau ticker sera ajouté à votre portefeuille.",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$c, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$d, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Ajouter" })
             ]
           }
@@ -33278,7 +33302,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
           className: "w-full bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors mb-2",
           title: "Synchroniser depuis Supabase\\n\\nCharge les tickers depuis la base de données Supabase.\\n\\nAjoute les nouveaux tickers présents dans Supabase mais absents de votre LocalStorage.\\n\\n⚠️ Ne modifie pas les tickers existants, seulement ajoute les nouveaux.",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: `w-4 h-4 ${isLoadingTickers ? "animate-spin" : ""}` }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: `w-4 h-4 ${isLoadingTickers ? "animate-spin" : ""}` }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: isLoadingTickers ? "Synchronisation..." : "Synchroniser Supabase" })
           ]
         }
@@ -33290,10 +33314,10 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
             onClick: onBulkSyncAll,
             disabled: isBulkSyncing || isLoadingTickers,
             className: "w-full bg-green-700 hover:bg-green-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors",
-            title: "Strategic Warehouse Sync (Deep Data)\\n\\nSynchronise TOUS les tickers avec historique COMPLET (30 ans).\\n\\nInclus maintenant:\\n• États Financiers Complets (Bilan, Compte de résultat, Flux de trésorerie)\\n• Historique Prix 20 ans\\n• Métriques 30 ans\\n\\nC'est l'option recommandée pour construire votre base de données.",
+            title: "🔄 Options de Synchronisation Avancées\\n\\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options:\\n\\n📊 Options principales:\\n• Sauvegarder avant sync\\n• Remplacer données oranges\\n• Forcer remplacement\\n\\n⚙️ Options détaillées:\\n• Synchroniser données historiques\\n• Synchroniser uniquement nouvelles années\\n• Synchroniser uniquement métriques manquantes\\n• Synchroniser assumptions\\n• Préserver exclusions\\n• Recalculer outliers\\n• Mettre à jour prix actuel\\n• Synchroniser métriques ValueLine\\n\\n💡 Chaque option inclut des explications détaillées, exemples concrets et informations sur les outils utilisés.",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: `w-4 h-4 ${isBulkSyncing ? "animate-spin" : ""}` }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex-1 text-left", children: isBulkSyncing && bulkSyncProgress ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}` : "Sync Warehouse (Deep)" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: `w-4 h-4 ${isBulkSyncing ? "animate-spin" : ""}` }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex-1 text-left", children: isBulkSyncing && bulkSyncProgress ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}` : "⚙️ Options Sync Avancées" })
             ]
           }
         ),
@@ -33434,7 +33458,7 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
                     },
                     title: profile.isWatchlist ? "👁️ Watchlist (Non détenu)\n\nCe titre est dans votre watchlist (surveillé mais non détenu).\n\nCliquez pour déplacer vers le Portefeuille (⭐).\n\nLa watchlist contient les titres que vous surveillez mais ne détenez pas encore." : "⭐ Portefeuille (Détenu)\n\nCe titre est dans votre portefeuille (vous le détenez actuellement).\n\nCliquez pour déplacer vers la Watchlist (👁️).\n\nLe portefeuille contient les titres que vous détenez actuellement.\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation.",
                     className: `p-1.5 rounded transition-colors ${profile.isWatchlist ? "text-blue-400 hover:bg-slate-700" : "text-yellow-500 hover:text-yellow-400 hover:bg-slate-700"}`,
-                    children: profile.isWatchlist ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-4 h-4 fill-current", style: { fill: "#eab308" } })
+                    children: profile.isWatchlist ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-4 h-4 fill-current", style: { fill: "#eab308" } })
                   }
                 ),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hidden group-hover:flex items-center gap-1", children: [
@@ -33447,7 +33471,7 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
                       },
                       title: "Dupliquer ce ticker\\n\\nCrée une copie complète de l'analyse actuelle.\\n\\nUtile pour:\\n• Comparer différents scénarios (optimiste/pessimiste)\\n• Tester différentes hypothèses\\n• Créer des variantes d'analyse\\n\\nLe ticker dupliqué aura le même nom avec un suffixe.",
                       className: "p-1.5 hover:bg-slate-700 hover:text-white rounded",
-                      children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-3.5 h-3.5" })
+                      children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-3.5 h-3.5" })
                     }
                   ),
                   isAdmin && /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -33479,10 +33503,10 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
           title: isFiltersExpanded ? "Réduire les filtres pour voir plus de titres" : "Développer les filtres",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xs font-semibold text-slate-500 uppercase flex items-center gap-1.5 sm:gap-2 cursor-help", title: "Filtres et Tri\\n\\nFiltrez et triez votre portefeuille selon différents critères.\\n\\nFiltres:\\n• Tous: Affiche tous les tickers\\n• Portefeuille: Uniquement les titres détenus\\n• Watchlist: Uniquement les titres surveillés\\n\\nTri:\\n• Alphabétique: A-Z ou Z-A\\n• Date de modification: Plus récent ou plus ancien\\n• Recommandation: Achat, Conserver, Vente\\n• Secteur: Par secteur d'activité", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-3 h-3 flex-shrink-0" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-3 h-3 flex-shrink-0" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate", children: "Filtres et Tri" })
             ] }),
-            isFiltersExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-4 h-4 text-slate-400 flex-shrink-0" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-4 h-4 text-slate-400 flex-shrink-0" })
+            isFiltersExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-4 h-4 text-slate-400 flex-shrink-0" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 text-slate-400 flex-shrink-0" })
           ]
         }
       ),
@@ -33517,7 +33541,7 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
               className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${filterBy === "watchlist" ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
               title: "Afficher uniquement les tickers de la watchlist (titres surveillés)",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-3 h-3" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-3 h-3" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Watchlist" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sm:hidden", children: "Watch" })
               ]
@@ -33702,7 +33726,7 @@ function hasManualEdits(data) {
 }
 const RightSidebar = ({ ticker: ticker2, onLoadVersion, isOpen, onToggle }) => {
   const [snapshots, setSnapshots] = reactExports.useState([]);
-  const [isLoading, setIsLoading] = reactExports.useState(false);
+  const [isLoading2, setIsLoading] = reactExports.useState(false);
   const [deletingId, setDeletingId] = reactExports.useState(null);
   reactExports.useEffect(() => {
     if (isOpen && ticker2) {
@@ -33817,7 +33841,7 @@ Cette action est irréversible.`)) {
         onClick: onToggle,
         className: `fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-slate-800 text-white p-2 rounded-l-lg shadow-lg hover:bg-slate-700 transition-all ${isOpen ? "translate-x-0" : "translate-x-full"}`,
         title: isOpen ? "Masquer l'historique des versions\n\nCliquez pour masquer la sidebar d'historique.\n\nL'historique contient tous les snapshots sauvegardés de cette analyse." : "Afficher l'historique des versions\n\nCliquez pour afficher la sidebar d'historique.\n\nL'historique contient tous les snapshots sauvegardés de cette analyse.\n\nVous pouvez:\n• Charger une version précédente (mode lecture seule)\n• Comparer différentes versions\n• Supprimer des snapshots",
-        children: isOpen ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-5 h-5" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-5 h-5" })
+        children: isOpen ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-5 h-5" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-5 h-5" })
       }
     ),
     isOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -33836,7 +33860,7 @@ Cette action est irréversible.`)) {
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 sm:p-4 border-b border-slate-800 bg-slate-950", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0 flex-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-base sm:text-lg font-bold text-blue-400 flex items-center gap-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$s, { className: "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate", children: "Historique" })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500 mt-1 truncate", children: ticker2 })
@@ -33847,11 +33871,11 @@ Cette action est irréversible.`)) {
                 onClick: onToggle,
                 className: "p-1 hover:bg-slate-800 rounded flex-shrink-0 ml-2",
                 title: "Fermer l'historique",
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-5 h-5" })
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-5 h-5" })
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-y-auto p-3 sm:p-4 space-y-2 sm:space-y-3", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center text-slate-500 py-8", children: "Chargement..." }) : snapshots.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center text-slate-500 py-8", children: "Aucun historique disponible" }) : snapshots.map((snapshot) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-y-auto p-3 sm:p-4 space-y-2 sm:space-y-3", children: isLoading2 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center text-slate-500 py-8", children: "Chargement..." }) : snapshots.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center text-slate-500 py-8", children: "Aucun historique disponible" }) : snapshots.map((snapshot) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "div",
             {
               className: "bg-slate-800 rounded-lg p-3 sm:p-4 border border-slate-700 hover:border-blue-500 transition-colors cursor-pointer relative group",
@@ -33865,7 +33889,7 @@ Cette action est irréversible.`)) {
                         snapshot.version
                       ] }),
                       snapshot.isCurrent && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-green-600 px-2 py-0.5 rounded", children: "Actuel" }),
-                      snapshot.isApproved && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 text-green-400 cursor-help", title: "Version approuvée\\n\\nCette version a été marquée comme officielle et approuvée.\\n\\nLes versions approuvées sont utilisées comme référence pour:\\n• Comparaison avec les versions futures\\n• Indicateur dans le KPI Dashboard\\n• Historique des décisions importantes" })
+                      snapshot.isApproved && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-4 h-4 text-green-400 cursor-help", title: "Version approuvée\\n\\nCette version a été marquée comme officielle et approuvée.\\n\\nLes versions approuvées sont utilisées comme référence pour:\\n• Comparaison avec les versions futures\\n• Indicateur dans le KPI Dashboard\\n• Historique des décisions importantes" })
                     ] }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-slate-400 mt-1", children: formatDate(snapshot.date) })
                   ] }),
@@ -33984,7 +34008,7 @@ const NotesEditor = ({ initialNotes, onSave }) => {
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200 h-full flex flex-col print-break-inside-avoid", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-sm font-bold text-gray-500 uppercase mb-2 flex items-center gap-2", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$e, { className: "w-4 h-4" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-4 h-4" }),
       "Notes d'Analyste"
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -34512,7 +34536,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-5 rounded-lg shadow border border-gray-200 print-break-inside-avoid", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-base sm:text-lg font-bold text-gray-700 mb-3 sm:mb-4 flex items-center gap-2", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-5 h-5 text-blue-600" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-5 h-5 text-blue-600" }),
       "ÉVALUATION PERSONNELLE (Projection 5 Ans)",
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-normal text-gray-500 ml-2", children: "(☑ = Incluse, ☐ = Exclue)" })
     ] }),
@@ -34545,7 +34569,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
                 onClick: () => toggleMetric("eps"),
                 className: "ml-2 p-1 hover:bg-gray-200 rounded transition-colors",
                 title: expandedMetrics.eps ? "Masquer les intervalles de référence historiques\n\nCliquez pour masquer les tableaux de comparaison:\n• Ratios historiques (Titre vs Secteur)\n• Croissance historique (Titre vs Secteur)\n• Projections 5 ans (Titre vs Secteur)" : "Afficher les intervalles de référence historiques\n\nCliquez pour afficher les tableaux de comparaison:\n• Ratios historiques (Titre vs Secteur)\n• Croissance historique (Titre vs Secteur)\n• Projections 5 ans (Titre vs Secteur)\n\nUtile pour valider vos hypothèses par rapport à l'historique et au secteur.",
-                children: expandedMetrics.eps ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-4 h-4 text-gray-600" })
+                children: expandedMetrics.eps ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] }) }),
@@ -34632,7 +34656,7 @@ ${assumptions.excludeEPS ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le
                 onClick: () => toggleMetric("cf"),
                 className: "ml-2 p-1 hover:bg-gray-200 rounded transition-colors",
                 title: expandedMetrics.cf ? "Masquer les intervalles de référence" : "Afficher les intervalles de référence",
-                children: expandedMetrics.cf ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-4 h-4 text-gray-600" })
+                children: expandedMetrics.cf ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] }) }),
@@ -34719,7 +34743,7 @@ ${assumptions.excludeCF ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
                 onClick: () => toggleMetric("bv"),
                 className: "ml-2 p-1 hover:bg-gray-200 rounded transition-colors",
                 title: expandedMetrics.bv ? "Masquer les intervalles de référence" : "Afficher les intervalles de référence",
-                children: expandedMetrics.bv ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-4 h-4 text-gray-600" })
+                children: expandedMetrics.bv ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] }) }),
@@ -34806,7 +34830,7 @@ ${assumptions.excludeBV ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
                 onClick: () => toggleMetric("div"),
                 className: "ml-2 p-1 hover:bg-gray-200 rounded transition-colors",
                 title: expandedMetrics.div ? "Masquer les intervalles de référence" : "Afficher les intervalles de référence",
-                children: expandedMetrics.div ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-4 h-4 text-gray-600" })
+                children: expandedMetrics.div ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] }) }),
@@ -35313,7 +35337,7 @@ const DataSourcesInfo = () => {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-lg shadow-sm border border-blue-200 mt-8", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3 mb-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$k, { className: "w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800", children: "📊 Sources des Données et Méthodologie de Calcul" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -35325,7 +35349,7 @@ const DataSourcesInfo = () => {
           className: "flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold",
           title: "Ouvrir le guide complet dans GitHub",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-5 h-5" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$D, { className: "w-5 h-5" }),
             "Guide Complet"
           ]
         }
@@ -36202,7 +36226,7 @@ const InfoTab = () => {
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-4 mb-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-6 h-6 text-yellow-500" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$k, { className: "w-6 h-6 text-yellow-500" }),
             "Guide d'Utilisation & Méthodologie"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 leading-relaxed", children: "Cette application est un outil d'aide à la décision pour l'investissement fondamental. Elle permet de construire des scénarios de valorisation personnalisés pour chaque société, en projetant les fondamentaux (Bénéfices, Cash Flow, Dividendes) sur un horizon de 5 ans." })
@@ -36216,7 +36240,7 @@ const InfoTab = () => {
             className: "flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold whitespace-nowrap",
             title: "Ouvrir le guide complet dans GitHub",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-5 h-5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$D, { className: "w-5 h-5" }),
               "Guide Complet"
             ]
           }
@@ -36259,7 +36283,7 @@ const InfoTab = () => {
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-6 rounded-lg shadow border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xl font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-6 h-6 text-indigo-500" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-6 h-6 text-indigo-500" }),
         "2. Interprétation Visuelle"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3 text-gray-600 text-sm", children: [
@@ -36283,7 +36307,7 @@ const InfoTab = () => {
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-6 rounded-lg shadow border-l-4 border-blue-600", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xl font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-6 h-6 text-blue-600" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-6 h-6 text-blue-600" }),
         "3. Méthodologie de Projection (Rendement Total)"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4 text-gray-600 text-sm", children: [
@@ -36326,7 +36350,7 @@ const InfoTab = () => {
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-6 rounded-lg shadow border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xl font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$H, { className: "w-6 h-6 text-green-500" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$I, { className: "w-6 h-6 text-green-500" }),
         "4. Fonctionnalités Pratiques"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc pl-5 space-y-2 text-gray-600 text-sm", children: [
@@ -36349,7 +36373,7 @@ const InfoTab = () => {
 const TickerSearch = ({ onSelect, onClose }) => {
   const [query, setQuery] = reactExports.useState("");
   const [results, setResults] = reactExports.useState([]);
-  const [isLoading, setIsLoading] = reactExports.useState(false);
+  const [isLoading2, setIsLoading] = reactExports.useState(false);
   const [selectedIndex, setSelectedIndex] = reactExports.useState(0);
   const inputRef = reactExports.useRef(null);
   reactExports.useEffect(() => {
@@ -36408,7 +36432,7 @@ const TickerSearch = ({ onSelect, onClose }) => {
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black/50 flex items-start justify-center pt-20 z-50", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-2xl w-full max-w-2xl mx-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 p-4 border-b border-gray-200", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-5 h-5 text-gray-400" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$h, { className: "w-5 h-5 text-gray-400" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "input",
         {
@@ -36421,7 +36445,7 @@ const TickerSearch = ({ onSelect, onClose }) => {
           className: "flex-1 outline-none text-lg"
         }
       ),
-      isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" }),
+      isLoading2 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
         {
@@ -36432,13 +36456,13 @@ const TickerSearch = ({ onSelect, onClose }) => {
       )
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-h-96 overflow-y-auto", children: [
-      results.length === 0 && query.length > 0 && !isLoading && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-8 text-center text-gray-500", children: [
+      results.length === 0 && query.length > 0 && !isLoading2 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-8 text-center text-gray-500", children: [
         'Aucun résultat trouvé pour "',
         query,
         '"'
       ] }),
       results.length === 0 && query.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-8 text-center text-gray-400", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-12 h-12 mx-auto mb-3 opacity-50" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$h, { className: "w-12 h-12 mx-auto mb-3 opacity-50" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm", children: "Tapez pour rechercher des tickers" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs mt-1", children: "Ex: AAPL, Microsoft, Tesla..." })
       ] }),
@@ -36497,7 +36521,7 @@ const ConfirmSyncDialog = ({
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-xl max-w-md w-full", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between p-6 border-b border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-8 h-8 text-yellow-500" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-8 h-8 text-yellow-500" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900", children: "Synchroniser avec l'API" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-500 mt-1", children: [
@@ -36568,6 +36592,931 @@ const ConfirmSyncDialog = ({
     ] })
   ] }) });
 };
+const HelpSection = ({ id, title, children, showHelp, setShowHelp }) => {
+  const isOpen = showHelp[id] || false;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "button",
+      {
+        onClick: () => setShowHelp((prev) => ({ ...prev, [id]: !prev[id] })),
+        className: "flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 transition-colors",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-4 h-4" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "En savoir plus" }),
+          isOpen ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-3 h-3" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-3 h-3" })
+        ]
+      }
+    ),
+    isOpen && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md text-xs text-gray-700", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h5", { className: "font-semibold text-blue-900 mb-2", children: title }),
+      children
+    ] })
+  ] });
+};
+const AdvancedSyncDialog = ({
+  isOpen,
+  ticker: ticker2,
+  hasManualData = false,
+  onCancel,
+  onConfirm,
+  isSyncing = false
+}) => {
+  const [options, setOptions] = reactExports.useState({
+    saveBeforeSync: true,
+    replaceOrangeData: false,
+    syncAllTickers: !ticker2,
+    // Si pas de ticker spécifique, sync tous par défaut
+    syncData: true,
+    syncAssumptions: true,
+    syncInfo: true,
+    forceReplace: false,
+    syncOnlyNewYears: false,
+    syncOnlyMissingMetrics: false,
+    preserveExclusions: true,
+    recalculateOutliers: true,
+    updateCurrentPrice: true,
+    syncValueLineMetrics: true
+  });
+  const [showHelp, setShowHelp] = reactExports.useState({});
+  if (!isOpen) return null;
+  const isBulkSync = !ticker2;
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000] p-4 overflow-y-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-xl max-w-4xl w-full my-8", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between p-6 border-b border-gray-200", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-8 h-8 text-blue-600" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900", children: "Options de Synchronisation Avancées" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 mt-1", children: isBulkSync ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            "Synchronisation de ",
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "tous les tickers" })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            "Ticker: ",
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-mono font-semibold", children: ticker2 })
+          ] }) })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
+        {
+          onClick: onCancel,
+          disabled: isSyncing,
+          className: "text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50",
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-6 h-6" })
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6 space-y-6 max-h-[70vh] overflow-y-auto", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-blue-900 mb-2", children: "🔄 Processus de Synchronisation" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-blue-800 space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Séquence d'exécution :" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("ol", { className: "list-decimal list-inside ml-2 space-y-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Sauvegarde" }),
+                " : Création d'un snapshot (si activé)"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Récupération FMP" }),
+                " : Appel API FMP Premium pour données historiques (30 ans)"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Merge intelligent" }),
+                " : Fusion des nouvelles données avec les existantes"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Calcul assumptions" }),
+                " : Recalcul des taux de croissance et ratios cibles"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Détection outliers" }),
+                " : Identification des métriques aberrantes"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Mise à jour Supabase" }),
+                " : Synchronisation des métriques ValueLine (si activé)"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Sauvegarde finale" }),
+                " : Création d'un snapshot post-sync"
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outils utilisés :" }),
+              " FMP API Premium, Supabase, Algorithmes de détection d'outliers, Calculs CAGR"
+            ] })
+          ] })
+        ] })
+      ] }) }),
+      hasManualData && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-50 border border-yellow-200 rounded-md p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-yellow-800 font-medium", children: "⚠️ Données manuelles détectées" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-yellow-700 mt-1", children: "Vous avez modifié des données manuellement (cases oranges). Choisissez si vous souhaitez les préserver ou les remplacer." })
+        ] })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-gray-900 flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-5 h-5 text-blue-600" }),
+          "Options de Synchronisation Principales"
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 bg-gray-50 rounded-md border border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 cursor-pointer", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "checkbox",
+              checked: options.saveBeforeSync,
+              onChange: (e) => setOptions((prev) => ({ ...prev, saveBeforeSync: e.target.checked })),
+              disabled: isSyncing,
+              className: "mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "💾 Sauvegarder la version actuelle avant synchronisation" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Crée un snapshot de sauvegarde avant de synchroniser. Recommandé pour pouvoir restaurer en cas de problème." }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              HelpSection,
+              {
+                id: "saveBeforeSync",
+                title: "Sauvegarde avant synchronisation",
+                showHelp,
+                setShowHelp,
+                children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
+                    " Un snapshot complet est créé dans Supabase avec toutes les données actuelles (historiques, assumptions, infos)."
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }),
+                    " Si vous avez modifié manuellement le taux de croissance EPS à 12% et que la sync le recalcule à 8.5%, vous pourrez restaurer la version avec 12%."
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
+                    " API Supabase Snapshots"
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Recommandation :" }),
+                    " Toujours activer cette option, surtout avant de remplacer les données oranges."
+                  ] })
+                ] })
+              }
+            )
+          ] })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 bg-orange-50 rounded-md border border-orange-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 cursor-pointer", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "checkbox",
+              checked: options.replaceOrangeData,
+              onChange: (e) => setOptions((prev) => ({ ...prev, replaceOrangeData: e.target.checked })),
+              disabled: isSyncing,
+              className: "mt-1 w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-2 focus:ring-orange-500"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-orange-900", children: "🟠 Remplacer les données oranges (assumptions manuelles)" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-orange-700 mt-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Attention:" }),
+              " Si coché, toutes les valeurs manuelles (taux de croissance, ratios cibles) seront recalculées et remplacées par les valeurs calculées depuis FMP. Cette action est irréversible."
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              HelpSection,
+              {
+                id: "replaceOrangeData",
+                title: "Remplacement des données oranges",
+                showHelp,
+                setShowHelp,
+                children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
+                    " Les assumptions modifiées manuellement (affichées en orange) seront recalculées depuis les données FMP historiques."
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                      "Vous aviez modifié ",
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "growthRateEPS" }),
+                      " à 10% manuellement"
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "FMP calcule un CAGR de 8.5% sur 5 ans" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : 10% → 8.5% (remplacé)" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : 10% → 10% (préservé)" })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Champs affectés :" }),
+                    " growthRateEPS, growthRateCF, growthRateBV, growthRateDiv, targetPE, targetPCF, targetPBV, targetYield"
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
+                    " Fonction ",
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "autoFillAssumptionsFromFMPData()" }),
+                    " avec ",
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "existingAssumptions = undefined" })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Recommandation :" }),
+                    " Utiliser uniquement si vous voulez réinitialiser toutes vos hypothèses manuelles avec les valeurs calculées."
+                  ] })
+                ] })
+              }
+            )
+          ] })
+        ] }) }),
+        options.replaceOrangeData && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 bg-red-50 rounded-md border border-red-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 cursor-pointer", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "checkbox",
+              checked: options.forceReplace,
+              onChange: (e) => setOptions((prev) => ({ ...prev, forceReplace: e.target.checked })),
+              disabled: isSyncing,
+              className: "mt-1 w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-2 focus:ring-red-500"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-red-900", children: "⚠️ Forcer le remplacement de TOUTES les données manuelles" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-red-700 mt-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Danger:" }),
+              " Remplace également les données historiques manuelles (pas seulement les assumptions). Utilisez avec précaution."
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              HelpSection,
+              {
+                id: "forceReplace",
+                title: "Remplacement forcé de toutes les données",
+                showHelp,
+                setShowHelp,
+                children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
+                    " Ignore complètement le flag ",
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "autoFetched: false" }),
+                    " et remplace TOUTES les données, même celles modifiées manuellement dans le tableau historique."
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Vous aviez modifié manuellement l'EPS de 2020 de 2.50$ à 2.75$" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "FMP retourne 2.50$ pour 2020" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : 2.75$ → 2.50$ (remplacé, même si manuel)" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : 2.75$ → 2.75$ (préservé car manuel)" })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Champs affectés :" }),
+                    " Toutes les données historiques (EPS, CF, BV, Dividendes, Prix High/Low) pour toutes les années"
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
+                    " Merge intelligent avec ",
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "forceReplace = true" })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "⚠️ Attention :" }),
+                    " Cette option est destructive et ne peut pas être annulée facilement. Assurez-vous d'avoir activé la sauvegarde avant sync."
+                  ] })
+                ] })
+              }
+            )
+          ] })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-t border-gray-200 pt-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-gray-600" }),
+            "Options Détaillées de Synchronisation"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-blue-50 rounded-md border border-blue-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 cursor-pointer", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "checkbox",
+                  checked: options.syncData,
+                  onChange: (e) => setOptions((prev) => ({ ...prev, syncData: e.target.checked })),
+                  disabled: isSyncing,
+                  className: "mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "📊 Synchroniser les données historiques" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "États financiers, prix historiques, métriques (30 ans d'historique)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  HelpSection,
+                  {
+                    id: "syncData",
+                    title: "Synchronisation des données historiques",
+                    showHelp,
+                    setShowHelp,
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
+                        " Récupère les données financières historiques depuis FMP API (30 ans d'historique) et les fusionne avec les données existantes."
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Données synchronisées :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "EPS (Earnings Per Share)" }),
+                          " : Bénéfices par action par année"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "CF (Cash Flow Per Share)" }),
+                          " : Flux de trésorerie par action"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "BV (Book Value Per Share)" }),
+                          " : Valeur comptable par action"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Dividendes" }),
+                          " : Dividendes par action"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Prix High/Low" }),
+                          " : Prix maximum et minimum par année"
+                        ] })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }),
+                        " Si vous avez des données jusqu'en 2020 et que FMP a des données jusqu'en 2024, les années 2021-2024 seront ajoutées automatiquement."
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
+                        " FMP API Premium - Endpoint ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "/api/v3/income-statement" }),
+                        ", ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "/api/v3/cash-flow-statement" }),
+                        ", ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "/api/v3/balance-sheet-statement" })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Séquence :" }),
+                        " Appel API → Parse JSON → Merge avec données existantes → Tri par année"
+                      ] })
+                    ] })
+                  }
+                )
+              ] })
+            ] }) }),
+            options.syncData && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-indigo-50 rounded-md border border-indigo-200 ml-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 cursor-pointer", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "checkbox",
+                  checked: options.syncOnlyNewYears,
+                  onChange: (e) => setOptions((prev) => ({ ...prev, syncOnlyNewYears: e.target.checked })),
+                  disabled: isSyncing,
+                  className: "mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🆕 Synchroniser uniquement les nouvelles années" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "N'ajoute que les années manquantes, ne modifie pas les années existantes" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  HelpSection,
+                  {
+                    id: "syncOnlyNewYears",
+                    title: "Synchronisation uniquement des nouvelles années",
+                    showHelp,
+                    setShowHelp,
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
+                        " Compare les années existantes avec les années disponibles dans FMP et n'ajoute que les années manquantes. Les années existantes ne sont pas modifiées, même si les données FMP sont différentes."
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Vous avez des données pour 2015-2020" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "FMP a des données pour 2010-2024" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : Ajoute uniquement 2010-2014 et 2021-2024" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : Met à jour toutes les années 2015-2020 aussi" })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Avantage :" }),
+                        " Plus rapide, préserve toutes vos modifications manuelles sur les années existantes"
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
+                        " Algorithme de comparaison d'années avec ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "mergedData.some(row => row.year === newRow.year)" })
+                      ] })
+                    ] })
+                  }
+                )
+              ] })
+            ] }) }),
+            options.syncData && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-indigo-50 rounded-md border border-indigo-200 ml-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 cursor-pointer", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "checkbox",
+                  checked: options.syncOnlyMissingMetrics,
+                  onChange: (e) => setOptions((prev) => ({ ...prev, syncOnlyMissingMetrics: e.target.checked })),
+                  disabled: isSyncing,
+                  className: "mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🔍 Synchroniser uniquement les métriques manquantes" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Ne remplit que les champs vides (0 ou null), préserve les valeurs existantes" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  HelpSection,
+                  {
+                    id: "syncOnlyMissingMetrics",
+                    title: "Synchronisation uniquement des métriques manquantes",
+                    showHelp,
+                    setShowHelp,
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
+                        " Pour chaque année, ne remplit que les champs qui sont actuellement vides (0, null, ou undefined). Les champs avec des valeurs existantes sont préservés."
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Année 2020 : EPS = 2.50$ (existant), CF = 0 (manquant)" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "FMP retourne : EPS = 2.50$, CF = 3.20$" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : EPS reste 2.50$, CF devient 3.20$" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : EPS devient 2.50$, CF devient 3.20$ (même si identique)" })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Avantage :" }),
+                        " Permet de compléter progressivement les données sans écraser ce qui existe déjà"
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
+                        " Condition ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "existingValue === 0 || existingValue === null || existingValue === undefined" })
+                      ] })
+                    ] })
+                  }
+                )
+              ] })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-blue-50 rounded-md border border-blue-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 cursor-pointer", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "checkbox",
+                  checked: options.syncAssumptions,
+                  onChange: (e) => setOptions((prev) => ({ ...prev, syncAssumptions: e.target.checked })),
+                  disabled: isSyncing,
+                  className: "mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🎯 Synchroniser les assumptions (hypothèses)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Taux de croissance, ratios cibles, année de base, dividende actuel" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  HelpSection,
+                  {
+                    id: "syncAssumptions",
+                    title: "Synchronisation des assumptions",
+                    showHelp,
+                    setShowHelp,
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
+                        " Recalcule les hypothèses de valorisation basées sur les données historiques FMP."
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Assumptions calculées :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Taux de croissance (CAGR 5 ans) :" }),
+                          " growthRateEPS, growthRateCF, growthRateBV, growthRateDiv"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Ratios cibles (moyenne 5 ans) :" }),
+                          " targetPE, targetPCF, targetPBV, targetYield"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Année de base :" }),
+                          " Dernière année avec EPS valide"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Dividende actuel :" }),
+                          " Dernier dividende par action"
+                        ] })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Données FMP : EPS 2019=2.00$, EPS 2024=2.80$" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Calcul CAGR : ((2.80/2.00)^(1/5) - 1) * 100 = 6.96%" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Résultat : growthRateEPS = 6.96%" })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
+                        " Fonction ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "autoFillAssumptionsFromFMPData()" }),
+                        " avec calculs CAGR et moyennes"
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Formule CAGR :" }),
+                        " ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "((ValeurFinale/ValeurInitiale)^(1/Années) - 1) * 100" })
+                      ] })
+                    ] })
+                  }
+                )
+              ] })
+            ] }) }),
+            options.syncAssumptions && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-indigo-50 rounded-md border border-indigo-200 ml-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 cursor-pointer", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "checkbox",
+                  checked: options.preserveExclusions,
+                  onChange: (e) => setOptions((prev) => ({ ...prev, preserveExclusions: e.target.checked })),
+                  disabled: isSyncing,
+                  className: "mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🚫 Préserver les exclusions de métriques" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Maintient les checkboxes d'exclusion (EPS, CF, BV, DIV) même après recalcul" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  HelpSection,
+                  {
+                    id: "preserveExclusions",
+                    title: "Préservation des exclusions de métriques",
+                    showHelp,
+                    setShowHelp,
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
+                        " Les flags d'exclusion (excludeEPS, excludeCF, excludeBV, excludeDIV) sont préservés même si la détection d'outliers les recalculerait différemment."
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Vous avez exclu EPS manuellement (excludeEPS = true)" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "La détection d'outliers recalcule et trouve que EPS n'est plus aberrant" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : excludeEPS reste true (préservé)" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : excludeEPS devient false (recalculé)" })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Avantage :" }),
+                        " Vous gardez le contrôle sur quelles métriques utiliser pour la valorisation"
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
+                        " Préservation des flags ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "excludeEPS" }),
+                        ", ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "excludeCF" }),
+                        ", etc. dans ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "finalAssumptions" })
+                      ] })
+                    ] })
+                  }
+                )
+              ] })
+            ] }) }),
+            options.syncAssumptions && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-indigo-50 rounded-md border border-indigo-200 ml-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 cursor-pointer", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "checkbox",
+                  checked: options.recalculateOutliers,
+                  onChange: (e) => setOptions((prev) => ({ ...prev, recalculateOutliers: e.target.checked })),
+                  disabled: isSyncing,
+                  className: "mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "📊 Recalculer la détection d'outliers" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Identifie automatiquement les métriques qui produisent des prix cibles aberrants" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  HelpSection,
+                  {
+                    id: "recalculateOutliers",
+                    title: "Recalcul de la détection d'outliers",
+                    showHelp,
+                    setShowHelp,
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
+                        " Analyse chaque métrique (EPS, CF, BV, DIV) et calcule le prix cible. Si le prix cible est aberrant (négatif, ",
+                        ">",
+                        " 10x le prix actuel, etc.), la métrique est automatiquement exclue."
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Prix actuel : 100$" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Calcul prix cible EPS : -50$ (aberrant, EPS négatif ou croissance impossible)" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Résultat : excludeEPS = true (métrique exclue automatiquement)" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Calcul prix cible CF : 150$ (normal)" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Résultat : excludeCF = false (métrique utilisée)" })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Critères d'aberration :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Prix cible négatif" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          "Prix cible ",
+                          ">",
+                          " 10x le prix actuel"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          "Prix cible ",
+                          "<",
+                          " 0.1x le prix actuel"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Données insuffisantes pour calculer" })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
+                        " Fonction ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "detectOutlierMetrics()" }),
+                        " avec seuils configurables"
+                      ] })
+                    ] })
+                  }
+                )
+              ] })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-blue-50 rounded-md border border-blue-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 cursor-pointer", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "checkbox",
+                  checked: options.updateCurrentPrice,
+                  onChange: (e) => setOptions((prev) => ({ ...prev, updateCurrentPrice: e.target.checked })),
+                  disabled: isSyncing,
+                  className: "mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "💰 Mettre à jour le prix actuel" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Met à jour le prix actuel depuis FMP (toujours activé par défaut)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  HelpSection,
+                  {
+                    id: "updateCurrentPrice",
+                    title: "Mise à jour du prix actuel",
+                    showHelp,
+                    setShowHelp,
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
+                        " Récupère le prix actuel depuis FMP API et met à jour l'assumption ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "currentPrice" }),
+                        "."
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Prix actuel dans l'app : 150.00$" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Prix FMP : 152.50$" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : 150.00$ → 152.50$ (mis à jour)" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : 150.00$ → 150.00$ (préservé)" })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
+                        " FMP API - Endpoint ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "/api/v3/quote" }),
+                        " ou ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "/api/v3/profile" })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Recommandation :" }),
+                        " Toujours activer pour avoir les prix à jour"
+                      ] })
+                    ] })
+                  }
+                )
+              ] })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-blue-50 rounded-md border border-blue-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 cursor-pointer", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "checkbox",
+                  checked: options.syncInfo,
+                  onChange: (e) => setOptions((prev) => ({ ...prev, syncInfo: e.target.checked })),
+                  disabled: isSyncing,
+                  className: "mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "ℹ️ Synchroniser les informations de profil" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Nom de l'entreprise, secteur, logo, beta, capitalisation boursière" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  HelpSection,
+                  {
+                    id: "syncInfo",
+                    title: "Synchronisation des informations de profil",
+                    showHelp,
+                    setShowHelp,
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
+                        " Met à jour les informations générales de l'entreprise depuis FMP API."
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Informations synchronisées :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Nom de l'entreprise" }),
+                          ' : Nom complet (ex: "Apple Inc.")'
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Secteur" }),
+                          ` : Secteur d'activité (ex: "Technology")`
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Logo" }),
+                          " : URL du logo de l'entreprise"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Beta" }),
+                          " : Coefficient bêta (volatilité relative au marché)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Capitalisation" }),
+                          " : Market Cap en USD"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Pays/Bourse" }),
+                          " : Localisation et bourse principale"
+                        ] })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
+                        " FMP API - Endpoint ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "/api/v3/profile" })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Note :" }),
+                        " Les métriques ValueLine (Security Rank, Earnings Predictability) sont préservées et rechargées depuis Supabase séparément."
+                      ] })
+                    ] })
+                  }
+                )
+              ] })
+            ] }) }),
+            options.syncInfo && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-indigo-50 rounded-md border border-indigo-200 ml-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 cursor-pointer", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "checkbox",
+                  checked: options.syncValueLineMetrics,
+                  onChange: (e) => setOptions((prev) => ({ ...prev, syncValueLineMetrics: e.target.checked })),
+                  disabled: isSyncing,
+                  className: "mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "⭐ Synchroniser les métriques ValueLine depuis Supabase" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Recharge Security Rank, Earnings Predictability, etc. depuis la base de données" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  HelpSection,
+                  {
+                    id: "syncValueLineMetrics",
+                    title: "Synchronisation des métriques ValueLine",
+                    showHelp,
+                    setShowHelp,
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
+                        " Recharge les métriques ValueLine depuis Supabase pour garantir la cohérence multi-utilisateurs. Ces métriques ne sont pas disponibles dans FMP."
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Métriques ValueLine :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Security Rank" }),
+                          " : Classement de sécurité (1-5, 1 = meilleur)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Earnings Predictability" }),
+                          " : Prédictibilité des bénéfices (A-E, A = meilleur)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Price Growth Persistence" }),
+                          " : Persistance de la croissance du prix"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Price Stability" }),
+                          " : Stabilité du prix"
+                        ] })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: 'Valeur locale : Security Rank = "2"' }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: 'Valeur Supabase : Security Rank = "1" (mise à jour par un autre utilisateur)' }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: 'Avec cette option : Security Rank devient "1" (synchronisé)' }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: 'Sans cette option : Security Rank reste "2" (local)' })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
+                        " API Supabase - Table ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "tickers" }),
+                        " avec colonnes ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "security_rank" }),
+                        ", ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "earnings_predictability" }),
+                        ", etc."
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Recommandation :" }),
+                        " Toujours activer pour avoir les dernières métriques ValueLine partagées"
+                      ] })
+                    ] })
+                  }
+                )
+              ] })
+            ] }) })
+          ] })
+        ] }),
+        isBulkSync && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-50 border border-blue-200 rounded-md p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-blue-800 font-medium", children: "Synchronisation en masse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-blue-700 mt-1", children: "Cette synchronisation traitera tous les tickers de votre portefeuille et watchlist. Le processus peut prendre plusieurs minutes selon le nombre de tickers." }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              HelpSection,
+              {
+                id: "bulkSync",
+                title: "Synchronisation en masse - Détails techniques",
+                showHelp,
+                setShowHelp,
+                children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Processus :" }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("ol", { className: "list-decimal list-inside ml-2 space-y-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Traitement par batch de 5 tickers en parallèle" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Délai de 500ms entre chaque batch" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Timeout de 30 secondes par ticker" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sauvegarde snapshot avant chaque sync (si activé)" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Appel FMP API pour chaque ticker" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Merge intelligent des données" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Recalcul des assumptions" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Détection d'outliers" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sauvegarde snapshot après sync" })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple de timing :" }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "10 tickers : ~2-3 minutes" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "50 tickers : ~10-15 minutes" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "100 tickers : ~20-30 minutes" })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Contrôles disponibles :" }),
+                    " Pause, Resume, Stop pendant la synchronisation"
+                  ] })
+                ] })
+              }
+            )
+          ] })
+        ] }) })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-lg", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
+        {
+          onClick: onCancel,
+          disabled: isSyncing,
+          className: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+          children: "Annuler"
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => onConfirm({
+              saveBeforeSync: true,
+              replaceOrangeData: false,
+              syncAllTickers: isBulkSync,
+              syncData: true,
+              syncAssumptions: true,
+              syncInfo: true,
+              forceReplace: false,
+              syncOnlyNewYears: false,
+              syncOnlyMissingMetrics: false,
+              preserveExclusions: true,
+              recalculateOutliers: true,
+              updateCurrentPrice: true,
+              syncValueLineMetrics: true
+            }),
+            disabled: isSyncing,
+            className: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+            children: "Sync Rapide"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => onConfirm(options),
+            disabled: isSyncing || !options.syncData && !options.syncAssumptions && !options.syncInfo,
+            className: "px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2",
+            children: isSyncing ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-4 h-4 animate-spin" }),
+              "Synchronisation..."
+            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-4 h-4" }),
+              "Synchroniser avec Options"
+            ] })
+          }
+        )
+      ] })
+    ] })
+  ] }) });
+};
 const HistoricalVersionBanner = ({
   snapshotDate,
   snapshotVersion,
@@ -36589,15 +37538,15 @@ const HistoricalVersionBanner = ({
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-50 border-b-2 border-yellow-300 p-4 print:hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-7xl mx-auto", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-6 h-6 text-yellow-600 flex-shrink-0" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-6 h-6 text-yellow-600 flex-shrink-0" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-yellow-900", children: isLocked ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$i, { className: "w-4 h-4" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-4 h-4" }),
             "Version historique (v",
             snapshotVersion,
             ") - Lecture seule"
           ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$h, { className: "w-4 h-4" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$i, { className: "w-4 h-4" }),
             "Version historique (v",
             snapshotVersion,
             ") - Déverrouillée"
@@ -36616,7 +37565,7 @@ const HistoricalVersionBanner = ({
               onClick: onUnlock,
               className: "px-3 py-1.5 text-sm font-medium text-yellow-800 bg-white border border-yellow-300 rounded-md hover:bg-yellow-50 transition-colors flex items-center gap-1.5",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$h, { className: "w-4 h-4" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$i, { className: "w-4 h-4" }),
                 "Déverrouiller"
               ]
             }
@@ -36643,7 +37592,7 @@ const HistoricalVersionBanner = ({
             onClick: onRevertToCurrent,
             className: "px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-1.5",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$G, { className: "w-4 h-4" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$H, { className: "w-4 h-4" }),
               "Revenir à la version actuelle"
             ]
           }
@@ -36686,10 +37635,10 @@ const Notification = ({
     });
   };
   const icons = {
-    success: ForwardRef$x,
+    success: ForwardRef$y,
     error: ForwardRef$2,
-    warning: ForwardRef$n,
-    info: ForwardRef$k
+    warning: ForwardRef$o,
+    info: ForwardRef$l
   };
   const colors = {
     success: "bg-green-50 border-green-200 text-green-800",
@@ -36752,7 +37701,7 @@ const LandingPage = ({ onGetStarted }) => {
           className: "group inline-flex items-center space-x-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Commencer l'analyse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$I, { className: "w-5 h-5 group-hover:translate-x-1 transition-transform" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: "w-5 h-5 group-hover:translate-x-1 transition-transform" })
           ]
         }
       )
@@ -36787,7 +37736,7 @@ const LandingPage = ({ onGetStarted }) => {
           className: "group inline-flex items-center space-x-3 bg-white text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Lancer l'application" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$I, { className: "w-5 h-5 group-hover:translate-x-1 transition-transform" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: "w-5 h-5 group-hover:translate-x-1 transition-transform" })
           ]
         }
       )
@@ -37016,7 +37965,7 @@ const RestoreDataDialog = ({
   onRestoreFromSnapshot,
   onRecalculateFromFMP,
   latestSnapshotDate,
-  isLoading = false
+  isLoading: isLoading2 = false
 }) => {
   if (!isOpen) return null;
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-xl max-w-md w-full p-6 relative", children: [
@@ -37025,7 +37974,7 @@ const RestoreDataDialog = ({
       {
         onClick: onClose,
         className: "absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors",
-        disabled: isLoading,
+        disabled: isLoading2,
         children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-5 h-5" })
       }
     ),
@@ -37039,10 +37988,10 @@ const RestoreDataDialog = ({
             onRestoreFromSnapshot();
             onClose();
           },
-          disabled: isLoading,
+          disabled: isLoading2,
           className: "w-full p-4 border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed",
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-blue-100 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$s, { className: "w-6 h-6 text-blue-600" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-blue-100 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-6 h-6 text-blue-600" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-900 mb-1", children: "Depuis la dernière sauvegarde" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mb-2", children: "Restaure les données et métriques de la dernière version sauvegardée (snapshot)." }),
@@ -37061,10 +38010,10 @@ const RestoreDataDialog = ({
             onRecalculateFromFMP();
             onClose();
           },
-          disabled: isLoading,
+          disabled: isLoading2,
           className: "w-full p-4 border-2 border-green-200 rounded-lg hover:border-green-400 hover:bg-green-50 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed",
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-green-100 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: "w-6 h-6 text-green-600" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-green-100 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-6 h-6 text-green-600" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-900 mb-1", children: "Recalculer depuis FMP" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mb-2", children: "Récupère les données FMP et recalcule automatiquement toutes les métriques (comme lors d'un nouvel ajout de ticker)." }),
@@ -37078,7 +38027,7 @@ const RestoreDataDialog = ({
       "button",
       {
         onClick: onClose,
-        disabled: isLoading,
+        disabled: isLoading2,
         className: "px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
         children: "Annuler"
       }
@@ -37185,7 +38134,7 @@ const UnifiedSettingsPanel = ({
   const [activeTab, setActiveTab] = reactExports.useState("overview");
   const [guardrailConfig, setGuardrailConfig] = reactExports.useState(() => loadConfig());
   const [validationSettings, setValidationSettings] = reactExports.useState(getDefaultValidationSettings());
-  const [isLoading, setIsLoading] = reactExports.useState(false);
+  const [isLoading2, setIsLoading] = reactExports.useState(false);
   const [isSaving, setIsSaving] = reactExports.useState(false);
   const [saveStatus, setSaveStatus] = reactExports.useState("idle");
   const [hasChanges, setHasChanges] = reactExports.useState(false);
@@ -37262,7 +38211,7 @@ const UnifiedSettingsPanel = ({
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[10000] p-4 text-left", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex-shrink-0", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 min-w-0", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-600 p-2 rounded-lg shadow-lg flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$q, { className: "w-5 h-5 text-white" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-600 p-2 rounded-lg shadow-lg flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$r, { className: "w-5 h-5 text-white" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-900 truncate", children: "Configuration Complète 3p1" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-0.5 truncate", children: "Guardrails, Validation, Ajustements" })
@@ -37278,7 +38227,7 @@ const UnifiedSettingsPanel = ({
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Sauvegardé" })
         ] }),
         saveStatus === "error" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-red-600 text-sm", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-5 h-5" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-5 h-5" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Erreur" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -37308,7 +38257,7 @@ const UnifiedSettingsPanel = ({
       },
       tab.id
     )) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-y-auto p-4", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-64", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600" }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-y-auto p-4", children: isLoading2 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-64", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600" }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
       activeTab === "overview" && /* @__PURE__ */ jsxRuntimeExports.jsx(
         OverviewTab,
         {
@@ -37338,7 +38287,7 @@ const UnifiedSettingsPanel = ({
           onClick: handleReset,
           className: "flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:text-red-600 transition-colors bg-white border border-gray-300 rounded-lg hover:bg-red-50",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: "w-4 h-4" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-4 h-4" }),
             "Réinitialiser tout"
           ]
         }
@@ -37434,7 +38383,7 @@ const OverviewTab = ({ guardrailConfig, validationSettings }) => {
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-50 border border-yellow-200 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$k, { className: "w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-yellow-800", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium mb-1", children: "💡 Note importante" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
@@ -37476,7 +38425,7 @@ const GuardrailsTab = ({ config: config2, onUpdate }) => {
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-50 border border-blue-200 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$k, { className: "w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-blue-800", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium mb-1", children: "Guardrails - Limites d'Affichage" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Ces limites contrôlent ce qui est affiché dans l'interface et les calculs de projections." })
@@ -37579,7 +38528,7 @@ const ValidationTab = ({ settings, onUpdate }) => {
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-green-50 border border-green-200 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$k, { className: "w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-green-800", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium mb-1", children: "Validation & Sanitisation Automatique" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Ces paramètres sont sauvegardés dans Supabase et contrôlent la sanitisation automatique des données lors du chargement, de la sauvegarde et de la synchronisation." })
@@ -38072,7 +39021,7 @@ const DataQualityReport = ({ data, assumptions, ticker: ticker2 }) => {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-lg shadow-lg", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-xl font-bold flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$k, { className: "w-6 h-6" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-6 h-6" }),
         "Rapport de Qualité des Données - ",
         ticker2
       ] }),
@@ -38104,7 +39053,7 @@ const DataQualityReport = ({ data, assumptions, ticker: ticker2 }) => {
     ] }),
     outlierAnalysis.outliers.filter((o) => o.isExcluded).length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-red-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-red-800 mb-4 flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-5 h-5" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-5 h-5" }),
         "Métriques Aberrantes Détectées (",
         outlierAnalysis.outliers.filter((o) => o.isExcluded).length,
         ")"
@@ -38130,7 +39079,7 @@ const DataQualityReport = ({ data, assumptions, ticker: ticker2 }) => {
     ] }),
     outlierAnalysis.outliers.filter((o) => !o.isExcluded).length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-green-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-green-800 mb-4 flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-5 h-5" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-5 h-5" }),
         "Métriques Valides (",
         outlierAnalysis.outliers.filter((o) => !o.isExcluded).length,
         ")"
@@ -38287,14 +39236,14 @@ const SanitizationReport = ({
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-purple-600 to-purple-800 text-white p-4 rounded-lg shadow-lg", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-xl font-bold flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-6 h-6" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-6 h-6" }),
         "Rapport de Sanitisation - ",
         ticker2
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-purple-100 text-sm mt-1", children: "Visualisation des corrections automatiques appliquées aux hypothèses" })
     ] }),
     changes.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-green-50 p-6 rounded-lg border border-green-200 text-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-12 h-12 text-green-600 mx-auto mb-2" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-12 h-12 text-green-600 mx-auto mb-2" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-green-800 mb-2", children: "Aucune correction nécessaire" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-green-600", children: "Toutes les hypothèses sont dans les limites de validation acceptables." })
     ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
@@ -38315,7 +39264,7 @@ const SanitizationReport = ({
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-5 h-5" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-5 h-5" }),
           "Détails des Corrections (",
           changes.length,
           ")"
@@ -38342,7 +39291,7 @@ const SanitizationReport = ({
               change.label
             ] }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-600 font-bold", children: change.category === "growth" || change.category === "ratio" ? formatPercent(change.original) : formatCurrency(change.original) }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$I, { className: "w-5 h-5 text-gray-400 mx-auto" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: "w-5 h-5 text-gray-400 mx-auto" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-green-600 font-bold", children: change.category === "growth" || change.category === "ratio" ? formatPercent(change.sanitized) : formatCurrency(change.sanitized) }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: change.change > 0 ? "text-green-600" : "text-red-600", children: [
               change.change > 0 ? "+" : "",
@@ -38442,7 +39391,7 @@ const FullDataVisualization = ({
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-4 rounded-lg shadow-lg", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-xl font-bold flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-6 h-6" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-6 h-6" }),
         "Visualisation Complète des Données - ",
         info.symbol
       ] }),
@@ -38650,7 +39599,7 @@ const ReportsPanel = ({
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-4 rounded-t-lg flex items-center justify-between", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-2xl font-bold flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-6 h-6" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$q, { className: "w-6 h-6" }),
           "Rapports Visuels et Analyse de Données"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-indigo-100 text-sm mt-1", children: [
@@ -38684,7 +39633,7 @@ const ReportsPanel = ({
           onClick: () => setActiveTab("quality"),
           className: `px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "quality" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-gray-500 hover:text-gray-700"}`,
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-4 h-4 inline mr-1" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-4 h-4 inline mr-1" }),
             "Qualité des Données"
           ]
         }
@@ -38695,7 +39644,7 @@ const ReportsPanel = ({
           onClick: () => setActiveTab("sanitization"),
           className: `px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "sanitization" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-gray-500 hover:text-gray-700"}`,
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 inline mr-1" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-4 h-4 inline mr-1" }),
             "Sanitisation"
           ]
         }
@@ -38706,7 +39655,7 @@ const ReportsPanel = ({
           onClick: () => setActiveTab("full"),
           className: `px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "full" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-gray-500 hover:text-gray-700"}`,
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-4 h-4 inline mr-1" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-4 h-4 inline mr-1" }),
             "Visualisation Complète"
           ]
         }
@@ -38746,7 +39695,7 @@ const ReportsPanel = ({
                 onClick: () => setActiveTab("quality"),
                 className: "p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 text-left transition-colors",
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-8 h-8 text-blue-600 mb-2" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-8 h-8 text-blue-600 mb-2" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-blue-800 mb-1", children: "Qualité des Données" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-blue-600", children: "Visualise les données aberrantes, les exclusions et la qualité des données historiques" })
                 ]
@@ -38758,7 +39707,7 @@ const ReportsPanel = ({
                 onClick: () => setActiveTab("sanitization"),
                 className: "p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 text-left transition-colors",
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-8 h-8 text-green-600 mb-2" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-8 h-8 text-green-600 mb-2" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-green-800 mb-1", children: "Rapport de Sanitisation" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-green-600", children: "Affiche toutes les corrections automatiques appliquées aux hypothèses" })
                 ]
@@ -38770,7 +39719,7 @@ const ReportsPanel = ({
                 onClick: () => setActiveTab("full"),
                 className: "p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 text-left transition-colors",
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-8 h-8 text-purple-600 mb-2" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-8 h-8 text-purple-600 mb-2" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-purple-800 mb-1", children: "Visualisation Complète" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-purple-600", children: "Graphiques complets de toutes les données historiques, ratios et métriques" })
                 ]
@@ -52099,6 +53048,8 @@ function App() {
   const [currentView, setCurrentView] = reactExports.useState("analysis");
   const [isSearchOpen, setIsSearchOpen] = reactExports.useState(false);
   const [showConfirmSync, setShowConfirmSync] = reactExports.useState(false);
+  const [showAdvancedSyncDialog, setShowAdvancedSyncDialog] = reactExports.useState(false);
+  const [isAdvancedSyncForBulk, setIsAdvancedSyncForBulk] = reactExports.useState(false);
   const [showRestoreDialog, setShowRestoreDialog] = reactExports.useState(false);
   const [latestSnapshotDate, setLatestSnapshotDate] = reactExports.useState(void 0);
   const [notifications, setNotifications] = reactExports.useState([]);
@@ -53051,14 +54002,10 @@ Vérifiez votre connexion et réessayez.`,
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [pastData, futureData, data]);
   const handleFetchData = async () => {
-    const hasEdits = hasManualEdits(data);
-    if (hasEdits) {
-      setShowConfirmSync(true);
-    } else {
-      await performSync(false);
-    }
+    setIsAdvancedSyncForBulk(false);
+    setShowAdvancedSyncDialog(true);
   };
-  const performSync = async (saveCurrentVersion) => {
+  const performSync = async (saveCurrentVersion, syncOptions) => {
     var _a4, _b3, _c, _d, _e, _f, _g;
     try {
       if (saveCurrentVersion) {
@@ -53089,30 +54036,70 @@ Vérifiez votre connexion et réessayez.`,
       setPastData((prev) => [...prev, data]);
       setFutureData([]);
       let mergedData = data.length > 0 ? [...data] : [];
-      if (result.data.length > 0) {
+      if (result.data.length > 0 && (syncOptions == null ? void 0 : syncOptions.syncData)) {
         const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
-        mergedData = data.map((existingRow) => {
-          const newRow = newDataByYear.get(existingRow.year);
-          if (!newRow) {
-            return existingRow;
-          }
-          if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
-            return existingRow;
-          }
-          return {
-            ...newRow,
-            autoFetched: true
-          };
-        });
-        result.data.forEach((newRow) => {
-          const exists = mergedData.some((row) => row.year === newRow.year);
-          if (!exists) {
-            mergedData.push({
+        if (syncOptions == null ? void 0 : syncOptions.syncOnlyNewYears) {
+          result.data.forEach((newRow) => {
+            const exists = mergedData.some((row) => row.year === newRow.year);
+            if (!exists) {
+              mergedData.push({
+                ...newRow,
+                autoFetched: true
+              });
+            }
+          });
+        } else {
+          mergedData = data.map((existingRow) => {
+            const newRow = newDataByYear.get(existingRow.year);
+            if (!newRow) {
+              return existingRow;
+            }
+            if (syncOptions == null ? void 0 : syncOptions.forceReplace) {
+              return {
+                ...newRow,
+                autoFetched: true
+              };
+            }
+            if (syncOptions == null ? void 0 : syncOptions.syncOnlyMissingMetrics) {
+              const updatedRow = { ...existingRow };
+              if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === void 0) && newRow.earningsPerShare > 0) {
+                updatedRow.earningsPerShare = newRow.earningsPerShare;
+              }
+              if ((existingRow.cashFlowPerShare === 0 || existingRow.cashFlowPerShare === null || existingRow.cashFlowPerShare === void 0) && newRow.cashFlowPerShare > 0) {
+                updatedRow.cashFlowPerShare = newRow.cashFlowPerShare;
+              }
+              if ((existingRow.bookValuePerShare === 0 || existingRow.bookValuePerShare === null || existingRow.bookValuePerShare === void 0) && newRow.bookValuePerShare > 0) {
+                updatedRow.bookValuePerShare = newRow.bookValuePerShare;
+              }
+              if ((existingRow.dividendPerShare === 0 || existingRow.dividendPerShare === null || existingRow.dividendPerShare === void 0) && newRow.dividendPerShare > 0) {
+                updatedRow.dividendPerShare = newRow.dividendPerShare;
+              }
+              if ((existingRow.priceHigh === 0 || existingRow.priceHigh === null || existingRow.priceHigh === void 0) && newRow.priceHigh > 0) {
+                updatedRow.priceHigh = newRow.priceHigh;
+              }
+              if ((existingRow.priceLow === 0 || existingRow.priceLow === null || existingRow.priceLow === void 0) && newRow.priceLow > 0) {
+                updatedRow.priceLow = newRow.priceLow;
+              }
+              return updatedRow;
+            }
+            if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
+              return existingRow;
+            }
+            return {
               ...newRow,
               autoFetched: true
-            });
-          }
-        });
+            };
+          });
+          result.data.forEach((newRow) => {
+            const exists = mergedData.some((row) => row.year === newRow.year);
+            if (!exists) {
+              mergedData.push({
+                ...newRow,
+                autoFetched: true
+              });
+            }
+          });
+        }
         mergedData.sort((a2, b) => a2.year - b.year);
         console.log("✅ performSync: Données mergées prêtes", {
           mergedDataLength: mergedData.length,
@@ -53134,7 +54121,7 @@ Vérifiez votre connexion et réessayez.`,
           currentDataLength: data.length
         });
       }
-      if (result.info) {
+      if (result.info && (syncOptions == null ? void 0 : syncOptions.syncInfo) !== false) {
         const existingProfile = library[activeId];
         let preservedValueLineMetrics = {
           securityRank: ((_d = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _d.securityRank) || result.info.securityRank || "N/A",
@@ -53189,12 +54176,13 @@ Vérifiez votre connexion et réessayez.`,
         });
       }
       const mergedDataForCalc = mergedData.length > 0 ? mergedData : result.data;
+      const existingAssumptionsForCalc = (syncOptions == null ? void 0 : syncOptions.replaceOrangeData) ? void 0 : assumptions;
       const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
         mergedDataForCalc,
         // Utiliser les données mergées au lieu de result.data
         result.currentPrice,
-        assumptions
-        // Préserver les valeurs existantes (excludeEPS, excludeCF, etc.)
+        existingAssumptionsForCalc
+        // Préserver les valeurs existantes seulement si replaceOrangeData est false
       );
       console.log("✅ Auto-filled assumptions in performSync (AVANT setAssumptions):", {
         growthEPS: autoFilledAssumptions.growthRateEPS,
@@ -53209,10 +54197,26 @@ Vérifiez votre connexion et réessayez.`,
         allAutoFilled: autoFilledAssumptions
       });
       setAssumptions((prev) => {
+        let outlierDetection2 = {
+          detectedOutliers: [],
+          excludeEPS: prev.excludeEPS || false,
+          excludeCF: prev.excludeCF || false,
+          excludeBV: prev.excludeBV || false,
+          excludeDIV: prev.excludeDIV || false
+        };
+        if ((syncOptions == null ? void 0 : syncOptions.recalculateOutliers) !== false) {
+          const tempAssumptions = { ...prev, ...autoFilledAssumptions };
+          outlierDetection2 = detectOutlierMetrics(mergedDataForCalc, tempAssumptions);
+        }
         const updated = {
           ...prev,
-          ...autoFilledAssumptions
+          ...autoFilledAssumptions,
           // Mettre à jour avec les nouvelles valeurs calculées
+          // Préserver les exclusions si l'option est activée
+          excludeEPS: (syncOptions == null ? void 0 : syncOptions.preserveExclusions) !== false ? prev.excludeEPS || outlierDetection2.excludeEPS : outlierDetection2.excludeEPS,
+          excludeCF: (syncOptions == null ? void 0 : syncOptions.preserveExclusions) !== false ? prev.excludeCF || outlierDetection2.excludeCF : outlierDetection2.excludeCF,
+          excludeBV: (syncOptions == null ? void 0 : syncOptions.preserveExclusions) !== false ? prev.excludeBV || outlierDetection2.excludeBV : outlierDetection2.excludeBV,
+          excludeDIV: (syncOptions == null ? void 0 : syncOptions.preserveExclusions) !== false ? prev.excludeDIV || outlierDetection2.excludeDIV : outlierDetection2.excludeDIV
         };
         console.log("✅ setAssumptions: Assumptions mises à jour", {
           prevGrowthEPS: prev.growthRateEPS,
@@ -53880,13 +54884,10 @@ Vérifiez les logs de la console pour plus de détails.`;
   const isSyncPaused = reactExports.useRef(false);
   const [syncPausedState, setSyncPausedState] = reactExports.useState(false);
   const handleBulkSyncAllTickers = async () => {
-    var _a4;
-    if (!confirm(`Synchroniser tous les ${Object.keys(library).length} tickers ?
-
-Chaque version sera sauvegardée avant la synchronisation.
-Les données manuelles et hypothèses (orange) seront préservées.`)) {
-      return;
-    }
+    setIsAdvancedSyncForBulk(true);
+    setShowAdvancedSyncDialog(true);
+  };
+  const handleBulkSyncAllTickersWithOptions = async (options) => {
     setIsBulkSyncing(true);
     abortSync.current = false;
     isSyncPaused.current = false;
@@ -53899,7 +54900,6 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
     const errors = [];
     const FMP_BATCH_SIZE = 5;
     const delayBetweenBatches = 500;
-    const delayBetweenTickersInBatch = 100;
     const FMP_TIMEOUT_MS = 3e4;
     const fetchCompanyDataWithTimeout = async (tickerSymbol) => {
       return Promise.race([
@@ -53910,115 +54910,181 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
       ]);
     };
     try {
-      console.log(`🚀 Début synchronisation: ${allTickers.length} tickers en ${Math.ceil(allTickers.length / FMP_BATCH_SIZE)} batches`);
+      console.log(`🚀 Début synchronisation avec options: ${allTickers.length} tickers en ${Math.ceil(allTickers.length / FMP_BATCH_SIZE)} batches`);
+      console.log("📋 Options de synchronisation:", options);
       for (let i = 0; i < allTickers.length; i += FMP_BATCH_SIZE) {
         if (abortSync.current) {
           console.log("🛑 Synchronisation arrêtée par l'utilisateur.");
           break;
         }
         while (isSyncPaused.current) {
-          if (abortSync.current) break;
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 100));
         }
-        if (abortSync.current) break;
         const batch = allTickers.slice(i, i + FMP_BATCH_SIZE);
-        const fmpResults = await Promise.allSettled(
+        if (i > 0) {
+          await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
+        }
+        await Promise.allSettled(
           batch.map(async (tickerSymbol) => {
             try {
+              setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
               const profile2 = library[tickerSymbol];
               if (!profile2) {
-                return { tickerSymbol, success: false, error: "Profil non trouvé", result: null };
+                console.warn(`⚠️ ${tickerSymbol}: Profil non trouvé`);
+                return;
               }
-              console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
-              await saveSnapshot(
-                tickerSymbol,
-                profile2.data,
-                profile2.assumptions,
-                profile2.info,
-                `Avant synchronisation globale - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
-                false,
-                false
-              );
+              if (options.saveBeforeSync) {
+                console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
+                await saveSnapshot(
+                  tickerSymbol,
+                  profile2.data,
+                  profile2.assumptions,
+                  profile2.info,
+                  `Avant synchronisation (${options.replaceOrangeData ? "avec remplacement données oranges" : "standard"}) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
+                  false,
+                  false
+                );
+              }
+              if (!options.syncData && !options.syncAssumptions && !options.syncInfo) {
+                console.log(`⏭️ ${tickerSymbol}: Aucune option de sync activée, ignoré`);
+                return;
+              }
               console.log(`🔄 Synchronisation ${tickerSymbol}...`);
               const result = await fetchCompanyDataWithTimeout(tickerSymbol);
-              return { tickerSymbol, success: true, result, profile: profile2 };
-            } catch (error) {
-              return {
-                tickerSymbol,
-                success: false,
-                error: error.message || "Erreur inconnue",
-                result: null,
-                profile: library[tickerSymbol] || null
-              };
-            }
-          })
-        );
-        for (const fmpResult of fmpResults) {
-          if (abortSync.current) {
-            console.log("🛑 Synchronisation arrêtée par l'utilisateur.");
-            break;
-          }
-          while (isSyncPaused.current) {
-            if (abortSync.current) break;
-            await new Promise((resolve) => setTimeout(resolve, 500));
-          }
-          if (abortSync.current) break;
-          if (fmpResult.status === "fulfilled") {
-            const { tickerSymbol, success, result, error, profile: profile2 } = fmpResult.value;
-            if (!success || !result || !profile2) {
-              errorCount++;
-              setSyncStats({ successCount, errorCount });
-              const errorMsg = `${tickerSymbol}: ${error || "Erreur inconnue"}`;
-              errors.push(errorMsg);
-              console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
-              setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
-              continue;
-            }
-            try {
-              const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
-              const mergedData = profile2.data.map((existingRow) => {
-                const newRow = newDataByYear.get(existingRow.year);
-                if (!newRow) return existingRow;
-                if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
-                  return existingRow;
+              let mergedData = profile2.data;
+              if (options.syncData && result.data.length > 0) {
+                const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
+                if (options.syncOnlyNewYears) {
+                  result.data.forEach((newRow) => {
+                    const exists = mergedData.some((row) => row.year === newRow.year);
+                    if (!exists) {
+                      mergedData.push({
+                        ...newRow,
+                        autoFetched: true
+                      });
+                    }
+                  });
+                } else {
+                  mergedData = profile2.data.map((existingRow) => {
+                    const newRow = newDataByYear.get(existingRow.year);
+                    if (!newRow) return existingRow;
+                    if (options.forceReplace) {
+                      return {
+                        ...newRow,
+                        autoFetched: true
+                      };
+                    }
+                    if (options.syncOnlyMissingMetrics) {
+                      const updatedRow = { ...existingRow };
+                      if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === void 0) && newRow.earningsPerShare > 0) {
+                        updatedRow.earningsPerShare = newRow.earningsPerShare;
+                      }
+                      if ((existingRow.cashFlowPerShare === 0 || existingRow.cashFlowPerShare === null || existingRow.cashFlowPerShare === void 0) && newRow.cashFlowPerShare > 0) {
+                        updatedRow.cashFlowPerShare = newRow.cashFlowPerShare;
+                      }
+                      if ((existingRow.bookValuePerShare === 0 || existingRow.bookValuePerShare === null || existingRow.bookValuePerShare === void 0) && newRow.bookValuePerShare > 0) {
+                        updatedRow.bookValuePerShare = newRow.bookValuePerShare;
+                      }
+                      if ((existingRow.dividendPerShare === 0 || existingRow.dividendPerShare === null || existingRow.dividendPerShare === void 0) && newRow.dividendPerShare > 0) {
+                        updatedRow.dividendPerShare = newRow.dividendPerShare;
+                      }
+                      if ((existingRow.priceHigh === 0 || existingRow.priceHigh === null || existingRow.priceHigh === void 0) && newRow.priceHigh > 0) {
+                        updatedRow.priceHigh = newRow.priceHigh;
+                      }
+                      if ((existingRow.priceLow === 0 || existingRow.priceLow === null || existingRow.priceLow === void 0) && newRow.priceLow > 0) {
+                        updatedRow.priceLow = newRow.priceLow;
+                      }
+                      return updatedRow;
+                    }
+                    if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
+                      return existingRow;
+                    }
+                    return {
+                      ...newRow,
+                      autoFetched: true
+                    };
+                  });
+                  result.data.forEach((newRow) => {
+                    const exists = mergedData.some((row) => row.year === newRow.year);
+                    if (!exists) {
+                      mergedData.push({
+                        ...newRow,
+                        autoFetched: true
+                      });
+                    }
+                  });
                 }
-                return { ...newRow, autoFetched: true };
-              });
-              result.data.forEach((newRow) => {
-                const exists = mergedData.some((row) => row.year === newRow.year);
-                if (!exists) {
-                  mergedData.push({ ...newRow, autoFetched: true });
-                }
-              });
-              mergedData.sort((a2, b) => a2.year - b.year);
-              const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-                mergedData,
-                result.currentPrice,
-                profile2.assumptions
-              );
-              const tempAssumptions = { ...profile2.assumptions, ...autoFilledAssumptions };
-              const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
-              if (outlierDetection.detectedOutliers.length > 0) {
-                console.log(`⚠️ ${tickerSymbol}: Outliers détectés: ${outlierDetection.detectedOutliers.join(", ")}`);
+                mergedData.sort((a2, b) => a2.year - b.year);
               }
-              const finalAssumptions = {
-                ...tempAssumptions,
-                excludeEPS: outlierDetection.excludeEPS,
-                excludeCF: outlierDetection.excludeCF,
-                excludeBV: outlierDetection.excludeBV,
-                excludeDIV: outlierDetection.excludeDIV
-              };
+              let finalAssumptions = profile2.assumptions;
+              if (options.syncAssumptions) {
+                const existingAssumptionsForCalc = options.replaceOrangeData ? void 0 : profile2.assumptions;
+                const currentPriceForCalc = options.updateCurrentPrice ? result.currentPrice : profile2.assumptions.currentPrice;
+                const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                  mergedData,
+                  currentPriceForCalc,
+                  existingAssumptionsForCalc
+                );
+                const tempAssumptions = {
+                  ...profile2.assumptions,
+                  ...autoFilledAssumptions
+                };
+                let outlierDetection = {
+                  detectedOutliers: [],
+                  excludeEPS: profile2.assumptions.excludeEPS || false,
+                  excludeCF: profile2.assumptions.excludeCF || false,
+                  excludeBV: profile2.assumptions.excludeBV || false,
+                  excludeDIV: profile2.assumptions.excludeDIV || false
+                };
+                if (options.recalculateOutliers) {
+                  outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
+                  if (outlierDetection.detectedOutliers.length > 0) {
+                    console.log(`⚠️ ${tickerSymbol}: Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(", ")}`);
+                  }
+                }
+                finalAssumptions = {
+                  ...tempAssumptions,
+                  // Préserver les exclusions si l'option est activée
+                  excludeEPS: options.preserveExclusions ? profile2.assumptions.excludeEPS || outlierDetection.excludeEPS : outlierDetection.excludeEPS,
+                  excludeCF: options.preserveExclusions ? profile2.assumptions.excludeCF || outlierDetection.excludeCF : outlierDetection.excludeCF,
+                  excludeBV: options.preserveExclusions ? profile2.assumptions.excludeBV || outlierDetection.excludeBV : outlierDetection.excludeBV,
+                  excludeDIV: options.preserveExclusions ? profile2.assumptions.excludeDIV || outlierDetection.excludeDIV : outlierDetection.excludeDIV
+                };
+              }
+              let updatedInfo = profile2.info;
+              if (options.syncInfo && result.info) {
+                updatedInfo = {
+                  ...profile2.info,
+                  ...result.info,
+                  name: result.info.name || profile2.info.name
+                };
+                if (options.syncValueLineMetrics) {
+                  try {
+                    const supabaseResult = await loadAllTickersFromSupabase();
+                    if (supabaseResult.success) {
+                      const supabaseTicker = supabaseResult.tickers.find((t) => t.ticker.toUpperCase() === tickerSymbol);
+                      if (supabaseTicker) {
+                        updatedInfo = {
+                          ...updatedInfo,
+                          securityRank: supabaseTicker.security_rank !== null && supabaseTicker.security_rank !== void 0 ? supabaseTicker.security_rank : updatedInfo.securityRank || "N/A",
+                          earningsPredictability: supabaseTicker.earnings_predictability !== null && supabaseTicker.earnings_predictability !== void 0 ? supabaseTicker.earnings_predictability : updatedInfo.earningsPredictability,
+                          priceGrowthPersistence: supabaseTicker.price_growth_persistence !== null && supabaseTicker.price_growth_persistence !== void 0 ? supabaseTicker.price_growth_persistence : updatedInfo.priceGrowthPersistence,
+                          priceStability: supabaseTicker.price_stability !== null && supabaseTicker.price_stability !== void 0 ? supabaseTicker.price_stability : updatedInfo.priceStability
+                        };
+                      }
+                    }
+                  } catch (error) {
+                    console.warn(`⚠️ Impossible de recharger les métriques ValueLine pour ${tickerSymbol}:`, error);
+                  }
+                }
+              }
               setLibrary((prev) => {
                 const updated = {
                   ...prev,
                   [tickerSymbol]: {
                     ...profile2,
                     data: mergedData,
-                    info: {
-                      ...profile2.info,
-                      ...result.info,
-                      name: result.info.name || profile2.info.name
-                    },
+                    info: updatedInfo,
                     assumptions: finalAssumptions,
                     lastModified: Date.now()
                   }
@@ -54026,7 +55092,7 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
                 try {
                   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
                 } catch (e) {
-                  console.warn(e);
+                  console.warn("Failed to save to LocalStorage:", e);
                 }
                 return updated;
               });
@@ -54034,60 +55100,54 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
                 tickerSymbol,
                 mergedData,
                 finalAssumptions,
-                { ...profile2.info, ...result.info },
-                `Synchronisation globale - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
+                updatedInfo,
+                `Après synchronisation (${options.replaceOrangeData ? "avec remplacement données oranges" : "standard"}) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
                 true,
                 true
               );
               successCount++;
-              setSyncStats({ successCount, errorCount });
-              console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
-              setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
-              await new Promise((resolve) => setTimeout(resolve, delayBetweenTickersInBatch));
-            } catch (error2) {
+              setSyncStats((prev) => ({ ...prev, successCount: prev.successCount + 1 }));
+              console.log(`✅ ${tickerSymbol}: Synchronisé avec succès`);
+            } catch (error) {
               errorCount++;
-              setSyncStats({ successCount, errorCount });
-              const errorMsg = `${tickerSymbol}: ${error2.message || "Erreur inconnue"}`;
+              const errorMsg = `${tickerSymbol}: ${error.message || String(error)}`;
               errors.push(errorMsg);
-              console.error(`❌ Erreur traitement ${tickerSymbol}:`, error2);
-              setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
+              setSyncStats((prev) => ({ ...prev, errorCount: prev.errorCount + 1 }));
+              console.error(`❌ ${errorMsg}`);
             }
-          } else {
-            const tickerSymbol = batch[fmpResults.indexOf(fmpResult)] || "UNKNOWN";
-            errorCount++;
-            setSyncStats({ successCount, errorCount });
-            const errorMsg = `${tickerSymbol}: ${((_a4 = fmpResult.reason) == null ? void 0 : _a4.message) || "Erreur inconnue"}`;
-            errors.push(errorMsg);
-            console.error(`❌ Erreur sync ${tickerSymbol}:`, fmpResult.reason);
-            setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
-          }
-        }
-        if (i + FMP_BATCH_SIZE < allTickers.length && !abortSync.current) {
-          await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
-        }
+          })
+        );
       }
-      console.log(`✅ Synchronisation terminée: ${successCount} succès, ${errorCount} erreurs`);
+      const summary = `Synchronisation terminée:
+✅ ${successCount} succès
+❌ ${errorCount} erreurs`;
+      if (errorCount > 0) {
+        console.warn(`⚠️ ${summary}
+Erreurs:
+${errors.join("\n")}`);
+        setNotifications((prev) => [...prev, {
+          id: `bulk-sync-${Date.now()}`,
+          message: `${summary}. Voir la console pour les détails.`,
+          type: "warning"
+        }]);
+      } else {
+        console.log(`✅ ${summary}`);
+        setNotifications((prev) => [...prev, {
+          id: `bulk-sync-${Date.now()}`,
+          message: summary,
+          type: "success"
+        }]);
+      }
     } catch (error) {
-      console.error("❌ Erreur fatale pendant la synchronisation:", error);
-      errorCount++;
-      errors.push(`Erreur fatale: ${error.message || "Erreur inconnue"}`);
+      console.error("❌ Erreur lors de la synchronisation en masse:", error);
+      setNotifications((prev) => [...prev, {
+        id: `bulk-sync-error-${Date.now()}`,
+        message: `Erreur lors de la synchronisation: ${error.message || String(error)}`,
+        type: "error"
+      }]);
     } finally {
       setIsBulkSyncing(false);
       setBulkSyncProgress({ current: 0, total: 0 });
-      const message = `Synchronisation terminée
-
-Réussies: ${successCount}
-Erreurs: ${errorCount}` + (errors.length > 0 ? `
-
-Erreurs:
-${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
-... et ${errors.length - 5} autres` : ""}` : "");
-      if (!abortSync.current) {
-        showNotification(message, errorCount > 0 ? "warning" : "success");
-      } else {
-        showNotification("Synchronisation arrêtée manuellement.", "warning");
-      }
-      console.log(`✅ ${message}`);
     }
   };
   const handleSyncSpecificTickers = async (tickersToSync) => {
@@ -54584,7 +55644,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
   isBulkSyncing ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "fixed bottom-4 right-4 bg-slate-800 p-4 rounded-lg shadow-xl border border-slate-700 z-[100] w-80 animate-in fade-in slide-in-from-bottom-5", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center mb-2", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-bold text-white text-sm flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: `w-4 h-4 ${!syncPausedState ? "animate-spin" : ""}` }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: `w-4 h-4 ${!syncPausedState ? "animate-spin" : ""}` }),
         "Syncing... ",
         bulkSyncProgress.current,
         "/",
@@ -54622,7 +55682,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
           },
           className: `flex-1 flex items-center justify-center gap-1 py-1.5 rounded transition-colors ${syncPausedState ? "bg-green-600 hover:bg-green-500 text-white" : "bg-yellow-600 hover:bg-yellow-500 text-white"}`,
           children: [
-            syncPausedState ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$d, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-4 h-4" }),
+            syncPausedState ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$e, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-4 h-4" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: syncPausedState ? "Resume" : "Pause" })
           ]
         }
@@ -54737,7 +55797,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 onClick: () => setIsSidebarOpen(!isSidebarOpen),
                 className: "p-2 bg-white rounded-md shadow-sm border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors flex-shrink-0",
                 title: isSidebarOpen ? "Fermer le menu" : "Ouvrir le menu",
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$D, { className: "w-5 h-5 sm:w-6 sm:h-6" })
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$E, { className: "w-5 h-5 sm:w-6 sm:h-6" })
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -54746,7 +55806,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 onClick: () => setIsRightSidebarOpen(!isRightSidebarOpen),
                 className: `p-2 rounded-lg transition-colors ${isRightSidebarOpen ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"}`,
                 title: "Afficher/Masquer l'historique",
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$s, { className: "w-5 h-5 sm:w-6 sm:h-6" })
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-5 h-5 sm:w-6 sm:h-6" })
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-base sm:text-xl font-bold text-gray-700 truncate flex-1 sm:flex-none", children: "Analyse Financière Pro" })
@@ -54759,7 +55819,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 title: "Tableau de bord principal",
                 className: `p-2 rounded-lg transition-colors duration-200 flex items-center gap-2 ${currentView === "analysis" ? "bg-blue-600 text-white shadow-md" : "text-gray-400 hover:text-white hover:bg-gray-800"}`,
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$A, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: "Analyse" })
                 ]
               }
@@ -54771,7 +55831,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 title: "Tableau de bord KPI et classement",
                 className: `p-2 rounded-lg transition-colors duration-200 flex items-center gap-2 ${currentView === "kpi" ? "bg-blue-600 text-white shadow-md" : "text-gray-400 hover:text-white hover:bg-gray-800"}`,
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$c, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: "KPIs & Classement" })
                 ]
               }
@@ -54783,7 +55843,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 title: "Mode d'emploi et documentation",
                 className: `p-2 rounded-lg transition-colors duration-200 flex items-center gap-2 ${currentView === "info" ? "bg-blue-600 text-white shadow-md" : "text-gray-400 hover:text-white hover:bg-gray-800"}`,
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$k, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: "Mode d'emploi" })
                 ]
               }
@@ -54831,11 +55891,11 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 ] })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1 bg-white rounded-md shadow-sm border border-gray-200 p-0.5 no-print", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: undo, disabled: pastData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: "↶ Annuler la dernière modification\\n\\nAnnule la dernière modification effectuée sur les données historiques.\\n\\n📊 Fonctionnalités:\\n• Permet de revenir en arrière sur les changements\\n• Fonctionne avec toutes les modifications (EPS, CF, BV, Dividendes, Prix)\\n• Historique illimité (tant que vous ne quittez pas la page)\\n\\n⌨️ Raccourci: Ctrl+Z (Cmd+Z sur Mac)", "aria-label": "Annuler la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$G, { className: "w-4 h-4" }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: undo, disabled: pastData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: "↶ Annuler la dernière modification\\n\\nAnnule la dernière modification effectuée sur les données historiques.\\n\\n📊 Fonctionnalités:\\n• Permet de revenir en arrière sur les changements\\n• Fonctionne avec toutes les modifications (EPS, CF, BV, Dividendes, Prix)\\n• Historique illimité (tant que vous ne quittez pas la page)\\n\\n⌨️ Raccourci: Ctrl+Z (Cmd+Z sur Mac)", "aria-label": "Annuler la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$H, { className: "w-4 h-4" }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-px bg-gray-200 my-1" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: redo, disabled: futureData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: "↷ Rétablir la modification annulée\\n\\nRétablit la dernière modification que vous avez annulée.\\n\\n📊 Fonctionnalités:\\n• Permet de refaire une action annulée\\n• Fonctionne avec toutes les modifications\\n• Disponible uniquement si vous avez annulé une action\\n\\n⌨️ Raccourci: Ctrl+Shift+Z (Cmd+Shift+Z sur Mac)", "aria-label": "Rétablir la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$F, { className: "w-4 h-4" }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: redo, disabled: futureData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: "↷ Rétablir la modification annulée\\n\\nRétablit la dernière modification que vous avez annulée.\\n\\n📊 Fonctionnalités:\\n• Permet de refaire une action annulée\\n• Fonctionne avec toutes les modifications\\n• Disponible uniquement si vous avez annulé une action\\n\\n⌨️ Raccourci: Ctrl+Shift+Z (Cmd+Shift+Z sur Mac)", "aria-label": "Rétablir la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$G, { className: "w-4 h-4" }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-px bg-gray-200 my-1" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleResetData, className: "p-1.5 rounded hover:bg-red-50 text-red-600", title: "🔄 Réinitialiser les données\\n\\nRéinitialise toutes les données historiques à leurs valeurs d'origine.\\n\\n⚠️ Attention:\\n• Cette action est irréversible\\n• Toutes vos modifications manuelles seront perdues\\n• Les données seront restaurées depuis la dernière synchronisation FMP\\n• Les hypothèses ne sont PAS affectées\\n\\n💡 Utilisation:\\n• Utile si vous avez fait des erreurs de saisie\\n• Permet de repartir de zéro avec les données FMP\\n• Confirmation requise avant exécution", "aria-label": "Réinitialiser toutes les données", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: "w-4 h-4" }) })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleResetData, className: "p-1.5 rounded hover:bg-red-50 text-red-600", title: "🔄 Réinitialiser les données\\n\\nRéinitialise toutes les données historiques à leurs valeurs d'origine.\\n\\n⚠️ Attention:\\n• Cette action est irréversible\\n• Toutes vos modifications manuelles seront perdues\\n• Les données seront restaurées depuis la dernière synchronisation FMP\\n• Les hypothèses ne sont PAS affectées\\n\\n💡 Utilisation:\\n• Utile si vous avez fait des erreurs de saisie\\n• Permet de repartir de zéro avec les données FMP\\n• Confirmation requise avant exécution", "aria-label": "Réinitialiser toutes les données", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-4 h-4" }) })
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(HistoricalTable, { data, onUpdateRow: handleUpdateRow }),
@@ -54930,7 +55990,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 rounded-lg shadow border border-gray-200", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xs sm:text-sm font-bold text-gray-500 uppercase mb-2 sm:mb-3 flex items-center gap-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$q, { className: "w-3 h-3 sm:w-4 sm:h-4" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$r, { className: "w-3 h-3 sm:w-4 sm:h-4" }),
                 "Configuration"
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 sm:space-y-3 text-xs sm:text-sm", children: [
@@ -55095,6 +56155,24 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
+      AdvancedSyncDialog,
+      {
+        isOpen: showAdvancedSyncDialog,
+        ticker: isAdvancedSyncForBulk ? void 0 : activeId,
+        hasManualData: hasManualEdits(data),
+        onCancel: () => setShowAdvancedSyncDialog(false),
+        onConfirm: async (options) => {
+          setShowAdvancedSyncDialog(false);
+          if (isAdvancedSyncForBulk) {
+            await handleBulkSyncAllTickersWithOptions(options);
+          } else {
+            await performSync(options.saveBeforeSync, options);
+          }
+        },
+        isSyncing: isLoading
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
       RestoreDataDialog,
       {
         isOpen: showRestoreDialog,
@@ -55152,20 +56230,20 @@ export {
   EvaluationDetails as E,
   ForwardRef$1 as F,
   React as R,
-  ForwardRef$l as a,
-  ForwardRef$y as b,
+  ForwardRef$m as a,
+  ForwardRef$z as b,
   calculateRecommendation as c,
   ForwardRef$7 as d,
-  ForwardRef$m as e,
-  ForwardRef$n as f,
-  ForwardRef$J as g,
-  ForwardRef$C as h,
-  ForwardRef$k as i,
+  ForwardRef$n as e,
+  ForwardRef$o as f,
+  ForwardRef$K as g,
+  ForwardRef$D as h,
+  ForwardRef$l as i,
   jsxRuntimeExports as j,
-  ForwardRef$x as k,
-  ForwardRef$t as l,
-  ForwardRef$w as m,
-  ForwardRef$q as n,
+  ForwardRef$y as k,
+  ForwardRef$u as l,
+  ForwardRef$x as m,
+  ForwardRef$r as n,
   ForwardRef$2 as o,
   listSnapshots as p,
   ForwardRef$9 as q,

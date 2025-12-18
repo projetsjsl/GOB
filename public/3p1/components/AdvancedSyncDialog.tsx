@@ -370,7 +370,7 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                                                             <li>Sans cette option : Met à jour toutes les années 2015-2020 aussi</li>
                                                         </ul>
                                                         <p><strong>Avantage :</strong> Plus rapide, préserve toutes vos modifications manuelles sur les années existantes</p>
-                                                        <p><strong>Outil :</strong> Algorithme de comparaison d'années avec <code className="bg-white px-1 rounded">mergedData.some(row => row.year === newRow.year)</code></p>
+                                                          <p><strong>Outil :</strong> Algorithme de comparaison d'années avec <code className="bg-white px-1 rounded">{'mergedData.some(row => row.year === newRow.year)'}</code></p>
                                                     </div>
                                                 </HelpSection>
                                             </div>
@@ -533,7 +533,7 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                                                     setShowHelp={setShowHelp}
                                                 >
                                                     <div className="space-y-2">
-                                                        <p><strong>Comportement :</strong> Analyse chaque métrique (EPS, CF, BV, DIV) et calcule le prix cible. Si le prix cible est aberrant (négatif, > 10x le prix actuel, etc.), la métrique est automatiquement exclue.</p>
+                                                          <p><strong>Comportement :</strong> Analyse chaque métrique (EPS, CF, BV, DIV) et calcule le prix cible. Si le prix cible est aberrant (négatif, {'>'} 10x le prix actuel, etc.), la métrique est automatiquement exclue.</p>
                                                         <p><strong>Exemple concret :</strong></p>
                                                         <ul className="list-disc list-inside ml-2 space-y-1">
                                                             <li>Prix actuel : 100$</li>
@@ -545,8 +545,8 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                                                         <p><strong>Critères d'aberration :</strong></p>
                                                         <ul className="list-disc list-inside ml-2 space-y-1">
                                                             <li>Prix cible négatif</li>
-                                                            <li>Prix cible > 10x le prix actuel</li>
-                                                            <li>Prix cible < 0.1x le prix actuel</li>
+                                                              <li>Prix cible {'>'} 10x le prix actuel</li>
+                                                              <li>Prix cible {'<'} 0.1x le prix actuel</li>
                                                             <li>Données insuffisantes pour calculer</li>
                                                         </ul>
                                                         <p><strong>Outil :</strong> Fonction <code className="bg-white px-1 rounded">detectOutlierMetrics()</code> avec seuils configurables</p>
