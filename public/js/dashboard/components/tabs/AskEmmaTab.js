@@ -51,12 +51,13 @@ const AskEmmaTab = React.memo(({
                 const [emmaApiKey, setEmmaApiKey] = useState('');
                 // emmaConnected, showPromptEditor, showTemperatureEditor, showLengthEditor maintenant dans le parent
                 const [emmaTemperature, setEmmaTemperature] = useState(0.3); // Température par défaut pour analyses financières
-                const [emmaMaxTokens, setEmmaMaxTokens] = useState(4096); // Longueur de réponse par défaut
+                const [emmaMaxTokens, setEmmaMaxTokens] = useState(16000); // 🚀 Longueur augmentée pour analyses ULTRA-DÉTAILLÉES (par défaut 16k tokens)
                 const [useFunctionCalling, setUseFunctionCalling] = useState(true); // Utiliser function calling par défaut
                 const [useValidatedMode, setUseValidatedMode] = useState(false); // Mode validation en 3 étapes
                 const [showScrollToBottom, setShowScrollToBottom] = useState(false); // Bouton scroll vers le bas
                 const [typingMessageId, setTypingMessageId] = useState(null); // ID du message en cours de typing
-                const typingIntervalRef = useRef(null); // Référence pour l'intervalle de typing
+                // ✅ Utiliser une Map pour gérer plusieurs intervalles de typing simultanés (crucial pour SMS multi-segments)
+                const typingIntervalsRef = useRef(new Map());
                 const [emmaPrompt, setEmmaPrompt] = useState(`<system_identity>
 Vous êtes Emma — Economic & Market Monitoring Assistant, un assistant IA de niveau expert en analyse financière.
 Version : 2.0 Advanced
@@ -652,87 +653,33 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         const response = typeof responseData === 'string' ? responseData : responseData.text;
                         const model = typeof responseData === 'object' ? responseData.model : null;
                         const modelReason = typeof responseData === 'object' ? responseData.modelReason : null;
-                        const channelUsed = typeof responseData === 'object' ? responseData.channel : 'web';
                         const isCached = typeof responseData === 'object' ? responseData.cached : false;
 
-                        // 📱 Si mode SMS, découper en segments SMS
-                        const channelSimRadio = document.querySelector('input[name="channel-sim"]:checked');
-                        const channelSim = channelSimRadio ? channelSimRadio.value : 'web';
+                        // Mode Web normal (Chatbot 100% Web)
+                        const messageId = Date.now() + 1;
+                        const emmaResponse = {
+                            id: messageId,
+                            type: 'emma',
+                            content: '', // Contenu vide au départ pour l'effet de typing
+                            fullContent: response, // Contenu complet stocké séparément
+                            timestamp: new Date().toLocaleTimeString('fr-FR'),
+                            model: model,  // Stocker le modèle utilisé
+                            modelReason: modelReason,  // Stocker la raison du choix
+                            cached: isCached
+                        };
                         
-                        if (channelSim === 'sms') {
-                            // Découper la réponse en segments SMS (1500 chars max par SMS)
-                            const smsSegments = splitIntoSMS(response, 1500);
-                            
+                        setEmmaMessages(prev => {
                             // Supprimer le message de confirmation temporaire
-                            setEmmaMessages(prev => prev.filter(msg => msg.content !== '📤 Message envoyé...'));
-                            
-                            // ✅ AJOUT SÉQUENTIEL pour garantir l'ordre 1/3, 2/3, 3/3
-                            const baseTimestamp = Date.now();
-                            const smsMessages = smsSegments.map((segment, index) => ({
-                                id: baseTimestamp + index,
-                                type: 'sms',
-                                content: '', // Contenu vide au départ pour l'effet de typing
-                                fullContent: segment,
-                                timestamp: new Date().toLocaleTimeString('fr-FR'),
-                                model: model,
-                                modelReason: modelReason,
-                                smsIndex: index + 1,
-                                smsTotal: smsSegments.length,
-                                charCount: segment.length,
-                                cached: isCached
-                            }));
-                            
-                            // Ajouter TOUS les messages SMS en une seule fois (garantit l'ordre)
-                            setEmmaMessages(prev => [...prev, ...smsMessages]);
-                            
-                            // Démarrer l'effet de typing progressif pour chaque segment avec délai
-                            smsMessages.forEach((smsMsg, index) => {
-                                setTimeout(() => {
-                                    startTypingEffect(smsMsg.id, smsMsg.fullContent);
-                                }, index * 500);
-                            });
-                            
-                            // Ajouter un message avec le coût estimé
-                            const costPerSMS = 0.0075;
-                            const totalCost = smsSegments.length * costPerSMS;
-                            const costMessage = {
-                                id: baseTimestamp + smsSegments.length,
-                                type: 'cost-estimate',
-                                content: `💰 Coût estimé: ${smsSegments.length} SMS × ${costPerSMS}$ = ${totalCost.toFixed(4)}$${isCached ? ' (Cache: gratuit!)' : ''}`,
-                                timestamp: new Date().toLocaleTimeString('fr-FR')
-                            };
-                            
-                            setTimeout(() => {
-                                setEmmaMessages(prev => [...prev, costMessage]);
-                            }, smsSegments.length * 500 + 500);
-                            
-                        } else {
-                            // Mode Web normal
-                            const messageId = Date.now() + 1;
-                            const emmaResponse = {
-                                id: messageId,
-                                type: 'emma',
-                                content: '', // Contenu vide au départ pour l'effet de typing
-                                fullContent: response, // Contenu complet stocké séparément
-                                timestamp: new Date().toLocaleTimeString('fr-FR'),
-                                model: model,  // Stocker le modèle utilisé
-                                modelReason: modelReason,  // Stocker la raison du choix
-                                cached: isCached
-                            };
-                            
-                            setEmmaMessages(prev => {
-                                // Supprimer le message de confirmation temporaire
-                                const filteredMessages = prev.filter(msg => msg.content !== '📤 Message envoyé...');
-                                const newMessages = [...filteredMessages, emmaResponse];
-                                // Sauvegarde automatique via useEffect
-                                return newMessages;
-                            });
+                            const filteredMessages = prev.filter(msg => msg.content !== '📤 Message envoyé...');
+                            const newMessages = [...filteredMessages, emmaResponse];
+                            // Sauvegarde automatique via useEffect
+                            return newMessages;
+                        });
 
-                            // Démarrer l'effet de typing progressif APRÈS la mise à jour du state
-                            setTimeout(() => {
-                                startTypingEffect(messageId, response);
-                            }, 50); // Délai minimal pour garantir que le state est mis à jour
-                        }
+                        // Démarrer l'effet de typing progressif APRÈS la mise à jour du state
+                        setTimeout(() => {
+                            startTypingEffect(messageId, response);
+                        }, 50); // Délai minimal pour garantir que le state est mis à jour
                         
                         // Confirmation de réception
                         console.log('✅ Réponse d\'Emma reçue:', response.length, 'caractères');
@@ -811,11 +758,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         // Extraire les tickers de l'équipe
                         const tickers = teamTickers || Object.keys(currentStockData);
 
-                        // 📱 Récupérer le canal simulé (web ou sms)
-                        const channelSimRadio = document.querySelector('input[name="channel-sim"]:checked');
-                        const channelSim = channelSimRadio ? channelSimRadio.value : 'web';
-                        
-                        console.log(`📤 Envoi de la requête à Emma Agent (format: ${channelSim})...`);
+                        console.log(`📤 Envoi de la requête à Emma Agent (format: web)...`);
 
                         // Utiliser Emma Agent avec le format de sortie adapté
                         const response = await fetch('/api/emma-agent', {
@@ -827,7 +770,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                                 message: userMessage,
                                 context: {
                                     output_mode: 'chat',  // ← MODE CHAT pour chatbot web
-                                    user_channel: channelSim,  // 'web' ou 'sms' pour adapter le FORMAT
+                                    user_channel: 'web',  // ← FORCÉ À WEB (chatbot 100% web)
                                     tickers: tickers,
                                     news_requested: true,
                                     stockData: currentStockData,
@@ -900,39 +843,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     }
                 };
 
-                // 📱 Fonction pour découper un message en segments SMS
-                const splitIntoSMS = (text, maxLength = 1500) => {
-                    if (text.length <= maxLength) {
-                        return [text];
-                    }
-                    
-                    const segments = [];
-                    let remaining = text;
-                    
-                    while (remaining.length > 0) {
-                        if (remaining.length <= maxLength) {
-                            segments.push(remaining);
-                            break;
-                        }
-                        
-                        // Chercher un point de coupure naturel (fin de phrase, paragraphe, etc.)
-                        let cutPoint = maxLength;
-                        const naturalBreaks = ['\n\n', '\n', '. ', '! ', '? ', ', ', ' '];
-                        
-                        for (const breakChar of naturalBreaks) {
-                            const lastBreak = remaining.lastIndexOf(breakChar, maxLength);
-                            if (lastBreak > maxLength * 0.7) { // Au moins 70% du max
-                                cutPoint = lastBreak + breakChar.length;
-                                break;
-                            }
-                        }
-                        
-                        segments.push(remaining.substring(0, cutPoint).trim());
-                        remaining = remaining.substring(cutPoint).trim();
-                    }
-                    
-                    return segments;
-                };
 
                 const clearChat = () => {
                     // Vider l'historique ET le localStorage
@@ -1766,20 +1676,22 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                 // --------- Effet de typing progressif ---------
                 const startTypingEffect = (messageId, fullContent) => {
-                    // Nettoyer l'intervalle précédent si existant
-                    if (typingIntervalRef.current) {
-                        clearInterval(typingIntervalRef.current);
+                    // Nettoyer l'intervalle spécifique à ce message s'il existe déjà
+                    if (typingIntervalsRef.current.has(messageId)) {
+                        clearInterval(typingIntervalsRef.current.get(messageId));
                     }
 
                     setTypingMessageId(messageId);
 
                     let currentIndex = 0;
-                    const typingSpeed = 15; // ms par caractère (plus petit = plus rapide)
+                    // Vitesse ultra-rapide pour donner une sensation de temps réel
+                    const typingSpeed = 5; 
 
-                    typingIntervalRef.current = setInterval(() => {
+                    const interval = setInterval(() => {
                         if (currentIndex < fullContent.length) {
-                            // Afficher les caractères par petits groupes pour un effet plus fluide
-                            const chunkSize = Math.floor(Math.random() * 3) + 1; // 1-3 caractères à la fois
+                            // Progression dynamique: plus le texte est long, plus on va vite
+                            const baseChunk = fullContent.length > 2000 ? 25 : (fullContent.length > 500 ? 15 : 8);
+                            const chunkSize = Math.floor(Math.random() * baseChunk) + baseChunk;
                             currentIndex += chunkSize;
 
                             // Mettre à jour le message avec le contenu partiel
@@ -1795,19 +1707,26 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     ? { ...msg, content: fullContent }
                                     : msg
                             ));
-                            clearInterval(typingIntervalRef.current);
-                            typingIntervalRef.current = null;
-                            setTypingMessageId(null);
+                            
+                            clearInterval(interval);
+                            typingIntervalsRef.current.delete(messageId);
+                            
+                            // Si plus aucun intervalle en cours, on reset le typingMessageId
+                            if (typingIntervalsRef.current.size === 0) {
+                                setTypingMessageId(null);
+                            }
                         }
                     }, typingSpeed);
+
+                    // Stocker l'intervalle
+                    typingIntervalsRef.current.set(messageId, interval);
                 };
 
-                // Nettoyer l'intervalle lors du démontage
+                // Nettoyer les intervalles lors du démontage
                 useEffect(() => {
                     return () => {
-                        if (typingIntervalRef.current) {
-                            clearInterval(typingIntervalRef.current);
-                        }
+                        typingIntervalsRef.current.forEach(interval => clearInterval(interval));
+                        typingIntervalsRef.current.clear();
                     };
                 }, []);
 
@@ -1956,8 +1875,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 ) : (
                                     <div className="space-y-4">
                                         {emmaMessages.map((message) => (
-                                            <div key={message.id} className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : message.type === 'cost-estimate' ? 'justify-center' : 'justify-start'}`}>
-                                                {message.type !== 'user' && message.type !== 'cost-estimate' && (
+                                            <div key={message.id} className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                                {message.type !== 'user' && (
                                                     <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
                                                         <img 
                                                             src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} 
@@ -1966,26 +1885,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         />
                                                     </div>
                                                 )}
-                                                <div className={`${message.type === 'sms' ? 'max-w-sm' : message.type === 'cost-estimate' ? 'max-w-md' : 'max-w-xl'} px-4 py-3 rounded-lg shadow ${
+                                                <div className={`max-w-xl px-4 py-3 rounded-lg shadow ${
                                                     message.type === 'user'
                                                         ? 'bg-gray-800 text-white shadow-gray-500/20'
                                                         : message.type === 'error'
                                                         ? 'bg-red-600 text-white shadow-red-500/20'
                                                         : message.type === 'system'
                                                         ? 'bg-yellow-100 text-yellow-800 border border-yellow-300'
-                                                        : message.type === 'sms'
-                                                        ? 'bg-green-50 text-gray-900 border-2 border-green-400 shadow-green-200'
-                                                        : message.type === 'cost-estimate'
-                                                        ? 'bg-yellow-50 text-yellow-900 border border-yellow-300'
                                                         : 'bg-gray-50 text-gray-900 border border-gray-200'
                                                 }`}>
-                                                    {/* 📱 Header SMS avec numéro de segment */}
-                                                    {message.type === 'sms' && (
-                                                        <div className="text-xs font-bold text-green-700 mb-2 pb-2 border-b border-green-300 flex justify-between items-center">
-                                                            <span>📱 SMS {message.smsIndex}/{message.smsTotal}</span>
-                                                            <span className="text-gray-500 font-normal">{message.charCount} chars</span>
-                                                        </div>
-                                                    )}
                                                     
                                                     <div className="prose prose-sm max-w-none">
                                                         <div dangerouslySetInnerHTML={{ __html: formatMessageText(message.content) }} />
@@ -1994,16 +1902,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         )}
                                                     </div>
                                                     <div className={`text-xs mt-1 ${
-                                                        message.type === 'user' ? 'text-blue-100' : message.type === 'sms' ? 'text-green-600' : 'text-gray-400'
+                                                        message.type === 'user' ? 'text-blue-100' : 'text-gray-400'
                                                     }`}>
                                                         {message.timestamp}
                                                         {message.cached && <span className="ml-2 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-bold">💾 Cache</span>}
                                                     </div>
-                                                    {/* Indicateur de paramètres pour les messages d'Emma et SMS */}
-                                                    {(message.type === 'emma' || message.type === 'sms') && (
-                                                        <div className={`text-xs mt-2 px-2 py-1 rounded ${
-                                                            message.type === 'sms' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                                                        }`}>
+                                                    {/* Indicateur de paramètres pour les messages d'Emma */}
+                                                    {message.type === 'emma' && (
+                                                        <div className="text-xs mt-2 px-2 py-1 rounded bg-gray-100 text-gray-600">
                                                             <div className="flex items-center gap-2 flex-wrap">
                                                                 <span className="font-medium flex items-center gap-1">
                                                                     <Icon emoji="⚙️" size={16} />
@@ -2203,67 +2109,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 )}
                             </div>
 
-                            {/* 📱 Simulateur de Canal SMS/Web */}
-                            <div className={`mb-3 p-3 rounded-lg border transition-colors duration-300 ${
-                                isDarkMode 
-                                    ? 'bg-gray-800 border-gray-700' 
-                                    : 'bg-gray-100 border-gray-300'
-                            }`}>
-                                <div className="flex items-center gap-4">
-                                    <label className={`font-semibold transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>
-                                        📱 Simuler canal:
-                                    </label>
-                                    
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input
-                                            type="radio"
-                                            name="channel-sim"
-                                            value="web"
-                                            defaultChecked
-                                            className="cursor-pointer"
-                                            onChange={(e) => {
-                                                const info = document.getElementById('sms-preview-info');
-                                                if (info) info.style.display = 'none';
-                                            }}
-                                        />
-                                        <span className={`transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>
-                                            🌐 Web (complet)
-                                        </span>
-                                    </label>
-                                    
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input
-                                            type="radio"
-                                            name="channel-sim"
-                                            value="sms"
-                                            className="cursor-pointer"
-                                            onChange={(e) => {
-                                                const info = document.getElementById('sms-preview-info');
-                                                if (info) info.style.display = 'block';
-                                            }}
-                                        />
-                                        <span className={`transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>
-                                            📱 SMS (format court)
-                                        </span>
-                                    </label>
-                                </div>
-                                
-                                <div 
-                                    id="sms-preview-info" 
-                                    className={`mt-2 text-sm transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                    }`}
-                                    style={{ display: 'none' }}
-                                >
-                                    ℹ️ Mode SMS: Réponse formatée comme un vrai SMS (3 messages max, pas d'envoi réel)
-                                </div>
-                            </div>
 
                             {/* Input avec suggestions slash commands */}
                             <div className="relative flex gap-2">

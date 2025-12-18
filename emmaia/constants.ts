@@ -139,7 +139,7 @@ export const SAMPLE_RATE_OUTPUT = 24000;
 export const HEYGEN_AVATAR_ID = 'Angela-inT-20220820'; 
 export const AKOOL_AVATAR_ID = 'akool_avatar_v1'; 
 
-export const DEFAULT_TAVUS_REPLICA_ID = 'r79e1c033f'; 
+export const DEFAULT_TAVUS_REPLICA_ID = 'r9c55f9312fb'; 
 export const DEFAULT_TAVUS_PERSONA_NAME = 'Emma IA • NATURELLE';
 export const DEFAULT_TAVUS_CONTEXT = `Tu es Emma IA...`;
 

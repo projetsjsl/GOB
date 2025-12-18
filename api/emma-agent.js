@@ -1855,23 +1855,23 @@ class SmartAgent {
             }
 
             // 📱 TRONCATURE DE SÉCURITÉ FINALE POUR SMS
-            // Limite absolue: 7500 caractères (4-5 SMS longs)
-            if (context.user_channel === 'sms' && response.length > 7500) {
-                console.warn(`⚠️ SMS response too long (${response.length} chars), truncating to 7500...`);
+            // Limite absolue: 6000 caractères (Max 4 SMS de 1500 chars)
+            if (context.user_channel === 'sms' && response.length > 6000) {
+                console.warn(`⚠️ SMS response too long (${response.length} chars), truncating to 6000 (Max 4 SMS)...`);
 
-                // Tronquer intelligemment au dernier point ou saut de ligne avant 7000 chars
-                const truncated = response.substring(0, 7000);
+                // Tronquer intelligemment au dernier point ou saut de ligne avant 5800 chars
+                const truncated = response.substring(0, 5800);
                 const lastPeriod = Math.max(truncated.lastIndexOf('.'), truncated.lastIndexOf('\n'));
 
-                if (lastPeriod > 6000) {
+                if (lastPeriod > 5000) {
                     // Tronquer au dernier point/saut de ligne
-                    response = truncated.substring(0, lastPeriod + 1) + '\n\n💬 Réponse tronquée. Pour + de détails, visite gobapps.com';
+                    response = truncated.substring(0, lastPeriod + 1) + '\n\n💬 Suite sur gobapps.com (Limite 4 SMS)';
                 } else {
                     // Tronquer brutalement si pas de point trouvé
-                    response = truncated + '...\n\n💬 Réponse tronquée. Pour + de détails, visite gobapps.com';
+                    response = truncated + '...\n\n💬 Suite sur gobapps.com (Limite 4 SMS)';
                 }
 
-                console.log(`✅ SMS truncated to ${response.length} chars`);
+                console.log(`✅ SMS truncated to ${response.length} chars (Target: 4 segments)`);
             }
 
             // 🛡️ FRESH DATA GUARD: Valider que les données factuelles ont des sources
@@ -2125,8 +2125,8 @@ class SmartAgent {
                     const parsed = JSON.parse(content);
                     return '\n' + jsonToText(parsed) + '\n';
                 } catch (e) {
-                    console.warn('⚠️ Could not parse JSON code block, removing');
-                    return ''; // Supprimer si non parseable
+                    console.warn('⚠️ Could not parse JSON code block, keeping original text');
+                    return match; // Conserver si non parseable (bug 5 fix)
                 }
             });
 
@@ -2137,13 +2137,15 @@ class SmartAgent {
 
             for (const match of matches) {
                 try {
+                    // Tenter de parser le JSON
                     const parsed = JSON.parse(match[0]);
                     const textVersion = jsonToText(parsed);
                     cleaned = cleaned.replace(match[0], '\n' + textVersion + '\n');
                 } catch (e) {
-                    // Si parsing échoue, supprimer le bloc
-                    console.warn('⚠️ Could not parse JSON object, removing');
-                    cleaned = cleaned.replace(match[0], '');
+                    // SI LE PARSING ÉCHOUE: Conserver le texte original! 
+                    // Il s'agit probablement de texte entre accolades et non d'un dump JSON.
+                    console.log('ℹ️ Text looks like JSON but is not parseable, keeping as original text.');
+                    // On ne fait rien, cleaned reste inchangé pour ce match
                 }
             }
 
@@ -2157,9 +2159,9 @@ class SmartAgent {
                     const textVersion = jsonToText(parsed);
                     cleaned = cleaned.replace(match[0], '\n' + textVersion + '\n');
                 } catch (e) {
-                    // Si parsing échoue, supprimer le bloc
-                    console.warn('⚠️ Could not parse JSON array, removing');
-                    cleaned = cleaned.replace(match[0], '');
+                    // SI LE PARSING ÉCHOUE: Conserver le texte original!
+                    console.log('ℹ️ Array-like text is not parseable JSON, keeping as original text.');
+                    // On ne fait rien
                 }
             }
 
@@ -3066,13 +3068,13 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
         // 🚀 TOKENS AUGMENTÉS ENCORE PLUS pour analyses LONGUES et COMPLÈTES (Bug 5 fix)
         // User feedback: "jaimais beaucoup avoir une longue analyse et maintenant c'est tellement court"
         if (complexityScore <= 2) {
-            return { level: 'simple', tokens: 3000, description: 'Question simple - réponse complète avec chiffres (800-1000 mots)' };
+            return { level: 'simple', tokens: 8000, description: 'Question simple - réponse complète ultra-détaillée (2000-3000 mots)' };
         } else if (complexityScore <= 5) {
-            return { level: 'moyenne', tokens: 6000, description: 'Question modérément complexe - analyse détaillée (1200-1500 mots)' };
+            return { level: 'moyenne', tokens: 12000, description: 'Question modérément complexe - analyse approfondie (3000-4000 mots)' };
         } else if (complexityScore <= 8) {
-            return { level: 'complexe', tokens: 12000, description: 'Analyse détaillée avec données temps réel (3000-4000 mots recommandé)' };
+            return { level: 'complexe', tokens: 24000, description: 'Analyse experte multi-dimensionnelle (6000-8000 mots)' };
         } else {
-            return { level: 'très_complexe', tokens: 16000, description: 'Analyse exhaustive multi-dimensionnelle (5000-6000 mots)' };
+            return { level: 'très_complexe', tokens: 32000, description: 'Analyse exhaustive totale (10000+ mots)' };
         }
     }
 
@@ -3172,36 +3174,55 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
             let maxTokens = modelConfig?.max_tokens || 8000;  // 🎯 DEFAULT ULTRA-AUGMENTÉ: 8000 tokens (~5600 mots = RÉPONSES TRÈS LONGUES)
             let complexityInfo = null;
 
-            // 📱 SMS: Contenu complet mais optimisé pour éviter timeouts
+            // 📱 SMS: Limité strictement pour respecter la règle des 4 SMS (max 6000 chars)
             if (context.user_channel === 'sms') {
-                maxTokens = 4000;  // 📱 SMS: 4000 tokens (~3000 mots, 6-8 SMS) - équilibre contenu/performance
-                console.log('📱 SMS mode: 4000 tokens (contenu complet optimisé - 6-8 SMS)');
+                maxTokens = 3000;  // 📱 SMS: 3000 tokens (~2200 mots) - large pour 6000 chars mais évite timeout
+                console.log('📱 SMS mode: 3000 tokens (calculé pour max 4 SMS/6000 chars)');
             } else if (outputMode === 'briefing') {
-                maxTokens = 10000;  // 🚀 Briefing MAXIMUM (AUGMENTÉ 8000 → 10000)
-                console.log('📊 Briefing mode: 10000 tokens (MAXIMUM EXHAUSTIF)');
+                maxTokens = 20000;  // 🚀 Briefing MAXIMUM (AUGMENTÉ 10000 → 20000)
+                console.log('📊 Briefing mode: 20000 tokens (MAXIMUM EXHAUSTIF)');
             } else if (outputMode === 'ticker_note') {
-                maxTokens = 10000;  // 📋 Note professionnelle MAXIMUM (AUGMENTÉ 8000 → 10000)
-                console.log('📋 Ticker note mode: 10000 tokens (note professionnelle MAXIMUM)');
+                maxTokens = 15000;  // 📋 Note professionnelle MAXIMUM (AUGMENTÉ 10000 → 15000)
+                console.log('📋 Ticker note mode: 15000 tokens (note professionnelle MAXIMUM)');
             } else if (outputMode === 'data') {
                 maxTokens = 500;  // JSON structuré: court
             } else if (outputMode === 'chat') {
                 // 🧠 Détection automatique de complexité pour ajustement intelligent
                 complexityInfo = this._detectComplexity(userMessage, intentData, toolResults);
 
-                // ✅ FIX: Forcer 15000 tokens pour comprehensive_analysis (12 sections obligatoires)
+                // ✅ FIX: Forcer 20000 tokens pour comprehensive_analysis (12 sections obligatoires) sur WEB
                 const isComprehensiveAnalysis = intentData?.intent === 'comprehensive_analysis';
-                if (isComprehensiveAnalysis) {
-                    maxTokens = 15000;  // 🎯 FORCÉ: 15000 tokens pour analyses complètes (12 sections)
-                    console.log(`🎯 Comprehensive Analysis détecté → FORCÉ à 15000 tokens (12 sections obligatoires)`);
+                if (isComprehensiveAnalysis && context.user_channel !== 'sms') {
+                    maxTokens = 20000;  // 🎯 FORCÉ: 20000 tokens pour analyses complètes (12 sections)
+                    console.log(`🎯 Comprehensive Analysis détecté → FORCÉ à 20000 tokens (12 sections obligatoires)`);
+                } else if (isComprehensiveAnalysis && context.user_channel === 'sms') {
+                    maxTokens = 3000; // Limite SMS respectée
                 } else {
-                    // 🚀🚀 MULTIPLIER par 3 les tokens pour réponses ULTRA-LONGUES
-                    maxTokens = complexityInfo.tokens * 3;
-                    console.log(`🧠 Complexité détectée: ${complexityInfo.level} → ${maxTokens} tokens (×3 BOOST MAXIMUM pour réponses ULTRA-LONGUES) (${complexityInfo.description})`);
+                    // 🚀🚀 MULTIPLIER par 3 les tokens pour réponses ULTRA-LONGUES (uniquement pour WEB)
+                    const multiplier = context.user_channel === 'sms' ? 1 : 3;
+                    maxTokens = complexityInfo.tokens * multiplier;
+                    console.log(`🧠 Complexité détectée: ${complexityInfo.level} → ${maxTokens} tokens (Channel: ${context.user_channel || 'web'}) (${complexityInfo.description})`);
                 }
             }
 
             // 🎯 NOUVEAU: Utiliser prompt spécifique par intent si disponible
             let systemPrompt = null;
+
+            // 🚀🚀🚀 INSTRUCTION DE LONGUEUR CRITIQUE POUR WEB 🚀🚀🚀
+            if (context.user_channel !== 'sms' && outputMode === 'chat') {
+                systemPrompt = `🚨🚨🚨 RÈGLE D'OR: RÉPONSE ULTRA-LONGUE ET EXHAUSTIVE OBLIGATOIRE 🚨🚨🚨
+- L'utilisateur a demandé une analyse "ULTRA DÉTAILLÉE" (Niveau Expert CFA).
+- Ta réponse doit être EXTRÊMEMENT LONGUE (vise 3000-5000 mots si possible).
+- Développe chaque point avec AU MOINS 2-3 paragraphes complets.
+- Ne fais JAMAIS de résumés courts ou de listes à puces simples sans explication profonde.
+- Analyse chaque donnée de manière narrative et comparative.
+- Si plusieurs tickers sont mentionnés, l'analyse pour CHAQUE ticker doit être aussi longue qu'un rapport complet.
+- Utilise des titres ## et du gras ** pour une structure claire.
+- RECHERCHE ET CITE un maximum de sources récentes via Perplexity.
+- TON: Institutionnel, profond, analytique.
+
+`;
+            }
 
             // Vérifier si un prompt custom existe pour cet intent
             if (intentData && intentData.intent) {
@@ -3210,7 +3231,7 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
                 const customPrompt = await configManager.get('prompts', `intent_${intentData.intent}`, defaultPrompt);
                 
                 if (customPrompt) {
-                    systemPrompt = customPrompt;
+                    systemPrompt = (systemPrompt || '') + customPrompt;
 
                     // ✅ Pour earnings, injecter la date actuelle dans le prompt
                     if (intentData.intent === 'earnings') {

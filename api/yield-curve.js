@@ -25,29 +25,29 @@ const US_TREASURY_RATES = {
 };
 
 const CANADA_RATES = {
-  '1M': 'IRCANTBS01',   // 1 mois
-  '3M': 'IRCANTBS03',   // 3 mois
-  '6M': 'IRCANTBS06',   // 6 mois
-  '1Y': 'IRCANTBS01Y',  // 1 an
-  '2Y': 'IRCANTBS02Y',  // 2 ans
-  '3Y': 'IRCANTBS03Y',  // 3 ans
-  '5Y': 'IRCANTBS05Y',  // 5 ans
-  '7Y': 'IRCANTBS07Y',  // 7 ans
-  '10Y': 'IRCANTBS10Y', // 10 ans
-  '30Y': 'IRCANTBS30Y'  // 30 ans
+  '1M': 'V122529',   // 1 mois (BoC Valet)
+  '3M': 'V122530',   // 3 mois
+  '6M': 'V122533',   // 6 mois
+  '1Y': 'V122536',   // 1 an
+  '2Y': 'V122540',   // 2 ans
+  '3Y': 'V122541',   // 3 ans
+  '5Y': 'V122543',   // 5 ans
+  '7Y': 'V122544',   // 7 ans
+  '10Y': 'V122552',  // 10 ans
+  '30Y': 'V122554'   // 30 ans
 };
 
 const CANADA_FALLBACK = [
-  { maturity: '1M', rate: 4.85 },
-  { maturity: '3M', rate: 4.72 },
-  { maturity: '6M', rate: 4.55 },
-  { maturity: '1Y', rate: 4.32 },
-  { maturity: '2Y', rate: 4.10 },
-  { maturity: '3Y', rate: 3.95 },
-  { maturity: '5Y', rate: 3.72 },
-  { maturity: '7Y', rate: 3.58 },
-  { maturity: '10Y', rate: 3.41 },
-  { maturity: '30Y', rate: 3.25 }
+  { maturity: '1M', rate: 2.25 },
+  { maturity: '3M', rate: 2.35 },
+  { maturity: '6M', rate: 2.45 },
+  { maturity: '1Y', rate: 2.50 },
+  { maturity: '2Y', rate: 2.58 },
+  { maturity: '3Y', rate: 2.75 },
+  { maturity: '5Y', rate: 2.96 },
+  { maturity: '7Y', rate: 3.15 },
+  { maturity: '10Y', rate: 3.40 },
+  { maturity: '30Y', rate: 3.84 }
 ];
 
 // Convertir la maturité en mois pour le tri
@@ -56,6 +56,40 @@ function maturityToMonths(maturity) {
   if (maturity.includes('M')) return value;
   if (maturity.includes('Y')) return value * 12;
   return 0;
+}
+
+/**
+ * Récupère les données depuis Bank of Canada Valet API
+ */
+async function fetchFromBoC(seriesId) {
+  try {
+    const url = `https://www.bankofcanada.ca/valet/observations/${seriesId}/json?recent=1`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      console.warn(`⚠️ BoC API erreur pour ${seriesId}: ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+
+    if (data.observations && data.observations.length > 0) {
+      const latestObservation = data.observations[0];
+      const value = latestObservation[seriesId]?.v;
+
+      if (!value || value === null) return null;
+
+      return {
+        value: parseFloat(value),
+        date: latestObservation.d
+      };
+    }
+
+    return null;
+  } catch (error) {
+    console.error(`❌ Erreur BoC pour ${seriesId}:`, error.message);
+    return null;
+  }
 }
 
 /**
@@ -214,14 +248,14 @@ async function getUSTreasury() {
  * Récupère la courbe des taux Canada
  */
 async function getCanadaRates() {
-  console.log('📊 Récupération des taux Canada...');
+  console.log('📊 Récupération des taux Canada (via Bank of Canada)...');
 
   const rates = {};
   let fetchDate = null;
 
-  // Récupérer depuis FRED
+  // Récupérer depuis Bank of Canada
   for (const [maturity, seriesId] of Object.entries(CANADA_RATES)) {
-    const data = await fetchFromFRED(seriesId);
+    const data = await fetchFromBoC(seriesId);
     if (data) {
       rates[maturity] = data.value;
       if (!fetchDate) fetchDate = data.date;
@@ -251,7 +285,7 @@ async function getCanadaRates() {
     country: 'Canada',
     currency: 'CAD',
     rates: ratesArray,
-    source: 'FRED',
+    source: 'Bank of Canada',
     date: fetchDate,
     count: ratesArray.length
   };

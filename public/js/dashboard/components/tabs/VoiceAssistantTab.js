@@ -215,8 +215,8 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
                     'x-api-key': apiKey
                 },
                 body: JSON.stringify({
-                    replica_id: tavusConfig.replicaId || 'r9d30b0e55ac',
-                    persona_id: tavusConfig.personaId || 'pe13ed370726',
+                    replica_id: tavusConfig.replicaId || 'r9c55f9312fb',
+                    persona_id: tavusConfig.personaId || 'p68d02f5eb54',
                     conversation_name: `Session ${new Date().toLocaleString('fr-FR')}`,
                     custom_greeting: tavusConfig.customGreeting || 'Bonjour ! Je suis votre assistant virtuel. Comment puis-je vous aider ?',
                     properties: tavusConfig.options || {}

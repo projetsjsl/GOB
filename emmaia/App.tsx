@@ -58,7 +58,7 @@ const App: React.FC = () => {
     llmTemperature: 0.6,
     geminiVoice: VOICE_NAME,
     chatMode: 'solo',
-    heygenToken: '',
+    heygenToken: process.env.HEYGEN_API_KEY || '',
     heygenAvatarId: HEYGEN_AVATAR_ID,
     heygenQuality: 'medium',
     heygenEmotion: 'Friendly',

@@ -30,9 +30,9 @@ export const emmaConfig = {
 
   // Configuration Tavus (Video Avatar)
   tavus: {
-    apiKey: 'YOUR_TAVUS_API_KEY', // Placeholder
-    replicaId: 'default_replica_id', // Placeholder
-    personaId: 'default_persona_id', // Placeholder
+    apiKey: '28eb5b8a711a4abd9c82e77a7279f9ca', 
+    replicaId: 'r9c55f9312fb', 
+    personaId: 'p68d02f5eb54', 
     conversationId: null, // Will be set dynamically
     options: {
       enableVideo: true,
