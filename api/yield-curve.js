@@ -25,16 +25,20 @@ const US_TREASURY_RATES = {
 };
 
 const CANADA_RATES = {
-  '1M': 'V122529',   // 1 mois (BoC Valet)
-  '3M': 'V122530',   // 3 mois
-  '6M': 'V122533',   // 6 mois
-  '1Y': 'V122536',   // 1 an
-  '2Y': 'V122540',   // 2 ans
-  '3Y': 'V122541',   // 3 ans
-  '5Y': 'V122543',   // 5 ans
-  '7Y': 'V122544',   // 7 ans
-  '10Y': 'V122552',  // 10 ans
-  '30Y': 'V122554'   // 30 ans
+  // Treasury Bills (Bons du Trésor) - Secondary Market
+  '1M': 'V39063',
+  '2M': 'V39064',
+  '3M': 'V39065',
+  '6M': 'V39066',
+  '1Y': 'V39067',
+
+  // Benchmark Bonds (Obligations Gouvernementales)
+  '2Y': 'V39051',
+  '3Y': 'V39052',
+  '5Y': 'V39053',
+  '7Y': 'V39054',
+  '10Y': 'V39055',
+  '30Y': 'V39056'
 };
 
 const CANADA_FALLBACK = [
