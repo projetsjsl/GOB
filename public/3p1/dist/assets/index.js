@@ -33897,57 +33897,77 @@ Cette action est irréversible.`)) {
   ] });
 };
 const SensitivityTable = ({ baseEPS, baseGrowth, basePE }) => {
-  const growthSteps = [baseGrowth - 2, baseGrowth, baseGrowth + 2];
-  const peSteps = [basePE - 3, basePE, basePE + 3];
+  const safeBaseGrowth = baseGrowth != null && baseGrowth !== void 0 && isFinite(baseGrowth) ? baseGrowth : 0;
+  const safeBasePE = basePE != null && basePE !== void 0 && isFinite(basePE) ? basePE : 0;
+  const safeBaseEPS = baseEPS != null && baseEPS !== void 0 && isFinite(baseEPS) ? baseEPS : 0;
+  const growthSteps = [safeBaseGrowth - 2, safeBaseGrowth, safeBaseGrowth + 2].map((v) => v != null && isFinite(v) ? v : 0);
+  const peSteps = [safeBasePE - 3, safeBasePE, safeBasePE + 3].map((v) => v != null && isFinite(v) ? v : 0);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200 print-break-inside-avoid", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-bold text-gray-500 uppercase mb-3", children: "Matrice de Sensibilité (Prix Cible 5 ans)" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-xs text-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 bg-slate-100 border border-slate-200 rounded-tl", children: "P/E vs Croissance" }),
-        growthSteps.map((g) => /* @__PURE__ */ jsxRuntimeExports.jsxs("th", { className: "p-2 bg-slate-50 border border-slate-200 font-semibold", children: [
-          g.toFixed(1),
-          "%"
-        ] }, g))
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: peSteps.map((pe) => /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "p-2 bg-slate-50 border border-slate-200 font-semibold", children: [
-          pe.toFixed(1),
-          "x"
-        ] }),
-        growthSteps.map((g) => {
-          const projectedEPS = baseEPS * Math.pow(1 + g / 100, 5);
-          const target = projectedEPS * pe;
-          return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 border border-slate-200 hover:bg-blue-50 transition-colors", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `font-mono font-bold ${g === baseGrowth && pe === basePE ? "text-blue-600 text-sm" : "text-gray-700"}`, children: formatCurrency(target) }) }, `${pe}-${g}`);
+        growthSteps.map((g, idx) => {
+          const safeG = g != null && g !== void 0 && isFinite(g) ? g : 0;
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs("th", { className: "p-2 bg-slate-50 border border-slate-200 font-semibold", children: [
+            safeG.toFixed(1),
+            "%"
+          ] }, `growth-${idx}-${safeG}`);
         })
-      ] }, pe)) })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: peSteps.map((pe, peIdx) => {
+        const safePE = pe != null && pe !== void 0 && isFinite(pe) ? pe : 0;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "p-2 bg-slate-50 border border-slate-200 font-semibold", children: [
+            safePE.toFixed(1),
+            "x"
+          ] }),
+          growthSteps.map((g, gIdx) => {
+            const safeG = g != null && g !== void 0 && isFinite(g) ? g : 0;
+            const projectedEPS = safeBaseEPS * Math.pow(1 + safeG / 100, 5);
+            const target = projectedEPS * safePE;
+            return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 border border-slate-200 hover:bg-blue-50 transition-colors", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `font-mono font-bold ${safeG === safeBaseGrowth && safePE === safeBasePE ? "text-blue-600 text-sm" : "text-gray-700"}`, children: formatCurrency(target) }) }, `pe-${peIdx}-g-${gIdx}`);
+          })
+        ] }, `pe-${peIdx}-${safePE}`);
+      }) })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[10px] text-gray-400 mt-2 text-center italic", children: "Axe vertical : P/E Cible · Axe horizontal : Croissance BPA" })
   ] });
 };
 const SensitivityTablePCF = ({ baseCF, baseGrowth, basePCF }) => {
-  const growthSteps = [baseGrowth - 2, baseGrowth, baseGrowth + 2];
-  const pcfSteps = [basePCF - 3, basePCF, basePCF + 3];
+  const safeBaseGrowth = baseGrowth != null && baseGrowth !== void 0 && isFinite(baseGrowth) ? baseGrowth : 0;
+  const safeBasePCF = basePCF != null && basePCF !== void 0 && isFinite(basePCF) ? basePCF : 0;
+  const safeBaseCF = baseCF != null && baseCF !== void 0 && isFinite(baseCF) ? baseCF : 0;
+  const growthSteps = [safeBaseGrowth - 2, safeBaseGrowth, safeBaseGrowth + 2].map((v) => v != null && isFinite(v) ? v : 0);
+  const pcfSteps = [safeBasePCF - 3, safeBasePCF, safeBasePCF + 3].map((v) => v != null && isFinite(v) ? v : 0);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200 print-break-inside-avoid", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-bold text-gray-500 uppercase mb-3", children: "Matrice de Sensibilité P/FCF (Prix Cible 5 ans)" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-xs text-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 bg-slate-100 border border-slate-200 rounded-tl", children: "P/FCF vs Croissance" }),
-        growthSteps.map((g) => /* @__PURE__ */ jsxRuntimeExports.jsxs("th", { className: "p-2 bg-slate-50 border border-slate-200 font-semibold", children: [
-          g.toFixed(1),
-          "%"
-        ] }, g))
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: pcfSteps.map((pcf) => /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "p-2 bg-slate-50 border border-slate-200 font-semibold", children: [
-          pcf.toFixed(1),
-          "x"
-        ] }),
-        growthSteps.map((g) => {
-          const projectedCF = baseCF * Math.pow(1 + g / 100, 5);
-          const target = projectedCF * pcf;
-          return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 border border-slate-200 hover:bg-green-50 transition-colors", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `font-mono font-bold ${g === baseGrowth && pcf === basePCF ? "text-green-600 text-sm" : "text-gray-700"}`, children: formatCurrency(target) }) }, `${pcf}-${g}`);
+        growthSteps.map((g, idx) => {
+          const safeG = g != null && g !== void 0 && isFinite(g) ? g : 0;
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs("th", { className: "p-2 bg-slate-50 border border-slate-200 font-semibold", children: [
+            safeG.toFixed(1),
+            "%"
+          ] }, `growth-${idx}-${safeG}`);
         })
-      ] }, pcf)) })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: pcfSteps.map((pcf, pcfIdx) => {
+        const safePCF = pcf != null && pcf !== void 0 && isFinite(pcf) ? pcf : 0;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "p-2 bg-slate-50 border border-slate-200 font-semibold", children: [
+            safePCF.toFixed(1),
+            "x"
+          ] }),
+          growthSteps.map((g, gIdx) => {
+            const safeG = g != null && g !== void 0 && isFinite(g) ? g : 0;
+            const projectedCF = safeBaseCF * Math.pow(1 + safeG / 100, 5);
+            const target = projectedCF * safePCF;
+            return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 border border-slate-200 hover:bg-green-50 transition-colors", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `font-mono font-bold ${safeG === safeBaseGrowth && safePCF === safeBasePCF ? "text-green-600 text-sm" : "text-gray-700"}`, children: formatCurrency(target) }) }, `pcf-${pcfIdx}-g-${gIdx}`);
+          })
+        ] }, `pcf-${pcfIdx}-${safePCF}`);
+      }) })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[10px] text-gray-400 mt-2 text-center italic", children: "Axe vertical : P/FCF Cible · Axe horizontal : Croissance CF" })
   ] });

@@ -8,9 +8,14 @@ interface SensitivityTableProps {
 }
 
 export const SensitivityTable: React.FC<SensitivityTableProps> = ({ baseEPS, baseGrowth, basePE }) => {
-  // Variations
-  const growthSteps = [baseGrowth - 2, baseGrowth, baseGrowth + 2];
-  const peSteps = [basePE - 3, basePE, basePE + 3];
+  // Vérifier que les valeurs de base sont définies - protection complète contre undefined
+  const safeBaseGrowth = (baseGrowth != null && baseGrowth !== undefined && isFinite(baseGrowth)) ? baseGrowth : 0;
+  const safeBasePE = (basePE != null && basePE !== undefined && isFinite(basePE)) ? basePE : 0;
+  const safeBaseEPS = (baseEPS != null && baseEPS !== undefined && isFinite(baseEPS)) ? baseEPS : 0;
+
+  // Variations - s'assurer que les valeurs sont toujours des nombres
+  const growthSteps = [safeBaseGrowth - 2, safeBaseGrowth, safeBaseGrowth + 2].map(v => (v != null && isFinite(v)) ? v : 0);
+  const peSteps = [safeBasePE - 3, safeBasePE, safeBasePE + 3].map(v => (v != null && isFinite(v)) ? v : 0);
 
   return (
     <div className="bg-white p-4 rounded-lg shadow border border-gray-200 print-break-inside-avoid">
@@ -20,30 +25,37 @@ export const SensitivityTable: React.FC<SensitivityTableProps> = ({ baseEPS, bas
           <thead>
             <tr>
               <th className="p-2 bg-slate-100 border border-slate-200 rounded-tl">P/E vs Croissance</th>
-              {growthSteps.map(g => (
-                <th key={g} className="p-2 bg-slate-50 border border-slate-200 font-semibold">
-                  {g.toFixed(1)}%
-                </th>
-              ))}
+              {growthSteps.map((g, idx) => {
+                const safeG = (g != null && g !== undefined && isFinite(g)) ? g : 0;
+                return (
+                  <th key={`growth-${idx}-${safeG}`} className="p-2 bg-slate-50 border border-slate-200 font-semibold">
+                    {safeG.toFixed(1)}%
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
-            {peSteps.map(pe => (
-              <tr key={pe}>
-                <td className="p-2 bg-slate-50 border border-slate-200 font-semibold">{pe.toFixed(1)}x</td>
-                {growthSteps.map(g => {
-                  const projectedEPS = baseEPS * Math.pow(1 + g / 100, 5);
-                  const target = projectedEPS * pe;
-                  return (
-                    <td key={`${pe}-${g}`} className="p-2 border border-slate-200 hover:bg-blue-50 transition-colors">
-                      <span className={`font-mono font-bold ${g === baseGrowth && pe === basePE ? 'text-blue-600 text-sm' : 'text-gray-700'}`}>
-                        {formatCurrency(target)}
-                      </span>
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
+            {peSteps.map((pe, peIdx) => {
+              const safePE = (pe != null && pe !== undefined && isFinite(pe)) ? pe : 0;
+              return (
+                <tr key={`pe-${peIdx}-${safePE}`}>
+                  <td className="p-2 bg-slate-50 border border-slate-200 font-semibold">{safePE.toFixed(1)}x</td>
+                  {growthSteps.map((g, gIdx) => {
+                    const safeG = (g != null && g !== undefined && isFinite(g)) ? g : 0;
+                    const projectedEPS = safeBaseEPS * Math.pow(1 + safeG / 100, 5);
+                    const target = projectedEPS * safePE;
+                    return (
+                      <td key={`pe-${peIdx}-g-${gIdx}`} className="p-2 border border-slate-200 hover:bg-blue-50 transition-colors">
+                        <span className={`font-mono font-bold ${safeG === safeBaseGrowth && safePE === safeBasePE ? 'text-blue-600 text-sm' : 'text-gray-700'}`}>
+                          {formatCurrency(target)}
+                        </span>
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

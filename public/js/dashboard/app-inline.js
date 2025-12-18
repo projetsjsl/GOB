@@ -14312,7 +14312,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         <div class="text-xs px-2 py-1 ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'}">
                                             📈 TradingView Chart: ${tag.ticker}
                                         </div>
-                                        <div class="tradingview-widget-container" style="height:400px;width:100%;">
+                                        <div class="tradingview-widget-container" style="height:900px;width:100%;">
                                             <iframe
                                                 src="https://www.tradingview.com/widgetembed/?symbol=${tvSymbol}&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=${isDarkMode ? 'dark' : 'light'}&style=1&timezone=America%2FNew_York&withdateranges=1&showpopupbutton=1&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=fr"
                                                 style="width:100%;height:100%;border:0;"
@@ -16798,7 +16798,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     Indices majeurs, Forex, Crypto - Données en direct
                                 </p>
                             </div>
-                            <div ref={marketOverviewRef} style={{height: '400px'}}></div>
+                            <div ref={marketOverviewRef} style={{height: '800px'}}></div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -16815,7 +16815,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         🔥 Heatmap Boursière
                                     </h3>
                                 </div>
-                                <div ref={heatmapRef} style={{height: '400px'}}></div>
+                                <div ref={heatmapRef} style={{height: '800px'}}></div>
                             </div>
 
                             {/* Screener Widget */}
@@ -16823,7 +16823,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 isDarkMode
                                     ? 'bg-gray-800/50 border-purple-500/30'
                                     : 'bg-white border-purple-400/40'
-                            }`}>
+                            }`} style={{width: '1047px', height: '800px'}}>
                                 <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                                     <h3 className={`text-lg font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
@@ -16831,7 +16831,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         🚀 Screener
                                     </h3>
                                 </div>
-                                <div ref={screenerRef} style={{height: '400px'}}></div>
+                                <div ref={screenerRef} style={{height: '700px'}}></div>
                             </div>
                         </div>
                     </div>
@@ -20917,7 +20917,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     locale: 'fr',
                     currencies: ['EUR', 'USD', 'JPY', 'GBP', 'CHF', 'AUD', 'CAD', 'CNY'],
                     width: '100%',
-                    height: 400
+                    height: 900
                 });
 
                 container.appendChild(script);
@@ -20991,7 +20991,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     ],
                     backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
                     width: '100%',
-                    height: 400
+                    height: 900
                 });
 
                 container.appendChild(script);
@@ -21168,7 +21168,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         'STD;RSI'
                     ],
                     width: 1200,
-                    height: 800
+                    height: 1200
                 });
 
                 container.appendChild(script);
@@ -21200,7 +21200,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     backgroundColor: '#0F0F0F',
                     support_host: 'https://www.tradingview.com',
                     width: 600,
-                    height: 800,
+                    height: 1200,
                     symbolsGroups: [
                         {
                             name: 'Indices',
@@ -21537,7 +21537,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </p>
                             </div>
 
-                            <div className="h-[400px] md:h-[500px] lg:h-[600px]">
+                            <div className="h-[800px] md:h-[900px] lg:h-[1000px]">
                                 <div className="tradingview-widget-container h-full" ref={tradingViewEventsRef}>
                                     {/* Le widget sera injecté ici par le script */}
                                 </div>
@@ -21592,7 +21592,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </p>
                             </div>
 
-                            <div className="h-[500px] md:h-[700px] lg:h-[900px]">
+                            <div className="h-[900px] md:h-[1100px] lg:h-[1300px]">
                                 <div className="tradingview-widget-container h-full" ref={tradingViewHeatmapRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -21625,7 +21625,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </p>
                         </div>
 
-                        <div className="h-[500px] md:h-[700px] lg:h-[900px]">
+                        <div className="h-[900px] md:h-[1100px] lg:h-[1300px]">
                             <div className="tradingview-widget-container h-full" ref={tradingViewHeatmapTSXRef}>
                                 <div className="tradingview-widget-container__widget"></div>
                                 <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -21659,7 +21659,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </p>
                         </div>
 
-                        <div className="h-[600px] md:h-[700px] lg:h-[850px]">
+                        <div className="h-[1000px] md:h-[1100px] lg:h-[1200px]">
                             <div className="tradingview-widget-container h-full" ref={tradingViewMarketQuotesRef}>
                                 <div className="tradingview-widget-container__widget"></div>
                                 <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -22094,7 +22094,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </p>
                             </div>
 
-                            <div className="h-[600px] md:h-[700px] lg:h-[800px]">
+                            <div className="h-[1000px] md:h-[1100px] lg:h-[1200px]">
                                 <div className="tradingview-widget-container h-full" ref={tradingViewScreenerRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -22703,7 +22703,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     countryFilter: 'ar,au,br,ca,cn,fr,de,in,id,it,jp,kr,mx,ru,sa,za,tr,gb,us,eu',
                     importanceFilter: '-1,0,1',
                     width: '100%',
-                    height: 600
+                    height: 1000
                 });
                 container.appendChild(script);
                 return () => { if (container) container.innerHTML = ''; };
@@ -22729,7 +22729,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         locale: 'fr',
                         currencies: ['EUR', 'USD', 'JPY', 'GBP', 'CHF', 'AUD', 'CAD', 'CNY'],
                         width: '100%',
-                        height: 500
+                        height: 900
                     });
                     container.appendChild(script);
                 }
@@ -22747,7 +22747,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         locale: 'fr',
                         currencies: ['EUR', 'USD', 'JPY', 'GBP', 'CHF', 'AUD', 'CAD', 'NZD', 'CNY'],
                         width: '100%',
-                        height: 400
+                        height: 900
                     });
                     container.appendChild(script);
                 }
@@ -22779,7 +22779,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     hasSymbolTooltip: true,
                     isMonoSize: false,
                     width: '100%',
-                    height: 600
+                    height: 1000
                 });
                 container.appendChild(script);
                 return () => { if (container) container.innerHTML = ''; };
@@ -22798,7 +22798,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     colorTheme: isDarkMode ? 'dark' : 'light',
                     locale: 'fr',
                     width: '100%',
-                    height: 800,
+                    height: 1200,
                     symbolsGroups: [
                         {
                             name: 'Indices',
@@ -23393,7 +23393,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             📅 Calendrier TradingView
                                         </h3>
                                     </div>
-                                    <div className="tradingview-widget-container" ref={tradingViewEventsRef}></div>
+                                    <div className="tradingview-widget-container" style={{height: '900px'}} ref={tradingViewEventsRef}></div>
                                 </div>
                             </ExpandableComponent>
                         </div>
@@ -23404,7 +23404,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             <ExpandableComponent title="Heat Map Forex" icon="💱" isDarkMode={isDarkMode}>
                                 <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                     <h3 className="p-4 text-lg font-bold">Heat Map Forex</h3>
-                                    <div className="tradingview-widget-container" ref={tradingViewForexRef}></div>
+                                    <div className="tradingview-widget-container" style={{height: '900px'}} ref={tradingViewForexRef}></div>
                                 </div>
                             </ExpandableComponent>
                             <ExpandableComponent title="Cross Rates" icon="💱" isDarkMode={isDarkMode}>
@@ -23418,7 +23418,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                     {activeSubTab === 'stocks' && (
                         <ExpandableComponent title="Stock Heatmaps" icon="🔥" isDarkMode={isDarkMode}>
-                            <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'} min-h-[700px]`}>
+                            <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'} min-h-[1100px]`}>
                                 <div className="p-4 border-b border-gray-700 flex gap-4">
                                     <button 
                                         onClick={() => setHeatmapSource('USA')}
@@ -23434,10 +23434,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </button>
                                 </div>
                                 {heatmapSource === 'USA' && 
-                                    <div className="tradingview-widget-container h-[600px]" ref={tradingViewHeatmapRef}></div>
+                                    <div className="tradingview-widget-container h-[1000px]" ref={tradingViewHeatmapRef}></div>
                                 }
                                 {heatmapSource === 'TSX' && 
-                                    <div className="tradingview-widget-container h-[600px]" ref={tradingViewHeatmapTSXRef}></div>
+                                    <div className="tradingview-widget-container h-[1000px]" ref={tradingViewHeatmapTSXRef}></div>
                                 }
                             </div>
                         </ExpandableComponent>
@@ -23496,7 +23496,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             Indices majeurs, Forex, Crypto - Données en direct
                                         </p>
                                     </div>
-                                    <div ref={marketOverviewRef} style={{ height: '400px' }}></div>
+                                    <div ref={marketOverviewRef} style={{ height: '900px' }}></div>
                                 </div>
                             </ExpandableComponent>
 
@@ -23514,7 +23514,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             Visualisation des performances par secteur
                                         </p>
                                     </div>
-                                    <div ref={heatmapRef} style={{ height: '500px' }}></div>
+                                    <div ref={heatmapRef} style={{ height: '900px' }}></div>
                                 </div>
                             </ExpandableComponent>
 
@@ -23532,7 +23532,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             Actions les plus performantes et en baisse
                                         </p>
                                     </div>
-                                    <div ref={screenerRef} style={{ height: '500px' }}></div>
+                                    <div ref={screenerRef} style={{ height: '900px' }}></div>
                                 </div>
                             </ExpandableComponent>
                         </div>

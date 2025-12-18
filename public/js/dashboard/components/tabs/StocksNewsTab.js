@@ -342,7 +342,7 @@ const StocksNewsTab = (props) => {
                             Indices majeurs, Forex, Crypto - Données en direct
                         </p>
                     </div>
-                    <div ref={marketOverviewRef} style={{height: '400px'}}></div>
+                    <div ref={marketOverviewRef} style={{height: '800px'}}></div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -359,7 +359,7 @@ const StocksNewsTab = (props) => {
                                 🚀 Screener
                             </h3>
                         </div>
-                        <div ref={screenerRef} style={{height: '400px'}}></div>
+                        <div ref={screenerRef} style={{height: '700px'}}></div>
                     </div>
                 </div>
             </div>

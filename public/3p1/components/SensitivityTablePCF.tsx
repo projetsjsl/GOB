@@ -8,9 +8,14 @@ interface SensitivityTablePCFProps {
 }
 
 export const SensitivityTablePCF: React.FC<SensitivityTablePCFProps> = ({ baseCF, baseGrowth, basePCF }) => {
-  // Variations
-  const growthSteps = [baseGrowth - 2, baseGrowth, baseGrowth + 2];
-  const pcfSteps = [basePCF - 3, basePCF, basePCF + 3];
+  // Vérifier que les valeurs de base sont définies - protection complète contre undefined
+  const safeBaseGrowth = (baseGrowth != null && baseGrowth !== undefined && isFinite(baseGrowth)) ? baseGrowth : 0;
+  const safeBasePCF = (basePCF != null && basePCF !== undefined && isFinite(basePCF)) ? basePCF : 0;
+  const safeBaseCF = (baseCF != null && baseCF !== undefined && isFinite(baseCF)) ? baseCF : 0;
+
+  // Variations - s'assurer que les valeurs sont toujours des nombres
+  const growthSteps = [safeBaseGrowth - 2, safeBaseGrowth, safeBaseGrowth + 2].map(v => (v != null && isFinite(v)) ? v : 0);
+  const pcfSteps = [safeBasePCF - 3, safeBasePCF, safeBasePCF + 3].map(v => (v != null && isFinite(v)) ? v : 0);
 
   return (
     <div className="bg-white p-4 rounded-lg shadow border border-gray-200 print-break-inside-avoid">
@@ -20,30 +25,37 @@ export const SensitivityTablePCF: React.FC<SensitivityTablePCFProps> = ({ baseCF
           <thead>
             <tr>
               <th className="p-2 bg-slate-100 border border-slate-200 rounded-tl">P/FCF vs Croissance</th>
-              {growthSteps.map(g => (
-                <th key={g} className="p-2 bg-slate-50 border border-slate-200 font-semibold">
-                  {g.toFixed(1)}%
-                </th>
-              ))}
+              {growthSteps.map((g, idx) => {
+                const safeG = (g != null && g !== undefined && isFinite(g)) ? g : 0;
+                return (
+                  <th key={`growth-${idx}-${safeG}`} className="p-2 bg-slate-50 border border-slate-200 font-semibold">
+                    {safeG.toFixed(1)}%
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
-            {pcfSteps.map(pcf => (
-              <tr key={pcf}>
-                <td className="p-2 bg-slate-50 border border-slate-200 font-semibold">{pcf.toFixed(1)}x</td>
-                {growthSteps.map(g => {
-                  const projectedCF = baseCF * Math.pow(1 + g / 100, 5);
-                  const target = projectedCF * pcf;
-                  return (
-                    <td key={`${pcf}-${g}`} className="p-2 border border-slate-200 hover:bg-green-50 transition-colors">
-                      <span className={`font-mono font-bold ${g === baseGrowth && pcf === basePCF ? 'text-green-600 text-sm' : 'text-gray-700'}`}>
-                        {formatCurrency(target)}
-                      </span>
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
+            {pcfSteps.map((pcf, pcfIdx) => {
+              const safePCF = (pcf != null && pcf !== undefined && isFinite(pcf)) ? pcf : 0;
+              return (
+                <tr key={`pcf-${pcfIdx}-${safePCF}`}>
+                  <td className="p-2 bg-slate-50 border border-slate-200 font-semibold">{safePCF.toFixed(1)}x</td>
+                  {growthSteps.map((g, gIdx) => {
+                    const safeG = (g != null && g !== undefined && isFinite(g)) ? g : 0;
+                    const projectedCF = safeBaseCF * Math.pow(1 + safeG / 100, 5);
+                    const target = projectedCF * safePCF;
+                    return (
+                      <td key={`pcf-${pcfIdx}-g-${gIdx}`} className="p-2 border border-slate-200 hover:bg-green-50 transition-colors">
+                        <span className={`font-mono font-bold ${safeG === safeBaseGrowth && safePCF === safeBasePCF ? 'text-green-600 text-sm' : 'text-gray-700'}`}>
+                          {formatCurrency(target)}
+                        </span>
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
