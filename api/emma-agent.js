@@ -3415,7 +3415,7 @@ Structure ta réponse de manière professionnelle et facile à lire. Sois exhaus
                 const searchResponse = await fetch('https://api.perplexity.ai/chat/completions', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+                        'Authorization': `Bearer ${perplexityApiKey}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(searchRequestBody),
@@ -3499,7 +3499,7 @@ Sois exhaustif et cite tes sources.`;
                 const searchResponse = await fetch('https://api.perplexity.ai/chat/completions', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+                        'Authorization': `Bearer ${perplexityApiKey}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(searchRequestBody),
@@ -3636,8 +3636,9 @@ ACHETER < 340$ (marge 25%+)
                 console.warn(`⚠️ Invalid recency value "${recency}", omitting recency filter`);
             }
 
-            // Vérifier que la clé API est définie
-            if (!process.env.PERPLEXITY_API_KEY) {
+            // Vérifier que la clé API est définie (avec fallback)
+            const perplexityApiKey = process.env.PERPLEXITY_API_KEY || process.env.NEXT_PUBLIC_PERPLEXITY_API_KEY;
+            if (!perplexityApiKey) {
                 console.error('\n' + '='.repeat(60));
                 console.error('❌ PERPLEXITY_API_KEY NOT CONFIGURED');
                 console.error('='.repeat(60));
@@ -3645,6 +3646,7 @@ ACHETER < 340$ (marge 25%+)
                 console.error('   → Solution: Ajouter PERPLEXITY_API_KEY dans Vercel Environment Variables');
                 console.error('   → Format attendu: pplx-...');
                 console.error('   → Vérifiez: Vercel Dashboard → Settings → Environment Variables');
+                console.error('   → Available env vars:', Object.keys(process.env).filter(k => k.includes('PERPLEXITY') || k.includes('API_KEY')).slice(0, 10));
                 console.error('='.repeat(60) + '\n');
                 console.log('🔄 Falling back to Gemini...');
                 throw new Error('PERPLEXITY_API_KEY not configured');
@@ -3675,7 +3677,7 @@ ACHETER < 340$ (marge 25%+)
 
             try {
                 const result = await callPerplexityWithFallback(requestBody, {
-                    apiKey: process.env.PERPLEXITY_API_KEY,
+                    apiKey: perplexityApiKey,
                     maxRetries: 1, // Perplexity stable, 1 retry suffit
                     logAttempts: true,
                     timeoutMs: timeoutDuration
@@ -4510,12 +4512,18 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    // Vérifier que PERPLEXITY_API_KEY est configurée
-    if (!process.env.PERPLEXITY_API_KEY) {
+    // Vérifier que PERPLEXITY_API_KEY est configurée (avec fallback)
+    const perplexityKey = process.env.PERPLEXITY_API_KEY || process.env.NEXT_PUBLIC_PERPLEXITY_API_KEY;
+    if (!perplexityKey) {
         console.error('❌ PERPLEXITY_API_KEY is not configured!');
+        console.error('Available env vars:', {
+            hasPerplexityKey: !!process.env.PERPLEXITY_API_KEY,
+            hasNextPublicPerplexityKey: !!process.env.NEXT_PUBLIC_PERPLEXITY_API_KEY,
+            envKeys: Object.keys(process.env).filter(k => k.includes('PERPLEXITY') || k.includes('API_KEY')).slice(0, 10)
+        });
         return res.status(503).json({
             success: false,
-            error: 'PERPLEXITY_API_KEY non configurée',
+            error: 'Perplexity API key not configured (PERPLEXITY_API_KEY)',
             response: '⚙️ Configuration manquante: La clé API Perplexity n\'est pas configurée dans Vercel. Veuillez ajouter PERPLEXITY_API_KEY dans les variables d\'environnement Vercel.',
             is_reliable: false
         });
