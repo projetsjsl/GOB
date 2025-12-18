@@ -1483,12 +1483,15 @@ export default function App() {
             setPastData(prev => [...prev, data]);
             setFutureData([]);
 
+            // ✅ CRITIQUE : Déclarer mergedData en dehors du if pour qu'il soit accessible partout
+            let mergedData: AnnualData[] = data.length > 0 ? [...data] : [];
+
             // Update Data avec merge intelligent : préserver les données manuelles
             if (result.data.length > 0) {
                 // Merge intelligent : préserver les données manuelles (comme dans handleBulkSyncAllTickers)
                 const newDataByYear = new Map(result.data.map(row => [row.year, row]));
                 
-                const mergedData = data.map((existingRow) => {
+                mergedData = data.map((existingRow) => {
                     const newRow = newDataByYear.get(existingRow.year);
                     
                     // Si pas de nouvelle donnée pour cette année, garder l'existant
@@ -1597,8 +1600,9 @@ export default function App() {
 
             // Auto-fill assumptions basées sur les données historiques FMP (fonction centralisée)
             // ⚠️ IMPORTANT : On préserve les hypothèses existantes (orange) sauf currentPrice
-            // Utiliser les données mergées (avec préservation des données manuelles) pour le calcul
-            const mergedDataForCalc = data.length > 0 ? data : result.data;
+            // ✅ CRITIQUE : Utiliser mergedData (défini ci-dessus) au lieu de data (ancienne valeur)
+            // mergedData contient les données mergées avec préservation des données manuelles
+            const mergedDataForCalc = mergedData.length > 0 ? mergedData : result.data;
             const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
                 mergedDataForCalc, // Utiliser les données mergées au lieu de result.data
                 result.currentPrice,
@@ -1618,7 +1622,8 @@ export default function App() {
             });
 
             // Détecter et exclure automatiquement les métriques avec prix cibles aberrants
-            const finalData = data.length > 0 ? data : result.data; // Utiliser les données mergées
+            // ✅ CRITIQUE : Utiliser mergedData (défini ci-dessus) qui contient les données mergées
+            const finalData = mergedData.length > 0 ? mergedData : result.data;
             
             // ✅ SIMPLIFIÉ : Plus besoin de sanitiser manuellement, setAssumptions le fait automatiquement !
             // Merger les assumptions (auto-filled prend priorité sur existantes)

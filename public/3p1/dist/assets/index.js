@@ -52939,9 +52939,10 @@ Vérifiez votre connexion et réessayez.`,
       const result = await fetchCompanyData(activeId);
       setPastData((prev) => [...prev, data]);
       setFutureData([]);
+      let mergedData = data.length > 0 ? [...data] : [];
       if (result.data.length > 0) {
         const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
-        const mergedData = data.map((existingRow) => {
+        mergedData = data.map((existingRow) => {
           const newRow = newDataByYear.get(existingRow.year);
           if (!newRow) {
             return existingRow;
@@ -53020,7 +53021,7 @@ Vérifiez votre connexion et réessayez.`,
           };
         });
       }
-      const mergedDataForCalc = data.length > 0 ? data : result.data;
+      const mergedDataForCalc = mergedData.length > 0 ? mergedData : result.data;
       const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
         mergedDataForCalc,
         // Utiliser les données mergées au lieu de result.data
@@ -53039,7 +53040,7 @@ Vérifiez votre connexion et réessayez.`,
         targetPCF: autoFilledAssumptions.targetPCF,
         targetPBV: autoFilledAssumptions.targetPBV
       });
-      const finalData = data.length > 0 ? data : result.data;
+      const finalData = mergedData.length > 0 ? mergedData : result.data;
       const finalAssumptions = {
         ...assumptions,
         ...autoFilledAssumptions
