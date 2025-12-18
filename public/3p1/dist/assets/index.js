@@ -54008,6 +54008,7 @@ Vérifiez votre connexion et réessayez.`,
   };
   const performSync = async (saveCurrentVersion, syncOptions) => {
     var _a4, _b3, _c, _d, _e, _f, _g;
+    setIsLoading(true);
     try {
       if (saveCurrentVersion) {
         const hasValidData = data && data.length > 0;

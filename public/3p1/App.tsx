@@ -1444,6 +1444,7 @@ export default function App() {
     };
 
     const performSync = async (saveCurrentVersion: boolean, syncOptions?: SyncOptions) => {
+        setIsLoading(true);
         try {
             // Save current version if requested AND we have valid data
             if (saveCurrentVersion) {
