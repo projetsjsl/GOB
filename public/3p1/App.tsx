@@ -14,6 +14,7 @@ import { AdditionalMetrics } from './components/AdditionalMetrics';
 import { InfoTab } from './components/InfoTab';
 import { TickerSearch } from './components/TickerSearch';
 import { ConfirmSyncDialog } from './components/ConfirmSyncDialog';
+import { AdvancedSyncDialog, SyncOptions } from './components/AdvancedSyncDialog';
 import { HistoricalVersionBanner } from './components/HistoricalVersionBanner';
 import { NotificationManager } from './components/Notification';
 import { SyncProgressBar } from './components/SyncProgressBar';
@@ -155,6 +156,8 @@ export default function App() {
     const [currentView, setCurrentView] = useState<'analysis' | 'info' | 'kpi'>('analysis');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [showConfirmSync, setShowConfirmSync] = useState(false);
+    const [showAdvancedSyncDialog, setShowAdvancedSyncDialog] = useState(false);
+    const [isAdvancedSyncForBulk, setIsAdvancedSyncForBulk] = useState(false);
     const [showRestoreDialog, setShowRestoreDialog] = useState(false);
     const [latestSnapshotDate, setLatestSnapshotDate] = useState<string | undefined>(undefined);
     const [notifications, setNotifications] = useState<Array<{ id: string; message: string; type: 'success' | 'error' | 'warning' | 'info' }>>([]);
@@ -1434,19 +1437,12 @@ export default function App() {
     // --- HANDLERS ---
 
     const handleFetchData = async () => {
-        // Check if manual edits exist
-        const hasEdits = hasManualEdits(data);
-
-        if (hasEdits) {
-            // Show confirmation dialog
-            setShowConfirmSync(true);
-        } else {
-            // No manual edits, sync directly
-            await performSync(false);
-        }
+        // Ouvrir le dialogue avancé au lieu du dialogue simple
+        setIsAdvancedSyncForBulk(false);
+        setShowAdvancedSyncDialog(true);
     };
 
-    const performSync = async (saveCurrentVersion: boolean) => {
+    const performSync = async (saveCurrentVersion: boolean, syncOptions?: SyncOptions) => {
         try {
             // Save current version if requested AND we have valid data
             if (saveCurrentVersion) {
@@ -1486,41 +1482,88 @@ export default function App() {
             // ✅ CRITIQUE : Déclarer mergedData en dehors du if pour qu'il soit accessible partout
             let mergedData: AnnualData[] = data.length > 0 ? [...data] : [];
 
-            // Update Data avec merge intelligent : préserver les données manuelles
-            if (result.data.length > 0) {
+            // Update Data avec merge intelligent : préserver les données manuelles (sauf si forceReplace)
+            if (result.data.length > 0 && syncOptions?.syncData) {
                 // Merge intelligent : préserver les données manuelles (comme dans handleBulkSyncAllTickers)
                 const newDataByYear = new Map(result.data.map(row => [row.year, row]));
                 
-                mergedData = data.map((existingRow) => {
-                    const newRow = newDataByYear.get(existingRow.year);
-                    
-                    // Si pas de nouvelle donnée pour cette année, garder l'existant
-                    if (!newRow) {
-                        return existingRow;
-                    }
+                // Si syncOnlyNewYears, ne traiter que les nouvelles années
+                if (syncOptions?.syncOnlyNewYears) {
+                    result.data.forEach(newRow => {
+                        const exists = mergedData.some(row => row.year === newRow.year);
+                        if (!exists) {
+                            mergedData.push({
+                                ...newRow,
+                                autoFetched: true
+                            });
+                        }
+                    });
+                } else {
+                    // Traitement normal : mettre à jour toutes les années
+                    mergedData = data.map((existingRow) => {
+                        const newRow = newDataByYear.get(existingRow.year);
+                        
+                        // Si pas de nouvelle donnée pour cette année, garder l'existant
+                        if (!newRow) {
+                            return existingRow;
+                        }
 
-                    // Si la donnée existante est manuelle (autoFetched: false ou undefined), la garder
-                    if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
-                        return existingRow; // Préserver la donnée manuelle
-                    }
+                        // Si forceReplace est true, remplacer toutes les données
+                        if (syncOptions?.forceReplace) {
+                            return {
+                                ...(newRow as AnnualData),
+                                autoFetched: true
+                            };
+                        }
 
-                    // Sinon, utiliser la nouvelle donnée avec autoFetched: true
-                    return {
-                        ...(newRow as AnnualData),
-                        autoFetched: true
-                    };
-                });
+                        // Si syncOnlyMissingMetrics, ne remplir que les champs vides
+                        if (syncOptions?.syncOnlyMissingMetrics) {
+                            const updatedRow = { ...existingRow };
+                            // Mettre à jour uniquement les champs qui sont 0, null ou undefined
+                            if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === undefined) && newRow.earningsPerShare > 0) {
+                                updatedRow.earningsPerShare = newRow.earningsPerShare;
+                            }
+                            if ((existingRow.cashFlowPerShare === 0 || existingRow.cashFlowPerShare === null || existingRow.cashFlowPerShare === undefined) && newRow.cashFlowPerShare > 0) {
+                                updatedRow.cashFlowPerShare = newRow.cashFlowPerShare;
+                            }
+                            if ((existingRow.bookValuePerShare === 0 || existingRow.bookValuePerShare === null || existingRow.bookValuePerShare === undefined) && newRow.bookValuePerShare > 0) {
+                                updatedRow.bookValuePerShare = newRow.bookValuePerShare;
+                            }
+                            if ((existingRow.dividendPerShare === 0 || existingRow.dividendPerShare === null || existingRow.dividendPerShare === undefined) && newRow.dividendPerShare > 0) {
+                                updatedRow.dividendPerShare = newRow.dividendPerShare;
+                            }
+                            if ((existingRow.priceHigh === 0 || existingRow.priceHigh === null || existingRow.priceHigh === undefined) && newRow.priceHigh > 0) {
+                                updatedRow.priceHigh = newRow.priceHigh;
+                            }
+                            if ((existingRow.priceLow === 0 || existingRow.priceLow === null || existingRow.priceLow === undefined) && newRow.priceLow > 0) {
+                                updatedRow.priceLow = newRow.priceLow;
+                            }
+                            return updatedRow;
+                        }
 
-                // Ajouter les nouvelles années qui n'existent pas dans les données existantes
-                result.data.forEach(newRow => {
-                    const exists = mergedData.some(row => row.year === newRow.year);
-                    if (!exists) {
-                        mergedData.push({
-                            ...newRow,
+                        // Si la donnée existante est manuelle (autoFetched: false ou undefined), la garder
+                        if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
+                            return existingRow; // Préserver la donnée manuelle
+                        }
+
+                        // Sinon, utiliser la nouvelle donnée avec autoFetched: true
+                        return {
+                            ...(newRow as AnnualData),
                             autoFetched: true
-                        });
-                    }
-                });
+                        };
+                    });
+
+                    // Ajouter les nouvelles années qui n'existent pas dans les données existantes
+                    result.data.forEach(newRow => {
+                        const exists = mergedData.some(row => row.year === newRow.year);
+                        if (!exists) {
+                            mergedData.push({
+                                ...newRow,
+                                autoFetched: true
+                            });
+                        }
+                    });
+                }
 
                 // Trier par année
                 mergedData.sort((a, b) => a.year - b.year);
@@ -1548,7 +1591,7 @@ export default function App() {
             }
 
             // Update Info (including logo and beta, but preserve ValueLine metrics)
-            if (result.info) {
+            if (result.info && syncOptions?.syncInfo !== false) {
                 // ⚠️ MULTI-UTILISATEUR : Recharger les métriques ValueLine depuis Supabase lors de la synchronisation FMP
                 // Pour garantir que tous les utilisateurs voient les mêmes valeurs
                 const existingProfile = library[activeId];
@@ -1618,14 +1661,16 @@ export default function App() {
             }
 
             // Auto-fill assumptions basées sur les données historiques FMP (fonction centralisée)
-            // ⚠️ IMPORTANT : On préserve les hypothèses existantes (orange) sauf currentPrice
+            // ⚠️ IMPORTANT : On préserve les hypothèses existantes (orange) sauf si replaceOrangeData est true
             // ✅ CRITIQUE : Utiliser mergedData (défini ci-dessus) au lieu de data (ancienne valeur)
             // mergedData contient les données mergées avec préservation des données manuelles
             const mergedDataForCalc = mergedData.length > 0 ? mergedData : result.data;
+            // Si replaceOrangeData est true, passer undefined pour forcer le recalcul de toutes les assumptions
+            const existingAssumptionsForCalc = syncOptions?.replaceOrangeData ? undefined : assumptions;
             const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
                 mergedDataForCalc, // Utiliser les données mergées au lieu de result.data
                 result.currentPrice,
-                assumptions // Préserver les valeurs existantes (excludeEPS, excludeCF, etc.)
+                existingAssumptionsForCalc // Préserver les valeurs existantes seulement si replaceOrangeData est false
             );
 
             console.log('✅ Auto-filled assumptions in performSync (AVANT setAssumptions):', {
@@ -1642,9 +1687,28 @@ export default function App() {
             });
 
             setAssumptions(prev => {
+                // Détecter les outliers si l'option est activée
+                let outlierDetection = { 
+                    detectedOutliers: [], 
+                    excludeEPS: prev.excludeEPS || false,
+                    excludeCF: prev.excludeCF || false,
+                    excludeBV: prev.excludeBV || false,
+                    excludeDIV: prev.excludeDIV || false
+                };
+                
+                if (syncOptions?.recalculateOutliers !== false) {
+                    const tempAssumptions = { ...prev, ...autoFilledAssumptions } as Assumptions;
+                    outlierDetection = detectOutlierMetrics(mergedDataForCalc, tempAssumptions);
+                }
+                
                 const updated = {
                     ...prev,
-                    ...autoFilledAssumptions // Mettre à jour avec les nouvelles valeurs calculées
+                    ...autoFilledAssumptions, // Mettre à jour avec les nouvelles valeurs calculées
+                    // Préserver les exclusions si l'option est activée
+                    excludeEPS: syncOptions?.preserveExclusions !== false ? (prev.excludeEPS || outlierDetection.excludeEPS) : outlierDetection.excludeEPS,
+                    excludeCF: syncOptions?.preserveExclusions !== false ? (prev.excludeCF || outlierDetection.excludeCF) : outlierDetection.excludeCF,
+                    excludeBV: syncOptions?.preserveExclusions !== false ? (prev.excludeBV || outlierDetection.excludeBV) : outlierDetection.excludeBV,
+                    excludeDIV: syncOptions?.preserveExclusions !== false ? (prev.excludeDIV || outlierDetection.excludeDIV) : outlierDetection.excludeDIV
                 };
                 console.log('✅ setAssumptions: Assumptions mises à jour', {
                     prevGrowthEPS: prev.growthRateEPS,
@@ -2530,10 +2594,12 @@ export default function App() {
     const [syncPausedState, setSyncPausedState] = useState(false);
 
     const handleBulkSyncAllTickers = async () => {
-        if (!confirm(`Synchroniser tous les ${Object.keys(library).length} tickers ?\n\nChaque version sera sauvegardée avant la synchronisation.\nLes données manuelles et hypothèses (orange) seront préservées.`)) {
-            return;
-        }
+        // Ouvrir le dialogue avancé pour la synchronisation en masse
+        setIsAdvancedSyncForBulk(true);
+        setShowAdvancedSyncDialog(true);
+    };
 
+    const handleBulkSyncAllTickersWithOptions = async (options: SyncOptions) => {
         setIsBulkSyncing(true);
         // Reset controls
         abortSync.current = false;
@@ -2568,7 +2634,8 @@ export default function App() {
         };
 
         try {
-            console.log(`🚀 Début synchronisation: ${allTickers.length} tickers en ${Math.ceil(allTickers.length / FMP_BATCH_SIZE)} batches`);
+            console.log(`🚀 Début synchronisation avec options: ${allTickers.length} tickers en ${Math.ceil(allTickers.length / FMP_BATCH_SIZE)} batches`);
+            console.log('📋 Options de synchronisation:', options);
             
             // Traiter par batch pour optimiser les appels FMP
             for (let i = 0; i < allTickers.length; i += FMP_BATCH_SIZE) {
@@ -2579,210 +2646,287 @@ export default function App() {
             }
 
             while (isSyncPaused.current) {
-                if (abortSync.current) break;
-                await new Promise(resolve => setTimeout(resolve, 500));
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
 
-            if (abortSync.current) break;
-
             const batch = allTickers.slice(i, i + FMP_BATCH_SIZE);
-            
-            // ✅ OPTIMISATION: Récupérer les données FMP en batch
-            const fmpResults = await Promise.allSettled(
+
+            // Attendre entre les batches
+            if (i > 0) {
+                await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
+            }
+
+            // Traiter le batch en parallèle
+            await Promise.allSettled(
                 batch.map(async (tickerSymbol) => {
                     try {
+                        setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
+
                         const profile = library[tickerSymbol];
                         if (!profile) {
-                            return { tickerSymbol, success: false, error: 'Profil non trouvé', result: null };
+                            console.warn(`⚠️ ${tickerSymbol}: Profil non trouvé`);
+                            return;
                         }
 
-                        // 1. Sauvegarder un snapshot avant la sync
-                        console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
-                        await saveSnapshot(
-                            tickerSymbol,
-                            profile.data,
-                            profile.assumptions,
-                            profile.info,
-                            `Avant synchronisation globale - ${new Date().toLocaleString()}`,
-                            false, 
-                            false 
-                        );
+                        // 1. Sauvegarder un snapshot avant la sync (si option activée)
+                        if (options.saveBeforeSync) {
+                            console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
+                            await saveSnapshot(
+                                tickerSymbol,
+                                profile.data,
+                                profile.assumptions,
+                                profile.info,
+                                `Avant synchronisation (${options.replaceOrangeData ? 'avec remplacement données oranges' : 'standard'}) - ${new Date().toLocaleString()}`,
+                                false,
+                                false
+                            );
+                        }
 
-                        // 2. Charger les nouvelles données FMP avec timeout
+                        // 2. Charger les nouvelles données FMP avec timeout (si option activée)
+                        if (!options.syncData && !options.syncAssumptions && !options.syncInfo) {
+                            console.log(`⏭️ ${tickerSymbol}: Aucune option de sync activée, ignoré`);
+                            return;
+                        }
+
                         console.log(`🔄 Synchronisation ${tickerSymbol}...`);
                         const result = await fetchCompanyDataWithTimeout(tickerSymbol);
-                        
-                        return { tickerSymbol, success: true, result, profile };
-                    } catch (error: any) {
-                        return { 
-                            tickerSymbol, 
-                            success: false, 
-                            error: error.message || 'Erreur inconnue', 
-                            result: null,
-                            profile: library[tickerSymbol] || null
-                        };
-                    }
-                })
-            );
 
-            // Traiter les résultats du batch
-            for (const fmpResult of fmpResults) {
-                // ✅ Vérifier pause/arrêt avant chaque ticker
-                if (abortSync.current) {
-                    console.log('🛑 Synchronisation arrêtée par l\'utilisateur.');
-                    break;
-                }
+                        // 3. Merge intelligent : préserver les données manuelles (sauf si forceReplace)
+                        let mergedData = profile.data;
+                        if (options.syncData && result.data.length > 0) {
+                            const newDataByYear = new Map(result.data.map(row => [row.year, row]));
+                            
+                            // Si syncOnlyNewYears, ne traiter que les nouvelles années
+                            if (options.syncOnlyNewYears) {
+                                result.data.forEach(newRow => {
+                                    const exists = mergedData.some(row => row.year === newRow.year);
+                                    if (!exists) {
+                                        mergedData.push({
+                                            ...(newRow as AnnualData),
+                                            autoFetched: true
+                                        });
+                                    }
+                                });
+                            } else {
+                                // Traitement normal : mettre à jour toutes les années
+                                mergedData = profile.data.map((existingRow) => {
+                                    const newRow = newDataByYear.get(existingRow.year);
+                                    if (!newRow) return existingRow;
+                                    
+                                    // Si forceReplace est true, remplacer toutes les données
+                                    if (options.forceReplace) {
+                                        return {
+                                            ...(newRow as AnnualData),
+                                            autoFetched: true
+                                        };
+                                    }
+                                    
+                                    // Si syncOnlyMissingMetrics, ne remplir que les champs vides
+                                    if (options.syncOnlyMissingMetrics) {
+                                        const updatedRow = { ...existingRow };
+                                        // Mettre à jour uniquement les champs qui sont 0, null ou undefined
+                                        if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === undefined) && newRow.earningsPerShare > 0) {
+                                            updatedRow.earningsPerShare = newRow.earningsPerShare;
+                                        }
+                                        if ((existingRow.cashFlowPerShare === 0 || existingRow.cashFlowPerShare === null || existingRow.cashFlowPerShare === undefined) && newRow.cashFlowPerShare > 0) {
+                                            updatedRow.cashFlowPerShare = newRow.cashFlowPerShare;
+                                        }
+                                        if ((existingRow.bookValuePerShare === 0 || existingRow.bookValuePerShare === null || existingRow.bookValuePerShare === undefined) && newRow.bookValuePerShare > 0) {
+                                            updatedRow.bookValuePerShare = newRow.bookValuePerShare;
+                                        }
+                                        if ((existingRow.dividendPerShare === 0 || existingRow.dividendPerShare === null || existingRow.dividendPerShare === undefined) && newRow.dividendPerShare > 0) {
+                                            updatedRow.dividendPerShare = newRow.dividendPerShare;
+                                        }
+                                        if ((existingRow.priceHigh === 0 || existingRow.priceHigh === null || existingRow.priceHigh === undefined) && newRow.priceHigh > 0) {
+                                            updatedRow.priceHigh = newRow.priceHigh;
+                                        }
+                                        if ((existingRow.priceLow === 0 || existingRow.priceLow === null || existingRow.priceLow === undefined) && newRow.priceLow > 0) {
+                                            updatedRow.priceLow = newRow.priceLow;
+                                        }
+                                        return updatedRow;
+                                    }
+                                    
+                                    if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
+                                        return existingRow;
+                                    }
+                                    return {
+                                        ...(newRow as AnnualData),
+                                        autoFetched: true
+                                    };
+                                });
 
-                while (isSyncPaused.current) {
-                    if (abortSync.current) break;
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                }
-
-                if (abortSync.current) break;
-
-                if (fmpResult.status === 'fulfilled') {
-                    const { tickerSymbol, success, result, error, profile } = fmpResult.value;
-
-                    if (!success || !result || !profile) {
-                        errorCount++;
-                        setSyncStats({ successCount, errorCount });
-                        const errorMsg = `${tickerSymbol}: ${error || 'Erreur inconnue'}`;
-                        errors.push(errorMsg);
-                        console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
-                        setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
-                        continue;
-                    }
-
-                    try {
-                        // 3. Merge intelligent
-                        const newDataByYear = new Map(result.data.map(row => [row.year, row]));
-                        const mergedData = profile.data.map((existingRow) => {
-                            const newRow = newDataByYear.get(existingRow.year);
-                            if (!newRow) return existingRow;
-                            if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
-                                return existingRow; 
+                                // Ajouter les nouvelles années
+                                result.data.forEach(newRow => {
+                                    const exists = mergedData.some(row => row.year === newRow.year);
+                                    if (!exists) {
+                                        mergedData.push({
+                                            ...(newRow as AnnualData),
+                                            autoFetched: true
+                                        });
+                                    }
+                                });
                             }
-                            return { ...(newRow as AnnualData), autoFetched: true };
-                        });
 
-                        result.data.forEach(newRow => {
-                            const exists = mergedData.some(row => row.year === newRow.year);
-                            if (!exists) {
-                                mergedData.push({ ...(newRow as AnnualData), autoFetched: true });
-                            }
-                        });
-                        mergedData.sort((a, b) => a.year - b.year);
-
-                        // 4. Recalculer métriques
-                        const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-                            mergedData,
-                            result.currentPrice,
-                            profile.assumptions 
-                        );
-
-                        // 5. Detect Outliers
-                        const tempAssumptions = { ...profile.assumptions, ...autoFilledAssumptions } as Assumptions;
-                        const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
-                        
-                        if (outlierDetection.detectedOutliers.length > 0) {
-                            console.log(`⚠️ ${tickerSymbol}: Outliers détectés: ${outlierDetection.detectedOutliers.join(', ')}`);
+                            mergedData.sort((a, b) => a.year - b.year);
                         }
 
-                        const finalAssumptions = {
-                            ...tempAssumptions,
-                            excludeEPS: outlierDetection.excludeEPS,
-                            excludeCF: outlierDetection.excludeCF,
-                            excludeBV: outlierDetection.excludeBV,
-                            excludeDIV: outlierDetection.excludeDIV
-                        };
+                        // 4. Recalculer les métriques (si option activée)
+                        let finalAssumptions = profile.assumptions;
+                        if (options.syncAssumptions) {
+                            // Si replaceOrangeData est true, passer undefined pour forcer le recalcul
+                            const existingAssumptionsForCalc = options.replaceOrangeData ? undefined : profile.assumptions;
+                            // Si updateCurrentPrice est false, préserver le prix actuel
+                            const currentPriceForCalc = options.updateCurrentPrice ? result.currentPrice : profile.assumptions.currentPrice;
+                            const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                                mergedData,
+                                currentPriceForCalc,
+                                existingAssumptionsForCalc
+                            );
 
-                        // 6. Update Library
+                            // Détecter les outliers (si option activée)
+                            const tempAssumptions = {
+                                ...profile.assumptions,
+                                ...autoFilledAssumptions
+                            } as Assumptions;
+                            
+                            let outlierDetection = { 
+                                detectedOutliers: [], 
+                                excludeEPS: profile.assumptions.excludeEPS || false,
+                                excludeCF: profile.assumptions.excludeCF || false,
+                                excludeBV: profile.assumptions.excludeBV || false,
+                                excludeDIV: profile.assumptions.excludeDIV || false
+                            };
+                            
+                            if (options.recalculateOutliers) {
+                                outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
+                                
+                                if (outlierDetection.detectedOutliers.length > 0) {
+                                    console.log(`⚠️ ${tickerSymbol}: Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(', ')}`);
+                                }
+                            }
+
+                            finalAssumptions = {
+                                ...tempAssumptions,
+                                // Préserver les exclusions si l'option est activée
+                                excludeEPS: options.preserveExclusions ? (profile.assumptions.excludeEPS || outlierDetection.excludeEPS) : outlierDetection.excludeEPS,
+                                excludeCF: options.preserveExclusions ? (profile.assumptions.excludeCF || outlierDetection.excludeCF) : outlierDetection.excludeCF,
+                                excludeBV: options.preserveExclusions ? (profile.assumptions.excludeBV || outlierDetection.excludeBV) : outlierDetection.excludeBV,
+                                excludeDIV: options.preserveExclusions ? (profile.assumptions.excludeDIV || outlierDetection.excludeDIV) : outlierDetection.excludeDIV
+                            } as Assumptions;
+                        }
+
+                        // 5. Mettre à jour le profil
+                        let updatedInfo = profile.info;
+                        if (options.syncInfo && result.info) {
+                            updatedInfo = {
+                                ...profile.info,
+                                ...result.info,
+                                name: result.info.name || profile.info.name
+                            };
+                            
+                            // Synchroniser les métriques ValueLine depuis Supabase (si option activée)
+                            if (options.syncValueLineMetrics) {
+                                try {
+                                    const supabaseResult = await loadAllTickersFromSupabase();
+                                    if (supabaseResult.success) {
+                                        const supabaseTicker = supabaseResult.tickers.find(t => t.ticker.toUpperCase() === tickerSymbol);
+                                        if (supabaseTicker) {
+                                            updatedInfo = {
+                                                ...updatedInfo,
+                                                securityRank: supabaseTicker.security_rank !== null && supabaseTicker.security_rank !== undefined
+                                                    ? supabaseTicker.security_rank
+                                                    : (updatedInfo.securityRank || 'N/A'),
+                                                earningsPredictability: supabaseTicker.earnings_predictability !== null && supabaseTicker.earnings_predictability !== undefined
+                                                    ? supabaseTicker.earnings_predictability
+                                                    : updatedInfo.earningsPredictability,
+                                                priceGrowthPersistence: supabaseTicker.price_growth_persistence !== null && supabaseTicker.price_growth_persistence !== undefined
+                                                    ? supabaseTicker.price_growth_persistence
+                                                    : updatedInfo.priceGrowthPersistence,
+                                                priceStability: supabaseTicker.price_stability !== null && supabaseTicker.price_stability !== undefined
+                                                    ? supabaseTicker.price_stability
+                                                    : updatedInfo.priceStability
+                                            };
+                                        }
+                                    }
+                                } catch (error) {
+                                    console.warn(`⚠️ Impossible de recharger les métriques ValueLine pour ${tickerSymbol}:`, error);
+                                }
+                            }
+                        }
+
                         setLibrary(prev => {
                             const updated = {
                                 ...prev,
                                 [tickerSymbol]: {
                                     ...profile,
                                     data: mergedData,
-                                    info: {
-                                        ...profile.info,
-                                        ...result.info,
-                                        name: result.info.name || profile.info.name
-                                    },
+                                    info: updatedInfo,
                                     assumptions: finalAssumptions,
                                     lastModified: Date.now()
                                 }
                             };
-                            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(updated)); } catch (e) { console.warn(e); }
+
+                            try {
+                                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                            } catch (e) {
+                                console.warn('Failed to save to LocalStorage:', e);
+                            }
+
                             return updated;
                         });
 
-                        // 7. Save Snapshot (en parallèle si possible)
+                        // 6. Sauvegarder le snapshot après sync
                         await saveSnapshot(
                             tickerSymbol,
                             mergedData,
                             finalAssumptions,
-                            { ...profile.info, ...result.info },
-                            `Synchronisation globale - ${new Date().toLocaleString()}`,
-                            true, 
-                            true   
+                            updatedInfo,
+                            `Après synchronisation (${options.replaceOrangeData ? 'avec remplacement données oranges' : 'standard'}) - ${new Date().toLocaleString()}`,
+                            true,
+                            true
                         );
 
                         successCount++;
-                        setSyncStats({ successCount, errorCount });
-                        console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
-                        setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
-
-                        // Délai minimal entre tickers dans le batch
-                        await new Promise(resolve => setTimeout(resolve, delayBetweenTickersInBatch));
+                        setSyncStats(prev => ({ ...prev, successCount: prev.successCount + 1 }));
+                        console.log(`✅ ${tickerSymbol}: Synchronisé avec succès`);
                     } catch (error: any) {
                         errorCount++;
-                        setSyncStats({ successCount, errorCount });
-                        const errorMsg = `${tickerSymbol}: ${error.message || 'Erreur inconnue'}`;
+                        const errorMsg = `${tickerSymbol}: ${error.message || String(error)}`;
                         errors.push(errorMsg);
-                        console.error(`❌ Erreur traitement ${tickerSymbol}:`, error);
-                        setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
+                        setSyncStats(prev => ({ ...prev, errorCount: prev.errorCount + 1 }));
+                        console.error(`❌ ${errorMsg}`);
                     }
-                } else {
-                    // Promise rejected
-                    const tickerSymbol = batch[fmpResults.indexOf(fmpResult)] || 'UNKNOWN';
-                    errorCount++;
-                    setSyncStats({ successCount, errorCount });
-                    const errorMsg = `${tickerSymbol}: ${fmpResult.reason?.message || 'Erreur inconnue'}`;
-                    errors.push(errorMsg);
-                    console.error(`❌ Erreur sync ${tickerSymbol}:`, fmpResult.reason);
-                    setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
-                }
+                })
+            );
             }
 
-            // Délai entre batches (seulement si pas le dernier batch)
-            if (i + FMP_BATCH_SIZE < allTickers.length && !abortSync.current) {
-                await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
+            // Afficher un résumé
+            const summary = `Synchronisation terminée:\n✅ ${successCount} succès\n❌ ${errorCount} erreurs`;
+            if (errorCount > 0) {
+                console.warn(`⚠️ ${summary}\nErreurs:\n${errors.join('\n')}`);
+                setNotifications(prev => [...prev, {
+                    id: `bulk-sync-${Date.now()}`,
+                    message: `${summary}. Voir la console pour les détails.`,
+                    type: 'warning'
+                }]);
+            } else {
+                console.log(`✅ ${summary}`);
+                setNotifications(prev => [...prev, {
+                    id: `bulk-sync-${Date.now()}`,
+                    message: summary,
+                    type: 'success'
+                }]);
             }
-            }
-
-            console.log(`✅ Synchronisation terminée: ${successCount} succès, ${errorCount} erreurs`);
         } catch (error: any) {
-            // ✅ GESTION ERREUR GLOBALE: S'assurer que le sync se termine même en cas d'erreur fatale
-            console.error('❌ Erreur fatale pendant la synchronisation:', error);
-            errorCount++;
-            errors.push(`Erreur fatale: ${error.message || 'Erreur inconnue'}`);
+            console.error('❌ Erreur lors de la synchronisation en masse:', error);
+            setNotifications(prev => [...prev, {
+                id: `bulk-sync-error-${Date.now()}`,
+                message: `Erreur lors de la synchronisation: ${error.message || String(error)}`,
+                type: 'error'
+            }]);
         } finally {
-            // ✅ GARANTIE: Toujours réinitialiser l'état, même en cas d'erreur
             setIsBulkSyncing(false);
             setBulkSyncProgress({ current: 0, total: 0 });
-            
-            // Afficher le résultat
-            const message = `Synchronisation terminée\n\n` +
-                `Réussies: ${successCount}\n` +
-                `Erreurs: ${errorCount}` +
-                (errors.length > 0 ? `\n\nErreurs:\n${errors.slice(0, 5).join('\n')}${errors.length > 5 ? `\n... et ${errors.length - 5} autres` : ''}` : '');
-            
-            if (!abortSync.current) {
-                 showNotification(message, errorCount > 0 ? 'warning' : 'success');
-            } else {
-                 showNotification("Synchronisation arrêtée manuellement.", 'warning');
-            }
-            console.log(`✅ ${message}`);
         }
     };
 
@@ -3961,6 +4105,7 @@ export default function App() {
             )}
 
             {/* Confirmation Dialog for API Sync */}
+            {/* Ancien dialogue simple (gardé pour compatibilité) */}
             <ConfirmSyncDialog
                 isOpen={showConfirmSync}
                 ticker={activeId}
@@ -3970,6 +4115,25 @@ export default function App() {
                     setShowConfirmSync(false);
                     await performSync(saveSnapshot);
                 }}
+            />
+
+            {/* Nouveau dialogue avancé */}
+            <AdvancedSyncDialog
+                isOpen={showAdvancedSyncDialog}
+                ticker={isAdvancedSyncForBulk ? undefined : activeId}
+                hasManualData={hasManualEdits(data)}
+                onCancel={() => setShowAdvancedSyncDialog(false)}
+                onConfirm={async (options) => {
+                    setShowAdvancedSyncDialog(false);
+                    if (isAdvancedSyncForBulk) {
+                        // Appeler handleBulkSyncAllTickers avec options
+                        await handleBulkSyncAllTickersWithOptions(options);
+                    } else {
+                        // Appeler performSync avec options
+                        await performSync(options.saveBeforeSync, options);
+                    }
+                }}
+                isSyncing={isLoading}
             />
 
             {/* Restore Data Dialog */}
