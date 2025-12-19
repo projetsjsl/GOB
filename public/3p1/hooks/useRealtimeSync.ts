@@ -75,7 +75,21 @@ export function useRealtimeSync(
       )
       .subscribe((status) => {
         if (isMounted) {
-          console.log(`📡 [${tableName}] Subscription status:`, status);
+          // ✅ Ne log que les statuts importants, ignorer CHANNEL_ERROR silencieusement
+          if (status === 'SUBSCRIBED') {
+            console.log(`📡 [${tableName}] Subscription status: ${status}`);
+          } else if (status === 'CHANNEL_ERROR') {
+            // Erreur de connexion - ignorer silencieusement (non-bloquant)
+            // La synchronisation périodique servira de fallback
+            if (typeof window !== 'undefined' && (localStorage.getItem('3p1-debug') === 'true' || window.location.search.includes('debug=true'))) {
+              console.warn(`⚠️ [${tableName}] Subscription error (non-bloquant, fallback périodique actif)`);
+            }
+          } else {
+            // Autres statuts (TIMED_OUT, CLOSED, etc.) - log seulement en debug
+            if (typeof window !== 'undefined' && (localStorage.getItem('3p1-debug') === 'true' || window.location.search.includes('debug=true'))) {
+              console.log(`📡 [${tableName}] Subscription status: ${status}`);
+            }
+          }
         }
       });
 

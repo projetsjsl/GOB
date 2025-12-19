@@ -55465,7 +55465,17 @@ function useRealtimeSync(tableName, onDataChange, options) {
       }
     ).subscribe((status) => {
       if (isMounted) {
-        console.log(`📡 [${tableName}] Subscription status:`, status);
+        if (status === "SUBSCRIBED") {
+          console.log(`📡 [${tableName}] Subscription status: ${status}`);
+        } else if (status === "CHANNEL_ERROR") {
+          if (typeof window !== "undefined" && (localStorage.getItem("3p1-debug") === "true" || window.location.search.includes("debug=true"))) {
+            console.warn(`⚠️ [${tableName}] Subscription error (non-bloquant, fallback périodique actif)`);
+          }
+        } else {
+          if (typeof window !== "undefined" && (localStorage.getItem("3p1-debug") === "true" || window.location.search.includes("debug=true"))) {
+            console.log(`📡 [${tableName}] Subscription status: ${status}`);
+          }
+        }
       }
     });
     return () => {
@@ -55881,30 +55891,7 @@ function App() {
       return;
     }
     const refreshPriceCacheIfNeeded = async () => {
-      var _a4, _b3, _c, _d;
-      try {
-        const response = await fetch("/api/market-data-batch?tickers=AAPL&checkOnly=true");
-        if (response.status === 404) {
-          console.log("ℹ️ Endpoint market-data-batch non disponible - Ignoré");
-          return;
-        }
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
-        const result = await response.json();
-        if (((_a4 = result.stats) == null ? void 0 : _a4.stale) > 0 || ((_b3 = result.stats) == null ? void 0 : _b3.missing) > 0) {
-          console.log("🔄 Cache prix expiré - Mise à jour automatique...");
-          fetch("/api/fmp-batch-sync", { method: "POST" }).then(() => console.log("✅ Cache prix mis à jour")).catch((err) => console.warn("⚠️ Erreur mise à jour cache prix:", err));
-        } else {
-          console.log("✅ Cache prix frais - Pas de mise à jour nécessaire");
-        }
-      } catch (error) {
-        if (((_c = error.message) == null ? void 0 : _c.includes("404")) || ((_d = error.message) == null ? void 0 : _d.includes("The page c"))) {
-          console.log("ℹ️ Endpoint market-data-batch non disponible - Ignoré");
-          return;
-        }
-        console.warn("⚠️ Erreur vérification cache prix:", error);
-      }
+      return;
     };
     const loadTickersFromSupabase = async () => {
       if (isLoadingTickers) {
