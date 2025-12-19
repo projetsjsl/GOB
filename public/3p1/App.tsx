@@ -2722,8 +2722,11 @@ export default function App() {
             }
 
             // ✅ OPTIMISATION: Récupérer tous les tickers du batch en une seule requête API
+            // Inclure les key metrics seulement si syncData est activé
+            const includeKeyMetrics = options.syncData;
             console.log(`📦 Récupération batch ${i / BATCH_API_SIZE + 1}/${Math.ceil(allTickers.length / BATCH_API_SIZE)}: ${batch.length} tickers`);
-            const batchResults = await fetchCompanyDataBatch(batch);
+            console.log(`🔍 [BATCH] Options: syncData=${options.syncData}, syncAssumptions=${options.syncAssumptions}, syncInfo=${options.syncInfo}, includeKeyMetrics=${includeKeyMetrics}`);
+            const batchResults = await fetchCompanyDataBatch(batch, includeKeyMetrics);
 
             // Traiter chaque ticker du batch
             await Promise.allSettled(
