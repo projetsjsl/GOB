@@ -15,6 +15,7 @@ import { InfoTab } from './components/InfoTab';
 import { TickerSearch } from './components/TickerSearch';
 import { ConfirmSyncDialog } from './components/ConfirmSyncDialog';
 import { AdvancedSyncDialog, SyncOptions } from './components/AdvancedSyncDialog';
+import { SyncReportDialog, SyncReportData } from './components/SyncReportDialog';
 import { HistoricalVersionBanner } from './components/HistoricalVersionBanner';
 import { NotificationManager } from './components/Notification';
 import { SyncProgressBar } from './components/SyncProgressBar';
@@ -1521,24 +1522,25 @@ export default function App() {
                         // Si syncOnlyMissingMetrics, ne remplir que les champs vides
                         if (syncOptions?.syncOnlyMissingMetrics) {
                             const updatedRow = { ...existingRow };
+                            const typedNewRow = newRow as AnnualData;
                             // Mettre à jour uniquement les champs qui sont 0, null ou undefined
-                            if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === undefined) && newRow.earningsPerShare > 0) {
-                                updatedRow.earningsPerShare = newRow.earningsPerShare;
+                            if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === undefined) && typedNewRow.earningsPerShare > 0) {
+                                updatedRow.earningsPerShare = typedNewRow.earningsPerShare;
                             }
-                            if ((existingRow.cashFlowPerShare === 0 || existingRow.cashFlowPerShare === null || existingRow.cashFlowPerShare === undefined) && newRow.cashFlowPerShare > 0) {
-                                updatedRow.cashFlowPerShare = newRow.cashFlowPerShare;
+                            if ((existingRow.cashFlowPerShare === 0 || existingRow.cashFlowPerShare === null || existingRow.cashFlowPerShare === undefined) && typedNewRow.cashFlowPerShare > 0) {
+                                updatedRow.cashFlowPerShare = typedNewRow.cashFlowPerShare;
                             }
-                            if ((existingRow.bookValuePerShare === 0 || existingRow.bookValuePerShare === null || existingRow.bookValuePerShare === undefined) && newRow.bookValuePerShare > 0) {
-                                updatedRow.bookValuePerShare = newRow.bookValuePerShare;
+                            if ((existingRow.bookValuePerShare === 0 || existingRow.bookValuePerShare === null || existingRow.bookValuePerShare === undefined) && typedNewRow.bookValuePerShare > 0) {
+                                updatedRow.bookValuePerShare = typedNewRow.bookValuePerShare;
                             }
-                            if ((existingRow.dividendPerShare === 0 || existingRow.dividendPerShare === null || existingRow.dividendPerShare === undefined) && newRow.dividendPerShare > 0) {
-                                updatedRow.dividendPerShare = newRow.dividendPerShare;
+                            if ((existingRow.dividendPerShare === 0 || existingRow.dividendPerShare === null || existingRow.dividendPerShare === undefined) && typedNewRow.dividendPerShare > 0) {
+                                updatedRow.dividendPerShare = typedNewRow.dividendPerShare;
                             }
-                            if ((existingRow.priceHigh === 0 || existingRow.priceHigh === null || existingRow.priceHigh === undefined) && newRow.priceHigh > 0) {
-                                updatedRow.priceHigh = newRow.priceHigh;
+                            if ((existingRow.priceHigh === 0 || existingRow.priceHigh === null || existingRow.priceHigh === undefined) && typedNewRow.priceHigh > 0) {
+                                updatedRow.priceHigh = typedNewRow.priceHigh;
                             }
-                            if ((existingRow.priceLow === 0 || existingRow.priceLow === null || existingRow.priceLow === undefined) && newRow.priceLow > 0) {
-                                updatedRow.priceLow = newRow.priceLow;
+                            if ((existingRow.priceLow === 0 || existingRow.priceLow === null || existingRow.priceLow === undefined) && typedNewRow.priceLow > 0) {
+                                updatedRow.priceLow = typedNewRow.priceLow;
                             }
                             return updatedRow;
                         }
@@ -2603,6 +2605,10 @@ export default function App() {
         setShowAdvancedSyncDialog(true);
     };
 
+    // État pour le rapport de synchronisation
+    const [syncReportData, setSyncReportData] = useState<any>(null);
+    const [showSyncReport, setShowSyncReport] = useState(false);
+
     const handleBulkSyncAllTickersWithOptions = async (options: SyncOptions) => {
         setIsBulkSyncing(true);
         // Reset controls
@@ -2614,11 +2620,15 @@ export default function App() {
         setBulkSyncProgress({ current: 0, total: allTickers.length });
         setSyncStats({ successCount: 0, errorCount: 0 });
 
+        const startTime = Date.now();
         let successCount = 0;
         let errorCount = 0;
         let skippedCount = 0; // Tickers introuvables dans FMP (404)
         const errors: string[] = [];
         const skippedTickers: string[] = []; // Tickers ignorés car introuvables dans FMP
+        
+        // ✅ Collecte des données pour le rapport détaillé
+        const tickerResults: any[] = [];
         
         // ✅ OPTIMISATION: Utiliser l'endpoint batch pour récupérer plusieurs tickers en une seule requête
         const BATCH_API_SIZE = 20; // Nombre de tickers par batch API (limite FMP)
@@ -2692,12 +2702,56 @@ export default function App() {
             // Traiter chaque ticker du batch
             await Promise.allSettled(
                 batch.map(async (tickerSymbol) => {
+                    const tickerStartTime = Date.now();
+                    let tickerResult: any = {
+                        ticker: tickerSymbol,
+                        success: false,
+                        timeMs: 0,
+                        dataRetrieved: {
+                            years: 0,
+                            dataPoints: 0,
+                            hasProfile: false,
+                            hasKeyMetrics: false,
+                            hasQuotes: false,
+                            hasFinancials: false
+                        },
+                        outliers: {
+                            detected: [],
+                            excluded: { EPS: false, CF: false, BV: false, DIV: false },
+                            reasons: {}
+                        },
+                        orangeData: {
+                            wasReplaced: options.replaceOrangeData || false
+                        },
+                        currentPrice: 0,
+                        zeroData: {
+                            earningsPerShare: 0,
+                            cashFlowPerShare: 0,
+                            bookValuePerShare: 0,
+                            dividendPerShare: 0,
+                            reasons: {}
+                        },
+                        naData: {
+                            fields: [],
+                            reasons: {}
+                        },
+                        other: {
+                            snapshotSaved: false,
+                            assumptionsUpdated: false,
+                            infoUpdated: false,
+                            valueLineMetricsSynced: false
+                        }
+                    };
+
                     try {
                         setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
 
                         const profile = library[tickerSymbol];
                         if (!profile) {
                             console.warn(`⚠️ ${tickerSymbol}: Profil non trouvé`);
+                            tickerResult.error = 'Profil non trouvé';
+                            tickerResult.timeMs = Date.now() - tickerStartTime;
+                            tickerResults.push(tickerResult);
                             return;
                         }
 
@@ -2713,6 +2767,7 @@ export default function App() {
                                 false,
                                 false
                             );
+                            tickerResult.other.snapshotSaved = true;
                         }
 
                         // 2. Charger les nouvelles données FMP avec timeout (si option activée)
@@ -2776,8 +2831,22 @@ export default function App() {
                             skippedCount++;
                             skippedTickers.push(tickerSymbol);
                             console.warn(`⏭️ ${tickerSymbol}: Ignoré (aucune donnée disponible)`);
+                            tickerResult.error = 'Aucune donnée disponible';
+                            tickerResult.timeMs = Date.now() - tickerStartTime;
+                            tickerResults.push(tickerResult);
                             return; // Sortir de la fonction pour ce ticker
                         }
+
+                        // ✅ Collecter les informations sur les données récupérées
+                        tickerResult.dataRetrieved = {
+                            years: result.data?.length || 0,
+                            dataPoints: result.data?.length || 0,
+                            hasProfile: !!result.info,
+                            hasKeyMetrics: !!(result.data && result.data.length > 0),
+                            hasQuotes: !!(result.currentPrice && result.currentPrice > 0),
+                            hasFinancials: !!(result.financials && result.financials.length > 0)
+                        };
+                        tickerResult.currentPrice = result.currentPrice || 0;
 
                         // 3. Merge intelligent : préserver les données manuelles (sauf si forceReplace)
                         let mergedData = profile.data;
@@ -2812,24 +2881,25 @@ export default function App() {
                                     // Si syncOnlyMissingMetrics, ne remplir que les champs vides
                                     if (options.syncOnlyMissingMetrics) {
                                         const updatedRow = { ...existingRow };
+                                        const typedNewRow = newRow as AnnualData;
                                         // Mettre à jour uniquement les champs qui sont 0, null ou undefined
-                                        if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === undefined) && newRow.earningsPerShare > 0) {
-                                            updatedRow.earningsPerShare = newRow.earningsPerShare;
+                                        if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === undefined) && typedNewRow.earningsPerShare > 0) {
+                                            updatedRow.earningsPerShare = typedNewRow.earningsPerShare;
                                         }
-                                        if ((existingRow.cashFlowPerShare === 0 || existingRow.cashFlowPerShare === null || existingRow.cashFlowPerShare === undefined) && newRow.cashFlowPerShare > 0) {
-                                            updatedRow.cashFlowPerShare = newRow.cashFlowPerShare;
+                                        if ((existingRow.cashFlowPerShare === 0 || existingRow.cashFlowPerShare === null || existingRow.cashFlowPerShare === undefined) && typedNewRow.cashFlowPerShare > 0) {
+                                            updatedRow.cashFlowPerShare = typedNewRow.cashFlowPerShare;
                                         }
-                                        if ((existingRow.bookValuePerShare === 0 || existingRow.bookValuePerShare === null || existingRow.bookValuePerShare === undefined) && newRow.bookValuePerShare > 0) {
-                                            updatedRow.bookValuePerShare = newRow.bookValuePerShare;
+                                        if ((existingRow.bookValuePerShare === 0 || existingRow.bookValuePerShare === null || existingRow.bookValuePerShare === undefined) && typedNewRow.bookValuePerShare > 0) {
+                                            updatedRow.bookValuePerShare = typedNewRow.bookValuePerShare;
                                         }
-                                        if ((existingRow.dividendPerShare === 0 || existingRow.dividendPerShare === null || existingRow.dividendPerShare === undefined) && newRow.dividendPerShare > 0) {
-                                            updatedRow.dividendPerShare = newRow.dividendPerShare;
+                                        if ((existingRow.dividendPerShare === 0 || existingRow.dividendPerShare === null || existingRow.dividendPerShare === undefined) && typedNewRow.dividendPerShare > 0) {
+                                            updatedRow.dividendPerShare = typedNewRow.dividendPerShare;
                                         }
-                                        if ((existingRow.priceHigh === 0 || existingRow.priceHigh === null || existingRow.priceHigh === undefined) && newRow.priceHigh > 0) {
-                                            updatedRow.priceHigh = newRow.priceHigh;
+                                        if ((existingRow.priceHigh === 0 || existingRow.priceHigh === null || existingRow.priceHigh === undefined) && typedNewRow.priceHigh > 0) {
+                                            updatedRow.priceHigh = typedNewRow.priceHigh;
                                         }
-                                        if ((existingRow.priceLow === 0 || existingRow.priceLow === null || existingRow.priceLow === undefined) && newRow.priceLow > 0) {
-                                            updatedRow.priceLow = newRow.priceLow;
+                                        if ((existingRow.priceLow === 0 || existingRow.priceLow === null || existingRow.priceLow === undefined) && typedNewRow.priceLow > 0) {
+                                            updatedRow.priceLow = typedNewRow.priceLow;
                                         }
                                         return updatedRow;
                                     }
@@ -2890,6 +2960,30 @@ export default function App() {
                                 
                                 if (outlierDetection.detectedOutliers.length > 0) {
                                     console.log(`⚠️ ${tickerSymbol}: Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(', ')}`);
+                                    
+                                    // ✅ Collecter les informations sur les outliers
+                                    tickerResult.outliers.detected = outlierDetection.detectedOutliers;
+                                    tickerResult.outliers.excluded = {
+                                        EPS: outlierDetection.excludeEPS,
+                                        CF: outlierDetection.excludeCF,
+                                        BV: outlierDetection.excludeBV,
+                                        DIV: outlierDetection.excludeDIV
+                                    };
+                                    
+                                    // Calculer les raisons pour chaque outlier
+                                    const currentPrice = tempAssumptions.currentPrice || 1;
+                                    const calculateTargetPrice = (metric: string) => {
+                                        // Cette logique devrait correspondre à calculateTargetPrices dans outlierDetection
+                                        // Pour simplifier, on utilise les prix cibles calculés
+                                        return 0; // Sera calculé plus bas
+                                    };
+                                    
+                                    outlierDetection.detectedOutliers.forEach(metric => {
+                                        const isExcluded = tickerResult.outliers.excluded[metric as keyof typeof tickerResult.outliers.excluded];
+                                        if (isExcluded) {
+                                            tickerResult.outliers.reasons[metric] = 'Prix cible aberrant détecté (>1.5σ ou retour implausible)';
+                                        }
+                                    });
                                 }
                             }
 
@@ -2901,6 +2995,20 @@ export default function App() {
                                 excludeBV: options.preserveExclusions ? (profile.assumptions.excludeBV || outlierDetection.excludeBV) : outlierDetection.excludeBV,
                                 excludeDIV: options.preserveExclusions ? (profile.assumptions.excludeDIV || outlierDetection.excludeDIV) : outlierDetection.excludeDIV
                             } as Assumptions;
+                            
+                            // ✅ Collecter les informations sur les cases oranges
+                            tickerResult.orangeData = {
+                                growthRateEPS: finalAssumptions.growthRateEPS,
+                                growthRateCF: finalAssumptions.growthRateCF,
+                                growthRateBV: finalAssumptions.growthRateBV,
+                                growthRateDiv: finalAssumptions.growthRateDiv,
+                                targetPE: finalAssumptions.targetPE,
+                                targetPCF: finalAssumptions.targetPCF,
+                                targetPBV: finalAssumptions.targetPBV,
+                                targetYield: finalAssumptions.targetYield,
+                                wasReplaced: options.replaceOrangeData || false
+                            };
+                            tickerResult.other.assumptionsUpdated = true;
                         }
 
                         // 5. Mettre à jour le profil
@@ -2911,6 +3019,7 @@ export default function App() {
                                 ...result.info,
                                 name: result.info.name || profile.info.name
                             };
+                            tickerResult.other.infoUpdated = true;
                             
                             // Synchroniser les métriques ValueLine depuis Supabase (si option activée)
                             if (options.syncValueLineMetrics) {
@@ -2934,6 +3043,7 @@ export default function App() {
                                                     ? supabaseTicker.price_stability
                                                     : updatedInfo.priceStability
                                             };
+                                            tickerResult.other.valueLineMetricsSynced = true;
                                         }
                                     }
                                 } catch (error) {
@@ -2963,6 +3073,52 @@ export default function App() {
                             return updated;
                         });
 
+                        // ✅ Analyser les données pour le rapport
+                        // Compter les données à zéro
+                        const zeroCounts = {
+                            earningsPerShare: mergedData.filter(d => d.earningsPerShare === 0 || d.earningsPerShare === null).length,
+                            cashFlowPerShare: mergedData.filter(d => d.cashFlowPerShare === 0 || d.cashFlowPerShare === null).length,
+                            bookValuePerShare: mergedData.filter(d => d.bookValuePerShare === 0 || d.bookValuePerShare === null).length,
+                            dividendPerShare: mergedData.filter(d => d.dividendPerShare === 0 || d.dividendPerShare === null).length
+                        };
+                        
+                        tickerResult.zeroData = {
+                            earningsPerShare: zeroCounts.earningsPerShare,
+                            cashFlowPerShare: zeroCounts.cashFlowPerShare,
+                            bookValuePerShare: zeroCounts.bookValuePerShare,
+                            dividendPerShare: zeroCounts.dividendPerShare,
+                            reasons: {
+                                earningsPerShare: zeroCounts.earningsPerShare > 0 ? `${zeroCounts.earningsPerShare} années avec EPS à 0 (pertes ou données manquantes)` : '',
+                                cashFlowPerShare: zeroCounts.cashFlowPerShare > 0 ? `${zeroCounts.cashFlowPerShare} années avec CF à 0 (CF négatif ou données manquantes)` : '',
+                                bookValuePerShare: zeroCounts.bookValuePerShare > 0 ? `${zeroCounts.bookValuePerShare} années avec BV à 0 (BV négatif ou données manquantes)` : '',
+                                dividendPerShare: zeroCounts.dividendPerShare > 0 ? `${zeroCounts.dividendPerShare} années avec DIV à 0 (pas de dividende ou données manquantes)` : ''
+                            }
+                        };
+                        
+                        // Détecter les données N/A
+                        const naFields: string[] = [];
+                        const naReasons: { [key: string]: string } = {};
+                        
+                        if (!tickerResult.currentPrice || tickerResult.currentPrice === 0) {
+                            naFields.push('currentPrice');
+                            naReasons.currentPrice = 'Prix actuel non disponible dans FMP';
+                        }
+                        
+                        if (mergedData.length === 0) {
+                            naFields.push('annualData');
+                            naReasons.annualData = 'Aucune donnée historique disponible';
+                        }
+                        
+                        if (!finalAssumptions.growthRateEPS && !finalAssumptions.growthRateCF) {
+                            naFields.push('assumptions');
+                            naReasons.assumptions = 'Impossible de calculer assumptions (données insuffisantes)';
+                        }
+                        
+                        tickerResult.naData = {
+                            fields: naFields,
+                            reasons: naReasons
+                        };
+
                         // 6. Sauvegarder le snapshot après sync
                         await saveSnapshot(
                             tickerSymbol,
@@ -2973,20 +3129,60 @@ export default function App() {
                             true,
                             true
                         );
+                        tickerResult.other.snapshotSaved = true;
 
                         successCount++;
+                        tickerResult.success = true;
+                        tickerResult.timeMs = Date.now() - tickerStartTime;
+                        tickerResults.push(tickerResult);
                         setSyncStats(prev => ({ ...prev, successCount: prev.successCount + 1 }));
                         console.log(`✅ ${tickerSymbol}: Synchronisé avec succès`);
                     } catch (error: any) {
                         errorCount++;
                         const errorMsg = `${tickerSymbol}: ${error.message || String(error)}`;
                         errors.push(errorMsg);
+                        tickerResult.success = false;
+                        tickerResult.error = error.message || String(error);
+                        tickerResult.timeMs = Date.now() - tickerStartTime;
+                        tickerResults.push(tickerResult);
                         setSyncStats(prev => ({ ...prev, errorCount: prev.errorCount + 1 }));
                         console.error(`❌ ${errorMsg}`);
                     }
                 })
             );
             }
+
+            // ✅ Générer le rapport de synchronisation
+            const endTime = Date.now();
+            const totalDataPoints = tickerResults
+                .filter(r => r.success)
+                .reduce((sum, r) => sum + (r.dataRetrieved?.dataPoints || 0), 0);
+            const totalOutliersDetected = tickerResults
+                .filter(r => r.success)
+                .reduce((sum, r) => sum + (r.outliers?.detected?.length || 0), 0);
+            const totalOrangeDataReplaced = tickerResults
+                .filter(r => r.success && r.orangeData?.wasReplaced)
+                .length;
+            const avgTimePerTicker = tickerResults.length > 0
+                ? tickerResults.reduce((sum, r) => sum + r.timeMs, 0) / tickerResults.length
+                : 0;
+
+            const reportData = {
+                startTime,
+                endTime,
+                totalTickers: allTickers.length,
+                successCount,
+                errorCount,
+                skippedCount,
+                options,
+                tickerResults,
+                globalStats: {
+                    avgTimePerTicker,
+                    totalDataPoints,
+                    totalOutliersDetected,
+                    totalOrangeDataReplaced
+                }
+            };
 
             // Afficher un résumé détaillé
             const totalProcessed = successCount + errorCount + skippedCount;
@@ -3009,25 +3205,44 @@ export default function App() {
                 console.warn(`❌ Erreurs:\n${errors.slice(0, 10).join('\n')}${errors.length > 10 ? `\n... et ${errors.length - 10} autres` : ''}`);
             }
             
-            // Notification
+            // Notification avec bouton pour voir le rapport
+            const notificationId = `bulk-sync-${Date.now()}`;
             if (errorCount > 0 || skippedCount > 0) {
                 const notificationMessage = skippedCount > 0 && errorCount === 0
                     ? `${summary}\n\n${skippedTickers.length} ticker(s) ignoré(s) car introuvable(s) dans FMP.`
                     : `${summary}\n\nVoir la console pour les détails.`;
                 
                 setNotifications(prev => [...prev, {
-                    id: `bulk-sync-${Date.now()}`,
+                    id: notificationId,
                     message: notificationMessage,
-                    type: skippedCount > 0 && errorCount === 0 ? 'warning' : 'error'
+                    type: skippedCount > 0 && errorCount === 0 ? 'warning' : 'error',
+                    action: {
+                        label: 'Voir Rapport Détaillé',
+                        onClick: () => {
+                            setSyncReportData(reportData);
+                            setShowSyncReport(true);
+                        }
+                    }
                 }]);
             } else {
                 console.log(`✅ ${summary}`);
                 setNotifications(prev => [...prev, {
-                    id: `bulk-sync-${Date.now()}`,
+                    id: notificationId,
                     message: summary,
-                    type: 'success'
+                    type: 'success',
+                    action: {
+                        label: 'Voir Rapport Détaillé',
+                        onClick: () => {
+                            setSyncReportData(reportData);
+                            setShowSyncReport(true);
+                        }
+                    }
                 }]);
             }
+            
+            // ✅ Toujours afficher le rapport après synchronisation
+            setSyncReportData(reportData);
+            setShowSyncReport(true);
         } catch (error: any) {
             console.error('❌ Erreur lors de la synchronisation en masse:', error);
             setNotifications(prev => [...prev, {
@@ -4286,6 +4501,13 @@ export default function App() {
                     onClose={() => setIsReportsOpen(false)}
                 />
             )}
+
+            {/* SYNC REPORT DIALOG */}
+            <SyncReportDialog
+                isOpen={showSyncReport}
+                reportData={syncReportData}
+                onClose={() => setShowSyncReport(false)}
+            />
         </div>
     );
 }

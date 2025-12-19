@@ -1,0 +1,1219 @@
+{
+  "startTime": 1766137059007,
+  "endTime": 1766137066723,
+  "totalTickers": 20,
+  "successCount": 20,
+  "errorCount": 0,
+  "skippedCount": 0,
+  "options": {
+    "saveBeforeSync": true,
+    "replaceOrangeData": false,
+    "syncAllTickers": false,
+    "syncData": true,
+    "syncAssumptions": true,
+    "syncInfo": true,
+    "forceReplace": false,
+    "syncOnlyNewYears": false,
+    "syncOnlyMissingMetrics": false,
+    "preserveExclusions": true,
+    "recalculateOutliers": true,
+    "updateCurrentPrice": true,
+    "syncValueLineMetrics": true
+  },
+  "tickerResults": [
+    {
+      "ticker": "AAPL",
+      "success": true,
+      "error": null,
+      "timeMs": 299,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [
+          "CF"
+        ],
+        "excluded": {
+          "EPS": false,
+          "CF": true,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {
+          "CF": "Prix cible aberrant détecté (>1.5σ ou retour implausible)"
+        }
+      },
+      "orangeData": {
+        "growthRateEPS": 7.7345358148133965,
+        "growthRateCF": 5.591432150981548,
+        "growthRateBV": 7.123699524424644,
+        "growthRateDiv": 5.170590524669091,
+        "targetPE": 23.191947341151618,
+        "targetPCF": 15.139434257157877,
+        "targetPBV": 4.950938894049208,
+        "targetYield": 0.014800450372890404,
+        "wasReplaced": false
+      },
+      "currentPrice": 272.19,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 0,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "MSFT",
+      "success": true,
+      "error": null,
+      "timeMs": 323,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [
+          "EPS"
+        ],
+        "excluded": {
+          "EPS": true,
+          "CF": false,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {
+          "EPS": "Prix cible aberrant détecté (>1.5σ ou retour implausible)"
+        }
+      },
+      "orangeData": {
+        "growthRateEPS": 9.483782762784697,
+        "growthRateCF": 5.601294806966409,
+        "growthRateBV": 7.283735939050438,
+        "growthRateDiv": 5.413362217812295,
+        "targetPE": 28.922514189647167,
+        "targetPCF": 20.3153612633356,
+        "targetPBV": 4.907567745703151,
+        "targetYield": 0.018720593464878657,
+        "wasReplaced": false
+      },
+      "currentPrice": 483.98,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 0,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "GOOGL",
+      "success": true,
+      "error": null,
+      "timeMs": 181,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {}
+      },
+      "orangeData": {
+        "growthRateEPS": 6.312317131841125,
+        "growthRateCF": 5.52514521296617,
+        "growthRateBV": 8.870454107384113,
+        "growthRateDiv": 5.220494027045817,
+        "targetPE": 27.644162253721465,
+        "targetPCF": 21.36282237373007,
+        "targetPBV": 4.489513231784771,
+        "targetYield": 0.019844095845656443,
+        "wasReplaced": false
+      },
+      "currentPrice": 302.46,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 1,
+        "bookValuePerShare": 1,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "1 années avec CF à 0 (CF négatif ou données manquantes)",
+          "bookValuePerShare": "1 années avec BV à 0 (BV négatif ou données manquantes)",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "TSLA",
+      "success": true,
+      "error": null,
+      "timeMs": 180,
+      "dataRetrieved": {
+        "years": 19,
+        "dataPoints": 19,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {}
+      },
+      "orangeData": {
+        "growthRateEPS": 10.468212991075443,
+        "growthRateCF": 8.231608296907659,
+        "growthRateBV": 7.213882306263287,
+        "growthRateDiv": 4.54855690691843,
+        "targetPE": 19.420484494206686,
+        "targetPCF": 21.27693485963004,
+        "targetPBV": 2.8047740860860655,
+        "targetYield": 0.015490859977004244,
+        "wasReplaced": false
+      },
+      "currentPrice": 483.37,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 0,
+        "bookValuePerShare": 1,
+        "dividendPerShare": 19,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "",
+          "bookValuePerShare": "1 années avec BV à 0 (BV négatif ou données manquantes)",
+          "dividendPerShare": "19 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "AMZN",
+      "success": true,
+      "error": null,
+      "timeMs": 180,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {}
+      },
+      "orangeData": {
+        "growthRateEPS": 8.206414205886889,
+        "growthRateCF": 5.1097072299313435,
+        "growthRateBV": 11.091318499443021,
+        "growthRateDiv": 5.659447933290083,
+        "targetPE": 19.96681497945918,
+        "targetPCF": 16.72037503653168,
+        "targetPBV": 3.53159537555317,
+        "targetYield": 0.012663200430254262,
+        "wasReplaced": false
+      },
+      "currentPrice": 226.76,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 0,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "NVDA",
+      "success": true,
+      "error": null,
+      "timeMs": 93,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {}
+      },
+      "orangeData": {
+        "growthRateEPS": 9.063018615753103,
+        "growthRateCF": 8.603175146845711,
+        "growthRateBV": 7.305782889738717,
+        "growthRateDiv": 4.468082805706211,
+        "targetPE": 28.063168833489264,
+        "targetPCF": 15.025936787513356,
+        "targetPBV": 2.426880137684414,
+        "targetYield": 0.024565684612179034,
+        "wasReplaced": false
+      },
+      "currentPrice": 174.14,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 0,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "META",
+      "success": true,
+      "error": null,
+      "timeMs": 95,
+      "dataRetrieved": {
+        "years": 18,
+        "dataPoints": 18,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [
+          "CF"
+        ],
+        "excluded": {
+          "EPS": false,
+          "CF": true,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {
+          "CF": "Prix cible aberrant détecté (>1.5σ ou retour implausible)"
+        }
+      },
+      "orangeData": {
+        "growthRateEPS": 9.743715774644652,
+        "growthRateCF": 8.18888811287616,
+        "growthRateBV": 11.473260022824944,
+        "growthRateDiv": 3.790800600475169,
+        "targetPE": 28.94481950414326,
+        "targetPCF": 19.09522992631352,
+        "targetPBV": 3.3804082870930205,
+        "targetYield": 0.019987725188707554,
+        "wasReplaced": false
+      },
+      "currentPrice": 664.45,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 2,
+        "bookValuePerShare": 3,
+        "dividendPerShare": 18,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "2 années avec CF à 0 (CF négatif ou données manquantes)",
+          "bookValuePerShare": "3 années avec BV à 0 (BV négatif ou données manquantes)",
+          "dividendPerShare": "18 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "JPM",
+      "success": true,
+      "error": null,
+      "timeMs": 92,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [
+          "BV"
+        ],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": true,
+          "DIV": false
+        },
+        "reasons": {
+          "BV": "Prix cible aberrant détecté (>1.5σ ou retour implausible)"
+        }
+      },
+      "orangeData": {
+        "growthRateEPS": 9.221067793227892,
+        "growthRateCF": 6.2453314661185155,
+        "growthRateBV": 10.23855165054498,
+        "growthRateDiv": 5.954310327222275,
+        "targetPE": 18.446147527365156,
+        "targetPCF": 18.48285067773483,
+        "targetPBV": 5.369523054509257,
+        "targetYield": 0.02885760975032302,
+        "wasReplaced": false
+      },
+      "currentPrice": 313,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 0,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "V",
+      "success": true,
+      "error": null,
+      "timeMs": 466,
+      "dataRetrieved": {
+        "years": 23,
+        "dataPoints": 23,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {}
+      },
+      "orangeData": {
+        "growthRateEPS": 7.051923643308156,
+        "growthRateCF": 8.294457691946956,
+        "growthRateBV": 11.197231050833295,
+        "growthRateDiv": 5.167919136019663,
+        "targetPE": 29.192524213378917,
+        "targetPCF": 12.425087765576011,
+        "targetPBV": 2.2435459928816197,
+        "targetYield": 0.021976245904674344,
+        "wasReplaced": false
+      },
+      "currentPrice": 346.01,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 1,
+        "bookValuePerShare": 1,
+        "dividendPerShare": 23,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "1 années avec CF à 0 (CF négatif ou données manquantes)",
+          "bookValuePerShare": "1 années avec BV à 0 (BV négatif ou données manquantes)",
+          "dividendPerShare": "23 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "JNJ",
+      "success": true,
+      "error": null,
+      "timeMs": 95,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [
+          "DIV"
+        ],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": false,
+          "DIV": true
+        },
+        "reasons": {
+          "DIV": "Prix cible aberrant détecté (>1.5σ ou retour implausible)"
+        }
+      },
+      "orangeData": {
+        "growthRateEPS": 8.48863553482225,
+        "growthRateCF": 7.269129276599431,
+        "growthRateBV": 8.88636952130281,
+        "growthRateDiv": 4.709213370107445,
+        "targetPE": 26.169774303786244,
+        "targetPCF": 18.3066225917588,
+        "targetPBV": 3.0932466278729454,
+        "targetYield": 0.01748545105878142,
+        "wasReplaced": false
+      },
+      "currentPrice": 208.31,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 0,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "WMT",
+      "success": true,
+      "error": null,
+      "timeMs": 102,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {}
+      },
+      "orangeData": {
+        "growthRateEPS": 8.866192117235329,
+        "growthRateCF": 7.048194367019629,
+        "growthRateBV": 7.051494891553084,
+        "growthRateDiv": 4.831094482020102,
+        "targetPE": 23.855248975965775,
+        "targetPCF": 15.863906542280905,
+        "targetPBV": 5.637784535257193,
+        "targetYield": 0.025981224241697146,
+        "wasReplaced": false
+      },
+      "currentPrice": 114.83,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 0,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "PG",
+      "success": true,
+      "error": null,
+      "timeMs": 95,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {}
+      },
+      "orangeData": {
+        "growthRateEPS": 9.58311713722691,
+        "growthRateCF": 6.1892140314613435,
+        "growthRateBV": 8.71460940573328,
+        "growthRateDiv": 3.910244279835081,
+        "targetPE": 23.935092592212378,
+        "targetPCF": 12.631770693361018,
+        "targetPBV": 4.136663438614067,
+        "targetYield": 0.0275528084509281,
+        "wasReplaced": false
+      },
+      "currentPrice": 145.55,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 0,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "MA",
+      "success": true,
+      "error": null,
+      "timeMs": 95,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {}
+      },
+      "orangeData": {
+        "growthRateEPS": 8.693004926168095,
+        "growthRateCF": 6.062741439540429,
+        "growthRateBV": 10.667260874813222,
+        "growthRateDiv": 5.344055987646312,
+        "targetPE": 18.208558949868163,
+        "targetPCF": 16.333542312641942,
+        "targetPBV": 4.646066161652357,
+        "targetYield": 0.027307150607270167,
+        "wasReplaced": false
+      },
+      "currentPrice": 566.21,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 1,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "1 années avec CF à 0 (CF négatif ou données manquantes)",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "UNH",
+      "success": true,
+      "error": null,
+      "timeMs": 103,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {}
+      },
+      "orangeData": {
+        "growthRateEPS": 6.3886331071343445,
+        "growthRateCF": 6.807449146445744,
+        "growthRateBV": 12.945255482251488,
+        "growthRateDiv": 6.317021308090542,
+        "targetPE": 29.48249992139021,
+        "targetPCF": 19.957914829916817,
+        "targetPBV": 5.882067570231174,
+        "targetYield": 0.01626807067485416,
+        "wasReplaced": false
+      },
+      "currentPrice": 328.14,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 0,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "HD",
+      "success": true,
+      "error": null,
+      "timeMs": 97,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [
+          "CF"
+        ],
+        "excluded": {
+          "EPS": false,
+          "CF": true,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {
+          "CF": "Prix cible aberrant détecté (>1.5σ ou retour implausible)"
+        }
+      },
+      "orangeData": {
+        "growthRateEPS": 10.642746223384348,
+        "growthRateCF": 7.490842397370767,
+        "growthRateBV": 11.731856392385447,
+        "growthRateDiv": 5.14607948853443,
+        "targetPE": 20.02962481420767,
+        "targetPCF": 21.082865943873287,
+        "targetPBV": 5.69140306380042,
+        "targetYield": 0.010474157358228329,
+        "wasReplaced": false
+      },
+      "currentPrice": 354.99,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 0,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "DIS",
+      "success": true,
+      "error": null,
+      "timeMs": 791,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [
+          "DIV"
+        ],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": false,
+          "DIV": true
+        },
+        "reasons": {
+          "DIV": "Prix cible aberrant détecté (>1.5σ ou retour implausible)"
+        }
+      },
+      "orangeData": {
+        "growthRateEPS": 10.146232061559227,
+        "growthRateCF": 7.207935185610531,
+        "growthRateBV": 10.237750166480522,
+        "growthRateDiv": 6.1431417114565345,
+        "targetPE": 26.720253180343583,
+        "targetPCF": 17.75297323427357,
+        "targetPBV": 3.2622204041702965,
+        "targetYield": 0.019264625805395473,
+        "wasReplaced": false
+      },
+      "currentPrice": 111.87,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 0,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "NFLX",
+      "success": true,
+      "error": null,
+      "timeMs": 426,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {}
+      },
+      "orangeData": {
+        "growthRateEPS": 10.3382528492864,
+        "growthRateCF": 6.254345437960312,
+        "growthRateBV": 11.644825899385696,
+        "growthRateDiv": 3.9103932531127494,
+        "targetPE": 22.283414481635653,
+        "targetPCF": 12.342182328645128,
+        "targetPBV": 3.8101716178271037,
+        "targetYield": 0.011341692006356804,
+        "wasReplaced": false
+      },
+      "currentPrice": 94,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 1,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "1 années avec CF à 0 (CF négatif ou données manquantes)",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "BAC",
+      "success": true,
+      "error": null,
+      "timeMs": 438,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {}
+      },
+      "orangeData": {
+        "growthRateEPS": 10.879485677628189,
+        "growthRateCF": 6.735861768244095,
+        "growthRateBV": 9.43388577107841,
+        "growthRateDiv": 5.182872126837027,
+        "targetPE": 24.39559629263156,
+        "targetPCF": 18.251517011751083,
+        "targetPBV": 4.902849066247966,
+        "targetYield": 0.02286939320605027,
+        "wasReplaced": false
+      },
+      "currentPrice": 54.26,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 0,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "XOM",
+      "success": true,
+      "error": null,
+      "timeMs": 790,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {}
+      },
+      "orangeData": {
+        "growthRateEPS": 7.2865321571205115,
+        "growthRateCF": 6.57314197761479,
+        "growthRateBV": 12.035047735022717,
+        "growthRateDiv": 6.190469268600749,
+        "targetPE": 17.270121727971063,
+        "targetPCF": 21.73224905343666,
+        "targetPBV": 2.113808082095434,
+        "targetYield": 0.018786982429035946,
+        "wasReplaced": false
+      },
+      "currentPrice": 116.54,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 0,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    },
+    {
+      "ticker": "CVX",
+      "success": true,
+      "error": null,
+      "timeMs": 140,
+      "dataRetrieved": {
+        "years": 25,
+        "dataPoints": 25,
+        "hasProfile": true,
+        "hasKeyMetrics": true,
+        "hasQuotes": true,
+        "hasFinancials": false
+      },
+      "outliers": {
+        "detected": [],
+        "excluded": {
+          "EPS": false,
+          "CF": false,
+          "BV": false,
+          "DIV": false
+        },
+        "reasons": {}
+      },
+      "orangeData": {
+        "growthRateEPS": 7.849567265252472,
+        "growthRateCF": 7.669162290995547,
+        "growthRateBV": 11.677671100834695,
+        "growthRateDiv": 4.203496688942371,
+        "targetPE": 29.523741688570883,
+        "targetPCF": 16.750825996894292,
+        "targetPBV": 3.413801588553267,
+        "targetYield": 0.026994881578010686,
+        "wasReplaced": false
+      },
+      "currentPrice": 147.69,
+      "zeroData": {
+        "earningsPerShare": 0,
+        "cashFlowPerShare": 0,
+        "bookValuePerShare": 0,
+        "dividendPerShare": 25,
+        "reasons": {
+          "earningsPerShare": "",
+          "cashFlowPerShare": "",
+          "bookValuePerShare": "",
+          "dividendPerShare": "25 années avec DIV à 0 (pas de dividende ou données manquantes)"
+        }
+      },
+      "naData": {
+        "fields": [],
+        "reasons": {}
+      },
+      "other": {
+        "snapshotSaved": true,
+        "assumptionsUpdated": true,
+        "infoUpdated": true,
+        "valueLineMetricsSynced": true
+      }
+    }
+  ],
+  "globalStats": {
+    "avgTimePerTicker": 254.05,
+    "totalDataPoints": 485,
+    "totalOutliersDetected": 7,
+    "totalOrangeDataReplaced": 0
+  }
+}
