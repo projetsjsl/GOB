@@ -54904,21 +54904,41 @@ Vérifiez les logs de la console pour plus de détails.`;
     let skippedCount = 0;
     const errors = [];
     const skippedTickers = [];
-    const FMP_BATCH_SIZE = 3;
-    const delayBetweenBatches = 2e3;
-    const FMP_TIMEOUT_MS = 3e4;
+    const BATCH_API_SIZE = 20;
+    const delayBetweenBatches = 1e3;
+    const fetchCompanyDataBatch = async (tickerSymbols) => {
+      const results = /* @__PURE__ */ new Map();
+      try {
+        const symbolString = tickerSymbols.join(",");
+        const response = await fetch(`/api/fmp-company-data-batch-sync?symbols=${encodeURIComponent(symbolString)}&limit=${BATCH_API_SIZE}`);
+        if (!response.ok) {
+          throw new Error(`Batch API error: ${response.status}`);
+        }
+        const batchData = await response.json();
+        if (batchData.success && batchData.results) {
+          batchData.results.forEach((result) => {
+            if (result.success && result.data) {
+              results.set(result.symbol.toUpperCase(), result.data);
+            }
+          });
+        }
+      } catch (error) {
+        console.error(`❌ Erreur batch fetch:`, error);
+      }
+      return results;
+    };
     const fetchCompanyDataWithTimeout = async (tickerSymbol) => {
       return Promise.race([
         fetchCompanyData(tickerSymbol),
         new Promise(
-          (_, reject) => setTimeout(() => reject(new Error(`Timeout après ${FMP_TIMEOUT_MS}ms`)), FMP_TIMEOUT_MS)
+          (_, reject) => setTimeout(() => reject(new Error(`Timeout après 30000ms`)), 3e4)
         )
       ]);
     };
     try {
-      console.log(`🚀 Début synchronisation avec options: ${allTickers.length} tickers en ${Math.ceil(allTickers.length / FMP_BATCH_SIZE)} batches`);
+      console.log(`🚀 Début synchronisation avec options: ${allTickers.length} tickers en ${Math.ceil(allTickers.length / BATCH_API_SIZE)} batches API`);
       console.log("📋 Options de synchronisation:", options);
-      for (let i = 0; i < allTickers.length; i += FMP_BATCH_SIZE) {
+      for (let i = 0; i < allTickers.length; i += BATCH_API_SIZE) {
         if (abortSync.current) {
           console.log("🛑 Synchronisation arrêtée par l'utilisateur.");
           break;
@@ -54926,10 +54946,12 @@ Vérifiez les logs de la console pour plus de détails.`;
         while (isSyncPaused.current) {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
-        const batch = allTickers.slice(i, i + FMP_BATCH_SIZE);
+        const batch = allTickers.slice(i, i + BATCH_API_SIZE);
         if (i > 0) {
           await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
         }
+        console.log(`📦 Récupération batch ${i / BATCH_API_SIZE + 1}/${Math.ceil(allTickers.length / BATCH_API_SIZE)}: ${batch.length} tickers`);
+        const batchResults = await fetchCompanyDataBatch(batch);
         await Promise.allSettled(
           batch.map(async (tickerSymbol) => {
             try {
@@ -54957,28 +54979,38 @@ Vérifiez les logs de la console pour plus de détails.`;
               }
               console.log(`🔄 Synchronisation ${tickerSymbol}...`);
               let result;
-              try {
-                result = await fetchCompanyDataWithTimeout(tickerSymbol);
-              } catch (fetchError) {
-                const isRateLimitError = fetchError.message && (fetchError.message.includes("Rate limit") || fetchError.message.includes("rate limit") || fetchError.message.includes("429"));
-                if (isRateLimitError) {
-                  errorCount++;
-                  const errorMsg = `${tickerSymbol}: ${fetchError.message}`;
-                  errors.push(errorMsg);
-                  setSyncStats((prev) => ({ ...prev, errorCount: prev.errorCount + 1 }));
-                  console.error(`❌ ${errorMsg}`);
-                  console.error(`⚠️ Rate limiting détecté - La synchronisation peut être ralentie ou interrompue.`);
-                  await new Promise((resolve) => setTimeout(resolve, 5e3));
-                  return;
+              if (batchResults.has(tickerSymbol)) {
+                result = batchResults.get(tickerSymbol);
+              } else {
+                try {
+                  result = await fetchCompanyDataWithTimeout(tickerSymbol);
+                } catch (fetchError) {
+                  const isRateLimitError = fetchError.message && (fetchError.message.includes("Rate limit") || fetchError.message.includes("rate limit") || fetchError.message.includes("429"));
+                  if (isRateLimitError) {
+                    errorCount++;
+                    const errorMsg = `${tickerSymbol}: ${fetchError.message}`;
+                    errors.push(errorMsg);
+                    setSyncStats((prev) => ({ ...prev, errorCount: prev.errorCount + 1 }));
+                    console.error(`❌ ${errorMsg}`);
+                    console.error(`⚠️ Rate limiting détecté - La synchronisation peut être ralentie ou interrompue.`);
+                    await new Promise((resolve) => setTimeout(resolve, 5e3));
+                    return;
+                  }
+                  const isNotFoundError = fetchError.message && (fetchError.message.includes("introuvable") || fetchError.message.includes("not found") || fetchError.message.includes("404"));
+                  if (isNotFoundError) {
+                    skippedCount++;
+                    skippedTickers.push(tickerSymbol);
+                    console.warn(`⏭️ ${tickerSymbol}: Ignoré (introuvable dans FMP). ${fetchError.message}`);
+                    return;
+                  }
+                  throw fetchError;
                 }
-                const isNotFoundError = fetchError.message && (fetchError.message.includes("introuvable") || fetchError.message.includes("not found") || fetchError.message.includes("404"));
-                if (isNotFoundError) {
-                  skippedCount++;
-                  skippedTickers.push(tickerSymbol);
-                  console.warn(`⏭️ ${tickerSymbol}: Ignoré (introuvable dans FMP). ${fetchError.message}`);
-                  return;
-                }
-                throw fetchError;
+              }
+              if (!result) {
+                skippedCount++;
+                skippedTickers.push(tickerSymbol);
+                console.warn(`⏭️ ${tickerSymbol}: Ignoré (aucune donnée disponible)`);
+                return;
               }
               if (!result || !result.data || result.data.length === 0) {
                 skippedCount++;
