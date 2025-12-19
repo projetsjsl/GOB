@@ -120,10 +120,10 @@ export default async function handler(req, res) {
         
         if (shouldIncludeKeyMetrics) {
             console.log(`📊 ${validSymbols.length} symboles avec profile valide - Récupération key metrics individuellement`);
-        
-        // Traiter par petits groupes pour éviter le rate limiting
-        const CONCURRENT_LIMIT = 3; // Maximum 3 appels simultanés
-        for (let i = 0; i < validSymbols.length; i += CONCURRENT_LIMIT) {
+            
+            // Traiter par petits groupes pour éviter le rate limiting
+            const CONCURRENT_LIMIT = 3; // Maximum 3 appels simultanés
+            for (let i = 0; i < validSymbols.length; i += CONCURRENT_LIMIT) {
             const batch = validSymbols.slice(i, i + CONCURRENT_LIMIT);
             
             // Faire les appels en parallèle pour ce petit batch
@@ -172,9 +172,10 @@ export default async function handler(req, res) {
                 console.log(`✅ Key metrics batch ${Math.floor(i / CONCURRENT_LIMIT) + 1}: ${successInBatch}/${batch.length} succès`);
             }
             
-            // Délai entre batches pour éviter rate limiting (ultra-sécurisé: 500ms)
-            if (i + CONCURRENT_LIMIT < validSymbols.length) {
-                await new Promise(resolve => setTimeout(resolve, 500));
+                // Délai entre batches pour éviter rate limiting (ultra-sécurisé: 500ms)
+                if (i + CONCURRENT_LIMIT < validSymbols.length) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
             }
         } else {
             console.log(`⏭️ Key metrics ignorées (includeKeyMetrics=false)`);

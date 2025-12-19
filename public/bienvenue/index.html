@@ -224,7 +224,7 @@
             employeeToReact: (db) => ({
                 ...db,
                 avatarUrl: db.avatar_url || (db.name?.includes('Caroline') ? '/images/caroline_avatar.jpg' : null),
-                startDate: db.start_date
+                startDate: db.start_date || '2026-01-01'
             }),
             employeeToDB: (react) => ({
                 name: react.name,
@@ -1183,6 +1183,7 @@
                         ref={inputRef}
                         type="date"
                         value={value || ''}
+                        defaultValue={value || '2026-01-01'}
                         onChange={(e) => {
                             onChange(e.target.value);
                             setIsOpen(false);
@@ -1191,7 +1192,7 @@
                             setIsOpen(false);
                             if (onBlur) onBlur(e);
                         }}
-                        min={min}
+                        min={min || '2026-01-01'}
                         max={max}
                         className="absolute opacity-0 w-full h-full cursor-pointer"
                         style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
@@ -1661,7 +1662,7 @@
                                                 <div className="flex items-center gap-2">
                                                      <div className="flex items-center gap-1">
                                                          <span className="text-[10px] font-bold text-gray-400 uppercase whitespace-nowrap">Début :</span>
-                                                         <input type="date" className="w-32 text-xs border rounded px-1 py-1" value={emp.startDate} onChange={e => updateEmp(emp.id, 'startDate', e.target.value)} title="Date de début d'emploi" />
+                                                         <input type="date" className="w-32 text-xs border rounded px-1 py-1" value={emp.startDate || '2026-01-01'} defaultValue="2026-01-01" min="2026-01-01" onChange={e => updateEmp(emp.id, 'startDate', e.target.value)} title="Date de début d'emploi" />
                                                      </div>
                                                      <button onClick={() => duplicateEmp(emp)} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded" title="Dupliquer"><Icons.Copy /></button>
                                                      <button onClick={(e) => { e.stopPropagation(); handleDeleteEmployee(emp.id); }} className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors" title="Supprimer l'employé"><Icons.Trash /></button>
@@ -1782,10 +1783,6 @@
                                                     <div>
                                                         <label className="text-xs text-gray-500 font-bold uppercase">Durée (jours)</label>
                                                         <input type="number" className="w-full p-1 border rounded" value={phase.duration} onChange={e => updatePhase(phase.id, 'duration', parseInt(e.target.value))} />
-                                                    </div>
-                                                    <div>
-                                                         <label className="text-xs text-gray-500 font-bold uppercase">Délicat (J+)</label>
-                                                         <input type="number" className="w-full p-1 border rounded" value={phase.startOffset} onChange={e => updatePhase(phase.id, 'startOffset', parseInt(e.target.value))} />
                                                     </div>
                                                 </div>
                                             </div>
@@ -2244,7 +2241,7 @@
                     const mapEmployee = (e) => ({
                         ...e,
                         avatarUrl: e.avatar_url || (e.name?.includes('Caroline') ? '/images/caroline_avatar.jpg' : null),
-                        startDate: e.start_date,
+                        startDate: e.start_date || '2026-01-01',
                     });
 
                     // Subscribe to employees table changes
