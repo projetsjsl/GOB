@@ -2630,6 +2630,24 @@ export default function App() {
         // ✅ Collecte des données pour le rapport détaillé
         const tickerResults: any[] = [];
         
+        // ✅ OPTIMISATION CRITIQUE: Charger les tickers Supabase UNE SEULE FOIS au début
+        // et mettre en cache pour éviter des centaines d'appels API pendant la synchronisation
+        let supabaseTickersCache: any[] | null = null;
+        if (options.syncValueLineMetrics) {
+            try {
+                console.log('📡 Chargement initial des tickers Supabase pour métriques ValueLine...');
+                const supabaseResult = await loadAllTickersFromSupabase();
+                if (supabaseResult.success) {
+                    supabaseTickersCache = supabaseResult.tickers;
+                    console.log(`✅ ${supabaseTickersCache.length} tickers Supabase chargés et mis en cache pour toute la synchronisation`);
+                } else {
+                    console.warn('⚠️ Échec chargement initial tickers Supabase, métriques ValueLine non synchronisées');
+                }
+            } catch (error: any) {
+                console.warn('⚠️ Erreur chargement initial tickers Supabase:', error.message);
+            }
+        }
+        
         // ✅ OPTIMISATION: Utiliser l'endpoint batch pour récupérer plusieurs tickers en une seule requête
         const BATCH_API_SIZE = 20; // Nombre de tickers par batch API (limite FMP)
         const delayBetweenBatches = 2000; // Délai entre batches API (2 secondes - ultra-sécurisé pour rate limiting)
@@ -2724,7 +2742,13 @@ export default function App() {
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
 
-            const batch = allTickers.slice(i, i + BATCH_API_SIZE);
+            const batch = allTickers.slice(i, i + BATCH_API_SIZE).filter(t => t && t.trim()); // ✅ FIX: Filtrer les tickers vides
+
+            // ✅ VALIDATION: Ignorer les batches vides
+            if (batch.length === 0) {
+                console.warn(`⚠️ Batch vide détecté à l'index ${i}, ignoré`);
+                continue;
+            }
 
             // Attendre entre les batches API
             if (i > 0) {
@@ -3134,12 +3158,11 @@ export default function App() {
                             tickerResult.other.infoUpdated = true;
                             
                             // Synchroniser les métriques ValueLine depuis Supabase (si option activée)
-                            if (options.syncValueLineMetrics) {
+                            // ✅ OPTIMISATION: Utiliser le cache au lieu d'appeler l'API pour chaque ticker
+                            if (options.syncValueLineMetrics && supabaseTickersCache) {
                                 try {
-                                    const supabaseResult = await loadAllTickersFromSupabase();
-                                    if (supabaseResult.success) {
-                                        const supabaseTicker = supabaseResult.tickers.find(t => t.ticker.toUpperCase() === tickerSymbol);
-                                        if (supabaseTicker) {
+                                    const supabaseTicker = supabaseTickersCache.find(t => t.ticker.toUpperCase() === tickerSymbol);
+                                    if (supabaseTicker) {
                                             updatedInfo = {
                                                 ...updatedInfo,
                                                 securityRank: supabaseTicker.security_rank !== null && supabaseTicker.security_rank !== undefined
@@ -3157,7 +3180,6 @@ export default function App() {
                                             };
                                             tickerResult.other.valueLineMetricsSynced = true;
                                         }
-                                    }
                                 } catch (error) {
                                     console.warn(`⚠️ Impossible de recharger les métriques ValueLine pour ${tickerSymbol}:`, error);
                                 }

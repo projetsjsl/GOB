@@ -57138,6 +57138,21 @@ Vérifiez les logs de la console pour plus de détails.`;
     const errors = [];
     const skippedTickers = [];
     const tickerResults = [];
+    let supabaseTickersCache = null;
+    if (options.syncValueLineMetrics) {
+      try {
+        console.log("📡 Chargement initial des tickers Supabase pour métriques ValueLine...");
+        const supabaseResult = await loadAllTickersFromSupabase();
+        if (supabaseResult.success) {
+          supabaseTickersCache = supabaseResult.tickers;
+          console.log(`✅ ${supabaseTickersCache.length} tickers Supabase chargés et mis en cache pour toute la synchronisation`);
+        } else {
+          console.warn("⚠️ Échec chargement initial tickers Supabase, métriques ValueLine non synchronisées");
+        }
+      } catch (error) {
+        console.warn("⚠️ Erreur chargement initial tickers Supabase:", error.message);
+      }
+    }
     const BATCH_API_SIZE = 20;
     const delayBetweenBatches = 2e3;
     const MAX_SYNC_TIME_MS = 30 * 60 * 1e3;
@@ -57213,7 +57228,11 @@ Vérifiez les logs de la console pour plus de détails.`;
         while (isSyncPaused.current) {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
-        const batch = allTickers.slice(i, i + BATCH_API_SIZE);
+        const batch = allTickers.slice(i, i + BATCH_API_SIZE).filter((t) => t && t.trim());
+        if (batch.length === 0) {
+          console.warn(`⚠️ Batch vide détecté à l'index ${i}, ignoré`);
+          continue;
+        }
         if (i > 0) {
           await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
         }
@@ -57533,21 +57552,18 @@ Vérifiez les logs de la console pour plus de détails.`;
                       name: result.info.name || profile2.info.name
                     };
                     tickerResult.other.infoUpdated = true;
-                    if (options.syncValueLineMetrics) {
+                    if (options.syncValueLineMetrics && supabaseTickersCache) {
                       try {
-                        const supabaseResult = await loadAllTickersFromSupabase();
-                        if (supabaseResult.success) {
-                          const supabaseTicker = supabaseResult.tickers.find((t) => t.ticker.toUpperCase() === tickerSymbol);
-                          if (supabaseTicker) {
-                            updatedInfo = {
-                              ...updatedInfo,
-                              securityRank: supabaseTicker.security_rank !== null && supabaseTicker.security_rank !== void 0 ? supabaseTicker.security_rank : updatedInfo.securityRank || "N/A",
-                              earningsPredictability: supabaseTicker.earnings_predictability !== null && supabaseTicker.earnings_predictability !== void 0 ? supabaseTicker.earnings_predictability : updatedInfo.earningsPredictability,
-                              priceGrowthPersistence: supabaseTicker.price_growth_persistence !== null && supabaseTicker.price_growth_persistence !== void 0 ? supabaseTicker.price_growth_persistence : updatedInfo.priceGrowthPersistence,
-                              priceStability: supabaseTicker.price_stability !== null && supabaseTicker.price_stability !== void 0 ? supabaseTicker.price_stability : updatedInfo.priceStability
-                            };
-                            tickerResult.other.valueLineMetricsSynced = true;
-                          }
+                        const supabaseTicker = supabaseTickersCache.find((t) => t.ticker.toUpperCase() === tickerSymbol);
+                        if (supabaseTicker) {
+                          updatedInfo = {
+                            ...updatedInfo,
+                            securityRank: supabaseTicker.security_rank !== null && supabaseTicker.security_rank !== void 0 ? supabaseTicker.security_rank : updatedInfo.securityRank || "N/A",
+                            earningsPredictability: supabaseTicker.earnings_predictability !== null && supabaseTicker.earnings_predictability !== void 0 ? supabaseTicker.earnings_predictability : updatedInfo.earningsPredictability,
+                            priceGrowthPersistence: supabaseTicker.price_growth_persistence !== null && supabaseTicker.price_growth_persistence !== void 0 ? supabaseTicker.price_growth_persistence : updatedInfo.priceGrowthPersistence,
+                            priceStability: supabaseTicker.price_stability !== null && supabaseTicker.price_stability !== void 0 ? supabaseTicker.price_stability : updatedInfo.priceStability
+                          };
+                          tickerResult.other.valueLineMetricsSynced = true;
                         }
                       } catch (error) {
                         console.warn(`⚠️ Impossible de recharger les métriques ValueLine pour ${tickerSymbol}:`, error);
