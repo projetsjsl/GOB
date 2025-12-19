@@ -145,27 +145,66 @@ async function createSnapshot(req, res, supabase) {
             .eq('ticker', cleanTicker);
     }
 
+    // Create snapshot - Construire l'objet d'insertion de manière conditionnelle
+    const insertData = {
+        ticker: cleanTicker,
+        profile_id: profile_id || cleanTicker,
+        user_id,
+        notes,
+        is_current,
+        is_watchlist,
+        auto_fetched,
+        annual_data,
+        assumptions,
+        company_info
+    };
+    
+    // Ajouter sync_metadata seulement si fourni (colonne peut ne pas exister si migration non appliquée)
+    if (sync_metadata !== null && sync_metadata !== undefined) {
+        insertData.sync_metadata = sync_metadata;
+    }
+
     // Create snapshot
     const { data, error } = await supabase
         .from('finance_pro_snapshots')
-        .insert([{
-            ticker: cleanTicker,
-            profile_id: profile_id || cleanTicker,
-            user_id,
-            notes,
-            is_current,
-            is_watchlist,
-            auto_fetched,
-            annual_data,
-            assumptions,
-            company_info,
-            sync_metadata // Ajouter les métadonnées de synchronisation
-        }])
+        .insert([insertData])
         .select()
         .single();
 
     if (error) {
         console.error('Create snapshot error:', error);
+        console.error('Error details:', {
+            message: error.message,
+            code: error.code,
+            hint: error.hint,
+            details: error.details
+        });
+        
+        // Si l'erreur est liée à sync_metadata (colonne inexistante), réessayer sans
+        if (error.code === '42703' || (error.message && error.message.includes('sync_metadata'))) {
+            console.warn('⚠️ sync_metadata column not found, retrying without it...');
+            delete insertData.sync_metadata;
+            
+            const { data: retryData, error: retryError } = await supabase
+                .from('finance_pro_snapshots')
+                .insert([insertData])
+                .select()
+                .single();
+            
+            if (retryError) {
+                console.error('Retry create snapshot error:', retryError);
+                return res.status(500).json({ 
+                    error: 'Failed to create snapshot',
+                    details: retryError.message,
+                    code: retryError.code,
+                    hint: retryError.hint
+                });
+            }
+            
+            console.log(`✅ Created snapshot for ${cleanTicker} (version ${retryData.version}) - without sync_metadata`);
+            return res.status(201).json(retryData);
+        }
+        
         return res.status(500).json({ 
             error: 'Failed to create snapshot',
             details: error.message,
