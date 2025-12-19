@@ -145,6 +145,29 @@ async function createSnapshot(req, res, supabase) {
             .eq('ticker', cleanTicker);
     }
 
+    // Nettoyer annual_data : supprimer les champs non standard qui pourraient causer des erreurs
+    // Le champ dataSource est nouveau et peut causer des problèmes si la structure JSON est trop complexe
+    const cleanedAnnualData = Array.isArray(annual_data) 
+        ? annual_data.map(row => {
+            // Garder seulement les champs standard de AnnualData
+            const cleaned = {
+                year: row.year,
+                priceHigh: row.priceHigh || 0,
+                priceLow: row.priceLow || 0,
+                cashFlowPerShare: row.cashFlowPerShare || 0,
+                dividendPerShare: row.dividendPerShare || 0,
+                bookValuePerShare: row.bookValuePerShare || 0,
+                earningsPerShare: row.earningsPerShare || 0
+            };
+            // Ajouter les champs optionnels seulement s'ils existent
+            if (row.isEstimate !== undefined) cleaned.isEstimate = row.isEstimate;
+            if (row.autoFetched !== undefined) cleaned.autoFetched = row.autoFetched;
+            // Note: dataSource est conservé car c'est un champ valide dans AnnualData
+            if (row.dataSource !== undefined) cleaned.dataSource = row.dataSource;
+            return cleaned;
+        })
+        : annual_data;
+
     // Create snapshot - Construire l'objet d'insertion de manière conditionnelle
     const insertData = {
         ticker: cleanTicker,
@@ -154,7 +177,7 @@ async function createSnapshot(req, res, supabase) {
         is_current,
         is_watchlist,
         auto_fetched,
-        annual_data,
+        annual_data: cleanedAnnualData, // Utiliser les données nettoyées
         assumptions,
         company_info
     };
@@ -172,7 +195,7 @@ async function createSnapshot(req, res, supabase) {
         .single();
 
     if (error) {
-        console.error('Create snapshot error:', error);
+        console.error(`❌ Create snapshot error for ${cleanTicker}:`, error);
         console.error('Error details:', {
             message: error.message,
             code: error.code,
@@ -205,11 +228,50 @@ async function createSnapshot(req, res, supabase) {
             return res.status(201).json(retryData);
         }
         
+        // Si erreur 400, c'est probablement un problème de validation JSON
+        // Essayer de nettoyer encore plus les données
+        if (error.code === '23502' || error.code === '23514' || (error.message && error.message.includes('constraint'))) {
+            console.warn(`⚠️ Validation error for ${cleanTicker}, trying with minimal data...`);
+            
+            // Essayer avec des données minimales pour identifier le problème
+            const minimalData = {
+                ticker: cleanTicker,
+                profile_id: profile_id || cleanTicker,
+                is_current,
+                is_watchlist,
+                auto_fetched,
+                annual_data: cleanedAnnualData.length > 0 ? cleanedAnnualData.slice(0, 1) : cleanedAnnualData, // Un seul élément pour test
+                assumptions: assumptions || {},
+                company_info: company_info || {}
+            };
+            
+            const { data: minimalRetryData, error: minimalRetryError } = await supabase
+                .from('finance_pro_snapshots')
+                .insert([minimalData])
+                .select()
+                .single();
+            
+            if (minimalRetryError) {
+                console.error('Minimal retry also failed:', minimalRetryError);
+                return res.status(500).json({ 
+                    error: 'Failed to create snapshot (validation error)',
+                    details: error.message,
+                    code: error.code,
+                    hint: error.hint,
+                    ticker: cleanTicker
+                });
+            }
+            
+            console.log(`✅ Created snapshot for ${cleanTicker} with minimal data`);
+            return res.status(201).json(minimalRetryData);
+        }
+        
         return res.status(500).json({ 
             error: 'Failed to create snapshot',
             details: error.message,
             code: error.code,
-            hint: error.hint
+            hint: error.hint,
+            ticker: cleanTicker
         });
     }
 
