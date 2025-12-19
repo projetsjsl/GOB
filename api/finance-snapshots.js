@@ -139,8 +139,24 @@ async function createSnapshot(req, res, supabase) {
     if (!ticker || !annual_data || !assumptions || !company_info) {
         return res.status(400).json({
             error: 'Missing required fields',
-            required: ['ticker', 'annual_data', 'assumptions', 'company_info']
+            required: ['ticker', 'annual_data', 'assumptions', 'company_info'],
+            received: {
+                hasTicker: !!ticker,
+                hasAnnualData: !!annual_data,
+                hasAssumptions: !!assumptions,
+                hasCompanyInfo: !!company_info
+            }
         });
+    }
+
+    // Vérifier la taille des données (limite approximative de 1MB pour JSONB)
+    try {
+        const dataSize = JSON.stringify({ annual_data, assumptions, company_info }).length;
+        if (dataSize > 1000000) { // 1MB
+            console.warn(`⚠️ Large payload for ${ticker}: ${(dataSize / 1024).toFixed(2)}KB`);
+        }
+    } catch (sizeError) {
+        console.warn('Could not calculate payload size:', sizeError);
     }
 
     const cleanTicker = ticker.toUpperCase();
