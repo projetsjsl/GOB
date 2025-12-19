@@ -2472,7 +2472,7 @@ export default function App() {
         const newLib = { ...library };
         delete newLib[id];
         setLibrary(newLib);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(newLib));
+        await saveToCache(newLib);
 
         // Update active ticker if needed
         if (activeId === id) {
@@ -2542,7 +2542,9 @@ export default function App() {
             };
 
             const newLib = { ...prev, [id]: updated };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(newLib));
+            saveToCache(newLib).catch(e => {
+                console.warn('Failed to save to cache:', e);
+            });
 
             // If modifying currently active profile, sync local state
             if (id === activeId) {
@@ -3168,11 +3170,10 @@ export default function App() {
                                 }
                             };
 
-                            try {
-                                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-                            } catch (e) {
-                                console.warn('Failed to save to LocalStorage:', e);
-                            }
+                            // Sauvegarder avec IndexedDB (évite QuotaExceededError)
+                            saveToCache(updated).catch(e => {
+                                console.warn('Failed to save to cache:', e);
+                            });
 
                             return updated;
                         });
@@ -3571,11 +3572,10 @@ export default function App() {
                                 }
                             };
 
-                            try {
-                                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-                            } catch (e) {
-                                console.warn('Failed to save to LocalStorage:', e);
-                            }
+                            // Sauvegarder avec IndexedDB (évite QuotaExceededError)
+                            saveToCache(updated).catch(e => {
+                                console.warn('Failed to save to cache:', e);
+                            });
 
                             return updated;
                         });
@@ -4017,11 +4017,10 @@ export default function App() {
                                         [symbol]: newProfile
                                     };
                                     
-                                    try {
-                                        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-                                    } catch (e) {
-                                        console.warn('Failed to save to LocalStorage:', e);
-                                    }
+                                    // Sauvegarder avec IndexedDB (évite QuotaExceededError)
+                                    saveToCache(updated).catch(e => {
+                                        console.warn('Failed to save to cache:', e);
+                                    });
                                     
                                     return updated;
                                 });

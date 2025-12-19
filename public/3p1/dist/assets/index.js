@@ -42689,7 +42689,25 @@ const localStorageAdapter = {
     }
   },
   setItem: async (key, value) => {
-    localStorage.setItem(key, JSON.stringify(value));
+    var _a3;
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+      if ((e == null ? void 0 : e.name) === "QuotaExceededError" || ((_a3 = e == null ? void 0 : e.message) == null ? void 0 : _a3.includes("quota"))) {
+        console.warn(`⚠️ LocalStorage quota exceeded for ${key}, attempting cleanup...`);
+        try {
+          const keys2 = Object.keys(localStorage);
+          const oldCacheKeys = keys2.filter((k2) => k2.startsWith("cache_") || k2.includes("_cache"));
+          oldCacheKeys.forEach((k2) => localStorage.removeItem(k2));
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch (retryError) {
+          console.error("❌ Failed to save even after cleanup, data too large for localStorage", retryError);
+          throw e;
+        }
+      } else {
+        throw e;
+      }
+    }
   },
   removeItem: async (key) => {
     localStorage.removeItem(key);
@@ -57319,7 +57337,7 @@ Vérifiez les logs de la console pour plus de détails.`;
     const newLib = { ...library };
     delete newLib[id];
     setLibrary(newLib);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newLib));
+    await saveToCache(newLib);
     if (activeId === id) {
       const remaining = Object.keys(newLib);
       if (remaining.length > 0) {
@@ -57380,7 +57398,9 @@ Vérifiez les logs de la console pour plus de détails.`;
         isWatchlist: !profile2.isWatchlist
       };
       const newLib = { ...prev, [id]: updated };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newLib));
+      saveToCache(newLib).catch((e) => {
+        console.warn("Failed to save to cache:", e);
+      });
       if (id === activeId) {
         setIsWatchlist(updated.isWatchlist);
       }
@@ -57862,11 +57882,9 @@ Vérifiez les logs de la console pour plus de détails.`;
                         lastModified: Date.now()
                       }
                     };
-                    try {
-                      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-                    } catch (e) {
-                      console.warn("Failed to save to LocalStorage:", e);
-                    }
+                    saveToCache(updated).catch((e) => {
+                      console.warn("Failed to save to cache:", e);
+                    });
                     return updated;
                   });
                   const zeroCounts = {
@@ -58205,11 +58223,9 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
                     lastModified: Date.now()
                   }
                 };
-                try {
-                  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-                } catch (e) {
-                  console.warn("Failed to save to LocalStorage:", e);
-                }
+                saveToCache(updated).catch((e) => {
+                  console.warn("Failed to save to cache:", e);
+                });
                 return updated;
               });
               try {
@@ -58527,11 +58543,9 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                     ...prev,
                     [symbol]: newProfile
                   };
-                  try {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-                  } catch (e) {
-                    console.warn("Failed to save to LocalStorage:", e);
-                  }
+                  saveToCache(updated).catch((e) => {
+                    console.warn("Failed to save to cache:", e);
+                  });
                   return updated;
                 });
                 successCount++;

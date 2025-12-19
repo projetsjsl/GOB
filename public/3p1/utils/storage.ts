@@ -131,7 +131,27 @@ export const localStorageAdapter: StorageAdapter = {
     }
   },
   setItem: async (key: string, value: any) => {
-    localStorage.setItem(key, JSON.stringify(value));
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (e: any) {
+      // Si QuotaExceededError, essayer de nettoyer et réessayer une fois
+      if (e?.name === 'QuotaExceededError' || e?.message?.includes('quota')) {
+        console.warn(`⚠️ LocalStorage quota exceeded for ${key}, attempting cleanup...`);
+        // Nettoyer les anciennes clés de cache si possible
+        try {
+          const keys = Object.keys(localStorage);
+          const oldCacheKeys = keys.filter(k => k.startsWith('cache_') || k.includes('_cache'));
+          oldCacheKeys.forEach(k => localStorage.removeItem(k));
+          // Réessayer
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch (retryError) {
+          console.error('❌ Failed to save even after cleanup, data too large for localStorage', retryError);
+          throw e; // Re-throw original error
+        }
+      } else {
+        throw e;
+      }
+    }
   },
   removeItem: async (key: string) => {
     localStorage.removeItem(key);
