@@ -2787,16 +2787,26 @@ export default function App() {
                         // 1. Sauvegarder un snapshot avant la sync (si option activée)
                         if (options.saveBeforeSync) {
                             console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
-                            await saveSnapshot(
-                                tickerSymbol,
-                                profile.data,
-                                profile.assumptions,
-                                profile.info,
-                                `Avant synchronisation (${options.replaceOrangeData ? 'avec remplacement données oranges' : 'standard'}) - ${new Date().toLocaleString()}`,
-                                false,
-                                false
-                            );
-                            tickerResult.other.snapshotSaved = true;
+                            try {
+                                const saveResult = await saveSnapshot(
+                                    tickerSymbol,
+                                    profile.data,
+                                    profile.assumptions,
+                                    profile.info,
+                                    `Avant synchronisation (${options.replaceOrangeData ? 'avec remplacement données oranges' : 'standard'}) - ${new Date().toLocaleString()}`,
+                                    false,
+                                    false
+                                );
+                                if (saveResult.success) {
+                                    tickerResult.other.snapshotSaved = true;
+                                } else {
+                                    console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot avant sync: ${saveResult.error}`);
+                                    // Ne pas bloquer la synchronisation si la sauvegarde échoue
+                                }
+                            } catch (saveError: any) {
+                                console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot avant sync: ${saveError.message}`);
+                                // Ne pas bloquer la synchronisation si la sauvegarde échoue
+                            }
                         }
 
                         // 2. Charger les nouvelles données FMP avec timeout (si option activée)
@@ -3207,16 +3217,26 @@ export default function App() {
                         };
 
                         // 6. Sauvegarder le snapshot après sync
-                        await saveSnapshot(
-                            tickerSymbol,
-                            mergedData,
-                            finalAssumptions,
-                            updatedInfo,
-                            `Après synchronisation (${options.replaceOrangeData ? 'avec remplacement données oranges' : 'standard'}) - ${new Date().toLocaleString()}`,
-                            true,
-                            true
-                        );
-                        tickerResult.other.snapshotSaved = true;
+                        try {
+                            const saveResult = await saveSnapshot(
+                                tickerSymbol,
+                                mergedData,
+                                finalAssumptions,
+                                updatedInfo,
+                                `Après synchronisation (${options.replaceOrangeData ? 'avec remplacement données oranges' : 'standard'}) - ${new Date().toLocaleString()}`,
+                                true,
+                                true
+                            );
+                            if (saveResult.success) {
+                                tickerResult.other.snapshotSaved = true;
+                            } else {
+                                console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot après sync: ${saveResult.error}`);
+                                // Ne pas bloquer la synchronisation si la sauvegarde échoue
+                            }
+                        } catch (saveError: any) {
+                            console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot après sync: ${saveError.message}`);
+                            // Ne pas bloquer la synchronisation si la sauvegarde échoue
+                        }
 
                         successCount++;
                         tickerResult.success = true;
@@ -3403,15 +3423,22 @@ export default function App() {
 
                         // 1. Sauvegarder un snapshot avant la sync
                         console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
-                        await saveSnapshot(
-                            tickerSymbol,
-                            profile.data,
-                            profile.assumptions,
-                            profile.info,
-                            `Avant synchronisation (N/A) - ${new Date().toLocaleString()}`,
-                            false,
-                            false
-                        );
+                        try {
+                            const saveResult = await saveSnapshot(
+                                tickerSymbol,
+                                profile.data,
+                                profile.assumptions,
+                                profile.info,
+                                `Avant synchronisation (N/A) - ${new Date().toLocaleString()}`,
+                                false,
+                                false
+                            );
+                            if (!saveResult.success) {
+                                console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot avant sync: ${saveResult.error}`);
+                            }
+                        } catch (saveError: any) {
+                            console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot avant sync: ${saveError.message}`);
+                        }
 
                         // 2. Charger les nouvelles données FMP avec timeout
                         console.log(`🔄 Synchronisation ${tickerSymbol}...`);
@@ -3498,18 +3525,25 @@ export default function App() {
                         });
 
                         // 7. Sauvegarder le snapshot après sync
-                        await saveSnapshot(
-                            tickerSymbol,
-                            mergedData,
-                            finalAssumptions,
-                            {
-                                ...profile.info,
-                                ...result.info
-                            },
-                            `Synchronisation (N/A) - ${new Date().toLocaleString()}`,
-                            true,
-                            true
-                        );
+                        try {
+                            const saveResult = await saveSnapshot(
+                                tickerSymbol,
+                                mergedData,
+                                finalAssumptions,
+                                {
+                                    ...profile.info,
+                                    ...result.info
+                                },
+                                `Synchronisation (N/A) - ${new Date().toLocaleString()}`,
+                                true,
+                                true
+                            );
+                            if (!saveResult.success) {
+                                console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot après sync: ${saveResult.error}`);
+                            }
+                        } catch (saveError: any) {
+                            console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot après sync: ${saveError.message}`);
+                        }
 
                         successCount++;
                         setSyncStats({ successCount, errorCount });

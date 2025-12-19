@@ -35196,6 +35196,18 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
 const API_BASE$1 = typeof window !== "undefined" ? window.location.origin : "";
 async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent = true, autoFetched = false) {
   try {
+    if (!ticker2 || !ticker2.trim()) {
+      return { success: false, error: "Ticker is required" };
+    }
+    if (!data || !Array.isArray(data)) {
+      return { success: false, error: "Annual data must be an array" };
+    }
+    if (!assumptions || typeof assumptions !== "object") {
+      return { success: false, error: "Assumptions must be an object" };
+    }
+    if (!info || typeof info !== "object") {
+      return { success: false, error: "Company info must be an object" };
+    }
     const sanitizedAssumptions = sanitizeAssumptionsSync(assumptions);
     const response = await fetch(`${API_BASE$1}/api/finance-snapshots`, {
       method: "POST",
@@ -35213,14 +35225,20 @@ async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent =
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
-      throw new Error(errorData.error || `HTTP ${response.status}`);
+      const errorMessage = errorData.error || `HTTP ${response.status}`;
+      if (response.status === 400) {
+        console.warn(`⚠️ Snapshot validation failed for ${ticker2}: ${errorMessage}`);
+      } else {
+        console.error(`❌ Failed to save snapshot for ${ticker2}: ${errorMessage}`);
+      }
+      return { success: false, error: errorMessage };
     }
     const snapshot = await response.json();
     console.log(`✅ Snapshot saved: ${ticker2} v${snapshot.version}`);
     return { success: true, snapshot };
   } catch (error) {
-    console.error("Failed to save snapshot:", error);
-    return { success: false, error: error.message };
+    console.error(`❌ Failed to save snapshot for ${ticker2}:`, error);
+    return { success: false, error: error.message || "Unknown error" };
   }
 }
 async function listSnapshots(ticker2, limit = 20) {
@@ -57090,24 +57108,49 @@ Vérifiez les logs de la console pour plus de détails.`;
     const tickerResults = [];
     const BATCH_API_SIZE = 20;
     const delayBetweenBatches = 2e3;
-    const fetchCompanyDataBatch = async (tickerSymbols) => {
+    const fetchCompanyDataBatch = async (tickerSymbols, includeKeyMetrics = true) => {
+      var _a4;
       const results = /* @__PURE__ */ new Map();
       try {
         const symbolString = tickerSymbols.join(",");
-        const response = await fetch(`/api/fmp-company-data-batch-sync?symbols=${encodeURIComponent(symbolString)}&limit=${BATCH_API_SIZE}`);
+        console.log(`🔍 [BATCH] Appel API pour ${tickerSymbols.length} tickers: ${symbolString.substring(0, 50)}...`);
+        console.log(`🔍 [BATCH] includeKeyMetrics: ${includeKeyMetrics}`);
+        const url = `/api/fmp-company-data-batch-sync?symbols=${encodeURIComponent(symbolString)}&limit=${BATCH_API_SIZE}&includeKeyMetrics=${includeKeyMetrics}`;
+        console.log(`🔍 [BATCH] URL: ${url.substring(0, 100)}...`);
+        const response = await fetch(url);
+        console.log(`🔍 [BATCH] Réponse HTTP: ${response.status} ${response.statusText}`);
         if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`❌ [BATCH] Erreur HTTP ${response.status}:`, errorText.substring(0, 200));
           throw new Error(`Batch API error: ${response.status}`);
         }
         const batchData = await response.json();
+        console.log(`🔍 [BATCH] Données reçues:`, {
+          success: batchData.success,
+          resultsCount: ((_a4 = batchData.results) == null ? void 0 : _a4.length) || 0,
+          stats: batchData.stats
+        });
         if (batchData.success && batchData.results) {
+          console.log(`📦 [BATCH] Batch API réponse: ${batchData.results.length} résultats`);
           batchData.results.forEach((result) => {
             if (result.success && result.data) {
+              const dataLength = result.data.data ? result.data.data.length : 0;
+              if (dataLength > 0) {
+                console.log(`✅ [BATCH] ${result.symbol}: ${dataLength} années de données`);
+              } else {
+                console.log(`⚠️ [BATCH] ${result.symbol}: Profile trouvé mais ${dataLength} années de données`);
+              }
               results.set(result.symbol.toUpperCase(), result.data);
+            } else {
+              console.warn(`❌ [BATCH] ${result.symbol}: Échec ou données manquantes (success: ${result.success}, hasData: ${!!result.data})`);
             }
           });
+          console.log(`📦 [BATCH] Total résultats stockés dans Map: ${results.size}`);
+        } else {
+          console.error(`❌ [BATCH] Batch API réponse invalide:`, batchData);
         }
       } catch (error) {
-        console.error(`❌ Erreur batch fetch:`, error);
+        console.error(`❌ [BATCH] Erreur batch fetch:`, error.message, error);
       }
       return results;
     };
@@ -57134,11 +57177,13 @@ Vérifiez les logs de la console pour plus de détails.`;
         if (i > 0) {
           await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
         }
+        const includeKeyMetrics = options.syncData;
         console.log(`📦 Récupération batch ${i / BATCH_API_SIZE + 1}/${Math.ceil(allTickers.length / BATCH_API_SIZE)}: ${batch.length} tickers`);
-        const batchResults = await fetchCompanyDataBatch(batch);
+        console.log(`🔍 [BATCH] Options: syncData=${options.syncData}, syncAssumptions=${options.syncAssumptions}, syncInfo=${options.syncInfo}, includeKeyMetrics=${includeKeyMetrics}`);
+        const batchResults = await fetchCompanyDataBatch(batch, includeKeyMetrics);
         await Promise.allSettled(
           batch.map(async (tickerSymbol) => {
-            var _a4, _b3;
+            var _a4, _b3, _c;
             const tickerStartTime = Date.now();
             let tickerResult = {
               ticker: tickerSymbol,
@@ -57191,16 +57236,24 @@ Vérifiez les logs de la console pour plus de détails.`;
               }
               if (options.saveBeforeSync) {
                 console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
-                await saveSnapshot(
-                  tickerSymbol,
-                  profile2.data,
-                  profile2.assumptions,
-                  profile2.info,
-                  `Avant synchronisation (${options.replaceOrangeData ? "avec remplacement données oranges" : "standard"}) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
-                  false,
-                  false
-                );
-                tickerResult.other.snapshotSaved = true;
+                try {
+                  const saveResult = await saveSnapshot(
+                    tickerSymbol,
+                    profile2.data,
+                    profile2.assumptions,
+                    profile2.info,
+                    `Avant synchronisation (${options.replaceOrangeData ? "avec remplacement données oranges" : "standard"}) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
+                    false,
+                    false
+                  );
+                  if (saveResult.success) {
+                    tickerResult.other.snapshotSaved = true;
+                  } else {
+                    console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot avant sync: ${saveResult.error}`);
+                  }
+                } catch (saveError) {
+                  console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot avant sync: ${saveError.message}`);
+                }
               }
               if (!options.syncData && !options.syncAssumptions && !options.syncInfo) {
                 console.log(`⏭️ ${tickerSymbol}: Aucune option de sync activée, ignoré`);
@@ -57210,7 +57263,9 @@ Vérifiez les logs de la console pour plus de détails.`;
               let result;
               if (batchResults.has(tickerSymbol)) {
                 result = batchResults.get(tickerSymbol);
+                console.log(`📦 ${tickerSymbol}: Données récupérées du batch (data.length: ${((_a4 = result == null ? void 0 : result.data) == null ? void 0 : _a4.length) || 0})`);
               } else {
+                console.warn(`⚠️ ${tickerSymbol}: Pas dans les résultats du batch, fallback vers appel individuel`);
                 try {
                   result = await fetchCompanyDataWithTimeout(tickerSymbol);
                 } catch (fetchError) {
@@ -57235,18 +57290,62 @@ Vérifiez les logs de la console pour plus de détails.`;
                   throw fetchError;
                 }
               }
-              if (!result || !result.data || result.data.length === 0) {
+              if (!result || !result.data) {
                 skippedCount++;
                 skippedTickers.push(tickerSymbol);
-                console.warn(`⏭️ ${tickerSymbol}: Ignoré (aucune donnée disponible)`);
-                tickerResult.error = "Aucune donnée disponible";
+                console.warn(`⏭️ ${tickerSymbol}: Ignoré (résultat invalide)`);
+                tickerResult.error = "Résultat invalide";
                 tickerResult.timeMs = Date.now() - tickerStartTime;
                 tickerResults.push(tickerResult);
                 return;
               }
+              if (result.data.length === 0) {
+                if (result.info && options.syncInfo) {
+                  console.log(`ℹ️ ${tickerSymbol}: Profile trouvé mais aucune donnée historique. Synchronisation des infos uniquement.`);
+                  const updatedProfile = {
+                    ...profile2,
+                    info: result.info
+                  };
+                  if (result.currentPrice && options.updateCurrentPrice) {
+                    updatedProfile.assumptions = {
+                      ...profile2.assumptions,
+                      currentPrice: result.currentPrice
+                    };
+                    tickerResult.currentPrice = result.currentPrice;
+                  } else {
+                    tickerResult.currentPrice = result.currentPrice || profile2.assumptions.currentPrice || 0;
+                  }
+                  setLibrary((prev) => ({
+                    ...prev,
+                    [tickerSymbol]: updatedProfile
+                  }));
+                  tickerResult.other.infoUpdated = true;
+                  tickerResult.success = true;
+                  tickerResult.dataRetrieved = {
+                    years: 0,
+                    dataPoints: 0,
+                    hasProfile: !!result.info,
+                    hasKeyMetrics: false,
+                    hasQuotes: !!(result.currentPrice && result.currentPrice > 0),
+                    hasFinancials: false
+                  };
+                  tickerResult.error = "Aucune donnée historique disponible (infos synchronisées)";
+                  tickerResult.timeMs = Date.now() - tickerStartTime;
+                  tickerResults.push(tickerResult);
+                  return;
+                } else {
+                  skippedCount++;
+                  skippedTickers.push(tickerSymbol);
+                  console.warn(`⏭️ ${tickerSymbol}: Ignoré (aucune donnée disponible)`);
+                  tickerResult.error = "Aucune donnée disponible";
+                  tickerResult.timeMs = Date.now() - tickerStartTime;
+                  tickerResults.push(tickerResult);
+                  return;
+                }
+              }
               tickerResult.dataRetrieved = {
-                years: ((_a4 = result.data) == null ? void 0 : _a4.length) || 0,
-                dataPoints: ((_b3 = result.data) == null ? void 0 : _b3.length) || 0,
+                years: ((_b3 = result.data) == null ? void 0 : _b3.length) || 0,
+                dataPoints: ((_c = result.data) == null ? void 0 : _c.length) || 0,
                 hasProfile: !!result.info,
                 hasKeyMetrics: !!(result.data && result.data.length > 0),
                 hasQuotes: !!(result.currentPrice && result.currentPrice > 0),
@@ -57466,16 +57565,24 @@ Vérifiez les logs de la console pour plus de détails.`;
                 fields: naFields,
                 reasons: naReasons
               };
-              await saveSnapshot(
-                tickerSymbol,
-                mergedData,
-                finalAssumptions,
-                updatedInfo,
-                `Après synchronisation (${options.replaceOrangeData ? "avec remplacement données oranges" : "standard"}) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
-                true,
-                true
-              );
-              tickerResult.other.snapshotSaved = true;
+              try {
+                const saveResult = await saveSnapshot(
+                  tickerSymbol,
+                  mergedData,
+                  finalAssumptions,
+                  updatedInfo,
+                  `Après synchronisation (${options.replaceOrangeData ? "avec remplacement données oranges" : "standard"}) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
+                  true,
+                  true
+                );
+                if (saveResult.success) {
+                  tickerResult.other.snapshotSaved = true;
+                } else {
+                  console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot après sync: ${saveResult.error}`);
+                }
+              } catch (saveError) {
+                console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot après sync: ${saveError.message}`);
+              }
               successCount++;
               tickerResult.success = true;
               tickerResult.timeMs = Date.now() - tickerStartTime;
@@ -57643,15 +57750,22 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
                 return;
               }
               console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
-              await saveSnapshot(
-                tickerSymbol,
-                profile2.data,
-                profile2.assumptions,
-                profile2.info,
-                `Avant synchronisation (N/A) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
-                false,
-                false
-              );
+              try {
+                const saveResult = await saveSnapshot(
+                  tickerSymbol,
+                  profile2.data,
+                  profile2.assumptions,
+                  profile2.info,
+                  `Avant synchronisation (N/A) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
+                  false,
+                  false
+                );
+                if (!saveResult.success) {
+                  console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot avant sync: ${saveResult.error}`);
+                }
+              } catch (saveError) {
+                console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot avant sync: ${saveError.message}`);
+              }
               console.log(`🔄 Synchronisation ${tickerSymbol}...`);
               const result = await fetchCompanyDataWithTimeout(tickerSymbol);
               const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
@@ -57718,18 +57832,25 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
                 }
                 return updated;
               });
-              await saveSnapshot(
-                tickerSymbol,
-                mergedData,
-                finalAssumptions,
-                {
-                  ...profile2.info,
-                  ...result.info
-                },
-                `Synchronisation (N/A) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
-                true,
-                true
-              );
+              try {
+                const saveResult = await saveSnapshot(
+                  tickerSymbol,
+                  mergedData,
+                  finalAssumptions,
+                  {
+                    ...profile2.info,
+                    ...result.info
+                  },
+                  `Synchronisation (N/A) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
+                  true,
+                  true
+                );
+                if (!saveResult.success) {
+                  console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot après sync: ${saveResult.error}`);
+                }
+              } catch (saveError) {
+                console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot après sync: ${saveError.message}`);
+              }
               successCount++;
               setSyncStats({ successCount, errorCount });
               console.log(`✅ ${tickerSymbol} synchronisé avec succès`);

@@ -17,6 +17,23 @@ export async function saveSnapshot(
     autoFetched = false
 ): Promise<{ success: boolean; snapshot?: any; error?: string }> {
     try {
+        // ✅ VALIDATION: Vérifier que les données requises sont présentes
+        if (!ticker || !ticker.trim()) {
+            return { success: false, error: 'Ticker is required' };
+        }
+        
+        if (!data || !Array.isArray(data)) {
+            return { success: false, error: 'Annual data must be an array' };
+        }
+        
+        if (!assumptions || typeof assumptions !== 'object') {
+            return { success: false, error: 'Assumptions must be an object' };
+        }
+        
+        if (!info || typeof info !== 'object') {
+            return { success: false, error: 'Company info must be an object' };
+        }
+        
         // ✅ SANITIZE: Corriger les valeurs aberrantes AVANT sauvegarde
         const sanitizedAssumptions = sanitizeAssumptionsSync(assumptions);
         
@@ -37,7 +54,14 @@ export async function saveSnapshot(
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-            throw new Error(errorData.error || `HTTP ${response.status}`);
+            const errorMessage = errorData.error || `HTTP ${response.status}`;
+            // Ne pas logger comme erreur critique si c'est une erreur 400 (validation)
+            if (response.status === 400) {
+                console.warn(`⚠️ Snapshot validation failed for ${ticker}: ${errorMessage}`);
+            } else {
+                console.error(`❌ Failed to save snapshot for ${ticker}: ${errorMessage}`);
+            }
+            return { success: false, error: errorMessage };
         }
 
         const snapshot = await response.json();
@@ -45,8 +69,8 @@ export async function saveSnapshot(
 
         return { success: true, snapshot };
     } catch (error: any) {
-        console.error('Failed to save snapshot:', error);
-        return { success: false, error: error.message };
+        console.error(`❌ Failed to save snapshot for ${ticker}:`, error);
+        return { success: false, error: error.message || 'Unknown error' };
     }
 }
 
