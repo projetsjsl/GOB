@@ -69,11 +69,15 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   // ✅ CRITIQUE : Si baseYear n'est pas défini ou n'existe pas, utiliser la dernière année avec données valides
   
   // ✅ CRITIQUE : Vérifier d'abord si data est vide
+  // ✅ OPTIMISATION: Logging conditionnel - seulement en mode debug pour éviter pollution console
+  const DEBUG_MODE = typeof window !== 'undefined' && (window.localStorage?.getItem('3p1-debug') === 'true' || window.location.search.includes('debug=true'));
   if (!data || data.length === 0) {
-    console.warn('⚠️ EvaluationDetails: Aucune donnée disponible', {
-      dataLength: data?.length || 0,
-      assumptions: assumptions
-    });
+    if (DEBUG_MODE) {
+      console.warn('⚠️ EvaluationDetails: Aucune donnée disponible', {
+        dataLength: data?.length || 0,
+        assumptions: assumptions
+      });
+    }
   }
   
   let baseYearData = data && data.length > 0 ? data.find(d => d.year === assumptions.baseYear) : null;
@@ -101,17 +105,20 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   };
 
   // ✅ DEBUG : Log pour diagnostiquer pourquoi les prix sont N/A
+  // ✅ OPTIMISATION: Logging conditionnel - seulement en mode debug
   if (baseValues.eps === 0 && baseValues.cf === 0 && baseValues.bv === 0) {
-    console.warn('⚠️ EvaluationDetails: Toutes les valeurs de base sont à 0', {
-      baseYear: assumptions.baseYear,
-      baseYearData,
-      dataLength: data?.length || 0,
-      dataYears: data?.map(d => d.year) || [],
-      baseValues,
-      allDataEPS: data?.map(d => ({ year: d.year, eps: d.earningsPerShare, cf: d.cashFlowPerShare, bv: d.bookValuePerShare })) || [],
-      hasData: !!data,
-      dataIsArray: Array.isArray(data)
-    });
+    if (DEBUG_MODE) {
+      console.warn('⚠️ EvaluationDetails: Toutes les valeurs de base sont à 0', {
+        baseYear: assumptions.baseYear,
+        baseYearData,
+        dataLength: data?.length || 0,
+        dataYears: data?.map(d => d.year) || [],
+        baseValues,
+        allDataEPS: data?.map(d => ({ year: d.year, eps: d.earningsPerShare, cf: d.cashFlowPerShare, bv: d.bookValuePerShare })) || [],
+        hasData: !!data,
+        dataIsArray: Array.isArray(data)
+      });
+    }
   }
 
   // Projections (5 Years) - MÊME VALIDATION QUE KPIDashboard
@@ -119,16 +126,22 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   const projectFutureValueSafe = (current: number, rate: number | undefined, years: number): number | undefined => {
     // ✅ Si le taux est undefined ou null, retourner undefined (pas 0)
     if (rate === undefined || rate === null) {
-      console.warn('⚠️ projectFutureValueSafe: rate is undefined/null', { current, rate, years });
+      if (DEBUG_MODE) {
+        console.warn('⚠️ projectFutureValueSafe: rate is undefined/null', { current, rate, years });
+      }
       return undefined;
     }
     // Valider les entrées - Si current est 0 ou négatif, retourner undefined (pas 0) pour indiquer données manquantes
     if (current <= 0 || !isFinite(current)) {
-      console.warn('⚠️ projectFutureValueSafe: current is invalid', { current, rate, years });
+      if (DEBUG_MODE) {
+        console.warn('⚠️ projectFutureValueSafe: current is invalid', { current, rate, years });
+      }
       return undefined;
     }
     if (!isFinite(rate)) {
-      console.warn('⚠️ projectFutureValueSafe: rate is not finite', { current, rate, years });
+      if (DEBUG_MODE) {
+        console.warn('⚠️ projectFutureValueSafe: rate is not finite', { current, rate, years });
+      }
       return undefined;
     }
     // Limiter le taux de croissance (Configurable)
@@ -136,7 +149,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
     const safeRate = Math.max(min, Math.min(rate, max));
     const result = current * Math.pow(1 + safeRate / 100, years);
     const finalResult = isFinite(result) && result > 0 ? result : undefined;
-    if (finalResult === undefined) {
+    if (finalResult === undefined && DEBUG_MODE) {
       console.warn('⚠️ projectFutureValueSafe: result is invalid', { current, rate, years, safeRate, result });
     }
     return finalResult;
@@ -168,20 +181,23 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   };
 
   // ✅ DEBUG : Log pour diagnostiquer les projections
+  // ✅ OPTIMISATION: Logging conditionnel - seulement en mode debug
   if (futureValues.eps === undefined && futureValues.cf === undefined && futureValues.bv === undefined) {
-    console.warn('⚠️ EvaluationDetails: Toutes les projections sont undefined', {
-      baseValues,
-      safeGrowthEPS,
-      safeGrowthCF,
-      safeGrowthBV,
-      safeGrowthDiv,
-      assumptions: {
-        growthRateEPS: assumptions.growthRateEPS,
-        growthRateCF: assumptions.growthRateCF,
-        growthRateBV: assumptions.growthRateBV,
-        growthRateDiv: assumptions.growthRateDiv
-      }
-    });
+    if (DEBUG_MODE) {
+      console.warn('⚠️ EvaluationDetails: Toutes les projections sont undefined', {
+        baseValues,
+        safeGrowthEPS,
+        safeGrowthCF,
+        safeGrowthBV,
+        safeGrowthDiv,
+        assumptions: {
+          growthRateEPS: assumptions.growthRateEPS,
+          growthRateCF: assumptions.growthRateCF,
+          growthRateBV: assumptions.growthRateBV,
+          growthRateDiv: assumptions.growthRateDiv
+        }
+      });
+    }
   }
 
   // Valider et limiter les ratios cibles (Configurable)
@@ -217,21 +233,24 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   };
 
   // ✅ DEBUG : Log pour diagnostiquer pourquoi les prix cibles sont undefined
+  // ✅ OPTIMISATION: Logging conditionnel - seulement en mode debug
   if (targets.eps === undefined && targets.cf === undefined && targets.bv === undefined && targets.div === undefined) {
-    console.warn('⚠️ EvaluationDetails: Tous les prix cibles sont undefined', {
-      futureValues,
-      safeTargetPE,
-      safeTargetPCF,
-      safeTargetPBV,
-      safeTargetYield,
-      assumptions: {
-        targetPE: assumptions.targetPE,
-        targetPCF: assumptions.targetPCF,
-        targetPBV: assumptions.targetPBV,
-        targetYield: assumptions.targetYield
-      },
-      baseValues
-    });
+    if (DEBUG_MODE) {
+      console.warn('⚠️ EvaluationDetails: Tous les prix cibles sont undefined', {
+        futureValues,
+        safeTargetPE,
+        safeTargetPCF,
+        safeTargetPBV,
+        safeTargetYield,
+        assumptions: {
+          targetPE: assumptions.targetPE,
+          targetPCF: assumptions.targetPCF,
+          targetPBV: assumptions.targetPBV,
+          targetYield: assumptions.targetYield
+        },
+        baseValues
+      });
+    }
   }
 
   // Average Target Price (excluding disabled metrics) - MÊME VALIDATION QUE KPIDashboard

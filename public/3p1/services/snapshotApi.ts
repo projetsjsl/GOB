@@ -14,7 +14,9 @@ export async function saveSnapshot(
     info: CompanyInfo,
     notes?: string,
     isCurrent = true,
-    autoFetched = false
+    autoFetched = false,
+    retryCount = 0,
+    maxRetries = 2
 ): Promise<{ success: boolean; snapshot?: any; error?: string }> {
     try {
         // ✅ VALIDATION: Vérifier que les données requises sont présentes
@@ -55,6 +57,15 @@ export async function saveSnapshot(
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
             const errorMessage = errorData.error || `HTTP ${response.status}`;
+            
+            // ✅ RETRY: Pour erreurs 500 (Supabase), réessayer automatiquement
+            if (response.status === 500 && retryCount < maxRetries) {
+                const delay = (retryCount + 1) * 1000; // 1s, 2s, 3s...
+                console.warn(`⚠️ Snapshot error 500 for ${ticker}, retry ${retryCount + 1}/${maxRetries} après ${delay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return saveSnapshot(ticker, data, assumptions, info, notes, isCurrent, autoFetched, retryCount + 1, maxRetries);
+            }
+            
             // Ne pas logger comme erreur critique si c'est une erreur 400 (validation)
             if (response.status === 400) {
                 console.warn(`⚠️ Snapshot validation failed for ${ticker}: ${errorMessage}`);
@@ -65,10 +76,22 @@ export async function saveSnapshot(
         }
 
         const snapshot = await response.json();
-        console.log(`✅ Snapshot saved: ${ticker} v${snapshot.version}`);
+        if (retryCount > 0) {
+            console.log(`✅ Snapshot saved: ${ticker} v${snapshot.version} (après ${retryCount} retry)`);
+        } else {
+            console.log(`✅ Snapshot saved: ${ticker} v${snapshot.version}`);
+        }
 
         return { success: true, snapshot };
     } catch (error: any) {
+        // ✅ RETRY: Pour erreurs réseau/timeout, réessayer automatiquement
+        if (retryCount < maxRetries && (error.message?.includes('fetch') || error.message?.includes('timeout'))) {
+            const delay = (retryCount + 1) * 1000;
+            console.warn(`⚠️ Snapshot network error for ${ticker}, retry ${retryCount + 1}/${maxRetries} après ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return saveSnapshot(ticker, data, assumptions, info, notes, isCurrent, autoFetched, retryCount + 1, maxRetries);
+        }
+        
         console.error(`❌ Failed to save snapshot for ${ticker}:`, error);
         return { success: false, error: error.message || 'Unknown error' };
     }

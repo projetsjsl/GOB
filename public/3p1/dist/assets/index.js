@@ -35194,7 +35194,8 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
   ] });
 };
 const API_BASE$1 = typeof window !== "undefined" ? window.location.origin : "";
-async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent = true, autoFetched = false) {
+async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent = true, autoFetched = false, retryCount = 0, maxRetries = 2) {
+  var _a3, _b2;
   try {
     if (!ticker2 || !ticker2.trim()) {
       return { success: false, error: "Ticker is required" };
@@ -35226,6 +35227,12 @@ async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent =
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
       const errorMessage = errorData.error || `HTTP ${response.status}`;
+      if (response.status === 500 && retryCount < maxRetries) {
+        const delay = (retryCount + 1) * 1e3;
+        console.warn(`⚠️ Snapshot error 500 for ${ticker2}, retry ${retryCount + 1}/${maxRetries} après ${delay}ms...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        return saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent, autoFetched, retryCount + 1, maxRetries);
+      }
       if (response.status === 400) {
         console.warn(`⚠️ Snapshot validation failed for ${ticker2}: ${errorMessage}`);
       } else {
@@ -35234,9 +35241,19 @@ async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent =
       return { success: false, error: errorMessage };
     }
     const snapshot = await response.json();
-    console.log(`✅ Snapshot saved: ${ticker2} v${snapshot.version}`);
+    if (retryCount > 0) {
+      console.log(`✅ Snapshot saved: ${ticker2} v${snapshot.version} (après ${retryCount} retry)`);
+    } else {
+      console.log(`✅ Snapshot saved: ${ticker2} v${snapshot.version}`);
+    }
     return { success: true, snapshot };
   } catch (error) {
+    if (retryCount < maxRetries && (((_a3 = error.message) == null ? void 0 : _a3.includes("fetch")) || ((_b2 = error.message) == null ? void 0 : _b2.includes("timeout")))) {
+      const delay = (retryCount + 1) * 1e3;
+      console.warn(`⚠️ Snapshot network error for ${ticker2}, retry ${retryCount + 1}/${maxRetries} après ${delay}ms...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent, autoFetched, retryCount + 1, maxRetries);
+    }
     console.error(`❌ Failed to save snapshot for ${ticker2}:`, error);
     return { success: false, error: error.message || "Unknown error" };
   }
@@ -35629,7 +35646,7 @@ const saveConfig = (config2) => {
   }
 };
 const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector, config: config2 = DEFAULT_CONFIG }) => {
-  var _a3, _b2, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x;
+  var _a3, _b2, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y;
   React.useEffect(() => {
     if (data && data.length > 0) {
       const lastData = data[data.length - 1];
@@ -35663,11 +35680,14 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
       [metric]: !prev[metric]
     }));
   };
+  const DEBUG_MODE = typeof window !== "undefined" && (((_a3 = window.localStorage) == null ? void 0 : _a3.getItem("3p1-debug")) === "true" || window.location.search.includes("debug=true"));
   if (!data || data.length === 0) {
-    console.warn("⚠️ EvaluationDetails: Aucune donnée disponible", {
-      dataLength: (data == null ? void 0 : data.length) || 0,
-      assumptions
-    });
+    if (DEBUG_MODE) {
+      console.warn("⚠️ EvaluationDetails: Aucune donnée disponible", {
+        dataLength: (data == null ? void 0 : data.length) || 0,
+        assumptions
+      });
+    }
   }
   let baseYearData = data && data.length > 0 ? data.find((d) => d.year === assumptions.baseYear) : null;
   if (!baseYearData || baseYearData.earningsPerShare <= 0 && baseYearData.cashFlowPerShare <= 0 && baseYearData.bookValuePerShare <= 0) {
@@ -35688,35 +35708,43 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     div: baseDiv
   };
   if (baseValues.eps === 0 && baseValues.cf === 0 && baseValues.bv === 0) {
-    console.warn("⚠️ EvaluationDetails: Toutes les valeurs de base sont à 0", {
-      baseYear: assumptions.baseYear,
-      baseYearData,
-      dataLength: (data == null ? void 0 : data.length) || 0,
-      dataYears: (data == null ? void 0 : data.map((d) => d.year)) || [],
-      baseValues,
-      allDataEPS: (data == null ? void 0 : data.map((d) => ({ year: d.year, eps: d.earningsPerShare, cf: d.cashFlowPerShare, bv: d.bookValuePerShare }))) || [],
-      hasData: !!data,
-      dataIsArray: Array.isArray(data)
-    });
+    if (DEBUG_MODE) {
+      console.warn("⚠️ EvaluationDetails: Toutes les valeurs de base sont à 0", {
+        baseYear: assumptions.baseYear,
+        baseYearData,
+        dataLength: (data == null ? void 0 : data.length) || 0,
+        dataYears: (data == null ? void 0 : data.map((d) => d.year)) || [],
+        baseValues,
+        allDataEPS: (data == null ? void 0 : data.map((d) => ({ year: d.year, eps: d.earningsPerShare, cf: d.cashFlowPerShare, bv: d.bookValuePerShare }))) || [],
+        hasData: !!data,
+        dataIsArray: Array.isArray(data)
+      });
+    }
   }
   const projectFutureValueSafe = (current, rate, years) => {
     if (rate === void 0 || rate === null) {
-      console.warn("⚠️ projectFutureValueSafe: rate is undefined/null", { current, rate, years });
+      if (DEBUG_MODE) {
+        console.warn("⚠️ projectFutureValueSafe: rate is undefined/null", { current, rate, years });
+      }
       return void 0;
     }
     if (current <= 0 || !isFinite(current)) {
-      console.warn("⚠️ projectFutureValueSafe: current is invalid", { current, rate, years });
+      if (DEBUG_MODE) {
+        console.warn("⚠️ projectFutureValueSafe: current is invalid", { current, rate, years });
+      }
       return void 0;
     }
     if (!isFinite(rate)) {
-      console.warn("⚠️ projectFutureValueSafe: rate is not finite", { current, rate, years });
+      if (DEBUG_MODE) {
+        console.warn("⚠️ projectFutureValueSafe: rate is not finite", { current, rate, years });
+      }
       return void 0;
     }
     const { min: min2, max: max2 } = config2.growth;
     const safeRate = Math.max(min2, Math.min(rate, max2));
     const result = current * Math.pow(1 + safeRate / 100, years);
     const finalResult = isFinite(result) && result > 0 ? result : void 0;
-    if (finalResult === void 0) {
+    if (finalResult === void 0 && DEBUG_MODE) {
       console.warn("⚠️ projectFutureValueSafe: result is invalid", { current, rate, years, safeRate, result });
     }
     return finalResult;
@@ -35734,19 +35762,21 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     div: projectFutureValueSafe(baseValues.div, safeGrowthDiv, 5)
   };
   if (futureValues.eps === void 0 && futureValues.cf === void 0 && futureValues.bv === void 0) {
-    console.warn("⚠️ EvaluationDetails: Toutes les projections sont undefined", {
-      baseValues,
-      safeGrowthEPS,
-      safeGrowthCF,
-      safeGrowthBV,
-      safeGrowthDiv,
-      assumptions: {
-        growthRateEPS: assumptions.growthRateEPS,
-        growthRateCF: assumptions.growthRateCF,
-        growthRateBV: assumptions.growthRateBV,
-        growthRateDiv: assumptions.growthRateDiv
-      }
-    });
+    if (DEBUG_MODE) {
+      console.warn("⚠️ EvaluationDetails: Toutes les projections sont undefined", {
+        baseValues,
+        safeGrowthEPS,
+        safeGrowthCF,
+        safeGrowthBV,
+        safeGrowthDiv,
+        assumptions: {
+          growthRateEPS: assumptions.growthRateEPS,
+          growthRateCF: assumptions.growthRateCF,
+          growthRateBV: assumptions.growthRateBV,
+          growthRateDiv: assumptions.growthRateDiv
+        }
+      });
+    }
   }
   const safeTargetPE = assumptions.targetPE !== void 0 ? Math.max(config2.ratios.pe.min, Math.min(assumptions.targetPE, config2.ratios.pe.max)) : void 0;
   const safeTargetPCF = assumptions.targetPCF !== void 0 ? Math.max(config2.ratios.pcf.min, Math.min(assumptions.targetPCF, config2.ratios.pcf.max)) : void 0;
@@ -35759,20 +35789,22 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     div: futureValues.div !== void 0 && safeTargetYield !== void 0 && futureValues.div > 0 && safeTargetYield > 0 && safeTargetYield <= 20 ? futureValues.div / (safeTargetYield / 100) : void 0
   };
   if (targets.eps === void 0 && targets.cf === void 0 && targets.bv === void 0 && targets.div === void 0) {
-    console.warn("⚠️ EvaluationDetails: Tous les prix cibles sont undefined", {
-      futureValues,
-      safeTargetPE,
-      safeTargetPCF,
-      safeTargetPBV,
-      safeTargetYield,
-      assumptions: {
-        targetPE: assumptions.targetPE,
-        targetPCF: assumptions.targetPCF,
-        targetPBV: assumptions.targetPBV,
-        targetYield: assumptions.targetYield
-      },
-      baseValues
-    });
+    if (DEBUG_MODE) {
+      console.warn("⚠️ EvaluationDetails: Tous les prix cibles sont undefined", {
+        futureValues,
+        safeTargetPE,
+        safeTargetPCF,
+        safeTargetPBV,
+        safeTargetYield,
+        assumptions: {
+          targetPE: assumptions.targetPE,
+          targetPCF: assumptions.targetPCF,
+          targetPBV: assumptions.targetPBV,
+          targetYield: assumptions.targetYield
+        },
+        baseValues
+      });
+    }
   }
   const currentPrice = Math.max(assumptions.currentPrice || 0, 0.01);
   const maxReasonableTarget = currentPrice * config2.projections.maxReasonableTargetMultiplier;
@@ -36134,12 +36166,12 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `BPA (EPS) Actuel: ${((_a3 = baseValues.eps) == null ? void 0 : _a3.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `BPA (EPS) Actuel: ${((_b2 = baseValues.eps) == null ? void 0 : _b2.toFixed(2)) ?? "0.00"} $
 
 Valeur de l'année de base ({assumptions.baseYear}).
 Source: Données historiques FMP (vert = officiel).
 
-Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_b2 = baseValues.eps) == null ? void 0 : _b2.toFixed(2)) ?? "0.00" }),
+Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_c = baseValues.eps) == null ? void 0 : _c.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeEPS ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -36160,14 +36192,14 @@ Auto-rempli avec le CAGR historique.
 Formule projection: BPA × (1 + Taux/100)⁵`
             }
           ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `BPA (EPS) Projeté (5 ans): ${((_c = futureValues.eps) == null ? void 0 : _c.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `BPA (EPS) Projeté (5 ans): ${((_d = futureValues.eps) == null ? void 0 : _d.toFixed(2)) ?? "0.00"} $
 
 Calculé avec:
-BPA Actuel (${((_d = baseValues.eps) == null ? void 0 : _d.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateEPS}%)⁵
+BPA Actuel (${((_e = baseValues.eps) == null ? void 0 : _e.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateEPS}%)⁵
 
-= ${((_e = futureValues.eps) == null ? void 0 : _e.toFixed(2)) ?? "0.00"} $
+= ${((_f = futureValues.eps) == null ? void 0 : _f.toFixed(2)) ?? "0.00"} $
 
-Valeur projetée utilisée pour calculer le prix cible.`, children: ((_f = futureValues.eps) == null ? void 0 : _f.toFixed(2)) ?? "0.00" }),
+Valeur projetée utilisée pour calculer le prix cible.`, children: ((_g = futureValues.eps) == null ? void 0 : _g.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeEPS ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -36221,12 +36253,12 @@ ${assumptions.excludeEPS ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `CFA (Cash Flow) Actuel: ${((_g = baseValues.cf) == null ? void 0 : _g.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `CFA (Cash Flow) Actuel: ${((_h = baseValues.cf) == null ? void 0 : _h.toFixed(2)) ?? "0.00"} $
 
 Valeur de l'année de base ({assumptions.baseYear}).
 Source: Données historiques FMP (vert = officiel).
 
-Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_h = baseValues.cf) == null ? void 0 : _h.toFixed(2)) ?? "0.00" }),
+Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_i = baseValues.cf) == null ? void 0 : _i.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeCF ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -36247,14 +36279,14 @@ Auto-rempli avec le CAGR historique.
 Formule projection: CF × (1 + Taux/100)⁵`
             }
           ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `CFA (Cash Flow) Projeté (5 ans): ${((_i = futureValues.cf) == null ? void 0 : _i.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `CFA (Cash Flow) Projeté (5 ans): ${((_j = futureValues.cf) == null ? void 0 : _j.toFixed(2)) ?? "0.00"} $
 
 Calculé avec:
-CF Actuel (${((_j = baseValues.cf) == null ? void 0 : _j.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateCF}%)⁵
+CF Actuel (${((_k = baseValues.cf) == null ? void 0 : _k.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateCF}%)⁵
 
-= ${((_k = futureValues.cf) == null ? void 0 : _k.toFixed(2)) ?? "0.00"} $
+= ${((_l = futureValues.cf) == null ? void 0 : _l.toFixed(2)) ?? "0.00"} $
 
-Valeur projetée utilisée pour calculer le prix cible.`, children: ((_l = futureValues.cf) == null ? void 0 : _l.toFixed(2)) ?? "0.00" }),
+Valeur projetée utilisée pour calculer le prix cible.`, children: ((_m = futureValues.cf) == null ? void 0 : _m.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeCF ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -36308,12 +36340,12 @@ ${assumptions.excludeCF ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `BV (Book Value) Actuel: ${((_m = baseValues.bv) == null ? void 0 : _m.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `BV (Book Value) Actuel: ${((_n = baseValues.bv) == null ? void 0 : _n.toFixed(2)) ?? "0.00"} $
 
 Valeur de l'année de base ({assumptions.baseYear}).
 Source: Données historiques FMP (vert = officiel).
 
-Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_n = baseValues.bv) == null ? void 0 : _n.toFixed(2)) ?? "0.00" }),
+Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_o = baseValues.bv) == null ? void 0 : _o.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeBV ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -36334,14 +36366,14 @@ Auto-rempli avec le CAGR historique.
 Formule projection: BV × (1 + Taux/100)⁵`
             }
           ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `BV (Book Value) Projeté (5 ans): ${((_o = futureValues.bv) == null ? void 0 : _o.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `BV (Book Value) Projeté (5 ans): ${((_p = futureValues.bv) == null ? void 0 : _p.toFixed(2)) ?? "0.00"} $
 
 Calculé avec:
-BV Actuel (${((_p = baseValues.bv) == null ? void 0 : _p.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateBV}%)⁵
+BV Actuel (${((_q = baseValues.bv) == null ? void 0 : _q.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateBV}%)⁵
 
-= ${((_q = futureValues.bv) == null ? void 0 : _q.toFixed(2)) ?? "0.00"} $
+= ${((_r = futureValues.bv) == null ? void 0 : _r.toFixed(2)) ?? "0.00"} $
 
-Valeur projetée utilisée pour calculer le prix cible.`, children: ((_r = futureValues.bv) == null ? void 0 : _r.toFixed(2)) ?? "0.00" }),
+Valeur projetée utilisée pour calculer le prix cible.`, children: ((_s = futureValues.bv) == null ? void 0 : _s.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeBV ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -36395,12 +36427,12 @@ ${assumptions.excludeBV ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `DIV (Dividende) Actuel: ${((_s = baseValues.div) == null ? void 0 : _s.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `DIV (Dividende) Actuel: ${((_t = baseValues.div) == null ? void 0 : _t.toFixed(2)) ?? "0.00"} $
 
 Valeur de l'année de base ({assumptions.baseYear}).
 Source: Données historiques FMP (vert = officiel).
 
-Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_t = baseValues.div) == null ? void 0 : _t.toFixed(2)) ?? "0.00" }),
+Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_u = baseValues.div) == null ? void 0 : _u.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeDIV ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -36421,14 +36453,14 @@ Auto-rempli avec le CAGR historique.
 Formule projection: DIV × (1 + Taux/100)⁵`
             }
           ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `DIV (Dividende) Projeté (5 ans): ${((_u = futureValues.div) == null ? void 0 : _u.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `DIV (Dividende) Projeté (5 ans): ${((_v = futureValues.div) == null ? void 0 : _v.toFixed(2)) ?? "0.00"} $
 
 Calculé avec:
-DIV Actuel (${((_v = baseValues.div) == null ? void 0 : _v.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateDiv}%)⁵
+DIV Actuel (${((_w = baseValues.div) == null ? void 0 : _w.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateDiv}%)⁵
 
-= ${((_w = futureValues.div) == null ? void 0 : _w.toFixed(2)) ?? "0.00"} $
+= ${((_x = futureValues.div) == null ? void 0 : _x.toFixed(2)) ?? "0.00"} $
 
-Valeur projetée utilisée pour calculer le prix cible.`, children: ((_x = futureValues.div) == null ? void 0 : _x.toFixed(2)) ?? "0.00" }),
+Valeur projetée utilisée pour calculer le prix cible.`, children: ((_y = futureValues.div) == null ? void 0 : _y.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeDIV ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "input",
@@ -57670,6 +57702,11 @@ Vérifiez les logs de la console pour plus de détails.`;
         }
       };
       const totalProcessed = successCount + errorCount + skippedCount;
+      const totalTickersProcessed = tickerResults.length;
+      if (totalTickersProcessed < allTickers.length) {
+        const missingCount = allTickers.length - totalTickersProcessed;
+        console.warn(`⚠️ ATTENTION: ${missingCount} ticker(s) non traité(s) sur ${allTickers.length} total`);
+      }
       let summary = `Synchronisation terminée:
 ✅ ${successCount} succès`;
       if (skippedCount > 0) {
@@ -57679,6 +57716,13 @@ Vérifiez les logs de la console pour plus de détails.`;
       if (errorCount > 0) {
         summary += `
 ❌ ${errorCount} erreurs`;
+      }
+      summary += `
+📊 Total traité: ${totalTickersProcessed}/${allTickers.length} (${Math.round(totalTickersProcessed / allTickers.length * 100)}%)`;
+      if (totalTickersProcessed === allTickers.length) {
+        console.log(`✅ 100% des tickers traités (${totalTickersProcessed}/${allTickers.length})`);
+      } else {
+        console.warn(`⚠️ ${totalTickersProcessed}/${allTickers.length} tickers traités (${Math.round(totalTickersProcessed / allTickers.length * 100)}%)`);
       }
       if (skippedCount > 0) {
         console.warn(`⏭️ Tickers ignorés (introuvables dans FMP):

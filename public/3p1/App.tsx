@@ -3334,6 +3334,16 @@ export default function App() {
 
             // Afficher un résumé détaillé
             const totalProcessed = successCount + errorCount + skippedCount;
+            const totalTickersProcessed = tickerResults.length;
+            
+            // ✅ VÉRIFICATION 100%: S'assurer que tous les tickers ont été traités
+            if (totalTickersProcessed < allTickers.length) {
+                const missingCount = allTickers.length - totalTickersProcessed;
+                console.warn(`⚠️ ATTENTION: ${missingCount} ticker(s) non traité(s) sur ${allTickers.length} total`);
+                // Les tickers manquants sont probablement ceux qui n'ont pas été ajoutés à tickerResults
+                // (ex: timeout avant même d'arriver au try/catch)
+            }
+            
             let summary = `Synchronisation terminée:\n✅ ${successCount} succès`;
             
             if (skippedCount > 0) {
@@ -3342,6 +3352,15 @@ export default function App() {
             
             if (errorCount > 0) {
                 summary += `\n❌ ${errorCount} erreurs`;
+            }
+            
+            // ✅ AFFICHER LE TOTAL TRAITÉ pour confirmer 100%
+            summary += `\n📊 Total traité: ${totalTickersProcessed}/${allTickers.length} (${Math.round(totalTickersProcessed / allTickers.length * 100)}%)`;
+            
+            if (totalTickersProcessed === allTickers.length) {
+                console.log(`✅ 100% des tickers traités (${totalTickersProcessed}/${allTickers.length})`);
+            } else {
+                console.warn(`⚠️ ${totalTickersProcessed}/${allTickers.length} tickers traités (${Math.round(totalTickersProcessed / allTickers.length * 100)}%)`);
             }
             
             // Log détaillé
