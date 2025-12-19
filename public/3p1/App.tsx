@@ -1521,8 +1521,16 @@ export default function App() {
                         }
 
                         // Sinon, utiliser la nouvelle donnée avec autoFetched: true
+                        // ✅ CRITIQUE : Ne pas remplacer les valeurs existantes par des valeurs à 0
+                        const newRowTyped = newRow as AnnualData;
                         return {
-                            ...(newRow as AnnualData),
+                            ...existingRow,
+                            earningsPerShare: (newRowTyped.earningsPerShare > 0) ? newRowTyped.earningsPerShare : existingRow.earningsPerShare,
+                            cashFlowPerShare: (newRowTyped.cashFlowPerShare > 0) ? newRowTyped.cashFlowPerShare : existingRow.cashFlowPerShare,
+                            bookValuePerShare: (newRowTyped.bookValuePerShare > 0) ? newRowTyped.bookValuePerShare : existingRow.bookValuePerShare,
+                            dividendPerShare: (newRowTyped.dividendPerShare > 0) ? newRowTyped.dividendPerShare : existingRow.dividendPerShare,
+                            priceHigh: (newRowTyped.priceHigh > 0) ? newRowTyped.priceHigh : existingRow.priceHigh,
+                            priceLow: (newRowTyped.priceLow > 0) ? newRowTyped.priceLow : existingRow.priceLow,
                             autoFetched: true
                         };
                     });
@@ -2331,8 +2339,15 @@ export default function App() {
                 }
 
                 // Sinon, utiliser la nouvelle donnée avec autoFetched: true
+                // ✅ CRITIQUE : Ne pas remplacer les valeurs existantes par des valeurs à 0
                 return {
-                    ...(newRow as AnnualData),
+                    ...existingRow,
+                    earningsPerShare: (newRow.earningsPerShare > 0) ? newRow.earningsPerShare : existingRow.earningsPerShare,
+                    cashFlowPerShare: (newRow.cashFlowPerShare > 0) ? newRow.cashFlowPerShare : existingRow.cashFlowPerShare,
+                    bookValuePerShare: (newRow.bookValuePerShare > 0) ? newRow.bookValuePerShare : existingRow.bookValuePerShare,
+                    dividendPerShare: (newRow.dividendPerShare > 0) ? newRow.dividendPerShare : existingRow.dividendPerShare,
+                    priceHigh: (newRow.priceHigh > 0) ? newRow.priceHigh : existingRow.priceHigh,
+                    priceLow: (newRow.priceLow > 0) ? newRow.priceLow : existingRow.priceLow,
                     autoFetched: true
                 };
             });
@@ -3527,8 +3542,15 @@ export default function App() {
                             if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
                                 return existingRow;
                             }
+                            // ✅ CRITIQUE : Ne pas remplacer les valeurs existantes par des valeurs à 0
                             return {
-                                ...(newRow as AnnualData),
+                                ...existingRow,
+                                earningsPerShare: (newRow.earningsPerShare > 0) ? newRow.earningsPerShare : existingRow.earningsPerShare,
+                                cashFlowPerShare: (newRow.cashFlowPerShare > 0) ? newRow.cashFlowPerShare : existingRow.cashFlowPerShare,
+                                bookValuePerShare: (newRow.bookValuePerShare > 0) ? newRow.bookValuePerShare : existingRow.bookValuePerShare,
+                                dividendPerShare: (newRow.dividendPerShare > 0) ? newRow.dividendPerShare : existingRow.dividendPerShare,
+                                priceHigh: (newRow.priceHigh > 0) ? newRow.priceHigh : existingRow.priceHigh,
+                                priceLow: (newRow.priceLow > 0) ? newRow.priceLow : existingRow.priceLow,
                                 autoFetched: true
                             };
                         });
