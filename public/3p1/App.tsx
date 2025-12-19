@@ -2622,7 +2622,7 @@ export default function App() {
         
         // ✅ OPTIMISATION: Utiliser l'endpoint batch pour récupérer plusieurs tickers en une seule requête
         const BATCH_API_SIZE = 20; // Nombre de tickers par batch API (limite FMP)
-        const delayBetweenBatches = 1000; // Délai entre batches API (1 seconde)
+        const delayBetweenBatches = 2000; // Délai entre batches API (2 secondes - ultra-sécurisé pour rate limiting)
 
         // ✅ FONCTION HELPER: Récupérer plusieurs tickers en batch
         const fetchCompanyDataBatch = async (tickerSymbols: string[]): Promise<Map<string, any>> => {

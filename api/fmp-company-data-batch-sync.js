@@ -99,9 +99,9 @@ export default async function handler(req, res) {
                     }
                 }
                 
-                // Délai entre batches pour éviter rate limiting
+                // Délai entre batches pour éviter rate limiting (ultra-sécurisé: 1.5s)
                 if (profileBatches.length > 1 && profileBatches.indexOf(batch) < profileBatches.length - 1) {
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await new Promise(resolve => setTimeout(resolve, 1500));
                 }
             } catch (error) {
                 console.error(`❌ Erreur batch profiles:`, error.message);
@@ -141,9 +141,9 @@ export default async function handler(req, res) {
                     console.warn(`⚠️ Key metrics batch échoué: ${metricsRes.status} pour ${batch.join(',')}`);
                 }
                 
-                // Délai entre batches
+                // Délai entre batches (ultra-sécurisé: 1.5s)
                 if (keyMetricsBatches.length > 1 && keyMetricsBatches.indexOf(batch) < keyMetricsBatches.length - 1) {
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await new Promise(resolve => setTimeout(resolve, 1500));
                 }
             } catch (error) {
                 console.error(`❌ Erreur batch key metrics:`, error.message);
@@ -173,9 +173,9 @@ export default async function handler(req, res) {
                     }
                 }
                 
-                // Délai entre batches
+                // Délai entre batches (ultra-sécurisé: 1s pour quotes car batch plus grand)
                 if (quoteBatches.length > 1 && quoteBatches.indexOf(batch) < quoteBatches.length - 1) {
-                    await new Promise(resolve => setTimeout(resolve, 300));
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                 }
             } catch (error) {
                 console.error(`❌ Erreur batch quotes:`, error.message);

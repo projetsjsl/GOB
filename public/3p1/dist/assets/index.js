@@ -54905,7 +54905,7 @@ Vérifiez les logs de la console pour plus de détails.`;
     const errors = [];
     const skippedTickers = [];
     const BATCH_API_SIZE = 20;
-    const delayBetweenBatches = 1e3;
+    const delayBetweenBatches = 2e3;
     const fetchCompanyDataBatch = async (tickerSymbols) => {
       const results = /* @__PURE__ */ new Map();
       try {
@@ -55005,12 +55005,6 @@ Vérifiez les logs de la console pour plus de détails.`;
                   }
                   throw fetchError;
                 }
-              }
-              if (!result) {
-                skippedCount++;
-                skippedTickers.push(tickerSymbol);
-                console.warn(`⏭️ ${tickerSymbol}: Ignoré (aucune donnée disponible)`);
-                return;
               }
               if (!result || !result.data || result.data.length === 0) {
                 skippedCount++;
