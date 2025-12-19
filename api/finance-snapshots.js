@@ -145,41 +145,53 @@ async function createSnapshot(req, res, supabase) {
             .eq('ticker', cleanTicker);
     }
 
-    // Nettoyer annual_data : supprimer les champs non standard qui pourraient causer des erreurs
-    // Le champ dataSource est nouveau et peut causer des problèmes si la structure JSON est trop complexe
+    // Nettoyer annual_data : supprimer les champs non standard et valider les valeurs numériques
     const cleanedAnnualData = Array.isArray(annual_data) 
         ? annual_data.map(row => {
-            // Garder seulement les champs standard de AnnualData
+            // Fonction helper pour nettoyer les valeurs numériques
+            const cleanNumber = (val) => {
+                if (val === null || val === undefined || isNaN(val) || !isFinite(val)) return 0;
+                return Number(val);
+            };
+            
+            // Garder seulement les champs standard de AnnualData avec validation
             const cleaned = {
-                year: row.year,
-                priceHigh: row.priceHigh || 0,
-                priceLow: row.priceLow || 0,
-                cashFlowPerShare: row.cashFlowPerShare || 0,
-                dividendPerShare: row.dividendPerShare || 0,
-                bookValuePerShare: row.bookValuePerShare || 0,
-                earningsPerShare: row.earningsPerShare || 0
+                year: Number(row.year) || new Date().getFullYear(),
+                priceHigh: cleanNumber(row.priceHigh),
+                priceLow: cleanNumber(row.priceLow),
+                cashFlowPerShare: cleanNumber(row.cashFlowPerShare),
+                dividendPerShare: cleanNumber(row.dividendPerShare),
+                bookValuePerShare: cleanNumber(row.bookValuePerShare),
+                earningsPerShare: cleanNumber(row.earningsPerShare)
             };
             // Ajouter les champs optionnels seulement s'ils existent
-            if (row.isEstimate !== undefined) cleaned.isEstimate = row.isEstimate;
-            if (row.autoFetched !== undefined) cleaned.autoFetched = row.autoFetched;
+            if (row.isEstimate !== undefined) cleaned.isEstimate = Boolean(row.isEstimate);
+            if (row.autoFetched !== undefined) cleaned.autoFetched = Boolean(row.autoFetched);
             // Note: dataSource est conservé car c'est un champ valide dans AnnualData
-            if (row.dataSource !== undefined) cleaned.dataSource = row.dataSource;
+            if (row.dataSource && ['fmp-verified', 'fmp-adjusted', 'manual', 'calculated'].includes(row.dataSource)) {
+                cleaned.dataSource = row.dataSource;
+            }
             return cleaned;
         })
-        : annual_data;
+        : (Array.isArray(annual_data) ? [] : annual_data);
+
+    // S'assurer que assumptions et company_info sont des objets valides
+    const cleanedAssumptions = assumptions && typeof assumptions === 'object' ? assumptions : {};
+    const cleanedCompanyInfo = company_info && typeof company_info === 'object' ? company_info : {};
 
     // Create snapshot - Construire l'objet d'insertion de manière conditionnelle
     const insertData = {
         ticker: cleanTicker,
         profile_id: profile_id || cleanTicker,
-        user_id,
-        notes,
-        is_current,
-        is_watchlist,
-        auto_fetched,
+        user_id: user_id || null,
+        notes: notes || null,
+        snapshot_date: new Date().toISOString().split('T')[0], // Format YYYY-MM-DD pour DATE
+        is_current: is_current !== undefined ? Boolean(is_current) : true,
+        is_watchlist: is_watchlist !== undefined ? Boolean(is_watchlist) : false,
+        auto_fetched: auto_fetched !== undefined ? Boolean(auto_fetched) : false,
         annual_data: cleanedAnnualData, // Utiliser les données nettoyées
-        assumptions,
-        company_info
+        assumptions: cleanedAssumptions,
+        company_info: cleanedCompanyInfo
     };
     
     // Ajouter sync_metadata seulement si fourni (colonne peut ne pas exister si migration non appliquée)
