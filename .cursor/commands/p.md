@@ -1,11 +1,20 @@
 # Commande `/p` - Push
 
-Quand l'utilisateur écrit `/p`, exécuter un push en tenant compte du contexte de la conversation :
+Quand l'utilisateur écrit `/p`, exécuter un push intelligent en tenant compte du contexte et des bonnes pratiques apprises.
 
-1. **Analyser les changements récents** dans la conversation pour créer un message de commit pertinent
-2. **Identifier les fichiers modifiés** selon le contexte
-3. **Créer un message de commit descriptif** basé sur les modifications discutées
-4. Exécuter: `git add [fichiers pertinents] && git commit -m "[message basé sur le contexte]" && git push`
+**Processus optimisé**:
+1. **Vérifier les linter errors** : `read_lints` sur les fichiers modifiés récemment
+2. **Identifier les fichiers modifiés** : Analyser le contexte de conversation + `git status`
+3. **Créer un message de commit contextuel** : 
+   - Format: `[Type]: [Description concise]` (Fix/Feature/Docs/Refactor)
+   - Basé sur les modifications discutées dans la conversation
+   - Inclure les détails importants (ex: "Fix: Batch endpoint key metrics avec includeKeyMetrics param")
+4. **Vérifier les erreurs communes** : Consulter `docs/REPERTOIRE_COMPLET_ERREURS.md` si applicable
+5. **Push** : `git add [fichiers] && git commit -m "[message]" && git push`
 
-**Exemple** : Si la conversation portait sur la correction du batch endpoint, le message pourrait être "Fix: Correction du batch endpoint pour les key metrics"
+**Bonnes pratiques apprises**:
+- Toujours vérifier les lints avant push
+- Messages de commit descriptifs mais concis
+- Ne commit que les fichiers pertinents au contexte
+- Éviter les commits génériques "Auto-commit"
 
