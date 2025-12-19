@@ -110,6 +110,11 @@ git push
 - Analyser le contexte AVANT de choisir les tests
 - Apprendre des patterns d'erreurs pour éviter répétition
 - Maximum 3 tentatives par type de test avant d'informer l'utilisateur
+- **Profils de synchronisation** : Inclure descriptions et détails ventilés pour chaque preset
+- **Visibilité UI** : Sections importantes doivent avoir bordures épaisses, ombres, fonds colorés
+- **Build 3p1** : Toujours inclure `dist/assets/index.js` et `dist/assets/index.css` dans le commit si composants modifiés
+- **Tests de filtres** : Vérifier que les filtres retournent des résultats (créer scripts de test si nécessaire)
+- **Stockage persistant** : Utiliser `storage` utility pour IndexedDB/localStorage, pas localStorage direct
 
 **Exemple complet optimisé** :
 1. Contexte : Batch endpoint modifié (`api/fmp-company-data-batch-sync.js`)

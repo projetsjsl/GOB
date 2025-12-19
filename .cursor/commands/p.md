@@ -76,4 +76,9 @@ git push
 - Ne commit que les fichiers pertinents au contexte
 - Analyser le contexte AVANT de créer le message de commit
 - Éviter les commits génériques "Auto-commit"
+- **Profils de synchronisation** : Inclure descriptions complètes et détails ventilés pour chaque preset
+- **Visibilité UI** : Améliorer visibilité avec bordures épaisses (border-2), ombres (shadow-sm), fonds colorés
+- **Build 3p1** : Toujours inclure fichiers `dist/` si composants React modifiés
+- **Stockage persistant** : Utiliser `storage` utility (IndexedDB/localStorage) au lieu de localStorage direct
+- **Tests de filtres** : Créer scripts de test pour valider que filtres fonctionnent et retournent des résultats
 

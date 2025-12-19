@@ -110,4 +110,9 @@ Documenter les solutions dans la conversation pour éviter répétition :
 - Attendre déploiement Vercel (2-5 min) avant tests console si erreurs 500
 - Vérifier les trois dimensions (code/console/UI) pour modifications importantes
 - Analyser le contexte AVANT de choisir les tests à exécuter
+- **Profils de synchronisation** : Vérifier que les presets avec détails ventilés s'affichent correctement
+- **Visibilité UI** : Pour sections importantes, utiliser bordures épaisses (border-2), ombres (shadow-sm), fonds colorés pour meilleure visibilité
+- **Stockage persistant** : Utiliser `storage` utility (IndexedDB/localStorage) pour profils personnalisés, pas localStorage direct
+- **Tests de filtres** : Créer scripts de test pour vérifier que filtres retournent des résultats (ex: `test-kpi-filters.js`, `test-sidebar-filters.js`)
+- **Build 3p1** : Toujours rebuild après modifications de composants React (`public/3p1/components/*.tsx`)
 
