@@ -1325,6 +1325,8 @@
                     
                     const dbField = dbFieldName || (field === 'phaseId' ? 'phase_id' : 
                                                      field === 'dayOffset' ? 'day_offset' : 
+                                                     field === 'startDate' ? 'start_date' :
+                                                     field === 'endDate' ? 'end_date' :
                                                      field === 'assignedTo' ? 'assigned_to' : field);
                     
                     console.log(`💾 [AdminPanel] Sauvegarde ${field} (${dbField}) pour tâche ${taskId}:`, value);
@@ -1336,6 +1338,14 @@
                         .select();
                     
                     if (error) {
+                        // ✅ FIX: Gérer les erreurs de colonnes manquantes gracieusement
+                        if (error.message && (error.message.includes('column') || error.message.includes('not found') || error.message.includes('schema cache'))) {
+                            console.warn(`⚠️ Colonne ${dbField} non trouvée dans task_templates. Migration SQL nécessaire.`);
+                            console.warn(`   Erreur complète:`, error);
+                            showNotification(`Colonne ${dbField} manquante. Exécutez la migration 013_add_task_dates.sql dans Supabase.`, 'warning');
+                            // Ne pas bloquer l'UI, retourner false mais continuer
+                            return false;
+                        }
                         console.error(`❌ Erreur sauvegarde ${field}:`, error);
                         showNotification(`Erreur sauvegarde ${field}: ${error.message || error.details}`, 'error');
                         return false;
@@ -1901,16 +1911,25 @@
                                                 setTaskTemplates([...taskTemplates, newTask]);
                                                 
                                                 if(useSupabase && supabase) {
+                                                    // ✅ FIX: Insérer avec gestion d'erreur pour colonnes manquantes
                                                     supabase.from('task_templates').insert([{ 
                                                         title, 
                                                         description: desc,
                                                         phase_id: phaseId, 
                                                         start_date: startDate,
                                                         end_date: endDate,
+                                                        day_offset: 0, // Rétrocompatibilité
                                                         category,
                                                         priority // Ensure DB column exists or ignore
                                                     }]).then(({error}) => {
-                                                        if(error) console.error(error);
+                                                        if (error) {
+                                                            if (error.message && (error.message.includes('column') || error.message.includes('not found') || error.message.includes('schema cache'))) {
+                                                                console.warn('⚠️ Colonnes start_date/end_date manquantes. Migration SQL nécessaire.');
+                                                                showNotification('Migration SQL nécessaire pour start_date/end_date. Voir 013_add_task_dates.sql', 'warning');
+                                                            } else {
+                                                                console.error('Erreur insertion tâche:', error);
+                                                            }
+                                                        }
                                                     });
                                                 }
                                                 document.getElementById('newTaskTitle').value = '';
@@ -2601,6 +2620,8 @@
                     
                     const dbField = dbFieldName || (field === 'phaseId' ? 'phase_id' : 
                                                      field === 'dayOffset' ? 'day_offset' : 
+                                                     field === 'startDate' ? 'start_date' :
+                                                     field === 'endDate' ? 'end_date' :
                                                      field === 'assignedTo' ? 'assigned_to' : field);
                     
                     console.log(`💾 Sauvegarde ${field} (${dbField}) pour tâche template ${templateId}:`, value);
@@ -2612,6 +2633,14 @@
                         .select(); // Retourner les données pour vérifier
                     
                     if (error) {
+                        // ✅ FIX: Gérer les erreurs de colonnes manquantes gracieusement
+                        if (error.message && (error.message.includes('column') || error.message.includes('not found') || error.message.includes('schema cache'))) {
+                            console.warn(`⚠️ Colonne ${dbField} non trouvée dans task_templates. Migration SQL nécessaire.`);
+                            console.warn(`   Erreur complète:`, error);
+                            showNotification(`Colonne ${dbField} manquante. Exécutez la migration 013_add_task_dates.sql dans Supabase.`, 'warning');
+                            // Ne pas bloquer l'UI, retourner false mais continuer
+                            return false;
+                        }
                         console.error(`❌ Erreur sauvegarde ${field}:`, error);
                         showNotification(`Erreur sauvegarde ${field}: ${error.message || error.details}`, 'error');
                         return false;
