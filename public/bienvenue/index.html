@@ -1224,9 +1224,9 @@
         };
 
         /**
-         * DatePicker - Composant calendrier simple et réutilisable
-         * ---------------------------------------------------------
-         * Affiche un input date natif avec un style amélioré et gestion d'ouverture/fermeture
+         * DatePicker - Composant calendrier avec panneau modal (style similaire au panneau ressources)
+         * --------------------------------------------------------------------------------------------
+         * Affiche un panneau modal flottant avec un calendrier natif, similaire au panneau "Modifier ressources"
          * 
          * @param {object} props - Les propriétés du composant
          * @param {string} props.value - La valeur de la date (format YYYY-MM-DD)
@@ -1242,9 +1242,10 @@
             const [isOpen, setIsOpen] = useState(false);
             const inputRef = useRef(null);
 
-            const handleClick = () => {
+            const handleClick = (e) => {
+                e.stopPropagation();
                 setIsOpen(true);
-                // Focus sur l'input pour ouvrir le calendrier natif
+                // Focus sur l'input pour ouvrir le calendrier natif après le rendu
                 setTimeout(() => {
                     if (inputRef.current) {
                         inputRef.current.focus();
@@ -1257,7 +1258,25 @@
                             }
                         }
                     }
-                }, 10);
+                }, 50);
+            };
+
+            const handleClose = () => {
+                setIsOpen(false);
+                if (onBlur) {
+                    onBlur();
+                }
+            };
+
+            const handleDateChange = (newValue) => {
+                // Forcer la date à être au minimum 2026-01-01
+                const minDate = min || '2026-01-01';
+                const finalValue = newValue && newValue < minDate ? minDate : newValue;
+                onChange(finalValue);
+                setIsOpen(false);
+                if (onBlur) {
+                    onBlur();
+                }
             };
 
             const formatDate = (dateStr) => {
@@ -1267,35 +1286,7 @@
             };
 
             return (
-                <div className="relative inline-block">
-                    <input
-                        ref={inputRef}
-                        type="date"
-                        value={value || '2026-01-01'}
-                        onChange={(e) => {
-                            const newValue = e.target.value;
-                            // Forcer la date à être au minimum 2026-01-01
-                            const minDate = min || '2026-01-01';
-                            if (newValue && newValue < minDate) {
-                                onChange(minDate);
-                            } else {
-                                onChange(newValue);
-                            }
-                            setIsOpen(false);
-                        }}
-                        onBlur={(e) => {
-                            setIsOpen(false);
-                            if (onBlur) onBlur(e);
-                        }}
-                        min={min || '2026-01-01'}
-                        max={max}
-                        className="absolute opacity-0 w-full h-full cursor-pointer z-10"
-                        style={{ pointerEvents: 'auto' }}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setIsOpen(true);
-                        }}
-                    />
+                <>
                     <div
                         onClick={handleClick}
                         className={`${className} cursor-pointer flex items-center gap-1 hover:bg-blue-50 transition-colors rounded px-2 py-1 border border-transparent hover:border-blue-300`}
@@ -1303,7 +1294,73 @@
                         {showIcon && <span>📅</span>}
                         <span className="text-xs whitespace-nowrap">{formatDate(value)}</span>
                     </div>
-                </div>
+
+                    {/* Panneau modal similaire au panneau ressources */}
+                    {isOpen && (
+                        <div style={{ position: 'fixed', inset: 0, zIndex: 10000, pointerEvents: 'none' }}>
+                            {/* Overlay semi-transparent pour fermer en cliquant à l'extérieur */}
+                            <div 
+                                className="fixed inset-0 bg-black/20 backdrop-blur-sm"
+                                style={{ pointerEvents: 'auto' }}
+                                onClick={handleClose}
+                            />
+                            {/* Panneau flottant centré avec calendrier */}
+                            <div 
+                                className="fixed bg-white rounded-xl shadow-2xl"
+                                style={{
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    width: '320px',
+                                    maxWidth: '90vw',
+                                    pointerEvents: 'auto',
+                                    zIndex: 10001
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                {/* Header */}
+                                <div className="px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between rounded-t-xl">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xl">📅</span>
+                                        <div className="text-sm font-bold">Sélectionner une date</div>
+                                    </div>
+                                    <button 
+                                        onClick={handleClose} 
+                                        className="text-white/80 hover:text-white hover:bg-white/20 p-1.5 rounded-lg transition-colors"
+                                        title="Fermer"
+                                    >
+                                        <Icons.X className="w-5 h-5" />
+                                    </button>
+                                </div>
+                                
+                                {/* Calendrier natif */}
+                                <div className="p-4 bg-gray-50">
+                                    <input
+                                        ref={inputRef}
+                                        type="date"
+                                        value={value || '2026-01-01'}
+                                        onChange={(e) => handleDateChange(e.target.value)}
+                                        min={min || '2026-01-01'}
+                                        max={max}
+                                        className="w-full p-3 border-2 border-blue-300 rounded-lg text-center text-lg font-semibold focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                        style={{ fontSize: '16px' }}
+                                    />
+                                    <div className="mt-3 text-xs text-gray-500 text-center">
+                                        Période: {min || '2026-01-01'} {max ? `→ ${max}` : ''}
+                                    </div>
+                                </div>
+                                
+                                {/* Footer avec date formatée */}
+                                {value && (
+                                    <div className="px-4 py-3 bg-white border-t border-gray-200 rounded-b-xl">
+                                        <div className="text-xs font-bold text-gray-500 uppercase mb-1">Date sélectionnée :</div>
+                                        <div className="text-sm font-semibold text-gray-900">{formatDate(value)}</div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </>
             );
         };
 
