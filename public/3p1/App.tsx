@@ -2745,8 +2745,9 @@ export default function App() {
                     const TICKER_TIMEOUT_MS = 60000; // 60 secondes max par ticker
                     
                     // Wrapper avec timeout pour éviter qu'un ticker bloque indéfiniment
-                    const tickerPromise = (async () => {
-                    let tickerResult: any = {
+                    return Promise.race([
+                        (async () => {
+                            let tickerResult: any = {
                         ticker: tickerSymbol,
                         success: false,
                         timeMs: 0,
@@ -3269,6 +3270,32 @@ export default function App() {
                         setSyncStats(prev => ({ ...prev, errorCount: prev.errorCount + 1 }));
                         console.error(`❌ ${errorMsg}`);
                     }
+                        })(),
+                        new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error(`Timeout après ${TICKER_TIMEOUT_MS / 1000}s`)), TICKER_TIMEOUT_MS)
+                        )
+                    ]).catch((timeoutError: any) => {
+                        // Si timeout, enregistrer comme erreur mais continuer
+                        errorCount++;
+                        const errorMsg = `${tickerSymbol}: ${timeoutError.message || 'Timeout'}`;
+                        errors.push(errorMsg);
+                        const tickerResult: any = {
+                            ticker: tickerSymbol,
+                            success: false,
+                            error: timeoutError.message || 'Timeout',
+                            timeMs: Date.now() - tickerStartTime,
+                            dataRetrieved: { years: 0, dataPoints: 0, hasProfile: false, hasKeyMetrics: false, hasQuotes: false, hasFinancials: false },
+                            outliers: { detected: [], excluded: { EPS: false, CF: false, BV: false, DIV: false }, reasons: {} },
+                            orangeData: { wasReplaced: false },
+                            currentPrice: 0,
+                            zeroData: { earningsPerShare: 0, cashFlowPerShare: 0, bookValuePerShare: 0, dividendPerShare: 0, reasons: {} },
+                            naData: { fields: [], reasons: {} },
+                            other: { snapshotSaved: false, assumptionsUpdated: false, infoUpdated: false, valueLineMetricsSynced: false }
+                        };
+                        tickerResults.push(tickerResult);
+                        setSyncStats(prev => ({ ...prev, errorCount: prev.errorCount + 1 }));
+                        console.error(`⏱️ ${errorMsg}`);
+                    });
                 })
             );
             }

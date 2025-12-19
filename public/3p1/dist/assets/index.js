@@ -57108,6 +57108,8 @@ Vérifiez les logs de la console pour plus de détails.`;
     const tickerResults = [];
     const BATCH_API_SIZE = 20;
     const delayBetweenBatches = 2e3;
+    const MAX_SYNC_TIME_MS = 30 * 60 * 1e3;
+    const startSyncTime = Date.now();
     const fetchCompanyDataBatch = async (tickerSymbols, includeKeyMetrics = true) => {
       var _a4;
       const results = /* @__PURE__ */ new Map();
@@ -57170,6 +57172,12 @@ Vérifiez les logs de la console pour plus de détails.`;
           console.log("🛑 Synchronisation arrêtée par l'utilisateur.");
           break;
         }
+        const elapsedTime = Date.now() - startSyncTime;
+        if (elapsedTime > MAX_SYNC_TIME_MS) {
+          console.warn(`⏱️ Timeout global atteint (${MAX_SYNC_TIME_MS / 1e3 / 60} min). Arrêt de la synchronisation.`);
+          console.warn(`📊 Progression: ${i}/${allTickers.length} tickers traités (${Math.round(i / allTickers.length * 100)}%)`);
+          break;
+        }
         while (isSyncPaused.current) {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
@@ -57183,423 +57191,451 @@ Vérifiez les logs de la console pour plus de détails.`;
         const batchResults = await fetchCompanyDataBatch(batch, includeKeyMetrics);
         await Promise.allSettled(
           batch.map(async (tickerSymbol) => {
-            var _a4, _b3, _c;
             const tickerStartTime = Date.now();
-            let tickerResult = {
-              ticker: tickerSymbol,
-              success: false,
-              timeMs: 0,
-              dataRetrieved: {
-                years: 0,
-                dataPoints: 0,
-                hasProfile: false,
-                hasKeyMetrics: false,
-                hasQuotes: false,
-                hasFinancials: false
-              },
-              outliers: {
-                detected: [],
-                excluded: { EPS: false, CF: false, BV: false, DIV: false },
-                reasons: {}
-              },
-              orangeData: {
-                wasReplaced: options.replaceOrangeData || false
-              },
-              currentPrice: 0,
-              zeroData: {
-                earningsPerShare: 0,
-                cashFlowPerShare: 0,
-                bookValuePerShare: 0,
-                dividendPerShare: 0,
-                reasons: {}
-              },
-              naData: {
-                fields: [],
-                reasons: {}
-              },
-              other: {
-                snapshotSaved: false,
-                assumptionsUpdated: false,
-                infoUpdated: false,
-                valueLineMetricsSynced: false
-              }
-            };
-            try {
-              setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
-              const profile2 = library[tickerSymbol];
-              if (!profile2) {
-                console.warn(`⚠️ ${tickerSymbol}: Profil non trouvé`);
-                tickerResult.error = "Profil non trouvé";
-                tickerResult.timeMs = Date.now() - tickerStartTime;
-                tickerResults.push(tickerResult);
-                return;
-              }
-              if (options.saveBeforeSync) {
-                console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
-                try {
-                  const saveResult = await saveSnapshot(
-                    tickerSymbol,
-                    profile2.data,
-                    profile2.assumptions,
-                    profile2.info,
-                    `Avant synchronisation (${options.replaceOrangeData ? "avec remplacement données oranges" : "standard"}) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
-                    false,
-                    false
-                  );
-                  if (saveResult.success) {
-                    tickerResult.other.snapshotSaved = true;
-                  } else {
-                    console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot avant sync: ${saveResult.error}`);
-                  }
-                } catch (saveError) {
-                  console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot avant sync: ${saveError.message}`);
-                }
-              }
-              if (!options.syncData && !options.syncAssumptions && !options.syncInfo) {
-                console.log(`⏭️ ${tickerSymbol}: Aucune option de sync activée, ignoré`);
-                return;
-              }
-              console.log(`🔄 Synchronisation ${tickerSymbol}...`);
-              let result;
-              if (batchResults.has(tickerSymbol)) {
-                result = batchResults.get(tickerSymbol);
-                console.log(`📦 ${tickerSymbol}: Données récupérées du batch (data.length: ${((_a4 = result == null ? void 0 : result.data) == null ? void 0 : _a4.length) || 0})`);
-              } else {
-                console.warn(`⚠️ ${tickerSymbol}: Pas dans les résultats du batch, fallback vers appel individuel`);
-                try {
-                  result = await fetchCompanyDataWithTimeout(tickerSymbol);
-                } catch (fetchError) {
-                  const isRateLimitError = fetchError.message && (fetchError.message.includes("Rate limit") || fetchError.message.includes("rate limit") || fetchError.message.includes("429"));
-                  if (isRateLimitError) {
-                    errorCount++;
-                    const errorMsg = `${tickerSymbol}: ${fetchError.message}`;
-                    errors.push(errorMsg);
-                    setSyncStats((prev) => ({ ...prev, errorCount: prev.errorCount + 1 }));
-                    console.error(`❌ ${errorMsg}`);
-                    console.error(`⚠️ Rate limiting détecté - La synchronisation peut être ralentie ou interrompue.`);
-                    await new Promise((resolve) => setTimeout(resolve, 5e3));
-                    return;
-                  }
-                  const isNotFoundError = fetchError.message && (fetchError.message.includes("introuvable") || fetchError.message.includes("not found") || fetchError.message.includes("404"));
-                  if (isNotFoundError) {
-                    skippedCount++;
-                    skippedTickers.push(tickerSymbol);
-                    console.warn(`⏭️ ${tickerSymbol}: Ignoré (introuvable dans FMP). ${fetchError.message}`);
-                    return;
-                  }
-                  throw fetchError;
-                }
-              }
-              if (!result || !result.data) {
-                skippedCount++;
-                skippedTickers.push(tickerSymbol);
-                console.warn(`⏭️ ${tickerSymbol}: Ignoré (résultat invalide)`);
-                tickerResult.error = "Résultat invalide";
-                tickerResult.timeMs = Date.now() - tickerStartTime;
-                tickerResults.push(tickerResult);
-                return;
-              }
-              if (result.data.length === 0) {
-                if (result.info && options.syncInfo) {
-                  console.log(`ℹ️ ${tickerSymbol}: Profile trouvé mais aucune donnée historique. Synchronisation des infos uniquement.`);
-                  const updatedProfile = {
-                    ...profile2,
-                    info: result.info
-                  };
-                  if (result.currentPrice && options.updateCurrentPrice) {
-                    updatedProfile.assumptions = {
-                      ...profile2.assumptions,
-                      currentPrice: result.currentPrice
-                    };
-                    tickerResult.currentPrice = result.currentPrice;
-                  } else {
-                    tickerResult.currentPrice = result.currentPrice || profile2.assumptions.currentPrice || 0;
-                  }
-                  setLibrary((prev) => ({
-                    ...prev,
-                    [tickerSymbol]: updatedProfile
-                  }));
-                  tickerResult.other.infoUpdated = true;
-                  tickerResult.success = true;
-                  tickerResult.dataRetrieved = {
+            const TICKER_TIMEOUT_MS = 6e4;
+            return Promise.race([
+              (async () => {
+                var _a4, _b3, _c;
+                let tickerResult = {
+                  ticker: tickerSymbol,
+                  success: false,
+                  timeMs: 0,
+                  dataRetrieved: {
                     years: 0,
                     dataPoints: 0,
-                    hasProfile: !!result.info,
+                    hasProfile: false,
                     hasKeyMetrics: false,
-                    hasQuotes: !!(result.currentPrice && result.currentPrice > 0),
+                    hasQuotes: false,
                     hasFinancials: false
-                  };
-                  tickerResult.error = "Aucune donnée historique disponible (infos synchronisées)";
-                  tickerResult.timeMs = Date.now() - tickerStartTime;
-                  tickerResults.push(tickerResult);
-                  return;
-                } else {
-                  skippedCount++;
-                  skippedTickers.push(tickerSymbol);
-                  console.warn(`⏭️ ${tickerSymbol}: Ignoré (aucune donnée disponible)`);
-                  tickerResult.error = "Aucune donnée disponible";
-                  tickerResult.timeMs = Date.now() - tickerStartTime;
-                  tickerResults.push(tickerResult);
-                  return;
-                }
-              }
-              tickerResult.dataRetrieved = {
-                years: ((_b3 = result.data) == null ? void 0 : _b3.length) || 0,
-                dataPoints: ((_c = result.data) == null ? void 0 : _c.length) || 0,
-                hasProfile: !!result.info,
-                hasKeyMetrics: !!(result.data && result.data.length > 0),
-                hasQuotes: !!(result.currentPrice && result.currentPrice > 0),
-                hasFinancials: !!(result.financials && result.financials.length > 0)
-              };
-              tickerResult.currentPrice = result.currentPrice || 0;
-              let mergedData = profile2.data;
-              if (options.syncData && result.data.length > 0) {
-                const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
-                if (options.syncOnlyNewYears) {
-                  result.data.forEach((newRow) => {
-                    const exists = mergedData.some((row) => row.year === newRow.year);
-                    if (!exists) {
-                      mergedData.push({
-                        ...newRow,
-                        autoFetched: true
-                      });
-                    }
-                  });
-                } else {
-                  mergedData = profile2.data.map((existingRow) => {
-                    const newRow = newDataByYear.get(existingRow.year);
-                    if (!newRow) return existingRow;
-                    if (options.forceReplace) {
-                      return {
-                        ...newRow,
-                        autoFetched: true
-                      };
-                    }
-                    if (options.syncOnlyMissingMetrics) {
-                      const updatedRow = { ...existingRow };
-                      const typedNewRow = newRow;
-                      if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === void 0) && typedNewRow.earningsPerShare > 0) {
-                        updatedRow.earningsPerShare = typedNewRow.earningsPerShare;
-                      }
-                      if ((existingRow.cashFlowPerShare === 0 || existingRow.cashFlowPerShare === null || existingRow.cashFlowPerShare === void 0) && typedNewRow.cashFlowPerShare > 0) {
-                        updatedRow.cashFlowPerShare = typedNewRow.cashFlowPerShare;
-                      }
-                      if ((existingRow.bookValuePerShare === 0 || existingRow.bookValuePerShare === null || existingRow.bookValuePerShare === void 0) && typedNewRow.bookValuePerShare > 0) {
-                        updatedRow.bookValuePerShare = typedNewRow.bookValuePerShare;
-                      }
-                      if ((existingRow.dividendPerShare === 0 || existingRow.dividendPerShare === null || existingRow.dividendPerShare === void 0) && typedNewRow.dividendPerShare > 0) {
-                        updatedRow.dividendPerShare = typedNewRow.dividendPerShare;
-                      }
-                      if ((existingRow.priceHigh === 0 || existingRow.priceHigh === null || existingRow.priceHigh === void 0) && typedNewRow.priceHigh > 0) {
-                        updatedRow.priceHigh = typedNewRow.priceHigh;
-                      }
-                      if ((existingRow.priceLow === 0 || existingRow.priceLow === null || existingRow.priceLow === void 0) && typedNewRow.priceLow > 0) {
-                        updatedRow.priceLow = typedNewRow.priceLow;
-                      }
-                      return updatedRow;
-                    }
-                    if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
-                      return existingRow;
-                    }
-                    return {
-                      ...newRow,
-                      autoFetched: true
-                    };
-                  });
-                  result.data.forEach((newRow) => {
-                    const exists = mergedData.some((row) => row.year === newRow.year);
-                    if (!exists) {
-                      mergedData.push({
-                        ...newRow,
-                        autoFetched: true
-                      });
-                    }
-                  });
-                }
-                mergedData.sort((a2, b) => a2.year - b.year);
-              }
-              let finalAssumptions = profile2.assumptions;
-              if (options.syncAssumptions) {
-                const existingAssumptionsForCalc = options.replaceOrangeData ? void 0 : profile2.assumptions;
-                const currentPriceForCalc = options.updateCurrentPrice ? result.currentPrice : profile2.assumptions.currentPrice;
-                const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-                  mergedData,
-                  currentPriceForCalc,
-                  existingAssumptionsForCalc
-                );
-                const tempAssumptions = {
-                  ...profile2.assumptions,
-                  ...autoFilledAssumptions
-                };
-                let outlierDetection = {
-                  detectedOutliers: [],
-                  excludeEPS: profile2.assumptions.excludeEPS || false,
-                  excludeCF: profile2.assumptions.excludeCF || false,
-                  excludeBV: profile2.assumptions.excludeBV || false,
-                  excludeDIV: profile2.assumptions.excludeDIV || false
-                };
-                if (options.recalculateOutliers) {
-                  outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
-                  if (outlierDetection.detectedOutliers.length > 0) {
-                    console.log(`⚠️ ${tickerSymbol}: Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(", ")}`);
-                    tickerResult.outliers.detected = outlierDetection.detectedOutliers;
-                    tickerResult.outliers.excluded = {
-                      EPS: outlierDetection.excludeEPS,
-                      CF: outlierDetection.excludeCF,
-                      BV: outlierDetection.excludeBV,
-                      DIV: outlierDetection.excludeDIV
-                    };
-                    const currentPrice = tempAssumptions.currentPrice || 1;
-                    const calculateTargetPrice = (metric) => {
-                      return 0;
-                    };
-                    outlierDetection.detectedOutliers.forEach((metric) => {
-                      const isExcluded = tickerResult.outliers.excluded[metric];
-                      if (isExcluded) {
-                        tickerResult.outliers.reasons[metric] = "Prix cible aberrant détecté (>1.5σ ou retour implausible)";
-                      }
-                    });
-                  }
-                }
-                finalAssumptions = {
-                  ...tempAssumptions,
-                  // Préserver les exclusions si l'option est activée
-                  excludeEPS: options.preserveExclusions ? profile2.assumptions.excludeEPS || outlierDetection.excludeEPS : outlierDetection.excludeEPS,
-                  excludeCF: options.preserveExclusions ? profile2.assumptions.excludeCF || outlierDetection.excludeCF : outlierDetection.excludeCF,
-                  excludeBV: options.preserveExclusions ? profile2.assumptions.excludeBV || outlierDetection.excludeBV : outlierDetection.excludeBV,
-                  excludeDIV: options.preserveExclusions ? profile2.assumptions.excludeDIV || outlierDetection.excludeDIV : outlierDetection.excludeDIV
-                };
-                tickerResult.orangeData = {
-                  growthRateEPS: finalAssumptions.growthRateEPS,
-                  growthRateCF: finalAssumptions.growthRateCF,
-                  growthRateBV: finalAssumptions.growthRateBV,
-                  growthRateDiv: finalAssumptions.growthRateDiv,
-                  targetPE: finalAssumptions.targetPE,
-                  targetPCF: finalAssumptions.targetPCF,
-                  targetPBV: finalAssumptions.targetPBV,
-                  targetYield: finalAssumptions.targetYield,
-                  wasReplaced: options.replaceOrangeData || false
-                };
-                tickerResult.other.assumptionsUpdated = true;
-              }
-              let updatedInfo = profile2.info;
-              if (options.syncInfo && result.info) {
-                updatedInfo = {
-                  ...profile2.info,
-                  ...result.info,
-                  name: result.info.name || profile2.info.name
-                };
-                tickerResult.other.infoUpdated = true;
-                if (options.syncValueLineMetrics) {
-                  try {
-                    const supabaseResult = await loadAllTickersFromSupabase();
-                    if (supabaseResult.success) {
-                      const supabaseTicker = supabaseResult.tickers.find((t) => t.ticker.toUpperCase() === tickerSymbol);
-                      if (supabaseTicker) {
-                        updatedInfo = {
-                          ...updatedInfo,
-                          securityRank: supabaseTicker.security_rank !== null && supabaseTicker.security_rank !== void 0 ? supabaseTicker.security_rank : updatedInfo.securityRank || "N/A",
-                          earningsPredictability: supabaseTicker.earnings_predictability !== null && supabaseTicker.earnings_predictability !== void 0 ? supabaseTicker.earnings_predictability : updatedInfo.earningsPredictability,
-                          priceGrowthPersistence: supabaseTicker.price_growth_persistence !== null && supabaseTicker.price_growth_persistence !== void 0 ? supabaseTicker.price_growth_persistence : updatedInfo.priceGrowthPersistence,
-                          priceStability: supabaseTicker.price_stability !== null && supabaseTicker.price_stability !== void 0 ? supabaseTicker.price_stability : updatedInfo.priceStability
-                        };
-                        tickerResult.other.valueLineMetricsSynced = true;
-                      }
-                    }
-                  } catch (error) {
-                    console.warn(`⚠️ Impossible de recharger les métriques ValueLine pour ${tickerSymbol}:`, error);
-                  }
-                }
-              }
-              setLibrary((prev) => {
-                const updated = {
-                  ...prev,
-                  [tickerSymbol]: {
-                    ...profile2,
-                    data: mergedData,
-                    info: updatedInfo,
-                    assumptions: finalAssumptions,
-                    lastModified: Date.now()
+                  },
+                  outliers: {
+                    detected: [],
+                    excluded: { EPS: false, CF: false, BV: false, DIV: false },
+                    reasons: {}
+                  },
+                  orangeData: {
+                    wasReplaced: options.replaceOrangeData || false
+                  },
+                  currentPrice: 0,
+                  zeroData: {
+                    earningsPerShare: 0,
+                    cashFlowPerShare: 0,
+                    bookValuePerShare: 0,
+                    dividendPerShare: 0,
+                    reasons: {}
+                  },
+                  naData: {
+                    fields: [],
+                    reasons: {}
+                  },
+                  other: {
+                    snapshotSaved: false,
+                    assumptionsUpdated: false,
+                    infoUpdated: false,
+                    valueLineMetricsSynced: false
                   }
                 };
                 try {
-                  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-                } catch (e) {
-                  console.warn("Failed to save to LocalStorage:", e);
+                  setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
+                  const profile2 = library[tickerSymbol];
+                  if (!profile2) {
+                    console.warn(`⚠️ ${tickerSymbol}: Profil non trouvé`);
+                    tickerResult.error = "Profil non trouvé";
+                    tickerResult.timeMs = Date.now() - tickerStartTime;
+                    tickerResults.push(tickerResult);
+                    return;
+                  }
+                  if (options.saveBeforeSync) {
+                    console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
+                    try {
+                      const saveResult = await saveSnapshot(
+                        tickerSymbol,
+                        profile2.data,
+                        profile2.assumptions,
+                        profile2.info,
+                        `Avant synchronisation (${options.replaceOrangeData ? "avec remplacement données oranges" : "standard"}) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
+                        false,
+                        false
+                      );
+                      if (saveResult.success) {
+                        tickerResult.other.snapshotSaved = true;
+                      } else {
+                        console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot avant sync: ${saveResult.error}`);
+                      }
+                    } catch (saveError) {
+                      console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot avant sync: ${saveError.message}`);
+                    }
+                  }
+                  if (!options.syncData && !options.syncAssumptions && !options.syncInfo) {
+                    console.log(`⏭️ ${tickerSymbol}: Aucune option de sync activée, ignoré`);
+                    return;
+                  }
+                  console.log(`🔄 Synchronisation ${tickerSymbol}...`);
+                  let result;
+                  if (batchResults.has(tickerSymbol)) {
+                    result = batchResults.get(tickerSymbol);
+                    console.log(`📦 ${tickerSymbol}: Données récupérées du batch (data.length: ${((_a4 = result == null ? void 0 : result.data) == null ? void 0 : _a4.length) || 0})`);
+                  } else {
+                    console.warn(`⚠️ ${tickerSymbol}: Pas dans les résultats du batch, fallback vers appel individuel`);
+                    try {
+                      result = await fetchCompanyDataWithTimeout(tickerSymbol);
+                    } catch (fetchError) {
+                      const isRateLimitError = fetchError.message && (fetchError.message.includes("Rate limit") || fetchError.message.includes("rate limit") || fetchError.message.includes("429"));
+                      if (isRateLimitError) {
+                        errorCount++;
+                        const errorMsg = `${tickerSymbol}: ${fetchError.message}`;
+                        errors.push(errorMsg);
+                        setSyncStats((prev) => ({ ...prev, errorCount: prev.errorCount + 1 }));
+                        console.error(`❌ ${errorMsg}`);
+                        console.error(`⚠️ Rate limiting détecté - La synchronisation peut être ralentie ou interrompue.`);
+                        await new Promise((resolve) => setTimeout(resolve, 5e3));
+                        return;
+                      }
+                      const isNotFoundError = fetchError.message && (fetchError.message.includes("introuvable") || fetchError.message.includes("not found") || fetchError.message.includes("404"));
+                      if (isNotFoundError) {
+                        skippedCount++;
+                        skippedTickers.push(tickerSymbol);
+                        console.warn(`⏭️ ${tickerSymbol}: Ignoré (introuvable dans FMP). ${fetchError.message}`);
+                        return;
+                      }
+                      throw fetchError;
+                    }
+                  }
+                  if (!result || !result.data) {
+                    skippedCount++;
+                    skippedTickers.push(tickerSymbol);
+                    console.warn(`⏭️ ${tickerSymbol}: Ignoré (résultat invalide)`);
+                    tickerResult.error = "Résultat invalide";
+                    tickerResult.timeMs = Date.now() - tickerStartTime;
+                    tickerResults.push(tickerResult);
+                    return;
+                  }
+                  if (result.data.length === 0) {
+                    if (result.info && options.syncInfo) {
+                      console.log(`ℹ️ ${tickerSymbol}: Profile trouvé mais aucune donnée historique. Synchronisation des infos uniquement.`);
+                      const updatedProfile = {
+                        ...profile2,
+                        info: result.info
+                      };
+                      if (result.currentPrice && options.updateCurrentPrice) {
+                        updatedProfile.assumptions = {
+                          ...profile2.assumptions,
+                          currentPrice: result.currentPrice
+                        };
+                        tickerResult.currentPrice = result.currentPrice;
+                      } else {
+                        tickerResult.currentPrice = result.currentPrice || profile2.assumptions.currentPrice || 0;
+                      }
+                      setLibrary((prev) => ({
+                        ...prev,
+                        [tickerSymbol]: updatedProfile
+                      }));
+                      tickerResult.other.infoUpdated = true;
+                      tickerResult.success = true;
+                      tickerResult.dataRetrieved = {
+                        years: 0,
+                        dataPoints: 0,
+                        hasProfile: !!result.info,
+                        hasKeyMetrics: false,
+                        hasQuotes: !!(result.currentPrice && result.currentPrice > 0),
+                        hasFinancials: false
+                      };
+                      tickerResult.error = "Aucune donnée historique disponible (infos synchronisées)";
+                      tickerResult.timeMs = Date.now() - tickerStartTime;
+                      tickerResults.push(tickerResult);
+                      return;
+                    } else {
+                      skippedCount++;
+                      skippedTickers.push(tickerSymbol);
+                      console.warn(`⏭️ ${tickerSymbol}: Ignoré (aucune donnée disponible)`);
+                      tickerResult.error = "Aucune donnée disponible";
+                      tickerResult.timeMs = Date.now() - tickerStartTime;
+                      tickerResults.push(tickerResult);
+                      return;
+                    }
+                  }
+                  tickerResult.dataRetrieved = {
+                    years: ((_b3 = result.data) == null ? void 0 : _b3.length) || 0,
+                    dataPoints: ((_c = result.data) == null ? void 0 : _c.length) || 0,
+                    hasProfile: !!result.info,
+                    hasKeyMetrics: !!(result.data && result.data.length > 0),
+                    hasQuotes: !!(result.currentPrice && result.currentPrice > 0),
+                    hasFinancials: !!(result.financials && result.financials.length > 0)
+                  };
+                  tickerResult.currentPrice = result.currentPrice || 0;
+                  let mergedData = profile2.data;
+                  if (options.syncData && result.data.length > 0) {
+                    const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
+                    if (options.syncOnlyNewYears) {
+                      result.data.forEach((newRow) => {
+                        const exists = mergedData.some((row) => row.year === newRow.year);
+                        if (!exists) {
+                          mergedData.push({
+                            ...newRow,
+                            autoFetched: true
+                          });
+                        }
+                      });
+                    } else {
+                      mergedData = profile2.data.map((existingRow) => {
+                        const newRow = newDataByYear.get(existingRow.year);
+                        if (!newRow) return existingRow;
+                        if (options.forceReplace) {
+                          return {
+                            ...newRow,
+                            autoFetched: true
+                          };
+                        }
+                        if (options.syncOnlyMissingMetrics) {
+                          const updatedRow = { ...existingRow };
+                          const typedNewRow = newRow;
+                          if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === void 0) && typedNewRow.earningsPerShare > 0) {
+                            updatedRow.earningsPerShare = typedNewRow.earningsPerShare;
+                          }
+                          if ((existingRow.cashFlowPerShare === 0 || existingRow.cashFlowPerShare === null || existingRow.cashFlowPerShare === void 0) && typedNewRow.cashFlowPerShare > 0) {
+                            updatedRow.cashFlowPerShare = typedNewRow.cashFlowPerShare;
+                          }
+                          if ((existingRow.bookValuePerShare === 0 || existingRow.bookValuePerShare === null || existingRow.bookValuePerShare === void 0) && typedNewRow.bookValuePerShare > 0) {
+                            updatedRow.bookValuePerShare = typedNewRow.bookValuePerShare;
+                          }
+                          if ((existingRow.dividendPerShare === 0 || existingRow.dividendPerShare === null || existingRow.dividendPerShare === void 0) && typedNewRow.dividendPerShare > 0) {
+                            updatedRow.dividendPerShare = typedNewRow.dividendPerShare;
+                          }
+                          if ((existingRow.priceHigh === 0 || existingRow.priceHigh === null || existingRow.priceHigh === void 0) && typedNewRow.priceHigh > 0) {
+                            updatedRow.priceHigh = typedNewRow.priceHigh;
+                          }
+                          if ((existingRow.priceLow === 0 || existingRow.priceLow === null || existingRow.priceLow === void 0) && typedNewRow.priceLow > 0) {
+                            updatedRow.priceLow = typedNewRow.priceLow;
+                          }
+                          return updatedRow;
+                        }
+                        if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
+                          return existingRow;
+                        }
+                        return {
+                          ...newRow,
+                          autoFetched: true
+                        };
+                      });
+                      result.data.forEach((newRow) => {
+                        const exists = mergedData.some((row) => row.year === newRow.year);
+                        if (!exists) {
+                          mergedData.push({
+                            ...newRow,
+                            autoFetched: true
+                          });
+                        }
+                      });
+                    }
+                    mergedData.sort((a2, b) => a2.year - b.year);
+                  }
+                  let finalAssumptions = profile2.assumptions;
+                  if (options.syncAssumptions) {
+                    const existingAssumptionsForCalc = options.replaceOrangeData ? void 0 : profile2.assumptions;
+                    const currentPriceForCalc = options.updateCurrentPrice ? result.currentPrice : profile2.assumptions.currentPrice;
+                    const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
+                      mergedData,
+                      currentPriceForCalc,
+                      existingAssumptionsForCalc
+                    );
+                    const tempAssumptions = {
+                      ...profile2.assumptions,
+                      ...autoFilledAssumptions
+                    };
+                    let outlierDetection = {
+                      detectedOutliers: [],
+                      excludeEPS: profile2.assumptions.excludeEPS || false,
+                      excludeCF: profile2.assumptions.excludeCF || false,
+                      excludeBV: profile2.assumptions.excludeBV || false,
+                      excludeDIV: profile2.assumptions.excludeDIV || false
+                    };
+                    if (options.recalculateOutliers) {
+                      outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
+                      if (outlierDetection.detectedOutliers.length > 0) {
+                        console.log(`⚠️ ${tickerSymbol}: Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(", ")}`);
+                        tickerResult.outliers.detected = outlierDetection.detectedOutliers;
+                        tickerResult.outliers.excluded = {
+                          EPS: outlierDetection.excludeEPS,
+                          CF: outlierDetection.excludeCF,
+                          BV: outlierDetection.excludeBV,
+                          DIV: outlierDetection.excludeDIV
+                        };
+                        const currentPrice = tempAssumptions.currentPrice || 1;
+                        const calculateTargetPrice = (metric) => {
+                          return 0;
+                        };
+                        outlierDetection.detectedOutliers.forEach((metric) => {
+                          const isExcluded = tickerResult.outliers.excluded[metric];
+                          if (isExcluded) {
+                            tickerResult.outliers.reasons[metric] = "Prix cible aberrant détecté (>1.5σ ou retour implausible)";
+                          }
+                        });
+                      }
+                    }
+                    finalAssumptions = {
+                      ...tempAssumptions,
+                      // Préserver les exclusions si l'option est activée
+                      excludeEPS: options.preserveExclusions ? profile2.assumptions.excludeEPS || outlierDetection.excludeEPS : outlierDetection.excludeEPS,
+                      excludeCF: options.preserveExclusions ? profile2.assumptions.excludeCF || outlierDetection.excludeCF : outlierDetection.excludeCF,
+                      excludeBV: options.preserveExclusions ? profile2.assumptions.excludeBV || outlierDetection.excludeBV : outlierDetection.excludeBV,
+                      excludeDIV: options.preserveExclusions ? profile2.assumptions.excludeDIV || outlierDetection.excludeDIV : outlierDetection.excludeDIV
+                    };
+                    tickerResult.orangeData = {
+                      growthRateEPS: finalAssumptions.growthRateEPS,
+                      growthRateCF: finalAssumptions.growthRateCF,
+                      growthRateBV: finalAssumptions.growthRateBV,
+                      growthRateDiv: finalAssumptions.growthRateDiv,
+                      targetPE: finalAssumptions.targetPE,
+                      targetPCF: finalAssumptions.targetPCF,
+                      targetPBV: finalAssumptions.targetPBV,
+                      targetYield: finalAssumptions.targetYield,
+                      wasReplaced: options.replaceOrangeData || false
+                    };
+                    tickerResult.other.assumptionsUpdated = true;
+                  }
+                  let updatedInfo = profile2.info;
+                  if (options.syncInfo && result.info) {
+                    updatedInfo = {
+                      ...profile2.info,
+                      ...result.info,
+                      name: result.info.name || profile2.info.name
+                    };
+                    tickerResult.other.infoUpdated = true;
+                    if (options.syncValueLineMetrics) {
+                      try {
+                        const supabaseResult = await loadAllTickersFromSupabase();
+                        if (supabaseResult.success) {
+                          const supabaseTicker = supabaseResult.tickers.find((t) => t.ticker.toUpperCase() === tickerSymbol);
+                          if (supabaseTicker) {
+                            updatedInfo = {
+                              ...updatedInfo,
+                              securityRank: supabaseTicker.security_rank !== null && supabaseTicker.security_rank !== void 0 ? supabaseTicker.security_rank : updatedInfo.securityRank || "N/A",
+                              earningsPredictability: supabaseTicker.earnings_predictability !== null && supabaseTicker.earnings_predictability !== void 0 ? supabaseTicker.earnings_predictability : updatedInfo.earningsPredictability,
+                              priceGrowthPersistence: supabaseTicker.price_growth_persistence !== null && supabaseTicker.price_growth_persistence !== void 0 ? supabaseTicker.price_growth_persistence : updatedInfo.priceGrowthPersistence,
+                              priceStability: supabaseTicker.price_stability !== null && supabaseTicker.price_stability !== void 0 ? supabaseTicker.price_stability : updatedInfo.priceStability
+                            };
+                            tickerResult.other.valueLineMetricsSynced = true;
+                          }
+                        }
+                      } catch (error) {
+                        console.warn(`⚠️ Impossible de recharger les métriques ValueLine pour ${tickerSymbol}:`, error);
+                      }
+                    }
+                  }
+                  setLibrary((prev) => {
+                    const updated = {
+                      ...prev,
+                      [tickerSymbol]: {
+                        ...profile2,
+                        data: mergedData,
+                        info: updatedInfo,
+                        assumptions: finalAssumptions,
+                        lastModified: Date.now()
+                      }
+                    };
+                    try {
+                      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                    } catch (e) {
+                      console.warn("Failed to save to LocalStorage:", e);
+                    }
+                    return updated;
+                  });
+                  const zeroCounts = {
+                    earningsPerShare: mergedData.filter((d) => d.earningsPerShare === 0 || d.earningsPerShare === null).length,
+                    cashFlowPerShare: mergedData.filter((d) => d.cashFlowPerShare === 0 || d.cashFlowPerShare === null).length,
+                    bookValuePerShare: mergedData.filter((d) => d.bookValuePerShare === 0 || d.bookValuePerShare === null).length,
+                    dividendPerShare: mergedData.filter((d) => d.dividendPerShare === 0 || d.dividendPerShare === null).length
+                  };
+                  tickerResult.zeroData = {
+                    earningsPerShare: zeroCounts.earningsPerShare,
+                    cashFlowPerShare: zeroCounts.cashFlowPerShare,
+                    bookValuePerShare: zeroCounts.bookValuePerShare,
+                    dividendPerShare: zeroCounts.dividendPerShare,
+                    reasons: {
+                      earningsPerShare: zeroCounts.earningsPerShare > 0 ? `${zeroCounts.earningsPerShare} années avec EPS à 0 (pertes ou données manquantes)` : "",
+                      cashFlowPerShare: zeroCounts.cashFlowPerShare > 0 ? `${zeroCounts.cashFlowPerShare} années avec CF à 0 (CF négatif ou données manquantes)` : "",
+                      bookValuePerShare: zeroCounts.bookValuePerShare > 0 ? `${zeroCounts.bookValuePerShare} années avec BV à 0 (BV négatif ou données manquantes)` : "",
+                      dividendPerShare: zeroCounts.dividendPerShare > 0 ? `${zeroCounts.dividendPerShare} années avec DIV à 0 (pas de dividende ou données manquantes)` : ""
+                    }
+                  };
+                  const naFields = [];
+                  const naReasons = {};
+                  if (!tickerResult.currentPrice || tickerResult.currentPrice === 0) {
+                    naFields.push("currentPrice");
+                    naReasons.currentPrice = "Prix actuel non disponible dans FMP";
+                  }
+                  if (mergedData.length === 0) {
+                    naFields.push("annualData");
+                    naReasons.annualData = "Aucune donnée historique disponible";
+                  }
+                  if (!finalAssumptions.growthRateEPS && !finalAssumptions.growthRateCF) {
+                    naFields.push("assumptions");
+                    naReasons.assumptions = "Impossible de calculer assumptions (données insuffisantes)";
+                  }
+                  tickerResult.naData = {
+                    fields: naFields,
+                    reasons: naReasons
+                  };
+                  try {
+                    const saveResult = await saveSnapshot(
+                      tickerSymbol,
+                      mergedData,
+                      finalAssumptions,
+                      updatedInfo,
+                      `Après synchronisation (${options.replaceOrangeData ? "avec remplacement données oranges" : "standard"}) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
+                      true,
+                      true
+                    );
+                    if (saveResult.success) {
+                      tickerResult.other.snapshotSaved = true;
+                    } else {
+                      console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot après sync: ${saveResult.error}`);
+                    }
+                  } catch (saveError) {
+                    console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot après sync: ${saveError.message}`);
+                  }
+                  successCount++;
+                  tickerResult.success = true;
+                  tickerResult.timeMs = Date.now() - tickerStartTime;
+                  tickerResults.push(tickerResult);
+                  setSyncStats((prev) => ({ ...prev, successCount: prev.successCount + 1 }));
+                  console.log(`✅ ${tickerSymbol}: Synchronisé avec succès`);
+                } catch (error) {
+                  errorCount++;
+                  const errorMsg = `${tickerSymbol}: ${error.message || String(error)}`;
+                  errors.push(errorMsg);
+                  tickerResult.success = false;
+                  tickerResult.error = error.message || String(error);
+                  tickerResult.timeMs = Date.now() - tickerStartTime;
+                  tickerResults.push(tickerResult);
+                  setSyncStats((prev) => ({ ...prev, errorCount: prev.errorCount + 1 }));
+                  console.error(`❌ ${errorMsg}`);
                 }
-                return updated;
-              });
-              const zeroCounts = {
-                earningsPerShare: mergedData.filter((d) => d.earningsPerShare === 0 || d.earningsPerShare === null).length,
-                cashFlowPerShare: mergedData.filter((d) => d.cashFlowPerShare === 0 || d.cashFlowPerShare === null).length,
-                bookValuePerShare: mergedData.filter((d) => d.bookValuePerShare === 0 || d.bookValuePerShare === null).length,
-                dividendPerShare: mergedData.filter((d) => d.dividendPerShare === 0 || d.dividendPerShare === null).length
-              };
-              tickerResult.zeroData = {
-                earningsPerShare: zeroCounts.earningsPerShare,
-                cashFlowPerShare: zeroCounts.cashFlowPerShare,
-                bookValuePerShare: zeroCounts.bookValuePerShare,
-                dividendPerShare: zeroCounts.dividendPerShare,
-                reasons: {
-                  earningsPerShare: zeroCounts.earningsPerShare > 0 ? `${zeroCounts.earningsPerShare} années avec EPS à 0 (pertes ou données manquantes)` : "",
-                  cashFlowPerShare: zeroCounts.cashFlowPerShare > 0 ? `${zeroCounts.cashFlowPerShare} années avec CF à 0 (CF négatif ou données manquantes)` : "",
-                  bookValuePerShare: zeroCounts.bookValuePerShare > 0 ? `${zeroCounts.bookValuePerShare} années avec BV à 0 (BV négatif ou données manquantes)` : "",
-                  dividendPerShare: zeroCounts.dividendPerShare > 0 ? `${zeroCounts.dividendPerShare} années avec DIV à 0 (pas de dividende ou données manquantes)` : ""
-                }
-              };
-              const naFields = [];
-              const naReasons = {};
-              if (!tickerResult.currentPrice || tickerResult.currentPrice === 0) {
-                naFields.push("currentPrice");
-                naReasons.currentPrice = "Prix actuel non disponible dans FMP";
-              }
-              if (mergedData.length === 0) {
-                naFields.push("annualData");
-                naReasons.annualData = "Aucune donnée historique disponible";
-              }
-              if (!finalAssumptions.growthRateEPS && !finalAssumptions.growthRateCF) {
-                naFields.push("assumptions");
-                naReasons.assumptions = "Impossible de calculer assumptions (données insuffisantes)";
-              }
-              tickerResult.naData = {
-                fields: naFields,
-                reasons: naReasons
-              };
-              try {
-                const saveResult = await saveSnapshot(
-                  tickerSymbol,
-                  mergedData,
-                  finalAssumptions,
-                  updatedInfo,
-                  `Après synchronisation (${options.replaceOrangeData ? "avec remplacement données oranges" : "standard"}) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
-                  true,
-                  true
-                );
-                if (saveResult.success) {
-                  tickerResult.other.snapshotSaved = true;
-                } else {
-                  console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot après sync: ${saveResult.error}`);
-                }
-              } catch (saveError) {
-                console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot après sync: ${saveError.message}`);
-              }
-              successCount++;
-              tickerResult.success = true;
-              tickerResult.timeMs = Date.now() - tickerStartTime;
-              tickerResults.push(tickerResult);
-              setSyncStats((prev) => ({ ...prev, successCount: prev.successCount + 1 }));
-              console.log(`✅ ${tickerSymbol}: Synchronisé avec succès`);
-            } catch (error) {
+              })(),
+              new Promise(
+                (_, reject) => setTimeout(() => reject(new Error(`Timeout après ${TICKER_TIMEOUT_MS / 1e3}s`)), TICKER_TIMEOUT_MS)
+              )
+            ]).catch((timeoutError) => {
               errorCount++;
-              const errorMsg = `${tickerSymbol}: ${error.message || String(error)}`;
+              const errorMsg = `${tickerSymbol}: ${timeoutError.message || "Timeout"}`;
               errors.push(errorMsg);
-              tickerResult.success = false;
-              tickerResult.error = error.message || String(error);
-              tickerResult.timeMs = Date.now() - tickerStartTime;
+              const tickerResult = {
+                ticker: tickerSymbol,
+                success: false,
+                error: timeoutError.message || "Timeout",
+                timeMs: Date.now() - tickerStartTime,
+                dataRetrieved: { years: 0, dataPoints: 0, hasProfile: false, hasKeyMetrics: false, hasQuotes: false, hasFinancials: false },
+                outliers: { detected: [], excluded: { EPS: false, CF: false, BV: false, DIV: false }, reasons: {} },
+                orangeData: { wasReplaced: false },
+                currentPrice: 0,
+                zeroData: { earningsPerShare: 0, cashFlowPerShare: 0, bookValuePerShare: 0, dividendPerShare: 0, reasons: {} },
+                naData: { fields: [], reasons: {} },
+                other: { snapshotSaved: false, assumptionsUpdated: false, infoUpdated: false, valueLineMetricsSynced: false }
+              };
               tickerResults.push(tickerResult);
               setSyncStats((prev) => ({ ...prev, errorCount: prev.errorCount + 1 }));
-              console.error(`❌ ${errorMsg}`);
-            }
+              console.error(`⏱️ ${errorMsg}`);
+            });
           })
         );
       }
