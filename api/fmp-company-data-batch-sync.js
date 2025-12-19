@@ -133,7 +133,12 @@ export default async function handler(req, res) {
                                 allKeyMetrics[symbol].push(metric);
                             }
                         });
+                        console.log(`✅ Key metrics batch: ${batch.length} symboles, ${metrics.length} métriques récupérées`);
+                    } else {
+                        console.warn(`⚠️ Key metrics batch: réponse non-array pour ${batch.join(',')}`);
                     }
+                } else {
+                    console.warn(`⚠️ Key metrics batch échoué: ${metricsRes.status} pour ${batch.join(',')}`);
                 }
                 
                 // Délai entre batches
@@ -184,19 +189,35 @@ export default async function handler(req, res) {
             const quote = allQuotes[symbol];
 
             // Transformer les key metrics en format AnnualData
+            // FMP key-metrics utilise 'date' (format YYYY-MM-DD) pas 'calendarYear'
             const data = metrics
-                .sort((a, b) => (b.calendarYear || 0) - (a.calendarYear || 0))
+                .map(metric => {
+                    // Extraire l'année de la date
+                    let year = new Date().getFullYear();
+                    if (metric.date) {
+                        year = new Date(metric.date).getFullYear();
+                    } else if (metric.calendarYear) {
+                        year = metric.calendarYear;
+                    }
+                    return { ...metric, year };
+                })
+                .sort((a, b) => b.year - a.year)
                 .slice(0, 25) // Limiter à 25 années
                 .map(metric => ({
-                    year: metric.calendarYear || new Date().getFullYear() - (metrics.indexOf(metric)),
-                    earningsPerShare: metric.earningsPerShare || 0,
+                    year: metric.year,
+                    earningsPerShare: metric.earningsPerShare || metric.netIncomePerShare || 0,
                     cashFlowPerShare: metric.operatingCashFlowPerShare || 0,
                     bookValuePerShare: metric.bookValuePerShare || 0,
                     dividendPerShare: metric.dividendPerShare || 0,
-                    priceHigh: metric.priceToBookRatio ? (metric.bookValuePerShare * metric.priceToBookRatio) : 0,
-                    priceLow: 0, // Pas disponible dans key metrics
+                    priceHigh: metric.priceToBookRatio && metric.bookValuePerShare ? (metric.bookValuePerShare * metric.priceToBookRatio) : 0,
+                    priceLow: 0, // Pas disponible dans key metrics seul, nécessiterait historical prices
                     autoFetched: true
                 }));
+
+            // Debug: log si pas de données
+            if (data.length === 0 && metrics.length > 0) {
+                console.warn(`⚠️ ${symbol}: ${metrics.length} métriques mais 0 données transformées. Premier metric:`, metrics[0]);
+            }
 
             return {
                 symbol,
