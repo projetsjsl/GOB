@@ -146,38 +146,78 @@ async function createSnapshot(req, res, supabase) {
     }
 
     // Nettoyer annual_data : supprimer les champs non standard et valider les valeurs numériques
-    const cleanedAnnualData = Array.isArray(annual_data) 
-        ? annual_data.map(row => {
+    let cleanedAnnualData = [];
+    try {
+        if (Array.isArray(annual_data) && annual_data.length > 0) {
             // Fonction helper pour nettoyer les valeurs numériques
             const cleanNumber = (val) => {
-                if (val === null || val === undefined || isNaN(val) || !isFinite(val)) return 0;
-                return Number(val);
+                if (val === null || val === undefined) return 0;
+                const num = Number(val);
+                if (isNaN(num) || !isFinite(num)) return 0;
+                return num;
             };
             
-            // Garder seulement les champs standard de AnnualData avec validation
-            const cleaned = {
-                year: Number(row.year) || new Date().getFullYear(),
-                priceHigh: cleanNumber(row.priceHigh),
-                priceLow: cleanNumber(row.priceLow),
-                cashFlowPerShare: cleanNumber(row.cashFlowPerShare),
-                dividendPerShare: cleanNumber(row.dividendPerShare),
-                bookValuePerShare: cleanNumber(row.bookValuePerShare),
-                earningsPerShare: cleanNumber(row.earningsPerShare)
-            };
-            // Ajouter les champs optionnels seulement s'ils existent
-            if (row.isEstimate !== undefined) cleaned.isEstimate = Boolean(row.isEstimate);
-            if (row.autoFetched !== undefined) cleaned.autoFetched = Boolean(row.autoFetched);
-            // Note: dataSource est conservé car c'est un champ valide dans AnnualData
-            if (row.dataSource && ['fmp-verified', 'fmp-adjusted', 'manual', 'calculated'].includes(row.dataSource)) {
-                cleaned.dataSource = row.dataSource;
-            }
-            return cleaned;
-        })
-        : (Array.isArray(annual_data) ? [] : annual_data);
+            cleanedAnnualData = annual_data.map(row => {
+                if (!row || typeof row !== 'object') {
+                    // Si la ligne n'est pas un objet valide, retourner un objet minimal
+                    return {
+                        year: new Date().getFullYear(),
+                        priceHigh: 0,
+                        priceLow: 0,
+                        cashFlowPerShare: 0,
+                        dividendPerShare: 0,
+                        bookValuePerShare: 0,
+                        earningsPerShare: 0
+                    };
+                }
+                
+                // Garder seulement les champs standard de AnnualData avec validation
+                const cleaned = {
+                    year: Number(row.year) || new Date().getFullYear(),
+                    priceHigh: cleanNumber(row.priceHigh),
+                    priceLow: cleanNumber(row.priceLow),
+                    cashFlowPerShare: cleanNumber(row.cashFlowPerShare),
+                    dividendPerShare: cleanNumber(row.dividendPerShare),
+                    bookValuePerShare: cleanNumber(row.bookValuePerShare),
+                    earningsPerShare: cleanNumber(row.earningsPerShare)
+                };
+                // Ajouter les champs optionnels seulement s'ils existent
+                if (row.isEstimate !== undefined) cleaned.isEstimate = Boolean(row.isEstimate);
+                if (row.autoFetched !== undefined) cleaned.autoFetched = Boolean(row.autoFetched);
+                // Note: dataSource est conservé car c'est un champ valide dans AnnualData
+                if (row.dataSource && ['fmp-verified', 'fmp-adjusted', 'manual', 'calculated'].includes(row.dataSource)) {
+                    cleaned.dataSource = row.dataSource;
+                }
+                return cleaned;
+            });
+        } else if (Array.isArray(annual_data)) {
+            // Array vide
+            cleanedAnnualData = [];
+        } else {
+            // Si ce n'est pas un array, essayer de le convertir ou utiliser un array vide
+            console.warn(`⚠️ annual_data is not an array for ${cleanTicker}, using empty array`);
+            cleanedAnnualData = [];
+        }
+    } catch (cleanError) {
+        console.error(`❌ Error cleaning annual_data for ${cleanTicker}:`, cleanError);
+        cleanedAnnualData = [];
+    }
 
     // S'assurer que assumptions et company_info sont des objets valides
-    const cleanedAssumptions = assumptions && typeof assumptions === 'object' ? assumptions : {};
-    const cleanedCompanyInfo = company_info && typeof company_info === 'object' ? company_info : {};
+    let cleanedAssumptions = {};
+    let cleanedCompanyInfo = {};
+    try {
+        cleanedAssumptions = (assumptions && typeof assumptions === 'object' && !Array.isArray(assumptions)) 
+            ? assumptions 
+            : {};
+        cleanedCompanyInfo = (company_info && typeof company_info === 'object' && !Array.isArray(company_info)) 
+            ? company_info 
+            : {};
+    } catch (cleanError) {
+        console.error(`❌ Error cleaning assumptions/company_info for ${cleanTicker}:`, cleanError);
+        cleanedAssumptions = {};
+        cleanedCompanyInfo = {};
+    }
 
     // Create snapshot - Construire l'objet d'insertion de manière conditionnelle
     const insertData = {
@@ -197,6 +237,17 @@ async function createSnapshot(req, res, supabase) {
     // Ajouter sync_metadata seulement si fourni (colonne peut ne pas exister si migration non appliquée)
     if (sync_metadata !== null && sync_metadata !== undefined) {
         insertData.sync_metadata = sync_metadata;
+    }
+
+    // Log pour debug (seulement en développement)
+    if (process.env.NODE_ENV === 'development') {
+        console.log(`📝 Attempting to create snapshot for ${cleanTicker}:`, {
+            ticker: insertData.ticker,
+            annual_data_length: cleanedAnnualData.length,
+            has_assumptions: Object.keys(cleanedAssumptions).length > 0,
+            has_company_info: Object.keys(cleanedCompanyInfo).length > 0,
+            has_sync_metadata: !!insertData.sync_metadata
+        });
     }
 
     // Create snapshot
