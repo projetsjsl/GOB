@@ -4651,6 +4651,7 @@ export default function App() {
                 isOpen={showAdvancedSyncDialog}
                 ticker={isAdvancedSyncForBulk ? undefined : activeId}
                 hasManualData={hasManualEdits(data)}
+                totalTickers={isAdvancedSyncForBulk ? Object.keys(library).length : 1}
                 onCancel={() => setShowAdvancedSyncDialog(false)}
                 onConfirm={async (options) => {
                     setShowAdvancedSyncDialog(false);

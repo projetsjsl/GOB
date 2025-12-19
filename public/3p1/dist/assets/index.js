@@ -38185,6 +38185,98 @@ const ConfirmSyncDialog = ({
     ] })
   ] }) });
 };
+const OPTION_METADATA = {
+  saveBeforeSync: {
+    timePerTickerMs: 200,
+    timeDescription: "~200ms par ticker (sauvegarde snapshot)",
+    utility: "recommandé",
+    utilityDescription: "Permet de restaurer l'état précédent en cas d'erreur"
+  },
+  replaceOrangeData: {
+    timePerTickerMs: 0,
+    // Pas de temps supplémentaire, juste un flag
+    timeDescription: "Aucun temps supplémentaire",
+    utility: "optionnel",
+    utilityDescription: "Utile si vous voulez remplacer vos hypothèses manuelles par des calculs automatiques"
+  },
+  syncAllTickers: {
+    timePerTickerMs: 0,
+    // Pas de temps par ticker, c'est juste le scope
+    timeDescription: "Détermine le nombre de tickers à synchroniser",
+    utility: "essentiel",
+    utilityDescription: "Définit si on synchronise un ticker ou tous les tickers"
+  },
+  syncData: {
+    timePerTickerMs: 1500,
+    // Appel API FMP + traitement
+    timeDescription: "~1.5s par ticker (appel API FMP + traitement)",
+    utility: "essentiel",
+    utilityDescription: "Récupère les données financières historiques (EPS, CF, BV, DIV, prix) - Option la plus importante"
+  },
+  syncAssumptions: {
+    timePerTickerMs: 100,
+    // Calculs CAGR et moyennes
+    timeDescription: "~100ms par ticker (calculs CAGR et moyennes)",
+    utility: "essentiel",
+    utilityDescription: "Calcule automatiquement les taux de croissance et ratios cibles basés sur l'historique"
+  },
+  syncInfo: {
+    timePerTickerMs: 50,
+    // Mise à jour des infos de base
+    timeDescription: "~50ms par ticker (mise à jour infos)",
+    utility: "recommandé",
+    utilityDescription: "Met à jour le nom, secteur, description de l'entreprise"
+  },
+  forceReplace: {
+    timePerTickerMs: 0,
+    // Pas de temps supplémentaire, juste un flag
+    timeDescription: "Aucun temps supplémentaire",
+    utility: "avancé",
+    utilityDescription: "Force le remplacement même des données manuelles (utilisé avec précaution)"
+  },
+  syncOnlyNewYears: {
+    timePerTickerMs: -200,
+    // Économise du temps en évitant les mises à jour
+    timeDescription: "Économise ~200ms par ticker (évite mises à jour années existantes)",
+    utility: "recommandé",
+    utilityDescription: "Plus rapide et préserve vos modifications manuelles sur les années existantes"
+  },
+  syncOnlyMissingMetrics: {
+    timePerTickerMs: -100,
+    // Économise du temps en évitant les remplacements
+    timeDescription: "Économise ~100ms par ticker (évite remplacements valeurs existantes)",
+    utility: "recommandé",
+    utilityDescription: "Complète progressivement les données sans écraser ce qui existe"
+  },
+  preserveExclusions: {
+    timePerTickerMs: 0,
+    // Pas de temps supplémentaire
+    timeDescription: "Aucun temps supplémentaire",
+    utility: "recommandé",
+    utilityDescription: "Préserve vos choix d'exclusion de métriques aberrantes"
+  },
+  recalculateOutliers: {
+    timePerTickerMs: 150,
+    // Détection d'outliers
+    timeDescription: "~150ms par ticker (détection outliers)",
+    utility: "recommandé",
+    utilityDescription: "Détecte et exclut automatiquement les métriques aberrantes (améliore la qualité des données)"
+  },
+  updateCurrentPrice: {
+    timePerTickerMs: 50,
+    // Récupération prix actuel
+    timeDescription: "~50ms par ticker (récupération prix)",
+    utility: "recommandé",
+    utilityDescription: "Met à jour le prix actuel de l'action pour les calculs de valorisation"
+  },
+  syncValueLineMetrics: {
+    timePerTickerMs: 0,
+    // Utilise le cache, pas de temps supplémentaire
+    timeDescription: "Aucun temps supplémentaire (utilise cache)",
+    utility: "optionnel",
+    utilityDescription: "Synchronise les métriques ValueLine depuis Supabase (securityRank, earningsPredictability, etc.)"
+  }
+};
 const HelpSection = ({ id, title, children, showHelp, setShowHelp }) => {
   const isOpen = showHelp[id] || false;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2", children: [
@@ -38212,7 +38304,9 @@ const AdvancedSyncDialog = ({
   hasManualData = false,
   onCancel,
   onConfirm,
-  isSyncing = false
+  isSyncing = false,
+  totalTickers = 1010
+  // Par défaut, estimation pour 1010 tickers
 }) => {
   const [options, setOptions] = reactExports.useState({
     saveBeforeSync: true,
@@ -38231,6 +38325,39 @@ const AdvancedSyncDialog = ({
     syncValueLineMetrics: true
   });
   const [showHelp, setShowHelp] = reactExports.useState({});
+  const estimatedTime = reactExports.useMemo(() => {
+    const tickerCount = ticker2 ? 1 : options.syncAllTickers ? totalTickers : 1;
+    let totalMs = 0;
+    const baseTimePerTicker = 2e3;
+    totalMs += baseTimePerTicker * tickerCount;
+    Object.entries(options).forEach(([key, value]) => {
+      if (value && OPTION_METADATA[key]) {
+        const metadata = OPTION_METADATA[key];
+        totalMs += metadata.timePerTickerMs * tickerCount;
+      }
+    });
+    const batchSize = 20;
+    const batchCount = Math.ceil(tickerCount / batchSize);
+    const delayBetweenBatches = 2e3;
+    totalMs += (batchCount - 1) * delayBetweenBatches;
+    return {
+      totalMs,
+      totalSeconds: Math.round(totalMs / 1e3),
+      totalMinutes: Math.round(totalMs / 6e4 * 10) / 10,
+      // Arrondi à 1 décimale
+      perTickerMs: Math.round(totalMs / tickerCount)
+    };
+  }, [options, ticker2, totalTickers]);
+  const getUtilityBadge = (utility) => {
+    const badges = {
+      essentiel: { color: "bg-red-100 text-red-800 border-red-300", label: "Essentiel" },
+      recommandé: { color: "bg-blue-100 text-blue-800 border-blue-300", label: "Recommandé" },
+      optionnel: { color: "bg-gray-100 text-gray-800 border-gray-300", label: "Optionnel" },
+      avancé: { color: "bg-purple-100 text-purple-800 border-purple-300", label: "Avancé" }
+    };
+    const badge = badges[utility] || badges.optionnel;
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `px-2 py-0.5 rounded-full text-xs font-medium border ${badge.color}`, children: badge.label });
+  };
   if (!isOpen) return null;
   const isBulkSync = !ticker2;
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000] p-4 overflow-y-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-xl max-w-4xl w-full my-8", children: [
@@ -38241,11 +38368,26 @@ const AdvancedSyncDialog = ({
           /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900", children: "Options de Synchronisation Avancées" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 mt-1", children: isBulkSync ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
             "Synchronisation de ",
-            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "tous les tickers" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "tous les tickers" }),
+            " (",
+            totalTickers,
+            " tickers)"
           ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
             "Ticker: ",
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-mono font-semibold", children: ticker2 })
-          ] }) })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 flex items-center gap-2 text-xs", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-4 h-4 text-blue-600" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-600", children: [
+              "Temps estimé: ",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { className: "text-gray-900", children: estimatedTime.totalMinutes >= 1 ? `${estimatedTime.totalMinutes} min` : `${estimatedTime.totalSeconds} sec` }),
+              isBulkSync && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-500 ml-1", children: [
+                "(~",
+                Math.round(estimatedTime.perTickerMs),
+                "ms/ticker)"
+              ] })
+            ] })
+          ] })
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -38326,8 +38468,19 @@ const AdvancedSyncDialog = ({
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "💾 Sauvegarder la version actuelle avant synchronisation" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "💾 Sauvegarder la version actuelle avant synchronisation" }),
+              getUtilityBadge(OPTION_METADATA.saveBeforeSync.utility),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                OPTION_METADATA.saveBeforeSync.timeDescription
+              ] })
+            ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Crée un snapshot de sauvegarde avant de synchroniser. Recommandé pour pouvoir restaurer en cas de problème." }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
+              "💡 ",
+              OPTION_METADATA.saveBeforeSync.utilityDescription
+            ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               HelpSection,
               {
@@ -38369,10 +38522,21 @@ const AdvancedSyncDialog = ({
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-orange-900", children: "🟠 Remplacer les données oranges (assumptions manuelles)" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-orange-900", children: "🟠 Remplacer les données oranges (assumptions manuelles)" }),
+              getUtilityBadge(OPTION_METADATA.replaceOrangeData.utility),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                OPTION_METADATA.replaceOrangeData.timeDescription
+              ] })
+            ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-orange-700 mt-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Attention:" }),
               " Si coché, toutes les valeurs manuelles (taux de croissance, ratios cibles) seront recalculées et remplacées par les valeurs calculées depuis FMP. Cette action est irréversible."
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
+              "💡 ",
+              OPTION_METADATA.replaceOrangeData.utilityDescription
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               HelpSection,
@@ -38429,10 +38593,21 @@ const AdvancedSyncDialog = ({
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-red-900", children: "⚠️ Forcer le remplacement de TOUTES les données manuelles" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-red-900", children: "⚠️ Forcer le remplacement de TOUTES les données manuelles" }),
+              getUtilityBadge(OPTION_METADATA.forceReplace.utility),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                OPTION_METADATA.forceReplace.timeDescription
+              ] })
+            ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-red-700 mt-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Danger:" }),
               " Remplace également les données historiques manuelles (pas seulement les assumptions). Utilisez avec précaution."
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
+              "💡 ",
+              OPTION_METADATA.forceReplace.utilityDescription
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               HelpSection,
@@ -38562,8 +38737,19 @@ const AdvancedSyncDialog = ({
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🆕 Synchroniser uniquement les nouvelles années" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🆕 Synchroniser uniquement les nouvelles années" }),
+                  getUtilityBadge(OPTION_METADATA.syncOnlyNewYears.utility),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-green-600", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    OPTION_METADATA.syncOnlyNewYears.timeDescription
+                  ] })
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "N'ajoute que les années manquantes, ne modifie pas les années existantes" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
+                  "💡 ",
+                  OPTION_METADATA.syncOnlyNewYears.utilityDescription
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpSection,
                   {
@@ -38609,8 +38795,19 @@ const AdvancedSyncDialog = ({
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🔍 Synchroniser uniquement les métriques manquantes" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🔍 Synchroniser uniquement les métriques manquantes" }),
+                  getUtilityBadge(OPTION_METADATA.syncOnlyMissingMetrics.utility),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-green-600", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    OPTION_METADATA.syncOnlyMissingMetrics.timeDescription
+                  ] })
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Ne remplit que les champs vides (0 ou null), préserve les valeurs existantes" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
+                  "💡 ",
+                  OPTION_METADATA.syncOnlyMissingMetrics.utilityDescription
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpSection,
                   {
@@ -38656,8 +38853,19 @@ const AdvancedSyncDialog = ({
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🎯 Synchroniser les assumptions (hypothèses)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🎯 Synchroniser les assumptions (hypothèses)" }),
+                  getUtilityBadge(OPTION_METADATA.syncAssumptions.utility),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    OPTION_METADATA.syncAssumptions.timeDescription
+                  ] })
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Taux de croissance, ratios cibles, année de base, dividende actuel" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
+                  "💡 ",
+                  OPTION_METADATA.syncAssumptions.utilityDescription
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpSection,
                   {
@@ -38723,8 +38931,19 @@ const AdvancedSyncDialog = ({
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🚫 Préserver les exclusions de métriques" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🚫 Préserver les exclusions de métriques" }),
+                  getUtilityBadge(OPTION_METADATA.preserveExclusions.utility),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    OPTION_METADATA.preserveExclusions.timeDescription
+                  ] })
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Maintient les checkboxes d'exclusion (EPS, CF, BV, DIV) même après recalcul" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
+                  "💡 ",
+                  OPTION_METADATA.preserveExclusions.utilityDescription
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpSection,
                   {
@@ -38774,8 +38993,19 @@ const AdvancedSyncDialog = ({
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "📊 Recalculer la détection d'outliers" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "📊 Recalculer la détection d'outliers" }),
+                  getUtilityBadge(OPTION_METADATA.recalculateOutliers.utility),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    OPTION_METADATA.recalculateOutliers.timeDescription
+                  ] })
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Identifie automatiquement les métriques qui produisent des prix cibles aberrants" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
+                  "💡 ",
+                  OPTION_METADATA.recalculateOutliers.utilityDescription
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpSection,
                   {
@@ -38836,8 +39066,19 @@ const AdvancedSyncDialog = ({
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "💰 Mettre à jour le prix actuel" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "💰 Mettre à jour le prix actuel" }),
+                  getUtilityBadge(OPTION_METADATA.updateCurrentPrice.utility),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    OPTION_METADATA.updateCurrentPrice.timeDescription
+                  ] })
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Met à jour le prix actuel depuis FMP (toujours activé par défaut)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
+                  "💡 ",
+                  OPTION_METADATA.updateCurrentPrice.utilityDescription
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpSection,
                   {
@@ -38887,8 +39128,19 @@ const AdvancedSyncDialog = ({
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "ℹ️ Synchroniser les informations de profil" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "ℹ️ Synchroniser les informations de profil" }),
+                  getUtilityBadge(OPTION_METADATA.syncInfo.utility),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    OPTION_METADATA.syncInfo.timeDescription
+                  ] })
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Nom de l'entreprise, secteur, logo, beta, capitalisation boursière" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
+                  "💡 ",
+                  OPTION_METADATA.syncInfo.utilityDescription
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpSection,
                   {
@@ -38954,8 +39206,19 @@ const AdvancedSyncDialog = ({
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "⭐ Synchroniser les métriques ValueLine depuis Supabase" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "⭐ Synchroniser les métriques ValueLine depuis Supabase" }),
+                  getUtilityBadge(OPTION_METADATA.syncValueLineMetrics.utility),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    OPTION_METADATA.syncValueLineMetrics.timeDescription
+                  ] })
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Recharge Security Rank, Earnings Predictability, etc. depuis la base de données" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
+                  "💡 ",
+                  OPTION_METADATA.syncValueLineMetrics.utilityDescription
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpSection,
                   {
@@ -39343,6 +39606,37 @@ const SyncReportDialog = ({
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500", children: "Outliers Détectés" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xl font-bold text-gray-900", children: reportData.globalStats.totalOutliersDetected })
         ] })
+      ] }),
+      reportData.options && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-gray-600" }),
+          "Options de Synchronisation Utilisées"
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3", children: Object.entries(reportData.options).map(([key, value]) => {
+          if (!value || key === "syncAllTickers") return null;
+          const metadata = OPTION_METADATA[key];
+          if (!metadata) return null;
+          const getUtilityColor = (utility) => {
+            const colors = {
+              essentiel: "bg-red-100 text-red-800 border-red-300",
+              recommandé: "bg-blue-100 text-blue-800 border-blue-300",
+              optionnel: "bg-gray-100 text-gray-800 border-gray-300",
+              avancé: "bg-purple-100 text-purple-800 border-purple-300"
+            };
+            return colors[utility] || colors.optionnel;
+          };
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 rounded border border-gray-200", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-medium text-gray-700 capitalize", children: key.replace(/([A-Z])/g, " $1").trim() }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `px-2 py-0.5 rounded-full text-xs font-medium border ${getUtilityColor(metadata.utility)}`, children: metadata.utility })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+              metadata.timeDescription
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1 italic", children: metadata.utilityDescription })
+          ] }, key);
+        }) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-6 grid grid-cols-1 md:grid-cols-2 gap-6", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg border border-gray-200", children: [
@@ -58822,6 +59116,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
         isOpen: showAdvancedSyncDialog,
         ticker: isAdvancedSyncForBulk ? void 0 : activeId,
         hasManualData: hasManualEdits(data),
+        totalTickers: isAdvancedSyncForBulk ? Object.keys(library).length : 1,
         onCancel: () => setShowAdvancedSyncDialog(false),
         onConfirm: async (options) => {
           setShowAdvancedSyncDialog(false);

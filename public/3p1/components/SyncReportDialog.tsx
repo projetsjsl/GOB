@@ -18,6 +18,7 @@ import {
     ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { OPTION_METADATA, SyncOptions } from './AdvancedSyncDialog';
 
 export interface TickerSyncResult {
     ticker: string;
@@ -349,6 +350,53 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
                             </div>
                         </div>
                     </div>
+
+                    {/* ✅ Section Options Utilisées avec Temps et Utilité */}
+                    {reportData.options && (
+                        <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                <InformationCircleIcon className="w-5 h-5 text-gray-600" />
+                                Options de Synchronisation Utilisées
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {Object.entries(reportData.options as SyncOptions).map(([key, value]) => {
+                                    if (!value || key === 'syncAllTickers') return null; // Ignorer les options désactivées et syncAllTickers
+                                    const metadata = OPTION_METADATA[key as keyof SyncOptions];
+                                    if (!metadata) return null;
+                                    
+                                    const getUtilityColor = (utility: string) => {
+                                        const colors = {
+                                            essentiel: 'bg-red-100 text-red-800 border-red-300',
+                                            recommandé: 'bg-blue-100 text-blue-800 border-blue-300',
+                                            optionnel: 'bg-gray-100 text-gray-800 border-gray-300',
+                                            avancé: 'bg-purple-100 text-purple-800 border-purple-300'
+                                        };
+                                        return colors[utility as keyof typeof colors] || colors.optionnel;
+                                    };
+                                    
+                                    return (
+                                        <div key={key} className="bg-white p-3 rounded border border-gray-200">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className="text-xs font-medium text-gray-700 capitalize">
+                                                    {key.replace(/([A-Z])/g, ' $1').trim()}
+                                                </span>
+                                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getUtilityColor(metadata.utility)}`}>
+                                                    {metadata.utility}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-1 text-xs text-gray-500">
+                                                <ClockIcon className="w-3 h-3" />
+                                                {metadata.timeDescription}
+                                            </div>
+                                            <p className="text-xs text-gray-600 mt-1 italic">
+                                                {metadata.utilityDescription}
+                                            </p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Graphiques */}
                     <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">

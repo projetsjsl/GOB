@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { XMarkIcon, ArrowPathIcon, ExclamationTriangleIcon, CheckCircleIcon, InformationCircleIcon, QuestionMarkCircleIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import React, { useState, useMemo } from 'react';
+import { XMarkIcon, ArrowPathIcon, ExclamationTriangleIcon, CheckCircleIcon, InformationCircleIcon, QuestionMarkCircleIcon, ChevronDownIcon, ChevronUpIcon, ClockIcon } from '@heroicons/react/24/outline';
 
 interface AdvancedSyncDialogProps {
     isOpen: boolean;
@@ -8,6 +8,7 @@ interface AdvancedSyncDialogProps {
     onCancel: () => void;
     onConfirm: (options: SyncOptions) => void;
     isSyncing?: boolean;
+    totalTickers?: number; // Nombre total de tickers pour estimation du temps
 }
 
 export interface SyncOptions {
@@ -25,6 +26,95 @@ export interface SyncOptions {
     updateCurrentPrice: boolean; // Mettre à jour le prix actuel
     syncValueLineMetrics: boolean; // Synchroniser les métriques ValueLine depuis Supabase
 }
+
+// Métadonnées pour chaque option : temps approximatif et utilité
+interface OptionMetadata {
+    timePerTickerMs: number; // Temps approximatif par ticker en millisecondes
+    timeDescription: string; // Description du temps
+    utility: 'essentiel' | 'recommandé' | 'optionnel' | 'avancé'; // Utilité de l'option
+    utilityDescription: string; // Description de l'utilité
+}
+
+export const OPTION_METADATA: Record<keyof SyncOptions, OptionMetadata> = {
+    saveBeforeSync: {
+        timePerTickerMs: 200,
+        timeDescription: '~200ms par ticker (sauvegarde snapshot)',
+        utility: 'recommandé',
+        utilityDescription: 'Permet de restaurer l\'état précédent en cas d\'erreur'
+    },
+    replaceOrangeData: {
+        timePerTickerMs: 0, // Pas de temps supplémentaire, juste un flag
+        timeDescription: 'Aucun temps supplémentaire',
+        utility: 'optionnel',
+        utilityDescription: 'Utile si vous voulez remplacer vos hypothèses manuelles par des calculs automatiques'
+    },
+    syncAllTickers: {
+        timePerTickerMs: 0, // Pas de temps par ticker, c'est juste le scope
+        timeDescription: 'Détermine le nombre de tickers à synchroniser',
+        utility: 'essentiel',
+        utilityDescription: 'Définit si on synchronise un ticker ou tous les tickers'
+    },
+    syncData: {
+        timePerTickerMs: 1500, // Appel API FMP + traitement
+        timeDescription: '~1.5s par ticker (appel API FMP + traitement)',
+        utility: 'essentiel',
+        utilityDescription: 'Récupère les données financières historiques (EPS, CF, BV, DIV, prix) - Option la plus importante'
+    },
+    syncAssumptions: {
+        timePerTickerMs: 100, // Calculs CAGR et moyennes
+        timeDescription: '~100ms par ticker (calculs CAGR et moyennes)',
+        utility: 'essentiel',
+        utilityDescription: 'Calcule automatiquement les taux de croissance et ratios cibles basés sur l\'historique'
+    },
+    syncInfo: {
+        timePerTickerMs: 50, // Mise à jour des infos de base
+        timeDescription: '~50ms par ticker (mise à jour infos)',
+        utility: 'recommandé',
+        utilityDescription: 'Met à jour le nom, secteur, description de l\'entreprise'
+    },
+    forceReplace: {
+        timePerTickerMs: 0, // Pas de temps supplémentaire, juste un flag
+        timeDescription: 'Aucun temps supplémentaire',
+        utility: 'avancé',
+        utilityDescription: 'Force le remplacement même des données manuelles (utilisé avec précaution)'
+    },
+    syncOnlyNewYears: {
+        timePerTickerMs: -200, // Économise du temps en évitant les mises à jour
+        timeDescription: 'Économise ~200ms par ticker (évite mises à jour années existantes)',
+        utility: 'recommandé',
+        utilityDescription: 'Plus rapide et préserve vos modifications manuelles sur les années existantes'
+    },
+    syncOnlyMissingMetrics: {
+        timePerTickerMs: -100, // Économise du temps en évitant les remplacements
+        timeDescription: 'Économise ~100ms par ticker (évite remplacements valeurs existantes)',
+        utility: 'recommandé',
+        utilityDescription: 'Complète progressivement les données sans écraser ce qui existe'
+    },
+    preserveExclusions: {
+        timePerTickerMs: 0, // Pas de temps supplémentaire
+        timeDescription: 'Aucun temps supplémentaire',
+        utility: 'recommandé',
+        utilityDescription: 'Préserve vos choix d\'exclusion de métriques aberrantes'
+    },
+    recalculateOutliers: {
+        timePerTickerMs: 150, // Détection d'outliers
+        timeDescription: '~150ms par ticker (détection outliers)',
+        utility: 'recommandé',
+        utilityDescription: 'Détecte et exclut automatiquement les métriques aberrantes (améliore la qualité des données)'
+    },
+    updateCurrentPrice: {
+        timePerTickerMs: 50, // Récupération prix actuel
+        timeDescription: '~50ms par ticker (récupération prix)',
+        utility: 'recommandé',
+        utilityDescription: 'Met à jour le prix actuel de l\'action pour les calculs de valorisation'
+    },
+    syncValueLineMetrics: {
+        timePerTickerMs: 0, // Utilise le cache, pas de temps supplémentaire
+        timeDescription: 'Aucun temps supplémentaire (utilise cache)',
+        utility: 'optionnel',
+        utilityDescription: 'Synchronise les métriques ValueLine depuis Supabase (securityRank, earningsPredictability, etc.)'
+    }
+};
 
 // Composant d'aide pour chaque option
 const HelpSection: React.FC<{ 
@@ -61,7 +151,8 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
     hasManualData = false,
     onCancel,
     onConfirm,
-    isSyncing = false
+    isSyncing = false,
+    totalTickers = 1010 // Par défaut, estimation pour 1010 tickers
 }) => {
     const [options, setOptions] = useState<SyncOptions>({
         saveBeforeSync: true,
@@ -80,6 +171,53 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
     });
 
     const [showHelp, setShowHelp] = useState<{ [key: string]: boolean }>({});
+
+    // ✅ Calcul du temps estimé basé sur les options sélectionnées
+    const estimatedTime = useMemo(() => {
+        const tickerCount = ticker ? 1 : (options.syncAllTickers ? totalTickers : 1);
+        let totalMs = 0;
+        
+        // Temps de base (batch API + traitement)
+        const baseTimePerTicker = 2000; // 2s par ticker (batch API + délais)
+        totalMs += baseTimePerTicker * tickerCount;
+        
+        // Ajouter/soustraire le temps de chaque option activée
+        Object.entries(options).forEach(([key, value]) => {
+            if (value && OPTION_METADATA[key as keyof SyncOptions]) {
+                const metadata = OPTION_METADATA[key as keyof SyncOptions];
+                totalMs += metadata.timePerTickerMs * tickerCount;
+            }
+        });
+        
+        // Temps de batch (délai entre batches)
+        const batchSize = 20;
+        const batchCount = Math.ceil(tickerCount / batchSize);
+        const delayBetweenBatches = 2000; // 2 secondes entre batches
+        totalMs += (batchCount - 1) * delayBetweenBatches;
+        
+        return {
+            totalMs,
+            totalSeconds: Math.round(totalMs / 1000),
+            totalMinutes: Math.round(totalMs / 60000 * 10) / 10, // Arrondi à 1 décimale
+            perTickerMs: Math.round(totalMs / tickerCount)
+        };
+    }, [options, ticker, totalTickers]);
+
+    // ✅ Fonction helper pour obtenir le badge d'utilité
+    const getUtilityBadge = (utility: string) => {
+        const badges = {
+            essentiel: { color: 'bg-red-100 text-red-800 border-red-300', label: 'Essentiel' },
+            recommandé: { color: 'bg-blue-100 text-blue-800 border-blue-300', label: 'Recommandé' },
+            optionnel: { color: 'bg-gray-100 text-gray-800 border-gray-300', label: 'Optionnel' },
+            avancé: { color: 'bg-purple-100 text-purple-800 border-purple-300', label: 'Avancé' }
+        };
+        const badge = badges[utility as keyof typeof badges] || badges.optionnel;
+        return (
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${badge.color}`}>
+                {badge.label}
+            </span>
+        );
+    };
 
     if (!isOpen) return null;
 
@@ -100,11 +238,27 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                             </h3>
                             <p className="text-sm text-gray-500 mt-1">
                                 {isBulkSync ? (
-                                    <>Synchronisation de <strong>tous les tickers</strong></>
+                                    <>Synchronisation de <strong>tous les tickers</strong> ({totalTickers} tickers)</>
                                 ) : (
                                     <>Ticker: <span className="font-mono font-semibold">{ticker}</span></>
                                 )}
                             </p>
+                            {/* ✅ Temps estimé */}
+                            <div className="mt-2 flex items-center gap-2 text-xs">
+                                <ClockIcon className="w-4 h-4 text-blue-600" />
+                                <span className="text-gray-600">
+                                    Temps estimé: <strong className="text-gray-900">
+                                        {estimatedTime.totalMinutes >= 1 
+                                            ? `${estimatedTime.totalMinutes} min` 
+                                            : `${estimatedTime.totalSeconds} sec`}
+                                    </strong>
+                                    {isBulkSync && (
+                                        <span className="text-gray-500 ml-1">
+                                            (~{Math.round(estimatedTime.perTickerMs)}ms/ticker)
+                                        </span>
+                                    )}
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <button
@@ -179,11 +333,21 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                                     className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                                 />
                                 <div className="flex-1">
-                                    <p className="text-sm font-medium text-gray-900">
-                                        💾 Sauvegarder la version actuelle avant synchronisation
-                                    </p>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <p className="text-sm font-medium text-gray-900">
+                                            💾 Sauvegarder la version actuelle avant synchronisation
+                                        </p>
+                                        {getUtilityBadge(OPTION_METADATA.saveBeforeSync.utility)}
+                                        <span className="flex items-center gap-1 text-xs text-gray-500">
+                                            <ClockIcon className="w-3 h-3" />
+                                            {OPTION_METADATA.saveBeforeSync.timeDescription}
+                                        </span>
+                                    </div>
                                     <p className="text-xs text-gray-600 mt-1">
                                         Crée un snapshot de sauvegarde avant de synchroniser. Recommandé pour pouvoir restaurer en cas de problème.
+                                    </p>
+                                    <p className="text-xs text-blue-700 mt-1 italic">
+                                        💡 {OPTION_METADATA.saveBeforeSync.utilityDescription}
                                     </p>
                                     <HelpSection 
                                         id="saveBeforeSync" 
@@ -213,11 +377,21 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                                     className="mt-1 w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-2 focus:ring-orange-500"
                                 />
                                 <div className="flex-1">
-                                    <p className="text-sm font-medium text-orange-900">
-                                        🟠 Remplacer les données oranges (assumptions manuelles)
-                                    </p>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <p className="text-sm font-medium text-orange-900">
+                                            🟠 Remplacer les données oranges (assumptions manuelles)
+                                        </p>
+                                        {getUtilityBadge(OPTION_METADATA.replaceOrangeData.utility)}
+                                        <span className="flex items-center gap-1 text-xs text-gray-500">
+                                            <ClockIcon className="w-3 h-3" />
+                                            {OPTION_METADATA.replaceOrangeData.timeDescription}
+                                        </span>
+                                    </div>
                                     <p className="text-xs text-orange-700 mt-1">
                                         <strong>Attention:</strong> Si coché, toutes les valeurs manuelles (taux de croissance, ratios cibles) seront recalculées et remplacées par les valeurs calculées depuis FMP. Cette action est irréversible.
+                                    </p>
+                                    <p className="text-xs text-blue-700 mt-1 italic">
+                                        💡 {OPTION_METADATA.replaceOrangeData.utilityDescription}
                                     </p>
                                     <HelpSection 
                                         id="replaceOrangeData" 
@@ -255,11 +429,21 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                                         className="mt-1 w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-2 focus:ring-red-500"
                                     />
                                     <div className="flex-1">
-                                        <p className="text-sm font-medium text-red-900">
-                                            ⚠️ Forcer le remplacement de TOUTES les données manuelles
-                                        </p>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <p className="text-sm font-medium text-red-900">
+                                                ⚠️ Forcer le remplacement de TOUTES les données manuelles
+                                            </p>
+                                            {getUtilityBadge(OPTION_METADATA.forceReplace.utility)}
+                                            <span className="flex items-center gap-1 text-xs text-gray-500">
+                                                <ClockIcon className="w-3 h-3" />
+                                                {OPTION_METADATA.forceReplace.timeDescription}
+                                            </span>
+                                        </div>
                                         <p className="text-xs text-red-700 mt-1">
                                             <strong>Danger:</strong> Remplace également les données historiques manuelles (pas seulement les assumptions). Utilisez avec précaution.
+                                        </p>
+                                        <p className="text-xs text-blue-700 mt-1 italic">
+                                            💡 {OPTION_METADATA.forceReplace.utilityDescription}
                                         </p>
                                         <HelpSection 
                                             id="forceReplace" 
@@ -348,11 +532,21 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                                                 className="mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
                                             />
                                             <div className="flex-1">
-                                                <p className="text-sm font-medium text-gray-900">
-                                                    🆕 Synchroniser uniquement les nouvelles années
-                                                </p>
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <p className="text-sm font-medium text-gray-900">
+                                                        🆕 Synchroniser uniquement les nouvelles années
+                                                    </p>
+                                                    {getUtilityBadge(OPTION_METADATA.syncOnlyNewYears.utility)}
+                                                    <span className="flex items-center gap-1 text-xs text-green-600">
+                                                        <ClockIcon className="w-3 h-3" />
+                                                        {OPTION_METADATA.syncOnlyNewYears.timeDescription}
+                                                    </span>
+                                                </div>
                                                 <p className="text-xs text-gray-600 mt-1">
                                                     N'ajoute que les années manquantes, ne modifie pas les années existantes
+                                                </p>
+                                                <p className="text-xs text-blue-700 mt-1 italic">
+                                                    💡 {OPTION_METADATA.syncOnlyNewYears.utilityDescription}
                                                 </p>
                                                 <HelpSection 
                                                     id="syncOnlyNewYears" 
@@ -390,11 +584,21 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                                                 className="mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
                                             />
                                             <div className="flex-1">
-                                                <p className="text-sm font-medium text-gray-900">
-                                                    🔍 Synchroniser uniquement les métriques manquantes
-                                                </p>
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <p className="text-sm font-medium text-gray-900">
+                                                        🔍 Synchroniser uniquement les métriques manquantes
+                                                    </p>
+                                                    {getUtilityBadge(OPTION_METADATA.syncOnlyMissingMetrics.utility)}
+                                                    <span className="flex items-center gap-1 text-xs text-green-600">
+                                                        <ClockIcon className="w-3 h-3" />
+                                                        {OPTION_METADATA.syncOnlyMissingMetrics.timeDescription}
+                                                    </span>
+                                                </div>
                                                 <p className="text-xs text-gray-600 mt-1">
                                                     Ne remplit que les champs vides (0 ou null), préserve les valeurs existantes
+                                                </p>
+                                                <p className="text-xs text-blue-700 mt-1 italic">
+                                                    💡 {OPTION_METADATA.syncOnlyMissingMetrics.utilityDescription}
                                                 </p>
                                                 <HelpSection 
                                                     id="syncOnlyMissingMetrics" 
@@ -431,11 +635,21 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                                             className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                                         />
                                         <div className="flex-1">
-                                            <p className="text-sm font-medium text-gray-900">
-                                                🎯 Synchroniser les assumptions (hypothèses)
-                                            </p>
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <p className="text-sm font-medium text-gray-900">
+                                                    🎯 Synchroniser les assumptions (hypothèses)
+                                                </p>
+                                                {getUtilityBadge(OPTION_METADATA.syncAssumptions.utility)}
+                                                <span className="flex items-center gap-1 text-xs text-gray-500">
+                                                    <ClockIcon className="w-3 h-3" />
+                                                    {OPTION_METADATA.syncAssumptions.timeDescription}
+                                                </span>
+                                            </div>
                                             <p className="text-xs text-gray-600 mt-1">
                                                 Taux de croissance, ratios cibles, année de base, dividende actuel
+                                            </p>
+                                            <p className="text-xs text-blue-700 mt-1 italic">
+                                                💡 {OPTION_METADATA.syncAssumptions.utilityDescription}
                                             </p>
                                             <HelpSection 
                                                 id="syncAssumptions" 
@@ -478,11 +692,21 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                                                 className="mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
                                             />
                                             <div className="flex-1">
-                                                <p className="text-sm font-medium text-gray-900">
-                                                    🚫 Préserver les exclusions de métriques
-                                                </p>
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <p className="text-sm font-medium text-gray-900">
+                                                        🚫 Préserver les exclusions de métriques
+                                                    </p>
+                                                    {getUtilityBadge(OPTION_METADATA.preserveExclusions.utility)}
+                                                    <span className="flex items-center gap-1 text-xs text-gray-500">
+                                                        <ClockIcon className="w-3 h-3" />
+                                                        {OPTION_METADATA.preserveExclusions.timeDescription}
+                                                    </span>
+                                                </div>
                                                 <p className="text-xs text-gray-600 mt-1">
                                                     Maintient les checkboxes d'exclusion (EPS, CF, BV, DIV) même après recalcul
+                                                </p>
+                                                <p className="text-xs text-blue-700 mt-1 italic">
+                                                    💡 {OPTION_METADATA.preserveExclusions.utilityDescription}
                                                 </p>
                                                 <HelpSection 
                                                     id="preserveExclusions" 
@@ -520,11 +744,21 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                                                 className="mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
                                             />
                                             <div className="flex-1">
-                                                <p className="text-sm font-medium text-gray-900">
-                                                    📊 Recalculer la détection d'outliers
-                                                </p>
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <p className="text-sm font-medium text-gray-900">
+                                                        📊 Recalculer la détection d'outliers
+                                                    </p>
+                                                    {getUtilityBadge(OPTION_METADATA.recalculateOutliers.utility)}
+                                                    <span className="flex items-center gap-1 text-xs text-gray-500">
+                                                        <ClockIcon className="w-3 h-3" />
+                                                        {OPTION_METADATA.recalculateOutliers.timeDescription}
+                                                    </span>
+                                                </div>
                                                 <p className="text-xs text-gray-600 mt-1">
                                                     Identifie automatiquement les métriques qui produisent des prix cibles aberrants
+                                                </p>
+                                                <p className="text-xs text-blue-700 mt-1 italic">
+                                                    💡 {OPTION_METADATA.recalculateOutliers.utilityDescription}
                                                 </p>
                                                 <HelpSection 
                                                     id="recalculateOutliers" 
@@ -568,11 +802,21 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                                             className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                                         />
                                         <div className="flex-1">
-                                            <p className="text-sm font-medium text-gray-900">
-                                                💰 Mettre à jour le prix actuel
-                                            </p>
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <p className="text-sm font-medium text-gray-900">
+                                                    💰 Mettre à jour le prix actuel
+                                                </p>
+                                                {getUtilityBadge(OPTION_METADATA.updateCurrentPrice.utility)}
+                                                <span className="flex items-center gap-1 text-xs text-gray-500">
+                                                    <ClockIcon className="w-3 h-3" />
+                                                    {OPTION_METADATA.updateCurrentPrice.timeDescription}
+                                                </span>
+                                            </div>
                                             <p className="text-xs text-gray-600 mt-1">
                                                 Met à jour le prix actuel depuis FMP (toujours activé par défaut)
+                                            </p>
+                                            <p className="text-xs text-blue-700 mt-1 italic">
+                                                💡 {OPTION_METADATA.updateCurrentPrice.utilityDescription}
                                             </p>
                                             <HelpSection 
                                                 id="updateCurrentPrice" 
@@ -608,11 +852,21 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                                             className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                                         />
                                         <div className="flex-1">
-                                            <p className="text-sm font-medium text-gray-900">
-                                                ℹ️ Synchroniser les informations de profil
-                                            </p>
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <p className="text-sm font-medium text-gray-900">
+                                                    ℹ️ Synchroniser les informations de profil
+                                                </p>
+                                                {getUtilityBadge(OPTION_METADATA.syncInfo.utility)}
+                                                <span className="flex items-center gap-1 text-xs text-gray-500">
+                                                    <ClockIcon className="w-3 h-3" />
+                                                    {OPTION_METADATA.syncInfo.timeDescription}
+                                                </span>
+                                            </div>
                                             <p className="text-xs text-gray-600 mt-1">
                                                 Nom de l'entreprise, secteur, logo, beta, capitalisation boursière
+                                            </p>
+                                            <p className="text-xs text-blue-700 mt-1 italic">
+                                                💡 {OPTION_METADATA.syncInfo.utilityDescription}
                                             </p>
                                             <HelpSection 
                                                 id="syncInfo" 
@@ -651,11 +905,21 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                                                 className="mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
                                             />
                                             <div className="flex-1">
-                                                <p className="text-sm font-medium text-gray-900">
-                                                    ⭐ Synchroniser les métriques ValueLine depuis Supabase
-                                                </p>
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <p className="text-sm font-medium text-gray-900">
+                                                        ⭐ Synchroniser les métriques ValueLine depuis Supabase
+                                                    </p>
+                                                    {getUtilityBadge(OPTION_METADATA.syncValueLineMetrics.utility)}
+                                                    <span className="flex items-center gap-1 text-xs text-gray-500">
+                                                        <ClockIcon className="w-3 h-3" />
+                                                        {OPTION_METADATA.syncValueLineMetrics.timeDescription}
+                                                    </span>
+                                                </div>
                                                 <p className="text-xs text-gray-600 mt-1">
                                                     Recharge Security Rank, Earnings Predictability, etc. depuis la base de données
+                                                </p>
+                                                <p className="text-xs text-blue-700 mt-1 italic">
+                                                    💡 {OPTION_METADATA.syncValueLineMetrics.utilityDescription}
                                                 </p>
                                                 <HelpSection 
                                                     id="syncValueLineMetrics" 
