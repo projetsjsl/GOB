@@ -110,12 +110,17 @@ export default async function handler(req, res) {
 
         // 2. Récupérer les key metrics en batch (seulement pour les symboles qui ont un profile)
         const validSymbols = Object.keys(allProfiles);
+        console.log(`📊 ${validSymbols.length} symboles avec profile valide`);
+        
         const keyMetricsBatches = [];
         for (let i = 0; i < validSymbols.length; i += KEY_METRICS_BATCH_SIZE) {
             keyMetricsBatches.push(validSymbols.slice(i, i + KEY_METRICS_BATCH_SIZE));
         }
 
         const allKeyMetrics = {};
+        let keyMetricsSuccessCount = 0;
+        let keyMetricsEmptyCount = 0;
+        
         for (const batch of keyMetricsBatches) {
             try {
                 const symbolString = batch.join(',');
@@ -124,21 +129,62 @@ export default async function handler(req, res) {
                 if (metricsRes.ok) {
                     const metrics = await metricsRes.json();
                     if (Array.isArray(metrics)) {
+                        // Grouper les métriques par symbole
+                        const metricsBySymbol = {};
                         metrics.forEach(metric => {
                             if (metric && metric.symbol) {
                                 const symbol = metric.symbol.toUpperCase();
-                                if (!allKeyMetrics[symbol]) {
-                                    allKeyMetrics[symbol] = [];
+                                if (!metricsBySymbol[symbol]) {
+                                    metricsBySymbol[symbol] = [];
                                 }
-                                allKeyMetrics[symbol].push(metric);
+                                metricsBySymbol[symbol].push(metric);
                             }
                         });
-                        console.log(`✅ Key metrics batch: ${batch.length} symboles, ${metrics.length} métriques récupérées`);
+                        
+                        // Ajouter au résultat global
+                        Object.keys(metricsBySymbol).forEach(symbol => {
+                            allKeyMetrics[symbol] = metricsBySymbol[symbol];
+                            keyMetricsSuccessCount++;
+                        });
+                        
+                        // Compter les symboles sans métriques
+                        batch.forEach(symbol => {
+                            if (!metricsBySymbol[symbol.toUpperCase()]) {
+                                keyMetricsEmptyCount++;
+                                console.warn(`⚠️ ${symbol}: Profile trouvé mais aucune key metric disponible`);
+                            }
+                        });
+                        
+                        console.log(`✅ Key metrics batch: ${batch.length} symboles, ${metrics.length} métriques récupérées (${Object.keys(metricsBySymbol).length} symboles avec données)`);
                     } else {
-                        console.warn(`⚠️ Key metrics batch: réponse non-array pour ${batch.join(',')}`);
+                        console.warn(`⚠️ Key metrics batch: réponse non-array pour ${batch.join(',')} (status: ${metricsRes.status})`);
+                        // Si la réponse n'est pas un array, tous les symboles du batch n'ont pas de métriques
+                        keyMetricsEmptyCount += batch.length;
+                    }
+                } else if (metricsRes.status === 429) {
+                    // Rate limiting - attendre et réessayer
+                    console.warn(`⏳ Rate limit détecté pour key metrics batch, attente 3s...`);
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    // Réessayer une fois
+                    const retryRes = await fetch(`${FMP_BASE}/key-metrics/${symbolString}?period=annual&limit=30&apikey=${FMP_KEY}`);
+                    if (retryRes.ok) {
+                        const metrics = await retryRes.json();
+                        if (Array.isArray(metrics)) {
+                            metrics.forEach(metric => {
+                                if (metric && metric.symbol) {
+                                    const symbol = metric.symbol.toUpperCase();
+                                    if (!allKeyMetrics[symbol]) {
+                                        allKeyMetrics[symbol] = [];
+                                    }
+                                    allKeyMetrics[symbol].push(metric);
+                                    keyMetricsSuccessCount++;
+                                }
+                            });
+                        }
                     }
                 } else {
                     console.warn(`⚠️ Key metrics batch échoué: ${metricsRes.status} pour ${batch.join(',')}`);
+                    keyMetricsEmptyCount += batch.length;
                 }
                 
                 // Délai entre batches (ultra-sécurisé: 1.5s)
@@ -147,8 +193,11 @@ export default async function handler(req, res) {
                 }
             } catch (error) {
                 console.error(`❌ Erreur batch key metrics:`, error.message);
+                keyMetricsEmptyCount += batch.length;
             }
         }
+        
+        console.log(`📊 Key metrics: ${keyMetricsSuccessCount} symboles avec données, ${keyMetricsEmptyCount} symboles sans données`);
 
         // 3. Récupérer les quotes en batch (plus grand batch possible)
         const quoteBatches = [];
@@ -215,8 +264,12 @@ export default async function handler(req, res) {
                 }));
 
             // Debug: log si pas de données
-            if (data.length === 0 && metrics.length > 0) {
-                console.warn(`⚠️ ${symbol}: ${metrics.length} métriques mais 0 données transformées. Premier metric:`, metrics[0]);
+            if (data.length === 0) {
+                if (metrics.length > 0) {
+                    console.warn(`⚠️ ${symbol}: ${metrics.length} métriques mais 0 données transformées. Premier metric:`, metrics[0]);
+                } else {
+                    console.warn(`⚠️ ${symbol}: Profile trouvé mais aucune key metric disponible. Type: ${profile.type || 'N/A'}, Exchange: ${profile.exchangeShortName || 'N/A'}`);
+                }
             }
 
             return {
@@ -261,8 +314,10 @@ export default async function handler(req, res) {
 
         const successCount = results.filter(r => r.success).length;
         const errorCount = results.filter(r => !r.success).length;
+        const withDataCount = results.filter(r => r.success && r.data && r.data.data && r.data.data.length > 0).length;
+        const withProfileOnlyCount = results.filter(r => r.success && r.data && (!r.data.data || r.data.data.length === 0)).length;
 
-        console.log(`✅ Batch sync terminé: ${successCount} succès, ${errorCount} erreurs`);
+        console.log(`✅ Batch sync terminé: ${successCount} succès (${withDataCount} avec données historiques, ${withProfileOnlyCount} profile uniquement), ${errorCount} erreurs`);
 
         return res.status(200).json({
             success: true,

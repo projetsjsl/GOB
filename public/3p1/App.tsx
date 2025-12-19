@@ -2827,14 +2827,70 @@ export default function App() {
                         }
                         
                         // Vérifier que les données sont valides avant de continuer
-                        if (!result || !result.data || result.data.length === 0) {
+                        // Accepter les tickers avec au moins un profile, même sans données historiques
+                        if (!result || !result.data) {
                             skippedCount++;
                             skippedTickers.push(tickerSymbol);
-                            console.warn(`⏭️ ${tickerSymbol}: Ignoré (aucune donnée disponible)`);
-                            tickerResult.error = 'Aucune donnée disponible';
+                            console.warn(`⏭️ ${tickerSymbol}: Ignoré (résultat invalide)`);
+                            tickerResult.error = 'Résultat invalide';
                             tickerResult.timeMs = Date.now() - tickerStartTime;
                             tickerResults.push(tickerResult);
                             return; // Sortir de la fonction pour ce ticker
+                        }
+                        
+                        // Si pas de données historiques mais profile disponible, synchroniser au moins les infos
+                        if (result.data.length === 0) {
+                            if (result.info && options.syncInfo) {
+                                // Synchroniser au moins les informations du profile
+                                console.log(`ℹ️ ${tickerSymbol}: Profile trouvé mais aucune donnée historique. Synchronisation des infos uniquement.`);
+                                
+                                // Mettre à jour les infos dans le profile
+                                const updatedProfile = {
+                                    ...profile,
+                                    info: result.info
+                                };
+                                
+                                // Mettre à jour le prix actuel dans les assumptions si disponible
+                                if (result.currentPrice && options.updateCurrentPrice) {
+                                    updatedProfile.assumptions = {
+                                        ...profile.assumptions,
+                                        currentPrice: result.currentPrice
+                                    };
+                                    tickerResult.currentPrice = result.currentPrice;
+                                } else {
+                                    tickerResult.currentPrice = result.currentPrice || profile.assumptions.currentPrice || 0;
+                                }
+                                
+                                // Mettre à jour le library
+                                setLibrary(prev => ({
+                                    ...prev,
+                                    [tickerSymbol]: updatedProfile
+                                }));
+                                
+                                tickerResult.other.infoUpdated = true;
+                                tickerResult.success = true;
+                                tickerResult.dataRetrieved = {
+                                    years: 0,
+                                    dataPoints: 0,
+                                    hasProfile: !!result.info,
+                                    hasKeyMetrics: false,
+                                    hasQuotes: !!(result.currentPrice && result.currentPrice > 0),
+                                    hasFinancials: false
+                                };
+                                tickerResult.error = 'Aucune donnée historique disponible (infos synchronisées)';
+                                tickerResult.timeMs = Date.now() - tickerStartTime;
+                                tickerResults.push(tickerResult);
+                                return;
+                            } else {
+                                // Pas de profile non plus, ignorer complètement
+                                skippedCount++;
+                                skippedTickers.push(tickerSymbol);
+                                console.warn(`⏭️ ${tickerSymbol}: Ignoré (aucune donnée disponible)`);
+                                tickerResult.error = 'Aucune donnée disponible';
+                                tickerResult.timeMs = Date.now() - tickerStartTime;
+                                tickerResults.push(tickerResult);
+                                return; // Sortir de la fonction pour ce ticker
+                            }
                         }
 
                         // ✅ Collecter les informations sur les données récupérées
