@@ -237,6 +237,13 @@ export default async function handler(req, res) {
             const metrics = allKeyMetrics[symbol] || [];
             const quote = allQuotes[symbol];
 
+            // Debug: log les métriques récupérées
+            if (metrics.length === 0) {
+                console.log(`ℹ️ ${symbol}: Profile OK mais 0 key metrics récupérées`);
+            } else {
+                console.log(`✅ ${symbol}: ${metrics.length} key metrics récupérées`);
+            }
+
             // Transformer les key metrics en format AnnualData
             // FMP key-metrics utilise 'date' (format YYYY-MM-DD) pas 'calendarYear'
             const data = metrics
@@ -266,10 +273,12 @@ export default async function handler(req, res) {
             // Debug: log si pas de données
             if (data.length === 0) {
                 if (metrics.length > 0) {
-                    console.warn(`⚠️ ${symbol}: ${metrics.length} métriques mais 0 données transformées. Premier metric:`, metrics[0]);
+                    console.warn(`⚠️ ${symbol}: ${metrics.length} métriques mais 0 données transformées. Premier metric:`, JSON.stringify(metrics[0]).substring(0, 200));
                 } else {
-                    console.warn(`⚠️ ${symbol}: Profile trouvé mais aucune key metric disponible. Type: ${profile.type || 'N/A'}, Exchange: ${profile.exchangeShortName || 'N/A'}`);
+                    console.warn(`⚠️ ${symbol}: Profile trouvé mais aucune key metric disponible. Type: ${profile.type || 'N/A'}, Exchange: ${profile.exchangeShortName || 'N/A'}, Sector: ${profile.sector || 'N/A'}`);
                 }
+            } else {
+                console.log(`✅ ${symbol}: ${data.length} années de données transformées`);
             }
 
             return {

@@ -2649,11 +2649,22 @@ export default function App() {
                 const batchData = await response.json();
                 
                 if (batchData.success && batchData.results) {
+                    console.log(`📦 Batch API réponse: ${batchData.results.length} résultats`);
                     batchData.results.forEach((result: any) => {
                         if (result.success && result.data) {
+                            const dataLength = result.data.data ? result.data.data.length : 0;
+                            if (dataLength > 0) {
+                                console.log(`✅ ${result.symbol}: ${dataLength} années de données`);
+                            } else {
+                                console.log(`⚠️ ${result.symbol}: Profile trouvé mais ${dataLength} années de données`);
+                            }
                             results.set(result.symbol.toUpperCase(), result.data);
+                        } else {
+                            console.warn(`❌ ${result.symbol}: Échec ou données manquantes (success: ${result.success}, hasData: ${!!result.data})`);
                         }
                     });
+                } else {
+                    console.error(`❌ Batch API réponse invalide:`, batchData);
                 }
             } catch (error) {
                 console.error(`❌ Erreur batch fetch:`, error);
@@ -2782,7 +2793,9 @@ export default function App() {
                         // Essayer d'abord le batch result
                         if (batchResults.has(tickerSymbol)) {
                             result = batchResults.get(tickerSymbol);
+                            console.log(`📦 ${tickerSymbol}: Données récupérées du batch (data.length: ${result?.data?.length || 0})`);
                         } else {
+                            console.warn(`⚠️ ${tickerSymbol}: Pas dans les résultats du batch, fallback vers appel individuel`);
                             // Fallback: appel individuel si pas dans le batch
                             try {
                                 result = await fetchCompanyDataWithTimeout(tickerSymbol);
