@@ -38858,16 +38858,19 @@ const AdvancedSyncDialog = ({
         selectedProfileId === "custom" && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-xs text-purple-700 italic", children: "✏️ Mode personnalisé : Modifiez les options ci-dessous manuellement" }),
         selectedProfileId !== "custom" && !selectedProfileId.startsWith("custom-") && (() => {
           const selectedPreset = DEFAULT_PRESETS.find((p) => p.id === selectedProfileId);
-          if (!selectedPreset || !selectedPreset.description) return null;
-          return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 p-4 bg-white border border-purple-200 rounded-lg", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h5", { className: "text-sm font-semibold text-purple-900 mb-2", children: "📋 Ce que ce profil implique :" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-700 mb-3", children: selectedPreset.description }),
-            selectedPreset.details && selectedPreset.details.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-semibold text-gray-700 mb-2", children: "Détails ventilés :" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "space-y-1.5", children: selectedPreset.details.map((detail, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "text-xs text-gray-600 flex items-start gap-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-purple-500 mt-0.5", children: "•" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: detail })
-              ] }, index2)) })
+          if (!selectedPreset) return null;
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 p-4 bg-white border-2 border-purple-300 rounded-lg shadow-sm", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("h5", { className: "text-sm font-bold text-purple-900 mb-3 flex items-center gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-purple-600" }),
+              "📋 Ce que ce profil implique :"
+            ] }),
+            selectedPreset.description && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-800 mb-4 font-medium bg-purple-50 p-3 rounded border border-purple-100", children: selectedPreset.description }),
+            selectedPreset.details && selectedPreset.details.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-bold text-gray-800 mb-3 uppercase tracking-wide", children: "Détails ventilés :" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-gray-50 p-3 rounded border border-gray-200 max-h-[300px] overflow-y-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "space-y-2", children: selectedPreset.details.map((detail, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "text-xs text-gray-700 flex items-start gap-2 leading-relaxed", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-purple-600 font-bold mt-0.5 flex-shrink-0", children: "•" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex-1", children: detail })
+              ] }, index2)) }) })
             ] })
           ] });
         })()

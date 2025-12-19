@@ -621,29 +621,34 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
                         {/* ✅ Détails ventilés du preset sélectionné */}
                         {selectedProfileId !== 'custom' && !selectedProfileId.startsWith('custom-') && (() => {
                             const selectedPreset = DEFAULT_PRESETS.find(p => p.id === selectedProfileId);
-                            if (!selectedPreset || !selectedPreset.description) return null;
+                            if (!selectedPreset) return null;
                             
                             return (
-                                <div className="mt-4 p-4 bg-white border border-purple-200 rounded-lg">
-                                    <h5 className="text-sm font-semibold text-purple-900 mb-2">
+                                <div className="mt-4 p-4 bg-white border-2 border-purple-300 rounded-lg shadow-sm">
+                                    <h5 className="text-sm font-bold text-purple-900 mb-3 flex items-center gap-2">
+                                        <InformationCircleIcon className="w-5 h-5 text-purple-600" />
                                         📋 Ce que ce profil implique :
                                     </h5>
-                                    <p className="text-xs text-gray-700 mb-3">
-                                        {selectedPreset.description}
-                                    </p>
+                                    {selectedPreset.description && (
+                                        <p className="text-sm text-gray-800 mb-4 font-medium bg-purple-50 p-3 rounded border border-purple-100">
+                                            {selectedPreset.description}
+                                        </p>
+                                    )}
                                     {selectedPreset.details && selectedPreset.details.length > 0 && (
-                                        <div className="space-y-1.5">
-                                            <p className="text-xs font-semibold text-gray-700 mb-2">
+                                        <div className="space-y-2">
+                                            <p className="text-xs font-bold text-gray-800 mb-3 uppercase tracking-wide">
                                                 Détails ventilés :
                                             </p>
-                                            <ul className="space-y-1.5">
-                                                {selectedPreset.details.map((detail, index) => (
-                                                    <li key={index} className="text-xs text-gray-600 flex items-start gap-2">
-                                                        <span className="text-purple-500 mt-0.5">•</span>
-                                                        <span>{detail}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
+                                            <div className="bg-gray-50 p-3 rounded border border-gray-200 max-h-[300px] overflow-y-auto">
+                                                <ul className="space-y-2">
+                                                    {selectedPreset.details.map((detail, index) => (
+                                                        <li key={index} className="text-xs text-gray-700 flex items-start gap-2 leading-relaxed">
+                                                            <span className="text-purple-600 font-bold mt-0.5 flex-shrink-0">•</span>
+                                                            <span className="flex-1">{detail}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
