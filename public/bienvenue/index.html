@@ -364,6 +364,30 @@
             },
             
             /**
+             * Helper pour forcer une date dans le 1er trimestre 2026 (2026-01-01 à 2026-03-31)
+             * @param {string|Date} dateStr - Date à valider
+             * @returns {Date} Date garantie d'être dans le 1er trimestre 2026
+             */
+            ensureQ1_2026(dateStr) {
+                const d = new Date(dateStr || '2026-01-01');
+                if (isNaN(d.getTime())) {
+                    return new Date('2026-01-01');
+                }
+                const minDate = new Date('2026-01-01');
+                const maxDate = new Date('2026-03-31');
+                
+                // Si la date est avant 2026-01-01, utiliser 2026-01-01
+                if (d < minDate) {
+                    return minDate;
+                }
+                // Si la date est après 2026-03-31, utiliser 2026-03-31
+                if (d > maxDate) {
+                    return maxDate;
+                }
+                return d;
+            },
+            
+            /**
              * Génère les tâches pour un employé en fusionnant templates et statuts sauvegardés
              * @param {Object} employee - Employé sélectionné
              * @param {Array} taskTemplates - Templates de tâches depuis la DB
@@ -385,17 +409,22 @@
                     let startDate, endDate, dueDate;
                     
                     if (tt.startDate && tt.endDate) {
-                        // Utiliser les dates absolues du template
-                        startDate = this.ensureMinDate2026(tt.startDate);
-                        endDate = this.ensureMinDate2026(tt.endDate);
+                        // Utiliser les dates absolues du template, mais forcer dans Q1 2026
+                        startDate = this.ensureQ1_2026(tt.startDate);
+                        endDate = this.ensureQ1_2026(tt.endDate);
+                        // S'assurer que endDate >= startDate
+                        if (endDate < startDate) {
+                            endDate = startDate;
+                        }
                         dueDate = endDate.toISOString().split('T')[0];
                     } else if (tt.dayOffset !== undefined) {
-                        // Rétrocompatibilité: calculer à partir de dayOffset
+                        // Rétrocompatibilité: calculer à partir de dayOffset, mais forcer dans Q1 2026
                         const empStart = this.ensureMinDate2026(employee.startDate);
                         const dueMs = empStart.getTime() + (tt.dayOffset || 0) * 86400000;
-                        dueDate = new Date(dueMs).toISOString().split('T')[0];
-                        startDate = new Date(dueMs);
-                        endDate = new Date(dueMs);
+                        const calculatedDate = new Date(dueMs);
+                        startDate = this.ensureQ1_2026(calculatedDate);
+                        endDate = this.ensureQ1_2026(calculatedDate);
+                        dueDate = endDate.toISOString().split('T')[0];
                     } else {
                         // Fallback: utiliser 2026-01-01
                         startDate = new Date('2026-01-01');
@@ -1991,10 +2020,18 @@
                                                                     <div className="flex items-center gap-1">
                                                                         <span className="text-[10px] font-bold text-gray-400 uppercase">Début :</span>
                                                                         <DatePicker
-                                                                            value={task.startDate || '2026-01-01'}
+                                                                            value={(() => {
+                                                                                // Forcer la date dans Q1 2026 si elle est en dehors
+                                                                                const currentDate = task.startDate || '2026-01-01';
+                                                                                const validDate = TaskManager.ensureQ1_2026(currentDate);
+                                                                                return validDate.toISOString().split('T')[0];
+                                                                            })()}
                                                                             onChange={(dateStr) => {
-                                                                                setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, startDate: dateStr } : t));
-                                                                                saveTaskField(task.id, 'startDate', dateStr);
+                                                                                // Forcer la date dans Q1 2026
+                                                                                const validDate = TaskManager.ensureQ1_2026(dateStr);
+                                                                                const validDateStr = validDate.toISOString().split('T')[0];
+                                                                                setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, startDate: validDateStr } : t));
+                                                                                saveTaskField(task.id, 'startDate', validDateStr);
                                                                             }}
                                                                             placeholder="Date début"
                                                                             className="px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-xs"
@@ -2007,10 +2044,21 @@
                                                                     <div className="flex items-center gap-1">
                                                                         <span className="text-[10px] font-bold text-gray-400 uppercase">Fin :</span>
                                                                         <DatePicker
-                                                                            value={task.endDate || task.startDate || '2026-01-01'}
+                                                                            value={(() => {
+                                                                                // Forcer la date dans Q1 2026 si elle est en dehors
+                                                                                const currentDate = task.endDate || task.startDate || '2026-01-01';
+                                                                                const validDate = TaskManager.ensureQ1_2026(currentDate);
+                                                                                return validDate.toISOString().split('T')[0];
+                                                                            })()}
                                                                             onChange={(dateStr) => {
-                                                                                setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, endDate: dateStr } : t));
-                                                                                saveTaskField(task.id, 'endDate', dateStr);
+                                                                                // Forcer la date dans Q1 2026
+                                                                                const validDate = TaskManager.ensureQ1_2026(dateStr);
+                                                                                const validDateStr = validDate.toISOString().split('T')[0];
+                                                                                // S'assurer que endDate >= startDate
+                                                                                const taskStartDate = task.startDate || '2026-01-01';
+                                                                                const finalDate = validDate >= new Date(taskStartDate) ? validDateStr : taskStartDate;
+                                                                                setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, endDate: finalDate } : t));
+                                                                                saveTaskField(task.id, 'endDate', finalDate);
                                                                             }}
                                                                             placeholder="Date fin"
                                                                             className="px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-xs"
@@ -2990,17 +3038,14 @@
                 const startEdit = (field, value) => { setEditing(field); setEditValue(value); };
                 const saveEdit = (field) => {
                     if (field === 'dueDate') {
-                        // ✅ FIX: dueDate n'existe pas en DB, on doit calculer dayOffset
-                        if (!selectedEmployee || !selectedEmployee.startDate) {
-                            console.warn('⚠️ Impossible de calculer dayOffset: selectedEmployee ou startDate manquant');
-                            setEditing(null);
-                            return;
-                        }
-                        const empStart = TaskManager.ensureMinDate2026(selectedEmployee.startDate);
-                        const selectedDate = new Date(editValue);
-                        const diffDays = Math.round((selectedDate.getTime() - empStart.getTime()) / (1000 * 60 * 60 * 24));
-                        // Mettre à jour avec dayOffset au lieu de dueDate
-                        onUpdate(task.id, 'dayOffset', diffDays);
+                        // ✅ FIX: Mettre à jour startDate et endDate directement
+                        // Forcer la date dans Q1 2026
+                        const validDate = TaskManager.ensureQ1_2026(editValue);
+                        const dateStr = validDate.toISOString().split('T')[0];
+                        
+                        // Mettre à jour startDate et endDate
+                        onUpdate(task.id, 'startDate', dateStr);
+                        onUpdate(task.id, 'endDate', dateStr);
                     } else {
                         if (editValue !== task[field]) {
                             onUpdate(task.id, field, editValue);
@@ -3087,14 +3132,24 @@
                                             onBlur={() => saveEdit('dueDate')}
                                             placeholder="Date à déterminer"
                                             className="px-2 py-0.5 rounded-full text-xs"
-                                            min={selectedEmployee?.startDate}
+                                            min="2026-01-01"
+                                            max="2026-03-31"
                                         />
                                     </div>
                                 ) : (
                                     <div className="flex items-center gap-1">
                                         <span className="text-[10px] font-bold text-gray-400 uppercase">Échéance :</span>
-                                        <span onClick={() => startEdit('dueDate', task.dueDate)} className={`px-2 py-0.5 rounded-full editable ${task.dueDate ? 'bg-gray-100' : 'bg-red-50 text-red-500 border border-red-200'}`}>
-                                            📅 {task.dueDate ? new Date(task.dueDate).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'Date à déterminer'}
+                                        <span onClick={() => {
+                                            // Forcer la date dans Q1 2026 avant d'éditer
+                                            const validDate = TaskManager.ensureQ1_2026(task.dueDate || task.endDate || '2026-01-01');
+                                            startEdit('dueDate', validDate.toISOString().split('T')[0]);
+                                        }} className={`px-2 py-0.5 rounded-full editable ${task.dueDate ? 'bg-gray-100' : 'bg-red-50 text-red-500 border border-red-200'}`}>
+                                            📅 {(() => {
+                                                const dateToShow = task.dueDate || task.endDate || task.startDate;
+                                                if (!dateToShow) return 'Date à déterminer';
+                                                const validDate = TaskManager.ensureQ1_2026(dateToShow);
+                                                return validDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                                            })()}
                                         </span>
                                     </div>
                                 )}
