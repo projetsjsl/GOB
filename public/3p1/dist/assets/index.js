@@ -57479,6 +57479,13 @@ Vérifiez les logs de la console pour plus de détails.`;
       showNotification(`Erreur: ${result.error}`, "error");
     }
   };
+  const hasCorruptedData = (data2) => {
+    if (!data2 || data2.length === 0) return true;
+    const allZero = data2.every(
+      (row) => (!row.earningsPerShare || row.earningsPerShare === 0) && (!row.cashFlowPerShare || row.cashFlowPerShare === 0) && (!row.bookValuePerShare || row.bookValuePerShare === 0)
+    );
+    return allZero;
+  };
   const handleSelectTicker = async (symbol) => {
     var _a4, _b3, _c, _d, _e, _f, _g;
     const upperSymbol = symbol.toUpperCase();
@@ -57487,7 +57494,12 @@ Vérifiez les logs de la console pour plus de détails.`;
       const isSkeleton = existingProfile._isSkeleton === true;
       const hasNoData = !existingProfile.data || existingProfile.data.length === 0;
       const hasNoPrice = !((_a4 = existingProfile.assumptions) == null ? void 0 : _a4.currentPrice) || existingProfile.assumptions.currentPrice === 0;
-      if (isSkeleton || hasNoData || hasNoPrice) {
+      const hasCorruptedDataValue = hasCorruptedData(existingProfile.data || []);
+      if (isSkeleton || hasNoData || hasNoPrice || hasCorruptedDataValue) {
+        if (hasCorruptedDataValue) {
+          console.warn(`⚠️ ${upperSymbol}: Données corrompues détectées (toutes les valeurs à 0) - Re-synchronisation forcée...`);
+          showNotification(`⚠️ ${upperSymbol}: Données corrompues détectées. Re-synchronisation en cours...`, "warning");
+        }
         console.log(`🔄 ${upperSymbol}: Profil squelette ou données vides détectées - Tentative chargement Supabase puis FMP...`);
         try {
           const { loadProfileFromSupabase: loadProfileFromSupabase2 } = await __vitePreload(async () => {

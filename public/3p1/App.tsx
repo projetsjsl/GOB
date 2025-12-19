@@ -2119,6 +2119,18 @@ export default function App() {
         }
     };
 
+    // ✅ NOUVEAU : Fonction pour détecter si les données sont corrompues (toutes à 0)
+    const hasCorruptedData = (data: AnnualData[]): boolean => {
+        if (!data || data.length === 0) return true;
+        // Vérifier si TOUTES les années ont toutes les valeurs à 0
+        const allZero = data.every(row => 
+            (!row.earningsPerShare || row.earningsPerShare === 0) &&
+            (!row.cashFlowPerShare || row.cashFlowPerShare === 0) &&
+            (!row.bookValuePerShare || row.bookValuePerShare === 0)
+        );
+        return allZero;
+    };
+
     const handleSelectTicker = async (symbol: string) => {
         const upperSymbol = symbol.toUpperCase();
         if (library[upperSymbol]) {
@@ -2129,8 +2141,13 @@ export default function App() {
             const isSkeleton = (existingProfile as any)._isSkeleton === true;
             const hasNoData = !existingProfile.data || existingProfile.data.length === 0;
             const hasNoPrice = !existingProfile.assumptions?.currentPrice || existingProfile.assumptions.currentPrice === 0;
+            const hasCorruptedDataValue = hasCorruptedData(existingProfile.data || []);
             
-            if (isSkeleton || hasNoData || hasNoPrice) {
+            if (isSkeleton || hasNoData || hasNoPrice || hasCorruptedDataValue) {
+                if (hasCorruptedDataValue) {
+                    console.warn(`⚠️ ${upperSymbol}: Données corrompues détectées (toutes les valeurs à 0) - Re-synchronisation forcée...`);
+                    showNotification(`⚠️ ${upperSymbol}: Données corrompues détectées. Re-synchronisation en cours...`, 'warning');
+                }
                 console.log(`🔄 ${upperSymbol}: Profil squelette ou données vides détectées - Tentative chargement Supabase puis FMP...`);
                 
                 // ✅ NOUVEAU : Essayer d'abord de charger depuis Supabase (snapshot)
