@@ -13,22 +13,26 @@ const EditableCell: React.FC<{
   onCommit: (val: number) => void;
   min?: number;
   id: string; // Added ID for navigation
-  autoFetched?: boolean; // Track if value is from API (shows green)
-}> = ({ value, onCommit, min = -Infinity, id, autoFetched = false }) => {
+  autoFetched?: boolean; // Deprecated, use dataSource instead
+  dataSource?: 'fmp-verified' | 'fmp-adjusted' | 'manual' | 'calculated'; // Source de la donnée
+}> = ({ value, onCommit, min = -Infinity, id, autoFetched = false, dataSource }) => {
   const [localValue, setLocalValue] = useState(value.toString());
-  const [wasAutoFetched, setWasAutoFetched] = useState(autoFetched);
+  // Déterminer la source : priorité à dataSource, sinon fallback sur autoFetched
+  const actualDataSource = dataSource || (autoFetched ? 'fmp-adjusted' : 'manual');
+  const [currentDataSource, setCurrentDataSource] = useState(actualDataSource);
 
   // Sync local state if external value changes (e.g. via undo/redo)
   useEffect(() => {
     setLocalValue(value.toString());
-    setWasAutoFetched(autoFetched);
-  }, [value, autoFetched]);
+    const newDataSource = dataSource || (autoFetched ? 'fmp-adjusted' : 'manual');
+    setCurrentDataSource(newDataSource);
+  }, [value, autoFetched, dataSource]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalValue(e.target.value);
-    // Mark as manually edited (removes green styling)
-    if (wasAutoFetched) {
-      setWasAutoFetched(false);
+    // Marquer comme manuel lors de l'édition
+    if (currentDataSource !== 'manual') {
+      setCurrentDataSource('manual');
     }
   };
 
@@ -68,11 +72,29 @@ const EditableCell: React.FC<{
     }
   };
 
-  // Conditional styling: green background + green text for auto-fetched data
+  // Conditional styling basé sur dataSource
   const baseClass = "w-full text-right focus:bg-white focus:ring-1 focus:ring-blue-400 rounded px-0.5 sm:px-1 outline-none transition-colors invalid:text-red-500 invalid:bg-red-50 text-xs sm:text-sm";
-  const autoFetchClass = wasAutoFetched
-    ? "bg-green-50 text-green-700 font-medium"
-    : "bg-transparent";
+  
+  let sourceClass = "bg-transparent"; // Par défaut : blanc (données manuelles ou non spécifiées)
+  let tooltipText = "Données manuelles\n\nFond blanc = valeur modifiée manuellement.\n\nLes modifications manuelles sont préservées lors de la synchronisation.";
+  
+  if (currentDataSource === 'fmp-verified') {
+    // ✅ VERT : Données FMP vérifiées directement (non modifiées)
+    sourceClass = "bg-green-50 text-green-700 font-medium";
+    tooltipText = "✅ Données FMP vérifiées\n\nFond VERT = données récupérées directement depuis l'API FMP, non modifiées.\n\nCes données sont les seules considérées comme \"officielles\" et vérifiées.\n\nCliquez pour modifier manuellement. La modification marquera cette valeur comme manuelle (fond orange).";
+  } else if (currentDataSource === 'fmp-adjusted') {
+    // 🔵 BLEU : Données FMP mais ajustées/mergées
+    sourceClass = "bg-blue-50 text-blue-700 font-medium";
+    tooltipText = "🔵 Données FMP ajustées\n\nFond BLEU = données provenant de FMP mais ajustées/mergées avec des valeurs existantes.\n\nCes données ne sont pas 100% vérifiées car elles ont été modifiées lors du merge.\n\nCliquez pour modifier manuellement. La modification marquera cette valeur comme manuelle (fond orange).";
+  } else if (currentDataSource === 'manual') {
+    // 🟠 ORANGE : Données manuelles
+    sourceClass = "bg-orange-50 text-orange-700 font-medium";
+    tooltipText = "🟠 Données manuelles\n\nFond ORANGE = valeur modifiée manuellement.\n\nLes modifications manuelles sont préservées lors de la synchronisation.";
+  } else if (currentDataSource === 'calculated') {
+    // ⚪ GRIS : Données calculées
+    sourceClass = "bg-gray-50 text-gray-700 font-medium";
+    tooltipText = "⚪ Données calculées\n\nFond GRIS = valeur calculée automatiquement.\n\nCes données ne proviennent pas directement de FMP.";
+  }
 
   return (
     <input
@@ -80,14 +102,12 @@ const EditableCell: React.FC<{
       type="number"
       step="0.01"
       min={min !== -Infinity ? min : undefined}
-      className={`${baseClass} ${autoFetchClass}`}
+      className={`${baseClass} ${sourceClass}`}
       value={localValue}
       onChange={handleChange}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
-      title={wasAutoFetched 
-        ? "Données auto-fetchées (FMP API)\n\nFond vert = données récupérées automatiquement depuis l'API FMP.\n\nCliquez pour modifier manuellement. La modification marquera cette valeur comme manuelle (fond blanc)."
-        : "Données manuelles\n\nFond blanc = valeur modifiée manuellement.\n\nLes modifications manuelles sont préservées lors de la synchronisation."}
+      title={tooltipText}
     />
   );
 };
@@ -136,31 +156,31 @@ export const HistoricalTable: React.FC<HistoricalTableProps> = ({ data, onUpdate
                 </td>
 
                 <td className="px-1.5 sm:px-2 py-1.5 sm:py-2 bg-blue-50/30 border-r">
-                  <EditableCell id={`input-priceHigh-${idx}`} value={row.priceHigh} onCommit={(v) => onUpdateRow(idx, 'priceHigh', v)} min={0} autoFetched={row.autoFetched} />
+                  <EditableCell id={`input-priceHigh-${idx}`} value={row.priceHigh} onCommit={(v) => onUpdateRow(idx, 'priceHigh', v)} min={0} autoFetched={row.autoFetched} dataSource={row.dataSource} />
                 </td>
                 <td className="px-2 py-2 bg-blue-50/30 border-r">
-                  <EditableCell id={`input-priceLow-${idx}`} value={row.priceLow} onCommit={(v) => onUpdateRow(idx, 'priceLow', v)} min={0} autoFetched={row.autoFetched} />
+                  <EditableCell id={`input-priceLow-${idx}`} value={row.priceLow} onCommit={(v) => onUpdateRow(idx, 'priceLow', v)} min={0} autoFetched={row.autoFetched} dataSource={row.dataSource} />
                 </td>
 
                 <td className="px-2 py-2 bg-green-50/30 border-r">
-                  <EditableCell id={`input-cashFlowPerShare-${idx}`} value={row.cashFlowPerShare} onCommit={(v) => onUpdateRow(idx, 'cashFlowPerShare', v)} autoFetched={row.autoFetched} />
+                  <EditableCell id={`input-cashFlowPerShare-${idx}`} value={row.cashFlowPerShare} onCommit={(v) => onUpdateRow(idx, 'cashFlowPerShare', v)} autoFetched={row.autoFetched} dataSource={row.dataSource} />
                 </td>
                 <td className="px-2 py-2 text-gray-500 cursor-help" title={`P/CF au Prix Haut: ${ratios.pcfHigh.toFixed(1)}x\n\nCalculé: Prix Haut (${row.priceHigh.toFixed(2)}) / Cash Flow (${row.cashFlowPerShare.toFixed(2)})\n\n= ${ratios.pcfHigh.toFixed(1)}x`}>{ratios.pcfHigh.toFixed(1)}</td>
                 <td className="px-2 py-2 text-gray-500 border-r cursor-help" title={`P/CF au Prix Bas: ${ratios.pcfLow.toFixed(1)}x\n\nCalculé: Prix Bas (${row.priceLow.toFixed(2)}) / Cash Flow (${row.cashFlowPerShare.toFixed(2)})\n\n= ${ratios.pcfLow.toFixed(1)}x`}>{ratios.pcfLow.toFixed(1)}</td>
 
                 <td className="px-2 py-2 bg-yellow-50/30 border-r">
-                  <EditableCell id={`input-dividendPerShare-${idx}`} value={row.dividendPerShare} onCommit={(v) => onUpdateRow(idx, 'dividendPerShare', v)} min={0} autoFetched={row.autoFetched} />
+                  <EditableCell id={`input-dividendPerShare-${idx}`} value={row.dividendPerShare} onCommit={(v) => onUpdateRow(idx, 'dividendPerShare', v)} min={0} autoFetched={row.autoFetched} dataSource={row.dataSource} />
                 </td>
                 <td className="px-2 py-2 text-gray-500 border-r cursor-help" title={`Rendement au Prix Bas: ${ratios.yieldHigh.toFixed(2)}%\n\nCalculé: (Dividende (${row.dividendPerShare.toFixed(2)}) / Prix Bas (${row.priceLow.toFixed(2)})) × 100\n\n= ${ratios.yieldHigh.toFixed(2)}%\n\nLe rendement est calculé au prix bas pour obtenir le rendement maximum.`}>{ratios.yieldHigh.toFixed(2)}%</td>
 
                 <td className="px-2 py-2 bg-purple-50/30 border-r">
-                  <EditableCell id={`input-bookValuePerShare-${idx}`} value={row.bookValuePerShare} onCommit={(v) => onUpdateRow(idx, 'bookValuePerShare', v)} autoFetched={row.autoFetched} />
+                  <EditableCell id={`input-bookValuePerShare-${idx}`} value={row.bookValuePerShare} onCommit={(v) => onUpdateRow(idx, 'bookValuePerShare', v)} autoFetched={row.autoFetched} dataSource={row.dataSource} />
                 </td>
                 <td className="px-2 py-2 text-gray-500 cursor-help" title={`P/BV au Prix Haut: ${ratios.pbvHigh.toFixed(1)}x\n\nCalculé: Prix Haut (${row.priceHigh.toFixed(2)}) / Book Value (${row.bookValuePerShare.toFixed(2)})\n\n= ${ratios.pbvHigh.toFixed(1)}x`}>{ratios.pbvHigh.toFixed(1)}</td>
                 <td className="px-2 py-2 text-gray-500 border-r cursor-help" title={`P/BV au Prix Bas: ${ratios.pbvLow.toFixed(1)}x\n\nCalculé: Prix Bas (${row.priceLow.toFixed(2)}) / Book Value (${row.bookValuePerShare.toFixed(2)})\n\n= ${ratios.pbvLow.toFixed(1)}x`}>{ratios.pbvLow.toFixed(1)}</td>
 
                 <td className="px-2 py-2 bg-red-50/30 border-r font-medium">
-                  <EditableCell id={`input-earningsPerShare-${idx}`} value={row.earningsPerShare} onCommit={(v) => onUpdateRow(idx, 'earningsPerShare', v)} autoFetched={row.autoFetched} />
+                  <EditableCell id={`input-earningsPerShare-${idx}`} value={row.earningsPerShare} onCommit={(v) => onUpdateRow(idx, 'earningsPerShare', v)} autoFetched={row.autoFetched} dataSource={row.dataSource} />
                 </td>
                 <td className="px-2 py-2 text-gray-500 cursor-help" title={`P/E au Prix Haut: ${ratios.peHigh.toFixed(1)}x\n\nCalculé: Prix Haut (${row.priceHigh.toFixed(2)}) / EPS (${row.earningsPerShare.toFixed(2)})\n\n= ${ratios.peHigh.toFixed(1)}x`}>{ratios.peHigh.toFixed(1)}</td>
                 <td className="px-2 py-2 text-gray-500 cursor-help" title={`P/E au Prix Bas: ${ratios.peLow.toFixed(1)}x\n\nCalculé: Prix Bas (${row.priceLow.toFixed(2)}) / EPS (${row.earningsPerShare.toFixed(2)})\n\n= ${ratios.peLow.toFixed(1)}x`}>{ratios.peLow.toFixed(1)}</td>

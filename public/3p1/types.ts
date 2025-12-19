@@ -7,7 +7,12 @@ export interface AnnualData {
   bookValuePerShare: number;
   earningsPerShare: number;
   isEstimate?: boolean;
-  autoFetched?: boolean; // Track if data came from API (shows green background)
+  autoFetched?: boolean; // Track if data came from API (deprecated, use dataSource instead)
+  dataSource?: 'fmp-verified' | 'fmp-adjusted' | 'manual' | 'calculated'; // Source de la donnée
+  // 'fmp-verified' = Données FMP vérifiées directement (VERT)
+  // 'fmp-adjusted' = Données FMP mais ajustées/mergées (BLEU)
+  // 'manual' = Données manuelles (ORANGE)
+  // 'calculated' = Données calculées (GRIS)
 }
 
 export interface CalculatedRatios {

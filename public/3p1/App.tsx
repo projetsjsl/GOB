@@ -1467,7 +1467,8 @@ export default function App() {
                         if (!exists) {
                             mergedData.push({
                                 ...newRow,
-                                autoFetched: true
+                                autoFetched: true,
+                                dataSource: 'fmp-verified' as const // ✅ Nouvelle année directement de FMP = vérifiée
                             });
                         }
                     });
@@ -1481,48 +1482,68 @@ export default function App() {
                             return existingRow;
                         }
 
-                        // Si forceReplace est true, remplacer toutes les données
+                        // Si forceReplace est true, remplacer toutes les données (données FMP vérifiées)
                         if (syncOptions?.forceReplace) {
                             return {
                                 ...(newRow as AnnualData),
-                                autoFetched: true
+                                autoFetched: true,
+                                dataSource: 'fmp-verified' as const // ✅ Force replace = données FMP vérifiées
                             };
                         }
 
-                        // Si syncOnlyMissingMetrics, ne remplir que les champs vides
+                        // Si syncOnlyMissingMetrics, ne remplir que les champs vides (données ajustées)
                         if (syncOptions?.syncOnlyMissingMetrics) {
                             const updatedRow = { ...existingRow };
                             const typedNewRow = newRow as AnnualData;
+                            let hasAdjustment = false;
                             // Mettre à jour uniquement les champs qui sont 0, null ou undefined
                             if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === undefined) && typedNewRow.earningsPerShare > 0) {
                                 updatedRow.earningsPerShare = typedNewRow.earningsPerShare;
+                                hasAdjustment = true;
                             }
                             if ((existingRow.cashFlowPerShare === 0 || existingRow.cashFlowPerShare === null || existingRow.cashFlowPerShare === undefined) && typedNewRow.cashFlowPerShare > 0) {
                                 updatedRow.cashFlowPerShare = typedNewRow.cashFlowPerShare;
+                                hasAdjustment = true;
                             }
                             if ((existingRow.bookValuePerShare === 0 || existingRow.bookValuePerShare === null || existingRow.bookValuePerShare === undefined) && typedNewRow.bookValuePerShare > 0) {
                                 updatedRow.bookValuePerShare = typedNewRow.bookValuePerShare;
+                                hasAdjustment = true;
                             }
                             if ((existingRow.dividendPerShare === 0 || existingRow.dividendPerShare === null || existingRow.dividendPerShare === undefined) && typedNewRow.dividendPerShare > 0) {
                                 updatedRow.dividendPerShare = typedNewRow.dividendPerShare;
+                                hasAdjustment = true;
                             }
                             if ((existingRow.priceHigh === 0 || existingRow.priceHigh === null || existingRow.priceHigh === undefined) && typedNewRow.priceHigh > 0) {
                                 updatedRow.priceHigh = typedNewRow.priceHigh;
+                                hasAdjustment = true;
                             }
                             if ((existingRow.priceLow === 0 || existingRow.priceLow === null || existingRow.priceLow === undefined) && typedNewRow.priceLow > 0) {
                                 updatedRow.priceLow = typedNewRow.priceLow;
+                                hasAdjustment = true;
+                            }
+                            // Si on a fait des ajustements, marquer comme ajusté
+                            if (hasAdjustment) {
+                                updatedRow.dataSource = 'fmp-adjusted' as const;
                             }
                             return updatedRow;
                         }
 
-                        // Si la donnée existante est manuelle (autoFetched: false ou undefined), la garder
-                        if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
+                        // Si la donnée existante est manuelle, la garder
+                        if (existingRow.autoFetched === false || existingRow.dataSource === 'manual') {
                             return existingRow; // Préserver la donnée manuelle
                         }
 
-                        // Sinon, utiliser la nouvelle donnée avec autoFetched: true
+                        // Sinon, merger avec préservation des valeurs existantes (données ajustées)
                         // ✅ CRITIQUE : Ne pas remplacer les valeurs existantes par des valeurs à 0
                         const newRowTyped = newRow as AnnualData;
+                        const hasPreservedValues = 
+                            (newRowTyped.earningsPerShare <= 0 && existingRow.earningsPerShare > 0) ||
+                            (newRowTyped.cashFlowPerShare <= 0 && existingRow.cashFlowPerShare > 0) ||
+                            (newRowTyped.bookValuePerShare <= 0 && existingRow.bookValuePerShare > 0) ||
+                            (newRowTyped.dividendPerShare <= 0 && existingRow.dividendPerShare > 0) ||
+                            (newRowTyped.priceHigh <= 0 && existingRow.priceHigh > 0) ||
+                            (newRowTyped.priceLow <= 0 && existingRow.priceLow > 0);
+                        
                         return {
                             ...existingRow,
                             earningsPerShare: (newRowTyped.earningsPerShare > 0) ? newRowTyped.earningsPerShare : existingRow.earningsPerShare,
@@ -1531,17 +1552,19 @@ export default function App() {
                             dividendPerShare: (newRowTyped.dividendPerShare > 0) ? newRowTyped.dividendPerShare : existingRow.dividendPerShare,
                             priceHigh: (newRowTyped.priceHigh > 0) ? newRowTyped.priceHigh : existingRow.priceHigh,
                             priceLow: (newRowTyped.priceLow > 0) ? newRowTyped.priceLow : existingRow.priceLow,
-                            autoFetched: true
+                            autoFetched: true,
+                            dataSource: hasPreservedValues ? 'fmp-adjusted' as const : 'fmp-verified' as const // ✅ Si valeurs préservées = ajusté, sinon vérifié
                         };
                     });
 
-                    // Ajouter les nouvelles années qui n'existent pas dans les données existantes
+                    // Ajouter les nouvelles années qui n'existent pas dans les données existantes (données FMP vérifiées)
                     result.data.forEach(newRow => {
                         const exists = mergedData.some(row => row.year === newRow.year);
                         if (!exists) {
                             mergedData.push({
                                 ...newRow,
-                                autoFetched: true
+                                autoFetched: true,
+                                dataSource: 'fmp-verified' as const // ✅ Nouvelle année directement de FMP = vérifiée
                             });
                         }
                     });
@@ -1843,7 +1866,7 @@ export default function App() {
         setFutureData([]);
 
         const updated = [...data];
-        updated[index] = { ...updated[index], [field]: value, autoFetched: false };
+        updated[index] = { ...updated[index], [field]: value, autoFetched: false, dataSource: 'manual' as const };
         setData(updated);
     };
 
@@ -2382,14 +2405,22 @@ export default function App() {
                     return existingRow;
                 }
 
-                // ✅ CRITIQUE : Si la donnée existante est manuelle (autoFetched: false ou undefined), la garder
-                if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
+                // ✅ CRITIQUE : Si la donnée existante est manuelle, la garder
+                if (existingRow.autoFetched === false || existingRow.dataSource === 'manual') {
                     return existingRow; // Préserver la donnée manuelle (orange)
                 }
 
-                // Sinon, utiliser la nouvelle donnée avec autoFetched: true
+                // Sinon, merger avec préservation des valeurs existantes (données ajustées)
                 // ✅ CRITIQUE : Ne pas remplacer les valeurs existantes par des valeurs à 0
                 const newRowTyped = newRow as AnnualData;
+                const hasPreservedValues = 
+                    (newRowTyped.earningsPerShare <= 0 && existingRow.earningsPerShare > 0) ||
+                    (newRowTyped.cashFlowPerShare <= 0 && existingRow.cashFlowPerShare > 0) ||
+                    (newRowTyped.bookValuePerShare <= 0 && existingRow.bookValuePerShare > 0) ||
+                    (newRowTyped.dividendPerShare <= 0 && existingRow.dividendPerShare > 0) ||
+                    (newRowTyped.priceHigh <= 0 && existingRow.priceHigh > 0) ||
+                    (newRowTyped.priceLow <= 0 && existingRow.priceLow > 0);
+                
                 return {
                     ...existingRow,
                     earningsPerShare: (newRowTyped.earningsPerShare > 0) ? newRowTyped.earningsPerShare : existingRow.earningsPerShare,
@@ -2398,7 +2429,8 @@ export default function App() {
                     dividendPerShare: (newRowTyped.dividendPerShare > 0) ? newRowTyped.dividendPerShare : existingRow.dividendPerShare,
                     priceHigh: (newRowTyped.priceHigh > 0) ? newRowTyped.priceHigh : existingRow.priceHigh,
                     priceLow: (newRowTyped.priceLow > 0) ? newRowTyped.priceLow : existingRow.priceLow,
-                    autoFetched: true
+                    autoFetched: true,
+                    dataSource: hasPreservedValues ? 'fmp-adjusted' as const : 'fmp-verified' as const // ✅ Si valeurs préservées = ajusté, sinon vérifié
                 };
             });
 
@@ -3043,77 +3075,95 @@ export default function App() {
                         if (options.syncData && result.data.length > 0) {
                             const newDataByYear = new Map(result.data.map(row => [row.year, row]));
                             
-                            // Si syncOnlyNewYears, ne traiter que les nouvelles années
-                            if (options.syncOnlyNewYears) {
-                                result.data.forEach(newRow => {
-                                    const exists = mergedData.some(row => row.year === newRow.year);
-                                    if (!exists) {
-                                        mergedData.push({
-                                            ...(newRow as AnnualData),
-                                            autoFetched: true
-                                        });
-                                    }
-                                });
-                            } else {
-                                // Traitement normal : mettre à jour toutes les années
-                                mergedData = profile.data.map((existingRow) => {
-                                    const newRow = newDataByYear.get(existingRow.year);
-                                    if (!newRow) return existingRow;
-                                    
-                                    // Si forceReplace est true, remplacer toutes les données
-                                    if (options.forceReplace) {
+                                // Si syncOnlyNewYears, ne traiter que les nouvelles années
+                                if (options.syncOnlyNewYears) {
+                                    result.data.forEach(newRow => {
+                                        const exists = mergedData.some(row => row.year === newRow.year);
+                                        if (!exists) {
+                                            mergedData.push({
+                                                ...(newRow as AnnualData),
+                                                autoFetched: true,
+                                                dataSource: 'fmp-verified' as const // ✅ Nouvelle année directement de FMP = vérifiée
+                                            });
+                                        }
+                                    });
+                                } else {
+                                    // Traitement normal : mettre à jour toutes les années
+                                    mergedData = profile.data.map((existingRow) => {
+                                        const newRow = newDataByYear.get(existingRow.year);
+                                        if (!newRow) return existingRow;
+                                        
+                                        // Si forceReplace est true, remplacer toutes les données (données FMP vérifiées)
+                                        if (options.forceReplace) {
+                                            return {
+                                                ...(newRow as AnnualData),
+                                                autoFetched: true,
+                                                dataSource: 'fmp-verified' as const // ✅ Force replace = données FMP vérifiées
+                                            };
+                                        }
+                                        
+                                        // Si syncOnlyMissingMetrics, ne remplir que les champs vides (données ajustées)
+                                        if (options.syncOnlyMissingMetrics) {
+                                            const updatedRow = { ...existingRow };
+                                            const typedNewRow = newRow as AnnualData;
+                                            let hasAdjustment = false;
+                                            // Mettre à jour uniquement les champs qui sont 0, null ou undefined
+                                            if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === undefined) && typedNewRow.earningsPerShare > 0) {
+                                                updatedRow.earningsPerShare = typedNewRow.earningsPerShare;
+                                                hasAdjustment = true;
+                                            }
+                                            if ((existingRow.cashFlowPerShare === 0 || existingRow.cashFlowPerShare === null || existingRow.cashFlowPerShare === undefined) && typedNewRow.cashFlowPerShare > 0) {
+                                                updatedRow.cashFlowPerShare = typedNewRow.cashFlowPerShare;
+                                                hasAdjustment = true;
+                                            }
+                                            if ((existingRow.bookValuePerShare === 0 || existingRow.bookValuePerShare === null || existingRow.bookValuePerShare === undefined) && typedNewRow.bookValuePerShare > 0) {
+                                                updatedRow.bookValuePerShare = typedNewRow.bookValuePerShare;
+                                                hasAdjustment = true;
+                                            }
+                                            if ((existingRow.dividendPerShare === 0 || existingRow.dividendPerShare === null || existingRow.dividendPerShare === undefined) && typedNewRow.dividendPerShare > 0) {
+                                                updatedRow.dividendPerShare = typedNewRow.dividendPerShare;
+                                                hasAdjustment = true;
+                                            }
+                                            if ((existingRow.priceHigh === 0 || existingRow.priceHigh === null || existingRow.priceHigh === undefined) && typedNewRow.priceHigh > 0) {
+                                                updatedRow.priceHigh = typedNewRow.priceHigh;
+                                                hasAdjustment = true;
+                                            }
+                                            if ((existingRow.priceLow === 0 || existingRow.priceLow === null || existingRow.priceLow === undefined) && typedNewRow.priceLow > 0) {
+                                                updatedRow.priceLow = typedNewRow.priceLow;
+                                                hasAdjustment = true;
+                                            }
+                                            // Si on a fait des ajustements, marquer comme ajusté
+                                            if (hasAdjustment) {
+                                                updatedRow.dataSource = 'fmp-adjusted' as const;
+                                            }
+                                            return updatedRow;
+                                        }
+                                        
+                                        // Si la donnée existante est manuelle, la garder
+                                        if (existingRow.autoFetched === false || existingRow.dataSource === 'manual') {
+                                            return existingRow;
+                                        }
+                                        
+                                        // Sinon, remplacer directement (données FMP vérifiées si pas de merge complexe)
                                         return {
                                             ...(newRow as AnnualData),
-                                            autoFetched: true
+                                            autoFetched: true,
+                                            dataSource: 'fmp-verified' as const // ✅ Remplacement direct = données FMP vérifiées
                                         };
-                                    }
-                                    
-                                    // Si syncOnlyMissingMetrics, ne remplir que les champs vides
-                                    if (options.syncOnlyMissingMetrics) {
-                                        const updatedRow = { ...existingRow };
-                                        const typedNewRow = newRow as AnnualData;
-                                        // Mettre à jour uniquement les champs qui sont 0, null ou undefined
-                                        if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === undefined) && typedNewRow.earningsPerShare > 0) {
-                                            updatedRow.earningsPerShare = typedNewRow.earningsPerShare;
-                                        }
-                                        if ((existingRow.cashFlowPerShare === 0 || existingRow.cashFlowPerShare === null || existingRow.cashFlowPerShare === undefined) && typedNewRow.cashFlowPerShare > 0) {
-                                            updatedRow.cashFlowPerShare = typedNewRow.cashFlowPerShare;
-                                        }
-                                        if ((existingRow.bookValuePerShare === 0 || existingRow.bookValuePerShare === null || existingRow.bookValuePerShare === undefined) && typedNewRow.bookValuePerShare > 0) {
-                                            updatedRow.bookValuePerShare = typedNewRow.bookValuePerShare;
-                                        }
-                                        if ((existingRow.dividendPerShare === 0 || existingRow.dividendPerShare === null || existingRow.dividendPerShare === undefined) && typedNewRow.dividendPerShare > 0) {
-                                            updatedRow.dividendPerShare = typedNewRow.dividendPerShare;
-                                        }
-                                        if ((existingRow.priceHigh === 0 || existingRow.priceHigh === null || existingRow.priceHigh === undefined) && typedNewRow.priceHigh > 0) {
-                                            updatedRow.priceHigh = typedNewRow.priceHigh;
-                                        }
-                                        if ((existingRow.priceLow === 0 || existingRow.priceLow === null || existingRow.priceLow === undefined) && typedNewRow.priceLow > 0) {
-                                            updatedRow.priceLow = typedNewRow.priceLow;
-                                        }
-                                        return updatedRow;
-                                    }
-                                    
-                                    if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
-                                        return existingRow;
-                                    }
-                                    return {
-                                        ...(newRow as AnnualData),
-                                        autoFetched: true
-                                    };
-                                });
+                                    });
 
-                                // Ajouter les nouvelles années
-                                result.data.forEach(newRow => {
-                                    const exists = mergedData.some(row => row.year === newRow.year);
-                                    if (!exists) {
-                                        mergedData.push({
-                                            ...(newRow as AnnualData),
-                                            autoFetched: true
-                                        });
-                                    }
-                                });
-                            }
+                                    // Ajouter les nouvelles années (données FMP vérifiées)
+                                    result.data.forEach(newRow => {
+                                        const exists = mergedData.some(row => row.year === newRow.year);
+                                        if (!exists) {
+                                            mergedData.push({
+                                                ...(newRow as AnnualData),
+                                                autoFetched: true,
+                                                dataSource: 'fmp-verified' as const // ✅ Nouvelle année directement de FMP = vérifiée
+                                            });
+                                        }
+                                    });
+                                }
 
                             mergedData.sort((a, b) => a.year - b.year);
                         }

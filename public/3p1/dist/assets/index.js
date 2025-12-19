@@ -9108,17 +9108,19 @@ Prix Actuel × Nombre d'actions en circulation`, children: info.marketCap })
     ] })
   ] });
 };
-const EditableCell = ({ value, onCommit, min: min2 = -Infinity, id, autoFetched = false }) => {
+const EditableCell = ({ value, onCommit, min: min2 = -Infinity, id, autoFetched = false, dataSource }) => {
   const [localValue, setLocalValue] = reactExports.useState(value.toString());
-  const [wasAutoFetched, setWasAutoFetched] = reactExports.useState(autoFetched);
+  const actualDataSource = dataSource || (autoFetched ? "fmp-adjusted" : "manual");
+  const [currentDataSource, setCurrentDataSource] = reactExports.useState(actualDataSource);
   reactExports.useEffect(() => {
     setLocalValue(value.toString());
-    setWasAutoFetched(autoFetched);
-  }, [value, autoFetched]);
+    const newDataSource = dataSource || (autoFetched ? "fmp-adjusted" : "manual");
+    setCurrentDataSource(newDataSource);
+  }, [value, autoFetched, dataSource]);
   const handleChange = (e) => {
     setLocalValue(e.target.value);
-    if (wasAutoFetched) {
-      setWasAutoFetched(false);
+    if (currentDataSource !== "manual") {
+      setCurrentDataSource("manual");
     }
   };
   const handleBlur = () => {
@@ -9156,7 +9158,27 @@ const EditableCell = ({ value, onCommit, min: min2 = -Infinity, id, autoFetched 
     }
   };
   const baseClass = "w-full text-right focus:bg-white focus:ring-1 focus:ring-blue-400 rounded px-0.5 sm:px-1 outline-none transition-colors invalid:text-red-500 invalid:bg-red-50 text-xs sm:text-sm";
-  const autoFetchClass = wasAutoFetched ? "bg-green-50 text-green-700 font-medium" : "bg-transparent";
+  let sourceClass = "bg-transparent";
+  let tooltipText = "Données manuelles\n\nFond blanc = valeur modifiée manuellement.\n\nLes modifications manuelles sont préservées lors de la synchronisation.";
+  if (currentDataSource === "fmp-verified") {
+    sourceClass = "bg-green-50 text-green-700 font-medium";
+    tooltipText = `✅ Données FMP vérifiées
+
+Fond VERT = données récupérées directement depuis l'API FMP, non modifiées.
+
+Ces données sont les seules considérées comme "officielles" et vérifiées.
+
+Cliquez pour modifier manuellement. La modification marquera cette valeur comme manuelle (fond orange).`;
+  } else if (currentDataSource === "fmp-adjusted") {
+    sourceClass = "bg-blue-50 text-blue-700 font-medium";
+    tooltipText = "🔵 Données FMP ajustées\n\nFond BLEU = données provenant de FMP mais ajustées/mergées avec des valeurs existantes.\n\nCes données ne sont pas 100% vérifiées car elles ont été modifiées lors du merge.\n\nCliquez pour modifier manuellement. La modification marquera cette valeur comme manuelle (fond orange).";
+  } else if (currentDataSource === "manual") {
+    sourceClass = "bg-orange-50 text-orange-700 font-medium";
+    tooltipText = "🟠 Données manuelles\n\nFond ORANGE = valeur modifiée manuellement.\n\nLes modifications manuelles sont préservées lors de la synchronisation.";
+  } else if (currentDataSource === "calculated") {
+    sourceClass = "bg-gray-50 text-gray-700 font-medium";
+    tooltipText = "⚪ Données calculées\n\nFond GRIS = valeur calculée automatiquement.\n\nCes données ne proviennent pas directement de FMP.";
+  }
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     "input",
     {
@@ -9164,12 +9186,12 @@ const EditableCell = ({ value, onCommit, min: min2 = -Infinity, id, autoFetched 
       type: "number",
       step: "0.01",
       min: min2 !== -Infinity ? min2 : void 0,
-      className: `${baseClass} ${autoFetchClass}`,
+      className: `${baseClass} ${sourceClass}`,
       value: localValue,
       onChange: handleChange,
       onBlur: handleBlur,
       onKeyDown: handleKeyDown,
-      title: wasAutoFetched ? "Données auto-fetchées (FMP API)\n\nFond vert = données récupérées automatiquement depuis l'API FMP.\n\nCliquez pour modifier manuellement. La modification marquera cette valeur comme manuelle (fond blanc)." : "Données manuelles\n\nFond blanc = valeur modifiée manuellement.\n\nLes modifications manuelles sont préservées lors de la synchronisation."
+      title: tooltipText
     }
   );
 };
@@ -9207,9 +9229,9 @@ const HistoricalTable = ({ data, onUpdateRow }) => {
       const rowClass = isFuture ? "bg-slate-50 italic" : "hover:bg-gray-50";
       return /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: rowClass, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 sm:px-3 py-1.5 sm:py-2 font-bold text-left text-gray-700 sticky left-0 bg-white border-r z-10 text-xs sm:text-sm", children: row.year }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-1.5 sm:px-2 py-1.5 sm:py-2 bg-blue-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-priceHigh-${idx}`, value: row.priceHigh, onCommit: (v) => onUpdateRow(idx, "priceHigh", v), min: 0, autoFetched: row.autoFetched }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-blue-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-priceLow-${idx}`, value: row.priceLow, onCommit: (v) => onUpdateRow(idx, "priceLow", v), min: 0, autoFetched: row.autoFetched }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-green-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-cashFlowPerShare-${idx}`, value: row.cashFlowPerShare, onCommit: (v) => onUpdateRow(idx, "cashFlowPerShare", v), autoFetched: row.autoFetched }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-1.5 sm:px-2 py-1.5 sm:py-2 bg-blue-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-priceHigh-${idx}`, value: row.priceHigh, onCommit: (v) => onUpdateRow(idx, "priceHigh", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-blue-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-priceLow-${idx}`, value: row.priceLow, onCommit: (v) => onUpdateRow(idx, "priceLow", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-green-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-cashFlowPerShare-${idx}`, value: row.cashFlowPerShare, onCommit: (v) => onUpdateRow(idx, "cashFlowPerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/CF au Prix Haut: ${ratios.pcfHigh.toFixed(1)}x
 
 Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / Cash Flow (${row.cashFlowPerShare.toFixed(2)})
@@ -9220,7 +9242,7 @@ Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / Cash Flow (${row.cashFlowPer
 Calculé: Prix Bas (${row.priceLow.toFixed(2)}) / Cash Flow (${row.cashFlowPerShare.toFixed(2)})
 
 = ${ratios.pcfLow.toFixed(1)}x`, children: ratios.pcfLow.toFixed(1) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-yellow-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-dividendPerShare-${idx}`, value: row.dividendPerShare, onCommit: (v) => onUpdateRow(idx, "dividendPerShare", v), min: 0, autoFetched: row.autoFetched }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-yellow-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-dividendPerShare-${idx}`, value: row.dividendPerShare, onCommit: (v) => onUpdateRow(idx, "dividendPerShare", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "px-2 py-2 text-gray-500 border-r cursor-help", title: `Rendement au Prix Bas: ${ratios.yieldHigh.toFixed(2)}%
 
 Calculé: (Dividende (${row.dividendPerShare.toFixed(2)}) / Prix Bas (${row.priceLow.toFixed(2)})) × 100
@@ -9231,7 +9253,7 @@ Le rendement est calculé au prix bas pour obtenir le rendement maximum.`, child
           ratios.yieldHigh.toFixed(2),
           "%"
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-purple-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-bookValuePerShare-${idx}`, value: row.bookValuePerShare, onCommit: (v) => onUpdateRow(idx, "bookValuePerShare", v), autoFetched: row.autoFetched }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-purple-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-bookValuePerShare-${idx}`, value: row.bookValuePerShare, onCommit: (v) => onUpdateRow(idx, "bookValuePerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/BV au Prix Haut: ${ratios.pbvHigh.toFixed(1)}x
 
 Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / Book Value (${row.bookValuePerShare.toFixed(2)})
@@ -9242,7 +9264,7 @@ Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / Book Value (${row.bookValueP
 Calculé: Prix Bas (${row.priceLow.toFixed(2)}) / Book Value (${row.bookValuePerShare.toFixed(2)})
 
 = ${ratios.pbvLow.toFixed(1)}x`, children: ratios.pbvLow.toFixed(1) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-red-50/30 border-r font-medium", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-earningsPerShare-${idx}`, value: row.earningsPerShare, onCommit: (v) => onUpdateRow(idx, "earningsPerShare", v), autoFetched: row.autoFetched }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-red-50/30 border-r font-medium", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-earningsPerShare-${idx}`, value: row.earningsPerShare, onCommit: (v) => onUpdateRow(idx, "earningsPerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/E au Prix Haut: ${ratios.peHigh.toFixed(1)}x
 
 Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / EPS (${row.earningsPerShare.toFixed(2)})
@@ -56968,7 +56990,9 @@ Vérifiez votre connexion et réessayez.`,
             if (!exists) {
               mergedData.push({
                 ...newRow,
-                autoFetched: true
+                autoFetched: true,
+                dataSource: "fmp-verified"
+                // ✅ Nouvelle année directement de FMP = vérifiée
               });
             }
           });
@@ -56981,36 +57005,49 @@ Vérifiez votre connexion et réessayez.`,
             if (syncOptions == null ? void 0 : syncOptions.forceReplace) {
               return {
                 ...newRow,
-                autoFetched: true
+                autoFetched: true,
+                dataSource: "fmp-verified"
+                // ✅ Force replace = données FMP vérifiées
               };
             }
             if (syncOptions == null ? void 0 : syncOptions.syncOnlyMissingMetrics) {
               const updatedRow = { ...existingRow };
               const typedNewRow = newRow;
+              let hasAdjustment = false;
               if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === void 0) && typedNewRow.earningsPerShare > 0) {
                 updatedRow.earningsPerShare = typedNewRow.earningsPerShare;
+                hasAdjustment = true;
               }
               if ((existingRow.cashFlowPerShare === 0 || existingRow.cashFlowPerShare === null || existingRow.cashFlowPerShare === void 0) && typedNewRow.cashFlowPerShare > 0) {
                 updatedRow.cashFlowPerShare = typedNewRow.cashFlowPerShare;
+                hasAdjustment = true;
               }
               if ((existingRow.bookValuePerShare === 0 || existingRow.bookValuePerShare === null || existingRow.bookValuePerShare === void 0) && typedNewRow.bookValuePerShare > 0) {
                 updatedRow.bookValuePerShare = typedNewRow.bookValuePerShare;
+                hasAdjustment = true;
               }
               if ((existingRow.dividendPerShare === 0 || existingRow.dividendPerShare === null || existingRow.dividendPerShare === void 0) && typedNewRow.dividendPerShare > 0) {
                 updatedRow.dividendPerShare = typedNewRow.dividendPerShare;
+                hasAdjustment = true;
               }
               if ((existingRow.priceHigh === 0 || existingRow.priceHigh === null || existingRow.priceHigh === void 0) && typedNewRow.priceHigh > 0) {
                 updatedRow.priceHigh = typedNewRow.priceHigh;
+                hasAdjustment = true;
               }
               if ((existingRow.priceLow === 0 || existingRow.priceLow === null || existingRow.priceLow === void 0) && typedNewRow.priceLow > 0) {
                 updatedRow.priceLow = typedNewRow.priceLow;
+                hasAdjustment = true;
+              }
+              if (hasAdjustment) {
+                updatedRow.dataSource = "fmp-adjusted";
               }
               return updatedRow;
             }
-            if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
+            if (existingRow.autoFetched === false || existingRow.dataSource === "manual") {
               return existingRow;
             }
             const newRowTyped = newRow;
+            const hasPreservedValues = newRowTyped.earningsPerShare <= 0 && existingRow.earningsPerShare > 0 || newRowTyped.cashFlowPerShare <= 0 && existingRow.cashFlowPerShare > 0 || newRowTyped.bookValuePerShare <= 0 && existingRow.bookValuePerShare > 0 || newRowTyped.dividendPerShare <= 0 && existingRow.dividendPerShare > 0 || newRowTyped.priceHigh <= 0 && existingRow.priceHigh > 0 || newRowTyped.priceLow <= 0 && existingRow.priceLow > 0;
             return {
               ...existingRow,
               earningsPerShare: newRowTyped.earningsPerShare > 0 ? newRowTyped.earningsPerShare : existingRow.earningsPerShare,
@@ -57019,7 +57056,9 @@ Vérifiez votre connexion et réessayez.`,
               dividendPerShare: newRowTyped.dividendPerShare > 0 ? newRowTyped.dividendPerShare : existingRow.dividendPerShare,
               priceHigh: newRowTyped.priceHigh > 0 ? newRowTyped.priceHigh : existingRow.priceHigh,
               priceLow: newRowTyped.priceLow > 0 ? newRowTyped.priceLow : existingRow.priceLow,
-              autoFetched: true
+              autoFetched: true,
+              dataSource: hasPreservedValues ? "fmp-adjusted" : "fmp-verified"
+              // ✅ Si valeurs préservées = ajusté, sinon vérifié
             };
           });
           result.data.forEach((newRow) => {
@@ -57027,7 +57066,9 @@ Vérifiez votre connexion et réessayez.`,
             if (!exists) {
               mergedData.push({
                 ...newRow,
-                autoFetched: true
+                autoFetched: true,
+                dataSource: "fmp-verified"
+                // ✅ Nouvelle année directement de FMP = vérifiée
               });
             }
           });
@@ -57182,6 +57223,50 @@ Vérifiez votre connexion et réessayez.`,
       };
       setAssumptions(assumptionsWithOutlierExclusions);
       console.log("💾 Auto-saving snapshot after API sync...");
+      const syncStartTime = Date.now();
+      const syncMetadata = {
+        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+        source: "fmp",
+        dataRetrieved: {
+          years: finalData.length,
+          dataPoints: finalData.length * 6,
+          // Approximation (EPS, CF, BV, DIV, priceHigh, priceLow)
+          hasProfile: !!result.info,
+          hasKeyMetrics: result.data.length > 0,
+          hasQuotes: !!result.currentPrice && result.currentPrice > 0,
+          hasFinancials: !!result.financials && result.financials.length > 0
+        },
+        outliers: {
+          detected: outlierDetection.detectedOutliers,
+          excluded: {
+            EPS: outlierDetection.excludeEPS,
+            CF: outlierDetection.excludeCF,
+            BV: outlierDetection.excludeBV,
+            DIV: outlierDetection.excludeDIV
+          },
+          reasons: {}
+        },
+        orangeData: {
+          growthRateEPS: assumptionsWithOutlierExclusions.growthRateEPS,
+          growthRateCF: assumptionsWithOutlierExclusions.growthRateCF,
+          growthRateBV: assumptionsWithOutlierExclusions.growthRateBV,
+          growthRateDiv: assumptionsWithOutlierExclusions.growthRateDiv,
+          targetPE: assumptionsWithOutlierExclusions.targetPE,
+          targetPCF: assumptionsWithOutlierExclusions.targetPCF,
+          targetPBV: assumptionsWithOutlierExclusions.targetPBV,
+          targetYield: assumptionsWithOutlierExclusions.targetYield,
+          wasReplaced: (syncOptions == null ? void 0 : syncOptions.replaceOrangeData) || false
+        },
+        other: {
+          snapshotSaved: true,
+          assumptionsUpdated: true,
+          infoUpdated: (syncOptions == null ? void 0 : syncOptions.syncInfo) !== false,
+          valueLineMetricsSynced: (syncOptions == null ? void 0 : syncOptions.syncValueLineMetrics) || false
+        },
+        options: syncOptions || {},
+        duration: Date.now() - syncStartTime,
+        success: true
+      };
       await saveSnapshot(
         activeId,
         finalData,
@@ -57191,8 +57276,14 @@ Vérifiez votre connexion et réessayez.`,
         `API sync - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
         true,
         // Mark as current
-        true
+        true,
         // Auto-fetched
+        0,
+        // retryCount
+        2,
+        // maxRetries
+        syncMetadata
+        // Métadonnées de synchronisation
       );
       showNotification(`Données synchronisées avec succès pour ${activeId}`, "success");
     } catch (e) {
@@ -57237,7 +57328,7 @@ Vérifiez les logs de la console pour plus de détails.`;
     setPastData((prev) => [...prev, data]);
     setFutureData([]);
     const updated = [...data];
-    updated[index2] = { ...updated[index2], [field]: value, autoFetched: false };
+    updated[index2] = { ...updated[index2], [field]: value, autoFetched: false, dataSource: "manual" };
     setData(updated);
   };
   const handleUpdateAssumption = (key, value) => {
@@ -58144,7 +58235,9 @@ Vérifiez les logs de la console pour plus de détails.`;
                         if (!exists) {
                           mergedData.push({
                             ...newRow,
-                            autoFetched: true
+                            autoFetched: true,
+                            dataSource: "fmp-verified"
+                            // ✅ Nouvelle année directement de FMP = vérifiée
                           });
                         }
                       });
@@ -58155,38 +58248,52 @@ Vérifiez les logs de la console pour plus de détails.`;
                         if (options.forceReplace) {
                           return {
                             ...newRow,
-                            autoFetched: true
+                            autoFetched: true,
+                            dataSource: "fmp-verified"
+                            // ✅ Force replace = données FMP vérifiées
                           };
                         }
                         if (options.syncOnlyMissingMetrics) {
                           const updatedRow = { ...existingRow };
                           const typedNewRow = newRow;
+                          let hasAdjustment = false;
                           if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === void 0) && typedNewRow.earningsPerShare > 0) {
                             updatedRow.earningsPerShare = typedNewRow.earningsPerShare;
+                            hasAdjustment = true;
                           }
                           if ((existingRow.cashFlowPerShare === 0 || existingRow.cashFlowPerShare === null || existingRow.cashFlowPerShare === void 0) && typedNewRow.cashFlowPerShare > 0) {
                             updatedRow.cashFlowPerShare = typedNewRow.cashFlowPerShare;
+                            hasAdjustment = true;
                           }
                           if ((existingRow.bookValuePerShare === 0 || existingRow.bookValuePerShare === null || existingRow.bookValuePerShare === void 0) && typedNewRow.bookValuePerShare > 0) {
                             updatedRow.bookValuePerShare = typedNewRow.bookValuePerShare;
+                            hasAdjustment = true;
                           }
                           if ((existingRow.dividendPerShare === 0 || existingRow.dividendPerShare === null || existingRow.dividendPerShare === void 0) && typedNewRow.dividendPerShare > 0) {
                             updatedRow.dividendPerShare = typedNewRow.dividendPerShare;
+                            hasAdjustment = true;
                           }
                           if ((existingRow.priceHigh === 0 || existingRow.priceHigh === null || existingRow.priceHigh === void 0) && typedNewRow.priceHigh > 0) {
                             updatedRow.priceHigh = typedNewRow.priceHigh;
+                            hasAdjustment = true;
                           }
                           if ((existingRow.priceLow === 0 || existingRow.priceLow === null || existingRow.priceLow === void 0) && typedNewRow.priceLow > 0) {
                             updatedRow.priceLow = typedNewRow.priceLow;
+                            hasAdjustment = true;
+                          }
+                          if (hasAdjustment) {
+                            updatedRow.dataSource = "fmp-adjusted";
                           }
                           return updatedRow;
                         }
-                        if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
+                        if (existingRow.autoFetched === false || existingRow.dataSource === "manual") {
                           return existingRow;
                         }
                         return {
                           ...newRow,
-                          autoFetched: true
+                          autoFetched: true,
+                          dataSource: "fmp-verified"
+                          // ✅ Remplacement direct = données FMP vérifiées
                         };
                       });
                       result.data.forEach((newRow) => {
@@ -58194,7 +58301,9 @@ Vérifiez les logs de la console pour plus de détails.`;
                         if (!exists) {
                           mergedData.push({
                             ...newRow,
-                            autoFetched: true
+                            autoFetched: true,
+                            dataSource: "fmp-verified"
+                            // ✅ Nouvelle année directement de FMP = vérifiée
                           });
                         }
                       });
