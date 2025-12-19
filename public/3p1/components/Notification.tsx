@@ -3,18 +3,25 @@ import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, InformationCircl
 
 export type NotificationType = 'success' | 'error' | 'warning' | 'info';
 
+interface NotificationAction {
+  label: string;
+  onClick: () => void;
+}
+
 interface NotificationProps {
   message: string;
   type: NotificationType;
   duration?: number;
   onClose?: () => void;
+  action?: NotificationAction;
 }
 
 export const Notification: React.FC<NotificationProps> = ({ 
   message, 
   type, 
   duration = 5000,
-  onClose 
+  onClose,
+  action
 }) => {
   const [isVisible, setIsVisible] = useState(true);
 
@@ -71,6 +78,18 @@ export const Notification: React.FC<NotificationProps> = ({
         <Icon className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="text-xs sm:text-sm font-medium whitespace-pre-line break-words">{message}</p>
+          {action && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                action.onClick();
+                handleClose();
+              }}
+              className="mt-2 px-3 py-1.5 bg-white border border-gray-300 rounded-md text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              {action.label}
+            </button>
+          )}
         </div>
         <button
           onClick={handleClose}
@@ -84,7 +103,7 @@ export const Notification: React.FC<NotificationProps> = ({
 };
 
 interface NotificationManagerProps {
-  notifications: Array<{ id: string; message: string; type: NotificationType }>;
+  notifications: Array<{ id: string; message: string; type: NotificationType; action?: NotificationAction }>;
   onRemove: (id: string) => void;
 }
 
@@ -99,6 +118,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
           key={notification.id}
           message={notification.message}
           type={notification.type}
+          action={notification.action}
           onClose={() => onRemove(notification.id)}
         />
       ))}

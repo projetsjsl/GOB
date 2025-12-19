@@ -12,8 +12,12 @@ import {
     ClockIcon,
     ChartBarIcon,
     CurrencyDollarIcon,
-    ExclamationCircleIcon
+    ExclamationCircleIcon,
+    ArrowDownTrayIcon,
+    DocumentArrowDownIcon,
+    ArrowPathIcon
 } from '@heroicons/react/24/outline';
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export interface TickerSyncResult {
     ticker: string;
@@ -96,12 +100,16 @@ interface SyncReportDialogProps {
     isOpen: boolean;
     reportData: SyncReportData | null;
     onClose: () => void;
+    onRetryTicker?: (ticker: string) => void;
+    onRetryFailed?: () => void;
 }
 
 export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
     isOpen,
     reportData,
-    onClose
+    onClose,
+    onRetryTicker,
+    onRetryFailed
 }) => {
     const [expandedTickers, setExpandedTickers] = React.useState<Set<string>>(new Set());
     const [filter, setFilter] = React.useState<'all' | 'success' | 'error' | 'skipped'>('all');
@@ -150,6 +158,98 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
         return filtered;
     }, [reportData, filter, sortBy]);
 
+    // Fonction d'export CSV
+    const exportToCSV = () => {
+        if (!reportData) return;
+
+        const headers = [
+            'Ticker',
+            'Statut',
+            'Temps (ms)',
+            'Prix Actuel',
+            'Années de Données',
+            'Points de Données',
+            'Outliers Détectés',
+            'Outliers Exclus',
+            'Cases Orange Recalculées',
+            'Données EPS à Zéro',
+            'Données CF à Zéro',
+            'Données BV à Zéro',
+            'Données DIV à Zéro',
+            'Données N/A',
+            'Snapshot Sauvegardé',
+            'Assumptions Mises à Jour',
+            'Info Mise à Jour',
+            'ValueLine Synced',
+            'Erreur'
+        ];
+
+        const rows = reportData.tickerResults.map(result => [
+            result.ticker,
+            result.success ? 'Succès' : 'Erreur',
+            result.timeMs.toString(),
+            result.currentPrice > 0 ? `$${result.currentPrice.toFixed(2)}` : 'N/A',
+            result.dataRetrieved?.years?.toString() || '0',
+            result.dataRetrieved?.dataPoints?.toString() || '0',
+            result.outliers?.detected?.join('; ') || '',
+            Object.entries(result.outliers?.excluded || {})
+                .filter(([_, excluded]) => excluded)
+                .map(([metric]) => metric)
+                .join('; ') || '',
+            result.orangeData?.wasReplaced ? 'Oui' : 'Non',
+            result.zeroData?.earningsPerShare?.toString() || '0',
+            result.zeroData?.cashFlowPerShare?.toString() || '0',
+            result.zeroData?.bookValuePerShare?.toString() || '0',
+            result.zeroData?.dividendPerShare?.toString() || '0',
+            result.naData?.fields?.join('; ') || '',
+            result.other?.snapshotSaved ? 'Oui' : 'Non',
+            result.other?.assumptionsUpdated ? 'Oui' : 'Non',
+            result.other?.infoUpdated ? 'Oui' : 'Non',
+            result.other?.valueLineMetricsSynced ? 'Oui' : 'Non',
+            result.error || ''
+        ]);
+
+        const csvContent = [
+            headers.join(','),
+            ...rows.map(row => row.map(cell => {
+                // Échapper les guillemets et les virgules
+                const cellStr = String(cell || '');
+                if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+                    return `"${cellStr.replace(/"/g, '""')}"`;
+                }
+                return cellStr;
+            }).join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `sync-report-${new Date(reportData.startTime).toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    // Fonction d'export JSON
+    const exportToJSON = () => {
+        if (!reportData) return;
+
+        const jsonContent = JSON.stringify(reportData, null, 2);
+        const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `sync-report-${new Date(reportData.startTime).toISOString().split('T')[0]}.json`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
     if (!isOpen || !reportData) return null;
 
     const duration = reportData.endTime - reportData.startTime;
@@ -171,12 +271,31 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
                             </p>
                         </div>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                        <XMarkIcon className="w-6 h-6" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        {/* Boutons d'export */}
+                        <button
+                            onClick={exportToCSV}
+                            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
+                            title="Exporter en CSV"
+                        >
+                            <ArrowDownTrayIcon className="w-4 h-4" />
+                            CSV
+                        </button>
+                        <button
+                            onClick={exportToJSON}
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+                            title="Exporter en JSON"
+                        >
+                            <DocumentArrowDownIcon className="w-4 h-4" />
+                            JSON
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                            <XMarkIcon className="w-6 h-6" />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Résumé Global */}
@@ -230,6 +349,72 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
                             </div>
                         </div>
                     </div>
+
+                    {/* Graphiques */}
+                    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Graphique en barres - Temps de traitement par ticker (top 10) */}
+                        <div className="bg-white p-4 rounded-lg border border-gray-200">
+                            <h4 className="text-sm font-semibold text-gray-700 mb-4">Temps de Traitement (Top 10)</h4>
+                            <ResponsiveContainer width="100%" height={250}>
+                                <BarChart
+                                    data={filteredResults
+                                        .sort((a, b) => b.timeMs - a.timeMs)
+                                        .slice(0, 10)
+                                        .map(r => ({
+                                            ticker: r.ticker,
+                                            temps: r.timeMs,
+                                            statut: r.success ? 'Succès' : 'Erreur'
+                                        }))}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="ticker" angle={-45} textAnchor="end" height={80} />
+                                    <YAxis label={{ value: 'Temps (ms)', angle: -90, position: 'insideLeft' }} />
+                                    <Tooltip formatter={(value: number) => `${value}ms`} />
+                                    <Bar dataKey="temps" fill="#3b82f6">
+                                        {filteredResults
+                                            .sort((a, b) => b.timeMs - a.timeMs)
+                                            .slice(0, 10)
+                                            .map((r, index) => (
+                                                <Cell key={`cell-${index}`} fill={r.success ? '#3b82f6' : '#ef4444'} />
+                                            ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        {/* Graphique en camembert - Répartition succès/erreurs/ignorés */}
+                        <div className="bg-white p-4 rounded-lg border border-gray-200">
+                            <h4 className="text-sm font-semibold text-gray-700 mb-4">Répartition des Résultats</h4>
+                            <ResponsiveContainer width="100%" height={250}>
+                                <PieChart>
+                                    <Pie
+                                        data={[
+                                            { name: 'Succès', value: reportData.successCount, color: '#10b981' },
+                                            { name: 'Erreurs', value: reportData.errorCount, color: '#ef4444' },
+                                            { name: 'Ignorés', value: reportData.skippedCount, color: '#f59e0b' }
+                                        ]}
+                                        cx="50%"
+                                        cy="50%"
+                                        labelLine={false}
+                                        label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(1)}%)`}
+                                        outerRadius={80}
+                                        fill="#8884d8"
+                                        dataKey="value"
+                                    >
+                                        {[
+                                            { name: 'Succès', value: reportData.successCount, color: '#10b981' },
+                                            { name: 'Erreurs', value: reportData.errorCount, color: '#ef4444' },
+                                            { name: 'Ignorés', value: reportData.skippedCount, color: '#f59e0b' }
+                                        ].map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip />
+                                    <Legend />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Filtres et Tri */}
@@ -275,13 +460,28 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
                                 result={result}
                                 isExpanded={expandedTickers.has(result.ticker)}
                                 onToggle={() => toggleTicker(result.ticker)}
+                                onRetry={onRetryTicker}
                             />
                         ))}
                     </div>
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+                <div className="p-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+                    <div className="flex gap-2">
+                        {reportData.errorCount > 0 && onRetryFailed && (
+                            <button
+                                onClick={() => {
+                                    onRetryFailed();
+                                    onClose();
+                                }}
+                                className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors text-sm font-medium flex items-center gap-2"
+                            >
+                                <ArrowPathIcon className="w-4 h-4" />
+                                Réessayer les Échecs ({reportData.errorCount})
+                            </button>
+                        )}
+                    </div>
                     <button
                         onClick={onClose}
                         className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
@@ -298,9 +498,10 @@ interface TickerResultCardProps {
     result: TickerSyncResult;
     isExpanded: boolean;
     onToggle: () => void;
+    onRetry?: (ticker: string) => void;
 }
 
-const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded, onToggle }) => {
+const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded, onToggle, onRetry }) => {
     const hasOutliers = result.outliers.detected.length > 0;
     const hasZeroData = Object.values(result.zeroData).some(v => v > 0);
     const hasNaData = result.naData.fields.length > 0;
@@ -610,6 +811,30 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                             </div>
                         </div>
                     </div>
+
+                    {/* Actions Correctives */}
+                    {!result.success && onRetry && (
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="font-semibold text-red-900 mb-1">Action Corrective</div>
+                                    <div className="text-sm text-red-700">
+                                        {result.error || 'Erreur inconnue'}
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onRetry(result.ticker);
+                                    }}
+                                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium flex items-center gap-2"
+                                >
+                                    <ArrowPathIcon className="w-4 h-4" />
+                                    Réessayer
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

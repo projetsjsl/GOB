@@ -4507,6 +4507,42 @@ export default function App() {
                 isOpen={showSyncReport}
                 reportData={syncReportData}
                 onClose={() => setShowSyncReport(false)}
+                onRetryTicker={async (ticker) => {
+                    // Réessayer la synchronisation pour un ticker spécifique
+                    if (syncReportData?.options) {
+                        const profile = library[ticker];
+                        if (profile) {
+                            setIsLoading(true);
+                            try {
+                                await performSync(false, syncReportData.options);
+                            } finally {
+                                setIsLoading(false);
+                            }
+                        }
+                    }
+                }}
+                onRetryFailed={async () => {
+                    // Réessayer tous les tickers en échec
+                    if (syncReportData?.options && syncReportData?.tickerResults) {
+                        const failedTickers = syncReportData.tickerResults
+                            .filter(r => !r.success && !r.error?.includes('introuvable'))
+                            .map(r => r.ticker);
+                        
+                        if (failedTickers.length > 0) {
+                            setIsBulkSyncing(true);
+                            try {
+                                // Créer une nouvelle synchronisation avec seulement les tickers en échec
+                                const options = { ...syncReportData.options, syncAllTickers: false };
+                                // Note: handleBulkSyncAllTickersWithOptions traite tous les tickers
+                                // Il faudrait créer une version qui accepte une liste de tickers
+                                // Pour l'instant, on utilise la version existante
+                                await handleBulkSyncAllTickersWithOptions(options);
+                            } finally {
+                                setIsBulkSyncing(false);
+                            }
+                        }
+                    }
+                }}
             />
         </div>
     );

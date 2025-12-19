@@ -2765,6 +2765,10 @@ input[type=number]::-webkit-outer-spin-button {
 .hover\:bg-red-600\/20:hover {
   background-color: rgb(220 38 38 / 0.2);
 }
+.hover\:bg-red-700:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
+}
 .hover\:bg-red-900\/50:hover {
   background-color: rgb(127 29 29 / 0.5);
 }
