@@ -49,6 +49,53 @@ export const calculateCAGR = (startValue: number, endValue: number, years: numbe
   return isFinite(result) ? result : 0;
 };
 
+/**
+ * Calcule la croissance historique sur une période donnée (par défaut 5 ans) pour une métrique
+ * Utilisé pour initialiser automatiquement les taux de croissance si absents
+ * 
+ * @param data - Données historiques annuelles
+ * @param metricKey - Clé de la métrique à calculer ('earningsPerShare', 'cashFlowPerShare', etc.)
+ * @param period - Période en années (par défaut 5 ans)
+ * @returns Taux de croissance en pourcentage (CAGR)
+ */
+export const calculateHistoricalGrowth = (
+  data: AnnualData[],
+  metricKey: keyof AnnualData,
+  period: number = 5
+): number => {
+  if (!data || data.length < 2) return 0;
+  
+  // Trier par année
+  const sorted = [...data].sort((a, b) => Number(a.year) - Number(b.year));
+  const last = sorted[sorted.length - 1];
+  const lastValue = Number(last[metricKey]);
+
+  if (lastValue <= 0) return 0;
+
+  const targetStartYear = Number(last.year) - period;
+  
+  // Chercher le point de départ valide le plus proche de N-period
+  let startCandidate = sorted
+    .filter(d => Number(d.year) <= targetStartYear && Number(d[metricKey]) > 0)
+    .sort((a, b) => Number(b.year) - Number(a.year))[0];
+
+  // Fallback: Si rien trouvé, essayer n'importe quel point antérieur
+  if (!startCandidate) {
+    startCandidate = sorted
+      .filter(d => Number(d.year) < Number(last.year) && Number(d[metricKey]) > 0)
+      .sort((a, b) => Number(a.year) - Number(b.year))[0];
+  }
+
+  if (!startCandidate) return 0;
+
+  const startValue = Number(startCandidate[metricKey]);
+  const years = Number(last.year) - Number(startCandidate.year);
+
+  if (years < 1) return 0;
+
+  return calculateCAGR(startValue, lastValue, years);
+};
+
 
 export const formatCurrency = (val: number | undefined | null) => {
   // ✅ CRITIQUE : Gérer undefined/null pour éviter d'afficher "0,00 $" pour des valeurs non chargées

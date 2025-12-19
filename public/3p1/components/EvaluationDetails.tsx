@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { formatCurrency, projectFutureValue, calculateCAGR } from '../utils/calculations';
+import { formatCurrency, projectFutureValue, calculateCAGR, calculateHistoricalGrowth } from '../utils/calculations';
 import { CalculatorIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { GuardrailConfig, DEFAULT_CONFIG } from '../config/AppConfig';
 import { AnnualData, Assumptions, CompanyInfo } from '../types';
@@ -156,22 +156,25 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   };
 
   // Valider et limiter les taux de croissance (Configurable)
-  // ✅ CRITIQUE : Ne pas utiliser || 0 pour éviter les valeurs inventées
-  // Si undefined, utiliser undefined (pas 0) pour indiquer que la valeur n'est pas encore chargée
+  // ✅ FIX: Si les taux de croissance sont 0 ou undefined, utiliser la moyenne historique 5 ans
+  // Cela corrige le problème des projections 5 ans à 0 au départ
   const growthMin = config.growth.min;
   const growthMax = config.growth.max;
-  const safeGrowthEPS = assumptions.growthRateEPS !== undefined 
-    ? Math.max(growthMin, Math.min(assumptions.growthRateEPS, growthMax))
-    : undefined;
-  const safeGrowthCF = assumptions.growthRateCF !== undefined 
-    ? Math.max(growthMin, Math.min(assumptions.growthRateCF, growthMax))
-    : undefined;
-  const safeGrowthBV = assumptions.growthRateBV !== undefined 
-    ? Math.max(growthMin, Math.min(assumptions.growthRateBV, growthMax))
-    : undefined;
-  const safeGrowthDiv = assumptions.growthRateDiv !== undefined 
-    ? Math.max(growthMin, Math.min(assumptions.growthRateDiv, growthMax))
-    : undefined;
+  
+  // Helper pour calculer la croissance historique si absente
+  const getSafeGrowth = (assumedGrowth: number | undefined, metricKey: keyof AnnualData): number => {
+    if (assumedGrowth !== undefined && assumedGrowth !== 0) {
+      return Math.max(growthMin, Math.min(assumedGrowth, growthMax));
+    }
+    // Si 0 ou undefined, calculer depuis l'historique 5 ans
+    const historicalGrowth = calculateHistoricalGrowth(data, metricKey, 5);
+    return historicalGrowth !== 0 ? Math.max(growthMin, Math.min(historicalGrowth, growthMax)) : 0;
+  };
+  
+  const safeGrowthEPS = getSafeGrowth(assumptions.growthRateEPS, 'earningsPerShare');
+  const safeGrowthCF = getSafeGrowth(assumptions.growthRateCF, 'cashFlowPerShare');
+  const safeGrowthBV = getSafeGrowth(assumptions.growthRateBV, 'bookValuePerShare');
+  const safeGrowthDiv = getSafeGrowth(assumptions.growthRateDiv, 'dividendPerShare');
 
   const futureValues = {
     eps: projectFutureValueSafe(baseValues.eps, safeGrowthEPS, 5),
@@ -317,9 +320,45 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   // But based on the user request matching 58.29% which is likely total upside:
   // We stick to totalReturnPercent.
 
+  // ✅ FIX: Améliorer handleInput pour permettre l'entrée de tous les chiffres valides
+  // Le problème était que parseFloat peut retourner NaN pour des valeurs partielles (ex: "1.")
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>, key: keyof Assumptions) => {
-    const val = parseFloat(e.target.value);
-    if (!isNaN(val)) onUpdateAssumption(key, val);
+    const inputValue = e.target.value.trim();
+    
+    // Permettre la valeur vide (pour permettre la suppression complète)
+    if (inputValue === '' || inputValue === '-') {
+      onUpdateAssumption(key, 0);
+      return;
+    }
+    
+    // Permettre les valeurs partielles avec point décimal (ex: "1.", "1.5")
+    const val = parseFloat(inputValue);
+    
+    // ✅ FIX: Accepter les valeurs valides même si elles sont en cours de saisie
+    // Ne pas bloquer les valeurs qui sont dans une plage raisonnable
+    if (!isNaN(val) && isFinite(val)) {
+      // Vérifier les limites selon le type de ratio
+      let min = -Infinity;
+      let max = Infinity;
+      
+      if (key === 'targetPE' || key === 'targetPCF') {
+        min = config.ratios.pe.min; // 1
+        max = config.ratios.pe.max; // 100
+      } else if (key === 'targetPBV') {
+        min = config.ratios.pbv.min; // 0.5
+        max = config.ratios.pbv.max; // 50
+      } else if (key === 'targetYield') {
+        min = config.ratios.yield.min; // 0.1
+        max = config.ratios.yield.max; // 20
+      } else if (key.includes('growthRate')) {
+        min = config.growth.min; // -50
+        max = config.growth.max; // 50
+      }
+      
+      // ✅ FIX: Permettre l'entrée même si hors limites (l'utilisateur peut être en train de taper)
+      // La validation finale se fera lors de la perte de focus ou de la sauvegarde
+      onUpdateAssumption(key, val);
+    }
   };
 
   const handleToggleExclusion = (metric: 'excludeEPS' | 'excludeCF' | 'excludeBV' | 'excludeDIV') => {

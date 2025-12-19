@@ -22,7 +22,7 @@ import { SyncProgressBar } from './components/SyncProgressBar';
 import { LandingPage } from './components/LandingPage';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
-import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation, autoFillAssumptionsFromFMPData, isMutualFund } from './utils/calculations';
+import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation, autoFillAssumptionsFromFMPData, isMutualFund, calculateHistoricalGrowth } from './utils/calculations';
 import { detectOutlierMetrics } from './utils/outlierDetection';
 import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon, ClockIcon, PresentationChartBarIcon, PlayIcon, PauseIcon, StopIcon } from '@heroicons/react/24/outline';
 import { fetchCompanyData } from './services/financeApi';
@@ -4257,6 +4257,67 @@ export default function App() {
 
     // Get Valuation Status
     const { recommendation, targetPrice, buyLimit, sellLimit } = calculateRecommendation(data, assumptions);
+    
+    // ✅ FIX: Calculer le prix cible moyen (au lieu d'utiliser seulement le prix cible BPA)
+    // Cette logique correspond à celle de EvaluationDetails pour garantir la cohérence
+    const calculateAverageTargetPrice = useMemo(() => {
+      const baseYearData = data.find(d => d.year === assumptions.baseYear) || data[data.length - 1];
+      const baseValues = {
+        eps: Math.max(baseYearData?.earningsPerShare || 0, 0),
+        cf: Math.max(baseYearData?.cashFlowPerShare || 0, 0),
+        bv: Math.max(baseYearData?.bookValuePerShare || 0, 0),
+        div: Math.max(assumptions.currentDividend || 0, 0)
+      };
+      
+      // ✅ FIX: Utiliser la croissance historique 5 ans si les taux sont 0 ou undefined
+      const safeGrowthEPS = (assumptions.growthRateEPS !== undefined && assumptions.growthRateEPS !== 0)
+        ? assumptions.growthRateEPS
+        : calculateHistoricalGrowth(data, 'earningsPerShare', 5);
+      const safeGrowthCF = (assumptions.growthRateCF !== undefined && assumptions.growthRateCF !== 0)
+        ? assumptions.growthRateCF
+        : calculateHistoricalGrowth(data, 'cashFlowPerShare', 5);
+      const safeGrowthBV = (assumptions.growthRateBV !== undefined && assumptions.growthRateBV !== 0)
+        ? assumptions.growthRateBV
+        : calculateHistoricalGrowth(data, 'bookValuePerShare', 5);
+      const safeGrowthDiv = (assumptions.growthRateDiv !== undefined && assumptions.growthRateDiv !== 0)
+        ? assumptions.growthRateDiv
+        : calculateHistoricalGrowth(data, 'dividendPerShare', 5);
+      
+      // Calculer les projections 5 ans avec les taux sécurisés
+      const futureValues = {
+        eps: projectFutureValue(baseValues.eps, safeGrowthEPS, 5),
+        cf: projectFutureValue(baseValues.cf, safeGrowthCF, 5),
+        bv: projectFutureValue(baseValues.bv, safeGrowthBV, 5),
+        div: projectFutureValue(baseValues.div, safeGrowthDiv, 5)
+      };
+      
+      // Calculer les prix cibles pour chaque métrique
+      const targets = {
+        eps: futureValues.eps > 0 && assumptions.targetPE > 0 ? futureValues.eps * assumptions.targetPE : null,
+        cf: futureValues.cf > 0 && assumptions.targetPCF > 0 ? futureValues.cf * assumptions.targetPCF : null,
+        bv: futureValues.bv > 0 && assumptions.targetPBV > 0 ? futureValues.bv * assumptions.targetPBV : null,
+        div: futureValues.div > 0 && assumptions.targetYield > 0 ? futureValues.div / (assumptions.targetYield / 100) : null
+      };
+      
+      // Filtrer les métriques exclues et valides
+      const currentPrice = Math.max(assumptions.currentPrice || 0, 0.01);
+      const maxReasonableTarget = currentPrice * 50; // Multiplicateur raisonnable
+      const minReasonableTarget = currentPrice * 0.1;
+      
+      const validTargets = [
+        !assumptions.excludeEPS && targets.eps !== null && targets.eps > 0 && targets.eps >= minReasonableTarget && targets.eps <= maxReasonableTarget && isFinite(targets.eps) ? targets.eps : null,
+        !assumptions.excludeCF && targets.cf !== null && targets.cf > 0 && targets.cf >= minReasonableTarget && targets.cf <= maxReasonableTarget && isFinite(targets.cf) ? targets.cf : null,
+        !assumptions.excludeBV && targets.bv !== null && targets.bv > 0 && targets.bv >= minReasonableTarget && targets.bv <= maxReasonableTarget && isFinite(targets.bv) ? targets.bv : null,
+        !assumptions.excludeDIV && targets.div !== null && targets.div > 0 && targets.div >= minReasonableTarget && targets.div <= maxReasonableTarget && isFinite(targets.div) ? targets.div : null
+      ].filter((t): t is number => t !== null && t > 0 && isFinite(t));
+      
+      return validTargets.length > 0
+        ? validTargets.reduce((a, b) => a + b, 0) / validTargets.length
+        : targetPrice; // Fallback sur prix cible BPA si aucun target valide
+    }, [data, assumptions, targetPrice]);
+    
+    // Utiliser le prix cible moyen pour le graphique
+    const chartTargetPrice = calculateAverageTargetPrice;
 
     const availableYears = data.map(d => d.year);
 
@@ -4552,7 +4613,7 @@ export default function App() {
                                         currentPrice={assumptions.currentPrice}
                                         buyPrice={buyLimit}
                                         sellPrice={sellLimit}
-                                        targetPrice={targetPrice}
+                                        targetPrice={chartTargetPrice}
                                         recommendation={recommendation}
                                     />
 
