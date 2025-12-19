@@ -222,29 +222,39 @@ export default async function handler(req, res) {
 
             // Transformer les key metrics en format AnnualData
             // FMP key-metrics utilise 'date' (format YYYY-MM-DD) pas 'calendarYear'
+            // IMPORTANT: Utiliser netIncomePerShare pour earningsPerShare (comme dans fmp-company-data.js)
             const data = metrics
                 .map(metric => {
                     // Extraire l'année de la date
                     let year = new Date().getFullYear();
                     if (metric.date) {
-                        year = new Date(metric.date).getFullYear();
+                        const dateObj = new Date(metric.date);
+                        if (!isNaN(dateObj.getTime())) {
+                            year = dateObj.getFullYear();
+                        }
                     } else if (metric.calendarYear) {
                         year = metric.calendarYear;
                     }
                     return { ...metric, year };
                 })
+                .filter(metric => metric.year && metric.year > 1900 && metric.year < 2100) // Filtrer les années invalides
                 .sort((a, b) => b.year - a.year)
                 .slice(0, 25) // Limiter à 25 années
                 .map(metric => ({
                     year: metric.year,
-                    earningsPerShare: metric.earningsPerShare || metric.netIncomePerShare || 0,
-                    cashFlowPerShare: metric.operatingCashFlowPerShare || 0,
-                    bookValuePerShare: metric.bookValuePerShare || 0,
-                    dividendPerShare: metric.dividendPerShare || 0,
-                    priceHigh: metric.priceToBookRatio && metric.bookValuePerShare ? (metric.bookValuePerShare * metric.priceToBookRatio) : 0,
+                    // IMPORTANT: Utiliser netIncomePerShare (comme dans fmp-company-data.js ligne 554)
+                    earningsPerShare: parseFloat(Number(metric.netIncomePerShare || metric.earningsPerShare || 0).toFixed(2)),
+                    cashFlowPerShare: parseFloat(Number(metric.operatingCashFlowPerShare || 0).toFixed(2)),
+                    bookValuePerShare: parseFloat(Number(metric.bookValuePerShare || 0).toFixed(2)),
+                    dividendPerShare: parseFloat(Number(metric.dividendPerShare || 0).toFixed(2)),
+                    // Calculer priceHigh à partir de priceToBookRatio si disponible
+                    priceHigh: metric.priceToBookRatio && metric.bookValuePerShare && metric.bookValuePerShare > 0 
+                        ? parseFloat(Number(metric.bookValuePerShare * metric.priceToBookRatio).toFixed(2))
+                        : 0,
                     priceLow: 0, // Pas disponible dans key metrics seul, nécessiterait historical prices
                     autoFetched: true
-                }));
+                }))
+                .filter(row => row.earningsPerShare > 0 || row.cashFlowPerShare > 0 || row.bookValuePerShare > 0); // Filtrer les lignes complètement vides
 
             // Debug: log si pas de données
             if (data.length === 0) {
