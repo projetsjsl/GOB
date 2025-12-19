@@ -162,11 +162,18 @@ async function createSnapshot(req, res, supabase) {
     const cleanTicker = ticker.toUpperCase();
 
     // If is_current=true, unmark other current snapshots for this ticker
+    // IMPORTANT: Faire cela AVANT l'insertion pour éviter les violations de contrainte unique
     if (is_current) {
-        await supabase
+        const { error: updateError } = await supabase
             .from('finance_pro_snapshots')
             .update({ is_current: false })
-            .eq('ticker', cleanTicker);
+            .eq('ticker', cleanTicker)
+            .eq('is_current', true);
+        
+        if (updateError) {
+            console.error(`❌ Error unmarking current snapshots for ${cleanTicker}:`, updateError);
+            // Ne pas bloquer l'insertion, mais logger l'erreur
+        }
     }
 
     // Nettoyer annual_data : supprimer les champs non standard et valider les valeurs numériques
@@ -275,11 +282,44 @@ async function createSnapshot(req, res, supabase) {
     }
 
     // Create snapshot
-    const { data, error } = await supabase
-        .from('finance_pro_snapshots')
-        .insert([insertData])
-        .select()
-        .single();
+    // Retry logic pour gérer les conflits de contrainte unique (is_current)
+    let retryCount = 0;
+    const maxRetries = 3;
+    let data, error;
+    
+    while (retryCount < maxRetries) {
+        const result = await supabase
+            .from('finance_pro_snapshots')
+            .insert([insertData])
+            .select()
+            .single();
+        
+        data = result.data;
+        error = result.error;
+        
+        // Si succès ou erreur non liée à la contrainte unique, sortir
+        if (!error || (error.code !== '23505' && !error.message?.includes('unique'))) {
+            break;
+        }
+        
+        // Si erreur de contrainte unique sur is_current, réessayer après avoir mis à jour
+        if (error.code === '23505' && is_current && retryCount < maxRetries - 1) {
+            console.warn(`⚠️ Unique constraint violation for ${cleanTicker}, retrying (attempt ${retryCount + 1}/${maxRetries})...`);
+            // S'assurer que tous les autres snapshots sont marqués comme non-current
+            await supabase
+                .from('finance_pro_snapshots')
+                .update({ is_current: false })
+                .eq('ticker', cleanTicker)
+                .eq('is_current', true);
+            
+            // Attendre un peu avant de réessayer (éviter les conditions de course)
+            await new Promise(resolve => setTimeout(resolve, 100 * (retryCount + 1)));
+            retryCount++;
+            continue;
+        }
+        
+        break;
+    }
 
     if (error) {
         console.error(`❌ Create snapshot error for ${cleanTicker}:`, error);
