@@ -136,10 +136,11 @@ async function comparePerformance() {
     // Test avec key metrics
     console.log('⏳ Test avec key metrics...');
     const startWith = Date.now();
+    let durationWith = 0;
     try {
         const urlWith = `${API_BASE_URL}/api/fmp-company-data-batch-sync?symbols=${testTickers.join(',')}&limit=50&includeKeyMetrics=true`;
         const resWith = await fetch(urlWith);
-        const durationWith = Date.now() - startWith;
+        durationWith = Date.now() - startWith;
         console.log(`   Durée: ${durationWith}ms`);
     } catch (error) {
         console.log(`   Erreur: ${error.message}`);
@@ -154,8 +155,10 @@ async function comparePerformance() {
         const durationWithout = Date.now() - startWithout;
         console.log(`   Durée: ${durationWithout}ms`);
         
-        const improvement = ((durationWith - durationWithout) / durationWith * 100).toFixed(1);
-        console.log(`\n📊 Amélioration: ${improvement}% plus rapide sans key metrics`);
+        if (durationWith > 0) {
+            const improvement = ((durationWith - durationWithout) / durationWith * 100).toFixed(1);
+            console.log(`\n📊 Amélioration: ${improvement}% plus rapide sans key metrics`);
+        }
     } catch (error) {
         console.log(`   Erreur: ${error.message}`);
     }

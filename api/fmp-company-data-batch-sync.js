@@ -124,10 +124,10 @@ export default async function handler(req, res) {
             // Traiter par petits groupes pour éviter le rate limiting
             const CONCURRENT_LIMIT = 3; // Maximum 3 appels simultanés
             for (let i = 0; i < validSymbols.length; i += CONCURRENT_LIMIT) {
-            const batch = validSymbols.slice(i, i + CONCURRENT_LIMIT);
+                const batch = validSymbols.slice(i, i + CONCURRENT_LIMIT);
             
-            // Faire les appels en parallèle pour ce petit batch
-            const promises = batch.map(async (symbol) => {
+                // Faire les appels en parallèle pour ce petit batch
+                const promises = batch.map(async (symbol) => {
                 try {
                     const metricsRes = await fetch(`${FMP_BASE}/key-metrics/${symbol}?period=annual&limit=30&apikey=${FMP_KEY}`);
                     
@@ -164,14 +164,14 @@ export default async function handler(req, res) {
                     keyMetricsEmptyCount++;
                     return { symbol, success: false, reason: error.message };
                 }
-            });
-            
-            const results = await Promise.all(promises);
-            const successInBatch = results.filter(r => r.success).length;
-            if (successInBatch > 0) {
-                console.log(`✅ Key metrics batch ${Math.floor(i / CONCURRENT_LIMIT) + 1}: ${successInBatch}/${batch.length} succès`);
-            }
-            
+                });
+                
+                const results = await Promise.all(promises);
+                const successInBatch = results.filter(r => r.success).length;
+                if (successInBatch > 0) {
+                    console.log(`✅ Key metrics batch ${Math.floor(i / CONCURRENT_LIMIT) + 1}: ${successInBatch}/${batch.length} succès`);
+                }
+                
                 // Délai entre batches pour éviter rate limiting (ultra-sécurisé: 500ms)
                 if (i + CONCURRENT_LIMIT < validSymbols.length) {
                     await new Promise(resolve => setTimeout(resolve, 500));
