@@ -2640,34 +2640,47 @@ export default function App() {
             
             try {
                 const symbolString = tickerSymbols.join(',');
-                const response = await fetch(`/api/fmp-company-data-batch-sync?symbols=${encodeURIComponent(symbolString)}&limit=${BATCH_API_SIZE}`);
+                console.log(`🔍 [BATCH] Appel API pour ${tickerSymbols.length} tickers: ${symbolString.substring(0, 50)}...`);
+                const url = `/api/fmp-company-data-batch-sync?symbols=${encodeURIComponent(symbolString)}&limit=${BATCH_API_SIZE}`;
+                console.log(`🔍 [BATCH] URL: ${url.substring(0, 100)}...`);
+                
+                const response = await fetch(url);
+                console.log(`🔍 [BATCH] Réponse HTTP: ${response.status} ${response.statusText}`);
                 
                 if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`❌ [BATCH] Erreur HTTP ${response.status}:`, errorText.substring(0, 200));
                     throw new Error(`Batch API error: ${response.status}`);
                 }
                 
                 const batchData = await response.json();
+                console.log(`🔍 [BATCH] Données reçues:`, {
+                    success: batchData.success,
+                    resultsCount: batchData.results?.length || 0,
+                    stats: batchData.stats
+                });
                 
                 if (batchData.success && batchData.results) {
-                    console.log(`📦 Batch API réponse: ${batchData.results.length} résultats`);
+                    console.log(`📦 [BATCH] Batch API réponse: ${batchData.results.length} résultats`);
                     batchData.results.forEach((result: any) => {
                         if (result.success && result.data) {
                             const dataLength = result.data.data ? result.data.data.length : 0;
                             if (dataLength > 0) {
-                                console.log(`✅ ${result.symbol}: ${dataLength} années de données`);
+                                console.log(`✅ [BATCH] ${result.symbol}: ${dataLength} années de données`);
                             } else {
-                                console.log(`⚠️ ${result.symbol}: Profile trouvé mais ${dataLength} années de données`);
+                                console.log(`⚠️ [BATCH] ${result.symbol}: Profile trouvé mais ${dataLength} années de données`);
                             }
                             results.set(result.symbol.toUpperCase(), result.data);
                         } else {
-                            console.warn(`❌ ${result.symbol}: Échec ou données manquantes (success: ${result.success}, hasData: ${!!result.data})`);
+                            console.warn(`❌ [BATCH] ${result.symbol}: Échec ou données manquantes (success: ${result.success}, hasData: ${!!result.data})`);
                         }
                     });
+                    console.log(`📦 [BATCH] Total résultats stockés dans Map: ${results.size}`);
                 } else {
-                    console.error(`❌ Batch API réponse invalide:`, batchData);
+                    console.error(`❌ [BATCH] Batch API réponse invalide:`, batchData);
                 }
-            } catch (error) {
-                console.error(`❌ Erreur batch fetch:`, error);
+            } catch (error: any) {
+                console.error(`❌ [BATCH] Erreur batch fetch:`, error.message, error);
             }
             
             return results;
