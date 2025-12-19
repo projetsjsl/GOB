@@ -56,8 +56,15 @@ export default async function handler(req, res) {
                 return res.status(405).json({ error: 'Method not allowed' });
         }
     } catch (error) {
-        console.error('Finance snapshots API error:', error);
-        return res.status(500).json({ error: error.message });
+        console.error('❌ Finance snapshots API error:', error);
+        console.error('Error stack:', error.stack);
+        console.error('Request method:', req.method);
+        console.error('Request body keys:', req.body ? Object.keys(req.body) : 'no body');
+        return res.status(500).json({ 
+            error: 'Internal server error',
+            message: error.message,
+            ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
+        });
     }
 }
 
@@ -113,7 +120,8 @@ async function getSnapshots(req, res, supabase) {
  * POST - Create new snapshot
  */
 async function createSnapshot(req, res, supabase) {
-    const {
+    try {
+        const {
         ticker,
         profile_id,
         annual_data,
@@ -340,6 +348,15 @@ async function createSnapshot(req, res, supabase) {
 
     console.log(`✅ Created snapshot for ${cleanTicker} (version ${data.version})`);
     return res.status(201).json(data);
+    } catch (snapshotError) {
+        console.error(`❌ Unexpected error in createSnapshot for ${req.body?.ticker || 'unknown'}:`, snapshotError);
+        console.error('Error stack:', snapshotError.stack);
+        return res.status(500).json({ 
+            error: 'Failed to create snapshot',
+            message: snapshotError.message,
+            ...(process.env.NODE_ENV === 'development' && { stack: snapshotError.stack })
+        });
+    }
 }
 
 /**
