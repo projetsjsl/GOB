@@ -54901,7 +54901,9 @@ Vérifiez les logs de la console pour plus de détails.`;
     setSyncStats({ successCount: 0, errorCount: 0 });
     let successCount = 0;
     let errorCount = 0;
+    let skippedCount = 0;
     const errors = [];
+    const skippedTickers = [];
     const FMP_BATCH_SIZE = 5;
     const delayBetweenBatches = 500;
     const FMP_TIMEOUT_MS = 3e4;
@@ -54954,7 +54956,25 @@ Vérifiez les logs de la console pour plus de détails.`;
                 return;
               }
               console.log(`🔄 Synchronisation ${tickerSymbol}...`);
-              const result = await fetchCompanyDataWithTimeout(tickerSymbol);
+              let result;
+              try {
+                result = await fetchCompanyDataWithTimeout(tickerSymbol);
+              } catch (fetchError) {
+                const isNotFoundError = fetchError.message && (fetchError.message.includes("introuvable") || fetchError.message.includes("not found") || fetchError.message.includes("404"));
+                if (isNotFoundError) {
+                  skippedCount++;
+                  skippedTickers.push(tickerSymbol);
+                  console.warn(`⏭️ ${tickerSymbol}: Ignoré (introuvable dans FMP). ${fetchError.message}`);
+                  return;
+                }
+                throw fetchError;
+              }
+              if (!result || !result.data || result.data.length === 0) {
+                skippedCount++;
+                skippedTickers.push(tickerSymbol);
+                console.warn(`⏭️ ${tickerSymbol}: Ignoré (aucune donnée disponible)`);
+                return;
+              }
               let mergedData = profile2.data;
               if (options.syncData && result.data.length > 0) {
                 const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
@@ -55122,17 +55142,37 @@ Vérifiez les logs de la console pour plus de détails.`;
           })
         );
       }
-      const summary = `Synchronisation terminée:
-✅ ${successCount} succès
-❌ ${errorCount} erreurs`;
+      const totalProcessed = successCount + errorCount + skippedCount;
+      let summary = `Synchronisation terminée:
+✅ ${successCount} succès`;
+      if (skippedCount > 0) {
+        summary += `
+⏭️ ${skippedCount} ignorés (introuvables dans FMP)`;
+      }
       if (errorCount > 0) {
-        console.warn(`⚠️ ${summary}
-Erreurs:
-${errors.join("\n")}`);
+        summary += `
+❌ ${errorCount} erreurs`;
+      }
+      if (skippedCount > 0) {
+        console.warn(`⏭️ Tickers ignorés (introuvables dans FMP):
+${skippedTickers.slice(0, 20).join(", ")}${skippedTickers.length > 20 ? `
+... et ${skippedTickers.length - 20} autres` : ""}`);
+      }
+      if (errorCount > 0) {
+        console.warn(`❌ Erreurs:
+${errors.slice(0, 10).join("\n")}${errors.length > 10 ? `
+... et ${errors.length - 10} autres` : ""}`);
+      }
+      if (errorCount > 0 || skippedCount > 0) {
+        const notificationMessage = skippedCount > 0 && errorCount === 0 ? `${summary}
+
+${skippedTickers.length} ticker(s) ignoré(s) car introuvable(s) dans FMP.` : `${summary}
+
+Voir la console pour les détails.`;
         setNotifications((prev) => [...prev, {
           id: `bulk-sync-${Date.now()}`,
-          message: `${summary}. Voir la console pour les détails.`,
-          type: "warning"
+          message: notificationMessage,
+          type: skippedCount > 0 && errorCount === 0 ? "warning" : "error"
         }]);
       } else {
         console.log(`✅ ${summary}`);

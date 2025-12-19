@@ -2616,7 +2616,9 @@ export default function App() {
 
         let successCount = 0;
         let errorCount = 0;
+        let skippedCount = 0; // Tickers introuvables dans FMP (404)
         const errors: string[] = [];
+        const skippedTickers: string[] = []; // Tickers ignorés car introuvables dans FMP
         
         // ✅ OPTIMISATION: Batch size pour FMP (5 tickers en parallèle)
         const FMP_BATCH_SIZE = 5;
@@ -2693,7 +2695,35 @@ export default function App() {
                         }
 
                         console.log(`🔄 Synchronisation ${tickerSymbol}...`);
-                        const result = await fetchCompanyDataWithTimeout(tickerSymbol);
+                        let result;
+                        try {
+                            result = await fetchCompanyDataWithTimeout(tickerSymbol);
+                        } catch (fetchError: any) {
+                            // Détecter si c'est une erreur 404 (ticker introuvable dans FMP)
+                            const isNotFoundError = fetchError.message && (
+                                fetchError.message.includes('introuvable') ||
+                                fetchError.message.includes('not found') ||
+                                fetchError.message.includes('404')
+                            );
+                            
+                            if (isNotFoundError) {
+                                // Ticker introuvable dans FMP - ignorer ce ticker
+                                skippedCount++;
+                                skippedTickers.push(tickerSymbol);
+                                console.warn(`⏭️ ${tickerSymbol}: Ignoré (introuvable dans FMP). ${fetchError.message}`);
+                                return; // Sortir de la fonction pour ce ticker
+                            }
+                            // Autre erreur - la propager pour être gérée par le catch externe
+                            throw fetchError;
+                        }
+
+                        // Vérifier que les données sont valides avant de continuer
+                        if (!result || !result.data || result.data.length === 0) {
+                            skippedCount++;
+                            skippedTickers.push(tickerSymbol);
+                            console.warn(`⏭️ ${tickerSymbol}: Ignoré (aucune donnée disponible)`);
+                            return; // Sortir de la fonction pour ce ticker
+                        }
 
                         // 3. Merge intelligent : préserver les données manuelles (sauf si forceReplace)
                         let mergedData = profile.data;
@@ -2904,14 +2934,37 @@ export default function App() {
             );
             }
 
-            // Afficher un résumé
-            const summary = `Synchronisation terminée:\n✅ ${successCount} succès\n❌ ${errorCount} erreurs`;
+            // Afficher un résumé détaillé
+            const totalProcessed = successCount + errorCount + skippedCount;
+            let summary = `Synchronisation terminée:\n✅ ${successCount} succès`;
+            
+            if (skippedCount > 0) {
+                summary += `\n⏭️ ${skippedCount} ignorés (introuvables dans FMP)`;
+            }
+            
             if (errorCount > 0) {
-                console.warn(`⚠️ ${summary}\nErreurs:\n${errors.join('\n')}`);
+                summary += `\n❌ ${errorCount} erreurs`;
+            }
+            
+            // Log détaillé
+            if (skippedCount > 0) {
+                console.warn(`⏭️ Tickers ignorés (introuvables dans FMP):\n${skippedTickers.slice(0, 20).join(', ')}${skippedTickers.length > 20 ? `\n... et ${skippedTickers.length - 20} autres` : ''}`);
+            }
+            
+            if (errorCount > 0) {
+                console.warn(`❌ Erreurs:\n${errors.slice(0, 10).join('\n')}${errors.length > 10 ? `\n... et ${errors.length - 10} autres` : ''}`);
+            }
+            
+            // Notification
+            if (errorCount > 0 || skippedCount > 0) {
+                const notificationMessage = skippedCount > 0 && errorCount === 0
+                    ? `${summary}\n\n${skippedTickers.length} ticker(s) ignoré(s) car introuvable(s) dans FMP.`
+                    : `${summary}\n\nVoir la console pour les détails.`;
+                
                 setNotifications(prev => [...prev, {
                     id: `bulk-sync-${Date.now()}`,
-                    message: `${summary}. Voir la console pour les détails.`,
-                    type: 'warning'
+                    message: notificationMessage,
+                    type: skippedCount > 0 && errorCount === 0 ? 'warning' : 'error'
                 }]);
             } else {
                 console.log(`✅ ${summary}`);
