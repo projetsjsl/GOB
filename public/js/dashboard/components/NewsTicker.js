@@ -4,9 +4,17 @@
 
 const { useState, useEffect, useRef } = React;
 
-const NewsTicker = ({ isDarkMode = true }) => {
+const NewsTicker = ({ isDarkMode = true, forceVisible = false }) => {
+    // Initialiser isVisible en vérifiant localStorage, mais forcer visible si demandé
+    const getInitialVisibility = () => {
+        if (forceVisible) return true;
+        const saved = localStorage.getItem('news-ticker-visible');
+        // Par défaut visible si non défini
+        return saved === null ? true : saved === 'true';
+    };
+    
     const [news, setNews] = useState([]);
-    const [isVisible, setIsVisible] = useState(true);
+    const [isVisible, setIsVisible] = useState(getInitialVisibility());
     const [isLoading, setIsLoading] = useState(true);
     const [newsType, setNewsType] = useState('all');
     const [showTypeSelector, setShowTypeSelector] = useState(false);
@@ -134,12 +142,37 @@ const NewsTicker = ({ isDarkMode = true }) => {
         }
     };
 
-    // Restaurer depuis localStorage
+    // Restaurer depuis localStorage - Par défaut visible si non défini
+    // Si forceVisible est true, ignorer localStorage
     useEffect(() => {
-        const saved = localStorage.getItem('news-ticker-visible');
-        if (saved !== null) {
-            setIsVisible(saved === 'true');
+        if (forceVisible) {
+            setIsVisible(true);
+            localStorage.setItem('news-ticker-visible', 'true');
+            return;
         }
+        const saved = localStorage.getItem('news-ticker-visible');
+        // Si aucune préférence sauvegardée, le ticker est visible par défaut
+        if (saved === null) {
+            setIsVisible(true);
+            localStorage.setItem('news-ticker-visible', 'true');
+        } else {
+            // Forcer l'affichage par défaut - le ticker sera toujours visible au chargement
+            // L'utilisateur peut toujours le fermer manuellement, mais il réapparaîtra au prochain chargement
+            setIsVisible(true);
+            localStorage.setItem('news-ticker-visible', 'true');
+        }
+    }, [forceVisible]);
+    
+    // Exposer une fonction globale pour réactiver le ticker
+    useEffect(() => {
+        window.showNewsTicker = () => {
+            setIsVisible(true);
+            localStorage.setItem('news-ticker-visible', 'true');
+            console.log('📰 NewsTicker réactivé');
+        };
+        return () => {
+            delete window.showNewsTicker;
+        };
     }, []);
 
     const handleClose = () => {
@@ -192,10 +225,21 @@ const NewsTicker = ({ isDarkMode = true }) => {
         { value: 'mergers', label: 'Fusions', icon: '🤝' }
     ];
 
-    if (!isVisible) return null;
+    // Debug: Log l'état de visibilité
+    useEffect(() => {
+        console.log('📰 NewsTicker - État:', { isVisible, isModalOpen, forceVisible, newsCount: news.length });
+    }, [isVisible, isModalOpen, forceVisible, news.length]);
 
-    // Masquer le NewsTicker si un modal est ouvert
-    if (isModalOpen) return null;
+    if (!isVisible && !forceVisible) {
+        console.log('📰 NewsTicker masqué: isVisible=false');
+        return null;
+    }
+
+    // Masquer le NewsTicker si un modal est ouvert (sauf si forceVisible)
+    if (isModalOpen && !forceVisible) {
+        console.log('📰 NewsTicker masqué: modal ouvert');
+        return null;
+    }
 
     return (
         <>

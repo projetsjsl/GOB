@@ -2633,6 +2633,8 @@ export default function App() {
         // ✅ OPTIMISATION: Utiliser l'endpoint batch pour récupérer plusieurs tickers en une seule requête
         const BATCH_API_SIZE = 20; // Nombre de tickers par batch API (limite FMP)
         const delayBetweenBatches = 2000; // Délai entre batches API (2 secondes - ultra-sécurisé pour rate limiting)
+        const MAX_SYNC_TIME_MS = 30 * 60 * 1000; // Timeout global : 30 minutes max pour toute la synchronisation
+        const startSyncTime = Date.now(); // Timestamp de début pour timeout global
 
         // ✅ FONCTION HELPER: Récupérer plusieurs tickers en batch
         const fetchCompanyDataBatch = async (tickerSymbols: string[], includeKeyMetrics: boolean = true): Promise<Map<string, any>> => {
@@ -2710,6 +2712,14 @@ export default function App() {
                     break;
                 }
 
+                // ✅ TIMEOUT GLOBAL: Vérifier si on dépasse le temps maximum
+                const elapsedTime = Date.now() - startSyncTime;
+                if (elapsedTime > MAX_SYNC_TIME_MS) {
+                    console.warn(`⏱️ Timeout global atteint (${MAX_SYNC_TIME_MS / 1000 / 60} min). Arrêt de la synchronisation.`);
+                    console.warn(`📊 Progression: ${i}/${allTickers.length} tickers traités (${Math.round(i / allTickers.length * 100)}%)`);
+                    break;
+                }
+
             while (isSyncPaused.current) {
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
@@ -2728,10 +2738,14 @@ export default function App() {
             console.log(`🔍 [BATCH] Options: syncData=${options.syncData}, syncAssumptions=${options.syncAssumptions}, syncInfo=${options.syncInfo}, includeKeyMetrics=${includeKeyMetrics}`);
             const batchResults = await fetchCompanyDataBatch(batch, includeKeyMetrics);
 
-            // Traiter chaque ticker du batch
+            // Traiter chaque ticker du batch avec timeout individuel
             await Promise.allSettled(
                 batch.map(async (tickerSymbol) => {
                     const tickerStartTime = Date.now();
+                    const TICKER_TIMEOUT_MS = 60000; // 60 secondes max par ticker
+                    
+                    // Wrapper avec timeout pour éviter qu'un ticker bloque indéfiniment
+                    const tickerPromise = (async () => {
                     let tickerResult: any = {
                         ticker: tickerSymbol,
                         success: false,
