@@ -57008,14 +57008,15 @@ Vérifiez votre connexion et réessayez.`,
             if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
               return existingRow;
             }
+            const newRowTyped = newRow;
             return {
               ...existingRow,
-              earningsPerShare: newRow.earningsPerShare > 0 ? newRow.earningsPerShare : existingRow.earningsPerShare,
-              cashFlowPerShare: newRow.cashFlowPerShare > 0 ? newRow.cashFlowPerShare : existingRow.cashFlowPerShare,
-              bookValuePerShare: newRow.bookValuePerShare > 0 ? newRow.bookValuePerShare : existingRow.bookValuePerShare,
-              dividendPerShare: newRow.dividendPerShare > 0 ? newRow.dividendPerShare : existingRow.dividendPerShare,
-              priceHigh: newRow.priceHigh > 0 ? newRow.priceHigh : existingRow.priceHigh,
-              priceLow: newRow.priceLow > 0 ? newRow.priceLow : existingRow.priceLow,
+              earningsPerShare: newRowTyped.earningsPerShare > 0 ? newRowTyped.earningsPerShare : existingRow.earningsPerShare,
+              cashFlowPerShare: newRowTyped.cashFlowPerShare > 0 ? newRowTyped.cashFlowPerShare : existingRow.cashFlowPerShare,
+              bookValuePerShare: newRowTyped.bookValuePerShare > 0 ? newRowTyped.bookValuePerShare : existingRow.bookValuePerShare,
+              dividendPerShare: newRowTyped.dividendPerShare > 0 ? newRowTyped.dividendPerShare : existingRow.dividendPerShare,
+              priceHigh: newRowTyped.priceHigh > 0 ? newRowTyped.priceHigh : existingRow.priceHigh,
+              priceLow: newRowTyped.priceLow > 0 ? newRowTyped.priceLow : existingRow.priceLow,
               autoFetched: true
             };
           });
@@ -57633,14 +57634,15 @@ Vérifiez les logs de la console pour plus de détails.`;
         if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
           return existingRow;
         }
+        const newRowTyped = newRow;
         return {
           ...existingRow,
-          earningsPerShare: newRow.earningsPerShare > 0 ? newRow.earningsPerShare : existingRow.earningsPerShare,
-          cashFlowPerShare: newRow.cashFlowPerShare > 0 ? newRow.cashFlowPerShare : existingRow.cashFlowPerShare,
-          bookValuePerShare: newRow.bookValuePerShare > 0 ? newRow.bookValuePerShare : existingRow.bookValuePerShare,
-          dividendPerShare: newRow.dividendPerShare > 0 ? newRow.dividendPerShare : existingRow.dividendPerShare,
-          priceHigh: newRow.priceHigh > 0 ? newRow.priceHigh : existingRow.priceHigh,
-          priceLow: newRow.priceLow > 0 ? newRow.priceLow : existingRow.priceLow,
+          earningsPerShare: newRowTyped.earningsPerShare > 0 ? newRowTyped.earningsPerShare : existingRow.earningsPerShare,
+          cashFlowPerShare: newRowTyped.cashFlowPerShare > 0 ? newRowTyped.cashFlowPerShare : existingRow.cashFlowPerShare,
+          bookValuePerShare: newRowTyped.bookValuePerShare > 0 ? newRowTyped.bookValuePerShare : existingRow.bookValuePerShare,
+          dividendPerShare: newRowTyped.dividendPerShare > 0 ? newRowTyped.dividendPerShare : existingRow.dividendPerShare,
+          priceHigh: newRowTyped.priceHigh > 0 ? newRowTyped.priceHigh : existingRow.priceHigh,
+          priceLow: newRowTyped.priceLow > 0 ? newRowTyped.priceLow : existingRow.priceLow,
           autoFetched: true
         };
       });
