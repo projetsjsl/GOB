@@ -108,92 +108,68 @@ export default async function handler(req, res) {
             }
         }
 
-        // 2. Récupérer les key metrics en batch (seulement pour les symboles qui ont un profile)
+        // 2. Récupérer les key metrics individuellement (FMP ne supporte pas les batch requests pour key-metrics)
         const validSymbols = Object.keys(allProfiles);
-        console.log(`📊 ${validSymbols.length} symboles avec profile valide`);
+        console.log(`📊 ${validSymbols.length} symboles avec profile valide - Récupération key metrics individuellement`);
         
-        const keyMetricsBatches = [];
-        for (let i = 0; i < validSymbols.length; i += KEY_METRICS_BATCH_SIZE) {
-            keyMetricsBatches.push(validSymbols.slice(i, i + KEY_METRICS_BATCH_SIZE));
-        }
-
         const allKeyMetrics = {};
         let keyMetricsSuccessCount = 0;
         let keyMetricsEmptyCount = 0;
         
-        for (const batch of keyMetricsBatches) {
-            try {
-                const symbolString = batch.join(',');
-                const metricsRes = await fetch(`${FMP_BASE}/key-metrics/${symbolString}?period=annual&limit=30&apikey=${FMP_KEY}`);
-                
-                if (metricsRes.ok) {
-                    const metrics = await metricsRes.json();
-                    if (Array.isArray(metrics)) {
-                        // Grouper les métriques par symbole
-                        const metricsBySymbol = {};
-                        metrics.forEach(metric => {
-                            if (metric && metric.symbol) {
-                                const symbol = metric.symbol.toUpperCase();
-                                if (!metricsBySymbol[symbol]) {
-                                    metricsBySymbol[symbol] = [];
-                                }
-                                metricsBySymbol[symbol].push(metric);
-                            }
-                        });
-                        
-                        // Ajouter au résultat global
-                        Object.keys(metricsBySymbol).forEach(symbol => {
-                            allKeyMetrics[symbol] = metricsBySymbol[symbol];
+        // Traiter par petits groupes pour éviter le rate limiting
+        const CONCURRENT_LIMIT = 3; // Maximum 3 appels simultanés
+        for (let i = 0; i < validSymbols.length; i += CONCURRENT_LIMIT) {
+            const batch = validSymbols.slice(i, i + CONCURRENT_LIMIT);
+            
+            // Faire les appels en parallèle pour ce petit batch
+            const promises = batch.map(async (symbol) => {
+                try {
+                    const metricsRes = await fetch(`${FMP_BASE}/key-metrics/${symbol}?period=annual&limit=30&apikey=${FMP_KEY}`);
+                    
+                    if (metricsRes.ok) {
+                        const metrics = await metricsRes.json();
+                        if (Array.isArray(metrics) && metrics.length > 0) {
+                            allKeyMetrics[symbol] = metrics;
                             keyMetricsSuccessCount++;
-                        });
-                        
-                        // Compter les symboles sans métriques
-                        batch.forEach(symbol => {
-                            if (!metricsBySymbol[symbol.toUpperCase()]) {
-                                keyMetricsEmptyCount++;
-                                console.warn(`⚠️ ${symbol}: Profile trouvé mais aucune key metric disponible`);
-                            }
-                        });
-                        
-                        console.log(`✅ Key metrics batch: ${batch.length} symboles, ${metrics.length} métriques récupérées (${Object.keys(metricsBySymbol).length} symboles avec données)`);
-                    } else {
-                        console.warn(`⚠️ Key metrics batch: réponse non-array pour ${batch.join(',')} (status: ${metricsRes.status})`);
-                        // Si la réponse n'est pas un array, tous les symboles du batch n'ont pas de métriques
-                        keyMetricsEmptyCount += batch.length;
-                    }
-                } else if (metricsRes.status === 429) {
-                    // Rate limiting - attendre et réessayer
-                    console.warn(`⏳ Rate limit détecté pour key metrics batch, attente 3s...`);
-                    await new Promise(resolve => setTimeout(resolve, 3000));
-                    // Réessayer une fois
-                    const retryRes = await fetch(`${FMP_BASE}/key-metrics/${symbolString}?period=annual&limit=30&apikey=${FMP_KEY}`);
-                    if (retryRes.ok) {
-                        const metrics = await retryRes.json();
-                        if (Array.isArray(metrics)) {
-                            metrics.forEach(metric => {
-                                if (metric && metric.symbol) {
-                                    const symbol = metric.symbol.toUpperCase();
-                                    if (!allKeyMetrics[symbol]) {
-                                        allKeyMetrics[symbol] = [];
-                                    }
-                                    allKeyMetrics[symbol].push(metric);
-                                    keyMetricsSuccessCount++;
-                                }
-                            });
+                            return { symbol, success: true, count: metrics.length };
+                        } else {
+                            keyMetricsEmptyCount++;
+                            return { symbol, success: false, reason: 'Empty array' };
                         }
+                    } else if (metricsRes.status === 429) {
+                        // Rate limiting - attendre et réessayer une fois
+                        console.warn(`⏳ Rate limit pour ${symbol}, attente 2s...`);
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        const retryRes = await fetch(`${FMP_BASE}/key-metrics/${symbol}?period=annual&limit=30&apikey=${FMP_KEY}`);
+                        if (retryRes.ok) {
+                            const metrics = await retryRes.json();
+                            if (Array.isArray(metrics) && metrics.length > 0) {
+                                allKeyMetrics[symbol] = metrics;
+                                keyMetricsSuccessCount++;
+                                return { symbol, success: true, count: metrics.length };
+                            }
+                        }
+                        keyMetricsEmptyCount++;
+                        return { symbol, success: false, reason: `HTTP ${retryRes.status}` };
+                    } else {
+                        keyMetricsEmptyCount++;
+                        return { symbol, success: false, reason: `HTTP ${metricsRes.status}` };
                     }
-                } else {
-                    console.warn(`⚠️ Key metrics batch échoué: ${metricsRes.status} pour ${batch.join(',')}`);
-                    keyMetricsEmptyCount += batch.length;
+                } catch (error) {
+                    keyMetricsEmptyCount++;
+                    return { symbol, success: false, reason: error.message };
                 }
-                
-                // Délai entre batches (ultra-sécurisé: 1.5s)
-                if (keyMetricsBatches.length > 1 && keyMetricsBatches.indexOf(batch) < keyMetricsBatches.length - 1) {
-                    await new Promise(resolve => setTimeout(resolve, 1500));
-                }
-            } catch (error) {
-                console.error(`❌ Erreur batch key metrics:`, error.message);
-                keyMetricsEmptyCount += batch.length;
+            });
+            
+            const results = await Promise.all(promises);
+            const successInBatch = results.filter(r => r.success).length;
+            if (successInBatch > 0) {
+                console.log(`✅ Key metrics batch ${Math.floor(i / CONCURRENT_LIMIT) + 1}: ${successInBatch}/${batch.length} succès`);
+            }
+            
+            // Délai entre batches pour éviter rate limiting (ultra-sécurisé: 500ms)
+            if (i + CONCURRENT_LIMIT < validSymbols.length) {
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
         }
         
