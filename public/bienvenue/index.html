@@ -221,11 +221,22 @@
          */
         const DataMapper = {
             // Employee
-            employeeToReact: (db) => ({
-                ...db,
-                avatarUrl: db.avatar_url || (db.name?.includes('Caroline') ? '/images/caroline_avatar.jpg' : null),
-                startDate: db.start_date || '2026-01-01'
-            }),
+            employeeToReact: (db) => {
+                // Forcer la date de début à être au minimum 2026-01-01
+                let startDate = db.start_date || '2026-01-01';
+                if (startDate) {
+                    const date = new Date(startDate);
+                    const minDate2026 = new Date('2026-01-01');
+                    if (date < minDate2026) {
+                        startDate = '2026-01-01';
+                    }
+                }
+                return {
+                    ...db,
+                    avatarUrl: db.avatar_url || (db.name?.includes('Caroline') ? '/images/caroline_avatar.jpg' : null),
+                    startDate: startDate
+                };
+            },
             employeeToDB: (react) => ({
                 name: react.name,
                 role: react.role,
@@ -1236,8 +1247,15 @@
                 // Focus sur l'input pour ouvrir le calendrier natif
                 setTimeout(() => {
                     if (inputRef.current) {
-                        inputRef.current.showPicker?.();
                         inputRef.current.focus();
+                        // Essayer showPicker() si disponible (Chrome/Edge)
+                        if (inputRef.current.showPicker) {
+                            try {
+                                inputRef.current.showPicker();
+                            } catch (err) {
+                                console.warn('showPicker() non supporté, utilisation du focus');
+                            }
+                        }
                     }
                 }, 10);
             };
@@ -1253,10 +1271,16 @@
                     <input
                         ref={inputRef}
                         type="date"
-                        value={value || ''}
-                        defaultValue={value || '2026-01-01'}
+                        value={value || '2026-01-01'}
                         onChange={(e) => {
-                            onChange(e.target.value);
+                            const newValue = e.target.value;
+                            // Forcer la date à être au minimum 2026-01-01
+                            const minDate = min || '2026-01-01';
+                            if (newValue && newValue < minDate) {
+                                onChange(minDate);
+                            } else {
+                                onChange(newValue);
+                            }
                             setIsOpen(false);
                         }}
                         onBlur={(e) => {
@@ -1265,8 +1289,12 @@
                         }}
                         min={min || '2026-01-01'}
                         max={max}
-                        className="absolute opacity-0 w-full h-full cursor-pointer"
-                        style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
+                        className="absolute opacity-0 w-full h-full cursor-pointer z-10"
+                        style={{ pointerEvents: 'auto' }}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsOpen(true);
+                        }}
                     />
                     <div
                         onClick={handleClick}
@@ -1743,7 +1771,24 @@
                                                 <div className="flex items-center gap-2">
                                                      <div className="flex items-center gap-1">
                                                          <span className="text-[10px] font-bold text-gray-400 uppercase whitespace-nowrap">Début :</span>
-                                                         <input type="date" className="w-32 text-xs border rounded px-1 py-1" value={emp.startDate || '2026-01-01'} defaultValue="2026-01-01" min="2026-01-01" onChange={e => updateEmp(emp.id, 'startDate', e.target.value)} title="Date de début d'emploi" />
+                                                         <input 
+                                                             type="date" 
+                                                             className="w-32 text-xs border rounded px-1 py-1" 
+                                                             value={(() => {
+                                                                 const date = emp.startDate || '2026-01-01';
+                                                                 const minDate = new Date('2026-01-01');
+                                                                 const empDate = new Date(date);
+                                                                 return empDate < minDate ? '2026-01-01' : date;
+                                                             })()} 
+                                                             min="2026-01-01" 
+                                                             onChange={e => {
+                                                                 const newValue = e.target.value;
+                                                                 // Forcer la date à être au minimum 2026-01-01
+                                                                 const finalValue = newValue < '2026-01-01' ? '2026-01-01' : newValue;
+                                                                 updateEmp(emp.id, 'startDate', finalValue);
+                                                             }} 
+                                                             title="Date de début d'emploi (minimum 2026-01-01)" 
+                                                         />
                                                      </div>
                                                      <button onClick={() => duplicateEmp(emp)} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded" title="Dupliquer"><Icons.Copy /></button>
                                                      <button onClick={(e) => { e.stopPropagation(); handleDeleteEmployee(emp.id); }} className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors" title="Supprimer l'employé"><Icons.Trash /></button>
