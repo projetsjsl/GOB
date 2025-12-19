@@ -266,7 +266,9 @@
             taskTemplateToReact: (db) => ({
                 ...db,
                 phaseId: db.phase_id,
-                dayOffset: db.day_offset,
+                dayOffset: db.day_offset, // Rétrocompatibilité
+                startDate: db.start_date || db.startDate,
+                endDate: db.end_date || db.endDate,
                 assignedTo: db.assigned_to || []
             }),
             taskTemplateToDB: (react) => ({
@@ -274,7 +276,9 @@
                 description: react.description,
                 priority: react.priority,
                 phase_id: react.phaseId,
-                day_offset: react.dayOffset,
+                day_offset: react.dayOffset, // Rétrocompatibilité
+                start_date: react.startDate,
+                end_date: react.endDate,
                 assigned_to: react.assignedTo
             })
         };
@@ -369,23 +373,44 @@
             generateTasks(employee, taskTemplates, employeeTasks) {
                 if (!employee || !employee.id) return [];
                 
-                // ✅ FIX: Toujours utiliser 2026-01-01 comme date de base minimum
-                // Même si l'employé a une date antérieure, on force 2026-01-01
-                const startDate = this.ensureMinDate2026(employee.startDate);
-                
                 const savedStatuses = employeeTasks[employee.id] || {};
                 
                 return taskTemplates.map(tt => {
                     const taskKey = `${employee.id}-${tt.id}`;
-                    const dueMs = startDate.getTime() + (tt.dayOffset || 0) * 86400000;
                     const savedStatus = savedStatuses[tt.id] || 'pending';
+                    
+                    // ✅ FIX: Utiliser les dates absolues startDate et endDate du template
+                    // Si le template a startDate/endDate, les utiliser directement
+                    // Sinon, calculer à partir de dayOffset (rétrocompatibilité)
+                    let startDate, endDate, dueDate;
+                    
+                    if (tt.startDate && tt.endDate) {
+                        // Utiliser les dates absolues du template
+                        startDate = this.ensureMinDate2026(tt.startDate);
+                        endDate = this.ensureMinDate2026(tt.endDate);
+                        dueDate = endDate.toISOString().split('T')[0];
+                    } else if (tt.dayOffset !== undefined) {
+                        // Rétrocompatibilité: calculer à partir de dayOffset
+                        const empStart = this.ensureMinDate2026(employee.startDate);
+                        const dueMs = empStart.getTime() + (tt.dayOffset || 0) * 86400000;
+                        dueDate = new Date(dueMs).toISOString().split('T')[0];
+                        startDate = new Date(dueMs);
+                        endDate = new Date(dueMs);
+                    } else {
+                        // Fallback: utiliser 2026-01-01
+                        startDate = new Date('2026-01-01');
+                        endDate = new Date('2026-01-01');
+                        dueDate = '2026-01-01';
+                    }
                     
                     return {
                         ...tt,
                         id: taskKey,
                         templateId: tt.id,
                         employeeId: employee.id,
-                        dueDate: new Date(dueMs).toISOString().split('T')[0],
+                        startDate: startDate.toISOString().split('T')[0],
+                        endDate: endDate.toISOString().split('T')[0],
+                        dueDate: dueDate,
                         status: savedStatus
                     };
                 });
@@ -583,35 +608,35 @@
         ];
 
         const defaultTaskTemplates = [
-            // Phase 1 - Arrivée & Logistique
-            { id: 1, phaseId: 1, title: 'Récupération du matériel informatique', description: 'Récupérer l\'ordinateur portable, l\'écran et les périphériques au département TI (2e étage).', priority: 'high', category: 'matériel', dayOffset: 0, assignedTo: [3] },
-            { id: 2, phaseId: 1, title: 'Configuration des accès courriels', description: 'Configuration d\'Outlook, de la signature corporative et des accès aux calendriers partagés.', priority: 'high', category: 'technique', dayOffset: 0, assignedTo: [4] },
-            { id: 3, phaseId: 1, title: 'Visite des locaux et présentation', description: 'Tour complet des bureaux, localisation des issues de secours, cafétéria et présentation aux équipes présentes.', priority: 'low', category: 'social', dayOffset: 0, assignedTo: [3] },
+            // Phase 1 - Arrivée & Logistique (Janvier 2026)
+            { id: 1, phaseId: 1, title: 'Récupération du matériel informatique', description: 'Récupérer l\'ordinateur portable, l\'écran et les périphériques au département TI (2e étage).', priority: 'high', category: 'matériel', startDate: '2026-01-02', endDate: '2026-01-02', assignedTo: [3] },
+            { id: 2, phaseId: 1, title: 'Configuration des accès courriels', description: 'Configuration d\'Outlook, de la signature corporative et des accès aux calendriers partagés.', priority: 'high', category: 'technique', startDate: '2026-01-02', endDate: '2026-01-03', assignedTo: [4] },
+            { id: 3, phaseId: 1, title: 'Visite des locaux et présentation', description: 'Tour complet des bureaux, localisation des issues de secours, cafétéria et présentation aux équipes présentes.', priority: 'low', category: 'social', startDate: '2026-01-02', endDate: '2026-01-02', assignedTo: [3] },
             
-            // Phase 1 - J2
-            { id: 4, phaseId: 1, title: 'Rencontre d\'introduction équipe', description: 'Rencontre informelle avec les membres de l\'équipe immédiate pour briser la glace.', priority: 'medium', category: 'social', dayOffset: 1, assignedTo: [1, 2] },
-            { id: 5, phaseId: 1, title: 'Formation CRM & Outils', description: 'Session de formation initiale sur le CRM, la gestion documentaire et les outils de communication.', priority: 'high', category: 'technique', dayOffset: 1, assignedTo: [4] },
+            // Phase 1 - J2 (Janvier 2026)
+            { id: 4, phaseId: 1, title: 'Rencontre d\'introduction équipe', description: 'Rencontre informelle avec les membres de l\'équipe immédiate pour briser la glace.', priority: 'medium', category: 'social', startDate: '2026-01-03', endDate: '2026-01-03', assignedTo: [1, 2] },
+            { id: 5, phaseId: 1, title: 'Formation CRM & Outils', description: 'Session de formation initiale sur le CRM, la gestion documentaire et les outils de communication.', priority: 'high', category: 'technique', startDate: '2026-01-03', endDate: '2026-01-05', assignedTo: [4] },
 
-            // Phase 2 - Formation (Vincent's Domain)
-            { id: 6, phaseId: 2, title: 'Formation Conformité & Éthique', description: 'Compléter les modules obligatoires sur la conformité, le code d\'éthique et la sécurité de l\'information.', priority: 'high', category: 'formation', dayOffset: 2, assignedTo: [3] },
-            { id: 7, phaseId: 2, title: 'Formation Gamme de Produits', description: 'Vue d\'ensemble détaillée des produits et services offerts, avec focus sur les nouveautés.', priority: 'medium', category: 'formation', dayOffset: 3, assignedTo: [1] },
-            { id: 11, phaseId: 2, title: 'Histoire GOB & Style d\'Investissement', description: 'Présentation par Vincent sur l\'histoire du groupe et la philosophie d\'investissement.', priority: 'high', category: 'formation', dayOffset: 2, assignedTo: [5] },
-            { id: 12, phaseId: 2, title: 'Les Modèles en Gestion Discrétionnaire (GD)', description: 'Explication détaillée des modèles de gestion discrétionnaire par Vincent.', priority: 'high', category: 'formation', dayOffset: 3, assignedTo: [5] },
-            { id: 13, phaseId: 2, title: 'Outils : Calculs GD & Tableaux de Bord', description: 'Session pratique avec Vincent sur les outils de calcul et le tableau de bord.', priority: 'high', category: 'technique', dayOffset: 4, assignedTo: [5] },
-            { id: 14, phaseId: 2, title: 'Arborescence & Sources d\'Information', description: 'Survol des essentiels : où trouver l\'information et comprendre l\'arborescence des dossiers.', priority: 'medium', category: 'administratif', dayOffset: 2, assignedTo: [5] },
-            { id: 15, phaseId: 2, title: 'Grille Tarifaire et Avantages', description: 'Explication complète de la structure tarifaire et de ses avantages concurrentiels.', priority: 'high', category: 'formation', dayOffset: 3, assignedTo: [5] },
-            { id: 16, phaseId: 2, title: 'Présentation "Nouveau Client"', description: 'Détail du contenu et de la structure de la présentation type pour un nouveau client.', priority: 'high', category: 'formation', dayOffset: 4, assignedTo: [5] },
+            // Phase 2 - Formation (Janvier-Février 2026)
+            { id: 6, phaseId: 2, title: 'Formation Conformité & Éthique', description: 'Compléter les modules obligatoires sur la conformité, le code d\'éthique et la sécurité de l\'information.', priority: 'high', category: 'formation', startDate: '2026-01-06', endDate: '2026-01-08', assignedTo: [3] },
+            { id: 7, phaseId: 2, title: 'Formation Gamme de Produits', description: 'Vue d\'ensemble détaillée des produits et services offerts, avec focus sur les nouveautés.', priority: 'medium', category: 'formation', startDate: '2026-01-09', endDate: '2026-01-10', assignedTo: [1] },
+            { id: 11, phaseId: 2, title: 'Histoire GOB & Style d\'Investissement', description: 'Présentation par Vincent sur l\'histoire du groupe et la philosophie d\'investissement.', priority: 'high', category: 'formation', startDate: '2026-01-13', endDate: '2026-01-14', assignedTo: [5] },
+            { id: 12, phaseId: 2, title: 'Les Modèles en Gestion Discrétionnaire (GD)', description: 'Explication détaillée des modèles de gestion discrétionnaire par Vincent.', priority: 'high', category: 'formation', startDate: '2026-01-15', endDate: '2026-01-17', assignedTo: [5] },
+            { id: 13, phaseId: 2, title: 'Outils : Calculs GD & Tableaux de Bord', description: 'Session pratique avec Vincent sur les outils de calcul et le tableau de bord.', priority: 'high', category: 'technique', startDate: '2026-01-20', endDate: '2026-01-22', assignedTo: [5] },
+            { id: 14, phaseId: 2, title: 'Arborescence & Sources d\'Information', description: 'Survol des essentiels : où trouver l\'information et comprendre l\'arborescence des dossiers.', priority: 'medium', category: 'administratif', startDate: '2026-01-23', endDate: '2026-01-24', assignedTo: [5] },
+            { id: 15, phaseId: 2, title: 'Grille Tarifaire et Avantages', description: 'Explication complète de la structure tarifaire et de ses avantages concurrentiels.', priority: 'high', category: 'formation', startDate: '2026-01-27', endDate: '2026-01-28', assignedTo: [5] },
+            { id: 16, phaseId: 2, title: 'Présentation "Nouveau Client"', description: 'Détail du contenu et de la structure de la présentation type pour un nouveau client.', priority: 'high', category: 'formation', startDate: '2026-01-29', endDate: '2026-01-31', assignedTo: [5] },
 
-            // Phase 2 continuation
-            { id: 8, phaseId: 2, title: 'Atelier Tableaux de Bord', description: 'Formation pratique sur l\'utilisation et l\'interprétation des tableaux de bord de performance.', priority: 'medium', category: 'technique', dayOffset: 4, assignedTo: [4] },
+            // Phase 2 continuation (Février 2026)
+            { id: 8, phaseId: 2, title: 'Atelier Tableaux de Bord', description: 'Formation pratique sur l\'utilisation et l\'interprétation des tableaux de bord de performance.', priority: 'medium', category: 'technique', startDate: '2026-02-03', endDate: '2026-02-05', assignedTo: [4] },
 
-            // Phase 3 - Immersion
-            { id: 9, phaseId: 3, title: 'Observation RDV Client (Senior)', description: 'Accompagnement d\'un conseiller senior lors d\'une rencontre client pour observation des bonnes pratiques.', priority: 'high', category: 'pratique', dayOffset: 8, assignedTo: [1] },
-            { id: 10, phaseId: 3, title: 'Simulation Dossier Client', description: 'Réalisation complète d\'un dossier client fictif pour valider l\'acquisition des compétences.', priority: 'medium', category: 'pratique', dayOffset: 10, assignedTo: [2] },
+            // Phase 3 - Immersion (Février-Mars 2026)
+            { id: 9, phaseId: 3, title: 'Observation RDV Client (Senior)', description: 'Accompagnement d\'un conseiller senior lors d\'une rencontre client pour observation des bonnes pratiques.', priority: 'high', category: 'pratique', startDate: '2026-02-10', endDate: '2026-02-14', assignedTo: [1] },
+            { id: 10, phaseId: 3, title: 'Simulation Dossier Client', description: 'Réalisation complète d\'un dossier client fictif pour valider l\'acquisition des compétences.', priority: 'medium', category: 'pratique', startDate: '2026-02-17', endDate: '2026-02-21', assignedTo: [2] },
             
-            // Phase 3 - Tours de roue (Catherine & Mélinda)
-            { id: 17, phaseId: 3, title: 'Tour de Roue : Communication', description: 'Session d\'immersion avec Catherine sur le volet Communication et Marketing.', priority: 'medium', category: 'formation', dayOffset: 7, assignedTo: [6] },
-            { id: 18, phaseId: 3, title: 'Tour de Roue : Trading', description: 'Session d\'immersion avec Mélinda sur le fonctionnement du desk de Trading.', priority: 'medium', category: 'technique', dayOffset: 9, assignedTo: [7] }
+            // Phase 3 - Tours de roue (Mars 2026)
+            { id: 17, phaseId: 3, title: 'Tour de Roue : Communication', description: 'Session d\'immersion avec Catherine sur le volet Communication et Marketing.', priority: 'medium', category: 'formation', startDate: '2026-03-03', endDate: '2026-03-05', assignedTo: [6] },
+            { id: 18, phaseId: 3, title: 'Tour de Roue : Trading', description: 'Session d\'immersion avec Mélinda sur le fonctionnement du desk de Trading.', priority: 'medium', category: 'technique', startDate: '2026-03-10', endDate: '2026-03-12', assignedTo: [7] }
         ];
 
         // Catégories disponibles pour les tâches
@@ -1825,7 +1850,8 @@
                                                 const title = document.getElementById('newTaskTitle').value;
                                                 const desc = document.getElementById('newTaskDesc').value || '';
                                                 const phaseId = parseInt(document.getElementById('newTaskPhase').value);
-                                                const dayOffset = parseInt(document.getElementById('newTaskDay').value);
+                                                const startDate = document.getElementById('newTaskStartDate').value || '2026-01-01';
+                                                const endDate = document.getElementById('newTaskEndDate').value || startDate;
                                                 const priority = document.getElementById('newTaskPriority').value;
                                                 const category = document.getElementById('newTaskCategory').value;
                                                 
@@ -1837,7 +1863,8 @@
                                                     title, 
                                                     description: desc,
                                                     phaseId, 
-                                                    dayOffset, 
+                                                    startDate,
+                                                    endDate,
                                                     priority,
                                                     category, 
                                                     assignedTo: [] 
@@ -1849,7 +1876,8 @@
                                                         title, 
                                                         description: desc,
                                                         phase_id: phaseId, 
-                                                        day_offset: dayOffset, 
+                                                        start_date: startDate,
+                                                        end_date: endDate,
                                                         category,
                                                         priority // Ensure DB column exists or ignore
                                                     }]).then(({error}) => {
@@ -1882,7 +1910,11 @@
                                              </div>
                                               <div className="md:col-span-2 flex items-center gap-2">
                                                 <span className="text-gray-500 text-sm font-bold">J+</span>
-                                                <input type="number" id="newTaskDay" className="w-full p-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-purple-500" placeholder="0" defaultValue="0" />
+                                                <div className="flex items-center gap-2">
+                                                    <input type="date" id="newTaskStartDate" className="w-full p-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-purple-500" min="2026-01-01" max="2026-03-31" defaultValue="2026-01-01" />
+                                                    <span className="text-gray-400">→</span>
+                                                    <input type="date" id="newTaskEndDate" className="w-full p-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-purple-500" min="2026-01-01" max="2026-03-31" defaultValue="2026-01-01" />
+                                                </div>
                                              </div>
                                          </div>
                                     </div>
@@ -1954,53 +1986,39 @@
                                                                     <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-50"><Icons.ChevronDown className="w-3 h-3" /></div>
                                                                 </div>
 
-                                                                {/* Day Offset - Avec calendrier pour date absolue */}
-                                                                <div className="flex items-center gap-2">
-                                                                    <div className="flex items-center bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200" title="Jours après le début">
-                                                                        <span className="text-[10px] font-bold text-gray-400 mr-2 uppercase">J+</span>
-                                                                        <input 
-                                                                            type="number" 
-                                                                            className="w-8 bg-transparent border-none p-0 text-sm font-bold text-gray-700 text-center outline-none"
-                                                                            value={task.dayOffset}
-                                                                            onChange={(e) => {
-                                                                                const val = parseInt(e.target.value) || 0;
-                                                                                setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, dayOffset: val } : t));
+                                                                {/* Dates de début et fin - 1er trimestre 2026 */}
+                                                                <div className="flex items-center gap-2 flex-wrap">
+                                                                    <div className="flex items-center gap-1">
+                                                                        <span className="text-[10px] font-bold text-gray-400 uppercase">Début :</span>
+                                                                        <DatePicker
+                                                                            value={task.startDate || '2026-01-01'}
+                                                                            onChange={(dateStr) => {
+                                                                                setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, startDate: dateStr } : t));
+                                                                                saveTaskField(task.id, 'startDate', dateStr);
                                                                             }}
-                                                                            onBlur={async (e) => {
-                                                                                const val = parseInt(e.target.value) || 0;
-                                                                                await saveTaskField(task.id, 'dayOffset', val);
-                                                                            }}
+                                                                            placeholder="Date début"
+                                                                            className="px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-xs"
+                                                                            min="2026-01-01"
+                                                                            max="2026-03-31"
+                                                                            showIcon={true}
                                                                         />
                                                                     </div>
-                                                                    {/* Calendrier pour date absolue */}
-                                                                    {(() => {
-                                                                        // Utiliser selectedEmployee si disponible, sinon le premier employé ou une date par défaut
-                                                                        const emp = selectedEmployee || employees[0];
-                                                                        const empStart = TaskManager.ensureMinDate2026(emp?.startDate);
-                                                                        const startDate = empStart.toISOString().split('T')[0];
-                                                                        
-                                                                        return (
-                                                                            <div className="flex items-center gap-2">
-                                                                                <span className="text-[10px] font-bold text-gray-400 uppercase whitespace-nowrap">Date échéance :</span>
-                                                                                <DatePicker
-                                                                                    value={(() => {
-                                                                                        const dueDate = new Date(empStart.getTime() + (task.dayOffset || 0) * 86400000);
-                                                                                        return dueDate.toISOString().split('T')[0];
-                                                                                    })()}
-                                                                                    onChange={(dateStr) => {
-                                                                                        const selectedDate = new Date(dateStr);
-                                                                                        const diffDays = Math.round((selectedDate.getTime() - empStart.getTime()) / (1000 * 60 * 60 * 24));
-                                                                                        setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, dayOffset: diffDays } : t));
-                                                                                        saveTaskField(task.id, 'dayOffset', diffDays);
-                                                                                    }}
-                                                                                    placeholder="Date d'échéance"
-                                                                                    className="px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-xs"
-                                                                                    min="2026-01-01"
-                                                                                    showIcon={true}
-                                                                                />
-                                                                            </div>
-                                                                        );
-                                                                    })()}
+                                                                    <span className="text-gray-400">→</span>
+                                                                    <div className="flex items-center gap-1">
+                                                                        <span className="text-[10px] font-bold text-gray-400 uppercase">Fin :</span>
+                                                                        <DatePicker
+                                                                            value={task.endDate || task.startDate || '2026-01-01'}
+                                                                            onChange={(dateStr) => {
+                                                                                setTaskTemplates(prev => prev.map(t => t.id === task.id ? { ...t, endDate: dateStr } : t));
+                                                                                saveTaskField(task.id, 'endDate', dateStr);
+                                                                            }}
+                                                                            placeholder="Date fin"
+                                                                            className="px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-xs"
+                                                                            min={task.startDate || '2026-01-01'}
+                                                                            max="2026-03-31"
+                                                                            showIcon={true}
+                                                                        />
+                                                                    </div>
                                                                 </div>
                                                             </div>
 
