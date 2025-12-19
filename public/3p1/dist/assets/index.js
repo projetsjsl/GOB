@@ -54904,8 +54904,8 @@ Vérifiez les logs de la console pour plus de détails.`;
     let skippedCount = 0;
     const errors = [];
     const skippedTickers = [];
-    const FMP_BATCH_SIZE = 5;
-    const delayBetweenBatches = 500;
+    const FMP_BATCH_SIZE = 3;
+    const delayBetweenBatches = 2e3;
     const FMP_TIMEOUT_MS = 3e4;
     const fetchCompanyDataWithTimeout = async (tickerSymbol) => {
       return Promise.race([
@@ -54960,6 +54960,17 @@ Vérifiez les logs de la console pour plus de détails.`;
               try {
                 result = await fetchCompanyDataWithTimeout(tickerSymbol);
               } catch (fetchError) {
+                const isRateLimitError = fetchError.message && (fetchError.message.includes("Rate limit") || fetchError.message.includes("rate limit") || fetchError.message.includes("429"));
+                if (isRateLimitError) {
+                  errorCount++;
+                  const errorMsg = `${tickerSymbol}: ${fetchError.message}`;
+                  errors.push(errorMsg);
+                  setSyncStats((prev) => ({ ...prev, errorCount: prev.errorCount + 1 }));
+                  console.error(`❌ ${errorMsg}`);
+                  console.error(`⚠️ Rate limiting détecté - La synchronisation peut être ralentie ou interrompue.`);
+                  await new Promise((resolve) => setTimeout(resolve, 5e3));
+                  return;
+                }
                 const isNotFoundError = fetchError.message && (fetchError.message.includes("introuvable") || fetchError.message.includes("not found") || fetchError.message.includes("404"));
                 if (isNotFoundError) {
                   skippedCount++;

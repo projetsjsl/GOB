@@ -97,13 +97,25 @@ export default async function handler(req, res) {
     };
 
     // Fonction pour essayer plusieurs variantes de symboles
-    const tryFetchProfile = async (symbolToTry) => {
+    const tryFetchProfile = async (symbolToTry, retryCount = 0) => {
+        const MAX_RETRIES = 2;
+        const RETRY_DELAY = 1000; // 1 seconde
+        
         try {
             const profileRes = await fetch(`${FMP_BASE}/profile/${symbolToTry}?apikey=${FMP_KEY}`);
             
             // Vérifier le statut HTTP
             if (!profileRes.ok) {
                 const errorText = await profileRes.text();
+                
+                // Gestion du rate limiting (429) avec retry
+                if (profileRes.status === 429 && retryCount < MAX_RETRIES) {
+                    const retryAfter = profileRes.headers.get('Retry-After') || RETRY_DELAY * (retryCount + 1);
+                    console.warn(`⏳ Rate limit atteint pour ${symbolToTry}, retry dans ${retryAfter}ms (tentative ${retryCount + 1}/${MAX_RETRIES})`);
+                    await new Promise(resolve => setTimeout(resolve, parseInt(retryAfter)));
+                    return tryFetchProfile(symbolToTry, retryCount + 1);
+                }
+                
                 console.warn(`⚠️ FMP Profile HTTP error for ${symbolToTry}: ${profileRes.status} - ${errorText.substring(0, 200)}`);
                 
                 // Si c'est une erreur d'API key invalide, on veut le savoir
@@ -117,6 +129,12 @@ export default async function handler(req, res) {
                         // Ignore parse error
                     }
                 }
+                
+                // Si c'est un rate limit après tous les retries, retourner une erreur spéciale
+                if (profileRes.status === 429) {
+                    throw new Error(`Rate limit FMP atteint pour ${symbolToTry} après ${MAX_RETRIES} tentatives`);
+                }
+                
                 return null;
             }
             
@@ -226,25 +244,47 @@ export default async function handler(req, res) {
             const triedSymbols = [cleanSymbol, ...(symbolVariants[cleanSymbol] || [])];
             console.error(`❌ Symbol '${cleanSymbol}' not found after trying: ${triedSymbols.join(', ')}`);
             
-            // Vérifier si c'est un problème de clé API
-            const testRes = await fetch(`${FMP_BASE}/profile/AAPL?apikey=${FMP_KEY}`);
-            if (!testRes.ok) {
-                const testError = await testRes.text();
-                if (testError.includes('Invalid API KEY') || testError.includes('API key')) {
-                    console.error(`❌ FMP API KEY semble invalide - Vérifiez FMP_API_KEY dans Vercel`);
-                    return res.status(500).json({
-                        error: 'FMP API key invalid or not configured',
-                        message: 'La clé API FMP semble invalide. Vérifiez FMP_API_KEY dans les variables d\'environnement Vercel.',
-                        tried: triedSymbols,
-                        diagnostic: 'Test avec AAPL a également échoué'
-                    });
+            // Vérifier si c'est un problème de clé API en testant avec un ticker connu
+            let apiKeyValid = true;
+            try {
+                const testRes = await fetch(`${FMP_BASE}/profile/AAPL?apikey=${FMP_KEY}`);
+                if (!testRes.ok) {
+                    const testError = await testRes.text();
+                    if (testError.includes('Invalid API KEY') || testError.includes('API key')) {
+                        apiKeyValid = false;
+                        console.error(`❌ FMP API KEY semble invalide - Vérifiez FMP_API_KEY dans Vercel`);
+                        return res.status(500).json({
+                            error: 'FMP API key invalid or not configured',
+                            message: 'La clé API FMP semble invalide. Vérifiez FMP_API_KEY dans les variables d\'environnement Vercel.',
+                            tried: triedSymbols,
+                            diagnostic: 'Test avec AAPL a également échoué'
+                        });
+                    }
+                    // Si AAPL échoue mais ce n'est pas une erreur de clé, c'est peut-être un rate limit
+                    if (testRes.status === 429) {
+                        console.error(`⚠️ Rate limiting détecté lors du test avec AAPL - FMP peut être surchargé`);
+                        return res.status(429).json({
+                            error: 'Rate limit FMP',
+                            message: `Rate limiting détecté. Veuillez réessayer dans quelques instants.`,
+                            tried: triedSymbols,
+                            diagnostic: 'Test avec AAPL a également échoué avec 429'
+                        });
+                    }
+                } else {
+                    const testData = await testRes.json();
+                    if (testData && Array.isArray(testData) && testData.length > 0) {
+                        console.log(`✅ Test API réussi avec AAPL - La clé API fonctionne`);
+                    }
                 }
+            } catch (testError) {
+                console.error(`❌ Erreur lors du test API avec AAPL:`, testError.message);
             }
             
             return res.status(404).json({ 
                 error: `Symbol '${cleanSymbol}' not found`,
                 tried: triedSymbols,
-                message: `Aucune donnée trouvée pour ${cleanSymbol} après avoir essayé ${triedSymbols.length} variante(s). Vérifiez que le symbole est correct.`
+                message: `Aucune donnée trouvée pour ${cleanSymbol} après avoir essayé ${triedSymbols.length} variante(s). Vérifiez que le symbole est correct et disponible dans FMP.`,
+                apiKeyValid: apiKeyValid
             });
         }
 

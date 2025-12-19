@@ -2620,10 +2620,10 @@ export default function App() {
         const errors: string[] = [];
         const skippedTickers: string[] = []; // Tickers ignorés car introuvables dans FMP
         
-        // ✅ OPTIMISATION: Batch size pour FMP (5 tickers en parallèle)
-        const FMP_BATCH_SIZE = 5;
-        // ✅ OPTIMISATION: Délai réduit entre batches (500ms au lieu de 2000ms)
-        const delayBetweenBatches = 500;
+        // ✅ OPTIMISATION: Batch size pour FMP (3 tickers en parallèle pour éviter rate limiting)
+        const FMP_BATCH_SIZE = 3;
+        // ✅ OPTIMISATION: Délai augmenté entre batches (2000ms pour éviter rate limiting)
+        const delayBetweenBatches = 2000;
         // ✅ OPTIMISATION: Délai réduit entre tickers dans un batch (100ms)
         const delayBetweenTickersInBatch = 100;
         // ✅ TIMEOUT: Timeout pour chaque appel FMP (30 secondes)
@@ -2699,6 +2699,26 @@ export default function App() {
                         try {
                             result = await fetchCompanyDataWithTimeout(tickerSymbol);
                         } catch (fetchError: any) {
+                            // Détecter si c'est une erreur de rate limiting
+                            const isRateLimitError = fetchError.message && (
+                                fetchError.message.includes('Rate limit') ||
+                                fetchError.message.includes('rate limit') ||
+                                fetchError.message.includes('429')
+                            );
+                            
+                            if (isRateLimitError) {
+                                // Rate limiting - propager l'erreur pour arrêter la synchronisation
+                                errorCount++;
+                                const errorMsg = `${tickerSymbol}: ${fetchError.message}`;
+                                errors.push(errorMsg);
+                                setSyncStats(prev => ({ ...prev, errorCount: prev.errorCount + 1 }));
+                                console.error(`❌ ${errorMsg}`);
+                                console.error(`⚠️ Rate limiting détecté - La synchronisation peut être ralentie ou interrompue.`);
+                                // Continuer avec les autres tickers mais avec un délai plus long
+                                await new Promise(resolve => setTimeout(resolve, 5000)); // Attendre 5 secondes
+                                return;
+                            }
+                            
                             // Détecter si c'est une erreur 404 (ticker introuvable dans FMP)
                             const isNotFoundError = fetchError.message && (
                                 fetchError.message.includes('introuvable') ||
