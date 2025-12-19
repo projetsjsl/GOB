@@ -2702,11 +2702,11 @@ export default function App() {
             
             // Traiter par batch API pour optimiser les appels FMP
             for (let i = 0; i < allTickers.length; i += BATCH_API_SIZE) {
-            // 0. Check for Pause or Abort
-            if (abortSync.current) {
-                console.log('🛑 Synchronisation arrêtée par l\'utilisateur.');
-                break;
-            }
+                // 0. Check for Pause or Abort
+                if (abortSync.current) {
+                    console.log('🛑 Synchronisation arrêtée par l\'utilisateur.');
+                    break;
+                }
 
             while (isSyncPaused.current) {
                 await new Promise(resolve => setTimeout(resolve, 100));
