@@ -24,11 +24,14 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { symbols, limit } = req.query;
+    const { symbols, limit, includeKeyMetrics } = req.query;
 
     if (!symbols || symbols.trim().length === 0) {
         return res.status(400).json({ error: 'Symbols parameter required (comma-separated)' });
     }
+    
+    // Par défaut, inclure les key metrics si le paramètre n'est pas spécifié (pour compatibilité)
+    const shouldIncludeKeyMetrics = includeKeyMetrics !== 'false';
 
     const FMP_KEY = process.env.FMP_API_KEY || process.env.FMP_KEY;
 
@@ -109,12 +112,14 @@ export default async function handler(req, res) {
         }
 
         // 2. Récupérer les key metrics individuellement (FMP ne supporte pas les batch requests pour key-metrics)
+        // Seulement si includeKeyMetrics est true
         const validSymbols = Object.keys(allProfiles);
-        console.log(`📊 ${validSymbols.length} symboles avec profile valide - Récupération key metrics individuellement`);
-        
         const allKeyMetrics = {};
         let keyMetricsSuccessCount = 0;
         let keyMetricsEmptyCount = 0;
+        
+        if (shouldIncludeKeyMetrics) {
+            console.log(`📊 ${validSymbols.length} symboles avec profile valide - Récupération key metrics individuellement`);
         
         // Traiter par petits groupes pour éviter le rate limiting
         const CONCURRENT_LIMIT = 3; // Maximum 3 appels simultanés
@@ -171,9 +176,13 @@ export default async function handler(req, res) {
             if (i + CONCURRENT_LIMIT < validSymbols.length) {
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
+        } else {
+            console.log(`⏭️ Key metrics ignorées (includeKeyMetrics=false)`);
         }
         
-        console.log(`📊 Key metrics: ${keyMetricsSuccessCount} symboles avec données, ${keyMetricsEmptyCount} symboles sans données`);
+        if (shouldIncludeKeyMetrics) {
+            console.log(`📊 Key metrics: ${keyMetricsSuccessCount} symboles avec données, ${keyMetricsEmptyCount} symboles sans données`);
+        }
 
         // 3. Récupérer les quotes en batch (plus grand batch possible)
         const quoteBatches = [];

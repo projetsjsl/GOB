@@ -2635,13 +2635,15 @@ export default function App() {
         const delayBetweenBatches = 2000; // Délai entre batches API (2 secondes - ultra-sécurisé pour rate limiting)
 
         // ✅ FONCTION HELPER: Récupérer plusieurs tickers en batch
-        const fetchCompanyDataBatch = async (tickerSymbols: string[]): Promise<Map<string, any>> => {
+        const fetchCompanyDataBatch = async (tickerSymbols: string[], includeKeyMetrics: boolean = true): Promise<Map<string, any>> => {
             const results = new Map<string, any>();
             
             try {
                 const symbolString = tickerSymbols.join(',');
                 console.log(`🔍 [BATCH] Appel API pour ${tickerSymbols.length} tickers: ${symbolString.substring(0, 50)}...`);
-                const url = `/api/fmp-company-data-batch-sync?symbols=${encodeURIComponent(symbolString)}&limit=${BATCH_API_SIZE}`;
+                console.log(`🔍 [BATCH] includeKeyMetrics: ${includeKeyMetrics}`);
+                // Inclure les key metrics seulement si demandé (pour optimiser si on veut seulement syncInfo ou syncAssumptions)
+                const url = `/api/fmp-company-data-batch-sync?symbols=${encodeURIComponent(symbolString)}&limit=${BATCH_API_SIZE}&includeKeyMetrics=${includeKeyMetrics}`;
                 console.log(`🔍 [BATCH] URL: ${url.substring(0, 100)}...`);
                 
                 const response = await fetch(url);
