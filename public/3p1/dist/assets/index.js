@@ -57963,7 +57963,10 @@ Vérifiez les logs de la console pour plus de détails.`;
               };
               tickerResults.push(tickerResult);
               setSyncStats((prev) => ({ ...prev, errorCount: prev.errorCount + 1 }));
-              console.error(`⏱️ ${errorMsg}`);
+              const isDebugMode = typeof window !== "undefined" && (localStorage.getItem("3p1-debug") === "true" || window.location.search.includes("debug=true"));
+              if (isDebugMode) {
+                console.warn(`⏱️ ${errorMsg}`);
+              }
             });
           })
         );
