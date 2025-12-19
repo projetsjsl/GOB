@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { XMarkIcon, ArrowPathIcon, ExclamationTriangleIcon, CheckCircleIcon, InformationCircleIcon, QuestionMarkCircleIcon, ChevronDownIcon, ChevronUpIcon, ClockIcon } from '@heroicons/react/24/outline';
+import React, { useState, useMemo, useEffect } from 'react';
+import { XMarkIcon, ArrowPathIcon, ExclamationTriangleIcon, CheckCircleIcon, InformationCircleIcon, QuestionMarkCircleIcon, ChevronDownIcon, ChevronUpIcon, ClockIcon, BookmarkIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { storage } from '../utils/storage';
 
 interface AdvancedSyncDialogProps {
     isOpen: boolean;
@@ -116,6 +117,196 @@ export const OPTION_METADATA: Record<keyof SyncOptions, OptionMetadata> = {
     }
 };
 
+// Interface pour un profil de synchronisation
+interface SyncProfile {
+    id: string;
+    name: string;
+    options: SyncOptions;
+    isPreset: boolean; // true pour les presets par défaut, false pour les profils personnalisés
+    description?: string; // Description détaillée du preset
+    details?: string[]; // Liste des détails ventilés
+    createdAt?: number;
+    updatedAt?: number;
+}
+
+// Presets par défaut
+const DEFAULT_PRESETS: SyncProfile[] = [
+    {
+        id: 'preset-complete',
+        name: '🔄 Synchronisation Complète',
+        isPreset: true,
+        description: 'Synchronisation complète avec toutes les fonctionnalités activées. Idéal pour une mise à jour exhaustive de tous les tickers.',
+        details: [
+            '💾 Sauvegarde snapshot avant sync (permettre restauration)',
+            '📊 Récupération données historiques FMP (30 ans : EPS, CF, BV, DIV, prix)',
+            '📈 Calcul automatique assumptions (taux croissance, ratios cibles)',
+            'ℹ️ Mise à jour infos entreprise (nom, secteur, logo, beta)',
+            '🛡️ Préservation exclusions métriques aberrantes',
+            '🔍 Recalcul détection outliers (amélioration qualité données)',
+            '💰 Mise à jour prix actuel',
+            '⭐ Synchronisation métriques ValueLine (Security Rank, Earnings Predictability)',
+            '⚠️ Ne remplace PAS les données oranges (assumptions manuelles préservées)',
+            '⏱️ Temps estimé : ~2.5s par ticker'
+        ],
+        options: {
+            saveBeforeSync: true,
+            replaceOrangeData: false,
+            syncAllTickers: false,
+            syncData: true,
+            syncAssumptions: true,
+            syncInfo: true,
+            forceReplace: false,
+            syncOnlyNewYears: false,
+            syncOnlyMissingMetrics: false,
+            preserveExclusions: true,
+            recalculateOutliers: true,
+            updateCurrentPrice: true,
+            syncValueLineMetrics: true
+        }
+    },
+    {
+        id: 'preset-fast',
+        name: '⚡ Synchronisation Rapide',
+        isPreset: true,
+        description: 'Synchronisation optimisée pour la vitesse. Économise du temps en évitant les opérations non essentielles.',
+        details: [
+            '❌ Pas de sauvegarde snapshot (gain ~200ms/ticker)',
+            '📊 Récupération données historiques FMP (essentiel)',
+            '📈 Calcul automatique assumptions (essentiel)',
+            '❌ Pas de mise à jour infos entreprise (gain ~50ms/ticker)',
+            '✅ Ajoute uniquement nouvelles années (évite merges complexes, gain ~200ms/ticker)',
+            '✅ Ajoute uniquement métriques manquantes (évite remplacements, gain ~100ms/ticker)',
+            '🛡️ Préservation exclusions métriques aberrantes',
+            '❌ Pas de recalcul outliers (gain ~150ms/ticker)',
+            '💰 Mise à jour prix actuel',
+            '❌ Pas de sync ValueLine (gain temps)',
+            '⚠️ Ne remplace PAS les données oranges',
+            '⏱️ Temps estimé : ~1.5s par ticker (40% plus rapide)'
+        ],
+        options: {
+            saveBeforeSync: false,
+            replaceOrangeData: false,
+            syncAllTickers: false,
+            syncData: true,
+            syncAssumptions: true,
+            syncInfo: false,
+            forceReplace: false,
+            syncOnlyNewYears: true,
+            syncOnlyMissingMetrics: true,
+            preserveExclusions: true,
+            recalculateOutliers: false,
+            updateCurrentPrice: true,
+            syncValueLineMetrics: false
+        }
+    },
+    {
+        id: 'preset-safe',
+        name: '🛡️ Synchronisation Sécurisée',
+        isPreset: true,
+        description: 'Synchronisation sécurisée avec sauvegarde et préservation maximale des données existantes. Recommandé pour les mises à jour régulières.',
+        details: [
+            '💾 Sauvegarde snapshot avant sync (sécurité)',
+            '📊 Récupération données historiques FMP',
+            '📈 Calcul automatique assumptions',
+            'ℹ️ Mise à jour infos entreprise',
+            '✅ Ajoute uniquement nouvelles années (préserve modifications manuelles années existantes)',
+            '✅ Ajoute uniquement métriques manquantes (ne remplace pas valeurs existantes)',
+            '🛡️ Préservation exclusions métriques aberrantes',
+            '🔍 Recalcul détection outliers',
+            '💰 Mise à jour prix actuel',
+            '⭐ Synchronisation métriques ValueLine',
+            '⚠️ Ne remplace PAS les données oranges',
+            '⏱️ Temps estimé : ~2.2s par ticker'
+        ],
+        options: {
+            saveBeforeSync: true,
+            replaceOrangeData: false,
+            syncAllTickers: false,
+            syncData: true,
+            syncAssumptions: true,
+            syncInfo: true,
+            forceReplace: false,
+            syncOnlyNewYears: true,
+            syncOnlyMissingMetrics: true,
+            preserveExclusions: true,
+            recalculateOutliers: true,
+            updateCurrentPrice: true,
+            syncValueLineMetrics: true
+        }
+    },
+    {
+        id: 'preset-replace-all',
+        name: '🔄 Remplacer Tout (Avancé)',
+        isPreset: true,
+        description: '⚠️ ATTENTION : Remplace TOUTES les données, y compris les modifications manuelles. Utiliser avec précaution.',
+        details: [
+            '💾 Sauvegarde snapshot avant sync (sécurité)',
+            '📊 Récupération données historiques FMP',
+            '📈 Calcul automatique assumptions',
+            'ℹ️ Mise à jour infos entreprise',
+            '🔄 Remplace TOUTES les données (même années existantes)',
+            '🔄 Remplace TOUTES les métriques (même valeurs existantes)',
+            '🔄 Remplace données oranges (assumptions manuelles remplacées par calculs automatiques)',
+            '❌ Ne préserve PAS les exclusions (toutes métriques réévaluées)',
+            '🔍 Recalcul détection outliers',
+            '💰 Mise à jour prix actuel',
+            '⭐ Synchronisation métriques ValueLine',
+            '⚠️ DESTRUCTIF : Perd toutes modifications manuelles',
+            '⏱️ Temps estimé : ~2.5s par ticker'
+        ],
+        options: {
+            saveBeforeSync: true,
+            replaceOrangeData: true,
+            syncAllTickers: false,
+            syncData: true,
+            syncAssumptions: true,
+            syncInfo: true,
+            forceReplace: true,
+            syncOnlyNewYears: false,
+            syncOnlyMissingMetrics: false,
+            preserveExclusions: false,
+            recalculateOutliers: true,
+            updateCurrentPrice: true,
+            syncValueLineMetrics: true
+        }
+    },
+    {
+        id: 'preset-info-only',
+        name: 'ℹ️ Infos Uniquement',
+        isPreset: true,
+        description: 'Met à jour uniquement les informations de base (nom, secteur, logo, beta, prix). Aucune modification des données historiques.',
+        details: [
+            '❌ Pas de sauvegarde snapshot',
+            '❌ Pas de récupération données historiques FMP',
+            '❌ Pas de calcul assumptions',
+            'ℹ️ Mise à jour infos entreprise uniquement (nom, secteur, logo, beta)',
+            '💰 Mise à jour prix actuel',
+            '⭐ Synchronisation métriques ValueLine',
+            '🛡️ Préservation exclusions métriques aberrantes',
+            '✅ Aucune modification données historiques',
+            '✅ Aucune modification assumptions',
+            '⏱️ Temps estimé : ~100ms par ticker (très rapide)'
+        ],
+        options: {
+            saveBeforeSync: false,
+            replaceOrangeData: false,
+            syncAllTickers: false,
+            syncData: false,
+            syncAssumptions: false,
+            syncInfo: true,
+            forceReplace: false,
+            syncOnlyNewYears: false,
+            syncOnlyMissingMetrics: false,
+            preserveExclusions: true,
+            recalculateOutliers: false,
+            updateCurrentPrice: true,
+            syncValueLineMetrics: true
+        }
+    }
+];
+
+const STORAGE_KEY_SYNC_PROFILES = '3p1_sync_profiles';
+
 // Composant d'aide pour chaque option
 const HelpSection: React.FC<{ 
     id: string; 
@@ -171,6 +362,105 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
     });
 
     const [showHelp, setShowHelp] = useState<{ [key: string]: boolean }>({});
+    
+    // ✅ États pour les profils de synchronisation
+    const [selectedProfileId, setSelectedProfileId] = useState<string>('preset-complete');
+    const [customProfiles, setCustomProfiles] = useState<SyncProfile[]>([]);
+    const [isLoadingProfiles, setIsLoadingProfiles] = useState(true);
+    const [showSaveProfileDialog, setShowSaveProfileDialog] = useState(false);
+    const [newProfileName, setNewProfileName] = useState('');
+
+    // ✅ Charger les profils personnalisés au montage
+    useEffect(() => {
+        const loadCustomProfiles = async () => {
+            try {
+                const saved = await storage.getItem(STORAGE_KEY_SYNC_PROFILES);
+                if (saved && Array.isArray(saved)) {
+                    setCustomProfiles(saved);
+                }
+            } catch (error) {
+                console.warn('Erreur lors du chargement des profils:', error);
+            } finally {
+                setIsLoadingProfiles(false);
+            }
+        };
+        loadCustomProfiles();
+    }, []);
+
+    // ✅ Tous les profils (presets + personnalisés)
+    const allProfiles = useMemo(() => {
+        return [...DEFAULT_PRESETS, ...customProfiles];
+    }, [customProfiles]);
+
+    // ✅ Charger un profil
+    const loadProfile = (profileId: string) => {
+        const profile = allProfiles.find(p => p.id === profileId);
+        if (profile) {
+            setOptions({
+                ...profile.options,
+                syncAllTickers: !ticker // Toujours respecter le contexte (ticker unique ou bulk)
+            });
+            setSelectedProfileId(profileId);
+        }
+    };
+
+    // ✅ Sauvegarder un profil personnalisé
+    const saveCustomProfile = async () => {
+        if (!newProfileName.trim()) {
+            alert('Veuillez entrer un nom pour le profil');
+            return;
+        }
+
+        const newProfile: SyncProfile = {
+            id: `custom-${Date.now()}`,
+            name: newProfileName.trim(),
+            options: { ...options },
+            isPreset: false,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+        };
+
+        const updated = [...customProfiles, newProfile];
+        setCustomProfiles(updated);
+        
+        try {
+            await storage.setItem(STORAGE_KEY_SYNC_PROFILES, updated);
+            setSelectedProfileId(newProfile.id);
+            setShowSaveProfileDialog(false);
+            setNewProfileName('');
+        } catch (error) {
+            console.error('Erreur lors de la sauvegarde du profil:', error);
+            alert('Erreur lors de la sauvegarde du profil');
+        }
+    };
+
+    // ✅ Supprimer un profil personnalisé
+    const deleteCustomProfile = async (profileId: string) => {
+        if (!confirm('Êtes-vous sûr de vouloir supprimer ce profil ?')) {
+            return;
+        }
+
+        const updated = customProfiles.filter(p => p.id !== profileId);
+        setCustomProfiles(updated);
+        
+        try {
+            await storage.setItem(STORAGE_KEY_SYNC_PROFILES, updated);
+            if (selectedProfileId === profileId) {
+                // Si le profil supprimé était sélectionné, charger le preset par défaut
+                loadProfile('preset-complete');
+            }
+        } catch (error) {
+            console.error('Erreur lors de la suppression du profil:', error);
+            alert('Erreur lors de la suppression du profil');
+        }
+    };
+
+    // ✅ Charger le profil sélectionné au changement
+    useEffect(() => {
+        if (!isLoadingProfiles && selectedProfileId && selectedProfileId !== 'custom') {
+            loadProfile(selectedProfileId);
+        }
+    }, [selectedProfileId, isLoadingProfiles, ticker]);
 
     // ✅ Calcul du temps estimé basé sur les options sélectionnées
     const estimatedTime = useMemo(() => {
@@ -272,6 +562,144 @@ export const AdvancedSyncDialog: React.FC<AdvancedSyncDialogProps> = ({
 
                 {/* Body */}
                 <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+                    {/* ✅ Sélecteur de Profil de Synchronisation */}
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-semibold text-purple-900 flex items-center gap-2">
+                                <BookmarkIcon className="w-5 h-5" />
+                                Profil de Synchronisation
+                            </h4>
+                            <button
+                                onClick={() => setShowSaveProfileDialog(true)}
+                                className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-purple-700 bg-purple-100 hover:bg-purple-200 rounded-md transition-colors"
+                                title="Sauvegarder la configuration actuelle comme nouveau profil"
+                            >
+                                <PlusIcon className="w-4 h-4" />
+                                Sauvegarder
+                            </button>
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <select
+                                value={selectedProfileId}
+                                onChange={(e) => setSelectedProfileId(e.target.value)}
+                                disabled={isSyncing || isLoadingProfiles}
+                                className="flex-1 min-w-[200px] px-3 py-2 text-sm border border-purple-300 rounded-md bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {DEFAULT_PRESETS.map(profile => (
+                                    <option key={profile.id} value={profile.id}>
+                                        {profile.name}
+                                    </option>
+                                ))}
+                                {customProfiles.length > 0 && (
+                                    <>
+                                        <option disabled>──────────</option>
+                                        {customProfiles.map(profile => (
+                                            <option key={profile.id} value={profile.id}>
+                                                {profile.name}
+                                            </option>
+                                        ))}
+                                    </>
+                                )}
+                                <option value="custom">✏️ Personnalisé</option>
+                            </select>
+                            {selectedProfileId.startsWith('custom-') && (
+                                <button
+                                    onClick={() => deleteCustomProfile(selectedProfileId)}
+                                    className="px-2 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                    title="Supprimer ce profil personnalisé"
+                                >
+                                    <TrashIcon className="w-4 h-4" />
+                                </button>
+                            )}
+                        </div>
+                        {selectedProfileId === 'custom' && (
+                            <p className="mt-2 text-xs text-purple-700 italic">
+                                ✏️ Mode personnalisé : Modifiez les options ci-dessous manuellement
+                            </p>
+                        )}
+                        
+                        {/* ✅ Détails ventilés du preset sélectionné */}
+                        {selectedProfileId !== 'custom' && !selectedProfileId.startsWith('custom-') && (() => {
+                            const selectedPreset = DEFAULT_PRESETS.find(p => p.id === selectedProfileId);
+                            if (!selectedPreset || !selectedPreset.description) return null;
+                            
+                            return (
+                                <div className="mt-4 p-4 bg-white border border-purple-200 rounded-lg">
+                                    <h5 className="text-sm font-semibold text-purple-900 mb-2">
+                                        📋 Ce que ce profil implique :
+                                    </h5>
+                                    <p className="text-xs text-gray-700 mb-3">
+                                        {selectedPreset.description}
+                                    </p>
+                                    {selectedPreset.details && selectedPreset.details.length > 0 && (
+                                        <div className="space-y-1.5">
+                                            <p className="text-xs font-semibold text-gray-700 mb-2">
+                                                Détails ventilés :
+                                            </p>
+                                            <ul className="space-y-1.5">
+                                                {selectedPreset.details.map((detail, index) => (
+                                                    <li key={index} className="text-xs text-gray-600 flex items-start gap-2">
+                                                        <span className="text-purple-500 mt-0.5">•</span>
+                                                        <span>{detail}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })()}
+                    </div>
+
+                    {/* ✅ Dialog pour sauvegarder un profil */}
+                    {showSaveProfileDialog && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10001] p-4">
+                            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                                    Sauvegarder un Profil
+                                </h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Nom du profil
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={newProfileName}
+                                            onChange={(e) => setNewProfileName(e.target.value)}
+                                            placeholder="Ex: Ma configuration personnalisée"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                                            autoFocus
+                                            onKeyPress={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    saveCustomProfile();
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-2 justify-end">
+                                        <button
+                                            onClick={() => {
+                                                setShowSaveProfileDialog(false);
+                                                setNewProfileName('');
+                                            }}
+                                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                                        >
+                                            Annuler
+                                        </button>
+                                        <button
+                                            onClick={saveCustomProfile}
+                                            disabled={!newProfileName.trim()}
+                                            className="px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            Sauvegarder
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Section d'information générale */}
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
                         <div className="flex items-start gap-3">

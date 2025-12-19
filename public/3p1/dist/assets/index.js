@@ -7213,7 +7213,7 @@ function ArrowDownTrayIcon({
     d: "M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
   }));
 }
-const ForwardRef$N = /* @__PURE__ */ reactExports.forwardRef(ArrowDownTrayIcon);
+const ForwardRef$O = /* @__PURE__ */ reactExports.forwardRef(ArrowDownTrayIcon);
 function ArrowPathIcon({
   title,
   titleId,
@@ -7237,7 +7237,7 @@ function ArrowPathIcon({
     d: "M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
   }));
 }
-const ForwardRef$M = /* @__PURE__ */ reactExports.forwardRef(ArrowPathIcon);
+const ForwardRef$N = /* @__PURE__ */ reactExports.forwardRef(ArrowPathIcon);
 function ArrowRightIcon({
   title,
   titleId,
@@ -7261,7 +7261,7 @@ function ArrowRightIcon({
     d: "M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
   }));
 }
-const ForwardRef$L = /* @__PURE__ */ reactExports.forwardRef(ArrowRightIcon);
+const ForwardRef$M = /* @__PURE__ */ reactExports.forwardRef(ArrowRightIcon);
 function ArrowTrendingUpIcon({
   title,
   titleId,
@@ -7285,7 +7285,7 @@ function ArrowTrendingUpIcon({
     d: "M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"
   }));
 }
-const ForwardRef$K = /* @__PURE__ */ reactExports.forwardRef(ArrowTrendingUpIcon);
+const ForwardRef$L = /* @__PURE__ */ reactExports.forwardRef(ArrowTrendingUpIcon);
 function ArrowUturnLeftIcon({
   title,
   titleId,
@@ -7309,7 +7309,7 @@ function ArrowUturnLeftIcon({
     d: "M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
   }));
 }
-const ForwardRef$J = /* @__PURE__ */ reactExports.forwardRef(ArrowUturnLeftIcon);
+const ForwardRef$K = /* @__PURE__ */ reactExports.forwardRef(ArrowUturnLeftIcon);
 function ArrowUturnRightIcon({
   title,
   titleId,
@@ -7333,7 +7333,7 @@ function ArrowUturnRightIcon({
     d: "m15 15 6-6m0 0-6-6m6 6H9a6 6 0 0 0 0 12h3"
   }));
 }
-const ForwardRef$I = /* @__PURE__ */ reactExports.forwardRef(ArrowUturnRightIcon);
+const ForwardRef$J = /* @__PURE__ */ reactExports.forwardRef(ArrowUturnRightIcon);
 function BanknotesIcon({
   title,
   titleId,
@@ -7357,7 +7357,7 @@ function BanknotesIcon({
     d: "M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"
   }));
 }
-const ForwardRef$H = /* @__PURE__ */ reactExports.forwardRef(BanknotesIcon);
+const ForwardRef$I = /* @__PURE__ */ reactExports.forwardRef(BanknotesIcon);
 function Bars3Icon({
   title,
   titleId,
@@ -7381,7 +7381,7 @@ function Bars3Icon({
     d: "M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
   }));
 }
-const ForwardRef$G = /* @__PURE__ */ reactExports.forwardRef(Bars3Icon);
+const ForwardRef$H = /* @__PURE__ */ reactExports.forwardRef(Bars3Icon);
 function BookOpenIcon({
   title,
   titleId,
@@ -7405,7 +7405,31 @@ function BookOpenIcon({
     d: "M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
   }));
 }
-const ForwardRef$F = /* @__PURE__ */ reactExports.forwardRef(BookOpenIcon);
+const ForwardRef$G = /* @__PURE__ */ reactExports.forwardRef(BookOpenIcon);
+function BookmarkIcon({
+  title,
+  titleId,
+  ...props
+}, svgRef) {
+  return /* @__PURE__ */ reactExports.createElement("svg", Object.assign({
+    xmlns: "http://www.w3.org/2000/svg",
+    fill: "none",
+    viewBox: "0 0 24 24",
+    strokeWidth: 1.5,
+    stroke: "currentColor",
+    "aria-hidden": "true",
+    "data-slot": "icon",
+    ref: svgRef,
+    "aria-labelledby": titleId
+  }, props), title ? /* @__PURE__ */ reactExports.createElement("title", {
+    id: titleId
+  }, title) : null, /* @__PURE__ */ reactExports.createElement("path", {
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    d: "M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+  }));
+}
+const ForwardRef$F = /* @__PURE__ */ reactExports.forwardRef(BookmarkIcon);
 function CalculatorIcon({
   title,
   titleId,
@@ -8962,7 +8986,7 @@ Source: FMP key-metrics`, children: [
               className: `flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-blue-50 text-blue-600 hover:bg-blue-100"}`,
               title: "🔄 Options de Synchronisation Avancées\\n\\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options configurables.\\n\\n📊 Le dialogue vous permet de:\\n• Choisir quelles données synchroniser (historiques, assumptions, infos)\\n• Décider si vous voulez remplacer les données oranges\\n• Configurer des options avancées (nouvelles années uniquement, métriques manquantes, etc.)\\n• Voir des explications détaillées avec exemples concrets pour chaque option\\n\\n💡 Chaque option inclut une section d'aide avec:\\n• Comportement attendu\\n• Exemples concrets\\n• Outils et APIs utilisés\\n• Formules et algorithmes\\n• Recommandations d'utilisation",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: `w-3 h-3 sm:w-4 sm:h-4 ${isLoading ? "animate-spin" : ""}` }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: `w-3 h-3 sm:w-4 sm:h-4 ${isLoading ? "animate-spin" : ""}` }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: isLoading ? "Sync..." : "⚙️ Options Sync" })
               ]
             }
@@ -8975,7 +8999,7 @@ Source: FMP key-metrics`, children: [
               className: `flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-purple-50 text-purple-600 hover:bg-purple-100"}`,
               title: "📥 Restaurer les données\\n\\nOuvre un dialogue de restauration avec 2 options principales:\\n\\n1️⃣ Charger le dernier snapshot:\\n   • Restaure la dernière sauvegarde complète\\n   • Inclut toutes les données historiques\\n   • Inclut toutes les hypothèses\\n   • Mode lecture seule (sécurisé)\\n   • Permet de comparer avec la version actuelle\\n\\n2️⃣ Recalculer depuis FMP:\\n   • Recharge les données FMP Premium (30 ans)\\n   • Réapplique automatiquement les hypothèses auto-fill\\n   • Préserve vos exclusions de métriques\\n   • Préserve les métriques ValueLine\\n   • Met à jour uniquement les données auto-fetchées\\n\\n💡 Utilisation:\\n• Utilisez 'Charger snapshot' pour revenir à une version précédente\\n• Utilisez 'Recalculer FMP' pour actualiser avec les dernières données\\n• Les modifications manuelles sont toujours préservées",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: "w-3 h-3 sm:w-4 sm:h-4" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: "w-3 h-3 sm:w-4 sm:h-4" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Restaurer" })
               ]
             }
@@ -9031,7 +9055,7 @@ Source: FMP key-metrics`, children: [
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Dividende annuel versé par action", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$H, { className: "w-3 h-3" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$I, { className: "w-3 h-3" }),
           " Dividende (Act.)"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -9049,7 +9073,7 @@ Source: FMP key-metrics`, children: [
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Rendement du dividende (Dividende / Prix)", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-3 h-3" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$L, { className: "w-3 h-3" }),
           " Rendement (Yield)"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-2 py-1 text-base sm:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help", title: `Rendement du dividende: ${formatPercent(assumptions.currentDividend / assumptions.currentPrice * 100)}
@@ -34845,7 +34869,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
           className: "w-full bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors mb-2",
           title: "Synchroniser depuis Supabase\\n\\nCharge les tickers depuis la base de données Supabase.\\n\\nAjoute les nouveaux tickers présents dans Supabase mais absents de votre LocalStorage.\\n\\n⚠️ Ne modifie pas les tickers existants, seulement ajoute les nouveaux.",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: `w-4 h-4 ${isLoadingTickers ? "animate-spin" : ""}` }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: `w-4 h-4 ${isLoadingTickers ? "animate-spin" : ""}` }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: isLoadingTickers ? "Synchronisation..." : "Synchroniser Supabase" })
           ]
         }
@@ -34859,7 +34883,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
             className: "w-full bg-green-700 hover:bg-green-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors",
             title: "🔄 Options de Synchronisation Avancées\\n\\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options:\\n\\n📊 Options principales:\\n• Sauvegarder avant sync\\n• Remplacer données oranges\\n• Forcer remplacement\\n\\n⚙️ Options détaillées:\\n• Synchroniser données historiques\\n• Synchroniser uniquement nouvelles années\\n• Synchroniser uniquement métriques manquantes\\n• Synchroniser assumptions\\n• Préserver exclusions\\n• Recalculer outliers\\n• Mettre à jour prix actuel\\n• Synchroniser métriques ValueLine\\n\\n💡 Chaque option inclut des explications détaillées, exemples concrets et informations sur les outils utilisés.",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: `w-4 h-4 ${isBulkSyncing ? "animate-spin" : ""}` }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: `w-4 h-4 ${isBulkSyncing ? "animate-spin" : ""}` }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex-1 text-left", children: isBulkSyncing && bulkSyncProgress ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}` : "⚙️ Options Sync Avancées" })
             ]
           }
@@ -36942,7 +36966,7 @@ const DataSourcesInfo = () => {
           className: "flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold",
           title: "Ouvrir le guide complet dans GitHub",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$F, { className: "w-5 h-5" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$G, { className: "w-5 h-5" }),
             "Guide Complet"
           ]
         }
@@ -37833,7 +37857,7 @@ const InfoTab = () => {
             className: "flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold whitespace-nowrap",
             title: "Ouvrir le guide complet dans GitHub",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$F, { className: "w-5 h-5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$G, { className: "w-5 h-5" }),
               "Guide Complet"
             ]
           }
@@ -37943,7 +37967,7 @@ const InfoTab = () => {
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-6 rounded-lg shadow border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xl font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-6 h-6 text-green-500" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$L, { className: "w-6 h-6 text-green-500" }),
         "4. Fonctionnalités Pratiques"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc pl-5 space-y-2 text-gray-600 text-sm", children: [
@@ -38185,6 +38209,134 @@ const ConfirmSyncDialog = ({
     ] })
   ] }) });
 };
+const DB_NAME = "3p1_FinanceDB";
+const STORE_NAME = "profiles";
+const DB_VERSION = 1;
+const openDB = () => {
+  return new Promise((resolve, reject) => {
+    if (typeof window === "undefined" || !window.indexedDB) {
+      reject(new Error("IndexedDB not supported"));
+      return;
+    }
+    const request = window.indexedDB.open(DB_NAME, DB_VERSION);
+    request.onerror = (event) => {
+      console.error("IndexedDB error:", request.error);
+      reject(request.error);
+    };
+    request.onsuccess = (event) => {
+      resolve(request.result);
+    };
+    request.onupgradeneeded = (event) => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+  });
+};
+const indexedDBAdapter = {
+  getItem: async (key) => {
+    try {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], "readonly");
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.get(key);
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(request.error);
+      });
+    } catch (e) {
+      console.warn("IDB Read Error, falling back to null", e);
+      return null;
+    }
+  },
+  setItem: async (key, value) => {
+    try {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], "readwrite");
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.put(value, key);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    } catch (e) {
+      console.error("IDB Write Error", e);
+      throw e;
+    }
+  },
+  removeItem: async (key) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], "readwrite");
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.delete(key);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  },
+  clear: async () => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], "readwrite");
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.clear();
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  },
+  keys: async () => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], "readonly");
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.getAllKeys();
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+};
+const localStorageAdapter = {
+  getItem: async (key) => {
+    const val = localStorage.getItem(key);
+    try {
+      return val ? JSON.parse(val) : null;
+    } catch {
+      return val;
+    }
+  },
+  setItem: async (key, value) => {
+    var _a3;
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+      if ((e == null ? void 0 : e.name) === "QuotaExceededError" || ((_a3 = e == null ? void 0 : e.message) == null ? void 0 : _a3.includes("quota"))) {
+        console.warn(`⚠️ LocalStorage quota exceeded for ${key}, attempting cleanup...`);
+        try {
+          const keys2 = Object.keys(localStorage);
+          const oldCacheKeys = keys2.filter((k2) => k2.startsWith("cache_") || k2.includes("_cache"));
+          oldCacheKeys.forEach((k2) => localStorage.removeItem(k2));
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch (retryError) {
+          console.error("❌ Failed to save even after cleanup, data too large for localStorage", retryError);
+          throw e;
+        }
+      } else {
+        throw e;
+      }
+    }
+  },
+  removeItem: async (key) => {
+    localStorage.removeItem(key);
+  },
+  clear: async () => {
+    localStorage.clear();
+  },
+  keys: async () => {
+    return Object.keys(localStorage);
+  }
+};
+const storage = typeof window !== "undefined" && window.indexedDB ? indexedDBAdapter : localStorageAdapter;
 const OPTION_METADATA = {
   saveBeforeSync: {
     timePerTickerMs: 200,
@@ -38277,6 +38429,181 @@ const OPTION_METADATA = {
     utilityDescription: "Synchronise les métriques ValueLine depuis Supabase (securityRank, earningsPredictability, etc.)"
   }
 };
+const DEFAULT_PRESETS = [
+  {
+    id: "preset-complete",
+    name: "🔄 Synchronisation Complète",
+    isPreset: true,
+    description: "Synchronisation complète avec toutes les fonctionnalités activées. Idéal pour une mise à jour exhaustive de tous les tickers.",
+    details: [
+      "💾 Sauvegarde snapshot avant sync (permettre restauration)",
+      "📊 Récupération données historiques FMP (30 ans : EPS, CF, BV, DIV, prix)",
+      "📈 Calcul automatique assumptions (taux croissance, ratios cibles)",
+      "ℹ️ Mise à jour infos entreprise (nom, secteur, logo, beta)",
+      "🛡️ Préservation exclusions métriques aberrantes",
+      "🔍 Recalcul détection outliers (amélioration qualité données)",
+      "💰 Mise à jour prix actuel",
+      "⭐ Synchronisation métriques ValueLine (Security Rank, Earnings Predictability)",
+      "⚠️ Ne remplace PAS les données oranges (assumptions manuelles préservées)",
+      "⏱️ Temps estimé : ~2.5s par ticker"
+    ],
+    options: {
+      saveBeforeSync: true,
+      replaceOrangeData: false,
+      syncAllTickers: false,
+      syncData: true,
+      syncAssumptions: true,
+      syncInfo: true,
+      forceReplace: false,
+      syncOnlyNewYears: false,
+      syncOnlyMissingMetrics: false,
+      preserveExclusions: true,
+      recalculateOutliers: true,
+      updateCurrentPrice: true,
+      syncValueLineMetrics: true
+    }
+  },
+  {
+    id: "preset-fast",
+    name: "⚡ Synchronisation Rapide",
+    isPreset: true,
+    description: "Synchronisation optimisée pour la vitesse. Économise du temps en évitant les opérations non essentielles.",
+    details: [
+      "❌ Pas de sauvegarde snapshot (gain ~200ms/ticker)",
+      "📊 Récupération données historiques FMP (essentiel)",
+      "📈 Calcul automatique assumptions (essentiel)",
+      "❌ Pas de mise à jour infos entreprise (gain ~50ms/ticker)",
+      "✅ Ajoute uniquement nouvelles années (évite merges complexes, gain ~200ms/ticker)",
+      "✅ Ajoute uniquement métriques manquantes (évite remplacements, gain ~100ms/ticker)",
+      "🛡️ Préservation exclusions métriques aberrantes",
+      "❌ Pas de recalcul outliers (gain ~150ms/ticker)",
+      "💰 Mise à jour prix actuel",
+      "❌ Pas de sync ValueLine (gain temps)",
+      "⚠️ Ne remplace PAS les données oranges",
+      "⏱️ Temps estimé : ~1.5s par ticker (40% plus rapide)"
+    ],
+    options: {
+      saveBeforeSync: false,
+      replaceOrangeData: false,
+      syncAllTickers: false,
+      syncData: true,
+      syncAssumptions: true,
+      syncInfo: false,
+      forceReplace: false,
+      syncOnlyNewYears: true,
+      syncOnlyMissingMetrics: true,
+      preserveExclusions: true,
+      recalculateOutliers: false,
+      updateCurrentPrice: true,
+      syncValueLineMetrics: false
+    }
+  },
+  {
+    id: "preset-safe",
+    name: "🛡️ Synchronisation Sécurisée",
+    isPreset: true,
+    description: "Synchronisation sécurisée avec sauvegarde et préservation maximale des données existantes. Recommandé pour les mises à jour régulières.",
+    details: [
+      "💾 Sauvegarde snapshot avant sync (sécurité)",
+      "📊 Récupération données historiques FMP",
+      "📈 Calcul automatique assumptions",
+      "ℹ️ Mise à jour infos entreprise",
+      "✅ Ajoute uniquement nouvelles années (préserve modifications manuelles années existantes)",
+      "✅ Ajoute uniquement métriques manquantes (ne remplace pas valeurs existantes)",
+      "🛡️ Préservation exclusions métriques aberrantes",
+      "🔍 Recalcul détection outliers",
+      "💰 Mise à jour prix actuel",
+      "⭐ Synchronisation métriques ValueLine",
+      "⚠️ Ne remplace PAS les données oranges",
+      "⏱️ Temps estimé : ~2.2s par ticker"
+    ],
+    options: {
+      saveBeforeSync: true,
+      replaceOrangeData: false,
+      syncAllTickers: false,
+      syncData: true,
+      syncAssumptions: true,
+      syncInfo: true,
+      forceReplace: false,
+      syncOnlyNewYears: true,
+      syncOnlyMissingMetrics: true,
+      preserveExclusions: true,
+      recalculateOutliers: true,
+      updateCurrentPrice: true,
+      syncValueLineMetrics: true
+    }
+  },
+  {
+    id: "preset-replace-all",
+    name: "🔄 Remplacer Tout (Avancé)",
+    isPreset: true,
+    description: "⚠️ ATTENTION : Remplace TOUTES les données, y compris les modifications manuelles. Utiliser avec précaution.",
+    details: [
+      "💾 Sauvegarde snapshot avant sync (sécurité)",
+      "📊 Récupération données historiques FMP",
+      "📈 Calcul automatique assumptions",
+      "ℹ️ Mise à jour infos entreprise",
+      "🔄 Remplace TOUTES les données (même années existantes)",
+      "🔄 Remplace TOUTES les métriques (même valeurs existantes)",
+      "🔄 Remplace données oranges (assumptions manuelles remplacées par calculs automatiques)",
+      "❌ Ne préserve PAS les exclusions (toutes métriques réévaluées)",
+      "🔍 Recalcul détection outliers",
+      "💰 Mise à jour prix actuel",
+      "⭐ Synchronisation métriques ValueLine",
+      "⚠️ DESTRUCTIF : Perd toutes modifications manuelles",
+      "⏱️ Temps estimé : ~2.5s par ticker"
+    ],
+    options: {
+      saveBeforeSync: true,
+      replaceOrangeData: true,
+      syncAllTickers: false,
+      syncData: true,
+      syncAssumptions: true,
+      syncInfo: true,
+      forceReplace: true,
+      syncOnlyNewYears: false,
+      syncOnlyMissingMetrics: false,
+      preserveExclusions: false,
+      recalculateOutliers: true,
+      updateCurrentPrice: true,
+      syncValueLineMetrics: true
+    }
+  },
+  {
+    id: "preset-info-only",
+    name: "ℹ️ Infos Uniquement",
+    isPreset: true,
+    description: "Met à jour uniquement les informations de base (nom, secteur, logo, beta, prix). Aucune modification des données historiques.",
+    details: [
+      "❌ Pas de sauvegarde snapshot",
+      "❌ Pas de récupération données historiques FMP",
+      "❌ Pas de calcul assumptions",
+      "ℹ️ Mise à jour infos entreprise uniquement (nom, secteur, logo, beta)",
+      "💰 Mise à jour prix actuel",
+      "⭐ Synchronisation métriques ValueLine",
+      "🛡️ Préservation exclusions métriques aberrantes",
+      "✅ Aucune modification données historiques",
+      "✅ Aucune modification assumptions",
+      "⏱️ Temps estimé : ~100ms par ticker (très rapide)"
+    ],
+    options: {
+      saveBeforeSync: false,
+      replaceOrangeData: false,
+      syncAllTickers: false,
+      syncData: false,
+      syncAssumptions: false,
+      syncInfo: true,
+      forceReplace: false,
+      syncOnlyNewYears: false,
+      syncOnlyMissingMetrics: false,
+      preserveExclusions: true,
+      recalculateOutliers: false,
+      updateCurrentPrice: true,
+      syncValueLineMetrics: true
+    }
+  }
+];
+const STORAGE_KEY_SYNC_PROFILES = "3p1_sync_profiles";
 const HelpSection = ({ id, title, children, showHelp, setShowHelp }) => {
   const isOpen = showHelp[id] || false;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2", children: [
@@ -38325,6 +38652,86 @@ const AdvancedSyncDialog = ({
     syncValueLineMetrics: true
   });
   const [showHelp, setShowHelp] = reactExports.useState({});
+  const [selectedProfileId, setSelectedProfileId] = reactExports.useState("preset-complete");
+  const [customProfiles, setCustomProfiles] = reactExports.useState([]);
+  const [isLoadingProfiles, setIsLoadingProfiles] = reactExports.useState(true);
+  const [showSaveProfileDialog, setShowSaveProfileDialog] = reactExports.useState(false);
+  const [newProfileName, setNewProfileName] = reactExports.useState("");
+  reactExports.useEffect(() => {
+    const loadCustomProfiles = async () => {
+      try {
+        const saved = await storage.getItem(STORAGE_KEY_SYNC_PROFILES);
+        if (saved && Array.isArray(saved)) {
+          setCustomProfiles(saved);
+        }
+      } catch (error) {
+        console.warn("Erreur lors du chargement des profils:", error);
+      } finally {
+        setIsLoadingProfiles(false);
+      }
+    };
+    loadCustomProfiles();
+  }, []);
+  const allProfiles = reactExports.useMemo(() => {
+    return [...DEFAULT_PRESETS, ...customProfiles];
+  }, [customProfiles]);
+  const loadProfile = (profileId) => {
+    const profile = allProfiles.find((p) => p.id === profileId);
+    if (profile) {
+      setOptions({
+        ...profile.options,
+        syncAllTickers: !ticker2
+        // Toujours respecter le contexte (ticker unique ou bulk)
+      });
+      setSelectedProfileId(profileId);
+    }
+  };
+  const saveCustomProfile = async () => {
+    if (!newProfileName.trim()) {
+      alert("Veuillez entrer un nom pour le profil");
+      return;
+    }
+    const newProfile = {
+      id: `custom-${Date.now()}`,
+      name: newProfileName.trim(),
+      options: { ...options },
+      isPreset: false,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    const updated = [...customProfiles, newProfile];
+    setCustomProfiles(updated);
+    try {
+      await storage.setItem(STORAGE_KEY_SYNC_PROFILES, updated);
+      setSelectedProfileId(newProfile.id);
+      setShowSaveProfileDialog(false);
+      setNewProfileName("");
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde du profil:", error);
+      alert("Erreur lors de la sauvegarde du profil");
+    }
+  };
+  const deleteCustomProfile = async (profileId) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce profil ?")) {
+      return;
+    }
+    const updated = customProfiles.filter((p) => p.id !== profileId);
+    setCustomProfiles(updated);
+    try {
+      await storage.setItem(STORAGE_KEY_SYNC_PROFILES, updated);
+      if (selectedProfileId === profileId) {
+        loadProfile("preset-complete");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression du profil:", error);
+      alert("Erreur lors de la suppression du profil");
+    }
+  };
+  reactExports.useEffect(() => {
+    if (!isLoadingProfiles && selectedProfileId && selectedProfileId !== "custom") {
+      loadProfile(selectedProfileId);
+    }
+  }, [selectedProfileId, isLoadingProfiles, ticker2]);
   const estimatedTime = reactExports.useMemo(() => {
     const tickerCount = ticker2 ? 1 : options.syncAllTickers ? totalTickers : 1;
     let totalMs = 0;
@@ -38363,7 +38770,7 @@ const AdvancedSyncDialog = ({
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000] p-4 overflow-y-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-xl max-w-4xl w-full my-8", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between p-6 border-b border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-8 h-8 text-blue-600" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: "w-8 h-8 text-blue-600" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900", children: "Options de Synchronisation Avancées" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 mt-1", children: isBulkSync ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
@@ -38401,6 +38808,116 @@ const AdvancedSyncDialog = ({
       )
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6 space-y-6 max-h-[70vh] overflow-y-auto", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-purple-900 flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$F, { className: "w-5 h-5" }),
+            "Profil de Synchronisation"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
+              onClick: () => setShowSaveProfileDialog(true),
+              className: "flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-purple-700 bg-purple-100 hover:bg-purple-200 rounded-md transition-colors",
+              title: "Sauvegarder la configuration actuelle comme nouveau profil",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$d, { className: "w-4 h-4" }),
+                "Sauvegarder"
+              ]
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "select",
+            {
+              value: selectedProfileId,
+              onChange: (e) => setSelectedProfileId(e.target.value),
+              disabled: isSyncing || isLoadingProfiles,
+              className: "flex-1 min-w-[200px] px-3 py-2 text-sm border border-purple-300 rounded-md bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-50 disabled:cursor-not-allowed",
+              children: [
+                DEFAULT_PRESETS.map((profile) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: profile.id, children: profile.name }, profile.id)),
+                customProfiles.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { disabled: true, children: "──────────" }),
+                  customProfiles.map((profile) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: profile.id, children: profile.name }, profile.id))
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "custom", children: "✏️ Personnalisé" })
+              ]
+            }
+          ),
+          selectedProfileId.startsWith("custom-") && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: () => deleteCustomProfile(selectedProfileId),
+              className: "px-2 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors",
+              title: "Supprimer ce profil personnalisé",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-4 h-4" })
+            }
+          )
+        ] }),
+        selectedProfileId === "custom" && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-xs text-purple-700 italic", children: "✏️ Mode personnalisé : Modifiez les options ci-dessous manuellement" }),
+        selectedProfileId !== "custom" && !selectedProfileId.startsWith("custom-") && (() => {
+          const selectedPreset = DEFAULT_PRESETS.find((p) => p.id === selectedProfileId);
+          if (!selectedPreset || !selectedPreset.description) return null;
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 p-4 bg-white border border-purple-200 rounded-lg", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h5", { className: "text-sm font-semibold text-purple-900 mb-2", children: "📋 Ce que ce profil implique :" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-700 mb-3", children: selectedPreset.description }),
+            selectedPreset.details && selectedPreset.details.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-semibold text-gray-700 mb-2", children: "Détails ventilés :" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "space-y-1.5", children: selectedPreset.details.map((detail, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "text-xs text-gray-600 flex items-start gap-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-purple-500 mt-0.5", children: "•" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: detail })
+              ] }, index2)) })
+            ] })
+          ] });
+        })()
+      ] }),
+      showSaveProfileDialog && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10001] p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-xl max-w-md w-full p-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 mb-4", children: "Sauvegarder un Profil" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 mb-2", children: "Nom du profil" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "input",
+              {
+                type: "text",
+                value: newProfileName,
+                onChange: (e) => setNewProfileName(e.target.value),
+                placeholder: "Ex: Ma configuration personnalisée",
+                className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500",
+                autoFocus: true,
+                onKeyPress: (e) => {
+                  if (e.key === "Enter") {
+                    saveCustomProfile();
+                  }
+                }
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 justify-end", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => {
+                  setShowSaveProfileDialog(false);
+                  setNewProfileName("");
+                },
+                className: "px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors",
+                children: "Annuler"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: saveCustomProfile,
+                disabled: !newProfileName.trim(),
+                className: "px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+                children: "Sauvegarder"
+              }
+            )
+          ] })
+        ] })
+      ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
@@ -39361,10 +39878,10 @@ const AdvancedSyncDialog = ({
             disabled: isSyncing || !options.syncData && !options.syncAssumptions && !options.syncInfo,
             className: "px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2",
             children: isSyncing ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-4 h-4 animate-spin" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: "w-4 h-4 animate-spin" }),
               "Synchronisation..."
             ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-4 h-4" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: "w-4 h-4" }),
               "Synchroniser avec Options"
             ] })
           }
@@ -39526,7 +40043,7 @@ const SyncReportDialog = ({
             className: "flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium",
             title: "Exporter en CSV",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: "w-4 h-4" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: "w-4 h-4" }),
               "CSV"
             ]
           }
@@ -39749,7 +40266,7 @@ const SyncReportDialog = ({
           },
           className: "px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors text-sm font-medium flex items-center gap-2",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-4 h-4" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: "w-4 h-4" }),
             "Réessayer les Échecs (",
             reportData.errorCount,
             ")"
@@ -40015,7 +40532,7 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
             },
             className: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium flex items-center gap-2",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-4 h-4" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: "w-4 h-4" }),
               "Réessayer"
             ]
           }
@@ -40099,7 +40616,7 @@ const HistoricalVersionBanner = ({
             onClick: onRevertToCurrent,
             className: "px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-1.5",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: "w-4 h-4" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-4 h-4" }),
               "Revenir à la version actuelle"
             ]
           }
@@ -40224,7 +40741,7 @@ const LandingPage = ({ onGetStarted }) => {
           className: "group inline-flex items-center space-x-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Commencer l'analyse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$L, { className: "w-5 h-5 group-hover:translate-x-1 transition-transform" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-5 h-5 group-hover:translate-x-1 transition-transform" })
           ]
         }
       )
@@ -40259,7 +40776,7 @@ const LandingPage = ({ onGetStarted }) => {
           className: "group inline-flex items-center space-x-3 bg-white text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Lancer l'application" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$L, { className: "w-5 h-5 group-hover:translate-x-1 transition-transform" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-5 h-5 group-hover:translate-x-1 transition-transform" })
           ]
         }
       )
@@ -40536,7 +41053,7 @@ const RestoreDataDialog = ({
           disabled: isLoading,
           className: "w-full p-4 border-2 border-green-200 rounded-lg hover:border-green-400 hover:bg-green-50 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed",
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-green-100 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-6 h-6 text-green-600" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-green-100 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: "w-6 h-6 text-green-600" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-900 mb-1", children: "Recalculer depuis FMP" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mb-2", children: "Récupère les données FMP et recalcule automatiquement toutes les métriques (comme lors d'un nouvel ajout de ticker)." }),
@@ -40810,7 +41327,7 @@ const UnifiedSettingsPanel = ({
           onClick: handleReset,
           className: "flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:text-red-600 transition-colors bg-white border border-gray-300 rounded-lg hover:bg-red-50",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-4 h-4" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: "w-4 h-4" }),
             "Réinitialiser tout"
           ]
         }
@@ -41814,7 +42331,7 @@ const SanitizationReport = ({
               change.label
             ] }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-600 font-bold", children: change.category === "growth" || change.category === "ratio" ? formatPercent(change.original) : formatCurrency(change.original) }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$L, { className: "w-5 h-5 text-gray-400 mx-auto" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-5 h-5 text-gray-400 mx-auto" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-green-600 font-bold", children: change.category === "growth" || change.category === "ratio" ? formatPercent(change.sanitized) : formatCurrency(change.sanitized) }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: change.change > 0 ? "text-green-600" : "text-red-600", children: [
               change.change > 0 ? "+" : "",
@@ -42592,134 +43109,6 @@ const supabaseDataLoader = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.
   loadProfileFromSupabase,
   loadProfilesBatchFromSupabase
 }, Symbol.toStringTag, { value: "Module" }));
-const DB_NAME = "3p1_FinanceDB";
-const STORE_NAME = "profiles";
-const DB_VERSION = 1;
-const openDB = () => {
-  return new Promise((resolve, reject) => {
-    if (typeof window === "undefined" || !window.indexedDB) {
-      reject(new Error("IndexedDB not supported"));
-      return;
-    }
-    const request = window.indexedDB.open(DB_NAME, DB_VERSION);
-    request.onerror = (event) => {
-      console.error("IndexedDB error:", request.error);
-      reject(request.error);
-    };
-    request.onsuccess = (event) => {
-      resolve(request.result);
-    };
-    request.onupgradeneeded = (event) => {
-      const db = request.result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME);
-      }
-    };
-  });
-};
-const indexedDBAdapter = {
-  getItem: async (key) => {
-    try {
-      const db = await openDB();
-      return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], "readonly");
-        const store = transaction.objectStore(STORE_NAME);
-        const request = store.get(key);
-        request.onsuccess = () => resolve(request.result || null);
-        request.onerror = () => reject(request.error);
-      });
-    } catch (e) {
-      console.warn("IDB Read Error, falling back to null", e);
-      return null;
-    }
-  },
-  setItem: async (key, value) => {
-    try {
-      const db = await openDB();
-      return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], "readwrite");
-        const store = transaction.objectStore(STORE_NAME);
-        const request = store.put(value, key);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
-    } catch (e) {
-      console.error("IDB Write Error", e);
-      throw e;
-    }
-  },
-  removeItem: async (key) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction([STORE_NAME], "readwrite");
-      const store = transaction.objectStore(STORE_NAME);
-      const request = store.delete(key);
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-  },
-  clear: async () => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction([STORE_NAME], "readwrite");
-      const store = transaction.objectStore(STORE_NAME);
-      const request = store.clear();
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-  },
-  keys: async () => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction([STORE_NAME], "readonly");
-      const store = transaction.objectStore(STORE_NAME);
-      const request = store.getAllKeys();
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
-};
-const localStorageAdapter = {
-  getItem: async (key) => {
-    const val = localStorage.getItem(key);
-    try {
-      return val ? JSON.parse(val) : null;
-    } catch {
-      return val;
-    }
-  },
-  setItem: async (key, value) => {
-    var _a3;
-    try {
-      localStorage.setItem(key, JSON.stringify(value));
-    } catch (e) {
-      if ((e == null ? void 0 : e.name) === "QuotaExceededError" || ((_a3 = e == null ? void 0 : e.message) == null ? void 0 : _a3.includes("quota"))) {
-        console.warn(`⚠️ LocalStorage quota exceeded for ${key}, attempting cleanup...`);
-        try {
-          const keys2 = Object.keys(localStorage);
-          const oldCacheKeys = keys2.filter((k2) => k2.startsWith("cache_") || k2.includes("_cache"));
-          oldCacheKeys.forEach((k2) => localStorage.removeItem(k2));
-          localStorage.setItem(key, JSON.stringify(value));
-        } catch (retryError) {
-          console.error("❌ Failed to save even after cleanup, data too large for localStorage", retryError);
-          throw e;
-        }
-      } else {
-        throw e;
-      }
-    }
-  },
-  removeItem: async (key) => {
-    localStorage.removeItem(key);
-  },
-  clear: async () => {
-    localStorage.clear();
-  },
-  keys: async () => {
-    return Object.keys(localStorage);
-  }
-};
-const storage = typeof window !== "undefined" && window.indexedDB ? indexedDBAdapter : localStorageAdapter;
 var main = {};
 var SupabaseClient$1 = {};
 var extendStatics = function(d, b) {
@@ -58604,7 +58993,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
   isBulkSyncing ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "fixed bottom-4 right-4 bg-slate-800 p-4 rounded-lg shadow-xl border border-slate-700 z-[100] w-80 animate-in fade-in slide-in-from-bottom-5", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center mb-2", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-bold text-white text-sm flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: `w-4 h-4 ${!syncPausedState ? "animate-spin" : ""}` }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: `w-4 h-4 ${!syncPausedState ? "animate-spin" : ""}` }),
         "Syncing... ",
         bulkSyncProgress.current,
         "/",
@@ -58757,7 +59146,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 onClick: () => setIsSidebarOpen(!isSidebarOpen),
                 className: "p-2 bg-white rounded-md shadow-sm border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors flex-shrink-0",
                 title: isSidebarOpen ? "Fermer le menu" : "Ouvrir le menu",
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$G, { className: "w-5 h-5 sm:w-6 sm:h-6" })
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$H, { className: "w-5 h-5 sm:w-6 sm:h-6" })
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -58851,11 +59240,11 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 ] })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1 bg-white rounded-md shadow-sm border border-gray-200 p-0.5 no-print", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: undo, disabled: pastData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: "↶ Annuler la dernière modification\\n\\nAnnule la dernière modification effectuée sur les données historiques.\\n\\n📊 Fonctionnalités:\\n• Permet de revenir en arrière sur les changements\\n• Fonctionne avec toutes les modifications (EPS, CF, BV, Dividendes, Prix)\\n• Historique illimité (tant que vous ne quittez pas la page)\\n\\n⌨️ Raccourci: Ctrl+Z (Cmd+Z sur Mac)", "aria-label": "Annuler la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: "w-4 h-4" }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: undo, disabled: pastData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: "↶ Annuler la dernière modification\\n\\nAnnule la dernière modification effectuée sur les données historiques.\\n\\n📊 Fonctionnalités:\\n• Permet de revenir en arrière sur les changements\\n• Fonctionne avec toutes les modifications (EPS, CF, BV, Dividendes, Prix)\\n• Historique illimité (tant que vous ne quittez pas la page)\\n\\n⌨️ Raccourci: Ctrl+Z (Cmd+Z sur Mac)", "aria-label": "Annuler la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-4 h-4" }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-px bg-gray-200 my-1" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: redo, disabled: futureData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: "↷ Rétablir la modification annulée\\n\\nRétablit la dernière modification que vous avez annulée.\\n\\n📊 Fonctionnalités:\\n• Permet de refaire une action annulée\\n• Fonctionne avec toutes les modifications\\n• Disponible uniquement si vous avez annulé une action\\n\\n⌨️ Raccourci: Ctrl+Shift+Z (Cmd+Shift+Z sur Mac)", "aria-label": "Rétablir la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$I, { className: "w-4 h-4" }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: redo, disabled: futureData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: "↷ Rétablir la modification annulée\\n\\nRétablit la dernière modification que vous avez annulée.\\n\\n📊 Fonctionnalités:\\n• Permet de refaire une action annulée\\n• Fonctionne avec toutes les modifications\\n• Disponible uniquement si vous avez annulé une action\\n\\n⌨️ Raccourci: Ctrl+Shift+Z (Cmd+Shift+Z sur Mac)", "aria-label": "Rétablir la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: "w-4 h-4" }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-px bg-gray-200 my-1" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleResetData, className: "p-1.5 rounded hover:bg-red-50 text-red-600", title: "🔄 Réinitialiser les données\\n\\nRéinitialise toutes les données historiques à leurs valeurs d'origine.\\n\\n⚠️ Attention:\\n• Cette action est irréversible\\n• Toutes vos modifications manuelles seront perdues\\n• Les données seront restaurées depuis la dernière synchronisation FMP\\n• Les hypothèses ne sont PAS affectées\\n\\n💡 Utilisation:\\n• Utile si vous avez fait des erreurs de saisie\\n• Permet de repartir de zéro avec les données FMP\\n• Confirmation requise avant exécution", "aria-label": "Réinitialiser toutes les données", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-4 h-4" }) })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleResetData, className: "p-1.5 rounded hover:bg-red-50 text-red-600", title: "🔄 Réinitialiser les données\\n\\nRéinitialise toutes les données historiques à leurs valeurs d'origine.\\n\\n⚠️ Attention:\\n• Cette action est irréversible\\n• Toutes vos modifications manuelles seront perdues\\n• Les données seront restaurées depuis la dernière synchronisation FMP\\n• Les hypothèses ne sont PAS affectées\\n\\n💡 Utilisation:\\n• Utile si vous avez fait des erreurs de saisie\\n• Permet de repartir de zéro avec les données FMP\\n• Confirmation requise avant exécution", "aria-label": "Réinitialiser toutes les données", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: "w-4 h-4" }) })
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(HistoricalTable, { data, onUpdateRow: handleUpdateRow }),
@@ -59235,8 +59624,8 @@ export {
   ForwardRef$7 as d,
   ForwardRef$n as e,
   ForwardRef$o as f,
-  ForwardRef$M as g,
-  ForwardRef$F as h,
+  ForwardRef$N as g,
+  ForwardRef$G as h,
   ForwardRef$l as i,
   jsxRuntimeExports as j,
   ForwardRef$A as k,
