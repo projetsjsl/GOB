@@ -1735,9 +1735,55 @@ export default function App() {
             // ✅ SIMPLIFIÉ : setAssumptions sanitis automatiquement !
             setAssumptions(assumptionsWithOutlierExclusions);
 
-            // Auto-save snapshot after successful sync
+            // Auto-save snapshot after successful sync avec métadonnées de synchronisation
             // ✅ saveSnapshot sanitis aussi, donc double protection
             console.log('💾 Auto-saving snapshot after API sync...');
+            
+            // Préparer les métadonnées de synchronisation pour performSync
+            const syncStartTime = Date.now();
+            const syncMetadata = {
+                timestamp: new Date().toISOString(),
+                source: 'fmp',
+                dataRetrieved: {
+                    years: finalData.length,
+                    dataPoints: finalData.length * 6, // Approximation (EPS, CF, BV, DIV, priceHigh, priceLow)
+                    hasProfile: !!result.info,
+                    hasKeyMetrics: result.data.length > 0,
+                    hasQuotes: !!result.currentPrice && result.currentPrice > 0,
+                    hasFinancials: !!result.financials && result.financials.length > 0
+                },
+                outliers: {
+                    detected: outlierDetection.detectedOutliers,
+                    excluded: {
+                        EPS: outlierDetection.excludeEPS,
+                        CF: outlierDetection.excludeCF,
+                        BV: outlierDetection.excludeBV,
+                        DIV: outlierDetection.excludeDIV
+                    },
+                    reasons: {}
+                },
+                orangeData: {
+                    growthRateEPS: assumptionsWithOutlierExclusions.growthRateEPS,
+                    growthRateCF: assumptionsWithOutlierExclusions.growthRateCF,
+                    growthRateBV: assumptionsWithOutlierExclusions.growthRateBV,
+                    growthRateDiv: assumptionsWithOutlierExclusions.growthRateDiv,
+                    targetPE: assumptionsWithOutlierExclusions.targetPE,
+                    targetPCF: assumptionsWithOutlierExclusions.targetPCF,
+                    targetPBV: assumptionsWithOutlierExclusions.targetPBV,
+                    targetYield: assumptionsWithOutlierExclusions.targetYield,
+                    wasReplaced: syncOptions?.replaceOrangeData || false
+                },
+                other: {
+                    snapshotSaved: true,
+                    assumptionsUpdated: true,
+                    infoUpdated: syncOptions?.syncInfo !== false,
+                    valueLineMetricsSynced: syncOptions?.syncValueLineMetrics || false
+                },
+                options: syncOptions || {},
+                duration: Date.now() - syncStartTime,
+                success: true
+            };
+
             await saveSnapshot(
                 activeId,
                 finalData,
@@ -1745,7 +1791,10 @@ export default function App() {
                 info,
                 `API sync - ${new Date().toLocaleString()}`,
                 true,  // Mark as current
-                true   // Auto-fetched
+                true,  // Auto-fetched
+                0,     // retryCount
+                2,     // maxRetries
+                syncMetadata // Métadonnées de synchronisation
             );
 
             showNotification(`Données synchronisées avec succès pour ${activeId}`, 'success');
@@ -3257,8 +3306,24 @@ export default function App() {
                             reasons: naReasons
                         };
 
-                        // 6. Sauvegarder le snapshot après sync
+                        // 6. Sauvegarder le snapshot après sync avec métadonnées détaillées
                         try {
+                            // Préparer les métadonnées de synchronisation
+                            const syncMetadata = {
+                                timestamp: new Date().toISOString(),
+                                source: 'fmp',
+                                dataRetrieved: tickerResult.dataRetrieved,
+                                outliers: tickerResult.outliers,
+                                orangeData: tickerResult.orangeData,
+                                zeroData: tickerResult.zeroData,
+                                naData: tickerResult.naData,
+                                other: tickerResult.other,
+                                options: options,
+                                duration: tickerResult.timeMs,
+                                success: tickerResult.success,
+                                error: tickerResult.error
+                            };
+
                             const saveResult = await saveSnapshot(
                                 tickerSymbol,
                                 mergedData,
@@ -3266,7 +3331,10 @@ export default function App() {
                                 updatedInfo,
                                 `Après synchronisation (${options.replaceOrangeData ? 'avec remplacement données oranges' : 'standard'}) - ${new Date().toLocaleString()}`,
                                 true,
-                                true
+                                true,
+                                0, // retryCount
+                                2, // maxRetries
+                                syncMetadata // Métadonnées de synchronisation
                             );
                             if (saveResult.success) {
                                 tickerResult.other.snapshotSaved = true;

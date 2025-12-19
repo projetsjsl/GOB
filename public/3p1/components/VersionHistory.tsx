@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ClockIcon, TrashIcon, DocumentDuplicateIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { ClockIcon, TrashIcon, DocumentDuplicateIcon, CheckCircleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { listSnapshots, deleteSnapshot } from '../services/snapshotApi';
+import { SyncDetailsDialog } from './SyncDetailsDialog';
 
 interface Snapshot {
     id: string;
@@ -10,6 +11,7 @@ interface Snapshot {
     notes: string;
     is_current: boolean;
     created_at: string;
+    sync_metadata?: any; // Métadonnées de synchronisation
 }
 
 interface VersionHistoryProps {
@@ -26,6 +28,7 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
     const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [selectedSyncDetails, setSelectedSyncDetails] = useState<{ snapshot: Snapshot; details: any } | null>(null);
 
     // Load snapshots when ticker changes
     useEffect(() => {
@@ -156,6 +159,19 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
                                             {snapshot.notes}
                                         </p>
                                     )}
+                                    {snapshot.sync_metadata && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedSyncDetails({ snapshot, details: snapshot.sync_metadata });
+                                            }}
+                                            className="mt-1 text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                                            title="Voir les détails de synchronisation"
+                                        >
+                                            <InformationCircleIcon className="w-3 h-3" />
+                                            Détails sync
+                                        </button>
+                                    )}
                                 </div>
 
                                 {/* Actions */}
@@ -181,6 +197,16 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
                         💡 Cliquez pour charger une version
                     </p>
                 </div>
+            )}
+
+            {/* Dialog des détails de synchronisation */}
+            {selectedSyncDetails && (
+                <SyncDetailsDialog
+                    isOpen={!!selectedSyncDetails}
+                    onClose={() => setSelectedSyncDetails(null)}
+                    ticker={ticker}
+                    syncDetails={selectedSyncDetails.details}
+                />
             )}
         </div>
     );

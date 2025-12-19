@@ -16,7 +16,8 @@ export async function saveSnapshot(
     isCurrent = true,
     autoFetched = false,
     retryCount = 0,
-    maxRetries = 2
+    maxRetries = 2,
+    syncMetadata?: any // Métadonnées de synchronisation (détails de la sync)
 ): Promise<{ success: boolean; snapshot?: any; error?: string }> {
     try {
         // ✅ VALIDATION: Vérifier que les données requises sont présentes
@@ -50,7 +51,8 @@ export async function saveSnapshot(
                 company_info: info,
                 notes,
                 is_current: isCurrent,
-                auto_fetched: autoFetched
+                auto_fetched: autoFetched,
+                sync_metadata: syncMetadata || null // Ajouter les métadonnées de synchronisation
             })
         });
 

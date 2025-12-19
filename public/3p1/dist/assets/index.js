@@ -35218,7 +35218,7 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
   ] });
 };
 const API_BASE$1 = typeof window !== "undefined" ? window.location.origin : "";
-async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent = true, autoFetched = false, retryCount = 0, maxRetries = 2) {
+async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent = true, autoFetched = false, retryCount = 0, maxRetries = 2, syncMetadata) {
   var _a3, _b2;
   try {
     if (!ticker2 || !ticker2.trim()) {
@@ -35245,7 +35245,9 @@ async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent =
         company_info: info,
         notes,
         is_current: isCurrent,
-        auto_fetched: autoFetched
+        auto_fetched: autoFetched,
+        sync_metadata: syncMetadata || null
+        // Ajouter les métadonnées de synchronisation
       })
     });
     if (!response.ok) {
@@ -58342,6 +58344,20 @@ Vérifiez les logs de la console pour plus de détails.`;
                     reasons: naReasons
                   };
                   try {
+                    const syncMetadata = {
+                      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+                      source: "fmp",
+                      dataRetrieved: tickerResult.dataRetrieved,
+                      outliers: tickerResult.outliers,
+                      orangeData: tickerResult.orangeData,
+                      zeroData: tickerResult.zeroData,
+                      naData: tickerResult.naData,
+                      other: tickerResult.other,
+                      options,
+                      duration: tickerResult.timeMs,
+                      success: tickerResult.success,
+                      error: tickerResult.error
+                    };
                     const saveResult = await saveSnapshot(
                       tickerSymbol,
                       mergedData,
@@ -58349,7 +58365,13 @@ Vérifiez les logs de la console pour plus de détails.`;
                       updatedInfo,
                       `Après synchronisation (${options.replaceOrangeData ? "avec remplacement données oranges" : "standard"}) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
                       true,
-                      true
+                      true,
+                      0,
+                      // retryCount
+                      2,
+                      // maxRetries
+                      syncMetadata
+                      // Métadonnées de synchronisation
                     );
                     if (saveResult.success) {
                       tickerResult.other.snapshotSaved = true;
@@ -58591,14 +58613,15 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
                 if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
                   return existingRow;
                 }
+                const newRowTyped = newRow;
                 return {
                   ...existingRow,
-                  earningsPerShare: newRow.earningsPerShare > 0 ? newRow.earningsPerShare : existingRow.earningsPerShare,
-                  cashFlowPerShare: newRow.cashFlowPerShare > 0 ? newRow.cashFlowPerShare : existingRow.cashFlowPerShare,
-                  bookValuePerShare: newRow.bookValuePerShare > 0 ? newRow.bookValuePerShare : existingRow.bookValuePerShare,
-                  dividendPerShare: newRow.dividendPerShare > 0 ? newRow.dividendPerShare : existingRow.dividendPerShare,
-                  priceHigh: newRow.priceHigh > 0 ? newRow.priceHigh : existingRow.priceHigh,
-                  priceLow: newRow.priceLow > 0 ? newRow.priceLow : existingRow.priceLow,
+                  earningsPerShare: newRowTyped.earningsPerShare > 0 ? newRowTyped.earningsPerShare : existingRow.earningsPerShare,
+                  cashFlowPerShare: newRowTyped.cashFlowPerShare > 0 ? newRowTyped.cashFlowPerShare : existingRow.cashFlowPerShare,
+                  bookValuePerShare: newRowTyped.bookValuePerShare > 0 ? newRowTyped.bookValuePerShare : existingRow.bookValuePerShare,
+                  dividendPerShare: newRowTyped.dividendPerShare > 0 ? newRowTyped.dividendPerShare : existingRow.dividendPerShare,
+                  priceHigh: newRowTyped.priceHigh > 0 ? newRowTyped.priceHigh : existingRow.priceHigh,
+                  priceLow: newRowTyped.priceLow > 0 ? newRowTyped.priceLow : existingRow.priceLow,
                   autoFetched: true
                 };
               });

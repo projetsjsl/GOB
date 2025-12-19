@@ -123,7 +123,8 @@ async function createSnapshot(req, res, supabase) {
         is_current = true,
         is_watchlist = false,
         auto_fetched = false,
-        user_id = null
+        user_id = null,
+        sync_metadata = null // Métadonnées de synchronisation
     } = req.body;
 
     // Validation
@@ -157,7 +158,8 @@ async function createSnapshot(req, res, supabase) {
             auto_fetched,
             annual_data,
             assumptions,
-            company_info
+            company_info,
+            sync_metadata // Ajouter les métadonnées de synchronisation
         }])
         .select()
         .single();
