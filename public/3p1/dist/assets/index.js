@@ -8542,6 +8542,23 @@ const calculateCAGR = (startValue, endValue, years) => {
   const result = (Math.pow(endValue / startValue, 1 / years) - 1) * 100;
   return isFinite(result) ? result : 0;
 };
+const calculateHistoricalGrowth = (data, metricKey, period = 5) => {
+  if (!data || data.length < 2) return 0;
+  const sorted = [...data].sort((a2, b) => Number(a2.year) - Number(b.year));
+  const last2 = sorted[sorted.length - 1];
+  const lastValue = Number(last2[metricKey]);
+  if (lastValue <= 0) return 0;
+  const targetStartYear = Number(last2.year) - period;
+  let startCandidate = sorted.filter((d) => Number(d.year) <= targetStartYear && Number(d[metricKey]) > 0).sort((a2, b) => Number(b.year) - Number(a2.year))[0];
+  if (!startCandidate) {
+    startCandidate = sorted.filter((d) => Number(d.year) < Number(last2.year) && Number(d[metricKey]) > 0).sort((a2, b) => Number(a2.year) - Number(b.year))[0];
+  }
+  if (!startCandidate) return 0;
+  const startValue = Number(startCandidate[metricKey]);
+  const years = Number(last2.year) - Number(startCandidate.year);
+  if (years < 1) return 0;
+  return calculateCAGR(startValue, lastValue, years);
+};
 const formatCurrency = (val) => {
   if (val === void 0 || val === null || !isFinite(val) || val === 0) {
     return "N/A";
@@ -35799,10 +35816,17 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
   };
   const growthMin = config2.growth.min;
   const growthMax = config2.growth.max;
-  const safeGrowthEPS = assumptions.growthRateEPS !== void 0 ? Math.max(growthMin, Math.min(assumptions.growthRateEPS, growthMax)) : void 0;
-  const safeGrowthCF = assumptions.growthRateCF !== void 0 ? Math.max(growthMin, Math.min(assumptions.growthRateCF, growthMax)) : void 0;
-  const safeGrowthBV = assumptions.growthRateBV !== void 0 ? Math.max(growthMin, Math.min(assumptions.growthRateBV, growthMax)) : void 0;
-  const safeGrowthDiv = assumptions.growthRateDiv !== void 0 ? Math.max(growthMin, Math.min(assumptions.growthRateDiv, growthMax)) : void 0;
+  const getSafeGrowth = (assumedGrowth, metricKey) => {
+    if (assumedGrowth !== void 0 && assumedGrowth !== 0) {
+      return Math.max(growthMin, Math.min(assumedGrowth, growthMax));
+    }
+    const historicalGrowth = calculateHistoricalGrowth(data, metricKey, 5);
+    return historicalGrowth !== 0 ? Math.max(growthMin, Math.min(historicalGrowth, growthMax)) : 0;
+  };
+  const safeGrowthEPS = getSafeGrowth(assumptions.growthRateEPS, "earningsPerShare");
+  const safeGrowthCF = getSafeGrowth(assumptions.growthRateCF, "cashFlowPerShare");
+  const safeGrowthBV = getSafeGrowth(assumptions.growthRateBV, "bookValuePerShare");
+  const safeGrowthDiv = getSafeGrowth(assumptions.growthRateDiv, "dividendPerShare");
   const futureValues = {
     eps: projectFutureValueSafe(baseValues.eps, safeGrowthEPS, 5),
     cf: projectFutureValueSafe(baseValues.cf, safeGrowthCF, 5),
@@ -35894,8 +35918,28 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     totalReturnPercent = -100;
   }
   const handleInput = (e, key) => {
-    const val = parseFloat(e.target.value);
-    if (!isNaN(val)) onUpdateAssumption(key, val);
+    const inputValue = e.target.value.trim();
+    if (inputValue === "" || inputValue === "-") {
+      onUpdateAssumption(key, 0);
+      return;
+    }
+    const val = parseFloat(inputValue);
+    if (!isNaN(val) && isFinite(val)) {
+      if (key === "targetPE" || key === "targetPCF") {
+        config2.ratios.pe.min;
+        config2.ratios.pe.max;
+      } else if (key === "targetPBV") {
+        config2.ratios.pbv.min;
+        config2.ratios.pbv.max;
+      } else if (key === "targetYield") {
+        config2.ratios.yield.min;
+        config2.ratios.yield.max;
+      } else if (key.includes("growthRate")) {
+        config2.growth.min;
+        config2.growth.max;
+      }
+      onUpdateAssumption(key, val);
+    }
   };
   const handleToggleExclusion = (metric) => {
     const currentValue = assumptions[metric] || false;
@@ -40856,6 +40900,659 @@ class ErrorBoundary extends reactExports.Component {
     return this.props.children;
   }
 }
+const FinanceProView = ({ onSelectTicker }) => {
+  const [viewMode, setViewMode] = reactExports.useState("overview");
+  const [loading, setLoading] = reactExports.useState(false);
+  const [error, setError] = reactExports.useState(null);
+  const [allSnapshots, setAllSnapshots] = reactExports.useState([]);
+  const [selectedTicker, setSelectedTicker] = reactExports.useState("");
+  const [snapshotData, setSnapshotData] = reactExports.useState(null);
+  const [screenerResults, setScreenerResults] = reactExports.useState([]);
+  const [screenerFilters, setScreenerFilters] = reactExports.useState([]);
+  const [compareList, setCompareList] = reactExports.useState(["AAPL", "MSFT", "GOOGL"]);
+  const [compareData, setCompareData] = reactExports.useState({});
+  const [searchTerm, setSearchTerm] = reactExports.useState("");
+  const [sortBy2, setSortBy] = reactExports.useState("ticker");
+  const [sortOrder, setSortOrder] = reactExports.useState("asc");
+  const apiBase = typeof window !== "undefined" ? window.location.origin : "";
+  const availableMetrics = [
+    { key: "roe", label: "ROE", format: "percent" },
+    { key: "roa", label: "ROA", format: "percent" },
+    { key: "netMargin", label: "Net Margin", format: "percent" },
+    { key: "grossMargin", label: "Gross Margin", format: "percent" },
+    { key: "debtToEquity", label: "Debt/Equity", format: "ratio" },
+    { key: "currentRatio", label: "Current Ratio", format: "ratio" },
+    { key: "earningsPerShare", label: "EPS", format: "currency" },
+    { key: "bookValuePerShare", label: "Book Value", format: "currency" },
+    { key: "dividendPerShare", label: "Dividend", format: "currency" }
+  ];
+  const formatCurrency2 = (value) => {
+    if (!value && value !== 0) return "N/A";
+    if (Math.abs(value) >= 1e12) return `$${(value / 1e12).toFixed(2)}T`;
+    if (Math.abs(value) >= 1e9) return `$${(value / 1e9).toFixed(2)}B`;
+    if (Math.abs(value) >= 1e6) return `$${(value / 1e6).toFixed(2)}M`;
+    return `$${value.toFixed(2)}`;
+  };
+  const formatPercent2 = (value) => {
+    if (!value && value !== 0) return "N/A";
+    const pct = Math.abs(value) < 1 ? value * 100 : value;
+    return `${pct.toFixed(2)}%`;
+  };
+  const formatValue = (value, format2) => {
+    switch (format2) {
+      case "currency":
+        return formatCurrency2(value);
+      case "percent":
+        return formatPercent2(value);
+      case "ratio":
+        return (value == null ? void 0 : value.toFixed(2)) || "N/A";
+      default:
+        return (value == null ? void 0 : value.toFixed(2)) || "N/A";
+    }
+  };
+  const fetchAllSnapshots = reactExports.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${apiBase}/api/finance-snapshots?all=true&current=true&limit=2000`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      if (data.success) {
+        setAllSnapshots(data.data || []);
+      }
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching snapshots:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [apiBase]);
+  const fetchSnapshot = reactExports.useCallback(async (ticker2) => {
+    var _a3;
+    try {
+      const response = await fetch(`${apiBase}/api/finance-snapshots?ticker=${ticker2}&current=true`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && ((_a3 = data.data) == null ? void 0 : _a3.length) > 0) {
+          setSnapshotData(data.data[0]);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching snapshot:", err);
+    }
+  }, [apiBase]);
+  const fetchCompareData = reactExports.useCallback(async (tickers) => {
+    setLoading(true);
+    try {
+      const results = {};
+      await Promise.all(tickers.filter((t) => t).map(async (ticker2) => {
+        var _a3;
+        const response = await fetch(`${apiBase}/api/finance-snapshots?ticker=${ticker2}&current=true`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && ((_a3 = data.data) == null ? void 0 : _a3.length) > 0) {
+            results[ticker2] = data.data[0];
+          }
+        }
+      }));
+      setCompareData(results);
+    } catch (err) {
+      console.error("Error fetching compare data:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [apiBase]);
+  const runScreener = reactExports.useCallback(() => {
+    var _a3;
+    const results = [];
+    for (const snapshot of allSnapshots) {
+      if (!((_a3 = snapshot.annual_data) == null ? void 0 : _a3.length)) continue;
+      const latestYear = snapshot.annual_data[0];
+      let passesFilters = true;
+      for (const filter of screenerFilters) {
+        const value = latestYear[filter.metric];
+        if (value === void 0 || value === null) continue;
+        switch (filter.operator) {
+          case "gt":
+            passesFilters = value > filter.value;
+            break;
+          case "lt":
+            passesFilters = value < filter.value;
+            break;
+          case "gte":
+            passesFilters = value >= filter.value;
+            break;
+          case "lte":
+            passesFilters = value <= filter.value;
+            break;
+          case "eq":
+            passesFilters = Math.abs(value - filter.value) < 1e-3;
+            break;
+        }
+        if (!passesFilters) break;
+      }
+      if (passesFilters) {
+        results.push({
+          ticker: snapshot.ticker,
+          companyInfo: snapshot.company_info,
+          latestData: latestYear,
+          yearsOfData: snapshot.annual_data.length
+        });
+      }
+    }
+    setScreenerResults(results.slice(0, 100));
+  }, [allSnapshots, screenerFilters]);
+  reactExports.useEffect(() => {
+    fetchAllSnapshots();
+  }, [fetchAllSnapshots]);
+  reactExports.useEffect(() => {
+    if (selectedTicker) {
+      fetchSnapshot(selectedTicker);
+    }
+  }, [selectedTicker, fetchSnapshot]);
+  reactExports.useEffect(() => {
+    if (viewMode === "compare" && compareList.length > 0) {
+      fetchCompareData(compareList);
+    }
+  }, [viewMode, compareList, fetchCompareData]);
+  const stats = reactExports.useMemo(() => {
+    const total = allSnapshots.length;
+    const avgYears = allSnapshots.reduce((sum, s2) => {
+      var _a3;
+      return sum + (((_a3 = s2.annual_data) == null ? void 0 : _a3.length) || 0);
+    }, 0) / (total || 1);
+    const with30Years = allSnapshots.filter((s2) => {
+      var _a3;
+      return ((_a3 = s2.annual_data) == null ? void 0 : _a3.length) >= 30;
+    }).length;
+    const with20Years = allSnapshots.filter((s2) => {
+      var _a3;
+      return ((_a3 = s2.annual_data) == null ? void 0 : _a3.length) >= 20;
+    }).length;
+    return { total, avgYears, with30Years, with20Years };
+  }, [allSnapshots]);
+  const filteredSnapshots = reactExports.useMemo(() => {
+    let result = [...allSnapshots];
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(
+        (s2) => {
+          var _a3, _b2;
+          return s2.ticker.toLowerCase().includes(term) || ((_b2 = (_a3 = s2.company_info) == null ? void 0 : _a3.companyName) == null ? void 0 : _b2.toLowerCase().includes(term));
+        }
+      );
+    }
+    result.sort((a2, b) => {
+      var _a3, _b2, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
+      let comparison = 0;
+      switch (sortBy2) {
+        case "ticker":
+          comparison = a2.ticker.localeCompare(b.ticker);
+          break;
+        case "years":
+          comparison = (((_a3 = b.annual_data) == null ? void 0 : _a3.length) || 0) - (((_b2 = a2.annual_data) == null ? void 0 : _b2.length) || 0);
+          break;
+        case "roe":
+          const roeA = ((_d = (_c = a2.annual_data) == null ? void 0 : _c[0]) == null ? void 0 : _d.roe) || ((_f = (_e = a2.annual_data) == null ? void 0 : _e[0]) == null ? void 0 : _f.earningsPerShare) || 0;
+          const roeB = ((_h = (_g = b.annual_data) == null ? void 0 : _g[0]) == null ? void 0 : _h.roe) || ((_j = (_i = b.annual_data) == null ? void 0 : _i[0]) == null ? void 0 : _j.earningsPerShare) || 0;
+          comparison = roeB - roeA;
+          break;
+        case "margin":
+          const marginA = ((_l = (_k = a2.annual_data) == null ? void 0 : _k[0]) == null ? void 0 : _l.netMargin) || 0;
+          const marginB = ((_n = (_m = b.annual_data) == null ? void 0 : _m[0]) == null ? void 0 : _n.netMargin) || 0;
+          comparison = marginB - marginA;
+          break;
+      }
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
+    return result;
+  }, [allSnapshots, searchTerm, sortBy2, sortOrder]);
+  const handleTickerClick = (ticker2) => {
+    setSelectedTicker(ticker2);
+    if (onSelectTicker) {
+      onSelectTicker(ticker2);
+    }
+  };
+  const renderStatsBar = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 md:grid-cols-4 gap-3 mb-4", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg p-3 shadow-sm border border-gray-200", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-gray-500 text-xs", children: "Total Tickers" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xl font-bold text-gray-800", children: stats.total })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg p-3 shadow-sm border border-gray-200", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-gray-500 text-xs", children: "Avg Years Data" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xl font-bold text-blue-600", children: stats.avgYears.toFixed(1) })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg p-3 shadow-sm border border-gray-200", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-gray-500 text-xs", children: "30+ Years" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xl font-bold text-green-600", children: stats.with30Years })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg p-3 shadow-sm border border-gray-200", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-gray-500 text-xs", children: "20+ Years" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xl font-bold text-yellow-600", children: stats.with20Years })
+    ] })
+  ] });
+  const renderNav = () => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex gap-2 mb-4 overflow-x-auto pb-2", children: [
+    { id: "overview", label: "Overview", icon: "📊" },
+    { id: "screener", label: "Screener", icon: "🔍" },
+    { id: "compare", label: "Compare", icon: "⚖️" },
+    { id: "ratios", label: "Ratios", icon: "📈" }
+  ].map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "button",
+    {
+      onClick: () => setViewMode(item.id),
+      className: `px-3 py-2 rounded-lg whitespace-nowrap text-sm font-medium transition-all ${viewMode === item.id ? "bg-blue-600 text-white shadow-md" : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"}`,
+      children: [
+        item.icon,
+        " ",
+        item.label
+      ]
+    },
+    item.id
+  )) });
+  const renderOverview = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row gap-3 mb-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "input",
+        {
+          type: "text",
+          value: searchTerm,
+          onChange: (e) => setSearchTerm(e.target.value),
+          placeholder: "Search ticker or company...",
+          className: "flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "select",
+        {
+          value: sortBy2,
+          onChange: (e) => setSortBy(e.target.value),
+          className: "px-3 py-2 border border-gray-300 rounded-lg bg-white",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "ticker", children: "Sort by Ticker" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "years", children: "Sort by Years of Data" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "roe", children: "Sort by ROE/EPS" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "margin", children: "Sort by Margin" })
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
+        {
+          onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
+          className: "px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50",
+          children: sortOrder === "asc" ? "↑" : "↓"
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto max-h-[500px] overflow-y-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-gray-50 sticky top-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-left text-gray-600 font-medium", children: "Ticker" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-left text-gray-600 font-medium", children: "Company" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-right text-gray-600 font-medium", children: "Years" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-right text-gray-600 font-medium", children: "EPS" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-right text-gray-600 font-medium", children: "Book Value" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-right text-gray-600 font-medium", children: "Dividend" })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: filteredSnapshots.slice(0, 100).map((snapshot, idx) => {
+          var _a3, _b2, _c, _d, _e, _f;
+          const latest = (_a3 = snapshot.annual_data) == null ? void 0 : _a3[0];
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "tr",
+            {
+              onClick: () => handleTickerClick(snapshot.ticker),
+              className: `border-t border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors ${idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"}`,
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 font-bold text-blue-600", children: snapshot.ticker }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-gray-700 truncate max-w-[200px]", children: ((_b2 = snapshot.company_info) == null ? void 0 : _b2.companyName) || "-" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-right text-gray-800 font-medium", children: ((_c = snapshot.annual_data) == null ? void 0 : _c.length) || 0 }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-right text-gray-800", children: ((_d = latest == null ? void 0 : latest.earningsPerShare) == null ? void 0 : _d.toFixed(2)) || "-" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-right text-gray-800", children: ((_e = latest == null ? void 0 : latest.bookValuePerShare) == null ? void 0 : _e.toFixed(2)) || "-" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-right text-green-600", children: ((_f = latest == null ? void 0 : latest.dividendPerShare) == null ? void 0 : _f.toFixed(2)) || "-" })
+              ]
+            },
+            snapshot.id
+          );
+        }) })
+      ] }) }),
+      filteredSnapshots.length > 100 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-3 py-2 bg-gray-50 text-gray-500 text-sm text-center", children: [
+        "Showing 100 of ",
+        filteredSnapshots.length,
+        " results"
+      ] })
+    ] })
+  ] });
+  const renderScreener = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg p-4 shadow-sm border border-gray-200 mb-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-gray-700 mb-3", children: "Screener Filters" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2", children: screenerFilters.map((filter, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "select",
+          {
+            value: filter.metric,
+            onChange: (e) => {
+              const newFilters = [...screenerFilters];
+              newFilters[idx].metric = e.target.value;
+              setScreenerFilters(newFilters);
+            },
+            className: "px-2 py-1 border border-gray-300 rounded text-sm",
+            children: availableMetrics.map((m) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: m.key, children: m.label }, m.key))
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "select",
+          {
+            value: filter.operator,
+            onChange: (e) => {
+              const newFilters = [...screenerFilters];
+              newFilters[idx].operator = e.target.value;
+              setScreenerFilters(newFilters);
+            },
+            className: "px-2 py-1 border border-gray-300 rounded text-sm",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "gt", children: ">" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "gte", children: ">=" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "lt", children: "<" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "lte", children: "<=" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "eq", children: "=" })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "input",
+          {
+            type: "number",
+            step: "0.01",
+            value: filter.value,
+            onChange: (e) => {
+              const newFilters = [...screenerFilters];
+              newFilters[idx].value = parseFloat(e.target.value) || 0;
+              setScreenerFilters(newFilters);
+            },
+            className: "px-2 py-1 border border-gray-300 rounded text-sm w-24"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => setScreenerFilters(screenerFilters.filter((_, i) => i !== idx)),
+            className: "px-2 py-1 bg-red-100 text-red-600 rounded text-sm hover:bg-red-200",
+            children: "×"
+          }
+        )
+      ] }, idx)) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 mt-3 flex-wrap", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => setScreenerFilters([...screenerFilters, { metric: "roe", operator: "gt", value: 0.15 }]),
+            className: "px-3 py-1 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200",
+            children: "+ Add Filter"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: runScreener,
+            className: "px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700",
+            children: "Run Screener"
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3 flex gap-2 flex-wrap", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => {
+              setScreenerFilters([
+                { metric: "earningsPerShare", operator: "gt", value: 5 }
+              ]);
+            },
+            className: "px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs hover:bg-blue-100",
+            children: "EPS > $5"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => {
+              setScreenerFilters([
+                { metric: "dividendPerShare", operator: "gt", value: 1 }
+              ]);
+            },
+            className: "px-2 py-1 bg-green-50 text-green-700 rounded text-xs hover:bg-green-100",
+            children: "Dividend > $1"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => {
+              setScreenerFilters([
+                { metric: "bookValuePerShare", operator: "gt", value: 20 }
+              ]);
+            },
+            className: "px-2 py-1 bg-purple-50 text-purple-700 rounded text-xs hover:bg-purple-100",
+            children: "Book Value > $20"
+          }
+        )
+      ] })
+    ] }),
+    screenerResults.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-3 py-2 bg-gray-50 border-b border-gray-200 flex justify-between items-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-medium text-gray-700", children: [
+        "Results: ",
+        screenerResults.length
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto max-h-[400px] overflow-y-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-gray-50 sticky top-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-left text-gray-600 font-medium", children: "Ticker" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-left text-gray-600 font-medium", children: "Company" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-right text-gray-600 font-medium", children: "Years" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-right text-gray-600 font-medium", children: "EPS" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-right text-gray-600 font-medium", children: "Book Value" })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: screenerResults.map((result, idx) => {
+          var _a3, _b2, _c, _d, _e;
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "tr",
+            {
+              onClick: () => handleTickerClick(result.ticker),
+              className: `border-t border-gray-100 hover:bg-blue-50 cursor-pointer ${idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"}`,
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 font-bold text-blue-600", children: result.ticker }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-gray-700 truncate max-w-[200px]", children: ((_a3 = result.companyInfo) == null ? void 0 : _a3.companyName) || "-" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-right text-gray-800", children: result.yearsOfData }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-right text-gray-800", children: ((_c = (_b2 = result.latestData) == null ? void 0 : _b2.earningsPerShare) == null ? void 0 : _c.toFixed(2)) || "-" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-right text-gray-800", children: ((_e = (_d = result.latestData) == null ? void 0 : _d.bookValuePerShare) == null ? void 0 : _e.toFixed(2)) || "-" })
+              ]
+            },
+            result.ticker
+          );
+        }) })
+      ] }) })
+    ] })
+  ] });
+  const renderCompare = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg p-4 shadow-sm border border-gray-200 mb-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-gray-700 mb-3", children: "Compare Stocks" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 flex-wrap items-center", children: [
+        compareList.map((ticker2, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 bg-gray-100 rounded px-2 py-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "text",
+              value: ticker2,
+              onChange: (e) => {
+                const newList = [...compareList];
+                newList[idx] = e.target.value.toUpperCase();
+                setCompareList(newList);
+              },
+              className: "bg-transparent w-16 text-sm font-medium outline-none"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: () => setCompareList(compareList.filter((_, i) => i !== idx)),
+              className: "text-red-500 hover:text-red-700 text-xs",
+              children: "×"
+            }
+          )
+        ] }, idx)),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => setCompareList([...compareList, ""]),
+            className: "px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200",
+            children: "+ Add"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => fetchCompareData(compareList.filter((t) => t)),
+            className: "px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700",
+            children: "Compare"
+          }
+        )
+      ] })
+    ] }),
+    Object.keys(compareData).length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-gray-50", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-left text-gray-600 font-medium", children: "Metric" }),
+        compareList.filter((t) => t && compareData[t]).map((ticker2) => /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-center text-blue-600 font-bold", children: ticker2 }, ticker2))
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("tbody", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "border-t border-gray-100", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-gray-600", children: "Years of Data" }),
+          compareList.filter((t) => t && compareData[t]).map((ticker2) => {
+            var _a3, _b2;
+            return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-center text-gray-800", children: ((_b2 = (_a3 = compareData[ticker2]) == null ? void 0 : _a3.annual_data) == null ? void 0 : _b2.length) || 0 }, ticker2);
+          })
+        ] }),
+        availableMetrics.slice(0, 6).map((metric, idx) => {
+          const values = compareList.filter((t) => t && compareData[t]).map((ticker2) => {
+            var _a3, _b2, _c;
+            return {
+              ticker: ticker2,
+              value: (_c = (_b2 = (_a3 = compareData[ticker2]) == null ? void 0 : _a3.annual_data) == null ? void 0 : _b2[0]) == null ? void 0 : _c[metric.key]
+            };
+          });
+          const maxValue = Math.max(...values.map((v) => v.value || 0));
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: `border-t border-gray-100 ${idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"}`, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-gray-600", children: metric.label }),
+            values.map(({ ticker: ticker2, value }) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "td",
+              {
+                className: `px-3 py-2 text-center ${value === maxValue && metric.key !== "debtToEquity" ? "text-green-600 font-bold" : "text-gray-800"}`,
+                children: formatValue(value, metric.format)
+              },
+              ticker2
+            ))
+          ] }, metric.key);
+        })
+      ] })
+    ] }) }) })
+  ] });
+  const renderRatios = () => {
+    var _a3;
+    if (!snapshotData) {
+      return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg p-6 shadow-sm border border-gray-200 text-center", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500 mb-3", children: "Select a ticker to view detailed ratios" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 justify-center", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "text",
+              value: selectedTicker,
+              onChange: (e) => setSelectedTicker(e.target.value.toUpperCase()),
+              placeholder: "Enter ticker...",
+              className: "px-3 py-2 border border-gray-300 rounded-lg w-32 text-center"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: () => fetchSnapshot(selectedTicker),
+              className: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700",
+              children: "Load"
+            }
+          )
+        ] })
+      ] });
+    }
+    const data = snapshotData.annual_data || [];
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 mb-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "input",
+          {
+            type: "text",
+            value: selectedTicker,
+            onChange: (e) => setSelectedTicker(e.target.value.toUpperCase()),
+            className: "px-3 py-2 border border-gray-300 rounded-lg w-24 font-bold"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800", children: ((_a3 = snapshotData.company_info) == null ? void 0 : _a3.companyName) || selectedTicker }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm text-gray-500", children: [
+          "(",
+          data.length,
+          " years)"
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto max-h-[400px] overflow-y-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-gray-50 sticky top-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-left text-gray-600 font-medium", children: "Year" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-right text-gray-600 font-medium", children: "EPS" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-right text-gray-600 font-medium", children: "Book Value" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-right text-gray-600 font-medium", children: "Dividend" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-right text-gray-600 font-medium", children: "Cash Flow" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-right text-gray-600 font-medium", children: "Price High" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-right text-gray-600 font-medium", children: "Price Low" })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: data.slice(0, 30).map((year, idx) => {
+          var _a4, _b2, _c, _d, _e, _f;
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: `border-t border-gray-100 ${idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"}`, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 font-bold text-gray-800", children: year.year }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-right text-gray-800", children: ((_a4 = year.earningsPerShare) == null ? void 0 : _a4.toFixed(2)) || "-" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-right text-gray-800", children: ((_b2 = year.bookValuePerShare) == null ? void 0 : _b2.toFixed(2)) || "-" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-right text-green-600", children: ((_c = year.dividendPerShare) == null ? void 0 : _c.toFixed(2)) || "-" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-right text-gray-800", children: ((_d = year.cashFlowPerShare) == null ? void 0 : _d.toFixed(2)) || "-" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-right text-gray-800", children: ((_e = year.priceHigh) == null ? void 0 : _e.toFixed(2)) || "-" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-3 py-2 text-right text-gray-800", children: ((_f = year.priceLow) == null ? void 0 : _f.toFixed(2)) || "-" })
+          ] }, year.year);
+        }) })
+      ] }) }) })
+    ] });
+  };
+  const renderContent2 = () => {
+    if (loading) {
+      return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center py-12", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent" }) });
+    }
+    switch (viewMode) {
+      case "overview":
+        return renderOverview();
+      case "screener":
+        return renderScreener();
+      case "compare":
+        return renderCompare();
+      case "ratios":
+        return renderRatios();
+      default:
+        return renderOverview();
+    }
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-bold text-gray-800 mb-1", children: "Finance Pro" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500", children: "Analyse fondamentale avec jusqu'à 30 ans de données historiques" })
+    ] }),
+    error && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm", children: error }),
+    renderStatsBar(),
+    renderNav(),
+    renderContent2()
+  ] });
+};
 function calculateTargetPrices(data, assumptions) {
   const baseYearData = data.find((d) => d.year === assumptions.baseYear) || data[data.length - 1];
   const currentPrice = Math.max(assumptions.currentPrice || 0, 0.01);
@@ -57724,10 +58421,11 @@ Vérifiez les logs de la console pour plus de détails.`;
         if (!newRow) {
           return existingRow;
         }
-        if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
+        if (existingRow.autoFetched === false || existingRow.dataSource === "manual") {
           return existingRow;
         }
         const newRowTyped = newRow;
+        const hasPreservedValues = newRowTyped.earningsPerShare <= 0 && existingRow.earningsPerShare > 0 || newRowTyped.cashFlowPerShare <= 0 && existingRow.cashFlowPerShare > 0 || newRowTyped.bookValuePerShare <= 0 && existingRow.bookValuePerShare > 0 || newRowTyped.dividendPerShare <= 0 && existingRow.dividendPerShare > 0 || newRowTyped.priceHigh <= 0 && existingRow.priceHigh > 0 || newRowTyped.priceLow <= 0 && existingRow.priceLow > 0;
         return {
           ...existingRow,
           earningsPerShare: newRowTyped.earningsPerShare > 0 ? newRowTyped.earningsPerShare : existingRow.earningsPerShare,
@@ -57736,7 +58434,9 @@ Vérifiez les logs de la console pour plus de détails.`;
           dividendPerShare: newRowTyped.dividendPerShare > 0 ? newRowTyped.dividendPerShare : existingRow.dividendPerShare,
           priceHigh: newRowTyped.priceHigh > 0 ? newRowTyped.priceHigh : existingRow.priceHigh,
           priceLow: newRowTyped.priceLow > 0 ? newRowTyped.priceLow : existingRow.priceLow,
-          autoFetched: true
+          autoFetched: true,
+          dataSource: hasPreservedValues ? "fmp-adjusted" : "fmp-verified"
+          // ✅ Si valeurs préservées = ajusté, sinon vérifié
         };
       });
       result.data.forEach((newRow) => {
@@ -59156,6 +59856,42 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
   const firstYearData = data[0];
   const historicalCAGR_EPS = calculateCAGR((firstYearData == null ? void 0 : firstYearData.earningsPerShare) || 0, baseEPS, effectiveBaseYear - ((firstYearData == null ? void 0 : firstYearData.year) || effectiveBaseYear));
   const { recommendation, targetPrice, buyLimit, sellLimit } = calculateRecommendation(data, assumptions);
+  const calculateAverageTargetPrice = reactExports.useMemo(() => {
+    const baseYearData2 = data.find((d) => d.year === assumptions.baseYear) || data[data.length - 1];
+    const baseValues = {
+      eps: Math.max((baseYearData2 == null ? void 0 : baseYearData2.earningsPerShare) || 0, 0),
+      cf: Math.max((baseYearData2 == null ? void 0 : baseYearData2.cashFlowPerShare) || 0, 0),
+      bv: Math.max((baseYearData2 == null ? void 0 : baseYearData2.bookValuePerShare) || 0, 0),
+      div: Math.max(assumptions.currentDividend || 0, 0)
+    };
+    const safeGrowthEPS = assumptions.growthRateEPS !== void 0 && assumptions.growthRateEPS !== 0 ? assumptions.growthRateEPS : calculateHistoricalGrowth(data, "earningsPerShare", 5);
+    const safeGrowthCF = assumptions.growthRateCF !== void 0 && assumptions.growthRateCF !== 0 ? assumptions.growthRateCF : calculateHistoricalGrowth(data, "cashFlowPerShare", 5);
+    const safeGrowthBV = assumptions.growthRateBV !== void 0 && assumptions.growthRateBV !== 0 ? assumptions.growthRateBV : calculateHistoricalGrowth(data, "bookValuePerShare", 5);
+    const safeGrowthDiv = assumptions.growthRateDiv !== void 0 && assumptions.growthRateDiv !== 0 ? assumptions.growthRateDiv : calculateHistoricalGrowth(data, "dividendPerShare", 5);
+    const futureValues = {
+      eps: projectFutureValue(baseValues.eps, safeGrowthEPS, 5),
+      cf: projectFutureValue(baseValues.cf, safeGrowthCF, 5),
+      bv: projectFutureValue(baseValues.bv, safeGrowthBV, 5),
+      div: projectFutureValue(baseValues.div, safeGrowthDiv, 5)
+    };
+    const targets = {
+      eps: futureValues.eps > 0 && assumptions.targetPE > 0 ? futureValues.eps * assumptions.targetPE : null,
+      cf: futureValues.cf > 0 && assumptions.targetPCF > 0 ? futureValues.cf * assumptions.targetPCF : null,
+      bv: futureValues.bv > 0 && assumptions.targetPBV > 0 ? futureValues.bv * assumptions.targetPBV : null,
+      div: futureValues.div > 0 && assumptions.targetYield > 0 ? futureValues.div / (assumptions.targetYield / 100) : null
+    };
+    const currentPrice = Math.max(assumptions.currentPrice || 0, 0.01);
+    const maxReasonableTarget = currentPrice * 50;
+    const minReasonableTarget = currentPrice * 0.1;
+    const validTargets = [
+      !assumptions.excludeEPS && targets.eps !== null && targets.eps > 0 && targets.eps >= minReasonableTarget && targets.eps <= maxReasonableTarget && isFinite(targets.eps) ? targets.eps : null,
+      !assumptions.excludeCF && targets.cf !== null && targets.cf > 0 && targets.cf >= minReasonableTarget && targets.cf <= maxReasonableTarget && isFinite(targets.cf) ? targets.cf : null,
+      !assumptions.excludeBV && targets.bv !== null && targets.bv > 0 && targets.bv >= minReasonableTarget && targets.bv <= maxReasonableTarget && isFinite(targets.bv) ? targets.bv : null,
+      !assumptions.excludeDIV && targets.div !== null && targets.div > 0 && targets.div >= minReasonableTarget && targets.div <= maxReasonableTarget && isFinite(targets.div) ? targets.div : null
+    ].filter((t) => t !== null && t > 0 && isFinite(t));
+    return validTargets.length > 0 ? validTargets.reduce((a2, b) => a2 + b, 0) / validTargets.length : targetPrice;
+  }, [data, assumptions, targetPrice]);
+  const chartTargetPrice = calculateAverageTargetPrice;
   const availableYears = data.map((d) => d.year);
   isBulkSyncing ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "fixed bottom-4 right-4 bg-slate-800 p-4 rounded-lg shadow-xl border border-slate-700 z-[100] w-80 animate-in fade-in slide-in-from-bottom-5", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center mb-2", children: [
@@ -59363,6 +60099,18 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: "Mode d'emploi" })
                 ]
               }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "button",
+              {
+                onClick: () => setCurrentView("financepro"),
+                title: "Finance Pro - Analyse fondamentale avancée",
+                className: `p-2 rounded-lg transition-colors duration-200 flex items-center gap-2 ${currentView === "financepro" ? "bg-green-600 text-white shadow-md" : "text-gray-400 hover:text-white hover:bg-gray-800"}`,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$E, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: "Finance Pro" })
+                ]
+              }
             )
           ] })
         ] }),
@@ -59395,7 +60143,23 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
             onUpdateProfile: handleUpdateProfile,
             onOpenSettings: () => setIsSettingsOpen(true)
           }
-        ) }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6", children: [
+        ) }) }) : currentView === "financepro" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ErrorBoundary, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          FinanceProView,
+          {
+            onSelectTicker: (ticker2) => {
+              const profileId = Object.keys(library).find(
+                (id) => {
+                  var _a4, _b3, _c;
+                  return ((_c = (_b3 = (_a4 = library[id]) == null ? void 0 : _a4.info) == null ? void 0 : _b3.symbol) == null ? void 0 : _c.toUpperCase()) === ticker2.toUpperCase();
+                }
+              );
+              if (profileId) {
+                setActiveId(profileId);
+                setCurrentView("analysis");
+              }
+            }
+          }
+        ) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-3 order-2 lg:order-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2 px-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-gray-700 flex items-center gap-2", children: [
@@ -59422,7 +60186,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 currentPrice: assumptions.currentPrice,
                 buyPrice: buyLimit,
                 sellPrice: sellLimit,
-                targetPrice,
+                targetPrice: chartTargetPrice,
                 recommendation
               }
             ),
