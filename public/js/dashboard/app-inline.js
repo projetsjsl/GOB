@@ -27092,15 +27092,84 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         // Map IDs to full link objects
                         const currentNavItems = linkIds.map(id => MASTER_NAV_LINKS.find(link => link.id === id)).filter(Boolean);
                         
-                        return window.SecondaryNavBar && (
-                            <div className="mb-6">
-                                <window.SecondaryNavBar 
-                                    activeTab={activeTab} 
-                                    onTabChange={setActiveTab} 
-                                    isDarkMode={isDarkMode}
-                                    items={currentNavItems}
-                                />
-                            </div>
+                        return (
+                            <>
+                                {/* NEW: Main 6-Tab Navigation */}
+                                <div className={`mb-4 p-1 rounded-xl ${isDarkMode ? 'bg-neutral-900/80' : 'bg-gray-100'}`}>
+                                    <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+                                        {MAIN_TABS.map(tab => {
+                                            const isActive = mainTab === tab.id;
+                                            const colorMap = {
+                                                'red': { active: 'from-red-600 to-red-500', text: 'text-red-400' },
+                                                'blue': { active: 'from-blue-600 to-blue-500', text: 'text-blue-400' },
+                                                'green': { active: 'from-emerald-600 to-emerald-500', text: 'text-emerald-400' },
+                                                'teal': { active: 'from-teal-600 to-teal-500', text: 'text-teal-400' },
+                                                'purple': { active: 'from-purple-600 to-purple-500', text: 'text-purple-400' },
+                                                'orange': { active: 'from-orange-600 to-orange-500', text: 'text-orange-400' }
+                                            };
+                                            const colors = colorMap[tab.color] || colorMap['blue'];
+                                            
+                                            return (
+                                                <button
+                                                    key={tab.id}
+                                                    onClick={() => handleNewTabChange(tab.id)}
+                                                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm whitespace-nowrap transition-all duration-300 ${
+                                                        isActive 
+                                                            ? `bg-gradient-to-r ${colors.active} text-white shadow-lg`
+                                                            : isDarkMode 
+                                                                ? 'text-gray-400 hover:text-white hover:bg-neutral-800'
+                                                                : 'text-gray-600 hover:text-gray-900 hover:bg-white'
+                                                    }`}
+                                                >
+                                                    <LucideIcon name={tab.icon} className="w-4 h-4" />
+                                                    <span>{tab.label}</span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* NEW: Sub-Tabs Navigation for current main tab */}
+                                {SUB_TABS[mainTab] && (
+                                    <div className={`mb-4 border-b ${isDarkMode ? 'border-neutral-700' : 'border-gray-200'}`}>
+                                        <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide pb-1">
+                                            {SUB_TABS[mainTab].map(subTab => {
+                                                const isActive = activeSubTab === subTab.id;
+                                                return (
+                                                    <button
+                                                        key={subTab.id}
+                                                        onClick={() => handleNewTabChange(subTab.id)}
+                                                        className={`flex items-center gap-2 px-3 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+                                                            isActive 
+                                                                ? isDarkMode 
+                                                                    ? 'text-white bg-neutral-800 border-b-2 border-emerald-500'
+                                                                    : 'text-gray-900 bg-white border-b-2 border-emerald-500 shadow-sm'
+                                                                : isDarkMode 
+                                                                    ? 'text-gray-500 hover:text-gray-300 hover:bg-neutral-800/50'
+                                                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                                        }`}
+                                                    >
+                                                        <LucideIcon name={subTab.icon} className="w-3.5 h-3.5" />
+                                                        <span>{subTab.label}</span>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Legacy: Keep SecondaryNavBar for backwards compatibility */}
+                                {window.SecondaryNavBar && currentNavItems.length > 0 && (
+                                    <div className="mb-4 hidden">
+                                        <window.SecondaryNavBar 
+                                            activeTab={activeTab} 
+                                            onTabChange={setActiveTab} 
+                                            isDarkMode={isDarkMode}
+                                            items={currentNavItems}
+                                        />
+                                    </div>
+                                )}
+                            </>
                         );
                     })()}
 
