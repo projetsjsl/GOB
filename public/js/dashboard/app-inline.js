@@ -700,23 +700,45 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         useEffect(() => {
             const loadSupabaseConfig = async () => {
                 try {
+                    // 🔥 FIX: Add timeout to prevent infinite loading
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
                     // Fetch Primary Nav Config
-                    const resPrimary = await fetch('/api/admin/emma-config?section=ui&key=primary_nav_config');
-                    const dataPrimary = await resPrimary.json();
-                    if (dataPrimary && dataPrimary.config && dataPrimary.config.value) {
-                        console.log('☁️ Primary Nav Config loaded from Supabase');
-                        setPrimaryNavConfig(dataPrimary.config.value);
+                    const resPrimary = await fetch('/api/admin/emma-config?section=ui&key=primary_nav_config', {
+                        signal: controller.signal
+                    });
+
+                    if (resPrimary.ok) {
+                        const dataPrimary = await resPrimary.json();
+                        if (dataPrimary && dataPrimary.config && dataPrimary.config.value) {
+                            console.log('☁️ Primary Nav Config loaded from Supabase');
+                            setPrimaryNavConfig(dataPrimary.config.value);
+                        }
                     }
 
                     // Fetch Secondary Nav Config
-                    const resSecondary = await fetch('/api/admin/emma-config?section=ui&key=secondary_nav_config');
-                    const dataSecondary = await resSecondary.json();
-                    if (dataSecondary && dataSecondary.config && dataSecondary.config.value) {
-                        console.log('☁️ Secondary Nav Config loaded from Supabase');
-                        setSecondaryNavConfig(dataSecondary.config.value);
+                    const resSecondary = await fetch('/api/admin/emma-config?section=ui&key=secondary_nav_config', {
+                        signal: controller.signal
+                    });
+
+                    if (resSecondary.ok) {
+                        const dataSecondary = await resSecondary.json();
+                        if (dataSecondary && dataSecondary.config && dataSecondary.config.value) {
+                            console.log('☁️ Secondary Nav Config loaded from Supabase');
+                            setSecondaryNavConfig(dataSecondary.config.value);
+                        }
                     }
+
+                    clearTimeout(timeoutId);
                 } catch (error) {
-                    console.error('❌ Error loading nav config from Supabase:', error);
+                    // 🔥 FIX: Don't block UI if Supabase config fails
+                    if (error.name === 'AbortError') {
+                        console.warn('⚠️ Supabase config timeout - using default config');
+                    } else {
+                        console.error('❌ Error loading nav config from Supabase:', error);
+                    }
+                    // Continue with default config - don't block the UI
                 }
             };
 

@@ -94,9 +94,24 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
     const loadNews = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch(`/api/finviz-news?type=${newsType}&limit=40`);
+
+            // 🔥 FIX: Add timeout to prevent infinite loading
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
+            const response = await fetch(`/api/finviz-news?type=${newsType}&limit=40`, {
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            // 🔥 FIX: Check if response is OK before parsing
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const data = await response.json();
-            
+
             if (data.success && data.news && data.news.length > 0) {
                 setNews(data.news);
             } else {
@@ -127,7 +142,13 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
             }
         } catch (error) {
             console.error('Erreur chargement actualités:', error);
-            // Fallback news
+
+            // 🔥 FIX: Show more specific error message
+            if (error.name === 'AbortError') {
+                console.warn('⚠️ News API timeout - using fallback news');
+            }
+
+            // Fallback news - always load something so UI isn't stuck
             setNews([
                 {
                     time: 'Aujourd\'hui, 11:15 AM',
@@ -138,6 +159,7 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
                 }
             ]);
         } finally {
+            // 🔥 FIX: ALWAYS set loading to false, no matter what
             setIsLoading(false);
         }
     };
