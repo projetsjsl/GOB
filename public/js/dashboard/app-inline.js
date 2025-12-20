@@ -17915,11 +17915,669 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         };
 
         // ============================================
+        // COMPOSANT FINANCE PRO PANEL
+        // ============================================
+        const FinanceProPanel = ({ isDarkMode }) => {
+            const [viewMode, setViewMode] = useState('overview'); // 'overview', 'screener', 'compare', 'ratios'
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState(null);
+            const [allSnapshots, setAllSnapshots] = useState([]);
+            const [selectedTicker, setSelectedTicker] = useState('');
+            const [snapshotData, setSnapshotData] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+            const [sortBy, setSortBy] = useState('ticker');
+            const [sortOrder, setSortOrder] = useState('asc');
+            const [screenerFilters, setScreenerFilters] = useState([]);
+            const [screenerResults, setScreenerResults] = useState([]);
+            const [compareList, setCompareList] = useState(['AAPL', 'MSFT', 'GOOGL']);
+            const [compareData, setCompareData] = useState({});
+
+            const apiBase = window.location.origin;
+
+            // Format helpers
+            const formatCurrency = (value) => {
+                if (!value && value !== 0) return 'N/A';
+                if (Math.abs(value) >= 1e12) return `$${(value / 1e12).toFixed(2)}T`;
+                if (Math.abs(value) >= 1e9) return `$${(value / 1e9).toFixed(2)}B`;
+                if (Math.abs(value) >= 1e6) return `$${(value / 1e6).toFixed(2)}M`;
+                return `$${value.toFixed(2)}`;
+            };
+
+            const formatPercent = (value) => {
+                if (!value && value !== 0) return 'N/A';
+                const pct = Math.abs(value) < 1 ? value * 100 : value;
+                return `${pct.toFixed(2)}%`;
+            };
+
+            // Fetch all snapshots
+            const fetchAllSnapshots = useCallback(async () => {
+                setLoading(true);
+                setError(null);
+                try {
+                    const response = await fetch(`${apiBase}/api/finance-snapshots?all=true&current=true&limit=2000`);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const data = await response.json();
+                    if (data.success) {
+                        setAllSnapshots(data.data || []);
+                    }
+                } catch (err) {
+                    setError(err.message);
+                    console.error('Error fetching snapshots:', err);
+                } finally {
+                    setLoading(false);
+                }
+            }, [apiBase]);
+
+            // Fetch single snapshot
+            const fetchSnapshot = useCallback(async (ticker) => {
+                try {
+                    const response = await fetch(`${apiBase}/api/finance-snapshots?ticker=${ticker}&current=true`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && data.data?.length > 0) {
+                            setSnapshotData(data.data[0]);
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error fetching snapshot:', err);
+                }
+            }, [apiBase]);
+
+            // Fetch compare data
+            const fetchCompareData = useCallback(async (tickers) => {
+                setLoading(true);
+                try {
+                    const results = {};
+                    await Promise.all(tickers.filter(t => t).map(async (ticker) => {
+                        const response = await fetch(`${apiBase}/api/finance-snapshots?ticker=${ticker}&current=true`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success && data.data?.length > 0) {
+                                results[ticker] = data.data[0];
+                            }
+                        }
+                    }));
+                    setCompareData(results);
+                } catch (err) {
+                    console.error('Error fetching compare data:', err);
+                } finally {
+                    setLoading(false);
+                }
+            }, [apiBase]);
+
+            // Run screener
+            const runScreener = useCallback(() => {
+                const results = [];
+                for (const snapshot of allSnapshots) {
+                    if (!snapshot.annual_data?.length) continue;
+                    const latestYear = snapshot.annual_data[0];
+                    let passesFilters = true;
+
+                    for (const filter of screenerFilters) {
+                        const value = latestYear[filter.metric];
+                        if (value === undefined || value === null) continue;
+                        switch (filter.operator) {
+                            case 'gt': passesFilters = value > filter.value; break;
+                            case 'lt': passesFilters = value < filter.value; break;
+                            case 'gte': passesFilters = value >= filter.value; break;
+                            case 'lte': passesFilters = value <= filter.value; break;
+                        }
+                        if (!passesFilters) break;
+                    }
+
+                    if (passesFilters) {
+                        results.push({
+                            ticker: snapshot.ticker,
+                            companyInfo: snapshot.company_info,
+                            latestData: latestYear,
+                            yearsOfData: snapshot.annual_data.length,
+                        });
+                    }
+                }
+                setScreenerResults(results.slice(0, 100));
+            }, [allSnapshots, screenerFilters]);
+
+            // Initial load
+            useEffect(() => {
+                fetchAllSnapshots();
+            }, [fetchAllSnapshots]);
+
+            useEffect(() => {
+                if (selectedTicker) {
+                    fetchSnapshot(selectedTicker);
+                }
+            }, [selectedTicker, fetchSnapshot]);
+
+            useEffect(() => {
+                if (viewMode === 'compare' && compareList.length > 0) {
+                    fetchCompareData(compareList);
+                }
+            }, [viewMode, compareList, fetchCompareData]);
+
+            // Stats summary
+            const stats = useMemo(() => {
+                const total = allSnapshots.length;
+                const avgYears = allSnapshots.reduce((sum, s) => sum + (s.annual_data?.length || 0), 0) / (total || 1);
+                const with30Years = allSnapshots.filter(s => s.annual_data?.length >= 30).length;
+                const with20Years = allSnapshots.filter(s => s.annual_data?.length >= 20).length;
+                return { total, avgYears, with30Years, with20Years };
+            }, [allSnapshots]);
+
+            // Filtered and sorted snapshots
+            const filteredSnapshots = useMemo(() => {
+                let result = [...allSnapshots];
+                if (searchTerm) {
+                    const term = searchTerm.toLowerCase();
+                    result = result.filter(s =>
+                        s.ticker.toLowerCase().includes(term) ||
+                        s.company_info?.companyName?.toLowerCase().includes(term)
+                    );
+                }
+                result.sort((a, b) => {
+                    let comparison = 0;
+                    switch (sortBy) {
+                        case 'ticker': comparison = a.ticker.localeCompare(b.ticker); break;
+                        case 'years': comparison = (b.annual_data?.length || 0) - (a.annual_data?.length || 0); break;
+                    }
+                    return sortOrder === 'asc' ? comparison : -comparison;
+                });
+                return result;
+            }, [allSnapshots, searchTerm, sortBy, sortOrder]);
+
+            const availableMetrics = [
+                { key: 'earningsPerShare', label: 'EPS' },
+                { key: 'bookValuePerShare', label: 'Book Value' },
+                { key: 'dividendPerShare', label: 'Dividend' },
+                { key: 'cashFlowPerShare', label: 'Cash Flow' },
+            ];
+
+            // Render stats bar
+            const renderStatsBar = () => (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                    <div className={`rounded-lg p-3 ${isDarkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
+                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Total Tickers</div>
+                        <div className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{stats.total}</div>
+                    </div>
+                    <div className={`rounded-lg p-3 ${isDarkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
+                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Avg Years Data</div>
+                        <div className="text-xl font-bold text-blue-500">{stats.avgYears.toFixed(1)}</div>
+                    </div>
+                    <div className={`rounded-lg p-3 ${isDarkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
+                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>30+ Years</div>
+                        <div className="text-xl font-bold text-green-500">{stats.with30Years}</div>
+                    </div>
+                    <div className={`rounded-lg p-3 ${isDarkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
+                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>20+ Years</div>
+                        <div className="text-xl font-bold text-yellow-500">{stats.with20Years}</div>
+                    </div>
+                </div>
+            );
+
+            // Render navigation
+            const renderNav = () => (
+                <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+                    {[
+                        { id: 'overview', label: 'Overview', icon: 'LayoutGrid' },
+                        { id: 'screener', label: 'Screener', icon: 'Search' },
+                        { id: 'compare', label: 'Compare', icon: 'GitCompare' },
+                        { id: 'ratios', label: 'Ratios', icon: 'TrendingUp' },
+                    ].map(item => (
+                        <button
+                            key={item.id}
+                            onClick={() => setViewMode(item.id)}
+                            className={`px-3 py-2 rounded-lg whitespace-nowrap text-sm font-medium transition-all flex items-center gap-2 ${
+                                viewMode === item.id
+                                    ? 'bg-green-600 text-white shadow-md'
+                                    : isDarkMode
+                                        ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                                        : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                            }`}
+                        >
+                            <LucideIcon name={item.icon} className="w-4 h-4" />
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+            );
+
+            // Render overview
+            const renderOverview = () => (
+                <div>
+                    <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Search ticker or company..."
+                            className={`flex-1 px-3 py-2 rounded-lg ${isDarkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-white border-gray-300'} border focus:ring-2 focus:ring-green-500`}
+                        />
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            className={`px-3 py-2 rounded-lg ${isDarkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-white border-gray-300'} border`}
+                        >
+                            <option value="ticker">Sort by Ticker</option>
+                            <option value="years">Sort by Years</option>
+                        </select>
+                    </div>
+
+                    <div className={`rounded-lg overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
+                        <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+                            <table className="w-full text-sm">
+                                <thead className={`sticky top-0 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                                    <tr>
+                                        <th className={`px-3 py-2 text-left font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Ticker</th>
+                                        <th className={`px-3 py-2 text-left font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Company</th>
+                                        <th className={`px-3 py-2 text-right font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Years</th>
+                                        <th className={`px-3 py-2 text-right font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>EPS</th>
+                                        <th className={`px-3 py-2 text-right font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Book Value</th>
+                                        <th className={`px-3 py-2 text-right font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Dividend</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredSnapshots.slice(0, 100).map((snapshot, idx) => {
+                                        const latest = snapshot.annual_data?.[0];
+                                        return (
+                                            <tr
+                                                key={snapshot.id}
+                                                onClick={() => {
+                                                    setSelectedTicker(snapshot.ticker);
+                                                    setViewMode('ratios');
+                                                }}
+                                                className={`border-t cursor-pointer transition-colors ${isDarkMode ? 'border-gray-700 hover:bg-gray-700/50' : 'border-gray-100 hover:bg-blue-50'}`}
+                                            >
+                                                <td className="px-3 py-2 font-bold text-green-500">{snapshot.ticker}</td>
+                                                <td className={`px-3 py-2 truncate max-w-[200px] ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                    {snapshot.company_info?.companyName || '-'}
+                                                </td>
+                                                <td className={`px-3 py-2 text-right font-medium ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                                                    {snapshot.annual_data?.length || 0}
+                                                </td>
+                                                <td className={`px-3 py-2 text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
+                                                    {latest?.earningsPerShare?.toFixed(2) || '-'}
+                                                </td>
+                                                <td className={`px-3 py-2 text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
+                                                    {latest?.bookValuePerShare?.toFixed(2) || '-'}
+                                                </td>
+                                                <td className="px-3 py-2 text-right text-green-500">
+                                                    {latest?.dividendPerShare?.toFixed(2) || '-'}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                        {filteredSnapshots.length > 100 && (
+                            <div className={`px-3 py-2 text-sm text-center ${isDarkMode ? 'bg-gray-900 text-gray-500' : 'bg-gray-50 text-gray-500'}`}>
+                                Showing 100 of {filteredSnapshots.length} results
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+
+            // Render screener
+            const renderScreener = () => (
+                <div>
+                    <div className={`rounded-lg p-4 mb-4 ${isDarkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
+                        <h3 className={`text-sm font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>Screener Filters</h3>
+                        <div className="space-y-2">
+                            {screenerFilters.map((filter, idx) => (
+                                <div key={idx} className="flex items-center gap-2 flex-wrap">
+                                    <select
+                                        value={filter.metric}
+                                        onChange={(e) => {
+                                            const newFilters = [...screenerFilters];
+                                            newFilters[idx].metric = e.target.value;
+                                            setScreenerFilters(newFilters);
+                                        }}
+                                        className={`px-2 py-1 rounded text-sm ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white border-gray-300'} border`}
+                                    >
+                                        {availableMetrics.map(m => (
+                                            <option key={m.key} value={m.key}>{m.label}</option>
+                                        ))}
+                                    </select>
+                                    <select
+                                        value={filter.operator}
+                                        onChange={(e) => {
+                                            const newFilters = [...screenerFilters];
+                                            newFilters[idx].operator = e.target.value;
+                                            setScreenerFilters(newFilters);
+                                        }}
+                                        className={`px-2 py-1 rounded text-sm ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white border-gray-300'} border`}
+                                    >
+                                        <option value="gt">&gt;</option>
+                                        <option value="gte">&gt;=</option>
+                                        <option value="lt">&lt;</option>
+                                        <option value="lte">&lt;=</option>
+                                    </select>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        value={filter.value}
+                                        onChange={(e) => {
+                                            const newFilters = [...screenerFilters];
+                                            newFilters[idx].value = parseFloat(e.target.value) || 0;
+                                            setScreenerFilters(newFilters);
+                                        }}
+                                        className={`px-2 py-1 rounded text-sm w-24 ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white border-gray-300'} border`}
+                                    />
+                                    <button
+                                        onClick={() => setScreenerFilters(screenerFilters.filter((_, i) => i !== idx))}
+                                        className="px-2 py-1 bg-red-500/20 text-red-500 rounded text-sm hover:bg-red-500/30"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="flex gap-2 mt-3 flex-wrap">
+                            <button
+                                onClick={() => setScreenerFilters([...screenerFilters, { metric: 'earningsPerShare', operator: 'gt', value: 5 }])}
+                                className={`px-3 py-1 rounded text-sm ${isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                            >
+                                + Add Filter
+                            </button>
+                            <button
+                                onClick={runScreener}
+                                className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+                            >
+                                Run Screener
+                            </button>
+                        </div>
+
+                        <div className="mt-3 flex gap-2 flex-wrap">
+                            <button
+                                onClick={() => setScreenerFilters([{ metric: 'earningsPerShare', operator: 'gt', value: 5 }])}
+                                className="px-2 py-1 bg-green-500/20 text-green-500 rounded text-xs hover:bg-green-500/30"
+                            >
+                                EPS &gt; $5
+                            </button>
+                            <button
+                                onClick={() => setScreenerFilters([{ metric: 'dividendPerShare', operator: 'gt', value: 1 }])}
+                                className="px-2 py-1 bg-blue-500/20 text-blue-500 rounded text-xs hover:bg-blue-500/30"
+                            >
+                                Dividend &gt; $1
+                            </button>
+                            <button
+                                onClick={() => setScreenerFilters([{ metric: 'bookValuePerShare', operator: 'gt', value: 20 }])}
+                                className="px-2 py-1 bg-purple-500/20 text-purple-500 rounded text-xs hover:bg-purple-500/30"
+                            >
+                                Book Value &gt; $20
+                            </button>
+                        </div>
+                    </div>
+
+                    {screenerResults.length > 0 && (
+                        <div className={`rounded-lg overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
+                            <div className={`px-3 py-2 border-b ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                                <span className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
+                                    Results: {screenerResults.length}
+                                </span>
+                            </div>
+                            <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+                                <table className="w-full text-sm">
+                                    <thead className={`sticky top-0 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                                        <tr>
+                                            <th className={`px-3 py-2 text-left font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Ticker</th>
+                                            <th className={`px-3 py-2 text-left font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Company</th>
+                                            <th className={`px-3 py-2 text-right font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Years</th>
+                                            <th className={`px-3 py-2 text-right font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>EPS</th>
+                                            <th className={`px-3 py-2 text-right font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Book Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {screenerResults.map((result, idx) => (
+                                            <tr
+                                                key={result.ticker}
+                                                onClick={() => {
+                                                    setSelectedTicker(result.ticker);
+                                                    setViewMode('ratios');
+                                                }}
+                                                className={`border-t cursor-pointer ${isDarkMode ? 'border-gray-700 hover:bg-gray-700/50' : 'border-gray-100 hover:bg-blue-50'}`}
+                                            >
+                                                <td className="px-3 py-2 font-bold text-green-500">{result.ticker}</td>
+                                                <td className={`px-3 py-2 truncate max-w-[200px] ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                    {result.companyInfo?.companyName || '-'}
+                                                </td>
+                                                <td className={`px-3 py-2 text-right ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{result.yearsOfData}</td>
+                                                <td className={`px-3 py-2 text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
+                                                    {result.latestData?.earningsPerShare?.toFixed(2) || '-'}
+                                                </td>
+                                                <td className={`px-3 py-2 text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
+                                                    {result.latestData?.bookValuePerShare?.toFixed(2) || '-'}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+
+            // Render compare
+            const renderCompare = () => (
+                <div>
+                    <div className={`rounded-lg p-4 mb-4 ${isDarkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
+                        <h3 className={`text-sm font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>Compare Stocks</h3>
+                        <div className="flex gap-2 flex-wrap items-center">
+                            {compareList.map((ticker, idx) => (
+                                <div key={idx} className={`flex items-center gap-1 rounded px-2 py-1 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                                    <input
+                                        type="text"
+                                        value={ticker}
+                                        onChange={(e) => {
+                                            const newList = [...compareList];
+                                            newList[idx] = e.target.value.toUpperCase();
+                                            setCompareList(newList);
+                                        }}
+                                        className={`bg-transparent w-16 text-sm font-medium outline-none ${isDarkMode ? 'text-white' : 'text-gray-800'}`}
+                                    />
+                                    <button
+                                        onClick={() => setCompareList(compareList.filter((_, i) => i !== idx))}
+                                        className="text-red-500 hover:text-red-700 text-xs"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            ))}
+                            <button
+                                onClick={() => setCompareList([...compareList, ''])}
+                                className="px-2 py-1 bg-green-500/20 text-green-500 rounded text-sm hover:bg-green-500/30"
+                            >
+                                + Add
+                            </button>
+                            <button
+                                onClick={() => fetchCompareData(compareList.filter(t => t))}
+                                className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+                            >
+                                Compare
+                            </button>
+                        </div>
+                    </div>
+
+                    {Object.keys(compareData).length > 0 && (
+                        <div className={`rounded-lg overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm">
+                                    <thead className={isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}>
+                                        <tr>
+                                            <th className={`px-3 py-2 text-left font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Metric</th>
+                                            {compareList.filter(t => t && compareData[t]).map(ticker => (
+                                                <th key={ticker} className="px-3 py-2 text-center text-green-500 font-bold">
+                                                    {ticker}
+                                                </th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr className={`border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+                                            <td className={`px-3 py-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Years of Data</td>
+                                            {compareList.filter(t => t && compareData[t]).map(ticker => (
+                                                <td key={ticker} className={`px-3 py-2 text-center ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                                                    {compareData[ticker]?.annual_data?.length || 0}
+                                                </td>
+                                            ))}
+                                        </tr>
+                                        {availableMetrics.map((metric, idx) => (
+                                            <tr key={metric.key} className={`border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+                                                <td className={`px-3 py-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{metric.label}</td>
+                                                {compareList.filter(t => t && compareData[t]).map(ticker => {
+                                                    const value = compareData[ticker]?.annual_data?.[0]?.[metric.key];
+                                                    return (
+                                                        <td key={ticker} className={`px-3 py-2 text-center ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                                                            {value?.toFixed(2) || 'N/A'}
+                                                        </td>
+                                                    );
+                                                })}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+
+            // Render ratios (detailed view)
+            const renderRatios = () => {
+                if (!snapshotData) {
+                    return (
+                        <div className={`rounded-lg p-6 text-center ${isDarkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
+                            <p className={`mb-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Select a ticker to view detailed ratios</p>
+                            <div className="flex gap-2 justify-center">
+                                <input
+                                    type="text"
+                                    value={selectedTicker}
+                                    onChange={(e) => setSelectedTicker(e.target.value.toUpperCase())}
+                                    placeholder="Enter ticker..."
+                                    className={`px-3 py-2 rounded-lg w-32 text-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white border-gray-300'} border`}
+                                />
+                                <button
+                                    onClick={() => fetchSnapshot(selectedTicker)}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                >
+                                    Load
+                                </button>
+                            </div>
+                        </div>
+                    );
+                }
+
+                const data = snapshotData.annual_data || [];
+
+                return (
+                    <div>
+                        <div className="flex items-center gap-3 mb-4">
+                            <input
+                                type="text"
+                                value={selectedTicker}
+                                onChange={(e) => setSelectedTicker(e.target.value.toUpperCase())}
+                                className={`px-3 py-2 rounded-lg w-24 font-bold ${isDarkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-white border-gray-300'} border`}
+                            />
+                            <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                                {snapshotData.company_info?.companyName || selectedTicker}
+                            </h3>
+                            <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>({data.length} years)</span>
+                        </div>
+
+                        <div className={`rounded-lg overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
+                            <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+                                <table className="w-full text-sm">
+                                    <thead className={`sticky top-0 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                                        <tr>
+                                            <th className={`px-3 py-2 text-left font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Year</th>
+                                            <th className={`px-3 py-2 text-right font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>EPS</th>
+                                            <th className={`px-3 py-2 text-right font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Book Value</th>
+                                            <th className={`px-3 py-2 text-right font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Dividend</th>
+                                            <th className={`px-3 py-2 text-right font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Cash Flow</th>
+                                            <th className={`px-3 py-2 text-right font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Price High</th>
+                                            <th className={`px-3 py-2 text-right font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Price Low</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {data.slice(0, 30).map((year, idx) => (
+                                            <tr key={year.year} className={`border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+                                                <td className={`px-3 py-2 font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{year.year}</td>
+                                                <td className={`px-3 py-2 text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
+                                                    {year.earningsPerShare?.toFixed(2) || '-'}
+                                                </td>
+                                                <td className={`px-3 py-2 text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
+                                                    {year.bookValuePerShare?.toFixed(2) || '-'}
+                                                </td>
+                                                <td className="px-3 py-2 text-right text-green-500">
+                                                    {year.dividendPerShare?.toFixed(2) || '-'}
+                                                </td>
+                                                <td className={`px-3 py-2 text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
+                                                    {year.cashFlowPerShare?.toFixed(2) || '-'}
+                                                </td>
+                                                <td className={`px-3 py-2 text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
+                                                    {year.priceHigh?.toFixed(2) || '-'}
+                                                </td>
+                                                <td className={`px-3 py-2 text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
+                                                    {year.priceLow?.toFixed(2) || '-'}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            // Render content based on view mode
+            const renderContent = () => {
+                if (loading) {
+                    return (
+                        <div className="flex items-center justify-center py-12">
+                            <div className="animate-spin rounded-full h-8 w-8 border-2 border-green-500 border-t-transparent"></div>
+                        </div>
+                    );
+                }
+
+                switch (viewMode) {
+                    case 'overview': return renderOverview();
+                    case 'screener': return renderScreener();
+                    case 'compare': return renderCompare();
+                    case 'ratios': return renderRatios();
+                    default: return renderOverview();
+                }
+            };
+
+            return (
+                <div className="p-4">
+                    <div className="mb-4">
+                        <h2 className={`text-xl font-bold mb-1 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Finance Pro</h2>
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                            Analyse fondamentale avec jusqu'à 30 ans de données historiques
+                        </p>
+                    </div>
+
+                    {error && (
+                        <div className="bg-red-500/20 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg mb-4 text-sm">
+                            {error}
+                        </div>
+                    )}
+
+                    {renderStatsBar()}
+                    {renderNav()}
+                    {renderContent()}
+                </div>
+            );
+        };
+
+        // ============================================
         // COMPOSANT INTELLISTOCKS
         // ============================================
         // Composant JLab unifié avec navigation interne
         const JLabUnifiedTab = () => {
-            const [jlabView, setJlabView] = useState('portfolio'); // 'portfolio', 'watchlist', '3pour1', 'advanced'
+            const [jlabView, setJlabView] = useState('portfolio'); // 'portfolio', 'watchlist', '3pour1', 'advanced', 'financepro'
 
             return (
                 <div className="w-full h-full">
@@ -18030,6 +18688,35 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </>
                                 )}
                             </button>
+                            <button
+                                onClick={() => setJlabView('financepro')}
+                                className={`px-6 py-3 font-semibold transition-all duration-300 whitespace-nowrap flex items-center gap-2 relative overflow-hidden rounded-t-lg group ${jlabView === 'financepro'
+                                    ? isDarkMode
+                                        ? 'text-white border-b-2 border-green-400 shadow-lg shadow-green-500/20'
+                                        : 'text-green-900 border-b-2 border-green-600 shadow-md'
+                                    : isDarkMode
+                                        ? 'text-gray-400 hover:text-white'
+                                        : 'text-gray-600 hover:text-gray-900'
+                                    }`}
+                                style={jlabView === 'financepro' ? {
+                                    background: isDarkMode
+                                        ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.9) 0%, rgba(74, 222, 128, 0.8) 100%), url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.05\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
+                                        : 'linear-gradient(135deg, rgba(220, 252, 231, 0.95) 0%, rgba(187, 247, 208, 0.9) 100%)'
+                                } : {
+                                    background: isDarkMode
+                                        ? 'linear-gradient(135deg, rgba(31, 41, 55, 0.8) 0%, rgba(17, 24, 39, 0.9) 100%)'
+                                        : 'linear-gradient(135deg, rgba(249, 250, 251, 0.9) 0%, rgba(243, 244, 246, 0.95) 100%)'
+                                }}
+                            >
+                                <LucideIcon name="TrendingUp" className="w-4 h-4 relative z-10" />
+                                <span className="relative z-10">Finance Pro</span>
+                                {jlabView === 'financepro' && (
+                                    <>
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                                        <div className="absolute inset-0 bg-gradient-to-br from-green-400/20 via-transparent to-transparent"></div>
+                                    </>
+                                )}
+                            </button>
                         </div>
                     </div>
 
@@ -18040,6 +18727,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                         {jlabView === 'advanced' && (
                             window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab isDarkMode={isDarkMode} /> : <div className="text-white p-4">Chargement de l'analyse avancée...</div>
+                        )}
+
+                        {jlabView === 'financepro' && (
+                            <FinanceProPanel isDarkMode={isDarkMode} />
                         )}
                     </div>
                 </div>
