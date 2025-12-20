@@ -192,15 +192,15 @@
                             }`}
                         >
                             {isEditing ? (
-                                <>
+                                <React.Fragment>
                                     <window.LucideIcon name="Check" className="w-4 h-4" />
                                     <span>Terminer</span>
-                                </>
+                                </React.Fragment>
                             ) : (
-                                <>
+                                <React.Fragment>
                                     <window.LucideIcon name="Move" className="w-4 h-4" />
                                     <span>Modifier</span>
-                                </>
+                                </React.Fragment>
                             )}
                         </button>
                     </div>

@@ -136,7 +136,8 @@
             // On doit merger les props 'type' des items originaux car RGL ne renvoie que x,y,w,h,i
             const mergedLayout = newLayout.map(item => {
                 const original = layout.find(l => l.i === item.i);
-                return { ...item, type: original ? original.type : 'UNKNOWN' };
+                // return { ...item, type: original ? original.type : 'UNKNOWN' };
+                return Object.assign({}, item, { type: original ? original.type : 'UNKNOWN' });
             });
             setLayout(mergedLayout);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedLayout));
