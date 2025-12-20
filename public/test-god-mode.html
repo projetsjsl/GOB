@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test GOD MODE - Dashboard Grid Layout</title>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0a0a0a;
+            color: #fff;
+        }
+        .test-container {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #8b5cf6;
+            margin-bottom: 10px;
+        }
+        .instructions {
+            background: #2a2a2a;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #8b5cf6;
+        }
+        .code-block {
+            background: #000;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            margin: 10px 0;
+            border: 1px solid #333;
+        }
+        button {
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #10b98120;
+            border: 1px solid #10b981;
+            color: #10b981;
+        }
+        .status.error {
+            background: #ef444420;
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🚀 Test GOD MODE - Dashboard Grid Layout</h1>
+        
+        <div class="instructions">
+            <h3>📋 Instructions</h3>
+            <ol>
+                <li>Ouvrez le dashboard dans un nouvel onglet: <a href="/beta-combined-dashboard.html" target="_blank" style="color: #8b5cf6;">beta-combined-dashboard.html</a></li>
+                <li>Ouvrez la console du navigateur (F12)</li>
+                <li>Copiez-collez le code ci-dessous dans la console</li>
+                <li>Appuyez sur Entrée pour exécuter les tests</li>
+            </ol>
+        </div>
+
+        <div class="instructions">
+            <h3>💻 Code à copier dans la console</h3>
+            <div class="code-block" id="testCode">
+                // Charger le script de test
+                const script = document.createElement('script');
+                script.src = '/js/dashboard/test-god-mode-console.js';
+                document.head.appendChild(script);
+                
+                // Attendre le chargement puis exécuter
+                script.onload = () => {
+                    setTimeout(() => {
+                        runGodModeTests(3); // 3 boucles
+                    }, 1000);
+                };
+            </div>
+            <button onclick="copyCode()">📋 Copier le code</button>
+        </div>
+
+        <div class="instructions">
+            <h3>🔍 Tests effectués</h3>
+            <ul>
+                <li>✅ React et ReactDOM chargés</li>
+                <li>✅ React Grid Layout disponible</li>
+                <li>✅ BetaCombinedDashboard exposé</li>
+                <li>✅ DashboardGridWrapper chargé</li>
+                <li>✅ Toggle Vue Onglets/Grille présent</li>
+                <li>✅ Mode grille actif par défaut</li>
+                <li>✅ Grille rendue correctement</li>
+                <li>✅ Widgets visibles</li>
+                <li>✅ Toggle fonctionnel</li>
+                <li>✅ Mode édition disponible</li>
+                <li>✅ LocalStorage accessible</li>
+                <li>✅ Composants RGL chargés</li>
+            </ul>
+        </div>
+
+        <div id="status" class="status" style="display: none;"></div>
+
+        <div class="instructions">
+            <h3>📊 Résultats</h3>
+            <p>Les résultats seront affichés dans la console du navigateur.</p>
+            <p>Vous pouvez aussi vérifier: <code>window.__GOD_MODE_TEST_RESULTS</code></p>
+        </div>
+    </div>
+
+    <script>
+        function copyCode() {
+            const code = document.getElementById('testCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const status = document.getElementById('status');
+                status.style.display = 'block';
+                status.className = 'status success';
+                status.textContent = '✅ Code copié dans le presse-papiers!';
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 3000);
+            });
+        }
+
+        // Auto-charger le script si on vient du dashboard
+        if (window.location.search.includes('from=dashboard')) {
+            const script = document.createElement('script');
+            script.src = '/js/dashboard/test-god-mode-console.js';
+            document.head.appendChild(script);
+        }
+    </script>
+</body>
+</html>
