@@ -21,7 +21,6 @@ import { NotificationManager } from './components/Notification';
 import { SyncProgressBar } from './components/SyncProgressBar';
 import { LandingPage } from './components/LandingPage';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { FinanceProView } from './components/FinanceProView';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
 import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation, autoFillAssumptionsFromFMPData, isMutualFund, calculateHistoricalGrowth } from './utils/calculations';
 import { detectOutlierMetrics } from './utils/outlierDetection';
@@ -155,7 +154,7 @@ export default function App() {
     const [isInitialized, setIsInitialized] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
-    const [currentView, setCurrentView] = useState<'analysis' | 'info' | 'kpi' | 'financepro'>('analysis');
+    const [currentView, setCurrentView] = useState<'analysis' | 'info' | 'kpi'>('analysis');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [showConfirmSync, setShowConfirmSync] = useState(false);
     const [showAdvancedSyncDialog, setShowAdvancedSyncDialog] = useState(false);
@@ -4534,25 +4533,13 @@ export default function App() {
                                     onClick={() => setCurrentView('info')}
                                     title="Mode d'emploi et documentation"
                                     className={`p-2 rounded-lg transition-colors duration-200 flex items-center gap-2 ${
-                                        currentView === 'info'
-                                            ? 'bg-blue-600 text-white shadow-md'
+                                        currentView === 'info' 
+                                            ? 'bg-blue-600 text-white shadow-md' 
                                             : 'text-gray-400 hover:text-white hover:bg-gray-800'
                                     }`}
                                 >
                                     <InformationCircleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                                     <span className="hidden xs:inline">Mode d'emploi</span>
-                                </button>
-                                <button
-                                    onClick={() => setCurrentView('financepro')}
-                                    title="Finance Pro - Analyse fondamentale avancée"
-                                    className={`p-2 rounded-lg transition-colors duration-200 flex items-center gap-2 ${
-                                        currentView === 'financepro'
-                                            ? 'bg-green-600 text-white shadow-md'
-                                            : 'text-gray-400 hover:text-white hover:bg-gray-800'
-                                    }`}
-                                >
-                                    <CalculatorIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                                    <span className="hidden xs:inline">Finance Pro</span>
                                 </button>
                             </div>
                         </div>
@@ -4572,7 +4559,7 @@ export default function App() {
                                     onOpenReports={() => setIsReportsOpen(true)}
                                 />
 
-                        {/* CONDITIONAL RENDER: ANALYSIS VS INFO VS KPI VS FINANCEPRO */}
+                        {/* CONDITIONAL RENDER: ANALYSIS VS INFO VS KPI */}
                         {currentView === 'info' ? (
                             <InfoTab />
                         ) : currentView === 'kpi' ? (
@@ -4589,21 +4576,6 @@ export default function App() {
                                         onOpenSettings={() => setIsSettingsOpen(true)}
                                     />
                                 </Suspense>
-                            </ErrorBoundary>
-                        ) : currentView === 'financepro' ? (
-                            <ErrorBoundary>
-                                <FinanceProView
-                                    onSelectTicker={(ticker) => {
-                                        // Switch to analysis view and load the ticker
-                                        const profileId = Object.keys(library).find(
-                                            id => library[id]?.info?.symbol?.toUpperCase() === ticker.toUpperCase()
-                                        );
-                                        if (profileId) {
-                                            setActiveId(profileId);
-                                            setCurrentView('analysis');
-                                        }
-                                    }}
-                                />
                             </ErrorBoundary>
                         ) : (
                             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
