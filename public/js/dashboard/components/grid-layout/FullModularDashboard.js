@@ -10,7 +10,7 @@
 (function() {
     'use strict';
 
-    const { useState, useEffect, useMemo, useCallback } = React;
+    const { useState, useEffect, useMemo, useCallback, useRef } = React;
     const { createRoot } = ReactDOM;
 
     // ===================================
@@ -124,8 +124,20 @@
     const FullModularDashboard = () => {
         const [isDarkMode, setIsDarkMode] = useState(true);
         const [layout, setLayout] = useState(() => {
-            try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || DEFAULT_LAYOUT; } 
-            catch (e) { return DEFAULT_LAYOUT; }
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && parsed.length > 0) {
+                        console.log(`✅ Layout chargé depuis localStorage: ${parsed.length} widgets`);
+                        return parsed;
+                    }
+                }
+            } catch (e) {
+                console.error('❌ Erreur chargement layout:', e);
+            }
+            console.log(`✅ Layout par défaut créé: ${DEFAULT_LAYOUT.length} widgets`, DEFAULT_LAYOUT);
+            return DEFAULT_LAYOUT;
         });
 
         // États partagés pour compatibilité avec BetaCombinedDashboard
@@ -332,7 +344,53 @@
             return <Component isDarkMode={isDarkMode} isAdmin={true} />;
         };
 
-        if(!ResponsiveGridLayout) return <div>Chargement du Noyau...</div>;
+        // Logs de débogage
+        useEffect(() => {
+            console.log('🔍 FullModularDashboard - État:', {
+                layoutLength: layout?.length || 0,
+                ResponsiveGridLayoutAvailable: !!ResponsiveGridLayout,
+                RGL: typeof window.ReactGridLayout !== 'undefined',
+                components: {
+                    MarketsEconomyTabRGL: typeof window.MarketsEconomyTabRGL !== 'undefined',
+                    TitresTabRGL: typeof window.TitresTabRGL !== 'undefined',
+                    JLabTab: typeof window.JLabTab !== 'undefined',
+                    AskEmmaTab: typeof window.AskEmmaTab !== 'undefined'
+                }
+            });
+        }, [layout, ResponsiveGridLayout]);
+
+        if(!ResponsiveGridLayout) {
+            console.error('❌ ResponsiveGridLayout non disponible');
+            return (
+                <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-[#0a0a0a] text-white' : 'bg-slate-100 text-gray-900'}`}>
+                    <div className={`p-8 rounded-xl ${isDarkMode ? 'bg-neutral-900' : 'bg-white'}`}>
+                        <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>⏳ Chargement du Noyau...</h2>
+                        <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            React Grid Layout en cours de chargement...
+                        </p>
+                        <p className={`text-sm mt-2 ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                            Vérifiez la console pour plus de détails.
+                        </p>
+                    </div>
+                </div>
+            );
+        }
+
+        // Vérifier que le layout n'est pas vide
+        if (!layout || layout.length === 0) {
+            console.warn('⚠️ Layout vide, utilisation du layout par défaut');
+            const defaultLayout = DEFAULT_LAYOUT;
+            setLayout(defaultLayout);
+            return (
+                <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-[#0a0a0a] text-white' : 'bg-slate-100 text-gray-900'}`}>
+                    <div className={`p-8 rounded-xl ${isDarkMode ? 'bg-blue-900/20' : 'bg-blue-100'}`}>
+                        <p className={`font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>⏳ Initialisation du layout...</p>
+                    </div>
+                </div>
+            );
+        }
+
+        console.log('✅ FullModularDashboard - Rendu avec', layout.length, 'widgets');
 
         return (
             <div className={`min-h-screen relative overflow-x-hidden ${isDarkMode ? 'bg-[#0a0a0a] text-white' : 'bg-slate-100 text-gray-900'} bg-[url('https://grainy-gradients.vercel.app/noise.svg')]`}>
