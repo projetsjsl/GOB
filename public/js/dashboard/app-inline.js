@@ -544,6 +544,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         ],
         'marches': [
             { id: 'marches-global', label: 'Vue Globale', icon: 'Globe', component: 'MarketsEconomyTab' },
+            { id: 'marches-flex', label: 'Vue Flex (Bêta)', icon: 'Layout', component: 'MarketsEconomyTabRGL' },
             { id: 'marches-calendar', label: 'Calendrier Éco', icon: 'Calendar', component: 'EconomicCalendarTab' },
             { id: 'marches-yield', label: 'Courbe Taux', icon: 'LineChart', component: 'YieldCurveTab' },
             { id: 'marches-nouvelles', label: 'Nouvelles', icon: 'Newspaper', component: 'NouvellesTab' }
@@ -27323,6 +27324,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                     {/* MARCHÉS Sub-tabs */}
                     {activeTab === 'marches-global' && <MarketsEconomyTab key={`marches-global-${tabMountKeys['markets-economy'] || 0}`} />}
+                    {activeTab === 'marches-flex' && (window.MarketsEconomyTabRGL ? <window.MarketsEconomyTabRGL isDarkMode={isDarkMode} isAdmin={true} /> : <div>Chargement...</div>)}
                     {activeTab === 'marches-calendar' && <EconomicCalendarTab key={`marches-calendar-${tabMountKeys['economic-calendar'] || 0}`} />}
                     {activeTab === 'marches-yield' && <YieldCurveTab />}
                     {activeTab === 'marches-nouvelles' && <NouvellesTab key={`marches-nouvelles-${tabMountKeys['nouvelles'] || 0}`} />}
