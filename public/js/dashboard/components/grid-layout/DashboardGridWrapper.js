@@ -435,31 +435,15 @@
             );
         }
 
-        // Logs de débogage
+        // ⚠️ CORRECTION PERFORMANCE: Logs uniquement au montage initial
         useEffect(() => {
-            console.log('🔍 DashboardGridWrapper - État:', {
+            console.log('🔍 DashboardGridWrapper - Montage initial:', {
                 layoutLength: layout?.length || 0,
-                isEditing,
-                currentBreakpoint,
-                ResponsiveGridLayoutAvailable: !!ResponsiveGridLayout,
-                RGL: typeof window.ReactGridLayout !== 'undefined'
+                ResponsiveGridLayoutAvailable: !!ResponsiveGridLayout
             });
-            
-            if (layout && layout.length > 0) {
-                console.log('📊 Layout actuel:', layout.map(item => ({
-                    id: item.i,
-                    size: `${item.w}x${item.h}`,
-                    pos: `(${item.x}, ${item.y})`,
-                    config: TAB_TO_WIDGET_MAP[item.i]?.label || 'INCONNU'
-                })));
-            }
-        }, [layout, isEditing, currentBreakpoint, ResponsiveGridLayout]);
+        }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-        console.log('🎨 DashboardGridWrapper - Rendu:', {
-            layoutLength: layout?.length || 0,
-            ResponsiveGridLayout: !!ResponsiveGridLayout,
-            isEditing
-        });
+        // ⚠️ SUPPRIMÉ: console.log dans le render causait des logs excessifs
 
         return (
             <div className={`min-h-screen ${isDarkMode ? 'bg-black' : 'bg-white'}`}>

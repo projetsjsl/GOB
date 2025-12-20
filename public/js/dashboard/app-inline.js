@@ -27226,14 +27226,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {/* Rendu conditionnel: Vue Grille ou Vue Onglets */}
                     {dashboardViewMode === 'grid' ? (
                         // VUE GRILLE (GOD MODE)
-                        (() => {
-                            console.log('🔍 Vérification DashboardGridWrapper:', {
-                                exists: typeof window.DashboardGridWrapper !== 'undefined',
-                                viewMode: dashboardViewMode,
-                                isDarkMode
-                            });
-                            return window.DashboardGridWrapper;
-                        })() ? (
+                        // ⚠️ CORRECTION PERFORMANCE: Console.log supprimé (causait logs excessifs)
+                        window.DashboardGridWrapper ? (
                             <window.DashboardGridWrapper
                                 isDarkMode={isDarkMode}
                                 isAdmin={true}

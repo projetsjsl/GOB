@@ -227,6 +227,7 @@
             console.log('📑 Changement d\'onglet:', tabId);
         }, []);
 
+        // ⚠️ CORRECTION PERFORMANCE: Exécuter une seule fois au montage
         // Exposer window.BetaCombinedDashboard pour compatibilité
         useEffect(() => {
             window.BetaCombinedDashboard = window.BetaCombinedDashboard || {};
@@ -248,20 +249,24 @@
             window.BetaCombinedDashboard.setActiveTab = setActiveTab;
             window.BetaCombinedDashboard.setSelectedStock = setSelectedStock;
             window.BetaCombinedDashboard.getCompanyLogo = getCompanyLogo;
-        }, [
-            isDarkMode, tickers, teamTickers, watchlistTickers, stockData, newsData,
-            loading, lastUpdate, tickerLatestNews, tickerMoveReasons, selectedStock,
-            loadTickersFromSupabase, fetchNews, refreshAllStocks, fetchLatestNewsForTickers,
-            setActiveTab, getCompanyLogo
-        ]);
+        }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+        // ⚠️ CORRECTION PERFORMANCE: Exécuter une seule fois au montage
         // Exposer window.BetaCombinedDashboardData pour compatibilité
         useEffect(() => {
             window.BetaCombinedDashboardData = window.BetaCombinedDashboardData || {};
             window.BetaCombinedDashboardData.getCompanyLogo = getCompanyLogo;
             window.BetaCombinedDashboardData.setActiveTab = setActiveTab;
             window.BetaCombinedDashboardData.isDarkMode = isDarkMode;
-        }, [getCompanyLogo, setActiveTab, isDarkMode]);
+        }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+        // ⚠️ CORRECTION BOUCLE INFINIE: Gérer le layout vide via useEffect
+        useEffect(() => {
+            if (!layout || layout.length === 0) {
+                console.warn('⚠️ Layout vide détecté dans useEffect, recréation du layout par défaut');
+                setLayout(DEFAULT_LAYOUT);
+            }
+        }, [layout]);
 
         // Sauvegarde auto
         const onLayoutChange = (newLayout) => {
@@ -344,20 +349,14 @@
             return <Component isDarkMode={isDarkMode} isAdmin={true} />;
         };
 
-        // Logs de débogage
+        // ⚠️ CORRECTION PERFORMANCE: Logs de débogage uniquement au montage initial
         useEffect(() => {
-            console.log('🔍 FullModularDashboard - État:', {
+            console.log('🔍 FullModularDashboard - Montage initial:', {
                 layoutLength: layout?.length || 0,
                 ResponsiveGridLayoutAvailable: !!ResponsiveGridLayout,
-                RGL: typeof window.ReactGridLayout !== 'undefined',
-                components: {
-                    MarketsEconomyTabRGL: typeof window.MarketsEconomyTabRGL !== 'undefined',
-                    TitresTabRGL: typeof window.TitresTabRGL !== 'undefined',
-                    JLabTab: typeof window.JLabTab !== 'undefined',
-                    AskEmmaTab: typeof window.AskEmmaTab !== 'undefined'
-                }
+                RGL: typeof window.ReactGridLayout !== 'undefined'
             });
-        }, [layout, ResponsiveGridLayout]);
+        }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
         if(!ResponsiveGridLayout) {
             console.error('❌ ResponsiveGridLayout non disponible');
@@ -376,21 +375,10 @@
             );
         }
 
-        // Vérifier que le layout n'est pas vide
-        if (!layout || layout.length === 0) {
-            console.warn('⚠️ Layout vide, utilisation du layout par défaut');
-            const defaultLayout = DEFAULT_LAYOUT;
-            setLayout(defaultLayout);
-            return (
-                <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-[#0a0a0a] text-white' : 'bg-slate-100 text-gray-900'}`}>
-                    <div className={`p-8 rounded-xl ${isDarkMode ? 'bg-blue-900/20' : 'bg-blue-100'}`}>
-                        <p className={`font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>⏳ Initialisation du layout...</p>
-                    </div>
-                </div>
-            );
-        }
+        // ⚠️ CORRECTION BOUCLE INFINIE: Déplacer dans useEffect au lieu du render
+        // Le layout vide est géré par le useEffect ci-dessous
 
-        console.log('✅ FullModularDashboard - Rendu avec', layout.length, 'widgets');
+        // ⚠️ SUPPRIMÉ: console.log dans le render causait des logs excessifs
 
         return (
             <div className={`min-h-screen relative overflow-x-hidden ${isDarkMode ? 'bg-[#0a0a0a] text-white' : 'bg-slate-100 text-gray-900'} bg-[url('https://grainy-gradients.vercel.app/noise.svg')]`}>
