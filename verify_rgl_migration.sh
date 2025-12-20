@@ -2,7 +2,7 @@
 # Script de vérification de la migration RGL
 echo "🔍 Vérification de la migration RGL..."
 
-FILES=("public/js/dashboard/components/grid-layout/RglDashboard.js" "public/js/dashboard/components/tabs/MarketsEconomyTabRGL.js")
+FILES=("public/js/dashboard/components/grid-layout/RglDashboard.js" "public/js/dashboard/components/tabs/MarketsEconomyTabRGL.js" "public/js/dashboard/components/tabs/TitresTabRGL.js")
 ERRORS=0
 
 for file in "${FILES[@]}"; do

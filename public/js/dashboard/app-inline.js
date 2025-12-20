@@ -551,6 +551,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         ],
         'titres': [
             { id: 'titres-portfolio', label: 'Mon Portfolio', icon: 'Wallet', component: 'StocksNewsTab:portfolio' },
+            { id: 'titres-flex', label: 'Dashboard Flex (Bêta)', icon: 'LayoutDashboard', component: 'TitresTabRGL' },
             { id: 'titres-watchlist', label: 'Watchlist', icon: 'Star', component: 'StocksNewsTab:watchlist' },
             { id: 'titres-3p1', label: 'Finance Pro', icon: 'PieChart', component: 'redirect:/3p1' },
             { id: 'titres-seeking', label: 'Seeking Alpha', icon: 'Newspaper', component: 'SeekingAlphaTab' },
@@ -27331,6 +27332,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                     {/* TITRES Sub-tabs */}
                     {activeTab === 'titres-portfolio' && <StocksNewsTab tickerSource="portfolio" />}
+                    {activeTab === 'titres-flex' && (window.TitresTabRGL ? <window.TitresTabRGL isDarkMode={isDarkMode} /> : <div>Chargement...</div>)}
                     {activeTab === 'titres-watchlist' && <StocksNewsTab tickerSource="watchlist" />}
                     {activeTab === 'titres-seeking' && <SeekingAlphaTab
                         isDarkMode={isDarkMode}
