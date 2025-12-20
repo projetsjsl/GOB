@@ -113,7 +113,7 @@
     <!-- Theme Selector Component -->
     <script type="text/babel" src="js/dashboard/components/ThemeSelector.js"></script>
     <script type="text/babel" src="js/dashboard/components/SecondaryNavBar.js"></script>
-    <script type="text/babel" src="js/dashboard/components/NewsBanner.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/NewsBanner.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/FinVoxTab.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/EmmAIATab.js"></script>
     <!-- Terminal Emma IA Tab -->
@@ -900,6 +900,41 @@
             100% { left: 100%; }
         }
 
+        /* Footer Info Bar Styles */
+        #footer-info-bar {
+            position: fixed;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.85);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #cbd5e1;
+            padding: 6px 16px;
+            font-size: 11px;
+            border-radius: 99px;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.9;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        #footer-info-bar .brand {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        #footer-info-bar .separator {
+            opacity: 0.3;
+        }
+
         /* Secondary Nav Specifics */
         .emma-nav-item {
             position: relative;
@@ -961,10 +996,9 @@
     <!-- Global Real-time Sync (must load after app-inline to dispatch events) -->
     <script src="/js/dashboard/realtime-sync.js"></script>
     <!-- Debug / Context Indicator -->
-    <!-- Debug / Context Indicator -->
-    <div id="footer-info-bar" style="position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 6px 16px; font-size: 11px; border-radius: 99px; z-index: 9999; pointer-events: none; opacity: 0.9; font-family: 'Plus Jakarta Sans', sans-serif; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); display: flex; align-items: center; gap: 8px; transition: all 0.3s ease;">
-        <span style="font-weight: 600; color: #fff;">GOB Apps</span>
-        <span style="opacity:0.3">|</span>
+    <div id="footer-info-bar">
+        <span class="brand">GOB Apps</span>
+        <span class="separator">|</span>
         <span id="footer-context">public/beta-combined-dashboard.html</span>
     </div>
 </body>

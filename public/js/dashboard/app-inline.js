@@ -169,6 +169,8 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             // Graphiques & Finance
             'PieChart': 'pie-chart',
             'BarChart3': 'stat-up',
+            'LayoutDashboard': 'view-grid',
+            'Flask': 'flask',
             'Brain': 'brain',
             'TrendingUp': 'trending-up',
             'TrendingDown': 'trending-down',
@@ -215,7 +217,10 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             'Phone': 'phone',
             'Globe': 'globe',
             'Building': 'building',
-            'ChatBubble': 'chat-bubble'
+            'ChatBubble': 'chat-bubble',
+            'MessageSquare': 'chat-bubble',
+            'Mic': 'microphone',
+            'Monitor': 'pc-monitor'
         };
 
         const iconClass = iconMap[name] || iconMap['Activity'];
@@ -1187,7 +1192,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 const tabNames = {
                     'stocks-news': 'Titres & Nouvelles (JLab™)',
                     'nouvelles': 'Nouvelles en direct',
-                    'jlab': 'JLAB - Hub d'analyse multifonctions',
+                    'jlab': 'JLAB - Hub d\'analyse multifonctions',
                     'email-briefings': 'Email Briefings',
                     'watchlist': 'Ma Watchlist (Supabase)',
                     'economic-calendar': 'Calendrier Économique',
@@ -18741,10 +18746,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             const [selectedStock, setSelectedStock] = useState('AAPL');
             const [timeframe, setTimeframe] = useState('1D');
             const [menuOpen, setMenuOpen] = useState(false);
-            const [stockDataIntelli, setStockDataIntelli] = useState(null);
-            const [loadingIntelli, setLoadingIntelli] = useState(true);
+            const [stockDataJLab, setStockDataJLab] = useState(null);
+            const [loadingJLab, setLoadingJLab] = useState(true);
             const [connected, setConnected] = useState(false);
-            const [lastUpdateIntelli, setLastUpdateIntelli] = useState(null);
+            const [lastUpdateJLab, setLastUpdateJLab] = useState(null);
             // Helppop: visibilité et liste des violations détectées
             const [showHelp, setShowHelp] = useState(false);
             const [violations, setViolations] = useState([]);
@@ -19669,15 +19674,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             useEffect(() => {
                 const fetchData = async () => {
                     try {
-                        setLoadingIntelli(true);
+                        setLoadingJLab(true);
                         console.log(`📊 Chargement des données pour ${selectedStock}...`);
 
                         // Essayer d'abord avec les vraies APIs
                         const realData = await fetchRealStockData(selectedStock, timeframe);
                         if (realData && realData.quote && realData.quote.price > 0) {
-                            setStockDataIntelli(realData);
+                            setStockDataJLab(realData);
                             setConnected(true);
-                            setLastUpdateIntelli(new Date());
+                            setLastUpdateJLab(new Date());
                             console.log('✅ Données chargées avec succès');
 
                             // Vérifier si les données intraday sont disponibles
@@ -19700,7 +19705,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                         // Utiliser mock data en dernier recours
                         const mockData = generateMockData(selectedStock);
-                        setStockDataIntelli(mockData);
+                        setStockDataJLab(mockData);
 
                         // Enregistrer une violation visible dans l'helppop
                         setViolations(prev => {
@@ -19712,7 +19717,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         });
                         setShowHelp(true);
                     } finally {
-                        setLoadingIntelli(false);
+                        setLoadingJLab(false);
                     }
                 };
                 fetchData();
@@ -20011,16 +20016,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             };
 
             const currentStock = stocks.find(s => s.symbol === selectedStock);
-            const quote = stockDataIntelli?.quote || {};
-            const metrics = stockDataIntelli?.metrics || {};
-            const ratios = stockDataIntelli?.ratios || {};
-            const profile = stockDataIntelli?.profile || {};
-            const intraday = stockDataIntelli?.intraday || [];
-            const news = stockDataIntelli?.news || [];
-            const sentiment = stockDataIntelli?.sentiment || {};
-            const insights = stockDataIntelli?.insights || {};
-            const historicalRatios = stockDataIntelli?.historicalRatios || [];
-            const movingAverages = stockDataIntelli?.movingAverages || {};
+            const quote = stockDataJLab?.quote || {};
+            const metrics = stockDataJLab?.metrics || {};
+            const ratios = stockDataJLab?.ratios || {};
+            const profile = stockDataJLab?.profile || {};
+            const intraday = stockDataJLab?.intraday || [];
+            const news = stockDataJLab?.news || [];
+            const sentiment = stockDataJLab?.sentiment || {};
+            const insights = stockDataJLab?.insights || {};
+            const historicalRatios = stockDataJLab?.historicalRatios || [];
+            const movingAverages = stockDataJLab?.movingAverages || {};
 
             const formatNumber = (window.DASHBOARD_UTILS && window.DASHBOARD_UTILS.formatNumberCompact) || ((num, prefix = '', suffix = '') => {
                 if (!num && num !== 0) return 'N/A';
@@ -20057,7 +20062,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 { name: 'AMZN', pe: 52.3, growth: 22.1, margin: 8.9 },
             ];
 
-            if (loadingIntelli) {
+            if (loadingJLab) {
                 return (
                     <div className={`min-h-screen p-2 flex items-center justify-center transition-colors duration-300 ${isDarkMode ? 'bg-neutral-950 text-gray-100' : 'bg-gray-50 text-gray-900'
                         }`}>
@@ -20299,13 +20304,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             <LucideIcon name="WifiOff" className="w-3 h-3 text-red-500" />
                                         )}
                                         {/* 🎯 Badge Score JSLAI™ avec Glow Animation - VAGUE 3+4 */}
-                                        {stockDataIntelli?.jslaiScore && (
-                                            <div className={`px-4 py-1.5 rounded text-sm font-bold border-2 ${stockDataIntelli.jslaiScore.total >= 75 ? 'bg-emerald-900/30 text-emerald-400 border-emerald-600 glow-pulse' :
-                                                stockDataIntelli.jslaiScore.total >= 65 ? 'bg-gray-900/30 text-gray-400 border-gray-600' :
-                                                    stockDataIntelli.jslaiScore.total >= 50 ? 'bg-yellow-900/30 text-yellow-400 border-yellow-600' :
+                                        {stockDataJLab?.jslaiScore && (
+                                            <div className={`px-4 py-1.5 rounded text-sm font-bold border-2 ${stockDataJLab.jslaiScore.total >= 75 ? 'bg-emerald-900/30 text-emerald-400 border-emerald-600 glow-pulse' :
+                                                stockDataJLab.jslaiScore.total >= 65 ? 'bg-gray-900/30 text-gray-400 border-gray-600' :
+                                                    stockDataJLab.jslaiScore.total >= 50 ? 'bg-yellow-900/30 text-yellow-400 border-yellow-600' :
                                                         'bg-red-900/30 text-red-400 border-red-600 glow-pulse-red'
                                                 }`}>
-                                                🎯 JSLAI™ {stockDataIntelli.jslaiScore.total}/100
+                                                🎯 JSLAI™ {stockDataJLab.jslaiScore.total}/100
                                             </div>
                                         )}
                                         {/* Emma AI Analysis Button with Avatar */}
@@ -20331,19 +20336,19 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         </button>
                                     </h1>
                                     <p className="text-[8px] text-gray-600">
-                                        {stockDataIntelli?.dataQuality ? (
+                                        {stockDataJLab?.dataQuality ? (
                                             <>
-                                                📊 Qualité: {stockDataIntelli.dataQuality.quality_percentage}% ({stockDataIntelli.dataQuality.production_sections}/{stockDataIntelli.dataQuality.total_sections} réelles)
-                                                {stockDataIntelli.dataQuality.status === 'EXCELLENT' && ' ✅'}
-                                                {stockDataIntelli.dataQuality.status === 'GOOD' && ' 🟢'}
-                                                {stockDataIntelli.dataQuality.status === 'FAIR' && ' 🟡'}
-                                                {stockDataIntelli.dataQuality.status === 'POOR' && ' 🔴'}
+                                                📊 Qualité: {stockDataJLab.dataQuality.quality_percentage}% ({stockDataJLab.dataQuality.production_sections}/{stockDataJLab.dataQuality.total_sections} réelles)
+                                                {stockDataJLab.dataQuality.status === 'EXCELLENT' && ' ✅'}
+                                                {stockDataJLab.dataQuality.status === 'GOOD' && ' 🟢'}
+                                                {stockDataJLab.dataQuality.status === 'FAIR' && ' 🟡'}
+                                                {stockDataJLab.dataQuality.status === 'POOR' && ' 🔴'}
                                             </>
                                         ) : (
                                             'Mode Démo Hybride • FMP + Perplexity AI'
                                         )}
-                                        {stockDataIntelli?.jslaiScore && (
-                                            <span className="ml-2">• {stockDataIntelli.jslaiScore.interpretation} ({stockDataIntelli.jslaiScore.recommendation})</span>
+                                        {stockDataJLab?.jslaiScore && (
+                                            <span className="ml-2">• {stockDataJLab.jslaiScore.interpretation} ({stockDataJLab.jslaiScore.recommendation})</span>
                                         )}
                                     </p>
                                 </div>
@@ -20353,13 +20358,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <button
                                     onClick={async () => {
                                         try {
-                                            setLoadingIntelli(true);
+                                            setLoadingJLab(true);
                                             console.log('🔄 Actualisation des données...');
                                             const realData = await fetchRealStockData(selectedStock, timeframe);
                                             if (realData && realData.quote && realData.quote.price > 0) {
-                                                setStockDataIntelli(realData);
+                                                setStockDataJLab(realData);
                                                 setConnected(true);
-                                                setLastUpdateIntelli(new Date());
+                                                setLastUpdateJLab(new Date());
                                                 console.log('✅ Données actualisées avec succès');
                                             } else {
                                                 throw new Error('Données invalides reçues de l\'API');
@@ -20368,7 +20373,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             console.error('❌ Erreur lors de l\'actualisation:', error);
                                             setConnected(false);
                                         } finally {
-                                            setLoadingIntelli(false);
+                                            setLoadingJLab(false);
                                         }
                                     }}
                                     className={`p-1.5 border rounded-md transition-all ${isDarkMode
@@ -20381,7 +20386,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                                 <button
                                     onClick={emmaPopulateJLab}
-                                    disabled={loadingIntelli}
+                                    disabled={loadingJLab}
                                     className={`px-3 py-1.5 border rounded-lg transition-all flex items-center gap-2 ${isDarkMode
                                         ? 'bg-purple-900 hover:bg-purple-800 border-purple-800 text-purple-200'
                                         : 'bg-purple-600 hover:bg-purple-700 border-purple-600 text-white'
@@ -20702,19 +20707,19 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     setTimeframe(period);
                                                     // Recharger les données avec le nouveau timeframe
                                                     try {
-                                                        setLoadingIntelli(true);
+                                                        setLoadingJLab(true);
                                                         console.log(`📊 Changement de timeframe vers ${period}...`);
                                                         const realData = await fetchRealStockData(selectedStock, period);
                                                         if (realData && realData.quote && realData.quote.price > 0) {
-                                                            setStockDataIntelli(realData);
+                                                            setStockDataJLab(realData);
                                                             setConnected(true);
-                                                            setLastUpdateIntelli(new Date());
+                                                            setLastUpdateJLab(new Date());
                                                             console.log(`✅ Données ${period} chargées avec succès`);
                                                         }
                                                     } catch (error) {
                                                         console.error('❌ Erreur lors du changement de timeframe:', error);
                                                     } finally {
-                                                        setLoadingIntelli(false);
+                                                        setLoadingJLab(false);
                                                     }
                                                 }}
                                                 className={`px-2 py-0.5 rounded text-[9px] font-semibold transition-all ${timeframe === period

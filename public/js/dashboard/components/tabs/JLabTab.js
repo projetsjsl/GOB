@@ -955,15 +955,15 @@ const JLabTab = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setLoadingIntelli(true);
+                setLoadingJLab(true);
                 console.log(`📊 Chargement des données pour ${selectedStock}...`);
 
                 // Essayer d'abord avec les vraies APIs
                 const realData = await fetchRealStockData(selectedStock, timeframe);
                 if (realData && realData.quote && realData.quote.price > 0) {
-                    setStockDataIntelli(realData);
+                    setStockDataJLab(realData);
                     setConnected(true);
-                    setLastUpdateIntelli(new Date());
+                    setLastUpdateJLab(new Date());
                     console.log('✅ Données chargées avec succès');
 
                     // Vérifier si les données intraday sont disponibles
@@ -986,7 +986,7 @@ const JLabTab = () => {
 
                 // Utiliser mock data en dernier recours
                 const mockData = generateMockData(selectedStock);
-                setStockDataIntelli(mockData);
+                setStockDataJLab(mockData);
 
                 // Enregistrer une violation visible dans l'helppop
                 setViolations(prev => {
@@ -998,7 +998,7 @@ const JLabTab = () => {
                 });
                 setShowHelp(true);
             } finally {
-                setLoadingIntelli(false);
+                setLoadingJLab(false);
             }
         };
         fetchData();
@@ -1701,13 +1701,13 @@ const JLabTab = () => {
                         <button
                             onClick={async () => {
                                 try {
-                                    setLoadingIntelli(true);
+                                    setLoadingJLab(true);
                                     console.log('🔄 Actualisation des données...');
                                     const realData = await fetchRealStockData(selectedStock, timeframe);
                                     if (realData && realData.quote && realData.quote.price > 0) {
-                                        setStockDataIntelli(realData);
+                                        setStockDataJLab(realData);
                                         setConnected(true);
-                                        setLastUpdateIntelli(new Date());
+                                        setLastUpdateJLab(new Date());
                                         console.log('✅ Données actualisées avec succès');
                                     } else {
                                         throw new Error('Données invalides reçues de l\'API');
@@ -1716,7 +1716,7 @@ const JLabTab = () => {
                                     console.error('❌ Erreur lors de l\'actualisation:', error);
                                     setConnected(false);
                                 } finally {
-                                    setLoadingIntelli(false);
+                                    setLoadingJLab(false);
                                 }
                             }}
                             className={`p-1.5 border rounded-md transition-all ${isDarkMode
@@ -2060,19 +2060,19 @@ const JLabTab = () => {
                                             setTimeframe(period);
                                             // Recharger les données avec le nouveau timeframe
                                             try {
-                                                setLoadingIntelli(true);
+                                                setLoadingJLab(true);
                                                 console.log(`📊 Changement de timeframe vers ${period}...`);
                                                 const realData = await fetchRealStockData(selectedStock, period);
                                                 if (realData && realData.quote && realData.quote.price > 0) {
-                                                    setStockDataIntelli(realData);
+                                                    setStockDataJLab(realData);
                                                     setConnected(true);
-                                                    setLastUpdateIntelli(new Date());
+                                                    setLastUpdateJLab(new Date());
                                                     console.log(`✅ Données ${period} chargées avec succès`);
                                                 }
                                             } catch (error) {
                                                 console.error('❌ Erreur lors du changement de timeframe:', error);
                                             } finally {
-                                                setLoadingIntelli(false);
+                                                setLoadingJLab(false);
                                             }
                                         }}
                                         className={`px-2 py-0.5 rounded text-[9px] font-semibold transition-all ${timeframe === period
@@ -3042,3 +3042,5 @@ const JLabTab = () => {
 };
 
 window.JLabTab = JLabTab;
+
+export { JLabTab };
