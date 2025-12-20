@@ -18800,6 +18800,35 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </>
                                 )}
                             </button>
+                            <button
+                                onClick={() => setJlabView('terminal')}
+                                className={`px-6 py-3 font-semibold transition-all duration-300 whitespace-nowrap flex items-center gap-2 relative overflow-hidden rounded-t-lg group ${jlabView === 'terminal'
+                                    ? isDarkMode
+                                        ? 'text-white border-b-2 border-orange-400 shadow-lg shadow-orange-500/20'
+                                        : 'text-orange-900 border-b-2 border-orange-600 shadow-md'
+                                    : isDarkMode
+                                        ? 'text-gray-400 hover:text-white'
+                                        : 'text-gray-600 hover:text-gray-900'
+                                    }`}
+                                style={jlabView === 'terminal' ? {
+                                    background: isDarkMode
+                                        ? 'linear-gradient(135deg, rgba(249, 115, 22, 0.9) 0%, rgba(251, 146, 60, 0.8) 100%)'
+                                        : 'linear-gradient(135deg, rgba(255, 237, 213, 0.95) 0%, rgba(254, 215, 170, 0.9) 100%)'
+                                } : {
+                                    background: isDarkMode
+                                        ? 'linear-gradient(135deg, rgba(31, 41, 55, 0.8) 0%, rgba(17, 24, 39, 0.9) 100%)'
+                                        : 'linear-gradient(135deg, rgba(249, 250, 251, 0.9) 0%, rgba(243, 244, 246, 0.95) 100%)'
+                                }}
+                            >
+                                <LucideIcon name="Terminal" className="w-4 h-4 relative z-10" />
+                                <span className="relative z-10">Terminal</span>
+                                {jlabView === 'terminal' && (
+                                    <>
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                                        <div className="absolute inset-0 bg-gradient-to-br from-orange-400/20 via-transparent to-transparent"></div>
+                                    </>
+                                )}
+                            </button>
                         </div>
                     </div>
 
@@ -18814,6 +18843,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                         {jlabView === 'financepro' && (
                             <FinanceProPanel isDarkMode={isDarkMode} />
+                        )}
+
+                        {jlabView === 'terminal' && (
+                            window.JLabTab ? <window.JLabTab /> : (
+                                <div className={`p-8 text-center rounded-xl border ${isDarkMode ? 'bg-neutral-900 border-neutral-800 text-gray-400' : 'bg-white border-gray-200 text-gray-600'}`}>
+                                    <LucideIcon name="Terminal" className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                                    <p className="text-lg font-semibold mb-2">Terminal JLab</p>
+                                    <p className="text-sm">Chargement du terminal avancé...</p>
+                                </div>
+                            )
                         )}
                     </div>
                 </div>
