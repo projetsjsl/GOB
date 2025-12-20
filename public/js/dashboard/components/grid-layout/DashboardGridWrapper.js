@@ -8,7 +8,7 @@
 (function() {
     'use strict';
 
-    const { useState, useEffect, useMemo, useCallback } = React;
+    const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
     // ===================================
     // CONSTANTES & CONFIGURATION
@@ -153,13 +153,36 @@
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     // Vérifier que le layout contient des widgets valides
-                    return parsed.filter(item => TAB_TO_WIDGET_MAP[item.i]);
+                    const validLayout = parsed.filter(item => TAB_TO_WIDGET_MAP[item.i]);
+                    if (validLayout.length > 0) {
+                        console.log(`✅ Layout chargé depuis localStorage: ${validLayout.length} widgets`);
+                        return validLayout;
+                    } else {
+                        console.warn('⚠️ Layout sauvegardé invalide, utilisation du layout par défaut');
+                    }
                 }
             } catch (e) {
-                console.error('Erreur chargement layout:', e);
+                console.error('❌ Erreur chargement layout:', e);
             }
-            return getDefaultLayout();
+            const defaultLayout = getDefaultLayout();
+            console.log(`✅ Layout par défaut créé: ${defaultLayout.length} widgets`, defaultLayout);
+            // Sauvegarder le layout par défaut
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultLayout));
+            } catch (e) {
+                console.warn('⚠️ Impossible de sauvegarder le layout par défaut:', e);
+            }
+            return defaultLayout;
         });
+
+        // S'assurer que le layout n'est jamais vide
+        useEffect(() => {
+            if (!layout || layout.length === 0) {
+                console.warn('⚠️ Layout vide détecté, recréation du layout par défaut');
+                const defaultLayout = getDefaultLayout();
+                setLayout(defaultLayout);
+            }
+        }, []);
 
         const [isEditing, setIsEditing] = useState(false);
         const [currentBreakpoint, setCurrentBreakpoint] = useState('lg');
@@ -246,14 +269,39 @@
                 );
             }
 
-            // Récupérer le composant
-            const Component = window[config.component] || window[config.component + 'Tab'];
+            // Récupérer le composant (plusieurs tentatives)
+            let Component = window[config.component];
             if (!Component) {
+                // Essayer avec 'Tab' suffix
+                Component = window[config.component + 'Tab'];
+            }
+            if (!Component && config.component === 'JLabUnifiedTab') {
+                // Fallback pour JLab
+                Component = window.JLabTab || window.JLabUnifiedTab;
+            }
+            if (!Component && config.component === 'StocksNewsTab') {
+                // StocksNewsTab peut être défini différemment
+                Component = window.StocksNewsTab;
+            }
+            if (!Component && config.component === 'MarketsEconomyTab') {
+                // MarketsEconomyTab peut être défini différemment
+                Component = window.MarketsEconomyTab;
+            }
+            
+            if (!Component) {
+                console.warn(`⚠️ Composant ${config.component} non trouvé. Tentatives:`, {
+                    direct: typeof window[config.component],
+                    withTab: typeof window[config.component + 'Tab'],
+                    allWindowKeys: Object.keys(window).filter(k => k.includes(config.component.split('Tab')[0]))
+                });
                 return (
-                    <div className={`h-full flex flex-col items-center justify-center ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
+                    <div className={`h-full flex flex-col items-center justify-center p-4 ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
                         <window.LucideIcon name="AlertTriangle" className={`w-12 h-12 mb-2 ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`} />
-                        <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <span className={`text-sm text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                             Composant {config.component} non chargé
+                        </span>
+                        <span className={`text-xs mt-2 text-center ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                            Vérifiez la console pour plus de détails
                         </span>
                     </div>
                 );
@@ -376,14 +424,42 @@
         ]);
 
         if (!ResponsiveGridLayout) {
+            console.error('❌ ResponsiveGridLayout non disponible');
             return (
                 <div className={`p-6 ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
                     <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>
                         <p className="font-medium">⚠️ React-Grid-Layout en cours de chargement...</p>
+                        <p className="text-sm mt-1">Vérifiez que le CDN est chargé dans beta-combined-dashboard.html</p>
                     </div>
                 </div>
             );
         }
+
+        // Logs de débogage
+        useEffect(() => {
+            console.log('🔍 DashboardGridWrapper - État:', {
+                layoutLength: layout?.length || 0,
+                isEditing,
+                currentBreakpoint,
+                ResponsiveGridLayoutAvailable: !!ResponsiveGridLayout,
+                RGL: typeof window.ReactGridLayout !== 'undefined'
+            });
+            
+            if (layout && layout.length > 0) {
+                console.log('📊 Layout actuel:', layout.map(item => ({
+                    id: item.i,
+                    size: `${item.w}x${item.h}`,
+                    pos: `(${item.x}, ${item.y})`,
+                    config: TAB_TO_WIDGET_MAP[item.i]?.label || 'INCONNU'
+                })));
+            }
+        }, [layout, isEditing, currentBreakpoint, ResponsiveGridLayout]);
+
+        console.log('🎨 DashboardGridWrapper - Rendu:', {
+            layoutLength: layout?.length || 0,
+            ResponsiveGridLayout: !!ResponsiveGridLayout,
+            isEditing
+        });
 
         return (
             <div className={`min-h-screen ${isDarkMode ? 'bg-black' : 'bg-white'}`}>
@@ -434,28 +510,60 @@
 
                 {/* Grille */}
                 <div className="p-4">
-                    <ResponsiveGridLayout
-                        className="layout"
-                        layouts={{ lg: layout }}
-                        breakpoints={BREAKPOINTS}
-                        cols={COLS}
-                        rowHeight={ROW_HEIGHT}
-                        onLayoutChange={handleLayoutChange}
-                        onBreakpointChange={setCurrentBreakpoint}
-                        isDraggable={isEditing}
-                        isResizable={isEditing}
-                        compactType="vertical"
-                        margin={[16, 16]}
-                    >
-                        {layout.map(item => (
-                            <div 
-                                key={item.i} 
-                                className={`h-full ${isEditing ? 'cursor-move ring-2 ring-emerald-500/50' : ''}`}
-                            >
-                                {renderWidget(item)}
+                    {!layout || layout.length === 0 ? (
+                        <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
+                            <div className={`p-4 rounded-lg text-center ${isDarkMode ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-100 text-blue-700'}`}>
+                                <p className="font-medium mb-2">⏳ Initialisation du layout...</p>
+                                <p className="text-sm mb-4">Création des widgets par défaut...</p>
+                                <button
+                                    onClick={() => {
+                                        const defaultLayout = getDefaultLayout();
+                                        setLayout(defaultLayout);
+                                        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultLayout));
+                                    }}
+                                    className={`px-4 py-2 rounded-lg font-medium text-sm ${
+                                        isDarkMode 
+                                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
+                                            : 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                                    }`}
+                                >
+                                    Créer Layout par Défaut
+                                </button>
                             </div>
-                        ))}
-                    </ResponsiveGridLayout>
+                        </div>
+                    ) : (
+                        <ResponsiveGridLayout
+                            className="layout"
+                            layouts={{ lg: layout }}
+                            breakpoints={BREAKPOINTS}
+                            cols={COLS}
+                            rowHeight={ROW_HEIGHT}
+                            onLayoutChange={handleLayoutChange}
+                            onBreakpointChange={setCurrentBreakpoint}
+                            isDraggable={isEditing}
+                            isResizable={isEditing}
+                            compactType="vertical"
+                            margin={[16, 16]}
+                        >
+                            {layout.map(item => {
+                                const config = TAB_TO_WIDGET_MAP[item.i];
+                                if (!config) {
+                                    console.warn(`⚠️ Widget ${item.i} non trouvé dans TAB_TO_WIDGET_MAP`);
+                                    return null;
+                                }
+                                return (
+                                    <div 
+                                        key={item.i} 
+                                        className={`h-full ${isEditing ? 'cursor-move ring-2 ring-emerald-500/50' : ''}`}
+                                        data-widget-id={item.i}
+                                        data-widget-label={config.label}
+                                    >
+                                        {renderWidget(item)}
+                                    </div>
+                                );
+                            })}
+                        </ResponsiveGridLayout>
+                    )}
                 </div>
 
                 {/* Dock pour ajouter des widgets (en mode édition) */}
@@ -489,4 +597,6 @@
 
     window.DashboardGridWrapper = DashboardGridWrapper;
     console.log('✅ DashboardGridWrapper chargé');
+    console.log('📊 Layout par défaut:', getDefaultLayout());
+    console.log('🧩 Composants disponibles:', Object.keys(TAB_TO_WIDGET_MAP).slice(0, 5), '...');
 })();

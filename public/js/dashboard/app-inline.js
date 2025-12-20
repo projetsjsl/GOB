@@ -27226,7 +27226,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {/* Rendu conditionnel: Vue Grille ou Vue Onglets */}
                     {dashboardViewMode === 'grid' ? (
                         // VUE GRILLE (GOD MODE)
-                        window.DashboardGridWrapper ? (
+                        (() => {
+                            console.log('🔍 Vérification DashboardGridWrapper:', {
+                                exists: typeof window.DashboardGridWrapper !== 'undefined',
+                                viewMode: dashboardViewMode,
+                                isDarkMode
+                            });
+                            return window.DashboardGridWrapper;
+                        })() ? (
                             <window.DashboardGridWrapper
                                 isDarkMode={isDarkMode}
                                 isAdmin={true}
@@ -27286,6 +27293,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>
                                     <p className="font-medium">⚠️ DashboardGridWrapper en cours de chargement...</p>
                                     <p className="text-sm mt-1">Veuillez patienter quelques instants.</p>
+                                    <p className="text-xs mt-2 opacity-75">
+                                        Vérifiez la console pour plus de détails. 
+                                        <br />
+                                        Tapez: <code className="bg-black/20 px-1 rounded">debugGodMode()</code> pour diagnostiquer
+                                    </p>
                                 </div>
                             </div>
                         )

@@ -141,6 +141,23 @@
     
     <!-- Script de test GOD MODE (disponible en console) -->
     <script src="/js/dashboard/test-god-mode-console.js"></script>
+    <!-- Script de débogage GOD MODE -->
+    <script src="/js/dashboard/debug-god-mode.js"></script>
+    <!-- Quick Fix GOD MODE -->
+    <script src="/js/dashboard/quick-fix-god-mode.js"></script>
+    <script>
+        // Exposer les fonctions de débogage globalement
+        window.debugGodMode = function() {
+            const script = document.createElement('script');
+            script.src = '/js/dashboard/debug-god-mode.js';
+            document.head.appendChild(script);
+        };
+        window.quickFixGodMode = function() {
+            const script = document.createElement('script');
+            script.src = '/js/dashboard/quick-fix-god-mode.js';
+            document.head.appendChild(script);
+        };
+    </script>
 
     <!-- TradingView Lightweight Charts - Bibliothèque officielle pour graphiques personnalisés -->
     <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
