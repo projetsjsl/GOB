@@ -573,6 +573,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         ],
         'tests': [
             { id: 'tests-rgl', label: 'Layout RGL', icon: 'LayoutDashboard', component: 'RglDashboard' },
+            { id: 'tests-canvas', label: 'Modulaire (Bêta)', icon: 'Move', component: 'redirect:modular-dashboard-beta.html' },
             { id: 'tests-calendar', label: 'Calendrier', icon: 'Calendar', component: 'InvestingCalendarTab' },
             { id: 'tests-sandbox', label: 'Sandbox', icon: 'Box', component: 'TestSandboxTab' },
             { id: 'tests-debug', label: 'Debug', icon: 'Bug', component: 'DebugTab' }
@@ -808,6 +809,16 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         
         // Enhanced tab change handler for new structure
         const handleNewTabChange = (tabId) => {
+             // 1. Check redirects first
+            for (const [main, subs] of Object.entries(SUB_TABS)) {
+                if (!Array.isArray(subs)) continue; // Protection
+                const sub = subs.find(s => s.id === tabId);
+                if (sub && typeof sub.component === 'string' && sub.component.startsWith('redirect:')) {
+                    window.location.href = sub.component.replace('redirect:', '');
+                    return;
+                }
+            }
+
             // Check if it's a main tab
             const isMainTab = MAIN_TABS.find(t => t.id === tabId);
             if (isMainTab) {

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOB Canvas - Beta Modular</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            bg: '#0f172a',
+                            surface: '#1e293b',
+                            border: '#334155'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- React Grid Layout CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/react-grid-layout@1.4.4/css/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/react-resizable@3.0.5/css/styles.css">
+    <script src="https://unpkg.com/react-grid-layout@1.4.4/dist/react-grid-layout.min.js"></script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        
+        .react-grid-item.react-grid-placeholder {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border-radius: 12px;
+            opacity: 0.5;
+        }
+        
+        .react-resizable-handle {
+            background-image: none;
+            width: 15px;
+            height: 15px;
+            bottom: 5px;
+            right: 5px;
+            border-right: 2px solid rgba(128,128,128,0.5);
+            border-bottom: 2px solid rgba(128,128,128,0.5);
+            cursor: se-resize;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white overflow-hidden">
+    <div id="root"></div>
+
+    <!-- UTILS & ICONS -->
+    <script type="text/babel">
+        // Lucide Icon Wrapper
+        window.LucideIcon = ({ name, className, ...props }) => {
+            const [iconNode, setIconNode] = React.useState(null);
+            const ref = React.useRef(null);
+
+            React.useEffect(() => {
+                if (ref.current) {
+                    const iconName = name || 'HelpCircle';
+                    const lucideIcon = lucide.icons[iconName];
+                    if (lucideIcon) {
+                        const svg = lucide.createIcons({
+                            icons: { [iconName]: lucideIcon },
+                            attrs: { class: className, ...props },
+                            nameAttr: 'data-lucide'
+                        });
+                        // Lucide processes the DOM directly based on data attributes or classes
+                        // But since we are in React, we manually create SVG if needed or just use lucide.icons[name]
+                        // Simple approach: Render an 'i' tag and let lucide replace it
+                    }
+                }
+            }, [name, className]);
+
+            // Plus simple pour React : utiliser les composants Lucide React si dispos, sinon :
+            const Icon = lucide.icons[name] || lucide.icons.HelpCircle;
+            // On convertit le SVG string ou node en JSX n'est pas trivial sans parser.
+            // Approche SVG direct:
+            
+            return (
+                <i data-lucide={name} className={className} {...props}></i>
+            );
+        };
+        
+        // Initialization Lucide après render
+        setInterval(() => {
+            if(window.lucide) window.lucide.createIcons();
+        }, 500);
+    </script>
+    
+    <!-- DASHBOARD COMPONENT -->
+    <script type="text/babel" src="js/dashboard/components/grid-layout/FullModularDashboard.js"></script>
+
+    <!-- BOOTSTRAP -->
+    <script type="text/babel">
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<window.FullModularDashboard />);
+    </script>
+</body>
+</html>
