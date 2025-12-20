@@ -18582,9 +18582,88 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // Composant JLab unifié avec navigation interne
         const JLabUnifiedTab = () => {
             const [jlabView, setJlabView] = useState('portfolio'); // 'portfolio', 'watchlist', '3pour1', 'advanced', 'financepro'
+            const [currentTime, setCurrentTime] = useState(new Date());
+            
+            // Update time every second
+            useEffect(() => {
+                const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+                return () => clearInterval(timer);
+            }, []);
 
             return (
                 <div className="w-full h-full">
+                    {/* PREMIUM JLAB HEADER */}
+                    <div className={`p-5 mb-4 rounded-2xl border backdrop-blur-sm transition-all duration-500 ${
+                        isDarkMode 
+                            ? 'bg-gradient-to-r from-neutral-900/80 to-neutral-800/60 border-neutral-700/50 shadow-xl shadow-black/20' 
+                            : 'bg-gradient-to-r from-white/90 to-gray-50/80 border-gray-200 shadow-lg'
+                    }`}>
+                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                            {/* Left: Logo & Title */}
+                            <div className="flex items-center gap-4">
+                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-blue-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 relative overflow-hidden group">
+                                    <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                    <LucideIcon name="FlaskRound" className="w-7 h-7 text-white relative z-10" />
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-3 mb-1">
+                                        <h1 className={`text-2xl font-black tracking-tight ${
+                                            isDarkMode 
+                                                ? 'bg-gradient-to-r from-white via-blue-100 to-emerald-200 bg-clip-text text-transparent' 
+                                                : 'text-gray-900'
+                                        }`} style={isDarkMode ? {WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundImage: 'linear-gradient(to right, white, #dbeafe, #d1fae5)'} : {}}>
+                                            JLab™ Terminal
+                                        </h1>
+                                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30">
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                            <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Live</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3 text-[11px]">
+                                        <span className="text-gray-500 font-medium">Quantum Core™</span>
+                                        <span className="text-gray-600">•</span>
+                                        <span className="font-mono text-gray-400">{currentTime.toLocaleTimeString()}</span>
+                                        <span className="text-gray-600">•</span>
+                                        <span className="text-gray-500">{tickers.length} titres suivis</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right: Controls */}
+                            <div className="flex items-center gap-3 flex-wrap">
+                                {/* Emma AI Button */}
+                                <button
+                                    onClick={emmaPopulateJLab}
+                                    className="group flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-600/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                                >
+                                    <div className="bg-white/20 p-1 rounded-lg">
+                                        <LucideIcon name="Sparkles" className="w-4 h-4" />
+                                    </div>
+                                    <div className="text-left">
+                                        <div className="text-[8px] font-bold uppercase tracking-wider opacity-70 leading-none">Intelligence</div>
+                                        <div className="text-sm font-bold leading-tight">Emma AI™</div>
+                                    </div>
+                                </button>
+
+                                {/* Divider */}
+                                <div className={`h-10 w-px ${isDarkMode ? 'bg-neutral-700/50' : 'bg-gray-300'}`} />
+
+                                {/* Refresh Button */}
+                                <button
+                                    onClick={() => refreshAllStocks && refreshAllStocks()}
+                                    className={`p-2.5 rounded-xl border transition-all duration-300 ${
+                                        isDarkMode 
+                                            ? 'bg-neutral-800/50 border-neutral-700 hover:border-emerald-500/50 hover:text-emerald-400' 
+                                            : 'bg-white border-gray-200 hover:border-emerald-400 hover:text-emerald-600'
+                                    } text-gray-500`}
+                                    title="Actualiser les données"
+                                >
+                                    <LucideIcon name="RefreshCw" className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Navigation interne JLab */}
                     <div className={`mb-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                         <div className="flex gap-2 overflow-x-auto pb-1">
