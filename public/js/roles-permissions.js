@@ -140,7 +140,7 @@ function hideUnauthorizedComponents() {
     const componentIds = [
         'stocks-news',
         'ask-emma',
-        'intellistocks',
+        'jlab',
         'economic-calendar',
         'investing-calendar',
         'yield-curve',
@@ -153,7 +153,7 @@ function hideUnauthorizedComponents() {
         'admin-jsla', // ID alternatif
         'emma-sms',
         'fastgraphs',
-        'news-ticker',
+        'news-banner',
         'theme-selector'
     ];
 

@@ -10,7 +10,7 @@ import { DansWatchlistTab } from './components/tabs/DansWatchlistTab.js';
 import { EconomicCalendarTab } from './components/tabs/EconomicCalendarTab.js';
 import { EmailBriefingsTab } from './components/tabs/EmailBriefingsTab.js';
 import { EmmaSmsPanel } from './components/tabs/EmmaSmsPanel.js';
-import { IntelliStocksTab } from './components/tabs/IntelliStocksTab.js';
+import { JLabTab } from './components/tabs/JLabTab.js';
 import { InvestingCalendarTab } from './components/tabs/InvestingCalendarTab.js';
 import { MarketsEconomyTab } from './components/tabs/MarketsEconomyTab.js';
 import { PlusTab } from './components/tabs/PlusTab.js';
@@ -147,8 +147,8 @@ export const BetaCombinedDashboard = () => {
                     <button onClick={() => setActiveTab('ask-emma')} className={`px-4 py-2 rounded ${activeTab === 'ask-emma' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>
                         Ask Emma
                     </button>
-                    <button onClick={() => setActiveTab('intellistocks')} className={`px-4 py-2 rounded ${activeTab === 'intellistocks' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>
-                        JLab
+                    <button onClick={() => setActiveTab('jlab')} className={`px-4 py-2 rounded ${activeTab === 'jlab' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>
+                        JLAB
                     </button>
                     {/* Add more tab buttons as needed */}
                 </nav>
@@ -157,7 +157,7 @@ export const BetaCombinedDashboard = () => {
                 <div className="tab-content">
                     {activeTab === 'stocks-news' && <StocksNewsTab />}
                     {activeTab === 'ask-emma' && <AskEmmaTab />}
-                    {activeTab === 'intellistocks' && <IntelliStocksTab />}
+                    {activeTab === 'jlab' && <JLabTab />}
                     {activeTab === 'economic-calendar' && <EconomicCalendarTab />}
                     {activeTab === 'investing-calendar' && <InvestingCalendarTab />}
                     {activeTab === 'yield-curve' && <YieldCurveTab />}

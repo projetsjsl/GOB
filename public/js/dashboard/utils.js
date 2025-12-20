@@ -344,7 +344,7 @@ const formatNumber = (num, prefix = '', suffix = '') => {
 const getTabIcon = (tabId) => {
     const iconMap = {
         'stocks-news': 'Newspaper',
-        'intellistocks': 'Brain',
+        'jlab': 'Flask',
         'dans-watchlist': 'Star',
         'ask-emma': 'ChatBubble',
         'emma-sms': 'Phone',
@@ -361,3 +361,20 @@ const getTabIcon = (tabId) => {
     
     return iconMap[tabId] || 'Activity';
 };
+
+// Export all functions
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        cleanText,
+        getNewsIcon,
+        getSourceCredibility,
+        sortNewsByCredibility,
+        isFrenchArticle,
+        getCompanyLogo,
+        getUserLoginId,
+        getGradeColor,
+        parseSeekingAlphaRawText,
+        formatNumber,
+        getTabIcon
+    };
+}

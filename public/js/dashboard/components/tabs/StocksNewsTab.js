@@ -450,7 +450,7 @@ const StocksNewsTab = (props) => {
                                             }`}
                                             onClick={() => {
                                                 safeSetSelectedStock(item.ticker);
-                                                safeSetActiveTab('intellistocks');
+                                                safeSetActiveTab('jlab');
                                             }}
                                         >
                                             <div className="flex-1 min-w-0 pr-2">
@@ -615,7 +615,7 @@ const StocksNewsTab = (props) => {
                                             }`}
                                             onClick={() => {
                                                 safeSetSelectedStock(item.ticker);
-                                                safeSetActiveTab('intellistocks');
+                                                safeSetActiveTab('jlab');
                                             }}
                                         >
                                             <div className="flex-1 min-w-0 pr-2">
@@ -769,7 +769,7 @@ const StocksNewsTab = (props) => {
                                     }`}
                                     onClick={() => {
                                         safeSetSelectedStock(item.ticker);
-                                        safeSetActiveTab('intellistocks');
+                                        safeSetActiveTab('jlab');
                                     }}
                                 >
                                     <div className="flex items-center justify-between mb-3">
@@ -907,7 +907,7 @@ const StocksNewsTab = (props) => {
                                         }`}
                                         onClick={() => {
                                             safeSetSelectedStock(ticker);
-                                            safeSetActiveTab('intellistocks');
+                                            safeSetActiveTab('jlab');
                                         }}
                                     >
                                         <div className="flex items-center gap-4 flex-1">
@@ -1019,7 +1019,7 @@ const StocksNewsTab = (props) => {
                                         }`}
                                         onClick={() => {
                                             safeSetSelectedStock(ticker);
-                                            safeSetActiveTab('intellistocks');
+                                            safeSetActiveTab('jlab');
                                         }}
                                     >
                                         <div className="flex items-start justify-between mb-4">
@@ -1289,7 +1289,7 @@ const StocksNewsTab = (props) => {
                                                     <button
                                                         onClick={() => {
                                                             safeSetSelectedStock(ticker);
-                                                            safeSetActiveTab('intellistocks');
+                                                            safeSetActiveTab('jlab');
                                                         }}
                                                         className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-300 hover:scale-[1.02] shadow ${
                                                             isDarkMode

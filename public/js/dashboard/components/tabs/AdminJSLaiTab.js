@@ -57,7 +57,7 @@ const AdminJSLaiTab = ({
                 
                 const [showIndicesManager, setShowIndicesManager] = React.useState(false);
                 const [showNavManager, setShowNavManager] = React.useState(false);
-                const [navConfigTargetTab, setNavConfigTargetTab] = React.useState('intellistocks');
+                const [navConfigTargetTab, setNavConfigTargetTab] = React.useState('jlab');
                 const [showPrimaryNavManager, setShowPrimaryNavManager] = React.useState(false);
                 
                 // États locaux pour les variables manquantes
@@ -1946,7 +1946,7 @@ const AdminJSLaiTab = ({
                                     <div className="text-xs space-y-1">
                                         <div>• <strong>{adminSelectedIndices.length}</strong> indice(s) sélectionné(s)</div>
                                         <div>• Les modifications sont sauvegardées automatiquement</div>
-                                        <div>• Le ticker tape se met à jour après la sélection</div>
+                                        <div>• Le TickerBanner se met à jour après la sélection</div>
                                         <div>• Les symboles invalides (avec ⚠️) ne s'afficheront pas</div>
                                     </div>
                                 </div>

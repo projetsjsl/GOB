@@ -14,7 +14,7 @@ console.log('Available tabs:', {
     EconomicCalendarTab: typeof window.EconomicCalendarTab,
     EmailBriefingsTab: typeof window.EmailBriefingsTab,
     EmmaSmsPanel: typeof window.EmmaSmsPanel,
-    IntelliStocksTab: typeof window.IntelliStocksTab,
+    JLabTab: typeof window.JLabTab,
     InvestingCalendarTab: typeof window.InvestingCalendarTab,
     MarketsEconomyTab: typeof window.MarketsEconomyTab,
     ScrappingSATab: typeof window.ScrappingSATab,

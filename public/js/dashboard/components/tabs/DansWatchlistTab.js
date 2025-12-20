@@ -387,7 +387,7 @@ const DansWatchlistTab = () => {
         }
     };
 
-    // Effet pour initialiser le TradingView Ticker Tape avec les tickers de la watchlist
+    // Effet pour initialiser le TradingView TickerBanner avec les tickers de la watchlist
     useEffect(() => {
         if (watchlistTickers.length > 0) {
             // Supprimer le widget existant s'il existe
@@ -433,7 +433,7 @@ const DansWatchlistTab = () => {
 
 
 
-            {/* TradingView Ticker Tape - VAGUE 2: Quick Wins */}
+            {/* TradingView TickerBanner - VAGUE 2: Quick Wins */}
             {watchlistTickers.length > 0 && (
                 <div className={`rounded-lg overflow-hidden border transition-colors duration-300 ${
                     isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'
@@ -444,7 +444,7 @@ const DansWatchlistTab = () => {
                 </div>
             )}
 
-            {/* Screener pour Dan's Watchlist - Identique à celui d'IntelliStocks */}
+            {/* Screener pour Dan's Watchlist - Identique à celui d'JLab */}
             {showScreener && (
                 <div className={`border rounded-lg p-3 transition-colors duration-300 ${
                     isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
@@ -465,7 +465,7 @@ const DansWatchlistTab = () => {
                         </button>
                     </div>
                     
-                    {/* Filtres - Mêmes que IntelliStocks */}
+                    {/* Filtres - Mêmes que JLab */}
                     <div className="grid grid-cols-5 gap-2 mb-3">
                         <div>
                             <label className="text-[9px] text-gray-500 mb-1 block">Market Cap Min (B$)</label>

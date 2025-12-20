@@ -1,5 +1,5 @@
 // Auto-converted from monolithic dashboard file
-// Component: IntelliStocksTab
+// Component: JLabTab
 
 const { useState, useEffect } = React;
 const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, AreaChart, Area } = Recharts;
@@ -7,7 +7,7 @@ const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContain
 
 
 
-const IntelliStocksTab = () => {
+const JLabTab = () => {
     // Récupère les données/handlers globaux du dashboard
     const dashboard = window.BetaCombinedDashboard || {};
     const isDarkMode = dashboard.isDarkMode ?? true;
@@ -24,10 +24,10 @@ const IntelliStocksTab = () => {
     const [selectedStock, setSelectedStock] = useState('AAPL');
     const [timeframe, setTimeframe] = useState('1D');
     const [menuOpen, setMenuOpen] = useState(false);
-    const [stockDataIntelli, setStockDataIntelli] = useState(null);
-    const [loadingIntelli, setLoadingIntelli] = useState(true);
+    const [stockDataJLab, setStockDataJLab] = useState(null);
+    const [loadingJLab, setLoadingJLab] = useState(true);
     const [connected, setConnected] = useState(false);
-    const [lastUpdateIntelli, setLastUpdateIntelli] = useState(null);
+    const [lastUpdateJLab, setLastUpdateJLab] = useState(null);
     // Helppop: visibilité et liste des violations détectées
     const [showHelp, setShowHelp] = useState(false);
     const [violations, setViolations] = useState([]);
@@ -1297,16 +1297,16 @@ const IntelliStocksTab = () => {
     };
 
     const currentStock = stocks.find(s => s.symbol === selectedStock);
-    const quote = stockDataIntelli?.quote || {};
-    const metrics = stockDataIntelli?.metrics || {};
-    const ratios = stockDataIntelli?.ratios || {};
-    const profile = stockDataIntelli?.profile || {};
-    const intraday = stockDataIntelli?.intraday || [];
-    const news = stockDataIntelli?.news || [];
-    const sentiment = stockDataIntelli?.sentiment || {};
-    const insights = stockDataIntelli?.insights || {};
-    const historicalRatios = stockDataIntelli?.historicalRatios || [];
-    const movingAverages = stockDataIntelli?.movingAverages || {};
+    const quote = stockDataJLab?.quote || {};
+    const metrics = stockDataJLab?.metrics || {};
+    const ratios = stockDataJLab?.ratios || {};
+    const profile = stockDataJLab?.profile || {};
+    const intraday = stockDataJLab?.intraday || [];
+    const news = stockDataJLab?.news || [];
+    const sentiment = stockDataJLab?.sentiment || {};
+    const insights = stockDataJLab?.insights || {};
+    const historicalRatios = stockDataJLab?.historicalRatios || [];
+    const movingAverages = stockDataJLab?.movingAverages || {};
 
     const formatNumber = (num, prefix = '', suffix = '') => {
         if (!num && num !== 0) return 'N/A';
@@ -1343,7 +1343,7 @@ const IntelliStocksTab = () => {
         { name: 'AMZN', pe: 52.3, growth: 22.1, margin: 8.9 },
     ];
 
-    if (loadingIntelli) {
+    if (loadingJLab) {
         return (
             <div className={`min-h-screen p-2 flex items-center justify-center transition-colors duration-300 ${isDarkMode ? 'bg-neutral-950 text-gray-100' : 'bg-gray-50 text-gray-900'
                 }`}>
@@ -1400,7 +1400,7 @@ const IntelliStocksTab = () => {
                 return StockAnalysisModal ? (
                     <StockAnalysisModal
                         symbol={selectedStock}
-                        currentPrice={stockDataIntelli?.quote?.price || 0}
+                        currentPrice={stockDataJLab?.quote?.price || 0}
                         onClose={() => setShowAnalysisModal(false)}
                     />
                 ) : null;
@@ -1421,8 +1421,8 @@ const IntelliStocksTab = () => {
             {showScenarioAnalysis && (() => {
                 const ScenarioAnalysisModal = window.ScenarioAnalysisModal;
                 // Utiliser les données chargées ou des valeurs par défaut sûres
-                const baselineData = stockDataIntelli ? {
-                    latestFCF: stockDataIntelli.dcfValue * 1000000000 * 0.05, // Estimation approximative si pas de données brutes
+                const baselineData = stockDataJLab ? {
+                    latestFCF: stockDataJLab.dcfValue * 1000000000 * 0.05, // Estimation approximative si pas de données brutes
                     netDebt: 0,
                     sharesOutstanding: 1000000000,
                     avgGrowth: 10
@@ -1431,7 +1431,7 @@ const IntelliStocksTab = () => {
                 return ScenarioAnalysisModal ? (
                     <ScenarioAnalysisModal
                         symbol={selectedStock}
-                        currentPrice={stockDataIntelli?.quote?.price || 0}
+                        currentPrice={stockDataJLab?.quote?.price || 0}
                         baselineData={baselineData}
                         onClose={() => setShowScenarioAnalysis(false)}
                     />
@@ -1640,20 +1640,20 @@ const IntelliStocksTab = () => {
                         <div>
                             <h1 className={`text-base font-bold flex items-center gap-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                Expert Trading Analytics
+                                JLAB - Hub d'analyse multifonctions
                                 {connected ? (
                                     <LucideIcon name="Wifi" className="w-3 h-3 text-green-500" />
                                 ) : (
                                     <LucideIcon name="WifiOff" className="w-3 h-3 text-red-500" />
                                 )}
                                 {/* 🎯 Badge Score JSLAI™ avec Glow Animation - VAGUE 3+4 */}
-                                {stockDataIntelli?.jslaiScore && (
-                                    <div className={`px-4 py-1.5 rounded text-sm font-bold border-2 ${stockDataIntelli.jslaiScore.total >= 75 ? 'bg-emerald-900/30 text-emerald-400 border-emerald-600 glow-pulse' :
-                                        stockDataIntelli.jslaiScore.total >= 65 ? 'bg-gray-900/30 text-gray-400 border-gray-600' :
-                                            stockDataIntelli.jslaiScore.total >= 50 ? 'bg-yellow-900/30 text-yellow-400 border-yellow-600' :
+                                {stockDataJLab?.jslaiScore && (
+                                    <div className={`px-4 py-1.5 rounded text-sm font-bold border-2 ${stockDataJLab.jslaiScore.total >= 75 ? 'bg-emerald-900/30 text-emerald-400 border-emerald-600 glow-pulse' :
+                                        stockDataJLab.jslaiScore.total >= 65 ? 'bg-gray-900/30 text-gray-400 border-gray-600' :
+                                            stockDataJLab.jslaiScore.total >= 50 ? 'bg-yellow-900/30 text-yellow-400 border-yellow-600' :
                                                 'bg-red-900/30 text-red-400 border-red-600 glow-pulse-red'
                                         }`}>
-                                        🎯 JSLAI™ {stockDataIntelli.jslaiScore.total}/100
+                                        🎯 JSLAI™ {stockDataJLab.jslaiScore.total}/100
                                     </div>
                                 )}
                                 {/* Emma AI Analysis Button with Avatar */}
@@ -1679,19 +1679,19 @@ const IntelliStocksTab = () => {
                                 </button>
                             </h1>
                             <p className="text-[8px] text-gray-600">
-                                {stockDataIntelli?.dataQuality ? (
+                                {stockDataJLab?.dataQuality ? (
                                     <>
-                                        📊 Qualité: {stockDataIntelli.dataQuality.quality_percentage}% ({stockDataIntelli.dataQuality.production_sections}/{stockDataIntelli.dataQuality.total_sections} réelles)
-                                        {stockDataIntelli.dataQuality.status === 'EXCELLENT' && ' ✅'}
-                                        {stockDataIntelli.dataQuality.status === 'GOOD' && ' 🟢'}
-                                        {stockDataIntelli.dataQuality.status === 'FAIR' && ' 🟡'}
-                                        {stockDataIntelli.dataQuality.status === 'POOR' && ' 🔴'}
+                                        📊 Qualité: {stockDataJLab.dataQuality.quality_percentage}% ({stockDataJLab.dataQuality.production_sections}/{stockDataJLab.dataQuality.total_sections} réelles)
+                                        {stockDataJLab.dataQuality.status === 'EXCELLENT' && ' ✅'}
+                                        {stockDataJLab.dataQuality.status === 'GOOD' && ' 🟢'}
+                                        {stockDataJLab.dataQuality.status === 'FAIR' && ' 🟡'}
+                                        {stockDataJLab.dataQuality.status === 'POOR' && ' 🔴'}
                                     </>
                                 ) : (
                                     'Mode Démo Hybride • FMP + Perplexity AI'
                                 )}
-                                {stockDataIntelli?.jslaiScore && (
-                                    <span className="ml-2">• {stockDataIntelli.jslaiScore.interpretation} ({stockDataIntelli.jslaiScore.recommendation})</span>
+                                {stockDataJLab?.jslaiScore && (
+                                    <span className="ml-2">• {stockDataJLab.jslaiScore.interpretation} ({stockDataJLab.jslaiScore.recommendation})</span>
                                 )}
                             </p>
                         </div>
@@ -1729,7 +1729,7 @@ const IntelliStocksTab = () => {
 
                         <button
                             onClick={emmaPopulateJLab}
-                            disabled={loadingIntelli}
+                            disabled={loadingJLab}
                             className={`px-3 py-1.5 border rounded-lg transition-all flex items-center gap-2 ${isDarkMode
                                 ? 'bg-purple-900 hover:bg-purple-800 border-purple-800 text-purple-200'
                                 : 'bg-purple-600 hover:bg-purple-700 border-purple-600 text-white'
@@ -1839,7 +1839,7 @@ const IntelliStocksTab = () => {
                                         ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800'
                                         : 'bg-white hover:bg-gray-100 border-gray-300'
                                         }`}
-                                    title={violations.length ? 'Diagnostics: problèmes détectés' : 'Aide IntelliStocks'}
+                                    title={violations.length ? 'Diagnostics: problèmes détectés' : 'Aide JLab'}
                                 >
                                     <div className="relative">
                                         <LucideIcon name={violations.length ? 'AlertTriangle' : 'HelpCircle'} className={`w-3 h-3 ${violations.length ? 'text-yellow-500' : 'text-gray-500'}`} />
@@ -1856,7 +1856,7 @@ const IntelliStocksTab = () => {
                                             <div className="flex items-center gap-2">
                                                 <LucideIcon name="LifeBuoy" className="w-4 h-4 text-blue-500" />
                                                 <div>
-                                                    <div className={`text-xs font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Aide & diagnostics IntelliStocks</div>
+                                                    <div className={`text-xs font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Aide & diagnostics JLab</div>
                                                     <div className="text-[10px] text-gray-500">Mode Démo Hybride • FMP + Perplexity</div>
                                                 </div>
                                             </div>
@@ -2563,17 +2563,17 @@ const IntelliStocksTab = () => {
                             {/* PDF Export */}
                             <div
                                 onClick={async () => {
-                                    if (stockDataIntelli) {
+                                    if (stockDataJLab) {
                                         await window.PDFExporter.generateAnalysisReport(selectedStock, {
-                                            currentPrice: stockDataIntelli.quote?.price || 0,
-                                            fairValue: stockDataIntelli.fairValue || 0,
-                                            upside: stockDataIntelli.upside || 0,
-                                            recommendation: stockDataIntelli.recommendation || 'N/A',
-                                            dcfValue: stockDataIntelli.dcfValue || 0,
-                                            peValue: stockDataIntelli.peValue || 0,
-                                            pbValue: stockDataIntelli.pbValue || 0,
-                                            metrics: stockDataIntelli.metrics || {},
-                                            aiInsights: stockDataIntelli.aiInsights || {}
+                                            currentPrice: stockDataJLab.quote?.price || 0,
+                                            fairValue: stockDataJLab.fairValue || 0,
+                                            upside: stockDataJLab.upside || 0,
+                                            recommendation: stockDataJLab.recommendation || 'N/A',
+                                            dcfValue: stockDataJLab.dcfValue || 0,
+                                            peValue: stockDataJLab.peValue || 0,
+                                            pbValue: stockDataJLab.pbValue || 0,
+                                            metrics: stockDataJLab.metrics || {},
+                                            aiInsights: stockDataJLab.aiInsights || {}
                                         });
                                     }
                                 }}
@@ -3027,12 +3027,12 @@ const IntelliStocksTab = () => {
                                 ✅ Dashboard Hybride Fonctionnel
                             </div>
                             <div className="text-[7px] text-gray-600">
-                                Mode Démo • FMP (données précises) + Perplexity (intelligence IA)
+                                Mode Production • FMP (Données Précises) + JSLAI™ (Intelligence Cognitive)
                             </div>
                         </div>
                         <div className="text-right">
                             <div className="text-[8px] text-gray-500 font-bold">Hybride Optimal</div>
-                            <div className="text-[7px] text-gray-600">Précision + IA</div>
+                            <div className="text-[7px] text-gray-600">Précision + JSLAI™</div>
                         </div>
                     </div>
                 </div>
@@ -3041,4 +3041,4 @@ const IntelliStocksTab = () => {
     );
 };
 
-window.IntelliStocksTab = IntelliStocksTab;
+window.JLabTab = JLabTab;

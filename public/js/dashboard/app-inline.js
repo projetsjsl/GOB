@@ -504,7 +504,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     const AskEmmaTab = window.AskEmmaTab;
     const TerminalEmmaIATab = window.TerminalEmmaIATab;
     const ChatGPTGroupTab = window.ChatGPTGroupTab;
-    const IntelliStocksTab = window.IntelliStocksTab;
+    const JLabTab = window.JLabTab;
     const StocksNewsTab = window.StocksNewsTab;
     const YieldCurveTab = window.YieldCurveTab;
     const AdvancedAnalysisTab = window.AdvancedAnalysisTab;
@@ -515,7 +515,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     
     // Master list of all available secondary navigation links
     const MASTER_NAV_LINKS = [
-        { id: 'intellistocks', label: 'Tableau de bord', icon: 'LayoutDashboard' },
+        { id: 'jlab', label: 'JLab™', icon: 'LayoutDashboard' },
         { id: 'markets-economy', label: 'Marchés & Éco', icon: 'TrendingUp' },
         { id: 'ask-emma', label: 'Emma IA', icon: 'MessageSquare' },
         { id: 'assistant-vocal', label: 'Assistant Vocal', icon: 'Mic' },
@@ -538,9 +538,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     // Default configuration for secondary navigation per tab
     // This defines which links show up when you are on a specific tab
     const DEFAULT_NAV_CONFIG = {
-        'intellistocks': ['ask-emma', 'markets-economy', 'finance-pro', 'plus'],
-        'ask-emma': ['intellistocks', 'assistant-vocal', 'plus'],
-        'default': ['intellistocks', 'ask-emma', 'finance-pro', 'plus']
+        'jlab': ['ask-emma', 'markets-economy', 'finance-pro', 'plus'],
+        'ask-emma': ['jlab', 'assistant-vocal', 'plus'],
+        'default': ['jlab', 'ask-emma', 'finance-pro', 'plus']
     };
 
     // ============================================================================
@@ -676,8 +676,8 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 const tab = params.get('tab');
                 if (tab) return tab;
             }
-            return 'intellistocks';
-        }); // Onglet par défaut: JLab™ (contient Titres & Nouvelles et Finance Pro)
+            return 'jlab';
+        }); // Onglet par défaut: JLAB (contient Titres & Nouvelles et Finance Pro)
         const [navigationHistory, setNavigationHistory] = useState([]); // Historique de navigation pour le bouton Back
         const [tickers, setTickers] = useState([]);
         const [teamTickers, setTeamTickers] = useState([]);
@@ -801,7 +801,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         const clickSoundRef = useRef(null);
         const tabSoundRef = useRef(null);
         const audioCtxRef = useRef(null);
-        const tickerTapeRef = useRef(null);
+        const tickerBannerRef = useRef(null);
 
         // Fonction utilitaire pour obtenir les styles basés sur le thème
         const getThemeStyles = () => {
@@ -853,7 +853,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         const stocksLoadingRef = useRef(false); // Pour éviter les chargements multiples
         const batchLoadedRef = useRef(false); // Pour suivre si le batch a déjà chargé les données
         
-        // États pour le composant expandable du ticker tape
+        // États pour le composant expandable du TickerBanner
         const [tickerExpandableOpen, setTickerExpandableOpen] = useState(false);
         const [tickerExpandableUrl, setTickerExpandableUrl] = useState('');
         const [tickerExpandableTitle, setTickerExpandableTitle] = useState('');
@@ -1187,7 +1187,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 const tabNames = {
                     'stocks-news': 'Titres & Nouvelles (JLab™)',
                     'nouvelles': 'Nouvelles en direct',
-                    'intellistocks': 'IntelliStocks™ Dashboard',
+                    'jlab': 'JLAB - Hub d'analyse multifonctions',
                     'email-briefings': 'Email Briefings',
                     'watchlist': 'Ma Watchlist (Supabase)',
                     'economic-calendar': 'Calendrier Économique',
@@ -1217,7 +1217,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 // Add context details
                 if (activeTab === 'ask-emma') {
                     infoText += emmaConnected ? ' • Connecté' : ' • Hors ligne';
-                } else if (['stocks-news', 'intellistocks', 'watchlist'].includes(activeTab)) {
+                } else if (['stocks-news', 'jlab', 'watchlist'].includes(activeTab)) {
                     infoText += ` • ${tickerCount} titres suivis`;
                 } else if (activeTab === 'nouvelles') {
                     infoText += ` • ${newsData?.length || 0} articles`;
@@ -1269,7 +1269,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             }
 
             // Afficher intro JLab si c'est la première visite de cette page load
-            if (tabId === 'intellistocks' && !tabsVisitedThisSession['jlab']) {
+            if (tabId === 'jlab' && !tabsVisitedThisSession['jlab']) {
                 setShowJLabIntro(true);
                 setTimeout(() => setShowJLabIntro(false), 3000);
                 setTabsVisitedThisSession(prev => ({ ...prev, 'jlab': true }));
@@ -2280,9 +2280,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             }
         };
 
-        // Fonction Emma Populate pour JLab (IntelliStocks)
+        // Fonction Emma Populate pour JLAB
         const emmaPopulateJLab = window.emmaPopulateJLab = async () => {
-            console.log('🤖 Emma Populate JLab (IntelliStocks)...');
+            console.log('🤖 Emma Populate JLAB...');
             setLoading(true);
 
             try {
@@ -2292,10 +2292,10 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: "Peupler l'onglet JLab (IntelliStocks) avec des analyses avancées. Calculer les scores JSLAI™, analyser les ratios financiers, évaluer la valorisation, et fournir des recommandations d'investissement basées sur l'analyse quantitative et qualitative.",
+                        message: "Peupler l'onglet JLAB avec des analyses avancées. Calculer les scores JSLAI™, analyser les ratios financiers, évaluer la valorisation, et fournir des recommandations d'investissement basées sur l'analyse quantitative et qualitative.",
                         context: {
                             tickers: teamTickers,
-                            analysis_type: 'jlab_intellistocks_population',
+                            analysis_type: 'jlab_population',
                             include_jsla_score: true,
                             include_valuation_analysis: true,
                             include_risk_assessment: true,
@@ -2346,7 +2346,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 const contexts = {
                     jlab: {
                         tickers: teamTickers,
-                        analysis_type: 'jlab_intellistocks_population',
+                        analysis_type: 'jlab_population',
                         include_jsla_score: true,
                         include_valuation_analysis: true,
                         include_risk_assessment: true,
@@ -3743,7 +3743,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         const getTabIcon = (tabId) => {
             const iconMap = {
                 'stocks-news': 'iconoir-briefcase', // Portefeuille pour Titres & Nouvelles
-                'intellistocks': 'iconoir-flask', // Laboratoire pour JLab™
+                'jlab': 'iconoir-flask', // Laboratoire pour JLab™
                 'ask-emma': 'iconoir-chat-bubble', // ✅ Icône valide
                 'finance-pro': 'iconoir-calculator', // Calculatrice pour Finance Pro
                 'plus': 'iconoir-menu', // Menu pour Plus
@@ -3886,9 +3886,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             ];
         });
 
-        // Charger le widget TradingView Ticker Tape
+        // Charger le widget TradingView TickerBanner
         useEffect(() => {
-            const container = tickerTapeRef.current;
+            const container = tickerBannerRef.current;
             if (!container) return;
 
             container.innerHTML = '';
@@ -3929,7 +3929,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
             container.appendChild(script);
 
-            // Intercepter les clics et navigations depuis le ticker tape
+            // Intercepter les clics et navigations depuis le TickerBanner
             const setupTickerInterception = () => {
                 // Attendre que l'iframe soit créé
                 const checkForIframe = setInterval(() => {
@@ -5776,7 +5776,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                     }}
                                                     onClick={() => {
                                                         setSelectedStock(item.ticker);
-                                                        setActiveTab('intellistocks');
+                                                        setActiveTab('jlab');
                                                     }}
                                                 >
                                                     <div className="flex-1 min-w-0 pr-2">
@@ -5868,7 +5868,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                         }`}
                                                     onClick={() => {
                                                         setSelectedStock(item.ticker);
-                                                        setActiveTab('intellistocks');
+                                                        setActiveTab('jlab');
                                                     }}
                                                 >
                                                     <div className="flex-1 min-w-0 pr-2">
@@ -5997,7 +5997,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                 }`}
                                             onClick={() => {
                                                 setSelectedStock(item.ticker);
-                                                setActiveTab('intellistocks');
+                                                setActiveTab('jlab');
                                             }}
                                         >
                                             <div className="flex items-center justify-between mb-3">
@@ -6131,7 +6131,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                         }`}
                                                     onClick={() => {
                                                         setSelectedStock(ticker);
-                                                        setActiveTab('intellistocks');
+                                                        setActiveTab('jlab');
                                                     }}
                                                 >
                                                     <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -7227,7 +7227,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 Ajoutez des tickers dans l'onglet JLab™ pour commencer.
                             </p>
                             <button
-                                onClick={() => setActiveTab('intellistocks')}
+                                onClick={() => setActiveTab('jlab')}
                                 className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                             >
                                 Aller à JLab™ →
@@ -7372,7 +7372,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         <div className="text-center py-8">
                             <p className="text-gray-400 mb-4">Aucun ticker disponible. Ajoutez des tickers dans l'onglet JLab™.</p>
                             <button
-                                onClick={() => setActiveTab('intellistocks')}
+                                onClick={() => setActiveTab('jlab')}
                                 className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                             >
                                 Aller à JLab™ →
@@ -17063,7 +17063,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     }}
                                                     onClick={() => {
                                                         setSelectedStock(item.ticker);
-                                                        setActiveTab('intellistocks');
+                                                        setActiveTab('jlab');
                                                     }}
                                                 >
                                                     <div className="flex-1 min-w-0 pr-2">
@@ -17155,7 +17155,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         }`}
                                                     onClick={() => {
                                                         setSelectedStock(item.ticker);
-                                                        setActiveTab('intellistocks');
+                                                        setActiveTab('jlab');
                                                     }}
                                                 >
                                                     <div className="flex-1 min-w-0 pr-2">
@@ -17284,7 +17284,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 }`}
                                             onClick={() => {
                                                 setSelectedStock(item.ticker);
-                                                setActiveTab('intellistocks');
+                                                setActiveTab('jlab');
                                             }}
                                         >
                                             <div className="flex items-center justify-between mb-3">
@@ -17418,7 +17418,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         }`}
                                                     onClick={() => {
                                                         setSelectedStock(ticker);
-                                                        setActiveTab('intellistocks');
+                                                        setActiveTab('jlab');
                                                     }}
                                                 >
                                                     <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -17501,7 +17501,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         }`}
                                                     onClick={() => {
                                                         setSelectedStock(ticker);
-                                                        setActiveTab('intellistocks');
+                                                        setActiveTab('jlab');
                                                     }}
                                                 >
                                                     <div className="flex items-start justify-between mb-4">
@@ -17729,7 +17729,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                 <button
                                                                     onClick={() => {
                                                                         setSelectedStock(ticker);
-                                                                        setActiveTab('intellistocks');
+                                                                        setActiveTab('jlab');
                                                                     }}
                                                                     className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-300 hover:scale-[1.02] shadow ${isDarkMode
                                                                         ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-blue-500/25'
@@ -18573,8 +18573,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         };
 
         // ============================================
-        // COMPOSANT INTELLISTOCKS
-        // ============================================
+        // COMPOSANT JLab
         // Composant JLab unifié avec navigation interne
         const JLabUnifiedTab = () => {
             const [jlabView, setJlabView] = useState('portfolio'); // 'portfolio', 'watchlist', '3pour1', 'advanced', 'financepro'
@@ -18737,7 +18736,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             );
         };
 
-        const LegacyIntelliStocksTab = () => {
+        const LegacyJLabTab = () => {
             const [time, setTime] = useState(new Date());
             const [selectedStock, setSelectedStock] = useState('AAPL');
             const [timeframe, setTimeframe] = useState('1D');
@@ -20293,7 +20292,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <div>
                                     <h1 className={`text-base font-bold flex items-center gap-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
-                                        Expert Trading Analytics
+                                        JLab™ - Hub d'analyse multifonctions
                                         {connected ? (
                                             <LucideIcon name="Wifi" className="w-3 h-3 text-green-500" />
                                         ) : (
@@ -20482,7 +20481,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800'
                                                 : 'bg-white hover:bg-gray-100 border-gray-300'
                                                 }`}
-                                            title={violations.length ? 'Diagnostics: problèmes détectés' : 'Aide IntelliStocks'}
+                                            title={violations.length ? 'Diagnostics: problèmes détectés' : 'Aide JLab'}
                                         >
                                             <div className="relative">
                                                 <LucideIcon name={violations.length ? 'AlertTriangle' : 'HelpCircle'} className={`w-3 h-3 ${violations.length ? 'text-yellow-500' : 'text-gray-500'}`} />
@@ -20499,7 +20498,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     <div className="flex items-center gap-2">
                                                         <LucideIcon name="LifeBuoy" className="w-4 h-4 text-blue-500" />
                                                         <div>
-                                                            <div className={`text-xs font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Aide & diagnostics IntelliStocks</div>
+                                                            <div className={`text-xs font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Aide & diagnostics JLab</div>
                                                             <div className="text-[10px] text-gray-500">Mode Démo Hybride • FMP + Perplexity</div>
                                                         </div>
                                                     </div>
@@ -25502,7 +25501,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             { id: 'admin-jsla', label: 'Admin', icon: 'iconoir-settings', component: AdminJSLaiTab },
             // Secondary / Optional Tabs
             { id: 'emma-config', label: 'Config', icon: 'iconoir-tools', component: EmmaConfigTab },
-            { id: 'intellistocks', label: 'JLab™', icon: 'iconoir-flask', component: JLabUnifiedTab },
+            { id: 'jlab', label: 'JLab™', icon: 'iconoir-flask', component: JLabUnifiedTab },
             { id: 'groupchat', label: 'RobotWeb', icon: 'iconoir-robot', component: window.GroupChatTab || (() => <div>Chargement...</div>) },
             { id: 'assistant-vocal', label: 'Assistant', icon: 'iconoir-microphone', component: VoiceAssistantTab },
             { id: 'finvox', label: 'FinVox', icon: 'iconoir-voice-circle', component: FinVoxTab },
@@ -25720,7 +25719,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 )}
 
                 {/* Intro JLab - première visite de session */}
-                {showJLabIntro && activeTab === 'intellistocks' && (
+                {showJLabIntro && activeTab === 'jlab' && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black emma-intro-overlay">
                         <div className="text-center">
                             <div className="mb-6">
@@ -26465,20 +26464,20 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     <div className="h-0.5 bg-gradient-to-r from-transparent via-green-500 to-transparent"></div>
                 </header>
 
-                {/* News Ticker - Bandeau d'actualités défilant */}
-                {window.NewsTicker ? (
-                    React.createElement(window.NewsTicker, { 
+                {/* TradingView TickerBanner Widget - Bandeau de cotations */}
+                <div className="tradingview-widget-container" ref={tickerBannerRef}>
+                    <div className="tradingview-widget-container__widget"></div>
+                </div>
+
+                {/* News Banner - Bandeau d'actualités défilant */}
+                {window.NewsBanner ? (
+                    React.createElement(window.NewsBanner, { 
                         isDarkMode: isDarkMode,
                         forceVisible: false // Peut être changé en true pour forcer l'affichage
                     })
                 ) : (
-                    console.warn('⚠️ NewsTicker component not loaded') || null
+                    console.warn('⚠️ NewsBanner component not loaded') || null
                 )}
-
-                {/* TradingView Ticker Tape Widget - Bandeau de cotations */}
-                <div className="tradingview-widget-container" ref={tickerTapeRef}>
-                    <div className="tradingview-widget-container__widget"></div>
-                </div>
 
                 {/* Bouton Back flottant - Visible quand il y a un historique de navigation */}
                 {navigationHistory.length > 0 && !showLoadingScreen && (
@@ -26848,7 +26847,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {activeTab === 'nouvelles' && <NouvellesTab key={`nouvelles-${tabMountKeys['nouvelles'] || 0}`} />}
                     {activeTab === 'advanced-analysis' && window.AdvancedAnalysisTab && <window.AdvancedAnalysisTab key={`advanced-analysis-${tabMountKeys['advanced-analysis'] || 0}`} isDarkMode={isDarkMode} />}
                     {/* {activeTab === 'yield-curve' && <YieldCurveTab />} */} {/* Intégré dans Marchés & Économie */}
-                    {activeTab === 'intellistocks' && <JLabUnifiedTab key={`intellistocks-${tabMountKeys['intellistocks'] || 0}`} />}
+                    {activeTab === 'jlab' && <JLabUnifiedTab key={`jlab-${tabMountKeys['jlab'] || 0}`} />}
                     {activeTab === 'groupchat' && window.GroupChatTab && React.createElement(window.GroupChatTab, { isDarkMode: isDarkMode, dashboardTab: activeTab, onDashboardTabChange: setActiveTab })}
                     {activeTab === 'ask-emma' && <AskEmmaTab
                         prefillMessage={emmaPrefillMessage}
@@ -27197,7 +27196,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </div>
                 )}
 
-                {/* Composant Expandable pour TradingView Ticker Tape */}
+                {/* Composant Expandable pour TradingView TickerBanner */}
                 {tickerExpandableOpen && (
                     <div 
                         className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm"
