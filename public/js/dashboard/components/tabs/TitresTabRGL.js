@@ -120,7 +120,7 @@
             try { 
                 const saved = localStorage.getItem(STORAGE_KEY);
                 return saved ? JSON.parse(saved) : { lg: TEMPLATES['standard'].layout };
-            } catch { return { lg: TEMPLATES['standard'].layout }; }
+            } catch (e) { return { lg: TEMPLATES['standard'].layout }; }
         });
         const [isEditing, setIsEditing] = useState(false); // Mode édition désactivé par défaut pour éviter erreurs accidentelles
         const [compactType, setCompactType] = useState('vertical');

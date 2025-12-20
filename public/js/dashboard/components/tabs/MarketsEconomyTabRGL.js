@@ -41,7 +41,7 @@
         // --- State RGL ---
         const [layouts, setLayouts] = useState(() => {
             try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || DEFAULT_LAYOUTS; }
-            catch { return DEFAULT_LAYOUTS; }
+            catch (e) { return DEFAULT_LAYOUTS; }
         });
         const [isEditing, setIsEditing] = useState(false);
 

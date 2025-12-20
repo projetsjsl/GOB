@@ -10,10 +10,11 @@ const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContain
 const JLabTab = () => {
     // Récupère les données/handlers globaux du dashboard
     const dashboard = window.BetaCombinedDashboard || {};
-    const isDarkMode = dashboard.isDarkMode ?? true;
-    const tickers = dashboard.tickers ?? [];
-    const stockData = dashboard.stockData ?? {};
-    const newsData = dashboard.newsData ?? [];
+    // Fix compatibility: use explicit check for boolean, || for others
+    const isDarkMode = (dashboard.isDarkMode !== undefined) ? dashboard.isDarkMode : true;
+    const tickers = dashboard.tickers || [];
+    const stockData = dashboard.stockData || {};
+    const newsData = dashboard.newsData || [];
     const loadTickersFromSupabase = dashboard.loadTickersFromSupabase;
     const fetchNews = dashboard.fetchNews;
     const refreshAllStocks = dashboard.refreshAllStocks;

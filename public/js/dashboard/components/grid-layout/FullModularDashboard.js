@@ -125,7 +125,7 @@
         const [isDarkMode, setIsDarkMode] = useState(true);
         const [layout, setLayout] = useState(() => {
             try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || DEFAULT_LAYOUT; } 
-            catch { return DEFAULT_LAYOUT; }
+            catch (e) { return DEFAULT_LAYOUT; }
         });
 
         const RGL = window.ReactGridLayout;
