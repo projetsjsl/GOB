@@ -27273,6 +27273,131 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {activeTab === 'terminal-emmaia' && <TerminalEmmaIATab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
                     {activeTab === 'fastgraphs' && <FastGraphsTab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
                     {activeTab === 'emma-config' && <EmmaConfigTab />}
+
+                    {/* ================================================== */}
+                    {/* NEW 6-TAB STRUCTURE - SUB-TAB CONTENT RENDERING */}
+                    {/* ================================================== */}
+                    
+                    {/* ADMIN Sub-tabs */}
+                    {activeTab === 'admin-config' && <EmmaConfigTab />}
+                    {activeTab === 'admin-settings' && <PlusTab 
+                        setActiveTab={setActiveTab} 
+                        activeTab={activeTab} 
+                        isDarkMode={isDarkMode}
+                        isProfessionalMode={isProfessionalMode}
+                    />}
+                    {activeTab === 'admin-briefings' && <EmailBriefingsTab />}
+                    {activeTab === 'admin-scraping' && <ScrappingSATab
+                        isDarkMode={isDarkMode}
+                        runSeekingAlphaScraper={runSeekingAlphaScraper}
+                        scrapingStatus={scrapingStatus}
+                        scrapingLogs={scrapingLogs}
+                        clearScrapingLogs={clearScrapingLogs}
+                        generateScrapingScript={generateScrapingScript}
+                        addScrapingLog={addScrapingLog}
+                        tickers={tickers}
+                        Icon={Icon}
+                        seekingAlphaData={seekingAlphaData}
+                    />}
+                    {activeTab === 'admin-fastgraphs' && <FastGraphsTab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
+                    {activeTab === 'admin-jsla' && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, {
+                        emmaConnected: emmaConnected,
+                        setEmmaConnected: setEmmaConnected,
+                        showPromptEditor: showPromptEditor,
+                        setShowPromptEditor: setShowPromptEditor,
+                        showTemperatureEditor: showTemperatureEditor,
+                        setShowTemperatureEditor: setShowTemperatureEditor,
+                        showLengthEditor: showLengthEditor,
+                        setShowLengthEditor: setShowLengthEditor,
+                        isDarkMode: isDarkMode,
+                        setActiveTab: setActiveTab,
+                        activeTab: activeTab,
+                        secondaryNavConfig: secondaryNavConfig,
+                        setSecondaryNavConfig: setSecondaryNavConfig,
+                        availableNavLinks: MASTER_NAV_LINKS,
+                        primaryNavConfig: primaryNavConfig,
+                        setPrimaryNavConfig: setPrimaryNavConfig,
+                        allTabsList: allTabs.map(t => ({ id: t.id, label: t.label, icon: t.icon }))
+                    })}
+
+                    {/* MARCHÉS Sub-tabs */}
+                    {activeTab === 'marches-global' && <MarketsEconomyTab key={`marches-global-${tabMountKeys['markets-economy'] || 0}`} />}
+                    {activeTab === 'marches-calendar' && <EconomicCalendarTab key={`marches-calendar-${tabMountKeys['economic-calendar'] || 0}`} />}
+                    {activeTab === 'marches-yield' && <YieldCurveTab />}
+                    {activeTab === 'marches-nouvelles' && <NouvellesTab key={`marches-nouvelles-${tabMountKeys['nouvelles'] || 0}`} />}
+
+                    {/* TITRES Sub-tabs */}
+                    {activeTab === 'titres-portfolio' && <StocksNewsTab tickerSource="portfolio" />}
+                    {activeTab === 'titres-watchlist' && <StocksNewsTab tickerSource="watchlist" />}
+                    {activeTab === 'titres-seeking' && <SeekingAlphaTab
+                        isDarkMode={isDarkMode}
+                        loading={loading}
+                        refreshAllStocks={refreshAllStocks}
+                        fetchNews={fetchNews}
+                        runSeekingAlphaScraper={runSeekingAlphaScraper}
+                        scrapingStatus={scrapingStatus}
+                        openSeekingAlpha={openSeekingAlpha}
+                        generateScrapingScript={generateScrapingScript}
+                        addScrapingLog={addScrapingLog}
+                        tickers={tickers}
+                        seekingAlphaData={seekingAlphaData}
+                        analyzeWithClaude={analyzeWithClaude}
+                        selectedStock={selectedStock}
+                        setSelectedStock={setSelectedStock}
+                        seekingAlphaStockData={seekingAlphaStockData}
+                        cleanText={cleanText}
+                        getGradeColor={getGradeColor}
+                        openPeersComparison={openPeersComparison}
+                        stockData={stockData}
+                        setActiveTab={setActiveTab}
+                        Icon={Icon}
+                        getCompanyLogo={getCompanyLogo}
+                        seekingAlphaViewMode={seekingAlphaViewMode}
+                        setSeekingAlphaViewMode={setSeekingAlphaViewMode}
+                    />}
+                    {activeTab === 'titres-compare' && <FinanceProPanel isDarkMode={isDarkMode} />}
+
+                    {/* JLAB Sub-tabs */}
+                    {activeTab === 'jlab-terminal' && (
+                        window.JLabTab ? <window.JLabTab /> : <JLabUnifiedTab key={`jlab-terminal-${tabMountKeys['jlab'] || 0}`} />
+                    )}
+                    {activeTab === 'jlab-advanced' && window.AdvancedAnalysisTab && <window.AdvancedAnalysisTab key={`jlab-advanced-${tabMountKeys['advanced-analysis'] || 0}`} isDarkMode={isDarkMode} />}
+                    {activeTab === 'jlab-screener' && <FinanceProPanel isDarkMode={isDarkMode} initialView="screener" />}
+                    {activeTab === 'jlab-ratios' && <FinanceProPanel isDarkMode={isDarkMode} initialView="ratios" />}
+
+                    {/* EMMA IA Sub-tabs */}
+                    {activeTab === 'emma-chat' && <AskEmmaTab
+                        prefillMessage={emmaPrefillMessage}
+                        setPrefillMessage={setEmmaPrefillMessage}
+                        autoSend={emmaAutoSend}
+                        setAutoSend={setEmmaAutoSend}
+                        emmaConnected={emmaConnected}
+                        setEmmaConnected={setEmmaConnected}
+                        showPromptEditor={showPromptEditor}
+                        setShowPromptEditor={setShowPromptEditor}
+                        showTemperatureEditor={showTemperatureEditor}
+                        setShowTemperatureEditor={setShowTemperatureEditor}
+                        showLengthEditor={showLengthEditor}
+                        setShowLengthEditor={setShowLengthEditor}
+                        setActiveTab={setActiveTab}
+                        activeTab={activeTab}
+                    />}
+                    {activeTab === 'emma-vocal' && <VoiceAssistantTab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
+                    {activeTab === 'emma-group' && window.GroupChatTab && React.createElement(window.GroupChatTab, { isDarkMode: isDarkMode, dashboardTab: activeTab, onDashboardTabChange: setActiveTab })}
+                    {activeTab === 'emma-terminal' && <TerminalEmmaIATab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
+                    {activeTab === 'emma-live' && <EmmAIATab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
+                    {activeTab === 'emma-finvox' && <FinVoxTab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
+
+                    {/* TESTS Sub-tabs */}
+                    {activeTab === 'tests-calendar' && <InvestingCalendarTab key={`tests-calendar-${tabMountKeys['investing-calendar'] || 0}`} />}
+                    {activeTab === 'tests-sandbox' && <InvestingCalendarTabInternal />}
+                    {activeTab === 'tests-debug' && (
+                        <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-neutral-900 text-white' : 'bg-white text-gray-900'}`}>
+                            <h2 className="text-xl font-bold mb-4">🐛 Debug Console</h2>
+                            <p className="text-gray-500">Zone de test pour nouvelles fonctionnalités</p>
+                        </div>
+                    )}
+
                 </main>
 
                 {/* Messages */}
