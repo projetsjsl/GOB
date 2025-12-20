@@ -14,6 +14,17 @@
     <script src="/js/env-config.js"></script>
     <!-- Babel - DOIT être chargé avant le script type="text/babel" -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Fix for "exports is not defined" error when Babel transpiles modules -->
+    <script>
+        // Polyfill for CommonJS exports to prevent Babel errors
+        if (typeof exports === 'undefined') {
+            window.exports = {};
+        }
+        if (typeof module === 'undefined') {
+            window.module = { exports: {} };
+        }
+    </script>
     <!-- Scripts non-critiques - Chargés en arrière-plan avec defer -->
     <script src="./caroline-plan-data.js" defer></script>
     <!-- email-template.js DOIT être chargé avant le script Babel pour que window.generateEmailHTML soit disponible -->

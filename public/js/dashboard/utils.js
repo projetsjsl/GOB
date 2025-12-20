@@ -362,9 +362,12 @@ const getTabIcon = (tabId) => {
     return iconMap[tabId] || 'Activity';
 };
 
-// Export all functions
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
+// Export functions to window for browser usage
+// NOTE: Do NOT use module.exports here - this file is loaded with Babel in browser
+// and will cause "exports is not defined" errors
+if (typeof window !== 'undefined') {
+    window.DASHBOARD_UTILS = window.DASHBOARD_UTILS || {};
+    Object.assign(window.DASHBOARD_UTILS, {
         cleanText,
         getNewsIcon,
         getSourceCredibility,
@@ -376,5 +379,5 @@ if (typeof module !== 'undefined' && module.exports) {
         parseSeekingAlphaRawText,
         formatNumber,
         getTabIcon
-    };
+    });
 }

@@ -96,6 +96,18 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <!-- Note: Babel Standalone utilisé intentionnellement pour ce fichier standalone -->
     <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
+
+    <!-- Fix for "exports is not defined" error when Babel transpiles modules -->
+    <script>
+        // Polyfill for CommonJS exports to prevent Babel errors
+        if (typeof exports === 'undefined') {
+            window.exports = {};
+        }
+        if (typeof module === 'undefined') {
+            window.module = { exports: {} };
+        }
+    </script>
+
     <!-- Performance Optimizer - Réduit le temps de chargement -->
     <script src="/js/dashboard/performance-optimizer.js"></script>
     <!-- Constantes partagées exposées globalement -->
