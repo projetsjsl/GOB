@@ -774,6 +774,23 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         const [visitedTabs, setVisitedTabs] = useState(new Set());
         const [tabMountKeys, setTabMountKeys] = useState({});
         
+        // État pour le mode de vue (onglets ou grille) - GOD MODE
+        const [dashboardViewMode, setDashboardViewMode] = useState(() => {
+            try {
+                const saved = localStorage.getItem('gob-dashboard-view-mode');
+                return saved || 'grid'; // Par défaut: grid (GOD MODE)
+            } catch {
+                return 'grid';
+            }
+        });
+
+        // Sauvegarder la préférence de vue
+        useEffect(() => {
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('gob-dashboard-view-mode', dashboardViewMode);
+            }
+        }, [dashboardViewMode]);
+
         const [activeTab, setActiveTab] = useState(() => {
             if (typeof window !== 'undefined') {
                 const params = new URLSearchParams(window.location.search);
@@ -27111,6 +27128,25 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 {/* NEW: Main 6-Tab Navigation */}
                                 <div className={`mb-4 p-1 rounded-xl ${isDarkMode ? 'bg-neutral-900/80' : 'bg-gray-100'}`}>
                                     <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+                                        {/* Toggle Vue Onglets/Grille */}
+                                        <button
+                                            onClick={() => {
+                                                const newMode = dashboardViewMode === 'tabs' ? 'grid' : 'tabs';
+                                                setDashboardViewMode(newMode);
+                                            }}
+                                            className={`flex items-center gap-2 px-3 py-2 rounded-lg font-semibold text-xs whitespace-nowrap transition-all duration-300 mr-2 ${
+                                                dashboardViewMode === 'grid'
+                                                    ? `bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg`
+                                                    : isDarkMode 
+                                                        ? 'text-gray-400 hover:text-white hover:bg-neutral-800'
+                                                        : 'text-gray-600 hover:text-gray-900 hover:bg-white'
+                                            }`}
+                                            title={dashboardViewMode === 'tabs' ? 'Passer en vue grille (GOD MODE)' : 'Passer en vue onglets'}
+                                        >
+                                            <LucideIcon name={dashboardViewMode === 'tabs' ? 'Layout' : 'List'} className="w-4 h-4" />
+                                            <span>{dashboardViewMode === 'tabs' ? '📐 Grille' : '📑 Onglets'}</span>
+                                        </button>
+                                        
                                         {MAIN_TABS.map(tab => {
                                             const isActive = mainTab === tab.id;
                                             const colorMap = {
@@ -27187,7 +27223,75 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         );
                     })()}
 
-
+                    {/* Rendu conditionnel: Vue Grille ou Vue Onglets */}
+                    {dashboardViewMode === 'grid' ? (
+                        // VUE GRILLE (GOD MODE)
+                        window.DashboardGridWrapper ? (
+                            <window.DashboardGridWrapper
+                                isDarkMode={isDarkMode}
+                                isAdmin={true}
+                                activeTab={activeTab}
+                                setActiveTab={setActiveTab}
+                                tickers={tickers}
+                                stockData={stockData}
+                                newsData={newsData}
+                                loading={loading}
+                                lastUpdate={lastUpdate}
+                                selectedStock={selectedStock}
+                                setSelectedStock={setSelectedStock}
+                                emmaConnected={emmaConnected}
+                                setEmmaConnected={setEmmaConnected}
+                                emmaPrefillMessage={emmaPrefillMessage}
+                                setEmmaPrefillMessage={setEmmaPrefillMessage}
+                                emmaAutoSend={emmaAutoSend}
+                                setEmmaAutoSend={setEmmaAutoSend}
+                                showPromptEditor={showPromptEditor}
+                                setShowPromptEditor={setShowPromptEditor}
+                                showTemperatureEditor={showTemperatureEditor}
+                                setShowTemperatureEditor={setShowTemperatureEditor}
+                                showLengthEditor={showLengthEditor}
+                                setShowLengthEditor={setShowLengthEditor}
+                                secondaryNavConfig={secondaryNavConfig}
+                                setSecondaryNavConfig={setSecondaryNavConfig}
+                                primaryNavConfig={primaryNavConfig}
+                                setPrimaryNavConfig={setPrimaryNavConfig}
+                                isProfessionalMode={isProfessionalMode}
+                                loadTickersFromSupabase={loadTickersFromSupabase}
+                                fetchNews={fetchNews}
+                                refreshAllStocks={refreshAllStocks}
+                                fetchLatestNewsForTickers={fetchLatestNewsForTickers}
+                                getCompanyLogo={getCompanyLogo}
+                                runSeekingAlphaScraper={runSeekingAlphaScraper}
+                                scrapingStatus={scrapingStatus}
+                                scrapingLogs={scrapingLogs}
+                                clearScrapingLogs={clearScrapingLogs}
+                                generateScrapingScript={generateScrapingScript}
+                                addScrapingLog={addScrapingLog}
+                                seekingAlphaData={seekingAlphaData}
+                                seekingAlphaStockData={seekingAlphaStockData}
+                                analyzeWithClaude={analyzeWithClaude}
+                                seekingAlphaViewMode={seekingAlphaViewMode}
+                                setSeekingAlphaViewMode={setSeekingAlphaViewMode}
+                                openPeersComparison={openPeersComparison}
+                                cleanText={cleanText}
+                                getGradeColor={getGradeColor}
+                                openSeekingAlpha={openSeekingAlpha}
+                                tabMountKeys={tabMountKeys}
+                                Icon={Icon}
+                                MASTER_NAV_LINKS={MASTER_NAV_LINKS}
+                                allTabs={allTabs}
+                            />
+                        ) : (
+                            <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
+                                <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>
+                                    <p className="font-medium">⚠️ DashboardGridWrapper en cours de chargement...</p>
+                                    <p className="text-sm mt-1">Veuillez patienter quelques instants.</p>
+                                </div>
+                            </div>
+                        )
+                    ) : (
+                        // VUE ONGLETS (CLASSIQUE)
+                        <>
                     {activeTab === 'markets-economy' && <MarketsEconomyTab key={`markets-economy-${tabMountKeys['markets-economy'] || 0}`} />}
                     {activeTab === 'nouvelles' && <NouvellesTab key={`nouvelles-${tabMountKeys['nouvelles'] || 0}`} />}
                     {activeTab === 'advanced-analysis' && window.AdvancedAnalysisTab && <window.AdvancedAnalysisTab key={`advanced-analysis-${tabMountKeys['advanced-analysis'] || 0}`} isDarkMode={isDarkMode} />}
@@ -27423,6 +27527,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             <div className="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full mx-auto mb-4" />
                             <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Chargement RGL...</p>
                         </div>
+                    )}
+                        </>
                     )}
 
                 </main>
