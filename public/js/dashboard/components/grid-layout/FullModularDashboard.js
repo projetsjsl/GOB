@@ -128,8 +128,128 @@
             catch (e) { return DEFAULT_LAYOUT; }
         });
 
+        // États partagés pour compatibilité avec BetaCombinedDashboard
+        const [tickers, setTickers] = useState([]);
+        const [teamTickers, setTeamTickers] = useState([]);
+        const [watchlistTickers, setWatchlistTickers] = useState([]);
+        const [stockData, setStockData] = useState({});
+        const [newsData, setNewsData] = useState([]);
+        const [loading, setLoading] = useState(false);
+        const [lastUpdate, setLastUpdate] = useState(null);
+        const [tickerLatestNews, setTickerLatestNews] = useState({});
+        const [tickerMoveReasons, setTickerMoveReasons] = useState({});
+        const [selectedStock, setSelectedStock] = useState(null);
+
+        // États pour AskEmmaTab
+        const [emmaPrefillMessage, setEmmaPrefillMessage] = useState('');
+        const [emmaAutoSend, setEmmaAutoSend] = useState(false);
+        const [emmaConnected, setEmmaConnected] = useState(false);
+        const [showPromptEditor, setShowPromptEditor] = useState(false);
+        const [showTemperatureEditor, setShowTemperatureEditor] = useState(false);
+        const [showLengthEditor, setShowLengthEditor] = useState(false);
+        const [activeTab, setActiveTab] = useState('ai');
+
         const RGL = window.ReactGridLayout;
         const ResponsiveGridLayout = useMemo(() => RGL && RGL.WidthProvider && RGL.Responsive ? RGL.WidthProvider(RGL.Responsive) : null, [RGL]);
+
+        // Fonctions utilitaires pour compatibilité
+        const getCompanyLogo = useCallback((ticker) => {
+            if (!ticker) return '';
+            // Utiliser Clearbit ou fallback
+            return `https://logo.clearbit.com/${ticker.toLowerCase()}.com`;
+        }, []);
+
+        const loadTickersFromSupabase = useCallback(async () => {
+            try {
+                setLoading(true);
+                // TODO: Implémenter le chargement depuis Supabase
+                // Pour l'instant, on utilise un mock ou on délègue si disponible
+                if (typeof window.supabase !== 'undefined') {
+                    // Logique de chargement Supabase ici
+                    console.log('📊 Chargement tickers depuis Supabase...');
+                }
+                setLoading(false);
+            } catch (error) {
+                console.error('❌ Erreur chargement tickers:', error);
+                setLoading(false);
+            }
+        }, []);
+
+        const fetchNews = useCallback(async () => {
+            try {
+                setLoading(true);
+                // TODO: Implémenter fetchNews
+                console.log('📰 Récupération actualités...');
+                setLastUpdate(new Date());
+                setLoading(false);
+            } catch (error) {
+                console.error('❌ Erreur fetchNews:', error);
+                setLoading(false);
+            }
+        }, []);
+
+        const refreshAllStocks = useCallback(async () => {
+            try {
+                setLoading(true);
+                // TODO: Implémenter refreshAllStocks
+                console.log('🔄 Actualisation données boursières...');
+                setLastUpdate(new Date());
+                setLoading(false);
+            } catch (error) {
+                console.error('❌ Erreur refreshAllStocks:', error);
+                setLoading(false);
+            }
+        }, []);
+
+        const fetchLatestNewsForTickers = useCallback(async () => {
+            try {
+                // TODO: Implémenter fetchLatestNewsForTickers
+                console.log('📰 Récupération actualités pour tickers...');
+            } catch (error) {
+                console.error('❌ Erreur fetchLatestNewsForTickers:', error);
+            }
+        }, []);
+
+        const setActiveTab = useCallback((tabId) => {
+            // Pour compatibilité avec les composants qui appellent setActiveTab
+            console.log('📑 Changement d\'onglet:', tabId);
+        }, []);
+
+        // Exposer window.BetaCombinedDashboard pour compatibilité
+        useEffect(() => {
+            window.BetaCombinedDashboard = window.BetaCombinedDashboard || {};
+            window.BetaCombinedDashboard.isDarkMode = isDarkMode;
+            window.BetaCombinedDashboard.tickers = tickers;
+            window.BetaCombinedDashboard.teamTickers = teamTickers;
+            window.BetaCombinedDashboard.watchlistTickers = watchlistTickers;
+            window.BetaCombinedDashboard.stockData = stockData;
+            window.BetaCombinedDashboard.newsData = newsData;
+            window.BetaCombinedDashboard.loading = loading;
+            window.BetaCombinedDashboard.lastUpdate = lastUpdate;
+            window.BetaCombinedDashboard.tickerLatestNews = tickerLatestNews;
+            window.BetaCombinedDashboard.tickerMoveReasons = tickerMoveReasons;
+            window.BetaCombinedDashboard.selectedStock = selectedStock;
+            window.BetaCombinedDashboard.loadTickersFromSupabase = loadTickersFromSupabase;
+            window.BetaCombinedDashboard.fetchNews = fetchNews;
+            window.BetaCombinedDashboard.refreshAllStocks = refreshAllStocks;
+            window.BetaCombinedDashboard.fetchLatestNewsForTickers = fetchLatestNewsForTickers;
+            window.BetaCombinedDashboard.setActiveTab = setActiveTab;
+            window.BetaCombinedDashboard.setSelectedStock = setSelectedStock;
+            window.BetaCombinedDashboard.getCompanyLogo = getCompanyLogo;
+        }, [
+            isDarkMode, tickers, teamTickers, watchlistTickers, stockData, newsData,
+            loading, lastUpdate, tickerLatestNews, tickerMoveReasons, selectedStock,
+            loadTickersFromSupabase, fetchNews, refreshAllStocks, fetchLatestNewsForTickers,
+            setActiveTab, getCompanyLogo
+        ]);
+
+        // Exposer window.BetaCombinedDashboardData pour compatibilité
+        useEffect(() => {
+            window.BetaCombinedDashboardData = window.BetaCombinedDashboardData || {};
+            window.BetaCombinedDashboardData.getCompanyLogo = getCompanyLogo;
+            window.BetaCombinedDashboardData.setActiveTab = setActiveTab;
+            window.BetaCombinedDashboardData.isDarkMode = isDarkMode;
+        }, [getCompanyLogo, setActiveTab, isDarkMode]);
 
         // Sauvegarde auto
         const onLayoutChange = (newLayout) => {
@@ -183,6 +303,32 @@
                 );
             }
 
+            // Props spécifiques selon le type de composant
+            if (item.type === 'AI') {
+                // AskEmmaTab nécessite des props spécifiques
+                return (
+                    <Component 
+                        isDarkMode={isDarkMode}
+                        isAdmin={true}
+                        prefillMessage={emmaPrefillMessage}
+                        setPrefillMessage={setEmmaPrefillMessage}
+                        autoSend={emmaAutoSend}
+                        setAutoSend={setEmmaAutoSend}
+                        emmaConnected={emmaConnected}
+                        setEmmaConnected={setEmmaConnected}
+                        showPromptEditor={showPromptEditor}
+                        setShowPromptEditor={setShowPromptEditor}
+                        showTemperatureEditor={showTemperatureEditor}
+                        setShowTemperatureEditor={setShowTemperatureEditor}
+                        showLengthEditor={showLengthEditor}
+                        setShowLengthEditor={setShowLengthEditor}
+                        setActiveTab={setActiveTab}
+                        activeTab={activeTab}
+                    />
+                );
+            }
+
+            // Pour les autres composants (MARKET, PORTFOLIO, TERMINAL)
             return <Component isDarkMode={isDarkMode} isAdmin={true} />;
         };
 

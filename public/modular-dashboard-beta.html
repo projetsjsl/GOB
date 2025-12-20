@@ -110,8 +110,11 @@
     <!-- === DEPENDANCIES === -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+    <!-- Recharts pour JLabTab (via unpkg UMD) -->
+    <script src="https://unpkg.com/recharts@2.10.3/umd/Recharts.js"></script>
+    <!-- Supabase Client (si nécessaire) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 
-    <!-- === UTILS === -->
     <!-- === UTILS === -->
     <script>
         // CRITICAL POLYFILLS FOR GOD MODE
@@ -122,6 +125,16 @@
         // CommonJS compatibility
         if (typeof exports === 'undefined') window.exports = {};
         if (typeof module === 'undefined') window.module = { exports: {} };
+        
+        // Exposer Recharts globalement pour compatibilité
+        if (typeof window.Recharts === 'undefined' && typeof Recharts !== 'undefined') {
+            window.Recharts = Recharts;
+        }
+        
+        // Exposer Supabase globalement
+        if (typeof window.supabase === 'undefined' && typeof supabase !== 'undefined') {
+            window.supabase = supabase;
+        }
     </script>
     <script src="/js/dashboard/utils-shared.js"></script>
     <script src="/js/dashboard/constants.js"></script>
