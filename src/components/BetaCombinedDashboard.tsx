@@ -12,6 +12,7 @@ import AskEmmaTab from './tabs/AskEmmaTab';
 import EmailBriefingsTab from './tabs/EmailBriefingsTab';
 import TestOnlyTab from './tabs/TestOnlyTab';
 import NouvellesTab from './tabs/NouvellesTab';
+import FinanceProTab from './tabs/FinanceProTab';
 import type { TabName, StockData, NewsArticle, SeekingAlphaData } from '../types';
 
 export const BetaCombinedDashboard: React.FC = () => {
@@ -464,6 +465,7 @@ export const BetaCombinedDashboard: React.FC = () => {
             case 'plus': return <PlusTab {...tabProps} />;
             case 'watchlist': return <DansWatchlistTab {...tabProps} />;
             case 'economic-calendar': return <EconomicCalendarTab {...tabProps} />;
+            case 'finance-pro': return <FinanceProTab {...tabProps} />;
             default: return <StocksNewsTab {...tabProps} />;
         }
     };
@@ -488,6 +490,7 @@ export const BetaCombinedDashboard: React.FC = () => {
                 <div className="flex gap-2 overflow-x-auto">
                     {[
                         { id: 'stocks-news' as TabName, label: '📊 Stocks & News' },
+                        { id: 'finance-pro' as TabName, label: '💹 Finance Pro' },
                         { id: 'nouvelles' as TabName, label: '📰 Nouvelles' },
                         { id: 'intellistocks' as TabName, label: '🧠 IntelliStocks' },
                         { id: 'email-briefings' as TabName, label: '📧 Briefings' },

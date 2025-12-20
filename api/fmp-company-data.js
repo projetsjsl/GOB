@@ -98,8 +98,8 @@ export default async function handler(req, res) {
 
     // Fonction pour essayer plusieurs variantes de symboles
     const tryFetchProfile = async (symbolToTry, retryCount = 0) => {
-        const MAX_RETRIES = 2;
-        const RETRY_DELAY = 1000; // 1 seconde
+        const MAX_RETRIES = 3;
+        const RETRY_DELAY = 5000; // 5 secondes (augmenté pour éviter les cascades de 429)
         
         try {
             const profileRes = await fetch(`${FMP_BASE}/profile/${symbolToTry}?apikey=${FMP_KEY}`);

@@ -71,7 +71,8 @@ export type TabName =
   | 'nouvelles'
   | 'ask-emma'
   | 'emma-config'
-  | 'testonly';
+  | 'testonly'
+  | 'finance-pro';
 
 // Props des tabs
 export interface TabProps {

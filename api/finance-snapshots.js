@@ -72,7 +72,7 @@ export default async function handler(req, res) {
  * GET - List snapshots or get specific one
  */
 async function getSnapshots(req, res, supabase) {
-    const { ticker, id, limit = 50 } = req.query;
+    const { ticker, id, limit = 50, all, current } = req.query;
 
     if (id) {
         // Get specific snapshot
@@ -87,18 +87,27 @@ async function getSnapshots(req, res, supabase) {
             return res.status(404).json({ error: 'Snapshot not found' });
         }
 
-        return res.status(200).json(data);
+        return res.status(200).json({ success: true, data: [data] });
     }
 
     if (ticker) {
         // List snapshots for ticker
-        const { data, error } = await supabase
+        let query = supabase
             .from('finance_pro_snapshots')
             .select('*')
-            .eq('ticker', ticker.toUpperCase())
+            .eq('ticker', ticker.toUpperCase());
+
+        // Filter by current if specified
+        if (current === 'true') {
+            query = query.eq('is_current', true);
+        }
+
+        query = query
             .order('snapshot_date', { ascending: false })
             .order('id', { ascending: false })
             .limit(parseInt(limit));
+
+        const { data, error } = await query;
 
         if (error) {
             console.error('List snapshots error:', error);
@@ -106,14 +115,44 @@ async function getSnapshots(req, res, supabase) {
         }
 
         return res.status(200).json({
+            success: true,
             count: data.length,
             ticker: ticker.toUpperCase(),
-            snapshots: data
+            data: data
+        });
+    }
+
+    // Get all snapshots (for Finance Pro dashboard)
+    if (all === 'true') {
+        let query = supabase
+            .from('finance_pro_snapshots')
+            .select('*');
+
+        // Filter by current if specified
+        if (current === 'true') {
+            query = query.eq('is_current', true);
+        }
+
+        query = query
+            .order('ticker', { ascending: true })
+            .limit(parseInt(limit) || 2000);
+
+        const { data, error } = await query;
+
+        if (error) {
+            console.error('List all snapshots error:', error);
+            return res.status(500).json({ error: 'Failed to fetch snapshots' });
+        }
+
+        return res.status(200).json({
+            success: true,
+            count: data.length,
+            data: data
         });
     }
 
     // No ticker or id - error
-    return res.status(400).json({ error: 'Ticker or ID required' });
+    return res.status(400).json({ error: 'Ticker, ID, or all=true required' });
 }
 
 /**
