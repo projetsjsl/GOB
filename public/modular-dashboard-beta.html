@@ -112,8 +112,18 @@
     <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
 
     <!-- === UTILS === -->
+    <!-- === UTILS === -->
+    <script>
+        // CRITICAL POLYFILLS FOR GOD MODE
+        // Defines missing globals before any component loads
+        window.showCommandsHelp = function() {
+            alert("ℹ️ Aide Commandes :\n\n- /reset : Réinitialiser le chat\n- /clear : Effacer l'historique\n- /help : Afficher ce message");
+        };
+        // CommonJS compatibility
+        if (typeof exports === 'undefined') window.exports = {};
+        if (typeof module === 'undefined') window.module = { exports: {} };
+    </script>
     <script src="/js/dashboard/utils-shared.js"></script>
-    <script src="/js/dashboard/utils-godmode.js"></script>
     <script src="/js/dashboard/constants.js"></script>
     
     <!-- === COMPONENTS === -->
