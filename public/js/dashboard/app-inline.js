@@ -570,6 +570,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             { id: 'emma-finvox', label: 'FinVox', icon: 'Headphones', component: 'FinVoxTab' }
         ],
         'tests': [
+            { id: 'tests-rgl', label: 'Layout RGL', icon: 'LayoutDashboard', component: 'RglDashboard' },
             { id: 'tests-calendar', label: 'Calendrier', icon: 'Calendar', component: 'InvestingCalendarTab' },
             { id: 'tests-sandbox', label: 'Sandbox', icon: 'Box', component: 'TestSandboxTab' },
             { id: 'tests-debug', label: 'Debug', icon: 'Bug', component: 'DebugTab' }
@@ -611,7 +612,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         'titres': 'titres-portfolio',
         'jlab': 'jlab-terminal',
         'emma': 'emma-chat',
-        'tests': 'tests-sandbox'
+        'tests': 'tests-rgl'
     };
 
     // Legacy: Keep MASTER_NAV_LINKS for backwards compatibility
@@ -27395,6 +27396,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-neutral-900 text-white' : 'bg-white text-gray-900'}`}>
                             <h2 className="text-xl font-bold mb-4">🐛 Debug Console</h2>
                             <p className="text-gray-500">Zone de test pour nouvelles fonctionnalités</p>
+                        </div>
+                    )}
+
+                    {/* RGL Dashboard - React-Grid-Layout */}
+                    {activeTab === 'tests-rgl' && window.RglDashboard && (
+                        <window.RglDashboard isDarkMode={isDarkMode} isAdmin={true} />
+                    )}
+                    {activeTab === 'tests-rgl' && !window.RglDashboard && (
+                        <div className={`p-8 text-center rounded-xl ${isDarkMode ? 'bg-neutral-900' : 'bg-white'}`}>
+                            <div className="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full mx-auto mb-4" />
+                            <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Chargement RGL...</p>
                         </div>
                     )}
 
