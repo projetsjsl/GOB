@@ -518,14 +518,110 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     // CONSTANTS & CONFIGURATION
     // ============================================================================
     
-    // Master list of all available secondary navigation links
+    // ============================================================================
+    // NEW NAVIGATION STRUCTURE - 6 MAIN TABS WITH SUB-TABS
+    // ============================================================================
+    
+    // 6 Main tabs (onglets principaux)
+    const MAIN_TABS = [
+        { id: 'admin', label: 'Admin', icon: 'Shield', color: 'red' },
+        { id: 'marches', label: 'Marchés', icon: 'TrendingUp', color: 'blue' },
+        { id: 'titres', label: 'Titres', icon: 'Briefcase', color: 'green' },
+        { id: 'jlab', label: 'JLab', icon: 'Flask', color: 'teal' },
+        { id: 'emma', label: 'Emma IA', icon: 'Brain', color: 'purple' },
+        { id: 'tests', label: 'Tests', icon: 'TestTube', color: 'orange' }
+    ];
+
+    // Sub-tabs for each main tab
+    const SUB_TABS = {
+        'admin': [
+            { id: 'admin-config', label: 'Configuration', icon: 'Settings', component: 'EmmaConfigTab' },
+            { id: 'admin-briefings', label: 'Briefings', icon: 'Mail', component: 'EmailBriefingsTab' },
+            { id: 'admin-scraping', label: 'Scraping', icon: 'Database', component: 'ScrappingSATab' },
+            { id: 'admin-fastgraphs', label: 'FastGraphs', icon: 'BarChart3', component: 'FastGraphsTab' },
+            { id: 'admin-settings', label: 'Paramètres', icon: 'Cog', component: 'PlusTab' },
+            { id: 'admin-jsla', label: 'Admin JSL', icon: 'Shield', component: 'AdminJSLaiTab' }
+        ],
+        'marches': [
+            { id: 'marches-global', label: 'Vue Globale', icon: 'Globe', component: 'MarketsEconomyTab' },
+            { id: 'marches-calendar', label: 'Calendrier Éco', icon: 'Calendar', component: 'EconomicCalendarTab' },
+            { id: 'marches-yield', label: 'Courbe Taux', icon: 'LineChart', component: 'YieldCurveTab' },
+            { id: 'marches-nouvelles', label: 'Nouvelles', icon: 'Newspaper', component: 'NouvellesTab' }
+        ],
+        'titres': [
+            { id: 'titres-portfolio', label: 'Mon Portfolio', icon: 'Wallet', component: 'StocksNewsTab:portfolio' },
+            { id: 'titres-watchlist', label: 'Watchlist', icon: 'Star', component: 'StocksNewsTab:watchlist' },
+            { id: 'titres-3p1', label: 'Finance Pro', icon: 'PieChart', component: 'redirect:/3p1' },
+            { id: 'titres-seeking', label: 'Seeking Alpha', icon: 'Newspaper', component: 'SeekingAlphaTab' },
+            { id: 'titres-compare', label: 'Comparer', icon: 'GitCompare', component: 'FinanceProPanel' }
+        ],
+        'jlab': [
+            { id: 'jlab-terminal', label: 'Terminal', icon: 'Terminal', component: 'JLabTab' },
+            { id: 'jlab-advanced', label: 'Analyse Pro', icon: 'Activity', component: 'AdvancedAnalysisTab' },
+            { id: 'jlab-screener', label: 'Screener', icon: 'Search', component: 'FinanceProPanel:screener' },
+            { id: 'jlab-ratios', label: 'Ratios', icon: 'TrendingUp', component: 'FinanceProPanel:ratios' }
+        ],
+        'emma': [
+            { id: 'emma-chat', label: 'Chat Emma', icon: 'MessageSquare', component: 'AskEmmaTab' },
+            { id: 'emma-vocal', label: 'Assistant Vocal', icon: 'Mic', component: 'VoiceAssistantTab' },
+            { id: 'emma-group', label: 'Group Chat', icon: 'Users', component: 'GroupChatTab' },
+            { id: 'emma-terminal', label: 'Terminal', icon: 'Monitor', component: 'TerminalEmmaIATab' },
+            { id: 'emma-live', label: 'EmmAIA Live', icon: 'Radio', component: 'EmmAIATab' },
+            { id: 'emma-finvox', label: 'FinVox', icon: 'Headphones', component: 'FinVoxTab' }
+        ],
+        'tests': [
+            { id: 'tests-calendar', label: 'Calendrier', icon: 'Calendar', component: 'InvestingCalendarTab' },
+            { id: 'tests-sandbox', label: 'Sandbox', icon: 'Box', component: 'TestSandboxTab' },
+            { id: 'tests-debug', label: 'Debug', icon: 'Bug', component: 'DebugTab' }
+        ]
+    };
+
+    // Mapping old tab IDs to new structure (for backwards compatibility)
+    const TAB_ID_MAPPING = {
+        'admin-jsla': { main: 'admin', sub: 'admin-jsla' },
+        'email-briefings': { main: 'admin', sub: 'admin-briefings' },
+        'scrapping-sa': { main: 'admin', sub: 'admin-scraping' },
+        'fastgraphs': { main: 'admin', sub: 'admin-fastgraphs' },
+        'plus': { main: 'admin', sub: 'admin-settings' },
+        'emma-config': { main: 'admin', sub: 'admin-config' },
+        'markets-economy': { main: 'marches', sub: 'marches-global' },
+        'economic-calendar': { main: 'marches', sub: 'marches-calendar' },
+        'yield-curve': { main: 'marches', sub: 'marches-yield' },
+        'nouvelles': { main: 'marches', sub: 'marches-nouvelles' },
+        'stocks-news': { main: 'titres', sub: 'titres-portfolio' },
+        'dans-watchlist': { main: 'titres', sub: 'titres-watchlist' },
+        'finance-pro': { main: 'titres', sub: 'titres-3p1' },
+        'seeking-alpha': { main: 'titres', sub: 'titres-seeking' },
+        'advanced-analysis': { main: 'jlab', sub: 'jlab-advanced' },
+        'jlab': { main: 'jlab', sub: 'jlab-terminal' },
+        'ask-emma': { main: 'emma', sub: 'emma-chat' },
+        'assistant-vocal': { main: 'emma', sub: 'emma-vocal' },
+        'groupchat': { main: 'emma', sub: 'emma-group' },
+        'terminal-emmaia': { main: 'emma', sub: 'emma-terminal' },
+        'emmaia': { main: 'emma', sub: 'emma-live' },
+        'finvox': { main: 'emma', sub: 'emma-finvox' },
+        'investing-calendar': { main: 'tests', sub: 'tests-calendar' },
+        'tests-tab': { main: 'tests', sub: 'tests-sandbox' }
+    };
+
+    // Default sub-tab for each main tab
+    const DEFAULT_SUB_TABS = {
+        'admin': 'admin-settings',
+        'marches': 'marches-global',
+        'titres': 'titres-portfolio',
+        'jlab': 'jlab-terminal',
+        'emma': 'emma-chat',
+        'tests': 'tests-sandbox'
+    };
+
+    // Legacy: Keep MASTER_NAV_LINKS for backwards compatibility
     const MASTER_NAV_LINKS = [
         { id: 'jlab', label: 'JLab™', icon: 'LayoutDashboard' },
         { id: 'markets-economy', label: 'Marchés & Éco', icon: 'TrendingUp' },
         { id: 'ask-emma', label: 'Emma IA', icon: 'MessageSquare' },
         { id: 'assistant-vocal', label: 'Assistant Vocal', icon: 'Mic' },
         { id: 'groupchat', label: 'Group Chat', icon: 'Users' },
-        { id: 'terminal-emmaia', label: 'Terminal EmmAIA', icon: 'Monitor' }, // Updated icon
+        { id: 'terminal-emmaia', label: 'Terminal EmmAIA', icon: 'Monitor' },
         { id: 'emmaia', label: 'EmmAIA (Live)', icon: 'Brain' },
         { id: 'finvox', label: 'FinVox', icon: 'Activity' },
         { id: 'investing-calendar', label: 'Cal. Investing', icon: 'Calendar' },
@@ -541,7 +637,6 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     ];
 
     // Default configuration for secondary navigation per tab
-    // This defines which links show up when you are on a specific tab
     const DEFAULT_NAV_CONFIG = {
         'jlab': ['ask-emma', 'markets-economy', 'finance-pro', 'plus'],
         'ask-emma': ['jlab', 'assistant-vocal', 'plus'],
@@ -683,6 +778,50 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             }
             return 'jlab';
         }); // Onglet par défaut: JLAB (contient Titres & Nouvelles et Finance Pro)
+        
+        // New navigation state for 6-tab structure
+        const [mainTab, setMainTab] = useState(() => {
+            // Determine main tab from activeTab using mapping
+            const mapping = TAB_ID_MAPPING[activeTab];
+            return mapping ? mapping.main : 'jlab';
+        });
+        const [activeSubTab, setActiveSubTab] = useState(() => {
+            const mapping = TAB_ID_MAPPING[activeTab];
+            return mapping ? mapping.sub : 'jlab-terminal';
+        });
+        
+        // Helper function to get main tab from any tab ID
+        const getMainTabFromId = (tabId) => {
+            const mapping = TAB_ID_MAPPING[tabId];
+            if (mapping) return mapping.main;
+            // Check if it's already a main tab
+            if (MAIN_TABS.find(t => t.id === tabId)) return tabId;
+            // Check if it's a sub-tab ID
+            for (const [main, subs] of Object.entries(SUB_TABS)) {
+                if (subs.find(s => s.id === tabId)) return main;
+            }
+            return 'jlab'; // default
+        };
+        
+        // Enhanced tab change handler for new structure
+        const handleNewTabChange = (tabId) => {
+            // Check if it's a main tab
+            const isMainTab = MAIN_TABS.find(t => t.id === tabId);
+            if (isMainTab) {
+                setMainTab(tabId);
+                const defaultSub = DEFAULT_SUB_TABS[tabId];
+                setActiveSubTab(defaultSub);
+                // Also update legacy activeTab for backwards compatibility
+                setActiveTab(defaultSub);
+            } else {
+                // It's a sub-tab
+                const mainTabId = getMainTabFromId(tabId);
+                setMainTab(mainTabId);
+                setActiveSubTab(tabId);
+                setActiveTab(tabId);
+            }
+        };
+        
         const [navigationHistory, setNavigationHistory] = useState([]); // Historique de navigation pour le bouton Back
         const [tickers, setTickers] = useState([]);
         const [teamTickers, setTeamTickers] = useState([]);
