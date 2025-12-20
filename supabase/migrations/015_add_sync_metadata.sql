@@ -11,3 +11,4 @@ ON finance_pro_snapshots USING GIN (sync_metadata);
 -- Comment on column
 COMMENT ON COLUMN finance_pro_snapshots.sync_metadata IS 'JSON object containing detailed synchronization information (source, data retrieved, outliers, options, duration, etc.)';
 
+

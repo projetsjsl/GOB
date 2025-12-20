@@ -8542,6 +8542,23 @@ const calculateCAGR = (startValue, endValue, years) => {
   const result = (Math.pow(endValue / startValue, 1 / years) - 1) * 100;
   return isFinite(result) ? result : 0;
 };
+const calculateHistoricalGrowth = (data, metricKey, period = 5) => {
+  if (!data || data.length < 2) return 0;
+  const sorted = [...data].sort((a2, b) => Number(a2.year) - Number(b.year));
+  const last2 = sorted[sorted.length - 1];
+  const lastValue = Number(last2[metricKey]);
+  if (lastValue <= 0) return 0;
+  const targetStartYear = Number(last2.year) - period;
+  let startCandidate = sorted.filter((d) => Number(d.year) <= targetStartYear && Number(d[metricKey]) > 0).sort((a2, b) => Number(b.year) - Number(a2.year))[0];
+  if (!startCandidate) {
+    startCandidate = sorted.filter((d) => Number(d.year) < Number(last2.year) && Number(d[metricKey]) > 0).sort((a2, b) => Number(a2.year) - Number(b.year))[0];
+  }
+  if (!startCandidate) return 0;
+  const startValue = Number(startCandidate[metricKey]);
+  const years = Number(last2.year) - Number(startCandidate.year);
+  if (years < 1) return 0;
+  return calculateCAGR(startValue, lastValue, years);
+};
 const formatCurrency = (val) => {
   if (val === void 0 || val === null || !isFinite(val) || val === 0) {
     return "N/A";
@@ -35799,10 +35816,17 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
   };
   const growthMin = config2.growth.min;
   const growthMax = config2.growth.max;
-  const safeGrowthEPS = assumptions.growthRateEPS !== void 0 ? Math.max(growthMin, Math.min(assumptions.growthRateEPS, growthMax)) : void 0;
-  const safeGrowthCF = assumptions.growthRateCF !== void 0 ? Math.max(growthMin, Math.min(assumptions.growthRateCF, growthMax)) : void 0;
-  const safeGrowthBV = assumptions.growthRateBV !== void 0 ? Math.max(growthMin, Math.min(assumptions.growthRateBV, growthMax)) : void 0;
-  const safeGrowthDiv = assumptions.growthRateDiv !== void 0 ? Math.max(growthMin, Math.min(assumptions.growthRateDiv, growthMax)) : void 0;
+  const getSafeGrowth = (assumedGrowth, metricKey) => {
+    if (assumedGrowth !== void 0 && assumedGrowth !== 0) {
+      return Math.max(growthMin, Math.min(assumedGrowth, growthMax));
+    }
+    const historicalGrowth = calculateHistoricalGrowth(data, metricKey, 5);
+    return historicalGrowth !== 0 ? Math.max(growthMin, Math.min(historicalGrowth, growthMax)) : 0;
+  };
+  const safeGrowthEPS = getSafeGrowth(assumptions.growthRateEPS, "earningsPerShare");
+  const safeGrowthCF = getSafeGrowth(assumptions.growthRateCF, "cashFlowPerShare");
+  const safeGrowthBV = getSafeGrowth(assumptions.growthRateBV, "bookValuePerShare");
+  const safeGrowthDiv = getSafeGrowth(assumptions.growthRateDiv, "dividendPerShare");
   const futureValues = {
     eps: projectFutureValueSafe(baseValues.eps, safeGrowthEPS, 5),
     cf: projectFutureValueSafe(baseValues.cf, safeGrowthCF, 5),
@@ -35894,8 +35918,28 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     totalReturnPercent = -100;
   }
   const handleInput = (e, key) => {
-    const val = parseFloat(e.target.value);
-    if (!isNaN(val)) onUpdateAssumption(key, val);
+    const inputValue = e.target.value.trim();
+    if (inputValue === "" || inputValue === "-") {
+      onUpdateAssumption(key, 0);
+      return;
+    }
+    const val = parseFloat(inputValue);
+    if (!isNaN(val) && isFinite(val)) {
+      if (key === "targetPE" || key === "targetPCF") {
+        config2.ratios.pe.min;
+        config2.ratios.pe.max;
+      } else if (key === "targetPBV") {
+        config2.ratios.pbv.min;
+        config2.ratios.pbv.max;
+      } else if (key === "targetYield") {
+        config2.ratios.yield.min;
+        config2.ratios.yield.max;
+      } else if (key.includes("growthRate")) {
+        config2.growth.min;
+        config2.growth.max;
+      }
+      onUpdateAssumption(key, val);
+    }
   };
   const handleToggleExclusion = (metric) => {
     const currentValue = assumptions[metric] || false;
@@ -57724,10 +57768,11 @@ Vérifiez les logs de la console pour plus de détails.`;
         if (!newRow) {
           return existingRow;
         }
-        if (existingRow.autoFetched === false || existingRow.autoFetched === void 0) {
+        if (existingRow.autoFetched === false || existingRow.dataSource === "manual") {
           return existingRow;
         }
         const newRowTyped = newRow;
+        const hasPreservedValues = newRowTyped.earningsPerShare <= 0 && existingRow.earningsPerShare > 0 || newRowTyped.cashFlowPerShare <= 0 && existingRow.cashFlowPerShare > 0 || newRowTyped.bookValuePerShare <= 0 && existingRow.bookValuePerShare > 0 || newRowTyped.dividendPerShare <= 0 && existingRow.dividendPerShare > 0 || newRowTyped.priceHigh <= 0 && existingRow.priceHigh > 0 || newRowTyped.priceLow <= 0 && existingRow.priceLow > 0;
         return {
           ...existingRow,
           earningsPerShare: newRowTyped.earningsPerShare > 0 ? newRowTyped.earningsPerShare : existingRow.earningsPerShare,
@@ -57736,7 +57781,9 @@ Vérifiez les logs de la console pour plus de détails.`;
           dividendPerShare: newRowTyped.dividendPerShare > 0 ? newRowTyped.dividendPerShare : existingRow.dividendPerShare,
           priceHigh: newRowTyped.priceHigh > 0 ? newRowTyped.priceHigh : existingRow.priceHigh,
           priceLow: newRowTyped.priceLow > 0 ? newRowTyped.priceLow : existingRow.priceLow,
-          autoFetched: true
+          autoFetched: true,
+          dataSource: hasPreservedValues ? "fmp-adjusted" : "fmp-verified"
+          // ✅ Si valeurs préservées = ajusté, sinon vérifié
         };
       });
       result.data.forEach((newRow) => {
@@ -59156,6 +59203,38 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
   const firstYearData = data[0];
   const historicalCAGR_EPS = calculateCAGR((firstYearData == null ? void 0 : firstYearData.earningsPerShare) || 0, baseEPS, effectiveBaseYear - ((firstYearData == null ? void 0 : firstYearData.year) || effectiveBaseYear));
   const { recommendation, targetPrice, buyLimit, sellLimit } = calculateRecommendation(data, assumptions);
+  const calculateAverageTargetPrice = reactExports.useMemo(() => {
+    const baseYearData2 = data.find((d) => d.year === assumptions.baseYear) || data[data.length - 1];
+    const baseValues = {
+      eps: Math.max((baseYearData2 == null ? void 0 : baseYearData2.earningsPerShare) || 0, 0),
+      cf: Math.max((baseYearData2 == null ? void 0 : baseYearData2.cashFlowPerShare) || 0, 0),
+      bv: Math.max((baseYearData2 == null ? void 0 : baseYearData2.bookValuePerShare) || 0, 0),
+      div: Math.max(assumptions.currentDividend || 0, 0)
+    };
+    const futureValues = {
+      eps: projectFutureValue(baseValues.eps, assumptions.growthRateEPS || 0, 5),
+      cf: projectFutureValue(baseValues.cf, assumptions.growthRateCF || 0, 5),
+      bv: projectFutureValue(baseValues.bv, assumptions.growthRateBV || 0, 5),
+      div: projectFutureValue(baseValues.div, assumptions.growthRateDiv || 0, 5)
+    };
+    const targets = {
+      eps: futureValues.eps > 0 && assumptions.targetPE > 0 ? futureValues.eps * assumptions.targetPE : null,
+      cf: futureValues.cf > 0 && assumptions.targetPCF > 0 ? futureValues.cf * assumptions.targetPCF : null,
+      bv: futureValues.bv > 0 && assumptions.targetPBV > 0 ? futureValues.bv * assumptions.targetPBV : null,
+      div: futureValues.div > 0 && assumptions.targetYield > 0 ? futureValues.div / (assumptions.targetYield / 100) : null
+    };
+    const currentPrice = Math.max(assumptions.currentPrice || 0, 0.01);
+    const maxReasonableTarget = currentPrice * 50;
+    const minReasonableTarget = currentPrice * 0.1;
+    const validTargets = [
+      !assumptions.excludeEPS && targets.eps !== null && targets.eps > 0 && targets.eps >= minReasonableTarget && targets.eps <= maxReasonableTarget && isFinite(targets.eps) ? targets.eps : null,
+      !assumptions.excludeCF && targets.cf !== null && targets.cf > 0 && targets.cf >= minReasonableTarget && targets.cf <= maxReasonableTarget && isFinite(targets.cf) ? targets.cf : null,
+      !assumptions.excludeBV && targets.bv !== null && targets.bv > 0 && targets.bv >= minReasonableTarget && targets.bv <= maxReasonableTarget && isFinite(targets.bv) ? targets.bv : null,
+      !assumptions.excludeDIV && targets.div !== null && targets.div > 0 && targets.div >= minReasonableTarget && targets.div <= maxReasonableTarget && isFinite(targets.div) ? targets.div : null
+    ].filter((t) => t !== null && t > 0 && isFinite(t));
+    return validTargets.length > 0 ? validTargets.reduce((a2, b) => a2 + b, 0) / validTargets.length : targetPrice;
+  }, [data, assumptions, targetPrice]);
+  const chartTargetPrice = calculateAverageTargetPrice;
   const availableYears = data.map((d) => d.year);
   isBulkSyncing ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "fixed bottom-4 right-4 bg-slate-800 p-4 rounded-lg shadow-xl border border-slate-700 z-[100] w-80 animate-in fade-in slide-in-from-bottom-5", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center mb-2", children: [
@@ -59422,7 +59501,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 currentPrice: assumptions.currentPrice,
                 buyPrice: buyLimit,
                 sellPrice: sellLimit,
-                targetPrice,
+                targetPrice: chartTargetPrice,
                 recommendation
               }
             ),

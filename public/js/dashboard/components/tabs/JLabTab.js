@@ -19,6 +19,14 @@ const JLabTab = () => {
     const refreshAllStocks = dashboard.refreshAllStocks;
     const fetchLatestNewsForTickers = dashboard.fetchLatestNewsForTickers;
     const getCompanyLogo = window.BetaCombinedDashboardData?.getCompanyLogo || dashboard.getCompanyLogo;
+    
+    // Global functions from main dashboard
+    const emmaPopulateJLab = window.emmaPopulateJLab || (() => console.warn('emmaPopulateJLab not available'));
+    const setEmmaPrefillMessage = dashboard.setEmmaPrefillMessage || (() => {});
+    const handleTabChange = dashboard.handleTabChange || (() => {});
+    
+    // Icon components
+    const IconoirIcon = window.IconoirIcon;
 
     const [time, setTime] = useState(new Date());
     const [selectedStock, setSelectedStock] = useState('AAPL');
@@ -1629,325 +1637,259 @@ const JLabTab = () => {
                 </div>
             )}
 
-            {/* Header */}
-            <div className="mb-2">
-                <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                        <div className={`p-1.5 border rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
-                            }`}>
-                            <LucideIcon name="Activity" className="w-4 h-4 text-gray-400" />
+            {/* PREMIUM JLAB HEADER */}
+            <div className={`p-5 mb-4 rounded-2xl border backdrop-blur-sm transition-all duration-500 ${
+                isDarkMode 
+                    ? 'bg-gradient-to-r from-neutral-900/80 to-neutral-800/60 border-neutral-700/50 shadow-xl shadow-black/20' 
+                    : 'bg-gradient-to-r from-white/90 to-gray-50/80 border-gray-200 shadow-lg'
+            }`}>
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    {/* Left: Logo & Title */}
+                    <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-blue-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            {IconoirIcon ? (
+                                <IconoirIcon name="Flask" className="w-7 h-7 text-white relative z-10" />
+                            ) : (
+                                <LucideIcon name="Activity" className="w-7 h-7 text-white relative z-10" />
+                            )}
                         </div>
                         <div>
-                            <h1 className={`text-base font-bold flex items-center gap-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
+                            <div className="flex items-center gap-3 mb-1">
+                                <h1 className={`text-2xl font-black tracking-tight ${
+                                    isDarkMode 
+                                        ? 'bg-gradient-to-r from-white via-blue-100 to-emerald-200 bg-clip-text text-transparent' 
+                                        : 'text-gray-900'
                                 }`}>
-                                JLAB - Hub d'analyse multifonctions
+                                    JLab™ Terminal
+                                </h1>
                                 {connected ? (
-                                    <LucideIcon name="Wifi" className="w-3 h-3 text-green-500" />
+                                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30">
+                                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                        <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Live</span>
+                                    </div>
                                 ) : (
-                                    <LucideIcon name="WifiOff" className="w-3 h-3 text-red-500" />
-                                )}
-                                {/* 🎯 Badge Score JSLAI™ avec Glow Animation - VAGUE 3+4 */}
-                                {stockDataJLab?.jslaiScore && (
-                                    <div className={`px-4 py-1.5 rounded text-sm font-bold border-2 ${stockDataJLab.jslaiScore.total >= 75 ? 'bg-emerald-900/30 text-emerald-400 border-emerald-600 glow-pulse' :
-                                        stockDataJLab.jslaiScore.total >= 65 ? 'bg-gray-900/30 text-gray-400 border-gray-600' :
-                                            stockDataJLab.jslaiScore.total >= 50 ? 'bg-yellow-900/30 text-yellow-400 border-yellow-600' :
-                                                'bg-red-900/30 text-red-400 border-red-600 glow-pulse-red'
-                                        }`}>
-                                        🎯 JSLAI™ {stockDataJLab.jslaiScore.total}/100
+                                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/15 border border-red-500/30">
+                                        <div className="w-2 h-2 rounded-full bg-red-500" />
+                                        <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider">Offline</span>
                                     </div>
                                 )}
-                                {/* Emma AI Analysis Button with Avatar */}
-                                <button
-                                    onClick={() => {
-                                        const analysisRequest = `Analyse approfondie de ${selectedStock}: fondamentaux, techniques, actualités et recommandation d'investissement`;
-                                        // Set prefill message first, then switch tab after a short delay
-                                        setEmmaPrefillMessage(analysisRequest);
-                                        setTimeout(() => handleTabChange('ask-emma'), 50);
-                                    }}
-                                    className={`flex items-center gap-2 px-4 py-1.5 rounded text-sm font-semibold border-2 transition-all hover:scale-105 ${isDarkMode
-                                        ? 'bg-purple-900/30 hover:bg-purple-800/40 text-purple-400 border-purple-600'
-                                        : 'bg-purple-100 hover:bg-purple-200 text-purple-700 border-purple-400'
-                                        }`}
-                                    title={`Demander une analyse détaillée de ${selectedStock} à Emma IA`}
-                                >
-                                    <img
-                                        src="EMMA-JSLAI-GOB-dark.jpg"
-                                        alt="Emma"
-                                        className="w-4 h-4 rounded-full"
-                                    />
-                                    Analyse d'Emma IA
-                                </button>
-                            </h1>
-                            <p className="text-[8px] text-gray-600">
-                                {stockDataJLab?.dataQuality ? (
-                                    <>
-                                        📊 Qualité: {stockDataJLab.dataQuality.quality_percentage}% ({stockDataJLab.dataQuality.production_sections}/{stockDataJLab.dataQuality.total_sections} réelles)
-                                        {stockDataJLab.dataQuality.status === 'EXCELLENT' && ' ✅'}
-                                        {stockDataJLab.dataQuality.status === 'GOOD' && ' 🟢'}
-                                        {stockDataJLab.dataQuality.status === 'FAIR' && ' 🟡'}
-                                        {stockDataJLab.dataQuality.status === 'POOR' && ' 🔴'}
-                                    </>
-                                ) : (
-                                    'Mode Démo Hybride • FMP + Perplexity AI'
+                            </div>
+                            <div className="flex items-center gap-3 text-[11px]">
+                                <span className="text-gray-500 font-medium">Quantum Core™</span>
+                                {stockDataJLab?.dataQuality && (
+                                    <span className={`font-bold ${
+                                        stockDataJLab.dataQuality.quality_percentage > 80 ? 'text-emerald-400' : 'text-yellow-400'
+                                    }`}>
+                                        {stockDataJLab.dataQuality.quality_percentage}% Accurate
+                                    </span>
                                 )}
-                                {stockDataJLab?.jslaiScore && (
-                                    <span className="ml-2">• {stockDataJLab.jslaiScore.interpretation} ({stockDataJLab.jslaiScore.recommendation})</span>
-                                )}
-                            </p>
+                                <span className="text-gray-600">•</span>
+                                <span className="font-mono text-gray-400">{time.toLocaleTimeString()}</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={async () => {
-                                try {
-                                    setLoadingJLab(true);
-                                    console.log('🔄 Actualisation des données...');
-                                    const realData = await fetchRealStockData(selectedStock, timeframe);
-                                    if (realData && realData.quote && realData.quote.price > 0) {
-                                        setStockDataJLab(realData);
-                                        setConnected(true);
-                                        setLastUpdateJLab(new Date());
-                                        console.log('✅ Données actualisées avec succès');
-                                    } else {
-                                        throw new Error('Données invalides reçues de l\'API');
-                                    }
-                                } catch (error) {
-                                    console.error('❌ Erreur lors de l\'actualisation:', error);
-                                    setConnected(false);
-                                } finally {
-                                    setLoadingJLab(false);
-                                }
-                            }}
-                            className={`p-1.5 border rounded-md transition-all ${isDarkMode
-                                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800'
-                                : 'bg-white hover:bg-gray-100 border-gray-300'
-                                }`}
-                        >
-                            <LucideIcon name="RefreshCw" className="w-3 h-3 text-gray-400" />
-                        </button>
-
+                    {/* Right: Controls */}
+                    <div className="flex items-center gap-3 flex-wrap">
+                        {/* Emma AI Button */}
                         <button
                             onClick={emmaPopulateJLab}
                             disabled={loadingJLab}
-                            className={`px-3 py-1.5 border rounded-lg transition-all flex items-center gap-2 ${isDarkMode
-                                ? 'bg-purple-900 hover:bg-purple-800 border-purple-800 text-purple-200'
-                                : 'bg-purple-600 hover:bg-purple-700 border-purple-600 text-white'
-                                } disabled:opacity-50`}
+                            className="group flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-600/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <span>🤖</span>
-                            <span className="text-xs font-semibold">Emma Populate</span>
+                            <div className="bg-white/20 p-1 rounded-lg">
+                                {IconoirIcon ? (
+                                    <IconoirIcon name="Brain" className="w-4 h-4 transition-transform group-hover:rotate-12" />
+                                ) : (
+                                    <LucideIcon name="Sparkles" className="w-4 h-4" />
+                                )}
+                            </div>
+                            <div className="text-left">
+                                <div className="text-[8px] font-bold uppercase tracking-wider opacity-70 leading-none">Intelligence</div>
+                                <div className="text-sm font-bold leading-tight">Emma AI™</div>
+                            </div>
                         </button>
 
+                        {/* Divider */}
+                        <div className={`h-10 w-px ${isDarkMode ? 'bg-neutral-700/50' : 'bg-gray-300'}`} />
+
+                        {/* Stock Selector */}
                         <div className="relative">
                             <button
                                 onClick={() => setMenuOpen(!menuOpen)}
-                                className={`flex items-center gap-2 px-3 py-1.5 border rounded-lg transition-all ${isDarkMode
-                                    ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800'
-                                    : 'bg-white hover:bg-gray-100 border-gray-300'
-                                    }`}
+                                className={`flex flex-col items-center justify-center w-20 h-12 rounded-xl border transition-all duration-300 ${
+                                    isDarkMode 
+                                        ? 'bg-neutral-800/50 border-neutral-700 hover:border-blue-500/50 hover:bg-neutral-800' 
+                                        : 'bg-white border-gray-200 hover:border-blue-400'
+                                }`}
                             >
-                                <div>
-                                    <div className={`text-xs font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                        }`}>{selectedStock}</div>
-                                    <div className="text-[8px] text-gray-600">{profile.companyName || currentStock?.name}</div>
-                                </div>
-                                <LucideIcon name="ChevronDown" className={`w-3 h-3 text-gray-400 transition-transform ${menuOpen ? 'rotate-180' : ''}`} />
+                                <span className="text-[8px] font-bold text-gray-500 uppercase tracking-wider">Ticker</span>
+                                <span className="text-lg font-black text-blue-400 leading-none">{selectedStock}</span>
                             </button>
-
+                            
                             {menuOpen && (
-                                <div className={`absolute top-full mt-1 right-0 w-48 border rounded-lg shadow-2xl overflow-hidden z-50 transition-colors duration-300 ${isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
-                                    }`}>
-                                    {stocks.map((stock) => (
-                                        <button
-                                            key={stock.symbol}
-                                            onClick={() => {
-                                                setSelectedStock(stock.symbol);
-                                                setMenuOpen(false);
-                                            }}
-                                            className={`w-full p-2 flex items-center justify-between transition-all text-xs ${selectedStock === stock.symbol
-                                                ? (isDarkMode ? 'bg-neutral-800' : 'bg-gray-100')
-                                                : (isDarkMode ? 'hover:bg-neutral-800' : 'hover:bg-gray-50')
-                                                }`}
-                                        >
-                                            <div className="text-left">
-                                                <div className={`font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                                    }`}>{stock.symbol}</div>
-                                                <div className="text-[8px] text-gray-600">{stock.name}</div>
-                                            </div>
-                                        </button>
-                                    ))}
+                                <div className={`absolute top-full mt-2 right-0 w-56 rounded-xl border shadow-2xl z-[100] overflow-hidden ${
+                                    isDarkMode ? 'bg-neutral-900 border-neutral-700' : 'bg-white border-gray-200'
+                                }`}>
+                                    <div className={`p-2.5 border-b ${isDarkMode ? 'border-neutral-800 bg-neutral-900/50' : 'border-gray-100'}`}>
+                                        <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Sélectionner un Actif</h4>
+                                    </div>
+                                    <div className="max-h-64 overflow-y-auto">
+                                        {stocks.map(s => (
+                                            <button
+                                                key={s.symbol}
+                                                onClick={() => { setSelectedStock(s.symbol); setMenuOpen(false); }}
+                                                className={`w-full p-3 flex items-center justify-between transition-colors border-b last:border-b-0 ${
+                                                    isDarkMode ? 'border-neutral-800 hover:bg-blue-500/10' : 'border-gray-100 hover:bg-blue-50'
+                                                } ${selectedStock === s.symbol ? (isDarkMode ? 'bg-blue-500/5' : 'bg-blue-50') : ''}`}
+                                            >
+                                                <div className="flex items-center gap-2.5">
+                                                    <div className={`w-7 h-7 rounded flex items-center justify-center font-bold text-[10px] ${
+                                                        isDarkMode ? 'bg-neutral-800 text-neutral-400' : 'bg-gray-100 text-gray-500'
+                                                    }`}>
+                                                        {s.symbol[0]}
+                                                    </div>
+                                                    <div className="text-left">
+                                                        <div className={`font-bold text-sm ${
+                                                            selectedStock === s.symbol ? 'text-blue-400' : (isDarkMode ? 'text-white' : 'text-gray-900')
+                                                        }`}>{s.symbol}</div>
+                                                        <div className="text-[10px] text-gray-500 truncate max-w-[120px]">{s.name}</div>
+                                                    </div>
+                                                </div>
+                                                {selectedStock === s.symbol && (
+                                                    <div className="w-2 h-2 rounded-full bg-blue-500 shadow-lg shadow-blue-500/50" />
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </div>
 
-                        <div className="text-right">
-                            <div className="text-xs font-mono font-bold text-gray-300">
-                                {time.toLocaleTimeString('fr-FR')}
-                            </div>
-                            <div className="text-[8px] text-gray-600">
-                                {time.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                        {/* Refresh Button */}
+                        <button
+                            onClick={async () => {
+                                setLoadingJLab(true);
+                                const realData = await fetchRealStockData(selectedStock, timeframe);
+                                if (realData) setStockDataJLab(realData);
+                                setLoadingJLab(false);
+                                setLastUpdateJLab(new Date());
+                            }}
+                            className={`p-2.5 rounded-xl border transition-all duration-300 ${
+                                isDarkMode 
+                                    ? 'bg-neutral-800/50 border-neutral-700 hover:border-emerald-500/50 hover:text-emerald-400' 
+                                    : 'bg-white border-gray-200 hover:border-emerald-400 hover:text-emerald-600'
+                            } text-gray-500`}
+                            title="Actualiser les données"
+                        >
+                            <LucideIcon name="RefreshCw" className={`w-4 h-4 ${loadingJLab ? 'animate-spin' : ''}`} />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* QUICK ACTIONS BAR */}
+            <div className="flex items-center justify-between mb-4 px-1">
+                <div className="flex gap-2">
+                    <button 
+                        onClick={() => setShowScreener(!showScreener)} 
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${
+                            showScreener 
+                                ? 'bg-emerald-600 border-emerald-500 text-white shadow-lg shadow-emerald-500/25' 
+                                : (isDarkMode 
+                                    ? 'bg-neutral-800/50 border-neutral-700 text-gray-400 hover:text-white hover:border-neutral-600' 
+                                    : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300')
+                        }`}
+                    >
+                        <LucideIcon name="Filter" className="w-4 h-4" />
+                        <span className="text-xs font-bold uppercase tracking-wide">Screener</span>
+                    </button>
+                    
+                    <button 
+                        onClick={() => setShowAnalysisModal(true)} 
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${
+                            isDarkMode 
+                                ? 'bg-neutral-800/50 border-neutral-700 text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/30' 
+                                : 'bg-white border-gray-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300'
+                        }`}
+                    >
+                        <LucideIcon name="TrendingUp" className="w-4 h-4" />
+                        <span className="text-xs font-bold uppercase tracking-wide">Analyse</span>
+                    </button>
+                    
+                    <button 
+                        onClick={() => setShowHelp(!showHelp)} 
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${
+                            showHelp 
+                                ? (isDarkMode ? 'bg-blue-500/10 border-blue-500/30 text-blue-400' : 'bg-blue-50 border-blue-300 text-blue-600')
+                                : (isDarkMode 
+                                    ? 'bg-neutral-800/50 border-neutral-700 text-gray-400 hover:text-white' 
+                                    : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900')
+                        }`}
+                    >
+                        <LucideIcon name="HelpCircle" className="w-4 h-4" />
+                        <span className="text-xs font-bold uppercase tracking-wide">Aide</span>
+                    </button>
+                </div>
+
+                {/* Time Display */}
+                <div className="text-right">
+                    <div className={`text-xs font-mono font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        {time.toLocaleTimeString('fr-FR')}
+                    </div>
+                    <div className="text-[10px] text-gray-500">
+                        {time.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })}
+                    </div>
+                </div>
+            </div>
+
+            {/* HELP MODAL */}
+            {showHelp && (
+                <div className={`mb-4 p-4 rounded-xl border transition-all duration-300 ${
+                    isDarkMode ? 'bg-neutral-900/80 border-neutral-700' : 'bg-white border-gray-200 shadow-lg'
+                }`}>
+                    <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                            <LucideIcon name="LifeBuoy" className="w-5 h-5 text-blue-500" />
+                            <div>
+                                <h3 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    Aide & Diagnostics JLab
+                                </h3>
+                                <p className="text-[10px] text-gray-500">Mode Hybride • FMP + JSLAI™</p>
                             </div>
                         </div>
-
-                        <div className="flex gap-1">
-                            <button
-                                onClick={() => setShowScreener(!showScreener)}
-                                className={`p-1.5 border rounded-md transition-all ${showScreener
-                                    ? 'bg-gray-800 border-gray-800'
-                                    : (isDarkMode
-                                        ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800'
-                                        : 'bg-white hover:bg-gray-100 border-gray-300')
-                                    }`}
-                                title="Ouvrir le screener de titres"
-                            >
-                                <LucideIcon name="Filter" className={`w-3 h-3 ${showScreener ? 'text-white' : 'text-gray-500'}`} />
-                            </button>
-                            <button
-                                onClick={() => setShowAnalysisModal(true)}
-                                className={`p-1.5 border rounded-md transition-all ${isDarkMode
-                                    ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800'
-                                    : 'bg-white hover:bg-gray-100 border-gray-300'
-                                    }`}
-                                title="Analyse approfondie du titre"
-                            >
-                                <LucideIcon name="TrendingUp" className="w-3 h-3 text-blue-500" />
-                            </button>
-                            <button className={`p-1.5 border rounded-md transition-all ${isDarkMode
-                                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800'
-                                : 'bg-white hover:bg-gray-100 border-gray-300'
-                                }`}>
-                                <LucideIcon name="Bell" className="w-3 h-3 text-gray-500" />
-                            </button>
-                            <button className={`p-1.5 border rounded-md transition-all ${isDarkMode
-                                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800'
-                                : 'bg-white hover:bg-gray-100 border-gray-300'
-                                }`}>
-                                <LucideIcon name="Search" className="w-3 h-3 text-gray-500" />
-                            </button>
-                            <button className={`p-1.5 border rounded-md transition-all ${isDarkMode
-                                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800'
-                                : 'bg-white hover:bg-gray-100 border-gray-300'
-                                }`}>
-                                <LucideIcon name="Settings" className="w-3 h-3 text-gray-500" />
-                            </button>
-                            {/* HelpPop / Violations */}
-                            <div className="relative">
-                                <button
-                                    onClick={() => setShowHelp(!showHelp)}
-                                    className={`p-1.5 border rounded-md transition-all ${isDarkMode
-                                        ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800'
-                                        : 'bg-white hover:bg-gray-100 border-gray-300'
-                                        }`}
-                                    title={violations.length ? 'Diagnostics: problèmes détectés' : 'Aide JLab'}
-                                >
-                                    <div className="relative">
-                                        <LucideIcon name={violations.length ? 'AlertTriangle' : 'HelpCircle'} className={`w-3 h-3 ${violations.length ? 'text-yellow-500' : 'text-gray-500'}`} />
-                                        {violations.length > 0 && (
-                                            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full"></span>
-                                        )}
-                                    </div>
-                                </button>
-
-                                {showHelp && (
-                                    <div className={`absolute right-0 mt-2 w-80 border rounded-xl shadow-2xl z-50 ${isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
-                                        }`}>
-                                        <div className={`p-3 border-b flex items-center justify-between gap-2 ${isDarkMode ? 'border-neutral-800' : 'border-gray-200'}`}>
-                                            <div className="flex items-center gap-2">
-                                                <LucideIcon name="LifeBuoy" className="w-4 h-4 text-blue-500" />
-                                                <div>
-                                                    <div className={`text-xs font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Aide & diagnostics JLab</div>
-                                                    <div className="text-[10px] text-gray-500">Mode Démo Hybride • FMP + Perplexity</div>
-                                                </div>
-                                            </div>
-                                            <button onClick={() => setShowHelp(false)} className={`p-1 rounded ${isDarkMode ? 'hover:bg-neutral-800' : 'hover:bg-gray-100'}`}>
-                                                <LucideIcon name="X" className="w-3 h-3 text-gray-500" />
-                                            </button>
-                                        </div>
-                                        <div className="p-3 space-y-2 text-[11px]">
-                                            {violations.length > 0 ? (
-                                                <div>
-                                                    <div className={`mb-1 font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Problèmes détectés</div>
-                                                    <ul className="space-y-1">
-                                                        {violations.map((v, i) => (
-                                                            <li key={i} className={`p-2 rounded border ${v.severity === 'high' ? (isDarkMode ? 'bg-red-900/30 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-800') :
-                                                                v.severity === 'medium' ? (isDarkMode ? 'bg-yellow-900/30 border-yellow-800 text-yellow-200' : 'bg-yellow-50 border-yellow-200 text-yellow-800') :
-                                                                    (isDarkMode ? 'bg-gray-900/30 border-gray-800 text-gray-200' : 'bg-gray-50 border-gray-200 text-gray-800')
-                                                                }`}>
-                                                                {v.message}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            ) : (
-                                                <div className={`p-2 rounded border ${isDarkMode ? 'bg-emerald-900/20 border-emerald-800 text-emerald-200' : 'bg-emerald-50 border-emerald-200 text-emerald-800'}`}>
-                                                    Aucun problème détecté.
-                                                </div>
-                                            )}
-
-                                            <div className={`pt-1 border-t ${isDarkMode ? 'border-neutral-800' : 'border-gray-200'}`} />
-                                            <div className="space-y-1">
-                                                <div className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Conseils rapides</div>
-                                                <ul className="list-disc pl-4 space-y-1 text-gray-500">
-                                                    <li>Les graphiques utilisent Chart.js pour afficher les données en temps réel.</li>
-                                                    <li>Les données proviennent de FMP et Marketaux via les APIs configurées.</li>
-                                                    <li>Actualisez avec le bouton rafraîchir pour recharger les dernières données du marché.</li>
-                                                    <li>Les graphiques s'adaptent au thème sombre/clair automatiquement.</li>
-                                                </ul>
-
-                                                <div className={`mt-2 pt-2 border-t ${isDarkMode ? 'border-neutral-800' : 'border-gray-200'}`} />
-                                                <div className="space-y-1">
-                                                    <div className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Code couleur des métriques</div>
-                                                    <div className="grid grid-cols-2 gap-1 text-[10px]">
-                                                        <div className="flex items-center gap-1">
-                                                            <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                                                            <span>Excellent / Sous-évalué</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <div className="w-2 h-2 rounded-full bg-gray-700"></div>
-                                                            <span>Bon / Juste valorisé</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                                                            <span>Moyen / Attention</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                                                            <span>Faible / Risque</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                                                            <span>Mauvais / Danger</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <div className="w-2 h-2 rounded-full bg-gray-400"></div>
-                                                            <span>Non disponible</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className={`mt-2 pt-2 border-t ${isDarkMode ? 'border-neutral-800' : 'border-gray-200'}`} />
-                                                <div className="space-y-1">
-                                                    <div className={`font-semibold text-[10px] ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Standards utilisés</div>
-                                                    <ul className="space-y-0.5 text-[9px] text-gray-500">
-                                                        <li><strong>P/E:</strong> &lt;15 excellent, 15-25 bon, &gt;25 élevé</li>
-                                                        <li><strong>PEG:</strong> &lt;1 sous-évalué (Peter Lynch), &gt;2 surévalué</li>
-                                                        <li><strong>ROE:</strong> &gt;20% excellent (Warren Buffett), &gt;15% bon</li>
-                                                        <li><strong>D/E:</strong> &lt;0.7 sain, &gt;2 risqué</li>
-                                                        <li><strong>Marge:</strong> &gt;20% excellente, 10-20% bonne</li>
-                                                        <li><strong>Beta:</strong> &lt;1 défensif, &gt;1.5 volatil</li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                        <button 
+                            onClick={() => setShowHelp(false)} 
+                            className={`p-1 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-neutral-800' : 'hover:bg-gray-100'}`}
+                        >
+                            <LucideIcon name="X" className="w-4 h-4 text-gray-500" />
+                        </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                        <div className={`p-3 rounded-lg border ${isDarkMode ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-emerald-50 border-emerald-200'}`}>
+                            <div className="text-emerald-500 font-bold text-[10px] uppercase tracking-wider mb-1">Indicateurs Sains</div>
+                            <p className="text-[11px] text-gray-500">P/E &lt; 15, PEG &lt; 1, ROE &gt; 20%</p>
+                        </div>
+                        <div className={`p-3 rounded-lg border ${isDarkMode ? 'bg-yellow-500/5 border-yellow-500/20' : 'bg-yellow-50 border-yellow-200'}`}>
+                            <div className="text-yellow-500 font-bold text-[10px] uppercase tracking-wider mb-1">Points de Vigilance</div>
+                            <p className="text-[11px] text-gray-500">P/E &gt; 25, D/E &gt; 2, RSI extrêmes</p>
+                        </div>
+                    </div>
+                    
+                    <div className={`p-3 rounded-lg border ${isDarkMode ? 'bg-neutral-800/50 border-neutral-700' : 'bg-gray-50 border-gray-200'}`}>
+                        <h4 className="font-bold text-[11px] text-gray-400 uppercase tracking-wider mb-2">Glossaire Rapide</h4>
+                        <div className="grid grid-cols-3 gap-2 text-[10px]">
+                            <div><strong className="text-blue-400">PEG:</strong> <span className="text-gray-500">Croissance / PE</span></div>
+                            <div><strong className="text-blue-400">Beta:</strong> <span className="text-gray-500">Volatilité marché</span></div>
+                            <div><strong className="text-blue-400">RSI:</strong> <span className="text-gray-500">Momentum 0-100</span></div>
                         </div>
                     </div>
                 </div>
+            )}
 
-                {/* Grid Layout */}
+     {/* Grid Layout */}
                 <div className="grid grid-cols-12 gap-2">
 
                     {/* Colonne gauche */}
@@ -3037,7 +2979,6 @@ const JLabTab = () => {
                     </div>
                 </div>
             </div>
-        </div>
     );
 };
 

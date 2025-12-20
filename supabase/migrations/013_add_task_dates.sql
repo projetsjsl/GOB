@@ -49,3 +49,4 @@ WHERE start_date IS NULL OR end_date IS NULL;
 CREATE INDEX IF NOT EXISTS idx_task_templates_start_date ON public.task_templates(start_date);
 CREATE INDEX IF NOT EXISTS idx_task_templates_end_date ON public.task_templates(end_date);
 
+

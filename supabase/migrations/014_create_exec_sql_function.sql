@@ -31,3 +31,4 @@ GRANT EXECUTE ON FUNCTION exec_sql(TEXT) TO service_role;
 
 COMMENT ON FUNCTION exec_sql IS 'Execute SQL statements via RPC. Use with caution - requires SECURITY DEFINER privileges.';
 
+
