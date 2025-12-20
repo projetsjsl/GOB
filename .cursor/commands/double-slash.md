@@ -71,14 +71,71 @@ scripts/test-*.js → CONSOLE (exécuter le script)
 
 **Si échec** : Corriger et réessayer (max 3 tentatives)
 
-## 5. APPRENTISSAGE DES RÉSULTATS
+## 5. TEST SCEPTIQUE RIGOUREUX 🔍
+
+**Philosophie**: Ne jamais faire confiance à un succès apparent. Toujours vérifier en profondeur avant push.
+
+### 5.1 Validation Multi-Niveaux (OBLIGATOIRE avant push)
+
+| Niveau | Vérification | Commande/Action |
+|--------|-------------|-----------------|
+| **Syntaxe** | Code compile sans erreur | `read_lints` sur fichiers modifiés |
+| **Runtime** | Pas d'erreurs console | Exécuter script de test |
+| **Données** | Valeurs réelles, non-nulles | Vérifier data !== null/undefined |
+| **Comportement** | Fonctionnalité opérationnelle | Test manuel ou automatisé |
+| **Régression** | Pas de cassure ailleurs | Tests croisés sur composants liés |
+
+### 5.2 Questions Sceptiques AVANT Push
+
+**Ne jamais push sans répondre OUI à toutes ces questions** :
+
+1. ❓ **Les données sont-elles réelles ?** (Pas juste un objet vide `{}` ou `[]`)
+2. ❓ **Le test couvre-t-il le cas réel ?** (Pas juste un mock/stub)
+3. ❓ **Ai-je testé les edge cases ?** (Valeurs nulles, chaînes vides, erreurs réseau)
+4. ❓ **La fonctionnalité marche de bout en bout ?** (Pas juste une partie)
+5. ❓ **Ai-je vérifié les composants liés ?** (Régression potentielle)
+6. ❓ **Les logs/console sont-ils propres ?** (Pas d'avertissements cachés)
+
+### 5.3 Vérifications Anti-Patterns
+
+**Patterns d'erreurs fréquents** (référence: `docs/REPERTOIRE_COMPLET_ERREURS.md`) :
+
+| Pattern Dangereux | Vérification |
+|------------------|--------------|
+| Variable avant `useState` | Ordre de déclaration correct ? |
+| `z-index` insuffisant | Hiérarchie modals > dropdowns > content ? |
+| Composant non exposé | `window.ComponentName = ComponentName` présent ? |
+| Référence non définie | Protection `typeof var !== 'undefined'` ? |
+| Données nulles | Fallback ou gestion d'erreur ? |
+
+### 5.4 Checklist Finale Sceptique
+
+**Valider TOUS ces points avant push** :
+
+- [ ] ✅ Code compile (0 erreurs lint)
+- [ ] ✅ Script termine avec code 0
+- [ ] ✅ Données réelles retournées (pas vides)
+- [ ] ✅ Fonctionnalité testée de bout en bout
+- [ ] ✅ Pas de régression sur composants liés
+- [ ] ✅ Console propre (pas d'erreurs/warnings cachés)
+- [ ] ✅ Edge cases couverts (null, vide, erreur)
+
+### 5.5 Si un doute persiste
+
+**NE PAS PUSH** et :
+1. Exécuter des tests supplémentaires
+2. Vérifier les composants liés
+3. Consulter `docs/REPERTOIRE_COMPLET_ERREURS.md` pour patterns connus
+4. Tester manuellement la fonctionnalité
+
+## 6. APPRENTISSAGE DES RÉSULTATS
 
 Documenter les solutions dans la conversation pour éviter répétition :
 - Erreurs de syntaxe → Patterns à éviter
 - Erreurs runtime → Corrections appliquées
 - Erreurs de build → Configurations nécessaires
 
-## 6. CRÉATION DU MESSAGE DE COMMIT
+## 7. CRÉATION DU MESSAGE DE COMMIT
 
 **Format** : `[Type]: [Description concise]`
 
@@ -92,7 +149,7 @@ Documenter les solutions dans la conversation pour éviter répétition :
 - Nouveau composant → `Feature: SyncReportDialog avec export CSV/JSON et graphiques`
 - Tests réussis → `Fix: [Description de la correction]` ou `Feature: [Description de la fonctionnalité]`
 
-## 7. PUSH
+## 8. PUSH
 
 **Séquence** :
 ```bash

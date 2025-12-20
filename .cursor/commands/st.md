@@ -97,7 +97,80 @@ supabase/migrations/*.sql → CODE (syntaxe SQL via read_lints)
 
 **Limite** : Maximum 3 tentatives par type de test avant d'informer l'utilisateur
 
-## 6. APPRENTISSAGE DES ÉCHECS
+## 6. TEST SCEPTIQUE RIGOUREUX 🔍
+
+**Philosophie**: Ne jamais faire confiance à un succès apparent. Toujours vérifier en profondeur.
+
+### 6.1 Validation Multi-Niveaux
+
+Pour chaque modification, appliquer le **principe de scepticisme** :
+
+| Niveau | Vérification | Commande/Action |
+|--------|-------------|-----------------|
+| **Syntaxe** | Code compile sans erreur | `read_lints` sur fichiers modifiés |
+| **Runtime** | Pas d'erreurs console | Exécuter script de test |
+| **Données** | Valeurs réelles, non-nulles | Vérifier que data !== null/undefined |
+| **Comportement** | Fonctionnalité opérationnelle | Test manuel ou automatisé |
+| **Régression** | Pas de cassure ailleurs | Tests croisés sur composants liés |
+
+### 6.2 Questions Sceptiques à Se Poser
+
+**Avant de déclarer "succès"**, répondre OUI à toutes ces questions :
+
+1. ❓ **Les données sont-elles réelles ?** (Pas juste un objet vide `{}` ou `[]`)
+2. ❓ **Le test couvre-t-il le cas réel ?** (Pas juste un mock/stub)
+3. ❓ **Ai-je testé les edge cases ?** (Valeurs nulles, chaînes vides, erreurs réseau)
+4. ❓ **La fonctionnalité marche de bout en bout ?** (Pas juste une partie)
+5. ❓ **Ai-je vérifié les composants liés ?** (Régression potentielle)
+6. ❓ **Les logs/console sont-ils propres ?** (Pas d'avertissements cachés)
+
+### 6.3 Diagnostic Console Approfondi
+
+**Commandes de vérification à exécuter** :
+
+```javascript
+// Vérifier l'état global des composants
+Object.keys(window).filter(k => k.includes('Tab') || k.includes('Component'))
+
+// Vérifier les erreurs silencieuses
+console.error = (function(original) {
+    return function(...args) {
+        console.log('🚨 ERREUR CAPTURÉE:', ...args);
+        original.apply(console, args);
+    };
+})(console.error);
+
+// Vérifier les données
+typeof data !== 'undefined' && data !== null && Object.keys(data).length > 0
+```
+
+### 6.4 Vérifications Anti-Patterns
+
+**Patterns d'erreurs fréquents** (référence: `docs/REPERTOIRE_COMPLET_ERREURS.md`) :
+
+| Pattern Dangereux | Vérification |
+|------------------|--------------|
+| Variable avant `useState` | Ordre de déclaration correct ? |
+| `z-index` insuffisant | Hiérarchie modals > dropdowns > content ? |
+| Composant non exposé | `window.ComponentName = ComponentName` présent ? |
+| Référence non définie | Protection `typeof var !== 'undefined'` ? |
+| Données nulles | Fallback ou gestion d'erreur ? |
+
+### 6.5 Checklist Finale Sceptique
+
+Avant de valider un test :
+
+- [ ] ✅ Code compile (0 erreurs lint)
+- [ ] ✅ Script termine avec code 0
+- [ ] ✅ Données réelles retournées (pas vides)
+- [ ] ✅ Fonctionnalité testée de bout en bout
+- [ ] ✅ Pas de régression sur composants liés
+- [ ] ✅ Console propre (pas d'erreurs/warnings cachés)
+- [ ] ✅ Edge cases couverts (null, vide, erreur)
+- [ ] ✅ Comportement identique en mode dark/light
+- [ ] ✅ Responsive testé (si UI modifiée)
+
+## 7. APPRENTISSAGE DES ÉCHECS
 
 Documenter les solutions dans la conversation pour éviter répétition :
 - Erreurs de syntaxe → Patterns à éviter
