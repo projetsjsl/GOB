@@ -84,6 +84,27 @@
         ].filter(item => defaultTabs.includes(item.i));
     };
 
+    // Preset layout templates
+    const LAYOUT_PRESETS = {
+        default: getDefaultLayout(),
+        trading: [
+            { i: 'titres-portfolio', x: 0, y: 0, w: 8, h: 12, minW: 6, minH: 8 },
+            { i: 'jlab-terminal', x: 8, y: 0, w: 4, h: 12, minW: 4, minH: 8 },
+            { i: 'marches-global', x: 0, y: 12, w: 12, h: 10, minW: 6, minH: 6 },
+            { i: 'jlab-advanced', x: 0, y: 22, w: 12, h: 12, minW: 8, minH: 8 }
+        ],
+        research: [
+            { i: 'jlab-terminal', x: 0, y: 0, w: 12, h: 14, minW: 8, minH: 10 },
+            { i: 'jlab-advanced', x: 0, y: 14, w: 6, h: 12, minW: 6, minH: 8 },
+            { i: 'emma-chat', x: 6, y: 14, w: 6, h: 12, minW: 4, minH: 8 },
+            { i: 'titres-portfolio', x: 0, y: 26, w: 12, h: 12, minW: 8, minH: 8 }
+        ],
+        minimal: [
+            { i: 'titres-portfolio', x: 0, y: 0, w: 12, h: 14, minW: 8, minH: 10 },
+            { i: 'emma-chat', x: 0, y: 14, w: 12, h: 10, minW: 6, minH: 8 }
+        ]
+    };
+
     // ===================================
     // COMPOSANT PRINCIPAL
     // ===================================
@@ -232,6 +253,15 @@
             const defaultLayout = getDefaultLayout();
             setLayout(defaultLayout);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultLayout));
+        }, []);
+
+        // Load preset layout
+        const loadPreset = useCallback((presetName) => {
+            const preset = LAYOUT_PRESETS[presetName];
+            if (preset) {
+                setLayout(preset);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(preset));
+            }
         }, []);
 
         // Rendre un widget
@@ -496,6 +526,22 @@
                     </div>
 
                     <div className="flex items-center gap-2">
+                        {isEditing && (
+                            <select
+                                onChange={(e) => loadPreset(e.target.value)}
+                                className={`px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm ${
+                                    isDarkMode
+                                        ? 'bg-neutral-700 text-gray-300 border border-neutral-600'
+                                        : 'bg-white text-gray-700 border border-gray-300'
+                                }`}
+                            >
+                                <option value="">Charger un preset...</option>
+                                <option value="default">🏠 Par défaut</option>
+                                <option value="trading">📈 Trading</option>
+                                <option value="research">🔬 Recherche</option>
+                                <option value="minimal">⚡ Minimal</option>
+                            </select>
+                        )}
                         <button
                             onClick={() => setIsEditing(!isEditing)}
                             className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 shadow-sm ${
