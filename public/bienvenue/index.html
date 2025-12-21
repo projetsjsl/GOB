@@ -17,8 +17,8 @@
 
     <!-- Fix for "exports is not defined" error when Babel transpiles modules -->
     <script>
-        // Polyfill for CommonJS exports to prevent Babel errors
-        // MUST run before any Babel transpilation
+        // Polyfill for CommonJS to prevent Babel and library errors
+        // MUST run before any Babel transpilation or libraries
         (function() {
             if (typeof window.exports === 'undefined') {
                 window.exports = {};
@@ -26,9 +26,24 @@
             if (typeof window.module === 'undefined') {
                 window.module = { exports: window.exports };
             }
+
+            // 🔥 FIX: Add require() polyfill for react-grid-layout
+            if (typeof window.require === 'undefined') {
+                window.require = function(moduleName) {
+                    // Return window globals for known modules
+                    const modules = {
+                        'react': window.React,
+                        'react-dom': window.ReactDOM,
+                        'prop-types': window.PropTypes || {}
+                    };
+                    return modules[moduleName] || {};
+                };
+            }
+
             // Also make available in global scope for Babel
             self.exports = window.exports;
             self.module = window.module;
+            self.require = window.require;
         })();
     </script>
 
