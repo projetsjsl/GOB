@@ -62,30 +62,26 @@
     // Layout par défaut basé sur les tabs les plus utilisés
     const getDefaultLayout = (activeTabs = []) => {
         const defaultTabs = activeTabs.length > 0 ? activeTabs : [
-            'titres-portfolio',
-            'marches-global',
-            'emma-chat',
-            'jlab-terminal'
+            'titres-portfolio',    // Top left - Portfolio widget
+            'marches-global',      // Top left below - Markets widget
+            'emma-chat',           // Top right - Emma chat
+            'jlab-terminal',       // Top right below - JLab Terminal
+            'marches-flex',        // Bottom - Markets flexible layout
+            'jlab-advanced'        // Bottom - Advanced analysis
         ];
-        
-        let y = 0;
-        return defaultTabs.map((tabId, index) => {
-            const config = TAB_TO_WIDGET_MAP[tabId];
-            if (!config) return null;
-            
-            const item = {
-                i: tabId,
-                x: index % 2 === 0 ? 0 : 6,
-                y: y,
-                w: config.defaultSize.w,
-                h: config.defaultSize.h,
-                minW: config.minSize.w,
-                minH: config.minSize.h
-            };
-            
-            if (index % 2 === 1) y += config.defaultSize.h;
-            return item;
-        }).filter(Boolean);
+
+        return [
+            // Row 1: Portfolio (full width top)
+            { i: 'titres-portfolio', x: 0, y: 0, w: 12, h: 12, minW: 8, minH: 8 },
+            // Row 2: Markets Global (left) + Emma Chat (right)
+            { i: 'marches-global', x: 0, y: 12, w: 6, h: 10, minW: 6, minH: 6 },
+            { i: 'emma-chat', x: 6, y: 12, w: 6, h: 10, minW: 4, minH: 8 },
+            // Row 3: JLab Terminal (left) + Markets Flex (right)
+            { i: 'jlab-terminal', x: 0, y: 22, w: 6, h: 14, minW: 8, minH: 10 },
+            { i: 'marches-flex', x: 6, y: 22, w: 6, h: 10, minW: 6, minH: 6 },
+            // Row 4: Advanced Analysis (full width bottom)
+            { i: 'jlab-advanced', x: 0, y: 36, w: 12, h: 12, minW: 8, minH: 8 }
+        ].filter(item => defaultTabs.includes(item.i));
     };
 
     // ===================================
@@ -412,7 +408,33 @@
                 });
             }
 
-            return React.createElement(Component, { ...commonProps, ...componentProps });
+            // Wrap component in a widget container with header
+            return (
+                <div className={`h-full flex flex-col rounded-xl overflow-hidden ${isDarkMode ? 'bg-neutral-900 border border-neutral-800' : 'bg-white border border-gray-200'} shadow-lg`}>
+                    {/* Widget Header */}
+                    <div className={`flex items-center justify-between px-4 py-2 border-b ${isDarkMode ? 'border-neutral-800 bg-neutral-800/50' : 'border-gray-200 bg-gray-50'}`}>
+                        <div className="flex items-center gap-2">
+                            <window.LucideIcon name={config.icon} className={`w-4 h-4 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                            <span className={`font-semibold text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                {config.label}
+                            </span>
+                        </div>
+                        {isEditing && (
+                            <button
+                                onClick={() => removeWidget(item.i)}
+                                className={`p-1 rounded hover:bg-red-500/20 transition-colors`}
+                                title="Retirer ce widget"
+                            >
+                                <window.LucideIcon name="X" className="w-4 h-4 text-red-500" />
+                            </button>
+                        )}
+                    </div>
+                    {/* Widget Content */}
+                    <div className="flex-1 overflow-auto">
+                        {React.createElement(Component, { ...commonProps, ...componentProps })}
+                    </div>
+                </div>
+            );
         }, [
             isDarkMode, isEditing, activeTab, setActiveTab,
             tickers, stockData, newsData, loading, lastUpdate, selectedStock, setSelectedStock,
