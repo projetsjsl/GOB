@@ -22,6 +22,8 @@ const AskEmmaTab = React.memo(({
                 setShowSlashSuggestions = () => {},
                 slashSuggestions = [],
                 setSlashSuggestions = () => {},
+                selectedSuggestionIndex = -1,
+                setSelectedSuggestionIndex = () => {},
                 setActiveTab,
                 activeTab
             }) => {

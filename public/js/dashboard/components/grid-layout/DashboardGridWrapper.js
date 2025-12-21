@@ -139,6 +139,8 @@
         setShowSlashSuggestions = () => {},
         slashSuggestions = [],
         setSlashSuggestions = () => {},
+        selectedSuggestionIndex = -1,
+        setSelectedSuggestionIndex = () => {},
         secondaryNavConfig = {},
         setSecondaryNavConfig = () => {},
         primaryNavConfig = {},
@@ -372,7 +374,9 @@
                     showSlashSuggestions,
                     setShowSlashSuggestions,
                     slashSuggestions,
-                    setSlashSuggestions
+                    setSlashSuggestions,
+                    selectedSuggestionIndex,
+                    setSelectedSuggestionIndex
                 });
             } else if (config.component === 'StocksNewsTab' || config.component === 'SeekingAlphaTab') {
                 Object.assign(componentProps, {

@@ -27277,6 +27277,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 setShowTemperatureEditor={setShowTemperatureEditor}
                                 showLengthEditor={showLengthEditor}
                                 setShowLengthEditor={setShowLengthEditor}
+                                showCommandsHelp={showCommandsHelp}
+                                setShowCommandsHelp={setShowCommandsHelp}
+                                showSlashSuggestions={showSlashSuggestions}
+                                setShowSlashSuggestions={setShowSlashSuggestions}
+                                slashSuggestions={slashSuggestions}
+                                setSlashSuggestions={setSlashSuggestions}
+                                selectedSuggestionIndex={selectedSuggestionIndex}
+                                setSelectedSuggestionIndex={setSelectedSuggestionIndex}
                                 secondaryNavConfig={secondaryNavConfig}
                                 setSecondaryNavConfig={setSecondaryNavConfig}
                                 primaryNavConfig={primaryNavConfig}
@@ -27302,6 +27310,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 cleanText={cleanText}
                                 getGradeColor={getGradeColor}
                                 openSeekingAlpha={openSeekingAlpha}
+                                summarizeWithEmma={summarizeWithEmma}
+                                isFrenchArticle={isFrenchArticle}
+                                getNewsIcon={getNewsIcon}
+                                getSourceCredibility={getSourceCredibility}
                                 tabMountKeys={tabMountKeys}
                                 Icon={Icon}
                                 MASTER_NAV_LINKS={MASTER_NAV_LINKS}
