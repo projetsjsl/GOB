@@ -16,6 +16,8 @@ const AskEmmaTab = React.memo(({
                 setShowTemperatureEditor,
                 showLengthEditor,
                 setShowLengthEditor,
+                showCommandsHelp = false,
+                setShowCommandsHelp = () => {},
                 setActiveTab,
                 activeTab
             }) => {

@@ -133,6 +133,8 @@
         setShowTemperatureEditor = () => {},
         showLengthEditor = false,
         setShowLengthEditor = () => {},
+        showCommandsHelp = false,
+        setShowCommandsHelp = () => {},
         secondaryNavConfig = {},
         setSecondaryNavConfig = () => {},
         primaryNavConfig = {},
@@ -159,6 +161,10 @@
         cleanText = (t) => t,
         getGradeColor = () => '',
         openSeekingAlpha = () => {},
+        summarizeWithEmma = () => {},
+        isFrenchArticle = () => false,
+        getNewsIcon = () => ({ icon: 'Newspaper', color: 'text-gray-500' }),
+        getSourceCredibility = () => 50,
         tabMountKeys = {},
         Icon = null,
         MASTER_NAV_LINKS = [],
@@ -356,7 +362,9 @@
                     showTemperatureEditor,
                     setShowTemperatureEditor,
                     showLengthEditor,
-                    setShowLengthEditor
+                    setShowLengthEditor,
+                    showCommandsHelp,
+                    setShowCommandsHelp
                 });
             } else if (config.component === 'StocksNewsTab' || config.component === 'SeekingAlphaTab') {
                 Object.assign(componentProps, {
@@ -435,6 +443,19 @@
                 Object.assign(componentProps, {
                     isDarkMode,
                     Icon
+                });
+            } else if (config.component === 'MarketsEconomyTab') {
+                Object.assign(componentProps, {
+                    isDarkMode,
+                    newsData,
+                    loading,
+                    lastUpdate,
+                    fetchNews,
+                    summarizeWithEmma,
+                    isFrenchArticle,
+                    getNewsIcon,
+                    getSourceCredibility,
+                    cleanText
                 });
             }
 

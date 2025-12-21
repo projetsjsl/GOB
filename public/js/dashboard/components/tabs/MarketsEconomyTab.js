@@ -3,7 +3,18 @@
 
 
 
-const MarketsEconomyTab = () => {
+const MarketsEconomyTab = ({
+    isDarkMode = false,
+    newsData = [],
+    loading = false,
+    lastUpdate = null,
+    fetchNews = () => {},
+    summarizeWithEmma = () => {},
+    isFrenchArticle = () => false,
+    getNewsIcon = () => ({ icon: 'Newspaper', color: 'text-gray-500' }),
+    getSourceCredibility = () => 50,
+    cleanText = (text) => text
+}) => {
     const [localFrenchOnly, setLocalFrenchOnly] = useState(false);
     const [selectedSource, setSelectedSource] = useState('all'); // Filtre source
     const [selectedMarket, setSelectedMarket] = useState('all'); // Filtre marché
