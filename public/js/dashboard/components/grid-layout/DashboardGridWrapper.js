@@ -405,6 +405,11 @@
                     isDarkMode,
                     isAdmin: isEditing
                 });
+            } else if (config.component === 'JLabUnifiedTab' || config.component === 'JLabTab') {
+                Object.assign(componentProps, {
+                    isDarkMode,
+                    Icon
+                });
             }
 
             return React.createElement(Component, { ...commonProps, ...componentProps });

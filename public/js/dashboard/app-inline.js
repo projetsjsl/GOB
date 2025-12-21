@@ -1076,24 +1076,24 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             for (let attempt = 0; attempt <= maxRetries; attempt++) {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-                
+
                 try {
                     const response = await fetch(url, {
                         ...options,
                         signal: controller.signal
                     });
                     clearTimeout(timeoutId);
-                    
+
                     if (!response.ok && response.status >= 500 && attempt < maxRetries) {
                         // Retry on server errors
                         await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
                         continue;
                     }
-                    
+
                     return response;
                 } catch (error) {
                     clearTimeout(timeoutId);
-                    
+
                     if (error.name === 'AbortError') {
                         if (attempt < maxRetries) {
                             await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
@@ -1101,17 +1101,20 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                         }
                         throw new Error(`Timeout après ${timeoutMs}ms pour ${url}`);
                     }
-                    
+
                     if (attempt < maxRetries) {
                         // Retry on network errors
                         await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
                         continue;
                     }
-                    
+
                     throw error;
                 }
             }
         };
+
+        // Expose globally for use in hybrid data fetching
+        window.fetchWithTimeoutAndRetry = fetchWithTimeoutAndRetry;
         
         // Helper pour Promise.allSettled avec timeout individuel
         const fetchAllSettledWithTimeout = async (promises, timeoutMs = 10000) => {
