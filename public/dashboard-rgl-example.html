@@ -11,10 +11,15 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
 
+    <!-- React Grid Layout MUST load BEFORE polyfills -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/react-grid-layout@1.4.4/css/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/react-resizable@3.0.5/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/react-grid-layout@1.4.4/dist/react-grid-layout.min.js"></script>
+
     <!-- Fix for "exports is not defined" error when Babel transpiles modules -->
     <script>
-        // Polyfill for CommonJS to prevent Babel and library errors
-        // MUST run before any Babel transpilation or libraries
+        // Polyfill for CommonJS to prevent Babel errors
+        // MUST run before any Babel transpilation
         (function() {
             if (typeof window.exports === 'undefined') {
                 window.exports = {};
@@ -23,29 +28,11 @@
                 window.module = { exports: window.exports };
             }
 
-            // 🔥 FIX: Add require() polyfill for react-grid-layout
-            if (typeof window.require === 'undefined') {
-                window.require = function(moduleName) {
-                    // Return window globals for known modules
-                    const modules = {
-                        'react': window.React,
-                        'react-dom': window.ReactDOM,
-                        'prop-types': window.PropTypes || {}
-                    };
-                    return modules[moduleName] || {};
-                };
-            }
-
-            // Also make available in global scope for Babel
+            // Make available in global scope for Babel
             self.exports = window.exports;
             self.module = window.module;
-            self.require = window.require;
         })();
     </script>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/react-grid-layout@1.4.4/css/styles.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/react-resizable@3.0.5/css/styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/react-grid-layout@1.4.4/dist/react-grid-layout.min.js"></script>
     <style>
         * { font-family: 'Inter', sans-serif; }
         body { background: #0a0a0a; }
