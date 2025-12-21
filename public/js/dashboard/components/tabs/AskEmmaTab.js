@@ -18,6 +18,10 @@ const AskEmmaTab = React.memo(({
                 setShowLengthEditor,
                 showCommandsHelp = false,
                 setShowCommandsHelp = () => {},
+                showSlashSuggestions = false,
+                setShowSlashSuggestions = () => {},
+                slashSuggestions = [],
+                setSlashSuggestions = () => {},
                 setActiveTab,
                 activeTab
             }) => {

@@ -135,6 +135,10 @@
         setShowLengthEditor = () => {},
         showCommandsHelp = false,
         setShowCommandsHelp = () => {},
+        showSlashSuggestions = false,
+        setShowSlashSuggestions = () => {},
+        slashSuggestions = [],
+        setSlashSuggestions = () => {},
         secondaryNavConfig = {},
         setSecondaryNavConfig = () => {},
         primaryNavConfig = {},
@@ -364,7 +368,11 @@
                     showLengthEditor,
                     setShowLengthEditor,
                     showCommandsHelp,
-                    setShowCommandsHelp
+                    setShowCommandsHelp,
+                    showSlashSuggestions,
+                    setShowSlashSuggestions,
+                    slashSuggestions,
+                    setSlashSuggestions
                 });
             } else if (config.component === 'StocksNewsTab' || config.component === 'SeekingAlphaTab') {
                 Object.assign(componentProps, {
