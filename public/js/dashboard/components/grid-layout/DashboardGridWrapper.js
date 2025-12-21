@@ -288,6 +288,36 @@
                 Component = window.MarketsEconomyTab;
             }
             
+            // Fallback pour les composants définis inline dans app-inline.js
+            // Ces composants ne sont pas exposés globalement car ils dépendent du contexte parent
+            if (!Component && (config.component === 'EmmaConfigTab' || config.component === 'NouvellesTab')) {
+                // Afficher un message explicatif plutôt qu'une erreur
+                return (
+                    <div className={`h-full flex flex-col items-center justify-center p-4 ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
+                        <window.LucideIcon name="Info" className={`w-12 h-12 mb-2 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+                        <span className={`text-sm text-center font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            {config.label}
+                        </span>
+                        <span className={`text-xs mt-2 text-center ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                            Ce widget est disponible en mode onglets
+                        </span>
+                        <button
+                            onClick={() => {
+                                localStorage.setItem('gob-dashboard-view-mode', 'tabs');
+                                window.location.reload();
+                            }}
+                            className={`mt-4 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                isDarkMode 
+                                    ? 'bg-blue-600 hover:bg-blue-500 text-white' 
+                                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                            }`}
+                        >
+                            Passer en mode onglets
+                        </button>
+                    </div>
+                );
+            }
+            
             if (!Component) {
                 console.warn(`⚠️ Composant ${config.component} non trouvé. Tentatives:`, {
                     direct: typeof window[config.component],
