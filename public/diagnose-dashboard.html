@@ -134,13 +134,20 @@
     <!-- Fix for "exports is not defined" error when Babel transpiles modules -->
     <script>
         // Polyfill for CommonJS exports to prevent Babel errors
-        if (typeof exports === 'undefined') {
-            window.exports = {};
-        }
-        if (typeof module === 'undefined') {
-            window.module = { exports: {} };
-        }
+        // MUST run before any Babel transpilation
+        (function() {
+            if (typeof window.exports === 'undefined') {
+                window.exports = {};
+            }
+            if (typeof window.module === 'undefined') {
+                window.module = { exports: window.exports };
+            }
+            // Also make available in global scope for Babel
+            self.exports = window.exports;
+            self.module = window.module;
+        })();
     </script>
+
                 { name: 'Recharts', check: () => typeof Recharts !== 'undefined', url: 'https://unpkg.com/recharts@2.5.0/dist/Recharts.js' }
             ];
 
