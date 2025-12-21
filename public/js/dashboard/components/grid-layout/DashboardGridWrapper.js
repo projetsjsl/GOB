@@ -489,31 +489,37 @@
                         <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-neutral-700 text-gray-300' : 'bg-gray-200 text-gray-600'}`}>
                             BP: {currentBreakpoint}
                         </span>
+                        <span className={`text-xs px-3 py-1 rounded-full flex items-center gap-1 ${isDarkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-700'}`}>
+                            <window.LucideIcon name="Grid3x3" className="w-3 h-3" />
+                            {layout?.length || 0} widgets
+                        </span>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => setIsEditing(!isEditing)}
-                            className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
-                                isEditing 
-                                    ? 'bg-emerald-500 text-white' 
-                                    : isDarkMode 
-                                        ? 'bg-neutral-700 text-gray-300 hover:bg-neutral-600' 
+                            className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 shadow-sm ${
+                                isEditing
+                                    ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+                                    : isDarkMode
+                                        ? 'bg-neutral-700 text-gray-300 hover:bg-neutral-600'
                                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                             }`}
                         >
-                            {isEditing ? '✓ Terminer' : '✎ Modifier Layout'}
+                            <window.LucideIcon name={isEditing ? "Check" : "Edit3"} className="w-4 h-4" />
+                            {isEditing ? 'Terminer' : 'Modifier'}
                         </button>
                         {isEditing && (
                             <button
                                 onClick={resetLayout}
-                                className={`px-4 py-2 rounded-lg font-medium text-sm ${
-                                    isDarkMode 
-                                        ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' 
+                                className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm ${
+                                    isDarkMode
+                                        ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
                                         : 'bg-red-100 text-red-600 hover:bg-red-200'
                                 }`}
                             >
-                                ↺ Reset
+                                <window.LucideIcon name="RotateCcw" className="w-4 h-4" />
+                                Reset
                             </button>
                         )}
                     </div>
