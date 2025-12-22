@@ -231,6 +231,37 @@
             };
             window.LucideIcon = window.IconoirIcon;
 
+            // Safe JSON fetch utility - handles non-JSON responses gracefully
+            window.fetchJsonSafe = async function(url, opts = {}) {
+                try {
+                    const res = await fetch(url, opts);
+                    const text = await res.text();
+                    
+                    if (!res.ok) {
+                        console.error('[API] Error', res.status, url, text.slice(0, 200));
+                        return { success: false, error: 'HTTP ' + res.status, data: null };
+                    }
+                    
+                    const ct = res.headers.get('content-type') || '';
+                    if (!ct.includes('application/json')) {
+                        console.error('[API] Not JSON', url, ct, text.slice(0, 200));
+                        return { success: false, error: 'Not JSON', data: null };
+                    }
+                    
+                    try {
+                        return JSON.parse(text);
+                    } catch(e) {
+                        console.error('[API] Invalid JSON', url, text.slice(0, 200));
+                        return { success: false, error: 'Invalid JSON', data: null };
+                    }
+                } catch(e) {
+                    console.error('[API] Fetch failed', url, e.message);
+                    return { success: false, error: e.message, data: null };
+                }
+            };
+
+
+
             if (typeof window.exports === 'undefined') {
                 window.exports = {};
             }

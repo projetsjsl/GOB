@@ -303,15 +303,14 @@ export default async function handler(req, res) {
         ],
         example: 'GET /api/terminal-data?action=instruments'
       });
-    } [
-          'instruments',
-          'kpi-values',
-          'watchlists',
-          'market-indices',
-          'price-history',
-          'symbol-metrics',
-          'sectors'
-        ]
+    }
+    
+    // Check if Supabase is configured
+    if (!supabase) {
+      return res.status(503).json({ 
+        success: false, 
+        error: 'Database not configured',
+        message: 'Supabase credentials missing'
       });
     }
 
