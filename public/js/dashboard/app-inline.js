@@ -26010,32 +26010,39 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             const gap = 4; // Gap entre les onglets
             const availableWidth = navWidth - padding * 2 - plusButtonWidth - gap;
 
-            // Séparer l'onglet admin des autres onglets
-            const adminTab = filteredAllTabs.find(tab => tab.id === 'admin-jsla');
-            const otherTabs = filteredAllTabs.filter(tab => tab.id !== 'admin-jsla');
+            // LISTE DE PRIORITÉ STRICTE demandée par l'utilisateur
+            // Admin, Marchés, Titres, JLab, Emma IA, Tests.
+            const PRIORITY_IDS = [
+                'admin-jsla', 
+                'markets-economy', 
+                'advanced-analysis', 
+                'jlab', 
+                'ask-emma', 
+                'tests-tab'
+            ];
 
             let currentWidth = 0;
             const visible = [];
             const hidden = [];
 
-            // Si admin, toujours ajouter l'onglet admin en premier
-            if (isAdmin && adminTab) {
-                const adminWidth = 70 + (adminTab.label.length * 4);
-                if (adminWidth <= availableWidth) {
-                    visible.push(adminTab);
-                    currentWidth += adminWidth + gap;
+            // 1. Ajouter d'abord les onglets prioritaires s'ils existent et qu'il y a de la place
+            for (const id of PRIORITY_IDS) {
+                const tab = filteredAllTabs.find(t => t.id === id);
+                if (tab) {
+                    const estimatedWidth = 70 + (tab.label.length * 4); // Approximation de taille
+                    
+                    if (currentWidth + estimatedWidth <= availableWidth) {
+                        visible.push(tab);
+                        currentWidth += estimatedWidth + gap;
+                    } else {
+                        hidden.push(tab);
+                    }
                 }
             }
 
-            // Ajouter les autres onglets
-            for (const tab of otherTabs) {
-                // Estimer la largeur de l'onglet (min-width: 70px + padding)
-                const estimatedWidth = 70 + (tab.label.length * 4); // Approximation
-                
-                if (currentWidth + estimatedWidth <= availableWidth) {
-                    visible.push(tab);
-                    currentWidth += estimatedWidth + gap;
-                } else {
+            // 2. Tous les autres onglets vont directement dans "hidden" (Menu Plus)
+            for (const tab of filteredAllTabs) {
+                if (!PRIORITY_IDS.includes(tab.id)) {
                     hidden.push(tab);
                 }
             }
