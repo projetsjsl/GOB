@@ -57811,6 +57811,7 @@ Vérifiez les logs de la console pour plus de détails.`;
         setActiveId(upperSymbol);
         setData(existingProfile.data);
         try {
+          console.log(`🔄 [ELSE BLOCK] Tentative récupération prix temps réel pour ${upperSymbol}...`);
           const { fetchMarketData: fetchMarketData2 } = await __vitePreload(async () => {
             const { fetchMarketData: fetchMarketData3 } = await Promise.resolve().then(() => marketDataCache);
             return { fetchMarketData: fetchMarketData3 };

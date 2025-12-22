@@ -2390,6 +2390,7 @@ export default function App() {
                 // ✅ FIX: Mettre à jour le prix actuel depuis l'API de marché si le profil existe
                 // Cela garantit que le prix est toujours à jour même pour les profils en cache
                 try {
+                    console.log(`🔄 [ELSE BLOCK] Tentative récupération prix temps réel pour ${upperSymbol}...`);
                     const { fetchMarketData } = await import('./services/marketDataCache');
                     const marketData = await fetchMarketData(upperSymbol);
                     
