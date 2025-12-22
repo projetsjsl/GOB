@@ -21924,7 +21924,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // COMPOSANT CALENDRIER INVESTING.COM
         // ============================================================================
         const InvestingCalendarTabInternal = () => {
-            console.log("DEBUG: InvestingCalendarTabInternal Mounting...");
+            // console.log("DEBUG: InvestingCalendarTabInternal Mounting...");
             const { useState, useEffect, useRef } = window.React;
             console.log("DEBUG: React hooks destructured", { useState, useEffect, useRef });
             // Refs pour les widgets TradingView

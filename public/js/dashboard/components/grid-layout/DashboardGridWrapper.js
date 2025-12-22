@@ -15,6 +15,11 @@
     // ===================================
     const STORAGE_KEY = 'gob_dashboard_grid_layout_v1';
     const ROW_HEIGHT = 50;
+
+    // Cache to prevent log spam for missing components
+    const _loggedMissingComponents = {};
+
+
     const COLS = { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 };
     const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
 
@@ -384,7 +389,9 @@ const DashboardGridWrapper = ({
                     'EmailBriefingsTab': window.AdminJSLaiTab,
                     'YieldCurveTab': window.MarketsEconomyTab,
                     'NouvellesTab': window.StocksNewsTab,
-                    'DansWatchlistTab': window.StocksNewsTab
+                    'DansWatchlistTab': window.StocksNewsTab,
+                    'InvestingCalendarTab': window.InvestingCalendarTab || window.InvestingCalendarTabInternal || window.EconomicCalendarTab,
+                    'EconomicCalendarTab': window.EconomicCalendarTab
                 };
                 Component = REGISTRY[config.component];
             }
@@ -414,19 +421,25 @@ const DashboardGridWrapper = ({
                     'EmailBriefingsTab': window.AdminJSLaiTab,
                     'YieldCurveTab': window.MarketsEconomyTab,
                     'NouvellesTab': window.StocksNewsTab,
-                    'DansWatchlistTab': window.StocksNewsTab
+                    'DansWatchlistTab': window.StocksNewsTab,
+                    'InvestingCalendarTab': window.InvestingCalendarTab || window.InvestingCalendarTabInternal || window.EconomicCalendarTab,
+                    'EconomicCalendarTab': window.EconomicCalendarTab
                 };
                 Component = REGISTRY[config.component];
             }
 
             if (!Component) {
-                console.warn('[MissingComponent]', { 
-                    key: item.i, 
-                    component: config.component,
-                    availableComponents: Object.keys(window).filter(k => 
-                        k.endsWith('Tab') || k.includes('Dashboard') || k.includes('Widget')
-                    ).slice(0, 20)
-                });
+                // Only log once per component to avoid spam
+                if (!_loggedMissingComponents[config.component]) {
+                    _loggedMissingComponents[config.component] = true;
+                    console.warn('[MissingComponent]', { 
+                        key: item.i, 
+                        component: config.component,
+                        availableComponents: Object.keys(window).filter(k => 
+                            k.endsWith('Tab') || k.includes('Dashboard') || k.includes('Widget')
+                        ).slice(0, 20)
+                    });
+                }
                 return <MissingComponentCard componentName={config.component} isDarkMode={isDarkMode} />;
             }
 

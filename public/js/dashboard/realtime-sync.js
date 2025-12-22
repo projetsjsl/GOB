@@ -1,17 +1,15 @@
 /**
  * Global Real-time Sync for GOB Dashboard
- * 
- * Provides centralized Supabase Realtime subscription.
- * Uses event-based approach instead of polling.
+ * Uses event-based + polling hybrid approach
  */
 (function() {
     console.log('📡 Real-time Sync: Initializing...');
 
+    let isConnected = false;
+
     function startRealtime(supabaseClient) {
-        if (!supabaseClient) {
-            console.warn('⚠️ Real-time Sync: No client provided');
-            return;
-        }
+        if (!supabaseClient || isConnected) return;
+        isConnected = true;
 
         try {
             const channel = supabaseClient
@@ -19,12 +17,8 @@
                 .on('postgres_changes', 
                     { event: '*', schema: 'public', table: 'tickers' }, 
                     (payload) => {
-                        console.log('�� Real-time Sync: Ticker update received!', payload);
-                        
-                        window.dispatchEvent(new CustomEvent('tickersUpdated', { 
-                            detail: payload 
-                        }));
-
+                        console.log('📡 Real-time Sync: Ticker update received!', payload);
+                        window.dispatchEvent(new CustomEvent('tickersUpdated', { detail: payload }));
                         if (window.Toast) {
                             const type = payload.eventType;
                             const ticker = payload.new?.ticker || payload.old?.ticker || 'Unknown';
@@ -46,41 +40,44 @@
             console.log('✅ Real-time Sync: Subscription active');
         } catch (e) {
             console.error('❌ Real-time Sync: Subscription error:', e);
+            isConnected = false;
         }
     }
 
-    function initRealtime() {
-        // Check if client already exists
-        const existingClient = window.__SUPABASE__;
-        if (existingClient) {
-            console.log('📡 Real-time Sync: Using existing global client');
-            startRealtime(existingClient);
+    function checkAndConnect() {
+        if (isConnected) return;
+        
+        const client = window.__SUPABASE__;
+        if (client) {
+            console.log('📡 Real-time Sync: Found global Supabase client');
+            startRealtime(client);
+        }
+    }
+
+    // Listen for supabase:ready event
+    window.addEventListener('supabase:ready', (e) => {
+        console.log('📡 Real-time Sync: Received supabase:ready event');
+        const client = e.detail?.client || window.__SUPABASE__;
+        if (client) startRealtime(client);
+    });
+
+    // Also check periodically in case event was missed
+    const checkInterval = setInterval(() => {
+        if (isConnected) {
+            clearInterval(checkInterval);
             return;
         }
+        checkAndConnect();
+    }, 1000);
 
-        // Wait for supabase:ready event from app-inline.js
-        console.log('📡 Real-time Sync: Waiting for supabase:ready event...');
-        window.addEventListener('supabase:ready', (e) => {
-            console.log('📡 Real-time Sync: Received supabase:ready event');
-            const client = e.detail?.client || window.__SUPABASE__;
-            if (client) {
-                startRealtime(client);
-            } else {
-                console.warn('⚠️ Real-time Sync: Event received but no client found');
-            }
-        }, { once: true });
+    // Stop checking after 30 seconds
+    setTimeout(() => {
+        clearInterval(checkInterval);
+        if (!isConnected) {
+            console.warn('⚠️ Real-time Sync: Could not connect after 30s');
+        }
+    }, 30000);
 
-        // Fallback: check again after React mounts (dash:ready event)
-        window.addEventListener('dash:ready', () => {
-            if (!window.__SUPABASE__) {
-                console.warn('⚠️ Real-time Sync: Dashboard ready but no Supabase client');
-                return;
-            }
-            // Client might have been set after our listener was added
-            startRealtime(window.__SUPABASE__);
-        }, { once: true });
-    }
-
-    // Start initialization
-    initRealtime();
+    // Initial check
+    checkAndConnect();
 })();
