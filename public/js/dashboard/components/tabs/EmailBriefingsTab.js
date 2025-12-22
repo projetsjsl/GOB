@@ -65,8 +65,28 @@ const EmailBriefingsTab = () => {
                     news: { request: null, response: null, error: null },
                     analysis: { request: null, response: null, error: null }
                 });
-        // NOTE: healthStatus, healthCheckLoading, processLog, showDebug, showFullLog
-        // moved to line ~468 (top of BetaCombinedDashboard for proper scope)
+                
+                // Missing state variables - added to fix ReferenceError
+                const [processLog, setProcessLog] = useState([]);
+                const [message, setMessage] = useState({ type: '', text: '' });
+                
+                // Get tickers from global dashboard context
+                const tickers = dashboard.tickers || [];
+                const watchlistTickers = dashboard.watchlistTickers || [];
+                const teamTickers = dashboard.teamTickers || [];
+                
+                // Helper function to add log entries
+                const addLogEntry = (step, action, details, status = 'info') => {
+                    const entry = {
+                        timestamp: new Date().toISOString(),
+                        step,
+                        action,
+                        details: typeof details === 'object' ? JSON.stringify(details, null, 2) : details,
+                        status
+                    };
+                    setProcessLog(prev => [...prev, entry]);
+                    console.log(`[${step}] ${action}:`, details);
+                };
 
                 // Tickers de la watchlist (récupérés depuis Supabase)
                 // Utilise l'état global watchlistTickers chargé depuis Supabase
