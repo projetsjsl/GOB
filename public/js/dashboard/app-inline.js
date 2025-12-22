@@ -1,3 +1,11 @@
+
+// SECURITY: Global fallback for showSlashSuggestions to prevent app crash
+if (typeof window.showSlashSuggestions === "undefined") {
+    window.showSlashSuggestions = false;
+}
+if (typeof window.setShowSlashSuggestions === "undefined") {
+    window.setShowSlashSuggestions = function() {};
+}
 /**
  * SAFETY NOTE FOR EDITORS:
  * - This file is huge and parsed by Babel Standalone in the browser; a single unclosed template string/backtick will break production.
