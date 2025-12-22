@@ -76,6 +76,49 @@ export async function fetchMarketDataBatch(tickers: string[]): Promise<MarketDat
     }
 
     const result = await response.json();
+    
+    // Transform the API response to match MarketData[] format
+    // API returns: {success: true, data: {quote: {TICKER: {price, ...}}}, ...}
+    // We need: {success: true, data: MarketData[], stats: {...}}
+    if (result.success && result.data?.quote) {
+      const transformedData: MarketData[] = [];
+      
+      for (const ticker of tickers) {
+        const upperTicker = ticker.toUpperCase();
+        const quoteData = result.data.quote[upperTicker];
+        
+        if (quoteData) {
+          transformedData.push({
+            ticker: upperTicker,
+            currentPrice: quoteData.price || 0,  // Map 'price' to 'currentPrice'
+            changePercent: quoteData.changesPercentage || 0,
+            changeAmount: quoteData.change || 0,
+            volume: quoteData.volume || 0,
+            marketCap: quoteData.marketCap || 0,
+            peRatio: quoteData.pe || null,
+            pcfRatio: null, // Not available in quote endpoint
+            pbvRatio: null, // Not available in quote endpoint
+            dividendYield: null, // Not available in quote endpoint
+            updatedAt: new Date().toISOString(),
+            isFresh: true
+          });
+        }
+      }
+      
+      return {
+        success: true,
+        data: transformedData,
+        stats: { 
+          total: tickers.length, 
+          fresh: transformedData.length, 
+          stale: 0, 
+          missing: tickers.length - transformedData.length 
+        },
+        missingTickers: tickers.filter(t => !result.data.quote[t.toUpperCase()]),
+        timestamp: new Date().toISOString()
+      };
+    }
+    
     return result;
 
   } catch (error: any) {

@@ -43008,6 +43008,7 @@ const mapSourceToIsWatchlist = (source) => {
   return null;
 };
 async function fetchMarketDataBatch(tickers) {
+  var _a3;
   if (tickers.length === 0) {
     return {
       success: true,
@@ -43036,6 +43037,45 @@ async function fetchMarketDataBatch(tickers) {
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
     const result = await response.json();
+    if (result.success && ((_a3 = result.data) == null ? void 0 : _a3.quote)) {
+      const transformedData = [];
+      for (const ticker2 of tickers) {
+        const upperTicker = ticker2.toUpperCase();
+        const quoteData = result.data.quote[upperTicker];
+        if (quoteData) {
+          transformedData.push({
+            ticker: upperTicker,
+            currentPrice: quoteData.price || 0,
+            // Map 'price' to 'currentPrice'
+            changePercent: quoteData.changesPercentage || 0,
+            changeAmount: quoteData.change || 0,
+            volume: quoteData.volume || 0,
+            marketCap: quoteData.marketCap || 0,
+            peRatio: quoteData.pe || null,
+            pcfRatio: null,
+            // Not available in quote endpoint
+            pbvRatio: null,
+            // Not available in quote endpoint
+            dividendYield: null,
+            // Not available in quote endpoint
+            updatedAt: (/* @__PURE__ */ new Date()).toISOString(),
+            isFresh: true
+          });
+        }
+      }
+      return {
+        success: true,
+        data: transformedData,
+        stats: {
+          total: tickers.length,
+          fresh: transformedData.length,
+          stale: 0,
+          missing: tickers.length - transformedData.length
+        },
+        missingTickers: tickers.filter((t) => !result.data.quote[t.toUpperCase()]),
+        timestamp: (/* @__PURE__ */ new Date()).toISOString()
+      };
+    }
     return result;
   } catch (error) {
     console.error("❌ Erreur fetchMarketDataBatch:", error);
