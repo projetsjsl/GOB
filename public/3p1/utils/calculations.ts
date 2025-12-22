@@ -371,7 +371,7 @@ export const autoFillAssumptionsFromFMPData = (
     currentDividend: preserveIfExists(
       round(lastData.dividendPerShare || 0, 4),
       existingAssumptions?.currentDividend,
-      false
+      true // ✅ FIX: Traiter comme un taux - ne pas préserver si existant est 0
     ),
     baseYear: preserveIfExists(
       lastValidData.year,
