@@ -609,6 +609,19 @@ const DashboardGridWrapper = ({
         return Object.keys(TAB_TO_WIDGET_MAP).filter(k => k.startsWith(prefix));
     };
     
+    
+    // Generate responsive layouts for different screen sizes
+    const generateResponsiveLayouts = (baseLayout) => {
+        const layouts = {
+            lg: baseLayout,
+            md: baseLayout.map(item => ({ ...item, w: Math.min(item.w, 10) })),
+            sm: baseLayout.map(item => ({ ...item, x: 0, w: 6 })),
+            xs: baseLayout.map(item => ({ ...item, x: 0, w: 4 })),
+            xxs: baseLayout.map(item => ({ ...item, x: 0, w: 2 }))
+        };
+        return layouts;
+    };
+
     // Filter layout to only show widgets for current main tab
     const filteredLayout = useMemo(() => {
         const validIds = getWidgetIdsForMainTab(mainTab);
@@ -752,7 +765,7 @@ const DashboardGridWrapper = ({
                     ) : (
                         <ResponsiveGridLayout
                             className="layout"
-                            layouts={{ lg: filteredLayout }}
+                            layouts={generateResponsiveLayouts(filteredLayout)}
                             breakpoints={BREAKPOINTS}
                             cols={COLS}
                             rowHeight={ROW_HEIGHT}
@@ -761,7 +774,11 @@ const DashboardGridWrapper = ({
                             isDraggable={isEditing}
                             isResizable={isEditing}
                             compactType="vertical"
-                            margin={[16, 16]}
+                            margin={[12, 12]}
+                            containerPadding={[8, 8]}
+                            useCSSTransforms={true}
+                            preventCollision={false}
+                            transformScale={1}
                         >
                             {filteredLayout.map(item => {
                                 const config = TAB_TO_WIDGET_MAP[item.i];
