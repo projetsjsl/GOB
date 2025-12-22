@@ -104,8 +104,17 @@
         (function() {
             // GLOBAL FALLBACKS & COMPONENTS to prevent ReferenceErrors in components
             
+
             window.ENVIRONMENT = "production";
             window.NODE_ENV = "production";
+            
+            // Supabase Configuration (required for auth, roles, realtime)
+            window.SUPABASE_URL = "https://boyuxgdplbpkknplxbxp.supabase.co";
+            window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJveXV4Z2RwbGJwa2tucGx4YnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzMzU5MTQsImV4cCI6MjA3NTkxMTkxNH0.-M-QdpBFlDtg1CeA00VepQCNzGzvU-tISyVA0yCLBdw";
+            window.ENV_CONFIG = {
+                SUPABASE_URL: window.SUPABASE_URL,
+                SUPABASE_ANON_KEY: window.SUPABASE_ANON_KEY
+            };
             window.showSlashSuggestions = false;
             window.setShowSlashSuggestions = function() {};
             window.Icon = function(props) {

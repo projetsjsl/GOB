@@ -22,8 +22,59 @@
     /**
      * Initialise la protection du dashboard
      */
+        /**
+     * Initialise la protection du dashboard
+     */
     async init() {
-      console.log('🔓 Auth Guard (TEST MODE): Bypassing authentication...');
+      // Try Supabase auth first
+      if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+        try {
+          console.log('🔓 Auth Guard: Checking Supabase session...');
+          const client = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+          const { data: { session }, error } = await client.auth.getSession();
+          
+          if (session && session.user) {
+            console.log('✅ Auth Guard: Supabase session found');
+            
+            // Get role from profiles table
+            const { data: profile } = await client
+              .from('profiles')
+              .select('role, display_name, username')
+              .eq('id', session.user.id)
+              .single();
+            
+            const role = profile?.role || session.user.app_metadata?.role || 'viewer';
+            const displayName = profile?.display_name || session.user.email || 'User';
+            
+            this.currentUser = {
+              id: session.user.id,
+              username: profile?.username || session.user.email,
+              display_name: displayName,
+              role: role,
+              email: session.user.email,
+              permissions: this.getPermissionsForRole(role),
+              last_login: new Date().toISOString()
+            };
+            
+            this.permissions = this.currentUser.permissions;
+            
+            // Store for other scripts
+            window.__EMMA_ROLE__ = role;
+            window.__EMMA_USER_ID__ = session.user.id;
+            
+            console.log('✅ Utilisateur authentifié (Supabase):', this.currentUser.display_name, 'Role:', role);
+            this.displayUserInfo();
+            this.createLogoutButton();
+            this.applyEmmaPermissions();
+            return;
+          }
+        } catch (e) {
+          console.warn('⚠️ Auth Guard: Supabase session check failed:', e);
+        }
+      }
+      
+      // Fallback to TEST MODE
+      console.log('🔓 Auth Guard (TEST MODE): No session found, using mock user...');
       
       const MOCK_USER = {
         id: 'mock-admin-test',
@@ -52,6 +103,10 @@
         console.warn('⚠️ Storage error:', e);
       }
 
+      // Set globals for roles-permissions.js
+      window.__EMMA_ROLE__ = MOCK_USER.role;
+      window.__EMMA_USER_ID__ = MOCK_USER.id;
+
       // Proceed as if authenticated
       this.currentUser = MOCK_USER;
       this.permissions = MOCK_USER.permissions;
@@ -60,6 +115,39 @@
       this.displayUserInfo();
       this.createLogoutButton();
       this.applyEmmaPermissions();
+    }
+    
+    /**
+     * Get permissions for a given role
+     */
+    getPermissionsForRole(role) {
+      const rolePermissions = {
+        admin: {
+          view_dashboard: true,
+          view_emma: true,
+          save_conversations: true,
+          view_own_history: true,
+          view_all_history: true,
+          manage_users: true
+        },
+        analyst: {
+          view_dashboard: true,
+          view_emma: true,
+          save_conversations: true,
+          view_own_history: true,
+          view_all_history: false,
+          manage_users: false
+        },
+        viewer: {
+          view_dashboard: true,
+          view_emma: true,
+          save_conversations: false,
+          view_own_history: false,
+          view_all_history: false,
+          manage_users: false
+        }
+      };
+      return rolePermissions[role] || rolePermissions.viewer;
     }
 
     /**

@@ -12,7 +12,15 @@ let userRole = null;
  */
 async function loadUserPermissions() {
     try {
-        // Récupérer l'utilisateur depuis sessionStorage
+        // 1. Check if auth-guard already set the role
+        if (window.__EMMA_ROLE__) {
+            userRole = window.__EMMA_ROLE__;
+            userPermissions = getDefaultPermissionsForRole(userRole);
+            console.log('[Roles] Using role from auth-guard:', userRole);
+            return userPermissions;
+        }
+        
+        // 2. Récupérer l'utilisateur depuis sessionStorage
         const userData = sessionStorage.getItem('gob-user');
         if (!userData) {
             console.warn('[Roles] Aucun utilisateur connecté');
@@ -21,31 +29,88 @@ async function loadUserPermissions() {
 
         const user = JSON.parse(userData);
         const username = user.username || user.role;
-
-        // Charger les permissions depuis l'API
-        const response = await fetch('/api/roles-config', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'get_user_permissions',
-                username: username
-            })
-        });
-
-        const data = await response.json();
-
-        if (data.success && data.permissions) {
-            userPermissions = data.permissions.component_permissions || {};
-            userRole = data.permissions.role_name;
-            console.log('[Roles] Permissions chargées:', userPermissions);
-            return userPermissions;
-        } else {
-            console.warn('[Roles] Aucune permission trouvée pour', username);
-            // Permissions par défaut (tout visible)
-            userPermissions = {};
+        
+        // If user already has role, use it
+        if (user.role) {
+            userRole = user.role;
+            userPermissions = user.permissions || getDefaultPermissionsForRole(user.role);
+            console.log('[Roles] Using role from session:', userRole);
             return userPermissions;
         }
+
+        // 3. Try loading from API (optional, may fail)
+        try {
+            const response = await fetch('/api/roles-config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'get_user_permissions',
+                    username: username
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.permissions) {
+                userPermissions = data.permissions.component_permissions || {};
+                userRole = data.permissions.role_name;
+                console.log('[Roles] Permissions loaded from API:', userPermissions);
+                return userPermissions;
+            }
+        } catch (apiError) {
+            console.warn('[Roles] API call failed, using defaults:', apiError);
+        }
+        
+        // 4. Fallback to default permissions
+        console.warn('[Roles] Using default permissions for', username);
+        userPermissions = {};
+        return userPermissions;
     } catch (error) {
+        console.error('[Roles] Erreur chargement permissions:', error);
+        userPermissions = {};
+        return userPermissions;
+    }
+}
+
+/**
+ * Get default permissions for a role
+ */
+function getDefaultPermissionsForRole(role) {
+    const defaults = {
+        admin: {
+            'stocks-news': true,
+            'ask-emma': true,
+            'jlab': true,
+            'economic-calendar': true,
+            'investing-calendar': true,
+            'yield-curve': true,
+            'markets-economy': true,
+            'dans-watchlist': true,
+            'scrapping-sa': true,
+            'seeking-alpha': true,
+            'email-briefings': true,
+            'admin-jslai': true,
+            'admin-jsla': true,
+            'emma-sms': true,
+            'fastgraphs': true,
+            'groupchat': true,
+            'emmaiai': true
+        },
+        analyst: {
+            'stocks-news': true,
+            'ask-emma': true,
+            'jlab': true,
+            'economic-calendar': true,
+            'markets-economy': true,
+            'seeking-alpha': true
+        },
+        viewer: {
+            'stocks-news': true,
+            'markets-economy': true
+        }
+    };
+    return defaults[role] || defaults.viewer;
+} catch (error) {
         console.error('[Roles] Erreur chargement permissions:', error);
         // En cas d'erreur, tout est visible (fallback)
         userPermissions = {};
