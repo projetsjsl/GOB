@@ -73,7 +73,7 @@ const DansWatchlistTab = () => {
             }
             
             setScreenerResults(results);
-            console.log(`✅ Screener Watchlist: ${results.length} résultats trouvés sur ${watchlistStocks.length} titres`);
+            void(`✅ Screener Watchlist: ${results.length} résultats trouvés sur ${watchlistStocks.length} titres`);
         } catch (error) {
             console.error('Erreur screener:', error);
         } finally {
@@ -136,7 +136,7 @@ const DansWatchlistTab = () => {
                 if (res.ok) {
                     const json = await res.json();
                     const tickers = Array.isArray(json.tickers) ? json.tickers : [];
-                    console.log('✅ Watchlist chargée depuis Supabase:', tickers);
+                    void('✅ Watchlist chargée depuis Supabase:', tickers);
                     setWatchlistTickers(tickers);
                     localStorage.setItem('dans-watchlist', JSON.stringify(tickers));
                     loadWatchlistData(tickers);
@@ -144,14 +144,14 @@ const DansWatchlistTab = () => {
                     return;
                 }
             } catch (e) {
-                console.log('⚠️ Supabase non disponible, utilisation du localStorage');
+                void('⚠️ Supabase non disponible, utilisation du localStorage');
             }
             
             // Fallback: charger depuis localStorage
             const savedWatchlist = localStorage.getItem('dans-watchlist');
             if (savedWatchlist) {
                 const tickers = JSON.parse(savedWatchlist);
-                console.log('📦 Watchlist chargée depuis localStorage:', tickers);
+                void('📦 Watchlist chargée depuis localStorage:', tickers);
                 setWatchlistTickers(tickers);
                 loadWatchlistData(tickers);
             }
@@ -188,14 +188,14 @@ const DansWatchlistTab = () => {
         try {
             // BATCH OPTIMIZATION: Use batch endpoint for multiple tickers
             if (tickers.length > 1) {
-                console.log(`🚀 Batch loading ${tickers.length} tickers...`);
+                void(`🚀 Batch loading ${tickers.length} tickers...`);
                 const symbolsQuery = tickers.join(',');
                 const batchResponse = await fetch(`${API_BASE_URL}/api/marketdata/batch?symbols=${symbolsQuery}&endpoints=quote,fundamentals`);
 
                 if (batchResponse.ok) {
                     const batchData = await batchResponse.json();
-                    console.log(`✅ Batch loaded: ${batchData.metadata?.total_data_points || 'N/A'} data points`);
-                    console.log(`💰 API Calls Saved: ${batchData.metadata?.api_calls_saved || 'N/A'}`);
+                    void(`✅ Batch loaded: ${batchData.metadata?.total_data_points || 'N/A'} data points`);
+                    void(`💰 API Calls Saved: ${batchData.metadata?.api_calls_saved || 'N/A'}`);
 
                     // Process batch results
                     if (batchData.success && batchData.data) {
@@ -261,7 +261,7 @@ const DansWatchlistTab = () => {
         localStorage.setItem('dans-watchlist', JSON.stringify(updatedTickers));
         setNewTicker('');
         // Message discret pour l'ajout
-        console.log(`✅ ${ticker} ajouté à la watchlist`);
+        void(`✅ ${ticker} ajouté à la watchlist`);
         
         // 2. Ajouter un placeholder avec état "loading" pour affichage immédiat
         setWatchlistStockData(prev => ({
@@ -299,7 +299,7 @@ const DansWatchlistTab = () => {
         });
         
         // Message discret pour la suppression
-        console.log(`✅ ${ticker} supprimé de la watchlist`);
+        void(`✅ ${ticker} supprimé de la watchlist`);
         
         // 3. ARRIÈRE-PLAN : Sauvegarder sur Supabase (sans bloquer l'UI)
         saveWatchlistToSupabaseAuto(ticker, 'remove').catch(err => {
@@ -310,7 +310,7 @@ const DansWatchlistTab = () => {
     // Actualiser les données de la watchlist (silencieux)
     const refreshWatchlist = async () => {
         await loadWatchlistData(watchlistTickers);
-        console.log('✅ Watchlist actualisée silencieusement');
+        void('✅ Watchlist actualisée silencieusement');
     };
 
     // Timer pour debounce de la sauvegarde Supabase
@@ -340,7 +340,7 @@ const DansWatchlistTab = () => {
                 }
                 
                 const result = await response.json();
-                console.log(`✅ Supabase: ${result.message}`);
+                void(`✅ Supabase: ${result.message}`);
             } catch (e) {
                 console.error('⚠️ Erreur sauvegarde Supabase:', e);
                 // Silencieux pour ne pas perturber l'UX
@@ -363,7 +363,7 @@ const DansWatchlistTab = () => {
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             
             const result = await response.json();
-            console.log('✅ Watchlist sauvegardée sur Supabase');
+            void('✅ Watchlist sauvegardée sur Supabase');
         } catch (e) {
             console.error('Erreur sauvegarde Supabase watchlist:', e);
             showMessage('Erreur sauvegarde Supabase', 'error');
@@ -380,7 +380,7 @@ const DansWatchlistTab = () => {
             setWatchlistTickers(tickers);
             localStorage.setItem('dans-watchlist', JSON.stringify(tickers));
             await loadWatchlistData(tickers);
-            console.log('✅ Watchlist chargée depuis Supabase');
+            void('✅ Watchlist chargée depuis Supabase');
         } catch (e) {
             console.error('Erreur chargement Supabase watchlist:', e);
             showMessage('Erreur chargement Supabase', 'error');

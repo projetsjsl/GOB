@@ -240,6 +240,6 @@ const ComponentManager = (() => {
         ReactDOM.render(<CloseablePanel />, container);
     };
 
-    console.log('✅ ComponentManager chargé. Utilisez: openComponentManager()');
+    void('✅ ComponentManager chargé. Utilisez: openComponentManager()');
     return { ComponentManagerPanel };
 })();

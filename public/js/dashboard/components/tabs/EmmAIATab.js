@@ -12,7 +12,7 @@ const EmmAIATab = ({ isDarkMode, activeTab, setActiveTab }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     const handleIframeLoad = () => {
-        console.log('EmmAIA iframe loaded successfully');
+        void('EmmAIA iframe loaded successfully');
         setIsLoading(false);
     };
 

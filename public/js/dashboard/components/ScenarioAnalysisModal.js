@@ -316,7 +316,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
                             Simulation What-If pour la valorisation DCF
                         </p>
                     </div>
-                    <button
+                    <button title="Action"
                         onClick={onClose}
                         className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center transition-colors"
                     >

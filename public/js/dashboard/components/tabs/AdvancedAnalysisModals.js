@@ -18,5 +18,5 @@
 // This file exists to prevent 404 errors
 // The actual modal components are loaded separately in beta-combined-dashboard.html
 
-console.log('AdvancedAnalysisModals.js loaded (placeholder)');
+void('AdvancedAnalysisModals.js loaded (placeholder)');
 

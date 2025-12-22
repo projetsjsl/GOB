@@ -132,7 +132,7 @@
                                 </span>
                             </div>
                             <div className="flex gap-2">
-                                <button onClick={() => setLocalFrenchOnly(!localFrenchOnly)} className={`px-3 py-1 rounded-lg text-sm ${localFrenchOnly ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}>
+                                <button title="Action" onClick={() => setLocalFrenchOnly(!localFrenchOnly)} className={`px-3 py-1 rounded-lg text-sm ${localFrenchOnly ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}>
                                     🇫🇷 FR
                                 </button>
                                 <button onClick={fetchNews} className={`px-3 py-1 rounded-lg text-sm ${isDarkMode ? 'bg-neutral-700 text-white' : 'bg-gray-200 text-gray-800'}`}>

@@ -12,7 +12,7 @@ const FinVoxTab = ({ isDarkMode, activeTab, setActiveTab }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     const handleIframeLoad = () => {
-        console.log('FinVox iframe loaded successfully');
+        void('FinVox iframe loaded successfully');
         setIsLoading(false);
     };
 

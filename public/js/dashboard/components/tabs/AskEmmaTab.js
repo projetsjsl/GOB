@@ -519,13 +519,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                 // Handle prefill message from other tabs
                 React.useEffect(() => {
                     if (prefillMessage && prefillMessage.trim() && typeof setPrefillMessage === 'function') {
-                        console.log('📝 Prefill message received:', prefillMessage);
+                        void('📝 Prefill message received:', prefillMessage);
                         setEmmaInput(prefillMessage);
                         setPrefillMessage(''); // Clear the prefill message after using it
 
                         // If autoSend is true, trigger send after input is set
                         if (autoSend) {
-                            console.log('🚀 Auto-send enabled, will send message');
+                            void('🚀 Auto-send enabled, will send message');
                             // Use setTimeout to ensure state is updated
                             setTimeout(() => {
                                 const sendButton = document.querySelector('[data-emma-send-button]');
@@ -554,7 +554,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                                 content: welcomeMessage,
                                 timestamp: new Date().toISOString()
                             }]);
-                            console.log('👋 Welcome message ajouté (aucun historique sauvegardé)');
+                            void('👋 Welcome message ajouté (aucun historique sauvegardé)');
                         }
                         // Historique déjà chargé depuis localStorage via useState
                         
@@ -585,7 +585,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         // Activer la sauvegarde localStorage maintenant que l'initialisation est terminée
                         isInitializingRef.current = false;
 
-                        console.log('✅ Historique Emma chargé et prêt');
+                        void('✅ Historique Emma chargé et prêt');
                     } catch (error) {
                         console.error('Erreur initialisation Emma:', error?.message || String(error));
                         // Même en cas d'erreur, arrêter l'animation de chargement et activer la sauvegarde
@@ -605,7 +605,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             return;
                         }
                     } catch (error) {
-                        console.log('Variable d\'environnement Vercel non disponible');
+                        void('Variable d\'environnement Vercel non disponible');
                     }
                     
                     // Fallback vers localStorage
@@ -615,9 +615,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                 };
 
                 const sendMessageToEmma = async () => {
-                    console.log('🔍 sendMessageToEmma appelée avec:', emmaInput);
+                    void('🔍 sendMessageToEmma appelée avec:', emmaInput);
                     if (!emmaInput.trim()) {
-                        console.log('❌ Input vide, sortie de la fonction');
+                        void('❌ Input vide, sortie de la fonction');
                         return;
                     }
                     
@@ -629,13 +629,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     };
                     
                     setEmmaMessages(prev => {
-                        console.log('📝 Ajout du message utilisateur:', userMessage);
+                        void('📝 Ajout du message utilisateur:', userMessage);
                         return [...prev, userMessage];
                     });
                     setEmmaLoading(true);
                     
                     // Feedback visuel immédiat
-                    console.log('📤 Message envoyé à Emma:', emmaInput);
+                    void('📤 Message envoyé à Emma:', emmaInput);
                     
                     // Ajouter un message temporaire de confirmation
                     const confirmMessage = {
@@ -645,17 +645,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         timestamp: new Date().toLocaleTimeString('fr-FR')
                     };
                     setEmmaMessages(prev => {
-                        console.log('📤 Ajout du message de confirmation:', confirmMessage);
+                        void('📤 Ajout du message de confirmation:', confirmMessage);
                         return [...prev, confirmMessage];
                     });
                     
                     try {
                         // Utiliser les données existantes du dashboard
-                        console.log('🚀 Envoi de la requête à Emma avec les données actuelles...');
+                        void('🚀 Envoi de la requête à Emma avec les données actuelles...');
                         
                         // Les fonctions refreshAllStocks, fetchNews, checkApiStatus ne sont pas accessibles ici
                         // Les données sont déjà incluses dans realTimeContext via stockData, newsData, apiStatus
-                        console.log('✅ Utilisation des données existantes du dashboard');
+                        void('✅ Utilisation des données existantes du dashboard');
                         
                         // Utiliser l'API Perplexity avec les données fraîches
                         const responseData = await generatePerplexityResponse(emmaInput);
@@ -691,7 +691,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         }, 50); // Délai minimal pour garantir que le state est mis à jour
                         
                         // Confirmation de réception
-                        console.log('✅ Réponse d\'Emma reçue:', response.length, 'caractères');
+                        void('✅ Réponse d\'Emma reçue:', response.length, 'caractères');
                     } catch (error) {
                         console.error('Erreur Perplexity:', error?.message || String(error));
                         // Analyser le type d'erreur pour un message plus précis
@@ -757,7 +757,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                 const generatePerplexityResponse = async (userMessage) => {
                     try {
-                        console.log('🔍 Génération de réponse Emma Agent pour:', userMessage);
+                        void('🔍 Génération de réponse Emma Agent pour:', userMessage);
 
                         // Récupérer les données en temps réel du dashboard
                         const currentStockData = stockData || {};
@@ -767,7 +767,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         // Extraire les tickers de l'équipe
                         const tickers = (typeof teamTickers !== 'undefined' ? teamTickers : null) || Object.keys(currentStockData);
 
-                        console.log(`📤 Envoi de la requête à Emma Agent (format: web)...`);
+                        void(`📤 Envoi de la requête à Emma Agent (format: web)...`);
 
                         // Utiliser Emma Agent avec le format de sortie adapté
                         const response = await fetch('/api/emma-agent', {
@@ -803,7 +803,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         }
 
                         const data = await response.json();
-                        console.log('📥 Réponse Emma Agent reçue:', {
+                        void('📥 Réponse Emma Agent reçue:', {
                             success: data.success,
                             tools_used: data.tools_used,
                             is_reliable: data.is_reliable,
@@ -831,7 +831,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         }
 
                         // Log de la réponse pour diagnostic
-                        console.log(`📝 Réponse Emma (${responseText.length} caractères, format: ${channelSim}):`, responseText);
+                        void(`📝 Réponse Emma (${responseText.length} caractères, format: ${channelSim}):`, responseText);
 
                         // Vérifier si la réponse semble tronquée
                         if (responseText.length < 50) {
@@ -862,7 +862,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     }];
                     setEmmaMessages(resetMessages);
                     sessionStorage.removeItem('emma-chat-history');
-                    console.log('🗑️ Historique Emma vidé (mémoire + sessionStorage)');
+                    void('🗑️ Historique Emma vidé (mémoire + sessionStorage)');
                 };
 
                 // Fonction d'auto-scroll vers le bas du chat avec animation fluide
@@ -897,7 +897,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     try {
                         if (emmaMessages.length > 0) {
                             sessionStorage.setItem('emma-chat-history', JSON.stringify(emmaMessages));
-                            console.log('💾 Historique Emma sauvegardé:', emmaMessages.length, 'messages');
+                            void('💾 Historique Emma sauvegardé:', emmaMessages.length, 'messages');
                         }
                     } catch (error) {
                         console.error('❌ Erreur sauvegarde historique Emma:', error);
@@ -2272,9 +2272,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <button
                                     data-emma-send-button
                                     onClick={() => {
-                                        console.log('🔘 Bouton Envoyer cliqué !');
-                                        console.log('📝 Contenu de emmaInput:', emmaInput);
-                                        console.log('📊 État de emmaLoading:', emmaLoading);
+                                        void('🔘 Bouton Envoyer cliqué !');
+                                        void('📝 Contenu de emmaInput:', emmaInput);
+                                        void('📊 État de emmaLoading:', emmaLoading);
                                         sendMessageToEmma();
                                     }}
                                     disabled={emmaLoading || !emmaInput.trim()}

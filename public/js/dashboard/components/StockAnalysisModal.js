@@ -56,7 +56,7 @@ const StockAnalysisModal = ({ symbol, currentPrice, onClose }) => {
                         <h3 className="text-xl font-bold text-white">Erreur de Chargement</h3>
                         <p className="text-gray-400 text-center">{error}</p>
                         <div className="flex gap-3 mt-4">
-                            <button
+                            <button title="Action"
                                 onClick={loadAnalysisData}
                                 className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
                             >
@@ -204,7 +204,7 @@ const ValuationTab = ({ data }) => {
                             />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-3xl font-bold text-white">${fairValue.toFixed(2)}</span>
+                            <span className="text-3xl font-bold text-white">${(fairValue || 0).toFixed(2)}</span>
                             <span className="text-sm text-gray-400">Juste Valeur</span>
                         </div>
                     </div>
@@ -212,12 +212,12 @@ const ValuationTab = ({ data }) => {
                 <div className="grid grid-cols-2 gap-4 mt-4">
                     <div className="bg-gray-900/50 rounded-lg p-3">
                         <p className="text-gray-400 text-xs">Prix Actuel</p>
-                        <p className="text-white font-bold text-lg">${currentPrice.toFixed(2)}</p>
+                        <p className="text-white font-bold text-lg">${(currentPrice || 0).toFixed(2)}</p>
                     </div>
                     <div className="bg-gray-900/50 rounded-lg p-3">
                         <p className="text-gray-400 text-xs">Potentiel</p>
                         <p className={`font-bold text-lg ${upside > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                            {upside > 0 ? '+' : ''}{upside.toFixed(1)}%
+                            {upside > 0 ? '+' : ''}{(upside || 0).toFixed(1)}%
                         </p>
                     </div>
                 </div>
@@ -350,7 +350,7 @@ const ValuationTab = ({ data }) => {
                         </h3>
                         <p className="text-gray-300">
                             Marge de sécurité: <span className={`font-bold ${marginOfSafety > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                {marginOfSafety.toFixed(1)}%
+                                {(marginOfSafety || 0).toFixed(1)}%
                             </span>
                         </p>
                     </div>

@@ -9,7 +9,15 @@ const PlusTab = ({ isDarkMode, isProfessionalMode, setActiveTab, activeTab }) =>
     const handleLogout = () => {
         // Nettoyer toutes les données de session
         sessionStorage.clear();
+        
+        // Preserve settings
+        const theme = localStorage.getItem('theme');
+        const layout = localStorage.getItem('gob_layout');
+        
         localStorage.clear();
+        
+        if (theme) localStorage.setItem('theme', theme);
+        if (layout) localStorage.setItem('gob_layout', layout);
 
         // Rediriger vers la page de login
         window.location.href = '/login.html';
@@ -48,7 +56,7 @@ const PlusTab = ({ isDarkMode, isProfessionalMode, setActiveTab, activeTab }) =>
                         }`}>
                             Gérez votre compte et vos préférences
                         </p>
-                        <button
+                        <button title="Action"
                             onClick={handleLogout}
                             className={`w-full px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
                                 isDarkMode

@@ -266,7 +266,7 @@ const DashboardGridWrapper = ({
                     });
 
                     if (validLayout.length > 0) {
-                        console.log(`✅ Layout chargé depuis localStorage: ${validLayout.length} widgets (après déduplication)`);
+                        void(`✅ Layout chargé depuis localStorage: ${validLayout.length} widgets (après déduplication)`);
                         return validLayout;
                     } else {
                         console.warn('⚠️ Layout sauvegardé invalide, utilisation du layout par défaut');
@@ -276,7 +276,7 @@ const DashboardGridWrapper = ({
                 console.error('❌ Erreur chargement layout:', e);
             }
             const defaultLayout = getDefaultLayout();
-            console.log(`✅ Layout par défaut créé: ${defaultLayout.length} widgets`, defaultLayout);
+            void(`✅ Layout par défaut créé: ${defaultLayout.length} widgets`, defaultLayout);
             // Sauvegarder le layout par défaut
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultLayout));
@@ -335,7 +335,7 @@ const DashboardGridWrapper = ({
 
             // Vérifier si le widget existe déjà
             if (layout.some(item => item.i === tabId)) {
-                console.log(`Widget ${tabId} existe déjà`);
+                void(`Widget ${tabId} existe déjà`);
                 return;
             }
 
@@ -710,7 +710,7 @@ const DashboardGridWrapper = ({
 
         // ⚠️ CORRECTION PERFORMANCE: Logs uniquement au montage initial
         useEffect(() => {
-            console.log('🔍 DashboardGridWrapper - Montage initial:', {
+            void('🔍 DashboardGridWrapper - Montage initial:', {
                 layoutLength: layout?.length || 0,
                 ResponsiveGridLayoutAvailable: !!ResponsiveGridLayout
             });
@@ -879,7 +879,7 @@ const DashboardGridWrapper = ({
     };
 
     window.DashboardGridWrapper = DashboardGridWrapper;
-    console.log('✅ DashboardGridWrapper chargé');
-    console.log('📊 Layout par défaut:', getDefaultLayout());
-    console.log('🧩 Composants disponibles:', Object.keys(TAB_TO_WIDGET_MAP).slice(0, 5), '...');
+    void('✅ DashboardGridWrapper chargé');
+    void('📊 Layout par défaut:', getDefaultLayout());
+    void('🧩 Composants disponibles:', Object.keys(TAB_TO_WIDGET_MAP).slice(0, 5), '...');
 })();

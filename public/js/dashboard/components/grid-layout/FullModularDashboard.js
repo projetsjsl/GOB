@@ -129,14 +129,14 @@
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     if (parsed && parsed.length > 0) {
-                        console.log(`✅ Layout chargé depuis localStorage: ${parsed.length} widgets`);
+                        void(`✅ Layout chargé depuis localStorage: ${parsed.length} widgets`);
                         return parsed;
                     }
                 }
             } catch (e) {
                 console.error('❌ Erreur chargement layout:', e);
             }
-            console.log(`✅ Layout par défaut créé: ${DEFAULT_LAYOUT.length} widgets`, DEFAULT_LAYOUT);
+            void(`✅ Layout par défaut créé: ${DEFAULT_LAYOUT.length} widgets`, DEFAULT_LAYOUT);
             return DEFAULT_LAYOUT;
         });
 
@@ -178,7 +178,7 @@
                 // Pour l'instant, on utilise un mock ou on délègue si disponible
                 if (typeof window.supabase !== 'undefined') {
                     // Logique de chargement Supabase ici
-                    console.log('📊 Chargement tickers depuis Supabase...');
+                    void('📊 Chargement tickers depuis Supabase...');
                 }
                 setLoading(false);
             } catch (error) {
@@ -191,7 +191,7 @@
             try {
                 setLoading(true);
                 // TODO: Implémenter fetchNews
-                console.log('📰 Récupération actualités...');
+                void('📰 Récupération actualités...');
                 setLastUpdate(new Date());
                 setLoading(false);
             } catch (error) {
@@ -204,7 +204,7 @@
             try {
                 setLoading(true);
                 // TODO: Implémenter refreshAllStocks
-                console.log('🔄 Actualisation données boursières...');
+                void('🔄 Actualisation données boursières...');
                 setLastUpdate(new Date());
                 setLoading(false);
             } catch (error) {
@@ -216,7 +216,7 @@
         const fetchLatestNewsForTickers = useCallback(async () => {
             try {
                 // TODO: Implémenter fetchLatestNewsForTickers
-                console.log('📰 Récupération actualités pour tickers...');
+                void('📰 Récupération actualités pour tickers...');
             } catch (error) {
                 console.error('❌ Erreur fetchLatestNewsForTickers:', error);
             }
@@ -351,7 +351,7 @@
 
         // ⚠️ CORRECTION PERFORMANCE: Logs de débogage uniquement au montage initial
         useEffect(() => {
-            console.log('🔍 FullModularDashboard - Montage initial:', {
+            void('🔍 FullModularDashboard - Montage initial:', {
                 layoutLength: layout?.length || 0,
                 ResponsiveGridLayoutAvailable: !!ResponsiveGridLayout,
                 RGL: typeof window.ReactGridLayout !== 'undefined'

@@ -389,7 +389,7 @@ const PeerComparisonModal = ({ symbols, onClose }) => {
                     ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="bg-gray-900/80 sticky top-0 z-10">
+                            <thead className="bg-gray-900 sticky top-0 shadow-sm z-10">
                                 <tr>
                                     <th className="text-left p-4 text-gray-400 font-medium">Métrique</th>
                                     {comparisonData.map((stock, idx) => (
@@ -417,7 +417,7 @@ const PeerComparisonModal = ({ symbols, onClose }) => {
                                     const bestValue = getBestValue(metric, values);
 
                                     return (
-                                        <tr key={idx} className="border-t border-gray-700/50 hover:bg-gray-800/50 transition-colors">
+                                        <tr key={idx} className="border-t border-gray-700/50 hover:bg-gray-800/50 odd:bg-transparent even:bg-gray-800/20 transition-colors">
                                             <td className="p-4 text-white font-medium sticky left-0 bg-gray-800/95">
                                                 {getMetricLabel(metric)}
                                             </td>

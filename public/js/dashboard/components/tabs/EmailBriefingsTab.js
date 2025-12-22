@@ -282,17 +282,17 @@ const EmailBriefingsTab = () => {
                 
                 // Fonction pour générer un briefing
                 const generateBriefing = async (type) => {
-                    console.log('🚀 DÉBUT generateBriefing:', { type, loading });
-                    console.log('🔍 API Sources configurées:', apiSources);
-                    console.log('🔍 Perplexity enabled:', perplexityEnabled);
+                    void('🚀 DÉBUT generateBriefing:', { type, loading });
+                    void('🔍 API Sources configurées:', apiSources);
+                    void('🔍 Perplexity enabled:', perplexityEnabled);
                     
                     // Protection contre les générations multiples
                     if (loading) {
-                        console.log('⚠️ Génération déjà en cours, ignoré');
+                        void('⚠️ Génération déjà en cours, ignoré');
                         return;
                     }
                     
-                    console.log('✅ Démarrage de la génération...');
+                    void('✅ Démarrage de la génération...');
                     setLoading(true);
                     setCurrentBriefing(null);
                     setPreviewHtml('');
@@ -590,7 +590,7 @@ const EmailBriefingsTab = () => {
                             timestamp: briefing.timestamp
                         }, 'success');
 
-                        console.log('🎯 Mise à jour des états React:', {
+                        void('🎯 Mise à jour des états React:', {
                             briefingType: briefing.type,
                             hasHtml: !!briefing.html,
                             htmlLength: briefing.html.length,
@@ -603,11 +603,11 @@ const EmailBriefingsTab = () => {
                         setPreviewHtml(html + '');
                         setSelectedType(type);
                         
-                        console.log('✅ États React mis à jour avec succès');
-                        console.log('🔍 Briefing object:', briefing);
-                        console.log('🔍 HTML length:', html.length);
-                        console.log('🔍 currentBriefing state will be:', briefing);
-                        console.log('🔍 previewHtml state will be:', html.substring(0, 100) + '...');
+                        void('✅ États React mis à jour avec succès');
+                        void('🔍 Briefing object:', briefing);
+                        void('🔍 HTML length:', html.length);
+                        void('🔍 currentBriefing state will be:', briefing);
+                        void('🔍 previewHtml state will be:', html.substring(0, 100) + '...');
                         
                         addLogEntry('COMPLETION', 'Briefing généré avec succès', {
                             totalTime: Date.now() - new Date(processLog[0]?.timestamp).getTime(),
@@ -645,7 +645,7 @@ const EmailBriefingsTab = () => {
 
                 // ÉTAPE 0: Intent Analysis avec Emma Agent
                 const analyzeIntent = async (type) => {
-                    console.log('🧠 ÉTAPE 0: Intent Analysis START');
+                    void('🧠 ÉTAPE 0: Intent Analysis START');
 
                     const intentAnalysisPrompt = `Tu es Emma, assistante financière experte.
 Analyse l'actualité et l'environnement de marché pour ${type}.
@@ -724,7 +724,7 @@ RÉPONDS EN JSON UNIQUEMENT:
                             const jsonMatch = result.response.match(/\{[\s\S]*\}/);
                             if (jsonMatch) {
                                 const intentData = JSON.parse(jsonMatch[0]);
-                                console.log('✅ Intent Analysis:', intentData);
+                                void('✅ Intent Analysis:', intentData);
                                 addLogEntry('INTENT_ANALYSIS', 'Intent détecté', intentData, 'success');
                                 return intentData;
                             }
@@ -751,7 +751,7 @@ RÉPONDS EN JSON UNIQUEMENT:
 
                 // ÉTAPE 1: Smart Data Gathering avec Emma Agent
                 const gatherSmartData = async (type, intentData) => {
-                    console.log('📊 ÉTAPE 1: Smart Data Gathering START');
+                    void('📊 ÉTAPE 1: Smart Data Gathering START');
 
                     try {
                         const response = await fetch('/api/emma-agent', {
@@ -776,7 +776,7 @@ RÉPONDS EN JSON UNIQUEMENT:
                         const result = await response.json();
 
                         if (result.success) {
-                            console.log('✅ Smart Data gathered:', result.tools_used);
+                            void('✅ Smart Data gathered:', result.tools_used);
                             addLogEntry('SMART_DATA', 'Données récupérées', {
                                 tools_used: result.tools_used,
                                 data_size: JSON.stringify(result).length
@@ -807,7 +807,7 @@ RÉPONDS EN JSON UNIQUEMENT:
 
                 // ÉTAPE 2: Content Selection
                 const selectEmailContent = (intentData, smartData) => {
-                    console.log('🎯 ÉTAPE 2: Content Selection START');
+                    void('🎯 ÉTAPE 2: Content Selection START');
 
                     const sections = [];
 
@@ -851,7 +851,7 @@ RÉPONDS EN JSON UNIQUEMENT:
                     // Trier par priorité décroissante
                     sections.sort((a, b) => b.priority - a.priority);
 
-                    console.log('✅ Sections sélectionnées:', sections.length);
+                    void('✅ Sections sélectionnées:', sections.length);
                     addLogEntry('CONTENT_SELECTION', 'Sections sélectionnées', {
                         count: sections.length,
                         titles: sections.map(s => s.title)
@@ -862,7 +862,7 @@ RÉPONDS EN JSON UNIQUEMENT:
 
                 // ÉTAPE 3: Build Adaptive Prompt
                 const buildAdaptivePrompt = (type, intentData, selectedSections) => {
-                    console.log('✍️ ÉTAPE 3: Build Adaptive Prompt START');
+                    void('✍️ ÉTAPE 3: Build Adaptive Prompt START');
 
                     const basePrompt = prompts[type]?.perplexity || prompts[type]?.openai || '';
                     let adaptedPrompt = basePrompt;
@@ -928,7 +928,7 @@ ${basePrompt}
                         }
                     });
 
-                    console.log('✅ Adaptive Prompt built:', adaptedPrompt.length, 'chars');
+                    void('✅ Adaptive Prompt built:', adaptedPrompt.length, 'chars');
                     addLogEntry('ADAPTIVE_PROMPT', 'Prompt adaptatif créé', {
                         length: adaptedPrompt.length,
                         intent: intentData.intent,
@@ -940,11 +940,11 @@ ${basePrompt}
 
                 // FONCTION PRINCIPALE: Generate Cognitive Briefing
                 const generateCognitiveBriefing = async (type) => {
-                    console.log('🧠 COGNITIVE BRIEFING START:', { type, loading });
+                    void('🧠 COGNITIVE BRIEFING START:', { type, loading });
 
                     // Protection contre les générations multiples
                     if (loading) {
-                        console.log('⚠️ Génération déjà en cours, ignoré');
+                        void('⚠️ Génération déjà en cours, ignoré');
                         return;
                     }
 
@@ -968,7 +968,7 @@ ${basePrompt}
 
                         // OPTIMISATION: Pour briefings prédéfinis, utiliser intent prédéfini (économise 5-15s)
                         if (['morning', 'noon', 'evening'].includes(type)) {
-                            console.log(`⚡ OPTIMISATION: Intent prédéfini pour ${type} (skip API call)`);
+                            void(`⚡ OPTIMISATION: Intent prédéfini pour ${type} (skip API call)`);
                             const currentHour = new Date().getHours();
 
                             // Intent adapté selon l'heure
@@ -1144,7 +1144,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
 - Focus sur l'ACTIONNABLE et les INSIGHTS
 - Citer les SOURCES en fin d'analyse`;
 
-                        console.log('✅ Adaptive prompt built:', briefingMessage.length, 'chars');
+                        void('✅ Adaptive prompt built:', briefingMessage.length, 'chars');
                         addLogEntry('ADAPTIVE_PROMPT', 'Prompt adaptatif créé', {
                             length: briefingMessage.length,
                             intent: intentData.intent,
@@ -1153,7 +1153,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         }, 'info');
 
                         // Appel Emma Agent en MODE BRIEFING
-                        console.log('🔄 Appel Emma Agent API en MODE BRIEFING...');
+                        void('🔄 Appel Emma Agent API en MODE BRIEFING...');
                         setStepDetails('⏳ Génération du briefing via Emma Agent... (cela peut prendre 2-3 minutes)');
                         addLogEntry('API_CALL_START', 'Début appel Emma Agent API', {
                             endpoint: '/api/emma-agent',
@@ -1168,21 +1168,21 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         // Warning 1: après 60s
                         const warningTimer1 = setTimeout(() => {
                             const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                            console.log(`⏰ Génération en cours: ${elapsed}s...`);
+                            void(`⏰ Génération en cours: ${elapsed}s...`);
                             setStepDetails(`⏳ Analyse en profondeur... ${elapsed}s (Emma collecte et analyse les données)`);
                         }, 60000);
 
                         // Warning 2: après 120s
                         const warningTimer2 = setTimeout(() => {
                             const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                            console.log(`⏰ Génération toujours en cours: ${elapsed}s...`);
+                            void(`⏰ Génération toujours en cours: ${elapsed}s...`);
                             setStepDetails(`⏳ Génération complexe... ${elapsed}s (Emma génère le briefing détaillé)`);
                         }, 120000);
 
                         // Warning 3: après 180s
                         const warningTimer3 = setTimeout(() => {
                             const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                            console.log(`⏰ Finalisation: ${elapsed}s...`);
+                            void(`⏰ Finalisation: ${elapsed}s...`);
                             setStepDetails(`⏳ Finalisation imminente... ${elapsed}s (max 300s)`);
                         }, 180000);
 
@@ -1210,7 +1210,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                             clearTimeout(warningTimer2);
                             clearTimeout(warningTimer3);
                             const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                            console.log(`✅ API responded after ${elapsed}s`);
+                            void(`✅ API responded after ${elapsed}s`);
 
                         } catch (fetchError) {
                             clearTimeout(warningTimer1);
@@ -1233,7 +1233,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                             throw new Error(`🌐 Erreur réseau: ${fetchError.message}`);
                         }
 
-                        console.log('📡 Emma Agent Response Status:', analysisResponse.status, analysisResponse.statusText);
+                        void('📡 Emma Agent Response Status:', analysisResponse.status, analysisResponse.statusText);
                         addLogEntry('API_RESPONSE', 'Réponse Emma Agent reçue', {
                             status: analysisResponse.status,
                             statusText: analysisResponse.statusText,
@@ -1247,7 +1247,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         }
 
                         const analysisResult = await analysisResponse.json();
-                        console.log('📊 Emma Agent Result:', {
+                        void('📊 Emma Agent Result:', {
                             success: analysisResult.success,
                             hasResponse: !!analysisResult.response,
                             responseLength: analysisResult.response?.length || 0,
@@ -1356,7 +1356,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         setCurrentStep('✅ Briefing généré avec succès!');
                         setStepDetails(`Analyse cognitive complétée en ${Math.round((Date.now() - new Date(processLog[0]?.timestamp).getTime()) / 1000)}s`);
 
-                        console.log('✅ COGNITIVE BRIEFING COMPLETE');
+                        void('✅ COGNITIVE BRIEFING COMPLETE');
 
                     } catch (error) {
                         addLogEntry('ERROR', 'Erreur génération cognitive briefing', {
@@ -2505,7 +2505,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             )}
                                         </div>
                                     </div>
-                                    {console.log('🔍 État previewHtml:', previewHtml ? previewHtml.substring(0, 200) + '...' : 'null')}
+                                    {void('🔍 État previewHtml:', previewHtml ? previewHtml.substring(0, 200) + '...' : 'null')}
                                     {previewHtml ? (
                                         isEditMode ? (
                                             <div className="p-4">
@@ -2530,8 +2530,8 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                 srcDoc={previewHtml}
                                                 className="w-full h-96 border-0"
                                                 title="Email Preview"
-                                                onLoad={() => console.log('✅ Iframe chargé avec succès')}
-                                                onError={() => console.log('❌ Erreur chargement iframe')}
+                                                onLoad={() => void('✅ Iframe chargé avec succès')}
+                                                onError={() => void('❌ Erreur chargement iframe')}
                                             />
                                         )
                                     ) : (

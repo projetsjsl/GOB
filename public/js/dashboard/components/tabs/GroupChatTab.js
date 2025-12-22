@@ -226,7 +226,7 @@ const GroupChatTab = ({ isDarkMode = true, dashboardTab, onDashboardTabChange })
         </div>
         <div style={{ display:'flex', gap:2, background:themeStyles.surface, borderRadius:'8px', padding:3, marginLeft:16 }}>
           {[{id:'main',icon:'🎯',label:'Main'},{id:'workflows',icon:'⚡',label:'Workflows'},{id:'admin',icon:'⚙️',label:'Admin'}].map(t => (
-            <button key={t.id} onClick={()=>setActiveTab(t.id)} style={{ padding:'6px 14px', borderRadius:'8px', border:'none', background: activeTab===t.id ? themeStyles.surface : 'transparent', color: activeTab===t.id ? themeStyles.primary : 'var(--theme-text-secondary, #a0a0b0)', cursor:'pointer', fontSize:11, fontWeight:600, display:'flex', alignItems:'center', gap:4 }}>{t.icon} {t.label}</button>
+            <button title="Action" key={t.id} onClick={()=>setActiveTab(t.id)} style={{ padding:'6px 14px', borderRadius:'8px', border:'none', background: activeTab===t.id ? themeStyles.surface : 'transparent', color: activeTab===t.id ? themeStyles.primary : 'var(--theme-text-secondary, #a0a0b0)', cursor:'pointer', fontSize:11, fontWeight:600, display:'flex', alignItems:'center', gap:4 }}>{t.icon} {t.label}</button>
           ))}
         </div>
         <div style={{ flex:1 }}/>
@@ -234,7 +234,7 @@ const GroupChatTab = ({ isDarkMode = true, dashboardTab, onDashboardTabChange })
           {Object.values(providers).map(p => <option key={p.id} value={p.id} disabled={p.status!=='ready'}>{p.icon} {p.name}</option>)}
         </select>
         <button onClick={()=>setExpertMode(!expertMode)} style={{ padding:'6px 10px', borderRadius:'8px', border:`1px solid ${themeStyles.border}`, background: expertMode ? 'rgba(179,136,255,0.15)' : themeStyles.surface, color: expertMode ? '#b388ff' : 'var(--theme-text-secondary, #a0a0b0)', cursor:'pointer', fontSize:11, fontWeight:600 }}>{expertMode ? '🔬' : '👤'}</button>
-        {debugUrl && <a href={debugUrl} target="_blank" className="anim-glow" style={{ padding:'5px 10px', background:'rgba(255,82,82,0.1)', border:'1px solid rgba(255,82,82,.3)', borderRadius:'8px', color:'#ff5252', fontSize:10, fontWeight:600, textDecoration:'none', display:'flex', alignItems:'center', gap:4 }}><span className="status-dot running anim-pulse"/> LIVE</a>}
+        {debugUrl && <a href={debugUrl} target="_blank" rel="noopener noreferrer" className="anim-glow" style={{ padding:'5px 10px', background:'rgba(255,82,82,0.1)', border:'1px solid rgba(255,82,82,.3)', borderRadius:'8px', color:'#ff5252', fontSize:10, fontWeight:600, textDecoration:'none', display:'flex', alignItems:'center', gap:4 }}><span className="status-dot running anim-pulse"/> LIVE</a>}
         <div style={{ display:'flex', alignItems:'center', gap:5, padding:'5px 10px', background:themeStyles.surface, borderRadius:'8px', border:`1px solid ${themeStyles.border}` }}><span className={`status-dot ${isRunning ? 'running' : provider?.status==='ready' ? 'ready' : 'error'}`} style={isRunning ? {animation:'pulse 1s infinite'} : {}}/><span style={{ fontSize:10, color:'var(--theme-text-secondary, #a0a0b0)' }}>{isRunning ? 'Running' : 'Ready'}</span></div>
       </header>
 

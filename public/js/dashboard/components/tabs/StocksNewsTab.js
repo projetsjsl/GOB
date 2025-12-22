@@ -109,13 +109,13 @@ const StocksNewsTab = (props) => {
 
             // Heatmap Widget
             if (heatmapRef.current) {
-                // console.log('🔄 [Heatmap SPX500] Chargement du widget TradingView...');
+                // void('🔄 [Heatmap SPX500] Chargement du widget TradingView...');
                 heatmapRef.current.innerHTML = '';
                 const script = document.createElement('script');
                 script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
                 script.async = true;
                 script.onload = () => {
-                    // console.log('✅ [Heatmap SPX500] Widget TradingView chargé');
+                    // void('✅ [Heatmap SPX500] Widget TradingView chargé');
                 };
                 script.onerror = (error) => {
                     console.error('❌ [Heatmap SPX500] Erreur chargement widget:', error);

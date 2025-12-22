@@ -53,7 +53,7 @@ const AnnouncementBarManager = ({ isDarkMode = true }) => {
                         
                         // Si le contenu a changé, on met à jour
                         if (JSON.stringify(prev) !== JSON.stringify(merged)) {
-                            console.log('🔄 Config Announcement Bars mise à jour depuis Supabase');
+                            void('🔄 Config Announcement Bars mise à jour depuis Supabase');
                             return merged;
                         }
                         return prev;

@@ -134,7 +134,7 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                     
                     // Extract symbols from screener results
                     stocksToScreen = stocks.slice(0, 50).map(s => s.symbol || s.ticker).filter(Boolean);
-                    console.log(`📊 FMP Screener: ${stocksToScreen.length} stocks found`);
+                    void(`📊 FMP Screener: ${stocksToScreen.length} stocks found`);
                 }
             } catch (screenerError) {
                 console.warn('FMP screener failed, using default list:', screenerError);
@@ -152,7 +152,7 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
             }
 
             // Step 2: Fetch data for all stocks using batch API
-            console.log(`🔍 Screening ${stocksToScreen.length} stocks...`);
+            void(`🔍 Screening ${stocksToScreen.length} stocks...`);
             
             // Split into batches of 10 to avoid API limits
             const BATCH_SIZE = 10;
@@ -252,7 +252,7 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
             allResults.sort((a, b) => b.marketCap - a.marketCap);
             
             setResults(allResults);
-            console.log(`✅ Screening complete: ${allResults.length} stocks match criteria`);
+            void(`✅ Screening complete: ${allResults.length} stocks match criteria`);
             
         } catch (error) {
             console.error('Screening error:', error);
@@ -282,7 +282,7 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                             Filtrez les titres selon vos critères
                         </p>
                     </div>
-                    <button
+                    <button title="Action"
                         onClick={onClose}
                         className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center transition-colors"
                     >

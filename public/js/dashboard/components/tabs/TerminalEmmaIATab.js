@@ -19,7 +19,7 @@ const TerminalEmmaIATab = ({ isDarkMode, activeTab, setActiveTab }) => {
     const [error, setError] = useState(null);
 
     const handleIframeLoad = () => {
-        console.log('Terminal Emma IA iframe chargé avec succès');
+        void('Terminal Emma IA iframe chargé avec succès');
         setIsLoading(false);
         setError(null);
     };

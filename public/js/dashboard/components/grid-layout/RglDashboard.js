@@ -335,7 +335,7 @@
                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-neutral-700 text-gray-300' : 'bg-gray-200 text-gray-600'}`}>BP: {currentBreakpoint}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <button onClick={() => setIsEditing(!isEditing)} className={`px-4 py-2 rounded-lg font-medium text-sm ${isEditing ? 'bg-emerald-500 text-white' : isDarkMode ? 'bg-neutral-700 text-gray-300' : 'bg-gray-200 text-gray-700'}`}>
+                            <button title="Action" onClick={() => setIsEditing(!isEditing)} className={`px-4 py-2 rounded-lg font-medium text-sm ${isEditing ? 'bg-emerald-500 text-white' : isDarkMode ? 'bg-neutral-700 text-gray-300' : 'bg-gray-200 text-gray-700'}`}>
                                 {isEditing ? '✓ Terminer' : '✎ Modifier'}
                             </button>
                             {isEditing && <button onClick={resetLayout} className={`px-4 py-2 rounded-lg font-medium text-sm ${isDarkMode ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-600'}`}>↺ Reset</button>}
@@ -361,5 +361,5 @@
     window.RglDashboard = RglDashboard;
     window.RGL_DEFAULT_LAYOUTS = DEFAULT_LAYOUTS;
     window.RGL_WIDGET_DEFINITIONS = WIDGET_DEFINITIONS;
-    console.log('✅ RglDashboard loaded');
+    void('✅ RglDashboard loaded');
 })();

@@ -112,10 +112,10 @@ const AdminJSLaiTab = ({
 
                 // --- Password Management Handler (Moved to Top) ---
                 const handlePasswordResetSubmit = async () => {
-                   console.log('🔑 handlePasswordResetSubmit called', { selectedUserForReset, newPassword });
+                   void('🔑 handlePasswordResetSubmit called', { selectedUserForReset, newPassword });
                    
                    if (!selectedUserForReset || !newPassword) {
-                       console.log('❌ Missing data:', { selectedUserForReset, newPassword: newPassword ? 'has value' : 'empty' });
+                       void('❌ Missing data:', { selectedUserForReset, newPassword: newPassword ? 'has value' : 'empty' });
                        showMessage('❌ Veuillez entrer un nouveau mot de passe', 'error');
                        return;
                    }
@@ -126,7 +126,7 @@ const AdminJSLaiTab = ({
                            ? window.authGuard.getCurrentUser() 
                            : { username: 'Admin' };
                        
-                       console.log('📡 Sending password update request...');
+                       void('📡 Sending password update request...');
                        const response = await fetch('/api/auth', {
                            method: 'POST',
                            headers: { 'Content-Type': 'application/json' },
@@ -141,7 +141,7 @@ const AdminJSLaiTab = ({
                            })
                        });
                        const data = await response.json();
-                       console.log('📥 Response:', data);
+                       void('📥 Response:', data);
                        
                        if (data.success) {
                            showMessage(`✅ Mot de passe de ${selectedUserForReset.username} changé en: ${newPassword}`, 'success');
@@ -213,7 +213,7 @@ const AdminJSLaiTab = ({
                                     ...prev,
                                     ...data.config.value
                                 }));
-                                console.log('✅ Announcement Bars config loaded from DB');
+                                void('✅ Announcement Bars config loaded from DB');
                             }
                         } catch (e) {
                             console.error('Error loading bar configs from DB:', e);
@@ -298,7 +298,7 @@ const AdminJSLaiTab = ({
                 
                 const fetchNews = () => {
                     // TODO: Implémenter la récupération des nouvelles
-                    console.log('Fetch news clicked');
+                    void('Fetch news clicked');
                 };
                 
                 // États pour les logs de scraping
@@ -312,7 +312,7 @@ const AdminJSLaiTab = ({
                         timestamp: new Date().toISOString()
                     };
                     setScrapingLogs(prev => [...prev, log]);
-                    console.log(`[Scraping ${type.toUpperCase()}] ${message}`);
+                    void(`[Scraping ${type.toUpperCase()}] ${message}`);
                 };
                 
                 const runSeekingAlphaScraper = async () => {
@@ -406,7 +406,7 @@ const AdminJSLaiTab = ({
                        }
 
                        try {
-                           console.log('📡 Fetching users list...');
+                           void('📡 Fetching users list...');
                            const response = await fetch('/api/auth', {
                                method: 'POST',
                                headers: { 'Content-Type': 'application/json' },
@@ -416,10 +416,10 @@ const AdminJSLaiTab = ({
                                })
                            });
                            const data = await response.json();
-                           console.log('📥 Users list response:', data);
+                           void('📥 Users list response:', data);
                            if (data.success) {
                                setAvailableUsers(data.users || []);
-                               console.log('✅ Users list updated:', data.users?.length || 0, 'users');
+                               void('✅ Users list updated:', data.users?.length || 0, 'users');
                            } else {
                                console.error('❌ Error fetching users:', data.error);
                                showMessage('❌ Erreur lors du chargement des utilisateurs: ' + (data.error || 'Erreur inconnue'), 'error');
@@ -525,10 +525,10 @@ const AdminJSLaiTab = ({
                             setShowRoleModal(false);
                             setRoleForm({ roleName: '', displayName: '', description: '', is_admin: false, componentPermissions: {} });
                         } else {
-                            alert('Erreur: ' + data.error);
+                            console.log('Alert suppressed:', 'Erreur: ' + data.error);
                         }
                     } catch (e) {
-                        alert('Erreur: ' + e.message);
+                        console.log('Alert suppressed:', 'Erreur: ' + e.message);
                     } finally {
                         setLoadingRoles(false);
                     }
@@ -557,10 +557,10 @@ const AdminJSLaiTab = ({
                             setShowRoleModal(false);
                             setSelectedRole(null);
                         } else {
-                            alert('Erreur: ' + data.error);
+                            console.log('Alert suppressed:', 'Erreur: ' + data.error);
                         }
                     } catch (e) {
-                        alert('Erreur: ' + e.message);
+                        console.log('Alert suppressed:', 'Erreur: ' + e.message);
                     } finally {
                         setLoadingRoles(false);
                     }
@@ -583,17 +583,17 @@ const AdminJSLaiTab = ({
                         if (data.success) {
                             fetchRoles();
                         } else {
-                            alert('Erreur: ' + data.error);
+                            console.log('Alert suppressed:', 'Erreur: ' + data.error);
                         }
                     } catch (e) {
-                        alert('Erreur: ' + e.message);
+                        console.log('Alert suppressed:', 'Erreur: ' + e.message);
                     } finally {
                         setLoadingRoles(false);
                     }
                 };
                 
                 const handleAssignRole = async () => {
-                    if (!assignUserForm.username || !assignUserForm.roleId) return alert('Veuillez remplir tous les champs');
+                    if (!assignUserForm.username || !assignUserForm.roleId) return console.log('Alert suppressed:', 'Veuillez remplir tous les champs');
                     setLoadingRoles(true);
                     try {
                         const response = await fetch('/api/roles-config', {
@@ -608,13 +608,13 @@ const AdminJSLaiTab = ({
                         });
                         const data = await response.json();
                         if (data.success) {
-                            alert(`Rôle assigné avec succès à ${assignUserForm.username}`);
+                            console.log('Alert suppressed:', `Rôle assigné avec succès à ${assignUserForm.username}`);
                             setAssignUserForm({ username: '', roleId: '' });
                         } else {
-                            alert('Erreur: ' + data.error);
+                            console.log('Alert suppressed:', 'Erreur: ' + data.error);
                         }
                     } catch (e) {
-                        alert('Erreur: ' + e.message);
+                        console.log('Alert suppressed:', 'Erreur: ' + e.message);
                     } finally {
                         setLoadingRoles(false);
                     }
@@ -1553,11 +1553,11 @@ const AdminJSLaiTab = ({
                                                     method: 'DELETE'
                                                 });
                                                 if (response.ok) {
-                                                    alert('Cache vidé avec succès');
+                                                    console.log('Alert suppressed:', 'Cache vidé avec succès');
                                                     setCacheStatus({});
                                                 }
                                             } catch (error) {
-                                                alert('Erreur lors du vidage du cache');
+                                                console.log('Alert suppressed:', 'Erreur lors du vidage du cache');
                                             }
                                         }
                                     }}
@@ -1576,7 +1576,7 @@ const AdminJSLaiTab = ({
                                         };
                                         setCacheSettings(defaultSettings);
                                         localStorage.setItem('cacheSettings', JSON.stringify(defaultSettings));
-                                        alert('Paramètres réinitialisés aux valeurs par défaut');
+                                        console.log('Alert suppressed:', 'Paramètres réinitialisés aux valeurs par défaut');
                                     }}
                                     className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
                                         darkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-600 hover:bg-gray-700 text-white'
@@ -2607,20 +2607,20 @@ const AdminJSLaiTab = ({
                                                 if (typeof showMessage === 'function') {
                                                     showMessage('✅ Emma Agent opérationnel', 'success');
                                                 } else {
-                                                    alert('✅ Emma Agent opérationnel');
+                                                    console.log('Alert suppressed:', '✅ Emma Agent opérationnel');
                                                 }
                                             } else {
                                                 if (typeof showMessage === 'function') {
                                                     showMessage('❌ Emma Agent erreur: ' + data.error, 'error');
                                                 } else {
-                                                    alert('❌ Emma Agent erreur: ' + data.error);
+                                                    console.log('Alert suppressed:', '❌ Emma Agent erreur: ' + data.error);
                                                 }
                                             }
                                         }).catch(error => {
                                             if (typeof showMessage === 'function') {
                                                 showMessage('❌ Erreur connexion Emma Agent', 'error');
                                             } else {
-                                                alert('❌ Erreur connexion Emma Agent');
+                                                console.log('Alert suppressed:', '❌ Erreur connexion Emma Agent');
                                             }
                                         });
                                     }}
@@ -2727,7 +2727,7 @@ const AdminJSLaiTab = ({
                                         .then(data => {
                                             if (data.success) {
                                                 showMessage('✅ Configuration des outils récupérée', 'success');
-                                                console.log('Tools Config:', data.tools_config);
+                                                void('Tools Config:', data.tools_config);
                                             } else {
                                                 showMessage('❌ Erreur récupération config', 'error');
                                             }

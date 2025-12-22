@@ -223,7 +223,7 @@ const YieldCurveTab = () => {
                         <option value="us">US Only</option>
                         <option value="canada">Canada Only</option>
                     </select>
-                    <button onClick={fetchYieldCurve} className="p-1.5 hover:bg-neutral-800 rounded transition-colors">
+                    <button title="Action" onClick={fetchYieldCurve} className="p-1.5 hover:bg-neutral-800 rounded transition-colors">
                         <LucideIcon name="RefreshCw" className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
@@ -309,7 +309,7 @@ const YieldCurveTab = () => {
                     <LucideIcon name="Shield" className="w-3 h-3" /> Sources de Référence
                 </h3>
                 <div className="flex flex-wrap gap-x-8 gap-y-4">
-                    <a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve" target="_blank" className="text-xs text-neutral-400 hover:text-blue-400 transition-colors flex items-center gap-2">
+                    <a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve" target="_blank" rel="noopener noreferrer" className="text-xs text-neutral-400 hover:text-blue-400 transition-colors flex items-center gap-2">
                         <div className="w-1 h-1 rounded-full bg-blue-500" /> U.S. Treasury Official
                     </a>
                     <a href="https://fred.stlouisfed.org" target="_blank" className="text-xs text-neutral-400 hover:text-blue-400 transition-colors flex items-center gap-2">

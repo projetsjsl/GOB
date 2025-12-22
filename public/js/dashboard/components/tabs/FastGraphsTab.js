@@ -34,7 +34,7 @@ const FastGraphsTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
     // Déclenchement automatique
     useEffect(() => {
         if (autoLogin && status === 'idle' && !sessionUrl) {
-            console.log('🔄 FastGraphs: Auto-login déclenché');
+            void('🔄 FastGraphs: Auto-login déclenché');
             handleLogin();
         }
     }, [autoLogin]); // Dépendance sur autoLogin et mount

@@ -88,7 +88,14 @@ export default async function handler(req, res) {
         throw new Error(`Erreur création session Browserbase: ${errText}`);
     }
 
-    const sessionData = await sessionResponse.json();
+        // Secure JSON parsing
+    let sessionData;
+    try {
+        const raw = await sessionResponse.text();
+        sessionData = JSON.parse(raw);
+    } catch(e) {
+        throw new Error(`Browserbase Session Error (Invalid JSON): ${e.message}`);
+    }
     const sessionId = sessionData.id;
     // URL de debug/view pour l'utilisateur
     const sessionUrl = `https://www.browserbase.com/sessions/${sessionId}`; 

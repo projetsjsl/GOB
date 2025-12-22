@@ -274,11 +274,11 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                 updatePresence(data.room.id);
             } else {
                 console.error('Erreur création salon:', data.error);
-                alert('Erreur création salon: ' + (data.error || 'Erreur inconnue'));
+                console.log('Alert suppressed:', 'Erreur création salon: ' + (data.error || 'Erreur inconnue'));
             }
         } catch (error) {
             console.error('Erreur création salon intégré:', error);
-            alert('Erreur création salon: ' + error.message);
+            console.log('Alert suppressed:', 'Erreur création salon: ' + error.message);
         } finally {
             setIsLoadingMessages(false);
         }
@@ -391,11 +391,11 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                 // Recharger les messages pour avoir la réponse de l'assistant (si appelé)
                 await loadIntegratedMessages(integratedRoom.id);
             } else {
-                alert('Erreur envoi message: ' + (data.error || 'Erreur inconnue'));
+                console.log('Alert suppressed:', 'Erreur envoi message: ' + (data.error || 'Erreur inconnue'));
             }
         } catch (error) {
             console.error('Erreur envoi message:', error);
-            alert('Erreur envoi message: ' + error.message);
+            console.log('Alert suppressed:', 'Erreur envoi message: ' + error.message);
         } finally {
             setIsSendingMessage(false);
         }
@@ -414,7 +414,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                 .find(msg => msg.role === 'user');
             
             if (!lastUserMessage) {
-                alert('Aucun message utilisateur récent pour appeler le LLM');
+                console.log('Alert suppressed:', 'Aucun message utilisateur récent pour appeler le LLM');
                 return;
             }
 
@@ -437,11 +437,11 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                 // Recharger les messages pour voir la réponse
                 await loadIntegratedMessages(integratedRoom.id);
             } else {
-                alert('Erreur appel LLM: ' + (data.error || 'Erreur inconnue'));
+                console.log('Alert suppressed:', 'Erreur appel LLM: ' + (data.error || 'Erreur inconnue'));
             }
         } catch (error) {
             console.error('Erreur appel LLM manuel:', error);
-            alert('Erreur appel LLM: ' + error.message);
+            console.log('Alert suppressed:', 'Erreur appel LLM: ' + error.message);
         } finally {
             setIsCallingLlm(false);
         }
@@ -1242,7 +1242,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                                 if (lastUserMsg) {
                                                     handleCallLlmManually();
                                                 } else {
-                                                    alert('Aucun message utilisateur récent');
+                                                    console.log('Alert suppressed:', 'Aucun message utilisateur récent');
                                                 }
                                             },
                                             disabled: isCallingLlm || integratedMessages.filter(m => m.role === 'user').length === 0,

@@ -96,9 +96,9 @@ const EconomicCalendarTab = ({ isDarkMode }) => {
     };
 
     // Debug: Log du chargement du composant
-    // console.log('📅 EconomicCalendarTab chargé'); // Disabled - too frequent
-    console.log('📊 Données init:', calendarData);
-    // console.log('🔧 État du composant:', { activeSubTab, loading, error }); // Disabled
+    // void('📅 EconomicCalendarTab chargé'); // Disabled - too frequent
+    void('📊 Données init:', calendarData);
+    // void('🔧 État du composant:', { activeSubTab, loading, error }); // Disabled
 
     // Load team and watchlist tickers once on mount
     React.useEffect(() => {
@@ -110,7 +110,7 @@ const EconomicCalendarTab = ({ isDarkMode }) => {
 
                 if (data.success) {
                     setTeamTickers(data.team_tickers || []);
-                    console.log(`✅ Team tickers loaded: ${data.team_tickers?.length || 0}`);
+                    void(`✅ Team tickers loaded: ${data.team_tickers?.length || 0}`);
                 }
             } catch (error) {
                 console.error('❌ Error loading team tickers:', error);
@@ -123,7 +123,7 @@ const EconomicCalendarTab = ({ isDarkMode }) => {
 
                 if (data.tickers && Array.isArray(data.tickers)) {
                     setWatchlistTickers(data.tickers);
-                    console.log(`✅ Watchlist tickers loaded: ${data.tickers.length}`);
+                    void(`✅ Watchlist tickers loaded: ${data.tickers.length}`);
                 }
             } catch (error) {
                 console.error('❌ Error loading watchlist tickers:', error);
@@ -132,7 +132,7 @@ const EconomicCalendarTab = ({ isDarkMode }) => {
                 if (savedWatchlist) {
                     const tickers = JSON.parse(savedWatchlist);
                     setWatchlistTickers(tickers);
-                    console.log(`📦 Watchlist loaded from localStorage: ${tickers.length}`);
+                    void(`📦 Watchlist loaded from localStorage: ${tickers.length}`);
                 }
             }
         };
@@ -151,7 +151,7 @@ const EconomicCalendarTab = ({ isDarkMode }) => {
     }, [activeSubTab]);
 
     const fetchCalendarData = async () => {
-        console.log('🔄 fetchCalendarData appelé pour:', activeSubTab);
+        void('🔄 fetchCalendarData appelé pour:', activeSubTab);
         setLoading(true);
         setError(null);
 
@@ -163,9 +163,9 @@ const EconomicCalendarTab = ({ isDarkMode }) => {
 
                 if (result.success && result.data) {
                     setCalendarData(result.data);
-                    console.log(`✅ ${result.data.length} earnings calendar days loaded from ${result.source}`);
+                    void(`✅ ${result.data.length} earnings calendar days loaded from ${result.source}`);
                     if (result.fallback_tried) {
-                        console.log('⚠️ Fallback sources tried:', result.fallback_tried);
+                        void('⚠️ Fallback sources tried:', result.fallback_tried);
                     }
                 } else {
                     setError('Aucune donnée d\'earnings disponible');
@@ -178,9 +178,9 @@ const EconomicCalendarTab = ({ isDarkMode }) => {
 
                 if (result.success && result.data) {
                     setCalendarData(result.data);
-                    console.log(`✅ ${result.data.length} economic calendar days loaded from ${result.source}`);
+                    void(`✅ ${result.data.length} economic calendar days loaded from ${result.source}`);
                     if (result.fallback_tried) {
-                        console.log('⚠️ Fallback sources tried:', result.fallback_tried);
+                        void('⚠️ Fallback sources tried:', result.fallback_tried);
                     }
                 } else {
                     setError('Aucune donnée économique disponible');
@@ -193,9 +193,9 @@ const EconomicCalendarTab = ({ isDarkMode }) => {
 
                 if (result.success && result.data) {
                     setCalendarData(result.data);
-                    console.log(`✅ ${result.data.length} dividend events loaded from ${result.source}`);
+                    void(`✅ ${result.data.length} dividend events loaded from ${result.source}`);
                     if (result.fallback_tried) {
-                        console.log('⚠️ Fallback sources tried:', result.fallback_tried);
+                        void('⚠️ Fallback sources tried:', result.fallback_tried);
                     }
                 } else {
                     setError('Aucune donnée de dividendes disponible');
@@ -214,7 +214,7 @@ const EconomicCalendarTab = ({ isDarkMode }) => {
     };
 
     const handleRefresh = async () => {
-        console.log('🔄 Actualisation du calendrier...');
+        void('🔄 Actualisation du calendrier...');
         setIsRefreshing(true);
         await fetchCalendarData();
         setTimeout(() => setIsRefreshing(false), 1000);
@@ -822,7 +822,7 @@ const EconomicCalendarTab = ({ isDarkMode }) => {
                             </span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}">Impact:</span>
+                            <span className={`font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Impact:</span>
                             <div className="flex items-center gap-1">
                                 <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
                                 <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>High</span>

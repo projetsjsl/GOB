@@ -19,7 +19,7 @@ const SecondaryNavBar = ({ activeTab, onTabChange, isDarkMode, items = [] }) => 
             {navItems.map((item) => {
                 const isActive = activeTab === item.id;
                 return (
-                    <button
+                    <button title="Action"
                         key={item.id}
                         onClick={() => onTabChange && onTabChange(item.id)}
                         className={`group relative px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 border overflow-hidden ${

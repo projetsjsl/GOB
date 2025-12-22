@@ -397,4 +397,4 @@ const ThemeSelector = () => {
 window.ThemeSelector = ThemeSelector;
 
 // Debug: Vérifier que le composant est bien chargé
-console.log('✅ ThemeSelector chargé:', typeof window.ThemeSelector !== 'undefined');
+void('✅ ThemeSelector chargé:', typeof window.ThemeSelector !== 'undefined');

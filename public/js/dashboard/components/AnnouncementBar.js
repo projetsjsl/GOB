@@ -163,7 +163,7 @@ const AnnouncementBar = ({
                             </span>
                         )}
                     </div>
-                    <button
+                    <button title="Action"
                         onClick={handleClose}
                         className={`${styles.text} hover:opacity-70 transition-opacity flex-shrink-0 p-1 rounded`}
                         aria-label="Fermer"

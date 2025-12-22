@@ -173,7 +173,7 @@ const JLabTab = () => {
     const calculateSentiment = (symbol, stockData) => {
         const { quote, metrics, ratios, profile, news } = stockData;
 
-        console.log(`📊 Calculating sentiment for ${symbol} from financial data...`);
+        void(`📊 Calculating sentiment for ${symbol} from financial data...`);
 
         // 1. Calculate fundamental score (0-100)
         let fundamentalScore = 50;
@@ -275,7 +275,7 @@ const JLabTab = () => {
     // Fonction pour récupérer les données réelles d'un stock
     const fetchRealStockData = async (symbol, currentTimeframe = '1D') => {
         try {
-            console.log(`🔍 Récupération des données réelles pour ${symbol}...`);
+            void(`🔍 Récupération des données réelles pour ${symbol}...`);
 
             // Déterminer le timeframe et les paramètres pour les données historiques
             let historicalTimeframe, historicalLimit;
@@ -360,7 +360,7 @@ const JLabTab = () => {
 
 
             // Log des données récupérées avec indicateurs de fallback
-            console.log('✅ Données récupérées:', {
+            void('✅ Données récupérées:', {
                 hasQuote: !!quote,
                 hasProfile: !!profile,
                 hasRatios: !!ratios,
@@ -377,7 +377,7 @@ const JLabTab = () => {
             const productionSections = totalSections - fallbackSections;
             const qualityPercentage = Math.round((productionSections / totalSections) * 100);
 
-            console.log(`📊 Qualité des données: ${qualityPercentage}% (${productionSections}/${totalSections} sections en production)`);
+            void(`📊 Qualité des données: ${qualityPercentage}% (${productionSections}/${totalSections} sections en production)`);
 
             // Gestion des erreurs
             const errors = [];
@@ -392,7 +392,7 @@ const JLabTab = () => {
                 // setMessage removed - was causing infinite loop due to undefined reference
             }
 
-            console.log('✅ Données hybrides récupérées:', {
+            void('✅ Données hybrides récupérées:', {
                 hasQuote: !!quote,
                 hasProfile: !!profile,
                 hasRatios: !!ratios,
@@ -565,7 +565,7 @@ const JLabTab = () => {
 
             // 🎯 Calcul automatique du sentiment et insights basé sur les données réelles
             // Plus besoin de Perplexity - on utilise les données gratuites des APIs
-            console.log('🤖 Calcul du sentiment et insights à partir des données réelles...');
+            void('🤖 Calcul du sentiment et insights à partir des données réelles...');
 
             // Calculer le sentiment basé sur le changement de prix et les ratios
             const priceChange = quote?.dp || 0;
@@ -642,7 +642,7 @@ const JLabTab = () => {
                 }
             };
 
-            console.log('✅ Sentiment et insights calculés à partir des données réelles (sans Perplexity)');
+            void('✅ Sentiment et insights calculés à partir des données réelles (sans Perplexity)');
 
             // Construire l'objet de données structuré
             return {
@@ -660,7 +660,7 @@ const JLabTab = () => {
                 intraday: (() => {
                     // Si on a des données historiques réelles, les utiliser
                     if (intradayData && Array.isArray(intradayData) && intradayData.length > 0) {
-                        console.log(`📊 Données historiques réelles récupérées: ${intradayData.length} points`);
+                        void(`📊 Données historiques réelles récupérées: ${intradayData.length} points`);
                         return intradayData.map((candle, i) => ({
                             date: candle.date || new Date(candle.timestamp || Date.now() - i * 60000).toLocaleString('fr-FR'),
                             open: candle.open || 0,
@@ -673,7 +673,7 @@ const JLabTab = () => {
 
                     // Si on a des données dans le format FMP
                     if (intradayData?.historical && Array.isArray(intradayData.historical) && intradayData.historical.length > 0) {
-                        console.log(`📊 Données FMP historiques récupérées: ${intradayData.historical.length} points`);
+                        void(`📊 Données FMP historiques récupérées: ${intradayData.historical.length} points`);
 
                         let filteredData = intradayData.historical;
 
@@ -684,7 +684,7 @@ const JLabTab = () => {
                                 const candleDate = new Date(candle.date);
                                 return candleDate.getFullYear() === currentYear;
                             });
-                            console.log(`📊 Données YTD filtrées: ${filteredData.length} points`);
+                            void(`📊 Données YTD filtrées: ${filteredData.length} points`);
                         }
 
                         return filteredData.map((candle, i) => ({
@@ -848,7 +848,7 @@ const JLabTab = () => {
                             });
                         }
 
-                        console.log(`📊 Données ${timeframe} générées pour ${symbol}: ${dataPoints.length} points`);
+                        void(`📊 Données ${timeframe} générées pour ${symbol}: ${dataPoints.length} points`);
                         return dataPoints;
                     }
 
@@ -975,7 +975,7 @@ const JLabTab = () => {
         const fetchData = async () => {
             try {
                 setLoadingJLab(true);
-                console.log(`📊 Chargement des données pour ${selectedStock}...`);
+                void(`📊 Chargement des données pour ${selectedStock}...`);
 
                 // Essayer d'abord avec les vraies APIs
                 const realData = await fetchRealStockData(selectedStock, timeframe);
@@ -993,7 +993,7 @@ const JLabTab = () => {
                     setStockDataJLab(normalizedData);
                     setConnected(true);
                     setLastUpdateJLab(new Date());
-                    console.log('✅ Données chargées avec succès');
+                    void('✅ Données chargées avec succès');
 
                     // Vérifier si les données intraday sont disponibles
                     if (!normalizedData.intraday || normalizedData.intraday.length === 0) {
@@ -1062,7 +1062,7 @@ const JLabTab = () => {
                 "largeChartUrl": ""
             });
             container.appendChild(script);
-            console.log(`📊 TradingView Mini Chart rechargé pour ${selectedStock}`);
+            void(`📊 TradingView Mini Chart rechargé pour ${selectedStock}`);
         }
     }, [selectedStock, isDarkMode]);
 
@@ -1320,7 +1320,7 @@ const JLabTab = () => {
             }
 
             setScreenerResults(results);
-            console.log(`✅ Screener: ${results.length} résultats trouvés sur ${stocksList.length} titres`);
+            void(`✅ Screener: ${results.length} résultats trouvés sur ${stocksList.length} titres`);
         } catch (error) {
             console.error('Erreur screener:', error);
         } finally {
@@ -2027,13 +2027,13 @@ const JLabTab = () => {
                                             // Recharger les données avec le nouveau timeframe
                                             try {
                                                 setLoadingJLab(true);
-                                                console.log(`📊 Changement de timeframe vers ${period}...`);
+                                                void(`📊 Changement de timeframe vers ${period}...`);
                                                 const realData = await fetchRealStockData(selectedStock, period);
                                                 if (realData && realData.quote && realData.quote.price > 0) {
                                                     setStockDataJLab(realData);
                                                     setConnected(true);
                                                     setLastUpdateJLab(new Date());
-                                                    console.log(`✅ Données ${period} chargées avec succès`);
+                                                    void(`✅ Données ${period} chargées avec succès`);
                                                 }
                                             } catch (error) {
                                                 console.error('❌ Erreur lors du changement de timeframe:', error);

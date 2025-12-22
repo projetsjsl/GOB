@@ -3,7 +3,7 @@
 
 
 
-const InvestingCalendarTab = () => {
+const InvestingCalendarTab = ({ isDarkMode }) => {
     // Refs pour les widgets TradingView
     const tradingViewForexRef = useRef(null);
     const tradingViewEventsRef = useRef(null);
@@ -32,7 +32,7 @@ const InvestingCalendarTab = () => {
             if (!event.origin.includes('tradingview.com')) return;
 
             // Logger tous les messages pour debug
-            console.log('📊 TradingView message:', event.data);
+            void('📊 TradingView message:', event.data);
 
             // Détecter les différents formats de messages possibles
             try {
@@ -40,19 +40,19 @@ const InvestingCalendarTab = () => {
 
                 // Format 1: {name: 'tv-widget-symbol-changed', data: {symbol: 'NASDAQ:AAPL'}}
                 if (data.name === 'tv-widget-symbol-changed' && data.data?.symbol) {
-                    console.log('✅ Symbol changed in Advanced Chart:', data.data.symbol);
+                    void('✅ Symbol changed in Advanced Chart:', data.data.symbol);
                     setTimelineSymbol(data.data.symbol);
                 }
 
                 // Format 2: {type: 'symbol-change', symbol: 'NASDAQ:AAPL'}
                 if (data.type === 'symbol-change' && data.symbol) {
-                    console.log('✅ Symbol changed in Advanced Chart:', data.symbol);
+                    void('✅ Symbol changed in Advanced Chart:', data.symbol);
                     setTimelineSymbol(data.symbol);
                 }
 
                 // Format 3: direct symbol string
                 if (data.symbol && !data.name && !data.type) {
-                    console.log('✅ Symbol changed in Advanced Chart:', data.symbol);
+                    void('✅ Symbol changed in Advanced Chart:', data.symbol);
                     setTimelineSymbol(data.symbol);
                 }
             } catch (error) {
@@ -119,7 +119,7 @@ const InvestingCalendarTab = () => {
         script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
         script.async = true;
         script.innerHTML = JSON.stringify({
-            colorTheme: 'light',
+            colorTheme: isDarkMode ? 'dark' : 'light',
             isTransparent: false,
             locale: 'en',
             countryFilter: 'ar,au,br,ca,cn,fr,de,in,id,it,jp,kr,mx,ru,sa,za,tr,gb,us,eu',
@@ -195,7 +195,7 @@ const InvestingCalendarTab = () => {
             grouping: 'sector',
             locale: 'fr',
             symbolUrl: '',
-            colorTheme: 'dark',
+            colorTheme: isDarkMode ? 'dark' : 'light',
             exchanges: [],
             hasTopBar: true,
             isDataSetEnabled: true,
@@ -219,11 +219,11 @@ const InvestingCalendarTab = () => {
     useEffect(() => {
         const container = tradingViewHeatmapTSXRef.current;
         if (!container) {
-            console.log('⚠️ [Heatmap TSX InvestingCalendar] Container ref not ready');
+            void('⚠️ [Heatmap TSX InvestingCalendar] Container ref not ready');
             return;
         }
 
-        console.log('🔄 [Heatmap TSX InvestingCalendar] Chargement du widget TradingView...');
+        void('🔄 [Heatmap TSX InvestingCalendar] Chargement du widget TradingView...');
         container.innerHTML = '';
 
         const script = document.createElement('script');
@@ -231,7 +231,7 @@ const InvestingCalendarTab = () => {
         script.type = 'text/javascript';
         script.async = true;
         script.onload = () => {
-            console.log('✅ [Heatmap TSX InvestingCalendar] Widget TradingView chargé');
+            void('✅ [Heatmap TSX InvestingCalendar] Widget TradingView chargé');
         };
         script.onerror = (error) => {
             console.error('❌ [Heatmap TSX InvestingCalendar] Erreur chargement widget:', error);
@@ -243,7 +243,7 @@ const InvestingCalendarTab = () => {
             grouping: 'sector',
             locale: 'fr',
             symbolUrl: '',
-            colorTheme: 'dark', // InvestingCalendarTab utilise toujours dark mode
+            colorTheme: isDarkMode ? 'dark' : 'light', // InvestingCalendarTab utilise toujours dark mode
             exchanges: [],
             hasTopBar: true,
             isDataSetEnabled: true,
@@ -344,7 +344,7 @@ const InvestingCalendarTab = () => {
         script.type = 'text/javascript';
         script.async = true;
         script.innerHTML = JSON.stringify({
-            colorTheme: 'dark',
+            colorTheme: isDarkMode ? 'dark' : 'light',
             locale: 'fr',
             largeChartUrl: '',
             isTransparent: false,
@@ -423,7 +423,7 @@ const InvestingCalendarTab = () => {
         script.async = true;
         script.innerHTML = JSON.stringify({
             symbol: timelineSymbol,
-            colorTheme: 'dark',
+            colorTheme: isDarkMode ? 'dark' : 'light',
             isTransparent: false,
             locale: 'fr',
             width: '100%'
@@ -452,7 +452,7 @@ const InvestingCalendarTab = () => {
         script.innerHTML = JSON.stringify({
             feedMode: 'symbol',
             symbol: timelineSymbol,
-            colorTheme: 'dark',
+            colorTheme: isDarkMode ? 'dark' : 'light',
             isTransparent: false,
             displayMode: 'regular',
             locale: 'fr',
@@ -491,7 +491,7 @@ const InvestingCalendarTab = () => {
             defaultScreen: 'most_capitalized',
             isTransparent: false,
             locale: 'fr',
-            colorTheme: 'dark',
+            colorTheme: isDarkMode ? 'dark' : 'light',
             width: '100%',
             height: '100%'
         });
@@ -522,7 +522,7 @@ const InvestingCalendarTab = () => {
         script.async = true;
         script.innerHTML = JSON.stringify({
             symbol: timelineSymbol,
-            colorTheme: 'dark',
+            colorTheme: isDarkMode ? 'dark' : 'light',
             isTransparent: false,
             locale: 'fr',
             width: '100%',
@@ -555,7 +555,7 @@ const InvestingCalendarTab = () => {
         script.async = true;
         script.innerHTML = JSON.stringify({
             symbol: timelineSymbol,
-            colorTheme: 'dark',
+            colorTheme: isDarkMode ? 'dark' : 'light',
             displayMode: 'regular',
             isTransparent: false,
             locale: 'fr',
@@ -588,7 +588,7 @@ const InvestingCalendarTab = () => {
         script.type = 'text/javascript';
         script.async = true;
         script.innerHTML = JSON.stringify({
-            colorTheme: 'dark',
+            colorTheme: isDarkMode ? 'dark' : 'light',
             displayMode: 'multiple',
             isTransparent: false,
             locale: 'fr',
@@ -820,7 +820,7 @@ const InvestingCalendarTab = () => {
                                     isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
                                 }`}
                             >
-                                <span className="blue-text">Track all markets on TradingView</span>
+                                <span className="blue-text">Suivez tous les marchés sur TradingView</span>
                             </a>
                         </div>
                     </div>
@@ -858,7 +858,7 @@ const InvestingCalendarTab = () => {
                                     isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
                                 }`}
                             >
-                                <span className="blue-text">Track all markets on TradingView</span>
+                                <span className="blue-text">Suivez tous les marchés sur TradingView</span>
                             </a>
                         </div>
                     </div>
@@ -896,7 +896,7 @@ const InvestingCalendarTab = () => {
                                     isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
                                 }`}
                             >
-                                <span className="blue-text">Track all markets on TradingView</span>
+                                <span className="blue-text">Suivez tous les marchés sur TradingView</span>
                             </a>
                         </div>
                     </div>
@@ -1350,7 +1350,7 @@ const InvestingCalendarTab = () => {
                                     isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
                                 }`}
                             >
-                                <span className="blue-text">Track all markets on TradingView</span>
+                                <span className="blue-text">Suivez tous les marchés sur TradingView</span>
                             </a>
                         </div>
                     </div>

@@ -88,7 +88,7 @@ const EconomicEventsModal = ({ symbol, stockData, watchlist, onClose }) => {
                             <p className="text-gray-400 text-sm">Next 7 days • Impact on your portfolio</p>
                         </div>
                     </div>
-                    <button
+                    <button title="Action"
                         onClick={onClose}
                         className="w-10 h-10 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors"
                     >

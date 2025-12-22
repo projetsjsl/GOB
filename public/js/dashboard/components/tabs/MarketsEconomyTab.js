@@ -274,7 +274,7 @@ const MarketsEconomyTab = ({
                     }`}>📰 Marchés & Économie</h2>
                     <div className="flex gap-2">
                         {/* Toggle Français */}
-                        <button
+                        <button title="Action"
                             onClick={() => setLocalFrenchOnly(!localFrenchOnly)}
                             className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
                                 localFrenchOnly

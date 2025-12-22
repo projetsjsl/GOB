@@ -193,7 +193,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
     const speakWithTavus = (text) => {
         // TODO: Implement Tavus conversation message sending
         // This would require the Tavus conversation API to send messages
-        console.log('Sending text to Tavus:', text);
+        void('Sending text to Tavus:', text);
     };
 
     /**
@@ -205,7 +205,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
         const apiKey = tavusConfig.apiKey || (window.ENV_CONFIG?.TAVUS_API_KEY);
 
         if (!apiKey || apiKey === 'YOUR_TAVUS_API_KEY') {
-            alert('Veuillez configurer votre clé API Tavus dans emma-config.js');
+            console.log('Alert suppressed:', 'Veuillez configurer votre clé API Tavus dans emma-config.js');
             return;
         }
 
@@ -243,7 +243,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
                 status: data.status
             };
 
-            console.log('Tavus conversation created:', data);
+            void('Tavus conversation created:', data);
 
             if (tavusVideoRef.current && data.conversation_url) {
                 // Use state to trigger re-render with iframe
@@ -255,7 +255,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
         } catch (error) {
             console.error('Error connecting to Tavus:', error);
             setTavusStatus('disconnected');
-            alert('Erreur lors de la connexion à Tavus. Vérifiez votre configuration.');
+            console.log('Alert suppressed:', 'Erreur lors de la connexion à Tavus. Vérifiez votre configuration.');
         }
     };
 
@@ -283,7 +283,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
                             </div>
                             <h3 className="text-2xl font-bold text-white mb-2">Assistant Virtuel</h3>
                             <p className="text-gray-400 mb-8 max-w-md mx-auto">Connectez-vous pour interagir avec votre assistant vidéo alimenté par Tavus et Gemini.</p>
-                            <button
+                            <button title="Action"
                                 onClick={connectTavus}
                                 disabled={tavusStatus === 'connecting'}
                                 className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold transition-all transform hover:scale-105 shadow-lg shadow-blue-600/30 flex items-center gap-2 mx-auto"

@@ -3423,7 +3423,7 @@ Structure ta réponse de manière professionnelle et facile à lire. Sois exhaus
                 });
 
                 if (searchResponse.ok) {
-                    const searchData = await searchResponse.json();
+                    let searchData; try { searchData = JSON.parse(await searchResponse.text()); } catch(e) { throw new Error('Search API Invalid JSON'); }
                     const searchContent = searchData.choices?.[0]?.message?.content || '';
                     const searchCitations = searchData.citations || this._extractCitations(searchContent);
 
@@ -3507,7 +3507,7 @@ Sois exhaustif et cite tes sources.`;
                 });
 
                 if (searchResponse.ok) {
-                    const searchData = await searchResponse.json();
+                    let searchData; try { searchData = JSON.parse(await searchResponse.text()); } catch(e) { throw new Error('Search API Invalid JSON'); }
                     const searchContent = searchData.choices?.[0]?.message?.content || '';
                     const searchCitations = searchData.citations || this._extractCitations(searchContent);
 
@@ -3847,7 +3847,7 @@ ACHETER < 340$ (marge 25%+)
         console.log('⚠️ Streaming désactivé, utilisation mode classique');
 
         try {
-            const data = await response.json();
+            let data; try { data = JSON.parse(await response.text()); } catch(e) { throw new Error('LLM API Invalid JSON'); }
             const content = data.choices[0].message.content;
             const citations = data.citations || [];
 
@@ -4094,7 +4094,7 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
                 throw new Error(`Claude API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
             }
 
-            const data = await response.json();
+            let data; try { data = JSON.parse(await response.text()); } catch(e) { throw new Error('LLM API Invalid JSON'); }
             return data.content[0].text;
 
         } catch (error) {

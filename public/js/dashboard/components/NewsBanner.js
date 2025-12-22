@@ -20,6 +20,7 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
     const [showTypeSelector, setShowTypeSelector] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
     const tickerRef = useRef(null);
     const animationRef = useRef(null);
     const intervalRef = useRef(null);
@@ -77,11 +78,13 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
         setCurrentNewsIndex(0);
 
         // Changer de nouvelle toutes les 5 secondes (pause de 5s)
-        intervalRef.current = setInterval(() => {
-            setCurrentNewsIndex((prevIndex) => {
-                return (prevIndex + 1) % news.length;
-            });
-        }, 5000); // 5 secondes de pause entre chaque nouvelle
+        if (!isPaused) {
+            intervalRef.current = setInterval(() => {
+                setCurrentNewsIndex((prevIndex) => {
+                    return (prevIndex + 1) % news.length;
+                });
+            }, 5000);
+        }
 
         return () => {
             if (intervalRef.current) {
@@ -89,7 +92,7 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
                 intervalRef.current = null;
             }
         };
-    }, [news, isVisible]);
+    }, [news, isVisible, isPaused]);
 
     const loadNews = async () => {
         try {
@@ -190,7 +193,7 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
         window.showNewsBanner = () => {
             setIsVisible(true);
             localStorage.setItem('news-banner-visible', 'true');
-            console.log('📰 NewsBanner réactivé');
+            void('📰 NewsBanner réactivé');
         };
         return () => {
             delete window.showNewsBanner;
@@ -249,17 +252,17 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
 
     // Debug: Log l'état de visibilité
     useEffect(() => {
-        console.log('📰 NewsBanner - État:', { isVisible, isModalOpen, forceVisible, newsCount: news.length });
+        void('📰 NewsBanner - État:', { isVisible, isModalOpen, forceVisible, newsCount: news.length });
     }, [isVisible, isModalOpen, forceVisible, news.length]);
 
     if (!isVisible && !forceVisible) {
-        console.log('📰 NewsBanner masqué: isVisible=false');
+        void('📰 NewsBanner masqué: isVisible=false');
         return null;
     }
 
     // Masquer le NewsBanner si un modal est ouvert (sauf si forceVisible)
     if (isModalOpen && !forceVisible) {
-        console.log('📰 NewsBanner masqué: modal ouvert');
+        void('📰 NewsBanner masqué: modal ouvert');
         return null;
     }
 
@@ -364,6 +367,8 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
             <div
                 ref={tickerRef}
                 className="absolute left-48 right-20 top-0 bottom-0 overflow-hidden flex items-center"
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
             >
                 {isLoading ? (
                     <div

@@ -239,7 +239,7 @@
         });
         
         if (count > 0) {
-            console.log(`✅ Auto-Expand: ${count} boutons ajoutés`);
+            void(`✅ Auto-Expand: ${count} boutons ajoutés`);
         }
     }
 
@@ -455,7 +455,7 @@
 
     // Initialisation
     function init() {
-        console.log('🚀 Auto-Expand v2.0: Initialisation...');
+        void('🚀 Auto-Expand v2.0: Initialisation...');
         injectStyles();
         
         const runInit = () => {

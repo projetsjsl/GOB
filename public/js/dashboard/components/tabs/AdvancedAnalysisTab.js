@@ -52,12 +52,12 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
 
         const loadWatchlistFromSupabase = async () => {
             try {
-                console.log('📥 Loading watchlist from Supabase...');
+                void('📥 Loading watchlist from Supabase...');
                 const res = await fetch('/api/supabase-watchlist');
                 if (res.ok) {
                     const json = await res.json();
                     const tickers = Array.isArray(json.tickers) ? json.tickers : [];
-                    console.log('✅ Watchlist loaded from Supabase:', tickers);
+                    void('✅ Watchlist loaded from Supabase:', tickers);
 
                     const merged = Array.isArray(json.teamTickers) && json.teamTickers.length > 0
                         ? Array.from(new Set([...tickers, ...json.teamTickers]))
@@ -74,7 +74,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                     return;
                 }
             } catch (e) {
-                console.log('⚠️ Supabase not available, using default tickers');
+                void('⚠️ Supabase not available, using default tickers');
             }
 
             // Fallback to default tickers if Supabase fails
@@ -98,7 +98,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
     const getFromCache = (key, ttl) => {
         const cached = cacheRef.current.get(key);
         if (cached && (Date.now() - cached.timestamp) < ttl) {
-            console.log(`📦 Cache hit: ${key}`);
+            void(`📦 Cache hit: ${key}`);
             return cached.data;
         }
         return null;
@@ -141,7 +141,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             const earningsResponse = earningsRes.status === 'fulfilled' && earningsRes.value.ok ? await earningsRes.value.json() : null;
             const analystResponse = analystRes.status === 'fulfilled' && analystRes.value.ok ? await analystRes.value.json() : null;
 
-            console.log('✅ Comprehensive data loaded for', symbol);
+            void('✅ Comprehensive data loaded for', symbol);
 
             const newStockData = {
                 symbol: symbol,
@@ -421,7 +421,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                             { id: 'analysis', label: 'Technique', icon: 'iconoir-stats-report' },
                             { id: 'timeline', label: 'Timeline', icon: 'iconoir-calendar' }
                         ].map(tab => (
-                            <button
+                            <button title="Action"
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
@@ -627,7 +627,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                                     }
                                 });
                             } else {
-                                alert('Données non disponibles pour l\'export. Veuillez d\'abord charger les données du titre.');
+                                console.log('Alert suppressed:', 'Données non disponibles pour l\'export. Veuillez d\'abord charger les données du titre.');
                             }
                         }}
                         className="bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border border-cyan-700/30 rounded-xl p-6 cursor-pointer hover:border-cyan-500 transition-all hover:shadow-lg hover:shadow-cyan-500/10 group"

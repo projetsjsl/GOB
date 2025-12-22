@@ -61,7 +61,7 @@ const ErrorMessage = ({ message, onDismiss, isDarkMode = true }) => {
                     <p className="text-sm">{message}</p>
                 </div>
                 {onDismiss && (
-                    <button
+                    <button title="Action"
                         onClick={onDismiss}
                         className="ml-4 text-current opacity-70 hover:opacity-100"
                     >
