@@ -13,7 +13,10 @@
     // ===================================
     // CONSTANTES & CONFIGURATION
     // ===================================
-    const STORAGE_KEY = 'gob_dashboard_grid_layout_v1';
+    const STORAGE_KEY_DEFAULT = 'gob_dashboard_layout_default_v1';
+    const STORAGE_KEY_DEV = 'gob_dashboard_layout_dev_v1';
+    // Fallback key for auto-save if needed, though we primarily use the above two now
+    const STORAGE_KEY_CURRENT = 'gob_dashboard_grid_layout_v1'; 
     const ROW_HEIGHT = 50;
 
     // Cache to prevent log spam for missing components
@@ -105,24 +108,23 @@
         ].filter(item => defaultTabs.includes(item.i));
     };
 
+    // Helper to load specialized presets
+    const loadSavedPreset = (key) => {
+        try {
+            const saved = localStorage.getItem(key);
+            if (saved) return JSON.parse(saved);
+        } catch(e) { console.error('Error loading preset', key, e); }
+        return null;
+    };
+
     // Preset layout templates
     const LAYOUT_PRESETS = {
-        default: getDefaultLayout(),
-        trading: [
-            { i: 'titres-portfolio', x: 0, y: 0, w: 8, h: 12, minW: 6, minH: 8 },
-            { i: 'jlab-terminal', x: 8, y: 0, w: 4, h: 12, minW: 4, minH: 8 },
-            { i: 'marches-global', x: 0, y: 12, w: 12, h: 10, minW: 6, minH: 6 },
-            { i: 'jlab-advanced', x: 0, y: 22, w: 12, h: 12, minW: 8, minH: 8 }
-        ],
-        research: [
-            { i: 'jlab-terminal', x: 0, y: 0, w: 12, h: 14, minW: 8, minH: 10 },
-            { i: 'jlab-advanced', x: 0, y: 14, w: 6, h: 12, minW: 6, minH: 8 },
-            { i: 'emma-chat', x: 6, y: 14, w: 6, h: 12, minW: 4, minH: 8 },
-            { i: 'titres-portfolio', x: 0, y: 26, w: 12, h: 12, minW: 8, minH: 8 }
-        ],
-        minimal: [
-            { i: 'titres-portfolio', x: 0, y: 0, w: 12, h: 14, minW: 8, minH: 10 },
-            { i: 'emma-chat', x: 0, y: 14, w: 12, h: 10, minW: 6, minH: 8 }
+        default: loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout(),
+        developer: loadSavedPreset(STORAGE_KEY_DEV) || [
+             // Developer preset defaults to everything mostly visible for testing
+            { i: 'admin-jsla', x: 0, y: 0, w: 12, h: 12, minW: 8, minH: 8 },
+            { i: 'tests-rgl', x: 0, y: 12, w: 6, h: 10, minW: 6, minH: 6 },
+            { i: 'emma-terminal', x: 6, y: 12, w: 6, h: 10, minW: 6, minH: 6 },
         ]
     };
 
@@ -250,47 +252,32 @@ const DashboardGridWrapper = ({
         allTabs = []
     }) => {
         const [layout, setLayout] = useState(() => {
+            // Load current working layout or default
             try {
-                const saved = localStorage.getItem(STORAGE_KEY);
+                const saved = localStorage.getItem(STORAGE_KEY_CURRENT);
                 if (saved) {
                     const parsed = JSON.parse(saved);
-                    // Vérifier que le layout contient des widgets valides
                     let validLayout = parsed.filter(item => TAB_TO_WIDGET_MAP[item.i]);
-                    
-                    // DEDUPLICATION STRICTE
+                    // Clean duplicates
                     const seen = new Set();
                     validLayout = validLayout.filter(item => {
                         if (seen.has(item.i)) return false;
                         seen.add(item.i);
                         return true;
                     });
-
-                    if (validLayout.length > 0) {
-                        void(`✅ Layout chargé depuis localStorage: ${validLayout.length} widgets (après déduplication)`);
-                        return validLayout;
-                    } else {
-                        console.warn('⚠️ Layout sauvegardé invalide, utilisation du layout par défaut');
-                    }
+                     if (validLayout.length > 0) return validLayout;
                 }
-            } catch (e) {
-                console.error('❌ Erreur chargement layout:', e);
-            }
-            const defaultLayout = getDefaultLayout();
-            void(`✅ Layout par défaut créé: ${defaultLayout.length} widgets`, defaultLayout);
-            // Sauvegarder le layout par défaut
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultLayout));
-            } catch (e) {
-                console.warn('⚠️ Impossible de sauvegarder le layout par défaut:', e);
-            }
-            return defaultLayout;
+            } catch (e) { console.error('❌ Erreur chargement layout:', e); }
+            
+            // Fallback to Saved Default or Hardcoded Default
+            return loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout();
         });
 
         // S'assurer que le layout n'est jamais vide et sans doublons
         useEffect(() => {
             if (!layout || layout.length === 0) {
                 console.warn('⚠️ Layout vide détecté, recréation du layout par défaut');
-                const defaultLayout = getDefaultLayout();
+                const defaultLayout = loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout();
                 setLayout(defaultLayout);
             } else {
                 // Vérification post-render des doublons
@@ -305,7 +292,7 @@ const DashboardGridWrapper = ({
                     console.warn(`⚠️ Doublons détectés et supprimés (${layout.length} -> ${uniqueLayout.length})`);
                     setLayout(uniqueLayout);
                     // Update storage immediately
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(uniqueLayout));
+                    localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(uniqueLayout));
                 }
             }
         }, [layout]);
@@ -320,13 +307,25 @@ const DashboardGridWrapper = ({
                 : null
         , [RGL]);
 
-        // Sauvegarder le layout
+        // Sauvegarder le layout courant
         const handleLayoutChange = useCallback((newLayout) => {
             if (isEditing) {
                 setLayout(newLayout);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(newLayout));
+                localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(newLayout));
             }
         }, [isEditing]);
+        
+        // Save current layout as a specific preset
+        const saveAsPreset = useCallback((presetName) => {
+             const key = presetName === 'default' ? STORAGE_KEY_DEFAULT : 
+                        presetName === 'developer' ? STORAGE_KEY_DEV : null;
+                        
+             if (key) {
+                 localStorage.setItem(key, JSON.stringify(layout));
+                 if (window.showToast) window.showToast(`Layout sauvegardé comme "${presetName === 'default' ? 'Production' : 'Développeur'}"`, 'success');
+                 else alert(`Layout sauvegardé comme "${presetName === 'default' ? 'Production' : 'Développeur'}"`);
+             }
+        }, [layout]);
 
         // Ajouter un widget
         const addWidget = useCallback((tabId) => {
@@ -357,19 +356,24 @@ const DashboardGridWrapper = ({
             setLayout(layout.filter(item => item.i !== tabId));
         }, [layout]);
 
-        // Reset layout
+        // Reset layout to Default Preset (Production)
         const resetLayout = useCallback(() => {
-            const defaultLayout = getDefaultLayout();
+            const defaultLayout = loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout();
             setLayout(defaultLayout);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultLayout));
+            localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(defaultLayout));
         }, []);
 
         // Load preset layout
         const loadPreset = useCallback((presetName) => {
-            const preset = LAYOUT_PRESETS[presetName];
+             // Reload from storage to get latest
+             let preset = null;
+             if (presetName === 'default') preset = loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout();
+             else if (presetName === 'developer') preset = loadSavedPreset(STORAGE_KEY_DEV) || LAYOUT_PRESETS.developer;
+             else preset = LAYOUT_PRESETS[presetName];
+
             if (preset) {
                 setLayout(preset);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(preset));
+                localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(preset));
             }
         }, []);
 
@@ -742,36 +746,73 @@ const DashboardGridWrapper = ({
                     </div>
 
                     <div className="flex items-center gap-2">
-                        {isEditing && (
-                            <select
-                                onChange={(e) => loadPreset(e.target.value)}
-                                className={`px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm ${
-                                    isDarkMode
-                                        ? 'bg-neutral-700 text-gray-300 border border-neutral-600'
-                                        : 'bg-white text-gray-700 border border-gray-300'
+                        {isAdmin && isEditing && (
+                            <>
+                                <div className="flex items-center gap-1 mr-2 px-2 border-r border-gray-500/30">
+                                    <button
+                                        onClick={() => saveAsPreset('default')}
+                                        className={`px-3 py-1.5 rounded-md font-medium text-xs flex items-center gap-1.5 shadow-sm transition-all ${
+                                            isDarkMode 
+                                                ? 'bg-blue-600 hover:bg-blue-500 text-white' 
+                                                : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                        }`}
+                                        title="Sauvegarder comme layout de Production (Par défaut)"
+                                    >
+                                        <window.LucideIcon name="Save" className="w-3.5 h-3.5" />
+                                        Sauv. Prod
+                                    </button>
+                                    <button
+                                        onClick={() => saveAsPreset('developer')}
+                                        className={`px-3 py-1.5 rounded-md font-medium text-xs flex items-center gap-1.5 shadow-sm transition-all ${
+                                            isDarkMode 
+                                                ? 'bg-purple-600 hover:bg-purple-500 text-white' 
+                                                : 'bg-purple-500 hover:bg-purple-600 text-white'
+                                        }`}
+                                        title="Sauvegarder comme layout Développeur"
+                                    >
+                                        <window.LucideIcon name="Code" className="w-3.5 h-3.5" />
+                                        Sauv. Dev
+                                    </button>
+                                </div>
+
+                                <select
+                                    onChange={(e) => {
+                                        if (e.target.value) loadPreset(e.target.value);
+                                    }}
+                                    className={`px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm ${
+                                        isDarkMode
+                                            ? 'bg-neutral-700 text-gray-300 border border-neutral-600'
+                                            : 'bg-white text-gray-700 border border-gray-300'
+                                    }`}
+                                    defaultValue=""
+                                >
+                                    <option value="" disabled>Charger un preset...</option>
+                                    <option value="default">🏠 Production (Défaut)</option>
+                                    <option value="developer">👨‍💻 Développeur</option>
+                                    <option value="trading">📈 Trading</option>
+                                    <option value="research">🔬 Recherche</option>
+                                    <option value="minimal">⚡ Minimal</option>
+                                </select>
+                            </>
+                        )}
+                        
+                        {isAdmin && (
+                            <button
+                                onClick={() => setIsEditing(!isEditing)}
+                                className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 shadow-sm ${
+                                    isEditing
+                                        ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+                                        : isDarkMode
+                                            ? 'bg-neutral-700 text-gray-300 hover:bg-neutral-600'
+                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                 }`}
                             >
-                                <option value="">Charger un preset...</option>
-                                <option value="default">🏠 Par défaut</option>
-                                <option value="trading">📈 Trading</option>
-                                <option value="research">🔬 Recherche</option>
-                                <option value="minimal">⚡ Minimal</option>
-                            </select>
+                                <window.LucideIcon name={isEditing ? "Check" : "Edit3"} className="w-4 h-4" />
+                                {isEditing ? 'Terminer' : 'Modifier'}
+                            </button>
                         )}
-                        <button
-                            onClick={() => setIsEditing(!isEditing)}
-                            className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 shadow-sm ${
-                                isEditing
-                                    ? 'bg-emerald-500 text-white hover:bg-emerald-600'
-                                    : isDarkMode
-                                        ? 'bg-neutral-700 text-gray-300 hover:bg-neutral-600'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                            }`}
-                        >
-                            <window.LucideIcon name={isEditing ? "Check" : "Edit3"} className="w-4 h-4" />
-                            {isEditing ? 'Terminer' : 'Modifier'}
-                        </button>
-                        {isEditing && (
+
+                        {isAdmin && isEditing && (
                             <button
                                 onClick={resetLayout}
                                 className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm ${
@@ -779,6 +820,7 @@ const DashboardGridWrapper = ({
                                         ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
                                         : 'bg-red-100 text-red-600 hover:bg-red-200'
                                 }`}
+                                title="Réinitialiser au layout de Production par défaut"
                             >
                                 <window.LucideIcon name="RotateCcw" className="w-4 h-4" />
                                 Reset
