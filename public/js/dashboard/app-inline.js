@@ -26962,7 +26962,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         {(window.RolesPermissions && window.userPermissions 
                             ? window.RolesPermissions.filterTabsByPermissions(tabs)
                             : tabs
-                        ).filter(tab => tab.id !== 'finance-pro' && tab.id !== 'advanced-analysis').map(tab => {
+                        ).map(tab => {
                             // Gérer le menu "Plus" spécialement
                             if (tab.id === 'plus' && tab.hiddenTabs) {
                                 return (
