@@ -9521,7 +9521,7 @@ STRUCTURE JSON OBLIGATOIRE:
         };
 
         // Composant PromptManager pour gérer les prompts de briefing
-        const PromptManager = () => {
+        const PromptManager = window.PromptManager = () => {
             const [prompts, setPrompts] = useState({
                 morning: { prompt: '', name: '', tone: '', length: '' },
                 midday: { prompt: '', name: '', tone: '', length: '' },
@@ -11841,7 +11841,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                             Modifiez les prompts utilisés pour les briefings automatisés. Les changements sont synchronisés avec n8n et GitHub.
                         </p>
 
-                        {typeof PromptManager !== 'undefined' ? <PromptManager /> : <div className="p-4 text-red-500">Erreur: PromptManager non chargé</div>}
+                        {window.PromptManager ? <window.PromptManager /> : <div className="p-4 text-red-500">Erreur: PromptManager non chargé</div>}
                     </div>
 
                     {/* SECTION 2.5.5: GESTION DES HORAIRES ET AUTOMATISATIONS */}
@@ -27186,6 +27186,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             items={currentNavItems}
                                         />
                                     </div>
+                                )}
+
+                                {/* MOBILE OVERLAY NAV - User Requested Feature */}
+                                {window.MobileNavOverlay && SUB_TABS[mainTab] && (
+                                    <window.MobileNavOverlay
+                                        items={SUB_TABS[mainTab]}
+                                        activeTab={activeSubTab}
+                                        onTabChange={handleNewTabChange}
+                                        isDarkMode={isDarkMode}
+                                        position="left" 
+                                    />
                                 )}
                             </>
                         );
