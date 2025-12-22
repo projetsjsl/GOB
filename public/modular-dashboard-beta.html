@@ -95,6 +95,8 @@
 
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Iconoir CSS for IconoirIcon polyfill -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
 
     <style>
         /* Custom Scrollbar */
@@ -164,6 +166,46 @@
         window.showCommandsHelp = function() {
             alert("ℹ️ Aide Commandes :\n\n- /reset : Réinitialiser le chat\n- /clear : Effacer l'historique\n- /help : Afficher ce message");
         };
+        
+        // Icon component polyfill for emoji-based icons (used by AskEmmaTab.js)
+        window.Icon = function(props) {
+            var emoji = props.emoji || '';
+            var size = props.size || 20;
+            var className = props.className || '';
+            if (typeof React === 'undefined') return emoji;
+            return React.createElement('span', { 
+                className: 'inline-block ' + className, 
+                style: { fontSize: size + 'px' } 
+            }, emoji);
+        };
+        
+        // IconoirIcon polyfill (maps Lucide icon names to Iconoir CSS classes)
+        window.IconoirIcon = function(props) {
+            var name = props.name || 'Activity';
+            var className = props.className || 'w-4 h-4';
+            var iconMap = {
+                'Activity': 'activity', 'Wifi': 'wifi', 'RefreshCw': 'refresh-double',
+                'ChevronDown': 'nav-arrow-down', 'Bell': 'bell', 'Search': 'search',
+                'Settings': 'settings', 'X': 'xmark', 'Plus': 'plus', 'Minus': 'minus',
+                'PieChart': 'pie-chart', 'BarChart3': 'stat-up', 'TrendingUp': 'trending-up',
+                'TrendingDown': 'trending-down', 'Calendar': 'calendar', 'Star': 'star',
+                'Layout': 'view-grid', 'Grid3x3': 'view-grid', 'Newspaper': 'newspaper',
+                'Target': 'target', 'Fire': 'sparks', 'ArrowUpRight': 'arrow-tr',
+                'Database': 'database', 'Mail': 'mail', 'Monitor': 'pc-monitor',
+                'Brain': 'brain', 'Cpu': 'cpu', 'Wallet': 'wallet', 'Globe': 'globe',
+                'FileText': 'page', 'Save': 'save-floppy-disk', 'Box': 'box-3d-center',
+                'AlertTriangle': 'warning-triangle', 'HelpCircle': 'help-circle',
+                'Maximize2': 'expand', 'Sun': 'sun-light', 'Moon': 'moon'
+            };
+            var iconClass = iconMap[name] || 'activity';
+            if (typeof React === 'undefined') return null;
+            return React.createElement('i', { 
+                className: 'iconoir-' + iconClass + ' ' + className, 
+                style: { fontSize: 'inherit' } 
+            });
+        };
+        window.LucideIcon = window.IconoirIcon;
+        
         // CommonJS compatibility
         if (typeof exports === 'undefined') window.exports = {};
         if (typeof module === 'undefined') window.module = { exports: {} };
