@@ -2269,6 +2269,37 @@ export default function App() {
                         setNotes(updatedProfile.notes || '');
                         
                         showNotification(`✅ ${upperSymbol} chargé depuis Supabase`, 'success');
+                        
+                        // ✅ FIX: Récupérer le prix en temps réel depuis l'API market data
+                        // Même après chargement Supabase, le prix peut être à 0 dans le snapshot
+                        try {
+                            const { fetchMarketData } = await import('./services/marketDataCache');
+                            const marketData = await fetchMarketData(upperSymbol);
+                            
+                            if (marketData && marketData.currentPrice > 0) {
+                                const priceUpdatedAssumptions = {
+                                    ...updatedProfile.assumptions,
+                                    currentPrice: marketData.currentPrice
+                                };
+                                setAssumptions(priceUpdatedAssumptions);
+                                
+                                // Aussi mettre à jour dans la library
+                                setLibrary(prev => ({
+                                    ...prev,
+                                    [upperSymbol]: {
+                                        ...prev[upperSymbol],
+                                        assumptions: priceUpdatedAssumptions,
+                                        lastModified: Date.now()
+                                    }
+                                }));
+                                console.log(`✅ Prix mis à jour pour ${upperSymbol}: $${marketData.currentPrice.toFixed(2)}`);
+                            } else {
+                                console.log(`⚠️ Prix de marché non disponible pour ${upperSymbol}`);
+                            }
+                        } catch (priceError) {
+                            console.warn(`⚠️ Erreur récupération prix pour ${upperSymbol}:`, priceError);
+                        }
+                        
                         return; // ✅ Succès - ne pas continuer vers FMP
                     } else {
                         console.log(`⚠️ ${upperSymbol}: Pas de snapshot Supabase disponible - Fallback FMP...`);
