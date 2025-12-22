@@ -13656,29 +13656,37 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                 }
             ];
 
-            // Initialiser le client Supabase
+            // Initialiser le client Supabase avec retry
             useEffect(() => {
-                if (typeof window.supabase !== 'undefined') {
-                    try {
-                        // URL/clé Supabase (surchargées via localStorage ou variables globales)
-                        const supabaseUrl = window.SUPABASE_URL || 'https://boyuxgdplbpkknplxbxp.supabase.co';
-                        const defaultSupabaseKey = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJveXV4Z2RwbGJwa2tucGx4YnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzMzU5MTQsImV4cCI6MjA3NTkxMTkxNH0.-M-QdpBFlDtg1CeA00VepQCNzGzvU-tISyVA0yCLBdw';
-                        const supabaseKey = localStorage.getItem('SUPABASE_ANON_KEY') || defaultSupabaseKey;
+                let attempts = 0;
+                const maxAttempts = 10;
+                
+                const initSupabase = () => {
+                    if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+                        try {
+                            const supabaseUrl = window.SUPABASE_URL || 'https://boyuxgdplbpkknplxbxp.supabase.co';
+                            const defaultSupabaseKey = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJveXV4Z2RwbGJwa2tucGx4YnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzMzU5MTQsImV4cCI6MjA3NTkxMTkxNH0.-M-QdpBFlDtg1CeA00VepQCNzGzvU-tISyVA0yCLBdw';
+                            const supabaseKey = localStorage.getItem('SUPABASE_ANON_KEY') || defaultSupabaseKey;
 
-                        const client = window.supabase.createClient(supabaseUrl, supabaseKey);
-                        setSupabaseClient(client);
-                        // Expose globally for other scripts (realtime-sync, roles-permissions)
-                        window.__SUPABASE__ = client;
-                        // Dispatch event for scripts waiting for Supabase
-                        window.dispatchEvent(new CustomEvent('supabase:ready', { detail: { client } }));
-                        console.log('✅ Client Supabase initialisé et exposé globalement + event dispatched');
-                    } catch (error) {
-                        console.error('❌ Erreur initialisation Supabase:', error);
-                        console.warn('⚠️ Utilisation des sections par défaut');
+                            const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+                            setSupabaseClient(client);
+                            window.__SUPABASE__ = client;
+                            window.dispatchEvent(new CustomEvent('supabase:ready', { detail: { client } }));
+                            console.log('✅ Client Supabase initialisé et exposé globalement');
+                        } catch (error) {
+                            console.error('❌ Erreur initialisation Supabase:', error);
+                        }
+                    } else {
+                        attempts++;
+                        if (attempts < maxAttempts) {
+                            setTimeout(initSupabase, 300);
+                        } else {
+                            console.warn('⚠️ Supabase SDK non disponible après', maxAttempts, 'tentatives');
+                        }
                     }
-                } else {
-                    console.warn('⚠️ Bibliothèque Supabase non chargée, utilisation des sections par défaut');
-                }
+                };
+                
+                initSupabase();
             }, []);
 
             // Charger les sections depuis Supabase

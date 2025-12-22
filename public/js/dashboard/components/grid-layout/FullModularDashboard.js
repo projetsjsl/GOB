@@ -222,9 +222,9 @@
             }
         }, []);
 
-        const setActiveTab = useCallback((tabId) => {
+        const handleTabChange = useCallback((tabId) => {
             // Pour compatibilité avec les composants qui appellent setActiveTab
-            console.log('📑 Changement d\'onglet:', tabId);
+            setActiveTab(tabId);
         }, []);
 
         // ⚠️ CORRECTION PERFORMANCE: Exécuter une seule fois au montage
@@ -246,7 +246,7 @@
             window.BetaCombinedDashboard.fetchNews = fetchNews;
             window.BetaCombinedDashboard.refreshAllStocks = refreshAllStocks;
             window.BetaCombinedDashboard.fetchLatestNewsForTickers = fetchLatestNewsForTickers;
-            window.BetaCombinedDashboard.setActiveTab = setActiveTab;
+            window.BetaCombinedDashboard.setActiveTab = handleTabChange;
             window.BetaCombinedDashboard.setSelectedStock = setSelectedStock;
             window.BetaCombinedDashboard.getCompanyLogo = getCompanyLogo;
         }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -256,7 +256,7 @@
         useEffect(() => {
             window.BetaCombinedDashboardData = window.BetaCombinedDashboardData || {};
             window.BetaCombinedDashboardData.getCompanyLogo = getCompanyLogo;
-            window.BetaCombinedDashboardData.setActiveTab = setActiveTab;
+            window.BetaCombinedDashboardData.setActiveTab = handleTabChange;
             window.BetaCombinedDashboardData.isDarkMode = isDarkMode;
         }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

@@ -96,9 +96,9 @@ const EconomicCalendarTab = ({ isDarkMode }) => {
     };
 
     // Debug: Log du chargement du composant
-    console.log('📅 EconomicCalendarTab chargé');
+    // console.log('📅 EconomicCalendarTab chargé'); // Disabled - too frequent
     console.log('📊 Données init:', calendarData);
-    console.log('🔧 État du composant:', { activeSubTab, loading, error });
+    // console.log('🔧 État du composant:', { activeSubTab, loading, error }); // Disabled
 
     // Load team and watchlist tickers once on mount
     React.useEffect(() => {
