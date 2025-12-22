@@ -64,9 +64,10 @@ venv.bak/
 *.backup
 backup/
 
-# Screenshots and debug images
-*.png
+# Screenshots and debug images (keep public/images)
 debug_*.png
+screenshot_*.png
+# !public/images/*.png  # Allow images in public folder
 
 # Temporary files
 *.tmp

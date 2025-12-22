@@ -32,6 +32,7 @@ const AskEmmaTab = React.memo(({
                 const tickers = dashboard.tickers ?? [];
                 const stockData = dashboard.stockData ?? {};
                 const newsData = dashboard.newsData ?? [];
+                const apiStatus = dashboard.apiStatus ?? {};  // Fix: Define apiStatus
                 const loadTickersFromSupabase = dashboard.loadTickersFromSupabase;
                 const fetchNews = dashboard.fetchNews;
                 const refreshAllStocks = dashboard.refreshAllStocks;
@@ -764,7 +765,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         const currentApiStatus = apiStatus || {};
 
                         // Extraire les tickers de l'équipe
-                        const tickers = teamTickers || Object.keys(currentStockData);
+                        const tickers = (typeof teamTickers !== 'undefined' ? teamTickers : null) || Object.keys(currentStockData);
 
                         console.log(`📤 Envoi de la requête à Emma Agent (format: web)...`);
 
