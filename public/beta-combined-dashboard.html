@@ -199,6 +199,13 @@
                 return "Analyse en cours...";
             };
             
+
+            // Initialize Lucide icons if available
+            if (window.lucide && window.lucide.createIcons) {
+                try {
+                    window.lucide.createIcons();
+                } catch(e) {}
+            }
             // Early LucideIcon/IconoirIcon polyfill - MUST be before component scripts
             window.IconoirIcon = function(props) {
                 var name = props.name || 'Activity';
