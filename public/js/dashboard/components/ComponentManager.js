@@ -77,25 +77,25 @@ const ComponentManager = (() => {
 
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                <div className={\`w-full max-w-4xl max-h-[90vh] \${bg} \${text} rounded-2xl shadow-2xl border \${border} overflow-hidden flex flex-col\`}>
-                    <div className={\`flex items-center justify-between p-4 border-b \${border}\`}>
+                <div className={`w-full max-w-4xl max-h-[90vh] ${bg} ${text} rounded-2xl shadow-2xl border ${border} overflow-hidden flex flex-col`}>
+                    <div className={`flex items-center justify-between p-4 border-b ${border}`}>
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
                                 <span className="text-xl">🧩</span>
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold">Gestionnaire de Composants</h2>
-                                <p className={\`text-sm \${isDarkMode ? 'text-gray-400' : 'text-gray-500'}\`}>
+                                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                     {components.filter(c => c.isLoaded).length}/{components.length} composants chargés
                                 </p>
                             </div>
                         </div>
-                        <button onClick={onClose} className={\`p-2 rounded-lg \${hover} transition-colors\`}>
+                        <button onClick={onClose} className={`p-2 rounded-lg ${hover} transition-colors`}>
                             <span className="text-xl">✕</span>
                         </button>
                     </div>
 
-                    <div className={\`flex border-b \${border}\`}>
+                    <div className={`flex border-b ${border}`}>
                         {[
                             { id: 'components', label: '📦 Composants', count: components.length },
                             { id: 'layout', label: '📐 Layout', count: layout.length },
@@ -104,13 +104,13 @@ const ComponentManager = (() => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={\`flex-1 py-3 px-4 text-sm font-medium transition-colors \${
+                                className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
                                     activeTab === tab.id
                                         ? 'border-b-2 border-emerald-500 text-emerald-500'
                                         : isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
-                                }\`}
+                                }`}
                             >
-                                {tab.label} {tab.count !== null && \`(\${tab.count})\`}
+                                {tab.label} {tab.count !== null && `(${tab.count})`}
                             </button>
                         ))}
                     </div>
@@ -123,27 +123,27 @@ const ComponentManager = (() => {
                                     placeholder="🔍 Rechercher un composant..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className={\`w-full px-4 py-2 rounded-lg border \${border} \${
+                                    className={`w-full px-4 py-2 rounded-lg border ${border} ${
                                         isDarkMode ? 'bg-neutral-800 text-white' : 'bg-gray-50 text-gray-900'
-                                    } focus:outline-none focus:ring-2 focus:ring-emerald-500\`}
+                                    } focus:outline-none focus:ring-2 focus:ring-emerald-500`}
                                 />
 
                                 {Object.entries(groupedComponents).map(([category, comps]) => (
                                     <div key={category} className="space-y-2">
-                                        <h3 className={\`text-sm font-semibold uppercase tracking-wider \${isDarkMode ? 'text-gray-500' : 'text-gray-400'}\`}>{category}</h3>
+                                        <h3 className={`text-sm font-semibold uppercase tracking-wider ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>{category}</h3>
                                         <div className="grid grid-cols-2 gap-2">
                                             {comps.map(comp => (
-                                                <div key={comp.id} className={\`p-3 rounded-lg border \${border} \${hover} transition-colors\`}>
+                                                <div key={comp.id} className={`p-3 rounded-lg border ${border} ${hover} transition-colors`}>
                                                     <div className="flex items-center justify-between">
                                                         <div className="flex items-center gap-2">
-                                                            <span className={\`w-2 h-2 rounded-full \${comp.isLoaded ? 'bg-emerald-500' : 'bg-red-500'}\`}></span>
+                                                            <span className={`w-2 h-2 rounded-full ${comp.isLoaded ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
                                                             <span className="font-medium text-sm">{comp.name}</span>
                                                         </div>
-                                                        <span className={\`text-xs px-2 py-0.5 rounded \${comp.isLoaded ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}\`}>
+                                                        <span className={`text-xs px-2 py-0.5 rounded ${comp.isLoaded ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
                                                             {comp.isLoaded ? '✓' : '✗'}
                                                         </span>
                                                     </div>
-                                                    <p className={\`text-xs mt-1 \${isDarkMode ? 'text-gray-500' : 'text-gray-400'}\`}>{comp.id}</p>
+                                                    <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>{comp.id}</p>
                                                 </div>
                                             ))}
                                         </div>
@@ -155,7 +155,7 @@ const ComponentManager = (() => {
                         {activeTab === 'layout' && (
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <p className={\`text-sm \${isDarkMode ? 'text-gray-400' : 'text-gray-500'}\`}>
+                                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                         {layout.length} widgets dans le layout actuel
                                     </p>
                                     <button onClick={handleResetLayout} className="px-3 py-1.5 text-sm bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors">
@@ -164,14 +164,14 @@ const ComponentManager = (() => {
                                 </div>
 
                                 {layout.length === 0 ? (
-                                    <div className={\`text-center py-8 \${isDarkMode ? 'text-gray-500' : 'text-gray-400'}\`}>Aucun widget dans le layout</div>
+                                    <div className={`text-center py-8 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Aucun widget dans le layout</div>
                                 ) : (
                                     <div className="space-y-2">
                                         {layout.map(widget => (
-                                            <div key={widget.i} className={\`p-3 rounded-lg border \${border} \${hover} transition-colors flex items-center justify-between\`}>
+                                            <div key={widget.i} className={`p-3 rounded-lg border ${border} ${hover} transition-colors flex items-center justify-between`}>
                                                 <div>
                                                     <p className="font-medium">{widget.i}</p>
-                                                    <p className={\`text-xs \${isDarkMode ? 'text-gray-500' : 'text-gray-400'}\`}>
+                                                    <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                                                         Position: ({widget.x}, {widget.y}) • Taille: {widget.w}×{widget.h}
                                                     </p>
                                                 </div>
@@ -187,7 +187,7 @@ const ComponentManager = (() => {
 
                         {activeTab === 'diagnostics' && (
                             <div className="space-y-4">
-                                <div className={\`p-4 rounded-lg border \${border} \${isDarkMode ? 'bg-neutral-800' : 'bg-gray-50'}\`}>
+                                <div className={`p-4 rounded-lg border ${border} ${isDarkMode ? 'bg-neutral-800' : 'bg-gray-50'}`}>
                                     <h4 className="font-semibold mb-2">📊 État du système</h4>
                                     <div className="grid grid-cols-2 gap-2 text-sm">
                                         <div>React: <span className="text-emerald-400">{typeof React !== 'undefined' ? '✓' : '✗'}</span></div>
@@ -199,7 +199,7 @@ const ComponentManager = (() => {
                                     </div>
                                 </div>
 
-                                <div className={\`p-4 rounded-lg border \${border} \${isDarkMode ? 'bg-neutral-800' : 'bg-gray-50'}\`}>
+                                <div className={`p-4 rounded-lg border ${border} ${isDarkMode ? 'bg-neutral-800' : 'bg-gray-50'}`}>
                                     <h4 className="font-semibold mb-2">🔧 Actions</h4>
                                     <div className="flex flex-wrap gap-2">
                                         <button onClick={() => { localStorage.clear(); window.location.reload(); }} className="px-3 py-1.5 text-sm bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30">
