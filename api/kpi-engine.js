@@ -335,9 +335,6 @@ export default async function handler(req, res) {
         example: 'GET /api/kpi-engine?action=compute&kpi_code=ROE&symbol=AAPL'
       });
     }
-      });
-    }
-
     if (!kpi_code) {
       return res.status(400).json({ error: 'kpi_code requis' });
     }

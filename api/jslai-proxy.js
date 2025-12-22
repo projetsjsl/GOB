@@ -14,8 +14,7 @@ export default async function handler(req, res) {
         example: 'GET /api/jslai-proxy?path=reee',
         description: 'Le paramètre path doit être le chemin relatif sur jslai.app (ex: "reee", "evaluation")'
       });
-    } });
-  }
+    }
 
   try {
     // Construire l'URL cible

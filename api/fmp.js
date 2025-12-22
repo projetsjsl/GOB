@@ -294,7 +294,19 @@ export default async function handler(req, res) {
       });
     }
 
-    const data = await fmpResponse.json();
+        // Secure JSON parsing
+    let data;
+    try {
+        const rawText = await fmpResponse.text();
+        try {
+            data = JSON.parse(rawText);
+        } catch(e) {
+             throw new Error(`Invalid JSON: ${rawText.substring(0,50)}...`);
+        }
+    } catch (e) {
+        console.error('FMP Proxy JSON Error', e);
+        return res.status(500).json({ error: 'Upstream invalid response', details: e.message });
+    }
 
     console.log(`✅ FMP API success: ${endpoint} - ${Array.isArray(data) ? data.length : 'object'} items`);
 
