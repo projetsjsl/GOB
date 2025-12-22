@@ -8,6 +8,51 @@ let userPermissions = null;
 let userRole = null;
 
 /**
+ * Get default permissions for a role
+ */
+function getDefaultPermissionsForRole(role) {
+    const defaults = {
+        admin: {
+            'stocks-news': true,
+            'ask-emma': true,
+            'jlab': true,
+            'economic-calendar': true,
+            'investing-calendar': true,
+            'yield-curve': true,
+            'markets-economy': true,
+            'dans-watchlist': true,
+            'scrapping-sa': true,
+            'seeking-alpha': true,
+            'email-briefings': true,
+            'admin-jslai': true,
+            'admin-jsla': true,
+            'emma-sms': true,
+            'fastgraphs': true,
+            'groupchat': true,
+            'emmaiai': true,
+            'emma-live': true,
+            'emma-finvox': true,
+            'emma-group': true,
+            'emma-terminal': true,
+            'emma-vocal': true
+        },
+        analyst: {
+            'stocks-news': true,
+            'ask-emma': true,
+            'jlab': true,
+            'economic-calendar': true,
+            'markets-economy': true,
+            'seeking-alpha': true
+        },
+        viewer: {
+            'stocks-news': true,
+            'markets-economy': true
+        }
+    };
+    return defaults[role] || defaults.viewer;
+}
+
+/**
  * Charger les permissions de l'utilisateur actuel
  */
 async function loadUserPermissions() {
@@ -21,10 +66,18 @@ async function loadUserPermissions() {
         }
         
         // 2. Récupérer l'utilisateur depuis sessionStorage
-        const userData = sessionStorage.getItem('gob-user');
+        let userData = null;
+        try {
+            userData = sessionStorage.getItem('gob-user');
+        } catch (e) {
+            console.warn('[Roles] Cannot access sessionStorage:', e);
+        }
+        
         if (!userData) {
-            console.warn('[Roles] Aucun utilisateur connecté');
-            return null;
+            console.warn('[Roles] Aucun utilisateur connecté, using admin fallback');
+            userRole = 'admin';
+            userPermissions = getDefaultPermissionsForRole('admin');
+            return userPermissions;
         }
 
         const user = JSON.parse(userData);
@@ -49,71 +102,29 @@ async function loadUserPermissions() {
                 })
             });
 
-            const data = await response.json();
-
-            if (data.success && data.permissions) {
-                userPermissions = data.permissions.component_permissions || {};
-                userRole = data.permissions.role_name;
-                console.log('[Roles] Permissions loaded from API:', userPermissions);
-                return userPermissions;
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.permissions) {
+                    userPermissions = data.permissions.component_permissions || {};
+                    userRole = data.permissions.role_name;
+                    console.log('[Roles] Permissions loaded from API:', userPermissions);
+                    return userPermissions;
+                }
             }
         } catch (apiError) {
-            console.warn('[Roles] API call failed, using defaults:', apiError);
+            console.warn('[Roles] API call failed, using defaults:', apiError.message);
         }
         
         // 4. Fallback to default permissions
-        console.warn('[Roles] Using default permissions for', username);
-        userPermissions = {};
+        console.warn('[Roles] Using default admin permissions');
+        userRole = 'admin';
+        userPermissions = getDefaultPermissionsForRole('admin');
         return userPermissions;
+        
     } catch (error) {
         console.error('[Roles] Erreur chargement permissions:', error);
-        userPermissions = {};
-        return userPermissions;
-    }
-}
-
-/**
- * Get default permissions for a role
- */
-function getDefaultPermissionsForRole(role) {
-    const defaults = {
-        admin: {
-            'stocks-news': true,
-            'ask-emma': true,
-            'jlab': true,
-            'economic-calendar': true,
-            'investing-calendar': true,
-            'yield-curve': true,
-            'markets-economy': true,
-            'dans-watchlist': true,
-            'scrapping-sa': true,
-            'seeking-alpha': true,
-            'email-briefings': true,
-            'admin-jslai': true,
-            'admin-jsla': true,
-            'emma-sms': true,
-            'fastgraphs': true,
-            'groupchat': true,
-            'emmaiai': true
-        },
-        analyst: {
-            'stocks-news': true,
-            'ask-emma': true,
-            'jlab': true,
-            'economic-calendar': true,
-            'markets-economy': true,
-            'seeking-alpha': true
-        },
-        viewer: {
-            'stocks-news': true,
-            'markets-economy': true
-        }
-    };
-    return defaults[role] || defaults.viewer;
-} catch (error) {
-        console.error('[Roles] Erreur chargement permissions:', error);
-        // En cas d'erreur, tout est visible (fallback)
-        userPermissions = {};
+        userRole = 'admin';
+        userPermissions = getDefaultPermissionsForRole('admin');
         return userPermissions;
     }
 }
@@ -145,6 +156,11 @@ function isAdminUser() {
         return true;
     }
     
+    // Vérifier depuis window global
+    if (window.__EMMA_ROLE__ === 'admin') {
+        return true;
+    }
+    
     // Vérifier depuis sessionStorage directement
     try {
         const userData = sessionStorage.getItem('gob-user');
@@ -155,7 +171,7 @@ function isAdminUser() {
             }
         }
     } catch (e) {
-        console.warn('[Roles] Erreur vérification admin:', e);
+        // Ignore storage errors
     }
     
     return false;
@@ -165,24 +181,19 @@ function isAdminUser() {
  * Filtrer les tabs selon les permissions
  */
 function filterTabsByPermissions(tabs) {
+    if (!Array.isArray(tabs)) return [];
+    
     const isAdmin = isAdminUser();
     
-    if (!userPermissions) {
-        // Si pas de permissions chargées mais utilisateur admin, autoriser l'onglet admin
-        if (isAdmin) {
-            return tabs; // Tout autoriser pour admin si pas de permissions
-        }
-        return tabs; // Pas de filtrage si pas de permissions
+    if (!userPermissions || isAdmin) {
+        return tabs; // Tout autoriser pour admin
     }
 
     return tabs.filter(tab => {
+        if (!tab || !tab.id) return false;
+        
         // Toujours autoriser certains tabs de base
         if (tab.id === 'plus' || tab.id === 'theme-selector') {
-            return true;
-        }
-
-        // Toujours autoriser l'onglet admin pour les utilisateurs admin
-        if (tab.id === 'admin-jsla' && isAdmin) {
             return true;
         }
 
@@ -195,51 +206,27 @@ function filterTabsByPermissions(tabs) {
  * Masquer les composants non autorisés dans le DOM
  */
 function hideUnauthorizedComponents() {
-    if (!userPermissions) {
-        return; // Pas de masquage si pas de permissions
+    if (!userPermissions || isAdminUser()) {
+        return; // Pas de masquage pour admin
     }
 
-    const isAdmin = isAdminUser();
-
-    // Liste des IDs de composants
     const componentIds = [
-        'stocks-news',
-        'ask-emma',
-        'jlab',
-        'economic-calendar',
-        'investing-calendar',
-        'yield-curve',
-        'markets-economy',
-        'dans-watchlist',
-        'scrapping-sa',
-        'seeking-alpha',
-        'email-briefings',
-        'admin-jslai',
-        'admin-jsla', // ID alternatif
-        'emma-sms',
-        'fastgraphs',
-        'news-banner',
-        'theme-selector'
+        'stocks-news', 'ask-emma', 'jlab', 'economic-calendar',
+        'investing-calendar', 'yield-curve', 'markets-economy',
+        'dans-watchlist', 'scrapping-sa', 'seeking-alpha',
+        'email-briefings', 'admin-jslai', 'admin-jsla',
+        'emma-sms', 'fastgraphs', 'news-banner', 'theme-selector'
     ];
 
     componentIds.forEach(componentId => {
-        // Ne pas masquer l'onglet admin pour les admins
-        if ((componentId === 'admin-jslai' || componentId === 'admin-jsla') && isAdmin) {
-            return;
-        }
-
         if (!hasPermission(componentId)) {
-            // Masquer les tabs correspondants
-            const tabElements = document.querySelectorAll(`[data-tab="${componentId}"], [data-component="${componentId}"]`);
-            tabElements.forEach(el => {
-                el.style.display = 'none';
-            });
+            const tabElements = document.querySelectorAll(
+                '[data-tab="' + componentId + '"], [data-component="' + componentId + '"]'
+            );
+            tabElements.forEach(el => { el.style.display = 'none'; });
 
-            // Masquer les contenus de tabs
-            const tabContent = document.getElementById(`tab-${componentId}`);
-            if (tabContent) {
-                tabContent.style.display = 'none';
-            }
+            const tabContent = document.getElementById('tab-' + componentId);
+            if (tabContent) { tabContent.style.display = 'none'; }
         }
     });
 }
@@ -248,17 +235,27 @@ function hideUnauthorizedComponents() {
  * Initialiser le système de permissions
  */
 async function initRolesPermissions() {
-    await loadUserPermissions();
-    hideUnauthorizedComponents();
-    
-    // Exposer les fonctions globalement pour utilisation dans le dashboard
-    window.hasPermission = hasPermission;
-    window.userPermissions = userPermissions;
-    window.userRole = userRole;
-    
-    console.log('[Roles] Système de permissions initialisé');
-    console.log('[Roles] Rôle:', userRole);
-    console.log('[Roles] Permissions:', userPermissions);
+    try {
+        await loadUserPermissions();
+        hideUnauthorizedComponents();
+        
+        // Exposer les fonctions globalement
+        window.hasPermission = hasPermission;
+        window.userPermissions = userPermissions;
+        window.userRole = userRole;
+        window.__EMMA_PERMS__ = userPermissions;
+        
+        console.log('[Roles] Système de permissions initialisé');
+        console.log('[Roles] Rôle:', userRole);
+        console.log('[Roles] Permissions:', Object.keys(userPermissions || {}));
+    } catch (error) {
+        console.error('[Roles] Init error:', error);
+        // Fallback to admin
+        userRole = 'admin';
+        userPermissions = getDefaultPermissionsForRole('admin');
+        window.userRole = userRole;
+        window.userPermissions = userPermissions;
+    }
 }
 
 // Initialiser au chargement
@@ -275,6 +272,6 @@ window.RolesPermissions = {
     filterTabsByPermissions,
     hideUnauthorizedComponents,
     initRolesPermissions,
-    isAdminUser
+    isAdminUser,
+    getDefaultPermissionsForRole
 };
-

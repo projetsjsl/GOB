@@ -13641,7 +13641,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                         const client = window.supabase.createClient(supabaseUrl, supabaseKey);
                         setSupabaseClient(client);
-                        console.log('✅ Client Supabase initialisé avec URL:', supabaseUrl);
+                        // Expose globally for other scripts (realtime-sync, roles-permissions)
+                        window.__SUPABASE__ = client;
+                        console.log('✅ Client Supabase initialisé et exposé globalement');
                     } catch (error) {
                         console.error('❌ Erreur initialisation Supabase:', error);
                         console.warn('⚠️ Utilisation des sections par défaut');

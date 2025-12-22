@@ -157,6 +157,23 @@ class WidgetErrorBoundary extends React.Component {
     }
 }
 
+// Missing Component Card - displayed when a component is not found
+const MissingComponentCard = ({ componentName, isDarkMode }) => (
+    <div className={`h-full flex flex-col items-center justify-center p-6 rounded-lg border-2 border-dashed ${
+        isDarkMode 
+            ? 'bg-neutral-900/50 border-amber-500/30 text-amber-400' 
+            : 'bg-amber-50 border-amber-300 text-amber-700'
+    }`}>
+        <span className="text-4xl mb-3">⚠️</span>
+        <h3 className="font-bold text-lg mb-2">Module non chargé</h3>
+        <p className="text-sm text-center opacity-75 mb-3">{componentName || 'Composant inconnu'}</p>
+        <p className="text-xs text-center opacity-50">
+            Vérifiez que le script est chargé dans beta-combined-dashboard.html
+        </p>
+    </div>
+);
+
+
 const DashboardGridWrapper = ({
         mainTab = "titres",
         isDarkMode = true,
@@ -403,22 +420,14 @@ const DashboardGridWrapper = ({
             }
 
             if (!Component) {
-                console.warn(`⚠️ Composant ${config.component} non trouvé. Tentatives:`, {
-                    direct: typeof window[config.component],
-                    withTab: typeof window[config.component + 'Tab'],
-                    allWindowKeys: Object.keys(window).filter(k => k.includes(config.component.split('Tab')[0]))
+                console.warn('[MissingComponent]', { 
+                    key: item.i, 
+                    component: config.component,
+                    availableComponents: Object.keys(window).filter(k => 
+                        k.endsWith('Tab') || k.includes('Dashboard') || k.includes('Widget')
+                    ).slice(0, 20)
                 });
-                return (
-                    <div className={`h-full flex flex-col items-center justify-center p-4 ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
-                        <window.LucideIcon name="AlertTriangle" className={`w-12 h-12 mb-2 ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`} />
-                        <span className={`text-sm text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                            Composant {config.component} non chargé
-                        </span>
-                        <span className={`text-xs mt-2 text-center ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                            Vérifiez la console pour plus de détails
-                        </span>
-                    </div>
-                );
+                return <MissingComponentCard componentName={config.component} isDarkMode={isDarkMode} />;
             }
 
             // Props communes pour tous les composants
