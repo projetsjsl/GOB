@@ -57724,6 +57724,7 @@ Vérifiez les logs de la console pour plus de détails.`;
             setNotes(updatedProfile.notes || "");
             showNotification(`✅ ${upperSymbol} chargé depuis Supabase`, "success");
             try {
+              console.log(`🔄 Tentative récupération prix temps réel pour ${upperSymbol}...`);
               const { fetchMarketData: fetchMarketData2 } = await __vitePreload(async () => {
                 const { fetchMarketData: fetchMarketData3 } = await Promise.resolve().then(() => marketDataCache);
                 return { fetchMarketData: fetchMarketData3 };

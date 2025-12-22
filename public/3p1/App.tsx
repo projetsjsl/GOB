@@ -2273,6 +2273,7 @@ export default function App() {
                         // ✅ FIX: Récupérer le prix en temps réel depuis l'API market data
                         // Même après chargement Supabase, le prix peut être à 0 dans le snapshot
                         try {
+                            console.log(`🔄 Tentative récupération prix temps réel pour ${upperSymbol}...`);
                             const { fetchMarketData } = await import('./services/marketDataCache');
                             const marketData = await fetchMarketData(upperSymbol);
                             
