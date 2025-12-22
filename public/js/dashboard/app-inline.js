@@ -27276,6 +27276,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         // ⚠️ CORRECTION PERFORMANCE: Console.log supprimé (causait logs excessifs)
                         window.DashboardGridWrapper ? (
                             <window.DashboardGridWrapper
+                                mainTab={mainTab}
                                 isDarkMode={isDarkMode}
                                 isAdmin={true}
                                 activeTab={activeTab}

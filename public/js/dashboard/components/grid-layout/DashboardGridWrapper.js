@@ -59,6 +59,22 @@
         'tests-calendar': { component: 'InvestingCalendarTab', label: 'Calendrier', icon: 'Calendar', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
     };
 
+    
+    // Mapping from main tab to widget IDs to show
+    const MAIN_TAB_TO_WIDGETS = {
+        'admin': ['admin-jsla', 'admin-config', 'admin-briefings', 'admin-scraping', 'admin-fastgraphs'],
+        'marches': ['marches-global', 'marches-flex', 'marches-calendar', 'marches-yield', 'marches-nouvelles'],
+        'titres': ['titres-portfolio', 'titres-flex', 'titres-watchlist', 'titres-seeking'],
+        'jlab': ['jlab-terminal', 'jlab-advanced'],
+        'emma': ['emma-chat', 'emma-vocal', 'emma-group', 'emma-terminal', 'emma-live', 'emma-finvox'],
+        'tests': ['tests-rgl', 'tests-calendar']
+    };
+    
+    // Get widgets for a main tab
+    const getWidgetsForTab = (mainTab) => {
+        return MAIN_TAB_TO_WIDGETS[mainTab] || Object.keys(TAB_TO_WIDGET_MAP);
+    };
+
     // Layout par défaut basé sur les tabs les plus utilisés
     const getDefaultLayout = (activeTabs = []) => {
         const defaultTabs = activeTabs.length > 0 ? activeTabs : [
@@ -142,6 +158,7 @@ class WidgetErrorBoundary extends React.Component {
 }
 
 const DashboardGridWrapper = ({
+        mainTab = "titres",
         isDarkMode = true,
         isAdmin = false,
         activeTab,
@@ -572,6 +589,52 @@ const DashboardGridWrapper = ({
             openSeekingAlpha, Icon, MASTER_NAV_LINKS, allTabs, layout
         ]);
 
+        
+    // ===================================
+    // FILTERED LAYOUT BY MAIN TAB
+    // ===================================
+    
+    // Get the relevant widget IDs for the current main tab
+    const getWidgetIdsForMainTab = (tab) => {
+        const prefixMap = {
+            'admin': 'admin-',
+            'marches': 'marches-',
+            'titres': 'titres-',
+            'jlab': 'jlab-',
+            'emma': 'emma-',
+            'tests': 'tests-'
+        };
+        const prefix = prefixMap[tab];
+        if (!prefix) return Object.keys(TAB_TO_WIDGET_MAP);
+        return Object.keys(TAB_TO_WIDGET_MAP).filter(k => k.startsWith(prefix));
+    };
+    
+    // Filter layout to only show widgets for current main tab
+    const filteredLayout = useMemo(() => {
+        const validIds = getWidgetIdsForMainTab(mainTab);
+        const existing = layout.filter(item => validIds.includes(item.i));
+        
+        // If no widgets match, generate default grid for this tab
+        if (existing.length === 0) {
+            const widgets = validIds;
+            return widgets.map((id, idx) => {
+                const config = TAB_TO_WIDGET_MAP[id] || {};
+                const defaultSize = config.defaultSize || { w: 6, h: 8 };
+                const minSize = config.minSize || { w: 4, h: 6 };
+                return {
+                    i: id,
+                    x: (idx % 2) * 6,
+                    y: Math.floor(idx / 2) * 8,
+                    w: defaultSize.w,
+                    h: defaultSize.h,
+                    minW: minSize.w,
+                    minH: minSize.h
+                };
+            });
+        }
+        return existing;
+    }, [layout, mainTab]);
+
         if (!ResponsiveGridLayout) {
             console.error('❌ ResponsiveGridLayout non disponible');
             return (
@@ -689,7 +752,7 @@ const DashboardGridWrapper = ({
                     ) : (
                         <ResponsiveGridLayout
                             className="layout"
-                            layouts={{ lg: layout }}
+                            layouts={{ lg: filteredLayout }}
                             breakpoints={BREAKPOINTS}
                             cols={COLS}
                             rowHeight={ROW_HEIGHT}
@@ -700,7 +763,7 @@ const DashboardGridWrapper = ({
                             compactType="vertical"
                             margin={[16, 16]}
                         >
-                            {layout.map(item => {
+                            {filteredLayout.map(item => {
                                 const config = TAB_TO_WIDGET_MAP[item.i];
                                 if (!config) {
                                     console.warn(`⚠️ Widget ${item.i} non trouvé dans TAB_TO_WIDGET_MAP`);
@@ -725,7 +788,7 @@ const DashboardGridWrapper = ({
                 {isEditing && (
                     <div className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-2xl flex gap-4 shadow-2xl z-50 max-w-4xl overflow-x-auto ${isDarkMode ? 'bg-neutral-800/90 backdrop-blur border border-neutral-700' : 'bg-white/90 backdrop-blur border border-gray-200'}`}>
                         {Object.entries(TAB_TO_WIDGET_MAP)
-                            .filter(([tabId]) => !layout.some(item => item.i === tabId))
+                            .filter(([tabId]) => !filteredLayout.some(item => item.i === tabId) && getWidgetIdsForMainTab(mainTab).includes(tabId))
                             .map(([tabId, config]) => (
                                 <button
                                     key={tabId}
