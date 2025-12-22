@@ -122,32 +122,15 @@
 
     <!-- UTILS & ICONS -->
     <script type="text/babel">
-        // Lucide Icon Wrapper
+        // Lucide Icon Wrapper - Safe version
         window.LucideIcon = ({ name, className, ...props }) => {
-            const [iconNode, setIconNode] = React.useState(null);
-            const ref = React.useRef(null);
-
-            React.useEffect(() => {
-                if (ref.current) {
-                    const iconName = name || 'HelpCircle';
-                    const lucideIcon = lucide.icons[iconName];
-                    if (lucideIcon) {
-                        const svg = lucide.createIcons({
-                            icons: { [iconName]: lucideIcon },
-                            attrs: { class: className, ...props },
-                            nameAttr: 'data-lucide'
-                        });
-                        // Lucide processes the DOM directly based on data attributes or classes
-                        // But since we are in React, we manually create SVG if needed or just use lucide.icons[name]
-                        // Simple approach: Render an 'i' tag and let lucide replace it
-                    }
-                }
-            }, [name, className]);
-
-            // Plus simple pour React : utiliser les composants Lucide React si dispos, sinon :
+            // Check if lucide is loaded
+            if (typeof lucide === 'undefined' || !lucide.icons) {
+                // Fallback to simple icon placeholder
+                return <i className={className} {...props}>●</i>;
+            }
+            
             const Icon = lucide.icons[name] || lucide.icons.HelpCircle;
-            // On convertit le SVG string ou node en JSX n'est pas trivial sans parser.
-            // Approche SVG direct:
             
             return (
                 <i data-lucide={name} className={className} {...props}></i>
@@ -156,7 +139,9 @@
         
         // Initialization Lucide après render
         setInterval(() => {
-            if(window.lucide) window.lucide.createIcons();
+            if(window.lucide && window.lucide.createIcons) {
+                try { window.lucide.createIcons(); } catch(e) {}
+            }
         }, 500);
     </script>
     
