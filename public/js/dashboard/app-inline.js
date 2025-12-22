@@ -5,6 +5,20 @@ if (typeof window.showSlashSuggestions === "undefined") {
 }
 if (typeof window.setShowSlashSuggestions === "undefined") {
     window.setShowSlashSuggestions = function() {};
+
+// EXPOSE Icon globally for other components (like JLabTab)
+window.Icon = ({ emoji, size = 20, className = '' }) => {
+    const isPro = window.isProfessionalMode ?? false;
+    if (!isPro) {
+        return <span className={"inline-block " + className} style={{ fontSize: size + 'px' }}>{emoji}</span>;
+    }
+    const iconClass = window.ProfessionalModeSystem?.emojiToIcon?.[emoji];
+    if (iconClass) {
+        return <i className={"iconoir-" + iconClass + " " + className} style={{ fontSize: size + 'px' }}></i>;
+    }
+    return <span className={"inline-block " + className} style={{ fontSize: size + 'px' }}>{emoji}</span>;
+};
+
 }
 /**
  * SAFETY NOTE FOR EDITORS:
