@@ -27277,6 +27277,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 setShowTemperatureEditor={setShowTemperatureEditor}
                                 showLengthEditor={showLengthEditor}
                                 setShowLengthEditor={setShowLengthEditor}
+                        showCommandsHelp={showCommandsHelp}
+                        setShowCommandsHelp={setShowCommandsHelp}
+                        showSlashSuggestions={showSlashSuggestions}
+                        setShowSlashSuggestions={setShowSlashSuggestions}
+                        slashSuggestions={slashSuggestions}
+                        setSlashSuggestions={setSlashSuggestions}
+                        selectedSuggestionIndex={selectedSuggestionIndex}
+                        setSelectedSuggestionIndex={setSelectedSuggestionIndex}
+                        isDarkMode={isDarkMode}
                                 showCommandsHelp={showCommandsHelp}
                                 setShowCommandsHelp={setShowCommandsHelp}
                                 showSlashSuggestions={showSlashSuggestions}
@@ -27354,6 +27363,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         setShowTemperatureEditor={setShowTemperatureEditor}
                         showLengthEditor={showLengthEditor}
                         setShowLengthEditor={setShowLengthEditor}
+                        showCommandsHelp={showCommandsHelp}
+                        setShowCommandsHelp={setShowCommandsHelp}
+                        showSlashSuggestions={showSlashSuggestions}
+                        setShowSlashSuggestions={setShowSlashSuggestions}
+                        slashSuggestions={slashSuggestions}
+                        setSlashSuggestions={setSlashSuggestions}
+                        selectedSuggestionIndex={selectedSuggestionIndex}
+                        setSelectedSuggestionIndex={setSelectedSuggestionIndex}
+                        isDarkMode={isDarkMode}
                         setActiveTab={setActiveTab}
                         activeTab={activeTab}
                     />}
@@ -27542,6 +27560,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         setShowTemperatureEditor={setShowTemperatureEditor}
                         showLengthEditor={showLengthEditor}
                         setShowLengthEditor={setShowLengthEditor}
+                        showCommandsHelp={showCommandsHelp}
+                        setShowCommandsHelp={setShowCommandsHelp}
+                        showSlashSuggestions={showSlashSuggestions}
+                        setShowSlashSuggestions={setShowSlashSuggestions}
+                        slashSuggestions={slashSuggestions}
+                        setSlashSuggestions={setSlashSuggestions}
+                        selectedSuggestionIndex={selectedSuggestionIndex}
+                        setSelectedSuggestionIndex={setSelectedSuggestionIndex}
+                        isDarkMode={isDarkMode}
                         setActiveTab={setActiveTab}
                         activeTab={activeTab}
                     />}
