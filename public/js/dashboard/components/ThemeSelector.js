@@ -298,13 +298,17 @@ const ThemeSelector = () => {
                     {/* Fenêtre centrée */}
                     <div 
                         ref={modalRef}
-                        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl max-h-[85vh] rounded-lg shadow-2xl flex flex-col overflow-hidden animate-slide-down"
+                        ref={modalRef}
+                        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl max-h-[85vh] rounded-xl shadow-2xl flex flex-col overflow-hidden"
                         style={{
-                            background: 'var(--theme-surface, #111827)',
+                            background: themeId === 'ia' || themeId === 'lightglass' 
+                                ? 'var(--theme-surface-dark, #111827)' // Use darker opacity for glass themes
+                                : 'var(--theme-surface, #111827)',
                             border: '1px solid var(--theme-border, #374151)',
                             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)',
                             pointerEvents: 'auto',
-                            zIndex: 10001
+                            zIndex: 10001,
+                            borderRadius: '0.75rem' // Force rounded corners even in terminal themes for UI consistency
                         }}
                         onClick={(e) => e.stopPropagation()}
                     >
