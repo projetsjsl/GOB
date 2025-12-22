@@ -127,7 +127,7 @@ const ComponentManager = (() => {
         },
         { 
             id: 'AdminJSLaiTab', 
-            name: 'Admin JSL AI', 
+            name: 'Admin JSLAI', 
             category: 'Admin',
             description: "Panneau de configuration général de l'IA (Prompts, Modèles, Clés API).",
             implications: "Si désactivé : Impossible de configurer Emma ou les clés API depuis l'interface.",

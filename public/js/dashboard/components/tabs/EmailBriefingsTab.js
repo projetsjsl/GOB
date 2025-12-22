@@ -1631,7 +1631,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
     </div>
     <div class="footer">
       <p>⚠️ Analyse générée par IA à titre informatif uniquement.</p>
-      <p>© ${new Date().getFullYear()} JSL AI - Emma En Direct</p>
+      <p>© ${new Date().getFullYear()} JSLAI - Emma En Direct</p>
     </div>
   </div>
 </body>

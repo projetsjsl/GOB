@@ -39,7 +39,7 @@ window.PDFExporter = {
         // Add logo/watermark
         doc.setTextColor(100, 116, 139);
         doc.setFontSize(10);
-        doc.text('Propulsé par JSL AI™', pageWidth - margin - 40, 33);
+        doc.text('Propulsé par JSLAI™', pageWidth - margin - 40, 33);
 
         yPos = 50;
 

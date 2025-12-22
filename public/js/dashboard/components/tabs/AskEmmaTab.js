@@ -2391,7 +2391,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         <img src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} alt="Emma" className="w-16 h-16 rounded-full object-cover" />
                                         <div>
                                             <div className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Emma — Analyste Financière IA</div>
-                                            <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>JSL AI • Profil professionnel</div>
+                                            <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>JSLAI • Profil professionnel</div>
                                         </div>
                                         <button onClick={() => setShowProfile(false)} className={`ml-auto px-3 py-1 rounded ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>Fermer</button>
                                     </div>

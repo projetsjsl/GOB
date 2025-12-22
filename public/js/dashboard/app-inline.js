@@ -5550,7 +5550,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 <div className={`text-sm space-y-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                     }`}>
                                     <p><strong>Version:</strong> Bêta</p>
-                                    <p><strong>Propulsé par:</strong> JSL AI</p>
+                                    <p><strong>Propulsé par:</strong> JSLAI</p>
                                     <p><strong>Terminal Financier</strong> - Tous droits réservés</p>
                                 </div>
                             </div>
@@ -8436,7 +8436,7 @@ STRUCTURE JSON OBLIGATOIRE:
     <!-- Footer Emma En Direct -->
     <div class="footer">
       <div class="footer-brand">Emma En Direct</div>
-      <div class="footer-tagline">L'analyse des marchés, sans filtre · Powered by JSL AI</div>
+      <div class="footer-tagline">L'analyse des marchés, sans filtre · Powered by JSLAI</div>
       
       <div class="footer-disclaimer">
         <strong>⚠️ AVERTISSEMENT IMPORTANT</strong><br/>
@@ -8448,7 +8448,7 @@ STRUCTURE JSON OBLIGATOIRE:
       
       <div class="footer-legal">
         Sources : ${expertModules.sources_status ? Object.values(expertModules.sources_status).join(', ') : 'Yahoo Finance, Alpha Vantage, FMP, Finnhub, Perplexity, OpenAI'}<br/>
-        © ${new Date().getFullYear()} JSL AI - Emma En Direct. Tous droits réservés.
+        © ${new Date().getFullYear()} JSLAI - Emma En Direct. Tous droits réservés.
       </div>
     </div>
   </div>
@@ -16135,7 +16135,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     <img src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} alt="Emma" className="w-16 h-16 rounded-full object-cover" />
                                     <div>
                                         <div className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Emma — Analyste Financière IA</div>
-                                        <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>JSL AI • Profil professionnel</div>
+                                        <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>JSLAI • Profil professionnel</div>
                                     </div>
                                     <button onClick={() => setShowProfile(false)} className={`ml-auto px-3 py-1 rounded ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>Fermer</button>
                                 </div>
@@ -26146,7 +26146,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 />
                             </div>
                             <h2 className="text-white text-3xl md:text-4xl font-bold mb-2">Emma IA</h2>
-                            <p className="text-emerald-300 text-lg">Analyste financière virtuelle • JSL AI</p>
+                            <p className="text-emerald-300 text-lg">Analyste financière virtuelle • JSLAI</p>
                         </div>
                     </div>
                 )}
@@ -26180,7 +26180,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 />
                             </div>
                             <h2 className="text-white text-3xl md:text-4xl font-bold mb-2">JLab™</h2>
-                            <p className="text-green-300 text-lg">Laboratoire d'analyse financière • JSL AI</p>
+                            <p className="text-green-300 text-lg">Laboratoire d'analyse financière • JSLAI</p>
                         </div>
                     </div>
                 )}
@@ -26197,7 +26197,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 />
                             </div>
                             <h2 className="text-white text-3xl md:text-4xl font-bold mb-2">Seeking Alpha</h2>
-                            <p className="text-green-300 text-lg">Scraping & Analysis • JSL AI</p>
+                            <p className="text-green-300 text-lg">Scraping & Analysis • JSLAI</p>
                         </div>
                     </div>
                 )}
@@ -26579,7 +26579,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     
                                     <img
                                         src="/logojslaidark.jpg"
-                                        alt="JSL AI Logo"
+                                        alt="JSLAI Logo"
                                         className="w-14 h-14 object-contain relative z-10 drop-shadow-2xl filter brightness-110"
                                     />
                                 </div>
@@ -26750,7 +26750,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             : `0 0 6px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)`
                                                     }}
                                                 >
-                                                    JSL AI
+                                                    JSLAI
                                                 </span> - Tous droits réservés
                                             </p>
                                         </div>
@@ -27262,7 +27262,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 />
                             </div>
                             <h2 className="text-white text-3xl md:text-4xl font-bold mb-2">JLab™</h2>
-                            <p className="text-green-300 text-lg">Laboratoire d'analyse financière • JSL AI</p>
+                            <p className="text-green-300 text-lg">Laboratoire d'analyse financière • JSLAI</p>
                         </div>
                     </div>
                 )}
