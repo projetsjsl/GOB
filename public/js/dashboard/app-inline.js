@@ -27431,6 +27431,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 primaryNavConfig={primaryNavConfig}
                                 setPrimaryNavConfig={setPrimaryNavConfig}
                                 isProfessionalMode={isProfessionalMode}
+                                apiStatus={apiStatus}
                                 loadTickersFromSupabase={loadTickersFromSupabase}
                                 fetchNews={fetchNews}
                                 refreshAllStocks={refreshAllStocks}
@@ -27513,6 +27514,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         activeTab={activeTab} 
                         isDarkMode={isDarkMode}
                         isProfessionalMode={isProfessionalMode}
+                                apiStatus={apiStatus}
                     />}
                     {activeTab === 'tests-tab' && <InvestingCalendarTabInternal />}
                     {activeTab === 'admin-jsla' && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, {
@@ -27596,6 +27598,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         activeTab={activeTab} 
                         isDarkMode={isDarkMode}
                         isProfessionalMode={isProfessionalMode}
+                                apiStatus={apiStatus}
                     />}
                     {activeTab === 'admin-briefings' && <EmailBriefingsTab />}
                     {activeTab === 'admin-scraping' && <ScrappingSATab

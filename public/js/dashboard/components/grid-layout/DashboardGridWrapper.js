@@ -218,6 +218,7 @@ const DashboardGridWrapper = ({
         primaryNavConfig = {},
         setPrimaryNavConfig = () => {},
         isProfessionalMode = false,
+        apiStatus = {},
         // Fonctions
         loadTickersFromSupabase = () => {},
         fetchNews = () => {},
@@ -479,6 +480,7 @@ const DashboardGridWrapper = ({
             
             if (config.component === 'AskEmmaTab') {
                 Object.assign(componentProps, {
+                    apiStatus,
                     prefillMessage: emmaPrefillMessage,
                     setPrefillMessage: setEmmaPrefillMessage,
                     autoSend: emmaAutoSend,
