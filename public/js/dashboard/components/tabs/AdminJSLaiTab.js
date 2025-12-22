@@ -898,6 +898,20 @@ const AdminJSLaiTab = ({
                     )}
 
 
+                    {/* ⏱️ Configuration Overlay "IA en cours" */}
+                    <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+                        darkMode ? 'bg-gradient-to-br from-purple-900/20 to-gray-900 border-purple-700' : 'bg-gradient-to-br from-purple-50 to-gray-50 border-purple-200'
+                    }`}>
+                        {window.DevTimerConfigPanel ? (
+                            <window.DevTimerConfigPanel isDarkMode={darkMode} />
+                        ) : (
+                            <div className={`text-center py-4 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                <span className="text-2xl">⏱️</span>
+                                <p className="mt-2 text-sm">Panneau de configuration DevTimer non chargé</p>
+                            </div>
+                        )}
+                    </div>
+
                     {/* 🛡️ Gestion des Rôles & Permissions */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         darkMode ? 'bg-gradient-to-br from-slate-900/20 to-gray-900 border-slate-700' : 'bg-gradient-to-br from-slate-50 to-gray-50 border-slate-200'
