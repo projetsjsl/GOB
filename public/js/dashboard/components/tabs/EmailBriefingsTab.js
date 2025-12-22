@@ -1,6 +1,36 @@
 // Auto-converted from monolithic dashboard file
 // Component: EmailBriefingsTab
 
+const { useState, useEffect, useRef } = React;
+
+// Placeholder Components to prevent ReferenceError
+const PromptManager = () => (
+    <div className="p-4 border border-dashed border-gray-300 rounded-lg text-center text-gray-500">
+        <h4 className="font-semibold">Prompt Manager</h4>
+        <p className="text-sm">Fonctionnalité en cours de migration...</p>
+    </div>
+);
+
+const ScheduleManager = () => (
+    <div className="p-4 border border-dashed border-gray-300 rounded-lg text-center text-gray-500">
+        <h4 className="font-semibold">Schedule Manager</h4>
+        <p className="text-sm">Fonctionnalité en cours de migration...</p>
+    </div>
+);
+
+const EmailPreviewManager = () => (
+    <div className="p-4 border border-dashed border-gray-300 rounded-lg text-center text-gray-500">
+        <h4 className="font-semibold">Email Preview</h4>
+        <p className="text-sm">Fonctionnalité en cours de migration...</p>
+    </div>
+);
+
+const EmailRecipientsManager = () => (
+    <div className="p-4 border border-dashed border-gray-300 rounded-lg text-center text-gray-500">
+        <h4 className="font-semibold">Destinataires</h4>
+        <p className="text-sm">Fonctionnalité en cours de migration...</p>
+    </div>
+);
 
 
 const EmailBriefingsTab = () => {
@@ -1730,179 +1760,139 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
 
 
                         {/* En-tête amélioré */}
-                        <div className={`p-6 rounded-xl border-2 transition-all duration-300 ${
+                        {/* En-tête amélioré */}
+                        <div className={`p-6 rounded-3xl border shadow-lg relative overflow-hidden transition-all duration-300 group ${
                             isDarkMode
-                                ? 'bg-gradient-to-r from-gray-900/30 to-gray-800/30 border-gray-500/30'
-                                : 'bg-gradient-to-r from-gray-800 to-gray-700 border-gray-600'
+                                ? 'bg-[#1e2532] border-gray-800'
+                                : 'bg-white border-gray-100'
                         }`}>
-                            <div className="flex justify-between items-start">
+                            {/* Gradients decoratifs */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+                            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -ml-32 -mb-32 pointer-events-none"></div>
+
+                            <div className="flex justify-between items-start relative z-10">
                                 <div>
                                     <div className="flex items-center gap-3 mb-2">
-                                        <h2 className={`text-3xl font-bold transition-colors duration-300 ${
-                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        <div className="p-2 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl shadow-lg shadow-purple-500/20">
+                                            <span className="text-xl text-white">📡</span>
+                                        </div>
+                                        <h2 className={`text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${
+                                            isDarkMode ? 'from-white to-gray-400' : 'from-gray-900 to-gray-600'
                                         }`}>
-                                            📡 Emma En Direct
+                                            Emma Briefings
                                         </h2>
-                                        <span className={`px-3 py-1 rounded-full text-xs font-bold transition-colors duration-300 ${
+                                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
                                             isDarkMode
-                                                ? 'bg-yellow-600/20 text-yellow-300 border border-yellow-500/50'
-                                                : 'bg-yellow-100 text-yellow-800 border border-yellow-400'
+                                                ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                                                : 'bg-yellow-100 text-yellow-700 border-yellow-200'
                                         }`}>
-                                            BÊTA v2.0
+                                            Bêta v2.0
                                         </span>
                                     </div>
-                                    <p className={`text-sm transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                    <p className={`text-base font-medium ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                     }`}>
-                                        Briefings intelligents alimentés par Emma Agent • Architecture cognitive multi-sources
+                                        Briefings financiers intelligents alimentés par <span className="text-purple-500">Emma Agent</span> & <span className="text-blue-500">Perplexity</span>
                                     </p>
                                 </div>
-                                <div className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
+                                
+                                <div className={`flex items-center gap-3 px-4 py-2 rounded-full border shadow-sm backdrop-blur-sm ${
+                                    isDarkMode ? 'bg-gray-800/80 border-gray-700' : 'bg-white/80 border-gray-200'
                                 }`}>
-                                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                    <span className={`text-xs font-medium transition-colors duration-300 ${
+                                    <span className="relative flex h-2.5 w-2.5">
+                                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                                    </span>
+                                    <span className={`text-xs font-bold uppercase tracking-wider ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                     }`}>
-                                        Système actif
+                                        Système Operationnel
                                     </span>
                                 </div>
                             </div>
                         </div>
 
                         {/* SECTION 2: AUTOMATION - Configuration des Crons Automatiques */}
-                        <div className={`p-6 rounded-lg border transition-colors duration-300 ${
-                            isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                        <div className={`p-8 rounded-3xl border shadow-xl relative overflow-hidden ${
+                            isDarkMode ? 'bg-[#0f141e] border-gray-800' : 'bg-white border-gray-100'
                         }`}>
-                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>⚙️ Briefings Automatiques (Cron Jobs)</h3>
-
-                            <p className={`text-sm mb-6 transition-colors duration-300 ${
-                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
-                                📅 Envois automatiques quotidiens (Lundi-Vendredi)
-                            </p>
-
-                            <div className="space-y-4">
-                                {/* Cron Matin 7h20 */}
-                                <div className={`p-4 rounded-lg border-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-gray-900/20 border-gray-500/30' : 'bg-gray-800 border-gray-700'
-                                }`}>
-                                    <div className="flex justify-between items-start mb-3">
-                                        <div>
-                                            <h4 className={`font-bold mb-1 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-white' : 'text-gray-900'
-                                            }`}>
-                                                🌅 Briefing Matin - 7h20 ET
-                                            </h4>
-                                            <p className={`text-sm transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>
-                                                Asie • Futures • Préouverture
-                                            </p>
-                                        </div>
-                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
-                                            🟢 ACTIF
-                                        </span>
-                                    </div>
-                                    <div className={`text-sm space-y-1 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                        <p><strong>Destinataire:</strong> projetsjsl@gmail.com</p>
-                                        <p><strong>Horaire UTC:</strong> 11:20 (Lun-Ven)</p>
-                                        <p><strong>Statut Vercel:</strong> ✅ Configuré</p>
-                                    </div>
-                                </div>
-
-                                {/* Cron Midi 11h50 */}
-                                <div className={`p-4 rounded-lg border-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-green-900/20 border-green-500/30' : 'bg-green-50 border-green-200'
-                                }`}>
-                                    <div className="flex justify-between items-start mb-3">
-                                        <div>
-                                            <h4 className={`font-bold mb-1 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-white' : 'text-gray-900'
-                                            }`}>
-                                                ☀️ Briefing Midi - 11h50 ET
-                                            </h4>
-                                            <p className={`text-sm transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>
-                                                Wall Street • Clôture Europe
-                                            </p>
-                                        </div>
-                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
-                                            🟢 ACTIF
-                                        </span>
-                                    </div>
-                                    <div className={`text-sm space-y-1 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                        <p><strong>Destinataire:</strong> projetsjsl@gmail.com</p>
-                                        <p><strong>Horaire UTC:</strong> 15:50 (Lun-Ven)</p>
-                                        <p><strong>Statut Vercel:</strong> ✅ Configuré</p>
-                                    </div>
-                                </div>
-
-                                {/* Cron Soir 16h20 */}
-                                <div className={`p-4 rounded-lg border-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-indigo-900/20 border-indigo-500/30' : 'bg-indigo-50 border-indigo-200'
-                                }`}>
-                                    <div className="flex justify-between items-start mb-3">
-                                        <div>
-                                            <h4 className={`font-bold mb-1 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-white' : 'text-gray-900'
-                                            }`}>
-                                                🌆 Briefing Soir - 16h20 ET
-                                            </h4>
-                                            <p className={`text-sm transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>
-                                                Clôture US • Asie Next
-                                            </p>
-                                        </div>
-                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
-                                            🟢 ACTIF
-                                        </span>
-                                    </div>
-                                    <div className={`text-sm space-y-1 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                        <p><strong>Destinataire:</strong> projetsjsl@gmail.com</p>
-                                        <p><strong>Horaire UTC:</strong> 20:20 (Lun-Ven)</p>
-                                        <p><strong>Statut Vercel:</strong> ✅ Configuré</p>
-                                    </div>
-                                </div>
-
-                                {/* Configuration globale */}
-                                <div className={`p-4 rounded-lg transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
-                                }`}>
-                                    <h4 className={`font-semibold mb-3 transition-colors duration-300 ${
+                            <div className="flex items-center gap-3 mb-6">
+                                <i className={`iconoir-clock text-2xl ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}></i>
+                                <div>
+                                    <h3 className={`text-xl font-bold ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>⚙️ Configuration Globale</h4>
-                                    <div className={`text-sm space-y-1 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                        <p><strong>Timezone:</strong> Eastern Time (ET)</p>
-                                        <p><strong>Jours actifs:</strong> Lundi-Vendredi</p>
-                                        <p><strong>Statut Vercel Crons:</strong> ✅ Configuré dans vercel.json</p>
-                                        <p><strong>Dernière modification:</strong> 2025-01-16</p>
+                                    }`}>Automatisation</h3>
+                                    <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Planning des envois quotidiens (Lun-Ven)</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {/* Cron Matin */}
+                                <div className={`p-4 rounded-2xl border transition-all duration-300 hover:scale-[1.02] ${
+                                    isDarkMode ? 'bg-[#151b26] border-gray-800 hover:border-gray-700' : 'bg-gray-50 border-gray-100 hover:border-blue-200'
+                                }`}>
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
+                                            <i className="iconoir-sun-light text-xl"></i>
+                                        </div>
+                                        <div className="px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20">ACTIF</div>
                                     </div>
+                                    <h4 className={`font-bold text-lg mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Matin</h4>
+                                    <p className={`text-xs font-mono mb-3 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>07:20 ET</p>
+                                    <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} line-clamp-2`}>Asie, Futures, Préouverture marchés US</p>
                                 </div>
 
-                                {/* Note informative */}
-                                <div className={`p-4 rounded-lg border transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-gray-900/10 border-gray-500/20' : 'bg-gray-800 border-gray-700'
+                                {/* Cron Midi */}
+                                <div className={`p-4 rounded-2xl border transition-all duration-300 hover:scale-[1.02] ${
+                                    isDarkMode ? 'bg-[#151b26] border-gray-800 hover:border-gray-700' : 'bg-gray-50 border-gray-100 hover:border-yellow-200'
                                 }`}>
-                                    <p className={`text-sm transition-colors duration-300 ${
-                                        isDarkMode ? 'text-blue-300' : 'text-blue-800'
-                                    }`}>
-                                        💡 <strong>Note:</strong> Les crons sont configurés dans <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">vercel.json</code>.
-                                        Pour modifier les horaires, utilisez les scripts <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">npm run cron:edt</code> ou
-                                        <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">npm run cron:est</code>.
-                                    </p>
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="p-2 rounded-lg bg-yellow-500/10 text-yellow-500">
+                                            <i className="iconoir-half-moon text-xl"></i>
+                                        </div>
+                                        <div className="px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20">ACTIF</div>
+                                    </div>
+                                    <h4 className={`font-bold text-lg mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Midi</h4>
+                                    <p className={`text-xs font-mono mb-3 ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`}>11:50 ET</p>
+                                    <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} line-clamp-2`}>Update mi-séance, Top Movers, Europe Close</p>
+                                </div>
+
+                                {/* Cron Soir */}
+                                <div className={`p-4 rounded-2xl border transition-all duration-300 hover:scale-[1.02] ${
+                                    isDarkMode ? 'bg-[#151b26] border-gray-800 hover:border-gray-700' : 'bg-gray-50 border-gray-100 hover:border-purple-200'
+                                }`}>
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="p-2 rounded-lg bg-purple-500/10 text-purple-500">
+                                            <i className="iconoir-moon-sat text-xl"></i>
+                                        </div>
+                                        <div className="px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20">ACTIF</div>
+                                    </div>
+                                    <h4 className={`font-bold text-lg mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Soir</h4>
+                                    <p className={`text-xs font-mono mb-3 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`}>16:20 ET</p>
+                                    <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} line-clamp-2`}>Clôture Wall Street, Bilan journée, After-hours</p>
+                                </div>
+
+                                {/* Config Blobale */}
+                                <div className={`p-4 rounded-2xl border transition-all duration-300 ${
+                                    isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-100 border-gray-200'
+                                }`}>
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="p-2 rounded-lg bg-gray-500/10 text-gray-500">
+                                            <i className="iconoir-settings text-xl"></i>
+                                        </div>
+                                    </div>
+                                    <h4 className={`font-bold text-sm mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Config Vercel</h4>
+                                    <div className={`space-y-1 text-[10px] uppercase font-bold tracking-wider ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        <div className="flex justify-between">
+                                            <span>Zone:</span> <span className="text-white">ET (New York)</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Jours:</span> <span className="text-white">Lun-Ven</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Destinataire:</span> <span className="text-white truncate max-w-[80px]">Principal</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2112,125 +2102,102 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         </div>
 
                         {/* SECTION 1: GÉNÉRER - Preview Manuel */}
-                        <div className={`p-6 rounded-lg border transition-colors duration-300 ${
-                            isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                        <div className={`p-8 rounded-3xl border shadow-xl ${
+                            isDarkMode ? 'bg-[#0f141e] border-gray-800' : 'bg-white border-gray-100'
                         }`}>
-                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>Générer un Briefing</h3>
+                            <div className="flex items-center gap-3 mb-6">
+                                <i className={`iconoir-flash text-2xl ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`}></i>
+                                <div>
+                                    <h3 className={`text-xl font-bold ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>Générateur Manuel</h3>
+                                    <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Lancer une analyse IA à la demande</p>
+                                </div>
+                            </div>
                             
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <button
                                     onClick={() => generateCognitiveBriefing('morning')}
                                     disabled={loading}
-                                    className={`group relative p-6 rounded-xl border-2 transition-all duration-300 ${
-                                        loading
-                                            ? 'opacity-50 cursor-not-allowed'
-                                            : 'hover:shadow-xl hover:-translate-y-1 cursor-pointer'
-                                    } ${
-                                        isDarkMode
-                                            ? 'bg-gray-900/30 border-gray-500/50 hover:border-gray-400'
-                                            : 'bg-gray-800 border-gray-700 hover:border-gray-600'
-                                    }`}
+                                    className={`group relative p-1 rounded-2xl transition-all duration-300 ${
+                                        loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] active:scale-95'
+                                    } ${isDarkMode ? 'bg-gray-800' : 'bg-white shadow-lg'}`}
                                 >
-                                    <div className="text-4xl mb-3">🌅</div>
-                                    <div className={`font-bold text-lg mb-1 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    <div className={`absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm`}></div>
+                                    <div className={`relative h-full p-6 rounded-2xl flex flex-col items-center text-center gap-4 overflow-hidden border ${
+                                        isDarkMode ? 'bg-[#151b26] border-gray-700' : 'bg-white border-white'
                                     }`}>
-                                        Briefing Matin
-                                    </div>
-                                    <div className={`text-sm transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                    }`}>
-                                        Asie • Futures • Préouverture
-                                    </div>
-                                    <div className={`absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                                        isDarkMode ? 'text-blue-400' : 'text-blue-600'
-                                    }`}>
-                                        →
+                                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-500">
+                                            <span className="text-3xl">🌅</span>
+                                        </div>
+                                        <div>
+                                            <div className={`font-bold text-lg mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Briefing Matin</div>
+                                            <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Préouverture & Asie</div>
+                                        </div>
                                     </div>
                                 </button>
 
                                 <button
                                     onClick={() => generateCognitiveBriefing('noon')}
                                     disabled={loading}
-                                    className={`group relative p-6 rounded-xl border-2 transition-all duration-300 ${
-                                        loading
-                                            ? 'opacity-50 cursor-not-allowed'
-                                            : 'hover:shadow-xl hover:-translate-y-1 cursor-pointer'
-                                    } ${
-                                        isDarkMode
-                                            ? 'bg-green-900/30 border-green-500/50 hover:border-green-400'
-                                            : 'bg-green-50 border-green-200 hover:border-green-400'
-                                    }`}
+                                    className={`group relative p-1 rounded-2xl transition-all duration-300 ${
+                                        loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] active:scale-95'
+                                    } ${isDarkMode ? 'bg-gray-800' : 'bg-white shadow-lg'}`}
                                 >
-                                    <div className="text-4xl mb-3">☀️</div>
-                                    <div className={`font-bold text-lg mb-1 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    <div className={`absolute inset-0 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm`}></div>
+                                    <div className={`relative h-full p-6 rounded-2xl flex flex-col items-center text-center gap-4 overflow-hidden border ${
+                                        isDarkMode ? 'bg-[#151b26] border-gray-700' : 'bg-white border-white'
                                     }`}>
-                                        Update Midi
-                                    </div>
-                                    <div className={`text-sm transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                    }`}>
-                                        US • Top Movers • Momentum
-                                    </div>
-                                    <div className={`absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                                        isDarkMode ? 'text-green-400' : 'text-green-600'
-                                    }`}>
-                                        →
+                                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-500/20 to-orange-500/20 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-500">
+                                            <span className="text-3xl">☀️</span>
+                                        </div>
+                                        <div>
+                                            <div className={`font-bold text-lg mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Update Midi</div>
+                                            <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Tendance Mi-Journée</div>
+                                        </div>
                                     </div>
                                 </button>
 
                                 <button
                                     onClick={() => generateCognitiveBriefing('evening')}
                                     disabled={loading}
-                                    className={`group relative p-6 rounded-xl border-2 transition-all duration-300 ${
-                                        loading
-                                            ? 'opacity-50 cursor-not-allowed'
-                                            : 'hover:shadow-xl hover:-translate-y-1 cursor-pointer'
-                                    } ${
-                                        isDarkMode
-                                            ? 'bg-indigo-900/30 border-indigo-500/50 hover:border-indigo-400'
-                                            : 'bg-indigo-50 border-indigo-200 hover:border-indigo-400'
-                                    }`}
+                                    className={`group relative p-1 rounded-2xl transition-all duration-300 ${
+                                        loading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] active:scale-95'
+                                    } ${isDarkMode ? 'bg-gray-800' : 'bg-white shadow-lg'}`}
                                 >
-                                    <div className="text-4xl mb-3">🌙</div>
-                                    <div className={`font-bold text-lg mb-1 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    <div className={`absolute inset-0 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm`}></div>
+                                    <div className={`relative h-full p-6 rounded-2xl flex flex-col items-center text-center gap-4 overflow-hidden border ${
+                                        isDarkMode ? 'bg-[#151b26] border-gray-700' : 'bg-white border-white'
                                     }`}>
-                                        Rapport Soir
-                                    </div>
-                                    <div className={`text-sm transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                    }`}>
-                                        Clôture • Analyse • Perspectives
-                                    </div>
-                                    <div className={`absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                                        isDarkMode ? 'text-indigo-400' : 'text-indigo-600'
-                                    }`}>
-                                        →
+                                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-indigo-500/20 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-500">
+                                            <span className="text-3xl">🌙</span>
+                                        </div>
+                                        <div>
+                                            <div className={`font-bold text-lg mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Close Report</div>
+                                            <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Clôture & Analyse</div>
+                                        </div>
                                     </div>
                                 </button>
                             </div>
-
+                            
                             {loading && (
-                                <div className={`mt-4 p-4 rounded-lg border-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-gray-900/20 border-gray-500/30' : 'bg-gray-800 border-gray-700'
+                                <div className={`mt-8 p-6 rounded-2xl border transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-blue-500/10 border-blue-500/20' : 'bg-blue-50 border-blue-100'
                                 }`}>
-                                    <div className="flex items-start space-x-3">
-                                        <div className="flex-shrink-0 mt-1">
-                                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                    <div className="flex items-center gap-4">
+                                        <div className="relative flex-shrink-0">
+                                            <div className="w-12 h-12 rounded-full border-4 border-blue-500/30 border-t-blue-500 animate-spin"></div>
+                                            <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-blue-500">IA</div>
                                         </div>
-                                        <div className="flex-1">
-                                            <div className={`font-semibold mb-1 transition-colors duration-300 ${
+                                        <div className="flex-1 min-w-0">
+                                            <div className={`font-bold text-lg mb-1 animate-pulse ${
                                                 isDarkMode ? 'text-blue-300' : 'text-blue-700'
                                             }`}>
-                                                {currentStep || 'Génération en cours...'}
+                                                {currentStep || 'Analyse en cours...'}
                                             </div>
                                             {stepDetails && (
-                                                <div className={`text-sm transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                <div className={`text-sm truncate ${
+                                                    isDarkMode ? 'text-blue-200/70' : 'text-blue-600/70'
                                                 }`}>
                                                     {stepDetails}
                                                 </div>

@@ -1776,527 +1776,454 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     setShowEmailModal(false);
                 };
 
-                return (
-                    <div className="h-full flex flex-col gap-4 p-2 overflow-hidden">
-                        {/* Navigation Secondaire */}
 
-                        <div className="flex justify-end items-center">
-                            <div className="flex gap-2">
+                return (
+                    <div className="h-full flex flex-col gap-0 p-0 overflow-hidden relative">
+                        {/* Header minimaliste avec contrôles */}
+                        <div className={`p-4 flex justify-between items-center border-b backdrop-blur-md z-10 sticky top-0 ${
+                            isDarkMode 
+                                ? 'bg-neutral-900/80 border-neutral-800' 
+                                : 'bg-white/80 border-gray-100'
+                        }`}>
+                            <div className="flex items-center gap-3">
+                                <div className="relative">
+                                    <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-emerald-500/50 shadow-lg shadow-emerald-500/20">
+                                        <img 
+                                            src={isDarkMode ? 'emma-avatar-gob-dark.jpg' : 'emma-avatar-gob-light.jpg'} 
+                                            alt="Emma" 
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-black"></div>
+                                </div>
+                                <div>
+                                    <h3 className={`font-bold text-sm leading-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        Emma AI
+                                    </h3>
+                                    <p className={`text-xs ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                                        Analyste Expert
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center gap-1">
                                 <button
                                     onClick={clearChat}
-                                    className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+                                    className={`p-2 rounded-lg transition-all duration-200 ${
+                                        isDarkMode 
+                                            ? 'text-gray-400 hover:text-red-400 hover:bg-red-900/20' 
+                                            : 'text-gray-500 hover:text-red-600 hover:bg-red-50'
+                                    }`}
+                                    title="Effacer l'historique"
                                 >
-                                    🗑️ Effacer
+                                    <Icon emoji="🗑️" size={16} />
                                 </button>
+                                <div className={`w-px h-6 mx-1 ${isDarkMode ? 'bg-neutral-800' : 'bg-gray-200'}`}></div>
                                 <button
                                     onClick={() => { if (typeof setShowProfile === 'function') setShowProfile(true); }}
-                                    className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+                                    className={`p-2 rounded-lg transition-all duration-200 ${
+                                        isDarkMode 
+                                            ? 'text-gray-400 hover:text-white hover:bg-white/5' 
+                                            : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                                    }`}
+                                    title="Profil & Compétences"
                                 >
-                                    👤 Profil d'Emma
+                                    <Icon emoji="👤" size={16} />
                                 </button>
                                 <button
                                     onClick={() => setShowEmailModal(true)}
-                                    className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition-colors"
-                                    title="Envoyer la discussion par courriel"
+                                    className={`p-2 rounded-lg transition-all duration-200 ${
+                                        isDarkMode 
+                                            ? 'text-gray-400 hover:text-white hover:bg-white/5' 
+                                            : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                                    }`}
+                                    title="Exporter la conversation"
                                 >
-                                    ✉️ Envoyer par courriel
+                                    <Icon emoji="✉️" size={16} />
                                 </button>
                             </div>
                         </div>
 
                         {/* Zone de chat */}
-                        <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
-                            isDarkMode
-                                ? 'bg-black border-gray-700'
-                                : 'bg-gray-50 border-gray-200'
-                        }`}>
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0">
-                                    <img 
-                                        src={isDarkMode ? 'emma-avatar-gob-dark.jpg' : 'emma-avatar-gob-light.jpg'} 
-                                        alt="Emma" 
-                                        className="w-full h-full object-cover"
-                                    />
+                        <div 
+                            className={`flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth ${
+                                isDarkMode ? 'bg-[#0B0F17]' : 'bg-[#FAFAFA]'
+                            }`}
+                            ref={chatContainerRef}
+                        >
+                            {historyLoading ? (
+                                <div className="flex flex-col items-center justify-center py-20 opacity-50 animate-pulse">
+                                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-500 to-cyan-500 mb-4 opacity-20"></div>
+                                    <div className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>Initialisation du cerveau...</div>
                                 </div>
-                                <div>
-                                    <h3 className="text-lg font-semibold transition-colors duration-300 text-gray-900">Emma IA</h3>
-                                    <p className="text-sm transition-colors duration-300 text-gray-600">Analyste financière virtuelle</p>
-                                </div>
-                            </div>
-
-                            {/* Messages */}
-                            <div className="relative">
-                                <div
-                                    ref={chatContainerRef}
-                                    className="flex-1 min-h-0 overflow-y-auto mb-4 p-4 rounded-lg transition-colors duration-300 border"
-                                    style={{ backgroundColor: 'var(--theme-bg, white)' }}
-                                >
-                                {historyLoading ? (
-                                    // Animation de chargement pendant la restauration de l'historique
-                                    <div className="flex flex-col items-center justify-center gap-4 py-12">
-                                        <div className="w-32 h-32 rounded-full overflow-hidden">
-                                            <img
-                                                src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'}
-                                                alt="Emma"
-                                                className="w-full h-full object-cover animate-pulse"
-                                            />
-                                        </div>
-                                        <div className={`flex flex-col items-center gap-2 ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                        }`}>
-                                            <div className="flex gap-1">
-                                                <div className="w-2 h-2 rounded-full bg-gray-700 animate-bounce" style={{animationDelay: '0ms'}}></div>
-                                                <div className="w-2 h-2 rounded-full bg-gray-700 animate-bounce" style={{animationDelay: '150ms'}}></div>
-                                                <div className="w-2 h-2 rounded-full bg-gray-700 animate-bounce" style={{animationDelay: '300ms'}}></div>
-                                            </div>
-                                            <p className="text-sm">Chargement de votre historique...</p>
-                                        </div>
+                            ) : emmaMessages.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-20 max-w-2xl mx-auto text-center">
+                                    <div className="mb-6 relative group cursor-pointer transition-transform hover:scale-105 duration-300">
+                                        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-cyan-500 rounded-full blur-xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                                        <img
+                                            src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'}
+                                            alt="Emma"
+                                            className="w-24 h-24 rounded-full relative z-10 shadow-2xl ring-4 ring-neutral-900/50"
+                                        />
                                     </div>
-                                ) : emmaMessages.length === 0 ? (
-                                    <div className="flex gap-3 mb-4">
-                                        <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                                            <img
-                                                src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'}
-                                                alt="Emma"
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </div>
-                                        <div className="flex-1 p-4 rounded-lg bg-gray-50 shadow-sm">
-                                            <p className="text-sm leading-relaxed mb-3 text-gray-800">
-                                                Bonjour ! Je suis Emma, Experte financière IA de JSLAI. Je peux vous aider avec l'analyse et l'évaluation financière.
-                                                {useFunctionCalling ? ' Je peux également récupérer des données en temps réel via les APIs financières.' : ' Je vous fournis des analyses basées sur mes connaissances.'}
-                                                Quel est votre défi financier ?
-                                            </p>
-                                            <div className={`flex items-start gap-2 p-3 rounded-lg mb-3 ${
-                                                isDarkMode ? 'bg-red-900/30 border border-red-800' : 'bg-red-50 border border-red-200'
+                                    <h1 className={`text-2xl font-bold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        Bonjour, je suis Emma.
+                                    </h1>
+                                    <p className={`text-lg mb-8 max-w-md mx-auto ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        Votre analyste financière personnelle. Posez-moi une question sur les marchés, ou demandez une analyse approfondie.
+                                    </p>
+                                    
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full text-left">
+                                        {[
+                                            { t: "Analyse ce titre", q: "Analyse complète de AAPL svp", i: "📊" },
+                                            { t: "Sentiment de marché", q: "Quel est le sentiment actuel sur la tech ?", i: "🌡️" },
+                                            { t: "Recherche de dividendes", q: "/screener dividend yield > 4% sector energy", i: "💰" },
+                                            { t: "Comparaison", q: "Compare JPM et BAC", i: "⚖️" }
+                                        ].map((s, i) => (
+                                            <button 
+                                                key={i}
+                                                onClick={() => setEmmaInput(s.q)}
+                                                className={`p-4 rounded-xl border transition-all duration-200 hover:-translate-y-1 hover:shadow-lg flex items-center gap-3 ${
+                                                    isDarkMode 
+                                                        ? 'bg-neutral-900 border-neutral-800 hover:border-emerald-500/50 hover:bg-neutral-800' 
+                                                        : 'bg-white border-gray-100 hover:border-emerald-200 hover:bg-emerald-50/30'
+                                                }`}
+                                            >
+                                                <span className="text-2xl opacity-80">{s.i}</span>
+                                                <div>
+                                                    <div className={`font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{s.t}</div>
+                                                    <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>{s.q}</div>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-6 max-w-4xl mx-auto pb-4">
+                                    {emmaMessages.map((message) => (
+                                        <div key={message.id} className={`flex gap-4 ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'} group`}>
+                                            <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden shadow-md mt-1 ${
+                                                message.type === 'user' 
+                                                    ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white' 
+                                                    : 'bg-gradient-to-br from-emerald-500 to-teal-600'
                                             }`}>
-                                                <span className="text-red-500 text-sm">📌</span>
-                                                <span className={`text-xs ${
-                                                    isDarkMode ? 'text-red-300' : 'text-red-700'
-                                                }`}>
-                                                    Rappel : Pour des conseils personnalisés, consultez toujours un expert qualifié du domaine.
-                                                </span>
-                                            </div>
-                                            <p className="text-sm text-gray-800">
-                                                Comment puis-je vous aider ?
-                                            </p>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-4">
-                                        {emmaMessages.map((message) => (
-                                            <div key={message.id} className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                                {message.type !== 'user' && (
-                                                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                                                        <img 
-                                                            src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} 
-                                                            alt="Emma" 
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    </div>
+                                                {message.type === 'user' ? (
+                                                    <Icon emoji="👤" size={14} />
+                                                ) : (
+                                                    <img 
+                                                        src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} 
+                                                        alt="AI" 
+                                                        className="w-full h-full object-cover"
+                                                    />
                                                 )}
-                                                <div className={`max-w-xl px-4 py-3 rounded-lg shadow ${
+                                            </div>
+                                            
+                                            <div className={`relative max-w-[85%] lg:max-w-[75%] space-y-1`}>
+                                                <div className={`px-5 py-3.5 rounded-2xl shadow-sm text-[0.93rem] leading-relaxed ${
                                                     message.type === 'user'
-                                                        ? 'bg-gray-800 text-white shadow-gray-500/20'
+                                                        ? 'bg-indigo-600 text-white rounded-tr-sm'
                                                         : message.type === 'error'
-                                                        ? 'bg-red-600 text-white shadow-red-500/20'
-                                                        : message.type === 'system'
-                                                        ? 'bg-yellow-100 text-yellow-800 border border-yellow-300'
-                                                        : 'bg-gray-50 text-gray-900 border border-gray-200'
+                                                            ? isDarkMode ? 'bg-red-900/40 text-red-200 border border-red-800/50' : 'bg-red-50 text-red-800 border border-red-100'
+                                                            : isDarkMode ? 'bg-[#151b26] text-gray-100 border border-gray-800 rounded-tl-sm' : 'bg-white text-gray-800 border border-gray-100 shadow-sm rounded-tl-sm'
                                                 }`}>
-                                                    
-                                                    <div className="prose prose-sm max-w-none">
+                                                    <div className={`prose max-w-none ${
+                                                        message.type === 'user' 
+                                                            ? 'prose-invert prose-p:my-1 prose-headings:text-white' 
+                                                            : isDarkMode ? 'prose-invert prose-p:text-gray-300 prose-headings:text-gray-100 prose-a:text-emerald-400' : 'prose-zinc prose-a:text-emerald-600'
+                                                    }`}>
                                                         <div dangerouslySetInnerHTML={{ __html: formatMessageText(message.content) }} />
                                                         {typingMessageId === message.id && (
-                                                            <span className="inline-block w-2 h-4 ml-0.5 bg-blue-500 animate-pulse"></span>
+                                                            <span className="inline-block w-1.5 h-4 ml-1 align-middle bg-emerald-500 animate-pulse rounded-full"></span>
                                                         )}
                                                     </div>
-                                                    <div className={`text-xs mt-1 ${
-                                                        message.type === 'user' ? 'text-blue-100' : 'text-gray-400'
-                                                    }`}>
-                                                        {message.timestamp}
-                                                        {message.cached && <span className="ml-2 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-bold">💾 Cache</span>}
-                                                    </div>
-                                                    {/* Indicateur de paramètres pour les messages d'Emma */}
-                                                    {message.type === 'emma' && (
-                                                        <div className="text-xs mt-2 px-2 py-1 rounded bg-gray-100 text-gray-600">
-                                                            <div className="flex items-center gap-2 flex-wrap">
-                                                                <span className="font-medium flex items-center gap-1">
-                                                                    <Icon emoji="⚙️" size={16} />
-                                                                    Paramètres:
-                                                                </span>
-                                                                {message.model && message.model !== 'cached' && (
-                                                                    <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${
-                                                                        message.model === 'sonar-pro' ? 'bg-blue-100 text-blue-700 border border-blue-300' :
-                                                                        message.model === 'claude' ? 'bg-purple-100 text-purple-700 border border-purple-300' :
-                                                                        message.model === 'gemini' ? 'bg-green-100 text-green-700 border border-green-300' :
-                                                                        'bg-gray-200 text-gray-700'
-                                                                    }`}>
-                                                                        🤖 {message.model === 'sonar-pro' ? 'Sonar Pro' : message.model === 'claude' ? 'Claude' : message.model === 'gemini' ? 'Gemini' : message.model}
-                                                                    </span>
-                                                                )}
-                                                                {message.cached && (
-                                                                    <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700 border border-blue-300">
-                                                                        💾 Cache (instantané)
-                                                                    </span>
-                                                                )}
-                                                                <span className={`px-1.5 py-0.5 rounded text-xs ${
-                                                                    emmaTemperature <= 0.3 ? 'bg-green-100 text-green-700' :
-                                                                    emmaTemperature <= 0.5 ? 'bg-gray-700 text-gray-200' :
-                                                                    emmaTemperature <= 0.7 ? 'bg-yellow-100 text-yellow-700' :
-                                                                    'bg-green-100 text-green-700'
-                                                                }`}>
-                                                                    Temp: {emmaTemperature} ({emmaTemperature <= 0.3 ? 'Précis' : emmaTemperature <= 0.5 ? 'Équilibré' : emmaTemperature <= 0.7 ? 'Naturel' : 'Créatif'})
-                                                                </span>
-                                                                <span className={`px-1.5 py-0.5 rounded text-xs ${
-                                                                    emmaMaxTokens <= 2048 ? 'bg-purple-100 text-purple-700' :
-                                                                    emmaMaxTokens <= 4096 ? 'bg-indigo-100 text-indigo-700' :
-                                                                    'bg-pink-100 text-pink-700'
-                                                                }`}>
-                                                                    Longueur: {emmaMaxTokens} ({emmaMaxTokens <= 2048 ? 'Concis' : emmaMaxTokens <= 4096 ? 'Détaillé' : 'Très détaillé'})
-                                                                </span>
-                                                            </div>
-                                                            {message.modelReason && (
-                                                                <div className="text-xs mt-1 text-gray-500 italic">
-                                                                    💡 {message.modelReason}
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                </div>
+                                                
+                                                {/* Metadata / Footer du message */}
+                                                <div className={`flex items-center gap-2 text-[10px] px-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${
+                                                    message.type === 'user' ? 'justify-end text-gray-500' : 'justify-start text-gray-500'
+                                                }`}>
+                                                    <span>{message.timestamp}</span>
+                                                    {message.type === 'emma' && message.model && !message.cached && (
+                                                        <span className={`px-1 rounded border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-100 border-gray-200'}`}>
+                                                            {message.model}
+                                                        </span>
+                                                    )}
+                                                    {message.cached && (
+                                                        <span className="flex items-center gap-0.5 text-blue-500">
+                                                            <Icon emoji="⚡" size={10} /> Cache
+                                                        </span>
                                                     )}
                                                 </div>
                                             </div>
-                                        ))}
-                                        {emmaLoading && (
-                                            <div className="flex gap-3 justify-start">
-                                                <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 animate-pulse">
-                                                    <img 
-                                                        src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} 
-                                                        alt="Emma" 
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                </div>
-                                                <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                                                    isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-900'
-                                                }`}>
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="flex gap-1">
-                                                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-                                                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
-                                                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
-                                                        </div>
-                                                        <span className="ml-1">Emma analyse...</span>
-                                                    </div>
-                                                    {/* Indicateur de paramètres pendant le chargement */}
-                                                    <div className={`text-xs mt-2 px-2 py-1 rounded ${
-                                                        isDarkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-100 text-gray-600'
-                                                    }`}>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="font-medium flex items-center gap-1">
-                                                                <Icon emoji="⚙️" size={16} />
-                                                                Utilise:
-                                                            </span>
-                                                            <span className={`px-1.5 py-0.5 rounded text-xs ${
-                                                                emmaTemperature <= 0.3 ? 'bg-green-100 text-green-700' :
-                                                                emmaTemperature <= 0.5 ? 'bg-gray-700 text-gray-200' :
-                                                                emmaTemperature <= 0.7 ? 'bg-yellow-100 text-yellow-700' :
-                                                                'bg-green-100 text-green-700'
-                                                            }`}>
-                                                                Temp: {emmaTemperature}
-                                                            </span>
-                                                            <span className={`px-1.5 py-0.5 rounded text-xs ${
-                                                                emmaMaxTokens <= 2048 ? 'bg-purple-100 text-purple-700' :
-                                                                emmaMaxTokens <= 4096 ? 'bg-indigo-100 text-indigo-700' :
-                                                                'bg-pink-100 text-pink-700'
-                                                            }`}>
-                                                                {emmaMaxTokens} tokens
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                                </div>
-                                
-                                {/* Bouton "Aller en bas" */}
-                                {showScrollToBottom && (
-                                    <button
-                                        onClick={scrollToBottom}
-                                        className={`absolute bottom-6 right-6 p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 ${
-                                            isDarkMode 
-                                                ? 'bg-gray-800 hover:bg-gray-700 text-white' 
-                                                : 'bg-gray-700 hover:bg-gray-600 text-white'
-                                        }`}
-                                        title="Aller en bas"
-                                    >
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                                        </svg>
-                                    </button>
-                                )}
-                            </div>
-
-                            {/* 💡 Suggestions de Commandes (Discrète) */}
-                            <div className={`mb-3 transition-all duration-300 ${
-                                showCommandsHelp ? 'opacity-100' : 'opacity-60 hover:opacity-100'
-                            }`}>
-                                <button
-                                    onClick={() => setShowCommandsHelp(!showCommandsHelp)}
-                                    className={`w-full text-left p-2 rounded-lg border transition-colors duration-300 ${
-                                        isDarkMode 
-                                            ? 'bg-gray-800/50 border-gray-700 hover:bg-gray-800 text-gray-400 hover:text-gray-300' 
-                                            : 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-gray-500 hover:text-gray-700'
-                                    }`}
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs font-medium flex items-center gap-2">
-                                            <span>💡</span>
-                                            <span>Commandes rapides disponibles</span>
-                                        </span>
-                                        <span className={`text-xs transition-transform duration-300 ${showCommandsHelp ? 'rotate-180' : ''}`}>
-                                            ▼
-                                        </span>
-                                    </div>
-                                </button>
-                                
-                                {showCommandsHelp && (
-                                    <div className={`mt-2 p-3 rounded-lg border transition-colors duration-300 ${
-                                        isDarkMode 
-                                            ? 'bg-gray-800/80 border-gray-700' 
-                                            : 'bg-white border-gray-200'
-                                    }`}>
-                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
-                                            {[
-                                                { cmd: '/rsi', desc: 'RSI Screener', icon: '📊' },
-                                                { cmd: '/quote', desc: 'Prix temps réel', icon: '💰' },
-                                                { cmd: '/fundamentals', desc: 'Fondamentaux', icon: '📈' },
-                                                { cmd: '/technical', desc: 'Analyse technique', icon: '🔍' },
-                                                { cmd: '/news', desc: 'Actualités', icon: '📰' },
-                                                { cmd: '/screener', desc: 'Stock Screener', icon: '🔎' },
-                                                { cmd: '/calendar', desc: 'Calendrier éco', icon: '📅' },
-                                                { cmd: '/earnings', desc: 'Résultats', icon: '📊' },
-                                                { cmd: '/taux', desc: 'Courbe taux', icon: '📉' },
-                                                { cmd: '/watchlist', desc: 'Watchlist', icon: '⭐' }
-                                            ].map((command) => (
-                                                <button
-                                                    key={command.cmd}
-                                                    onClick={() => {
-                                                        setEmmaInput(command.cmd + ' ');
-                                                        setShowCommandsHelp(false);
-                                                    }}
-                                                    className={`text-left p-2 rounded border transition-all duration-200 hover:scale-105 ${
-                                                        isDarkMode 
-                                                            ? 'bg-gray-700/50 border-gray-600 hover:bg-gray-700 hover:border-gray-500 text-gray-300' 
-                                                            : 'bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-300 text-gray-700'
-                                                    }`}
-                                                    title={command.desc}
-                                                >
-                                                    <div className="flex items-center gap-1.5">
-                                                        <span className="text-sm">{command.icon}</span>
-                                                        <div className="flex-1 min-w-0">
-                                                            <div className="text-xs font-semibold truncate">{command.cmd}</div>
-                                                            <div className={`text-xs truncate ${
-                                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                                            }`}>
-                                                                {command.desc}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </button>
-                                            ))}
                                         </div>
-                                        <div className={`mt-3 pt-3 border-t text-xs ${
-                                            isDarkMode 
-                                                ? 'border-gray-700 text-gray-400' 
-                                                : 'border-gray-200 text-gray-500'
-                                        }`}>
-                                            💡 <strong>Astuce:</strong> Tapez <code className={`px-1 py-0.5 rounded ${
-                                                isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'
-                                            }`}>/</code> dans le champ de saisie pour voir l'autocomplete
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-
-                            {/* Input avec suggestions slash commands */}
-                            <div className="relative flex gap-2">
-                                <div className="flex-1 relative">
-                                    <input
-                                        type="text"
-                                        value={emmaInput}
-                                        onChange={(e) => {
-                                            const value = e.target.value;
-                                            setEmmaInput(value);
-                                            
-                                            // Détecter si l'utilisateur tape un slash command
-                                            if (value.startsWith('/')) {
-                                                const query = value.slice(1).toLowerCase();
-                                                const commands = [
-                                                    { cmd: '/rsi', desc: 'RSI Screener - Opportunités survente/surachat', icon: '📊' },
-                                                    { cmd: '/quote', desc: 'Prix en temps réel', icon: '💰' },
-                                                    { cmd: '/fundamentals', desc: 'Analyse fondamentale', icon: '📈' },
-                                                    { cmd: '/technical', desc: 'Analyse technique', icon: '🔍' },
-                                                    { cmd: '/news', desc: 'Actualités récentes', icon: '📰' },
-                                                    { cmd: '/screener', desc: 'Stock Screener - Recherche avancée', icon: '🔎' },
-                                                    { cmd: '/calendar', desc: 'Calendrier économique', icon: '📅' },
-                                                    { cmd: '/earnings', desc: 'Résultats d\'entreprises', icon: '📊' },
-                                                    { cmd: '/taux', desc: 'Courbe des taux obligataires', icon: '📉' },
-                                                    { cmd: '/watchlist', desc: 'Gestion watchlist', icon: '⭐' }
-                                                ];
-                                                
-                                                const filtered = commands.filter(c => 
-                                                    c.cmd.slice(1).toLowerCase().startsWith(query) || 
-                                                    c.desc.toLowerCase().includes(query)
-                                                );
-                                                
-                                                if (filtered.length > 0 && query.length > 0) {
-                                                    setSlashSuggestions(filtered);
-                                                    setShowSlashSuggestions(true);
-                                                    setSelectedSuggestionIndex(-1);
-                                                } else if (query.length === 0) {
-                                                    setSlashSuggestions(commands);
-                                                    setShowSlashSuggestions(true);
-                                                    setSelectedSuggestionIndex(-1);
-                                                } else {
-                                                    setShowSlashSuggestions(false);
-                                                }
-                                            } else {
-                                                setShowSlashSuggestions(false);
-                                            }
-                                        }}
-                                        onKeyDown={(e) => {
-                                            if (showSlashSuggestions && slashSuggestions.length > 0) {
-                                                if (e.key === 'ArrowDown') {
-                                                    e.preventDefault();
-                                                    setSelectedSuggestionIndex(prev => 
-                                                        prev < slashSuggestions.length - 1 ? prev + 1 : prev
-                                                    );
-                                                } else if (e.key === 'ArrowUp') {
-                                                    e.preventDefault();
-                                                    setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1);
-                                                } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
-                                                    e.preventDefault();
-                                                    const selected = slashSuggestions[selectedSuggestionIndex];
-                                                    setEmmaInput(selected.cmd + ' ');
-                                                    setShowSlashSuggestions(false);
-                                                    setSelectedSuggestionIndex(-1);
-                                                } else if (e.key === 'Escape') {
-                                                    setShowSlashSuggestions(false);
-                                                    setSelectedSuggestionIndex(-1);
-                                                } else if (e.key === 'Enter' && !showSlashSuggestions) {
-                                                    sendMessageToEmma();
-                                                }
-                                            } else if (e.key === 'Enter') {
-                                                sendMessageToEmma();
-                                            }
-                                        }}
-                                        onFocus={() => {
-                                            if (emmaInput.startsWith('/')) {
-                                                const query = emmaInput.slice(1).toLowerCase();
-                                                const commands = [
-                                                    { cmd: '/rsi', desc: 'RSI Screener - Opportunités survente/surachat', icon: '📊' },
-                                                    { cmd: '/quote', desc: 'Prix en temps réel', icon: '💰' },
-                                                    { cmd: '/fundamentals', desc: 'Analyse fondamentale', icon: '📈' },
-                                                    { cmd: '/technical', desc: 'Analyse technique', icon: '🔍' },
-                                                    { cmd: '/news', desc: 'Actualités récentes', icon: '📰' },
-                                                    { cmd: '/screener', desc: 'Stock Screener - Recherche avancée', icon: '🔎' },
-                                                    { cmd: '/calendar', desc: 'Calendrier économique', icon: '📅' },
-                                                    { cmd: '/earnings', desc: 'Résultats d\'entreprises', icon: '📊' },
-                                                    { cmd: '/taux', desc: 'Courbe des taux obligataires', icon: '📉' },
-                                                    { cmd: '/watchlist', desc: 'Gestion watchlist', icon: '⭐' }
-                                                ];
-                                                const filtered = query.length > 0 
-                                                    ? commands.filter(c => c.cmd.slice(1).toLowerCase().startsWith(query))
-                                                    : commands;
-                                                setSlashSuggestions(filtered);
-                                                setShowSlashSuggestions(filtered.length > 0);
-                                            }
-                                        }}
-                                        onBlur={() => {
-                                            // Délai pour permettre le clic sur une suggestion
-                                            setTimeout(() => setShowSlashSuggestions(false), 200);
-                                        }}
-                                        placeholder="Posez votre question à Emma... (Tapez / pour voir les commandes)"
-                                        className={`flex-1 px-4 py-2 rounded-lg border transition-colors duration-300 ${
-                                            isDarkMode 
-                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                                        }`}
-                                        disabled={emmaLoading}
-                                    />
+                                    ))}
                                     
-                                    {/* Suggestions de slash commands */}
-                                    {showSlashSuggestions && slashSuggestions.length > 0 && (
-                                        <div className={`absolute z-[9999] w-full mt-1 rounded-lg border shadow-lg max-h-64 overflow-y-auto ${
-                                            isDarkMode
-                                                ? 'bg-gray-800 border-gray-700'
-                                                : 'bg-white border-gray-300'
-                                        }`}>
-                                            {slashSuggestions.map((suggestion, index) => (
-                                                <div
-                                                    key={suggestion.cmd}
-                                                    onClick={() => {
-                                                        setEmmaInput(suggestion.cmd + ' ');
-                                                        setShowSlashSuggestions(false);
-                                                        setSelectedSuggestionIndex(-1);
-                                                    }}
-                                                    className={`px-4 py-2 cursor-pointer transition-colors ${
-                                                        index === selectedSuggestionIndex
-                                                            ? isDarkMode 
-                                                                ? 'bg-gray-700' 
-                                                                : 'bg-gray-100'
-                                                            : ''
-                                                    } ${
-                                                        isDarkMode 
-                                                            ? 'hover:bg-gray-700 text-gray-200' 
-                                                            : 'hover:bg-gray-50 text-gray-900'
-                                                    }`}
-                                                >
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-lg">{suggestion.icon}</span>
-                                                        <div className="flex-1">
-                                                            <div className="font-semibold text-sm">{suggestion.cmd}</div>
-                                                            <div className={`text-xs ${
-                                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                                            }`}>
-                                                                {suggestion.desc}
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                    {emmaLoading && (
+                                        <div className="flex gap-4 max-w-4xl mx-auto">
+                                            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-gradient-to-br from-emerald-500 to-teal-600 mt-1 shadow-md">
+                                                <img 
+                                                    src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} 
+                                                    alt="AI" 
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                            <div className={`px-5 py-4 rounded-2xl rounded-tl-sm flex items-center gap-3 shadow-sm border ${
+                                                isDarkMode ? 'bg-[#151b26] border-gray-800' : 'bg-white border-gray-100'
+                                            }`}>
+                                                <div className="flex gap-1.5">
+                                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-[bounce_1s_infinite_0ms]"></div>
+                                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-[bounce_1s_infinite_200ms]"></div>
+                                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-[bounce_1s_infinite_400ms]"></div>
                                                 </div>
-                                            ))}
+                                                <span className={`text-xs font-medium animate-pulse ${isDarkMode ? 'text-emerald-500' : 'text-emerald-700'}`}>
+                                                    Analyse en cours...
+                                                </span>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
-                                <button
-                                    data-emma-send-button
-                                    onClick={() => {
-                                        void('🔘 Bouton Envoyer cliqué !');
-                                        void('📝 Contenu de emmaInput:', emmaInput);
-                                        void('📊 État de emmaLoading:', emmaLoading);
-                                        sendMessageToEmma();
-                                    }}
-                                    disabled={emmaLoading || !emmaInput.trim()}
-                                    className={`px-6 py-2 rounded-lg font-medium transition-colors duration-300 ${
-                                        emmaLoading || !emmaInput.trim()
-                                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                            : 'bg-gray-800 text-white hover:bg-gray-700'
-                                    }`}
-                                >
-                                    {emmaLoading ? '⏳' : '📤'}
-                                </button>
-                                {emmaInput.trim() && (
+                            )}
+                            
+                            {/* Invisible element to scroll to */}
+                            <div ref={el => { if (el && showScrollToBottom) el.scrollIntoView({ behavior: 'smooth' }); }} />
+                        </div>
+
+                        {/* Input Area Flottante */}
+                         <div className={`p-4 sticky bottom-0 z-20 backdrop-blur-xl border-t ${
+                            isDarkMode 
+                                ? 'bg-neutral-900/90 border-neutral-800' 
+                                : 'bg-white/90 border-gray-100'
+                        }`}>
+                            <div className="max-w-4xl mx-auto relative group">
+                                <div className={`absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 opacity-20 group-hover:opacity-40 transition duration-500 blur ${emmaLoading ? 'animate-pulse' : ''}`}></div>
+                                
+                                <div className={`relative flex items-end gap-2 p-2 rounded-2xl border shadow-xl ${
+                                    isDarkMode 
+                                        ? 'bg-[#0f141e] border-gray-800' 
+                                        : 'bg-white border-gray-200'
+                                }`}>
+                                    
+                                    {/* Command Trigger */}
                                     <button
-                                        onClick={() => setEmmaInput('')}
-                                        className="px-3 py-2 rounded-lg bg-gray-500 text-white hover:bg-gray-600 transition-colors"
-                                        title="Vider l'input"
+                                        onClick={() => setShowCommandsHelp(!showCommandsHelp)}
+                                        className={`p-2.5 rounded-xl transition-colors shrink-0 mb-0.5 ${
+                                            showCommandsHelp 
+                                                ? 'bg-emerald-500 text-white' 
+                                                : isDarkMode ? 'text-gray-400 hover:bg-gray-800' : 'text-gray-400 hover:bg-gray-100'
+                                        }`}
+                                        title="Commandes disponibles"
                                     >
-                                        ✕
+                                        <Icon emoji="⚡" size={20} />
                                     </button>
-                                )}
+
+                                    <div className="flex-1 relative mb-0.5">
+                                        <textarea
+                                            value={emmaInput}
+                                            onChange={(e) => {
+                                                setEmmaInput(e.target.value);
+                                                // Auto-resize
+                                                e.target.style.height = 'auto';
+                                                e.target.style.height = Math.min(e.target.scrollHeight, 150) + 'px';
+                                                
+                                                // Slash logic reused from original
+                                                // Slash Logic
+                                                if (e.target.value.startsWith('/')) {
+                                                    const query = e.target.value.slice(1).toLowerCase();
+                                                    
+                                                    const COMMANDS = [
+                                                        { command: '/quote', description: 'Prix temps réel (ex: /quote AAPL)' },
+                                                        { command: '/chart', description: 'Graphique technique (ex: /chart TSLA)' },
+                                                        { command: '/rsi', description: 'RSI Screener (ex: /rsi)' },
+                                                        { command: '/fundamentals', description: 'Données fondamentales (ex: /fundamentals MSFT)' },
+                                                        { command: '/news', description: 'Dernières actualités (ex: /news NVDA)' },
+                                                        { command: '/analysis', description: 'Analyse complète (ex: /analysis AMD)' },
+                                                        { command: '/screener', description: 'Recherche de titres (ex: /screener technology)' },
+                                                        { command: '/calendar', description: 'Calendrier économique' },
+                                                        { command: '/earnings', description: 'Résultats financiers' },
+                                                        { command: '/sector', description: 'Performance sectorielle' },
+                                                        { command: '/crypto', description: 'Prix crypto (ex: /crypto BTC)' },
+                                                        { command: '/forex', description: 'Taux de change (ex: /forex EURUSD)' }
+                                                    ];
+
+                                                    const filtered = COMMANDS.filter(c => c.command.toLowerCase().includes('/' + query));
+                                                    
+                                                    if (filtered.length > 0) {
+                                                        if (typeof setSlashSuggestions === 'function') setSlashSuggestions(filtered);
+                                                        if (typeof setShowSlashSuggestions === 'function') setShowSlashSuggestions(true);
+                                                        if (typeof setSelectedSuggestionIndex === 'function') setSelectedSuggestionIndex(0);
+                                                    } else {
+                                                        if (typeof setShowSlashSuggestions === 'function') setShowSlashSuggestions(false);
+                                                    }
+                                                } else {
+                                                    if (typeof setShowSlashSuggestions === 'function') setShowSlashSuggestions(false);
+                                                }
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if(e.key === 'Enter' && !e.shiftKey) {
+                                                    e.preventDefault();
+                                                    if (!emmaLoading && emmaInput.trim()) sendMessageToEmma();
+                                                }
+                                            }}
+                                            placeholder="Posez une question, demandez une analyse, ou tapez / pour une commande..."
+                                            rows={1}
+                                            className={`w-full bg-transparent border-0 focus:ring-0 resize-none py-2.5 px-2 max-h-[150px] ${
+                                                isDarkMode ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'
+                                            }`}
+                                            style={{ minHeight: '44px' }}
+                                        />
+                                        
+                                    {/* Suggestions Slash */}
+                                    {showSlashSuggestions && slashSuggestions.length > 0 && (
+                                        <div className={`absolute bottom-full left-0 mb-2 w-64 rounded-xl shadow-xl border overflow-hidden animate-in slide-in-from-bottom-2 duration-200 z-50 ${
+                                            isDarkMode 
+                                                ? 'bg-[#151b26] border-gray-700' 
+                                                : 'bg-white border-gray-200'
+                                        }`}>
+                                            <div className={`px-3 py-2 text-[10px] font-semibold uppercase tracking-wider border-b ${
+                                                isDarkMode ? 'bg-gray-800 text-gray-400 border-gray-700' : 'bg-gray-50 text-gray-500 border-gray-100'
+                                            }`}>
+                                                Commandes suggérées
+                                            </div>
+                                            <div className="max-h-60 overflow-y-auto p-1">
+                                                {slashSuggestions.map((cmd, index) => (
+                                                    <button
+                                                        key={cmd.command}
+                                                        onClick={() => {
+                                                            const newValue = cmd.command + ' ';
+                                                            setEmmaInput(newValue);
+                                                            setShowSlashSuggestions(false);
+                                                            // Focus back to textarea
+                                                            const ta = document.querySelector('textarea');
+                                                            if (ta) ta.focus();
+                                                        }}
+                                                        className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-3 transition-colors ${
+                                                            index === selectedSuggestionIndex
+                                                                ? isDarkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-50 text-emerald-700'
+                                                                : isDarkMode ? 'hover:bg-gray-800 text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                                                        }`}
+                                                    >
+                                                        <span className="font-mono font-bold">{cmd.command}</span>
+                                                        <span className={`text-xs truncate ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                                            {cmd.description}
+                                                        </span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                    <button
+                                        onClick={sendMessageToEmma}
+                                        disabled={emmaLoading || !emmaInput.trim()}
+                                        className={`p-2.5 rounded-xl transition-all duration-200 shrink-0 mb-0.5 ${
+                                            emmaLoading || !emmaInput.trim()
+                                                ? isDarkMode ? 'bg-gray-800 text-gray-600' : 'bg-gray-100 text-gray-400'
+                                                : 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 hover:bg-emerald-400 hover:scale-105 active:scale-95'
+                                        }`}
+                                    >
+                                        {emmaLoading ? (
+                                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                        ) : (
+                                            <Icon emoji="📤" size={20} />
+                                        )}
+                                    </button>
+                                </div>
+                                <div className={`text-[10px] text-center mt-2 opacity-60 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                    Emma utilise des modèles d'IA avancés et peut faire des erreurs. Vérifiez les informations financières importantes.
+                                </div>
                             </div>
+                        </div>
+
+                        {/* Modals & Overlays (Email, etc) */}
+                        {showEmailModal && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                                <div className={`w-full max-w-md p-6 rounded-2xl shadow-2xl scale-100 transition-all ${
+                                    isDarkMode ? 'bg-neutral-900 border border-neutral-800' : 'bg-white'
+                                }`}>
+                                    <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>✉️ Exporter la conversation</h3>
+                                    
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Destinataire</label>
+                                            <input 
+                                                type="email" 
+                                                value={emailTo}
+                                                onChange={e => setEmailTo(e.target.value)}
+                                                placeholder="exemple@email.com"
+                                                className={`w-full p-2.5 rounded-lg border focus:ring-2 focus:ring-emerald-500 outline-none transition-all ${
+                                                    isDarkMode ? 'bg-black border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'
+                                                }`}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-3 justify-end mt-6">
+                                        <button 
+                                            onClick={() => setShowEmailModal(false)}
+                                            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                                                isDarkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
+                                        >
+                                            Annuler
+                                        </button>
+                                        <button 
+                                            onClick={sendEmailTranscript}
+                                            className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-white font-medium shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95"
+                                        >
+                                            Envoyer
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        
+                        {/* Help Overlay - Styled */}
+                         {showCommandsHelp && (
+                            <div className={`absolute bottom-24 left-1/2 -translate-x-1/2 w-full max-w-3xl z-30 p-4 rounded-xl shadow-2xl border backdrop-blur-xl animate-in slide-in-from-bottom-5 fade-in duration-200 ${
+                                isDarkMode 
+                                    ? 'bg-neutral-900/95 border-neutral-700' 
+                                    : 'bg-white/95 border-gray-200'
+                            }`}>
+                                <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-100/10">
+                                    <h5 className={`font-semibold ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>⚡ Commandes Rapides</h5>
+                                    <button onClick={() => setShowCommandsHelp(false)} className="opacity-50 hover:opacity-100">✕</button>
+                                </div>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                     {[
+                                        { cmd: '/rsi', desc: 'RSI Screener', icon: '📊' },
+                                        { cmd: '/quote', desc: 'Prix temps réel', icon: '💰' },
+                                        { cmd: '/fundamentals', desc: 'Fondamentaux', icon: '📈' },
+                                        { cmd: '/technical', desc: 'Analyse technique', icon: '🔍' },
+                                        { cmd: '/news', desc: 'Actualités', icon: '📰' },
+                                        { cmd: '/screener', desc: 'Stock Screener', icon: '🔎' },
+                                        { cmd: '/calendar', desc: 'Calendrier éco', icon: '📅' },
+                                        { cmd: '/earnings', desc: 'Résultats', icon: '📊' }
+                                    ].map((c, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => {
+                                                setEmmaInput(c.cmd + ' ');
+                                                setShowCommandsHelp(false);
+                                            }}
+                                            className={`flex items-center gap-2 p-2 rounded-lg text-left transition-colors ${
+                                                isDarkMode 
+                                                    ? 'bg-white/5 hover:bg-white/10 text-gray-200' 
+                                                    : 'bg-gray-50 hover:bg-gray-100 text-gray-800'
+                                            }`}
+                                        >
+                                            <span className="opacity-70">{c.icon}</span>
+                                            <div>
+                                                <div className="font-mono text-xs font-bold">{c.cmd}</div>
+                                                <div className="text-[10px] opacity-60 truncate">{c.desc}</div>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
                         </div>
 
                         {/* Éditeur de prompt */}
@@ -2385,15 +2312,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                         {/* Modal Profil d'Emma */}
                         {(typeof showProfile !== 'undefined' ? showProfile : false) && (
-                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-                                <div className={`w-full max-w-3xl rounded-xl shadow-2xl overflow-hidden ${isDarkMode ? 'bg-gray-900 border border-gray-700' : 'bg-white border border-gray-200'}`}>
+                            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70" onClick={() => { console.log('Profil: Click backdrop'); setShowProfile(false); }}>
+                                <div className={`w-full max-w-3xl rounded-xl shadow-2xl overflow-hidden ${isDarkMode ? 'bg-gray-900 border border-gray-700' : 'bg-white border border-gray-200'}`} onClick={(e) => e.stopPropagation()}>
                                     <div className={`p-5 flex items-center gap-4 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
                                         <img src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} alt="Emma" className="w-16 h-16 rounded-full object-cover" />
                                         <div>
                                             <div className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Emma — Analyste Financière IA</div>
                                             <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>JSLAI • Profil professionnel</div>
                                         </div>
-                                        <button onClick={() => setShowProfile(false)} className={`ml-auto px-3 py-1 rounded ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>Fermer</button>
+                                        <button onClick={() => { console.log('Profil: Click Fermer'); setShowProfile(false); }} className={`ml-auto px-3 py-1 rounded ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>Fermer</button>
                                     </div>
                                     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>

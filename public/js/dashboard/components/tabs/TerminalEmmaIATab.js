@@ -43,19 +43,33 @@ const TerminalEmmaIATab = ({ isDarkMode, activeTab, setActiveTab }) => {
 
 
             {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50 z-10">
-                    <div className="text-center">
-                        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-                        <p className="text-gray-400">Chargement du Terminal Emma IA...</p>
-                        <p className="text-gray-500 text-sm mt-2">Dashboard marché • Screener • KPIs</p>
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0e27] z-50">
+                    <div className="relative w-24 h-24 mb-8">
+                        <div className="absolute inset-0 border-4 border-transparent border-t-blue-500 rounded-full animate-[spin_1s_linear_infinite]"></div>
+                        <div className="absolute inset-2 border-4 border-transparent border-t-purple-500 rounded-full animate-[spin_1.5s_linear_infinite_reverse]"></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <i className="iconoir-terminal text-3xl text-white opacity-80"></i>
+                        </div>
+                    </div>
+                    <div className="text-center space-y-2">
+                        <h3 className="text-2xl font-bold text-white tracking-tight">
+                            Terminal Emma <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">IA</span>
+                        </h3>
+                        <div className="flex items-center gap-2 text-sm text-gray-400 justify-center">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                            <span>Chargement du Dashboard Marché</span>
+                        </div>
                     </div>
                 </div>
             )}
             {error && (
-                <div className="absolute inset-0 flex items-center justify-center bg-red-900/20 z-10">
-                    <div className="text-center bg-red-900/50 p-4 rounded-lg">
-                        <p className="text-red-400 font-semibold">Erreur</p>
-                        <p className="text-red-300 text-sm mt-2">{error}</p>
+                <div className="absolute inset-0 flex items-center justify-center bg-[#0a0e27]/90 backdrop-blur-sm z-50">
+                    <div className="text-center p-8 max-w-md bg-gray-900/50 border border-red-500/30 rounded-2xl shadow-2xl">
+                        <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4 border border-red-500/20">
+                            <i className="iconoir-warning-triangle text-3xl text-red-500"></i>
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">Erreur de Connexion</h3>
+                        <p className="text-gray-400 text-sm mb-6">{error}</p>
                         <button
                             onClick={() => {
                                 setError(null);
@@ -66,8 +80,9 @@ const TerminalEmmaIATab = ({ isDarkMode, activeTab, setActiveTab }) => {
                                     iframe.src = iframe.src;
                                 }
                             }}
-                            className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded"
+                            className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white rounded-xl font-medium transition-all shadow-lg shadow-red-500/20 hover:shadow-red-500/30 flex items-center gap-2 mx-auto"
                         >
+                            <i className="iconoir-refresh"></i>
                             Réessayer
                         </button>
                     </div>

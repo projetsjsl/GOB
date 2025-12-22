@@ -63,29 +63,33 @@
         })();
     </script>
 
-    <!-- React Grid Layout loads after the require polyfill -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/react-grid-layout@1.4.4/css/styles.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/react-resizable@3.0.5/css/styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/react-grid-layout@1.4.4/dist/react-grid-layout.min.js"></script>
+    <!-- React Grid Layout (Reliable CDN) -->
+    <script src="https://unpkg.com/react-grid-layout@1.4.4/dist/react-grid-layout.min.js"></script>
+    <script src="https://unpkg.com/react-resizable@3.0.5/dist/react-resizable.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/react-grid-layout@1.4.4/css/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/react-resizable@3.0.5/css/styles.css">
 
     <!-- Verify and expose React Grid Layout -->
     <script>
         (function() {
-            // The UMD build should have exposed ReactGridLayout globally
-            if (typeof window.ReactGridLayout === 'undefined') {
-                console.error('❌ ReactGridLayout failed to load from CDN');
-
-                // Try alternative access methods
-                if (typeof window.module !== 'undefined' && window.module.exports) {
-                    window.ReactGridLayout = window.module.exports;
-                    console.log('✅ ReactGridLayout recovered from module.exports');
+            // Wait for scripts to load
+            window.addEventListener('load', function() {
+                // Check if RGL loaded correctly
+                if (typeof window.ReactGridLayout === 'undefined') {
+                    console.error('❌ ReactGridLayout failed to load from CDN');
+                    
+                    // Try to recover from global export if UMD failed to attach to window
+                    if (window.exports && window.exports.Responsive) {
+                         window.ReactGridLayout = window.exports;
+                         console.log('✅ ReactGridLayout recovered from window.exports');
+                    } else if (window.module && window.module.exports && window.module.exports.Responsive) {
+                         window.ReactGridLayout = window.module.exports;
+                         console.log('✅ ReactGridLayout recovered from window.module.exports');
+                    }
+                } else {
+                    console.log('✅ ReactGridLayout loaded successfully via window');
                 }
-            } else {
-                console.log('✅ ReactGridLayout loaded successfully:', {
-                    hasResponsive: !!window.ReactGridLayout.Responsive,
-                    hasWidthProvider: !!window.ReactGridLayout.WidthProvider
-                });
-            }
+            });
         })();
     </script>
 

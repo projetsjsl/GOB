@@ -25743,7 +25743,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             { id: 'ask-emma', label: 'Emma IA', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
             { id: 'tests-tab', label: 'Tests', icon: 'iconoir-test-tube', component: InvestingCalendarTabInternal },
             
-            // Secondary / Optional Tabs (moved to end or hidden depending on config)
+            // Secondary / Optional Tabs
             { id: 'nouvelles', label: 'Nouvelles', icon: 'iconoir-newspaper', component: NouvellesTab },
             { id: 'emma-config', label: 'Config', icon: 'iconoir-tools', component: EmmaConfigTab },
             { id: 'fastgraphs', label: 'FastGraphs', icon: 'iconoir-graph-up', component: FastGraphsTab },
@@ -25755,6 +25755,38 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             { id: 'emmaia', label: 'EmmAIA', icon: 'iconoir-brain', component: EmmAIATab },
             { id: 'finance-pro', label: 'Finance Pro (3p1)', icon: 'iconoir-pie-chart', component: FinanceProTab },
             { id: 'email-briefings', label: 'Emma', icon: 'iconoir-antenna-signal', component: EmailBriefingsTab },
+            
+            // Sub-tabs Mapping for direct access
+            { id: 'marches-global', label: 'Vue Globale', icon: 'iconoir-globe', component: MarketsEconomyTab },
+            { id: 'marches-yield', label: 'Courbe Taux', icon: 'iconoir-graph-up', component: window.YieldCurveTab || (() => <div className="p-10 text-center">Composant YieldCurveTab non chargé</div>) },
+            { id: 'marches-calendar', label: 'Calendrier Éco', icon: 'iconoir-calendar', component: EconomicCalendarTab },
+            { id: 'marches-nouvelles', label: 'Nouvelles', icon: 'iconoir-newspaper', component: NouvellesTab },
+
+            { id: 'titres-portfolio', label: 'Mon Portfolio', icon: 'iconoir-wallet', component: StocksNewsTab }, // Default view
+            { id: 'titres-watchlist', label: 'Watchlist', icon: 'iconoir-star', component: (props) => <StocksNewsTab {...props} defaultView="watchlist" /> },
+            { id: 'titres-seeking', label: 'Seeking Alpha', icon: 'iconoir-search', component: SeekingAlphaTab },
+            { id: 'titres-3p1', label: 'Finance Pro', icon: 'iconoir-pie-chart', component: FinanceProTab },
+
+            { id: 'jlab-terminal', label: 'Terminal', icon: 'iconoir-terminal', component: JLabUnifiedTab },
+            { id: 'jlab-advanced', label: 'Analyse Pro', icon: 'iconoir-activity', component: (props) => window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab isDarkMode={isDarkMode} {...props} /> : <div>Chargement...</div> },
+            { id: 'jlab-screener', label: 'Screener', icon: 'iconoir-filter', component: () => <div className="p-10 text-center">Screener Pro (Coming Soon)</div> },
+            { id: 'jlab-ratios', label: 'Ratios', icon: 'iconoir-calculator', component: () => <div className="p-10 text-center">Analyse Ratios (Coming Soon)</div> },
+
+            { id: 'emma-chat', label: 'Chat Emma', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
+            { id: 'emma-vocal', label: 'Assistant Vocal', icon: 'iconoir-microphone', component: VoiceAssistantTab },
+            { id: 'emma-group', label: 'Group Chat', icon: 'iconoir-users', component: window.GroupChatTab || (() => <div>Chargement...</div>) },
+            { id: 'emma-terminal', label: 'Terminal', icon: 'iconoir-monitor', component: TerminalEmmaIATab },
+            { id: 'emma-live', label: 'EmmAIA Live', icon: 'iconoir-radio', component: EmmAIATab },
+            { id: 'emma-finvox', label: 'FinVox', icon: 'iconoir-headset', component: FinVoxTab },
+
+            { id: 'tests-calendar', label: 'Calendrier', icon: 'iconoir-calendar', component: InvestingCalendarTabInternal },
+            { id: 'tests-rgl', label: 'Layout RGL', icon: 'iconoir-layout', component: () => <div className="p-10 text-center">Layout RGL (Coming Soon)</div> },
+            
+            // Fixes for specific error reports
+            { id: 'admin-config', label: 'Configuration', icon: 'iconoir-settings', component: EmmaConfigTab },
+            { id: 'admin-briefings', label: 'Briefings', icon: 'iconoir-mail', component: EmailBriefingsTab },
+            { id: 'admin-scraping', label: 'Scraping', icon: 'iconoir-database', component: ScrappingSATab },
+            { id: 'admin-fastgraphs', label: 'FastGraphs', icon: 'iconoir-graph-up', component: FastGraphsTab },
         ], []);
 
         // Filter tabs based on Primary Navigation Config (visibility settings)
@@ -25772,6 +25804,38 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         const [hiddenTabs, setHiddenTabs] = useState([]);
         const [showPlusMenu, setShowPlusMenu] = useState(false);
         const [showTitresSubmenu, setShowTitresSubmenu] = useState(false);
+        const [showSecNavEditor, setShowSecNavEditor] = useState(false);
+
+        // State for configurable SubTabs (Secondary Navigation)
+        const [savedSubTabIds, setSavedSubTabIds] = useState(() => {
+            try {
+                return JSON.parse(localStorage.getItem('gob-subtabs-config') || '{}');
+            } catch (e) {
+                return {};
+            }
+        });
+        
+        const handleSaveSecondaryNavConfig = (tabId, selectedLinkIds) => {
+            const newConfig = { ...savedSubTabIds, [tabId]: selectedLinkIds };
+            setSavedSubTabIds(newConfig);
+            localStorage.setItem('gob-subtabs-config', JSON.stringify(newConfig));
+            // Force view refresh if needed
+        };
+
+        const getVisibleSubTabs = useCallback((mainTabId) => {
+            const defaultItems = SUB_TABS[mainTabId] || [];
+            const savedIds = savedSubTabIds[mainTabId];
+            
+            if (!savedIds) return defaultItems;
+            
+            // Return items in the order of savedIds
+            const items = savedIds.map(id => defaultItems.find(item => item.id === id)).filter(Boolean);
+            
+            // If some new items were added to default but not in saved, we might want to append them?
+            // For now, strict adherence to savedIds allows hiding items (which is a feature).
+            return items;
+        }, [savedSubTabIds]);
+
         const navRef = useRef(null);
         const tabRefs = useRef({});
 
@@ -27096,6 +27160,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 {/* NEW: Main 6-Tab Navigation */}
                                 <div className={`mb-4 p-1 rounded-xl ${isDarkMode ? 'bg-neutral-900/80' : 'bg-gray-100'}`}>
                                     <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+                                        {/* Edit Secondary Nav */}
+                                        <button
+                                            onClick={() => setShowSecNavEditor(true)}
+                                            className={`p-2 rounded-lg transition-colors mr-1 ${
+                                                isDarkMode ? 'text-gray-500 hover:text-white hover:bg-neutral-800' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-200'
+                                            }`}
+                                            title="Configurer la navigation secondaire"
+                                        >
+                                            <LucideIcon name="Settings" className="w-4 h-4" />
+                                        </button>
+
                                         {/* Toggle Vue Onglets/Grille */}
                                         <button
                                             onClick={() => {
@@ -27148,10 +27223,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </div>
 
                                 {/* NEW: Sub-Tabs Navigation for current main tab */}
-                                {SUB_TABS[mainTab] && (
+                                {getVisibleSubTabs(mainTab).length > 0 && (
                                     <div className={`mb-4 border-b ${isDarkMode ? 'border-neutral-700' : 'border-gray-200'}`}>
                                         <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide pb-1">
-                                            {SUB_TABS[mainTab].map(subTab => {
+                                            {getVisibleSubTabs(mainTab).map(subTab => {
                                                 const isActive = activeSubTab === subTab.id;
                                                 return (
                                                     <button
@@ -27189,9 +27264,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 )}
 
                                 {/* MOBILE OVERLAY NAV - User Requested Feature */}
-                                {window.MobileNavOverlay && SUB_TABS[mainTab] && (
+                                {window.MobileNavOverlay && getVisibleSubTabs(mainTab).length > 0 && (
                                     <window.MobileNavOverlay
-                                        items={SUB_TABS[mainTab]}
+                                        items={getVisibleSubTabs(mainTab)}
                                         activeTab={activeSubTab}
                                         onTabChange={handleNewTabChange}
                                         isDarkMode={isDarkMode}
@@ -27855,6 +27930,20 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </div>
                         </div>
                     </div>
+                )}
+                
+                {/* Secondary Nav Editor Modal */}
+                {window.SecondaryNavEditor && (
+                    <window.SecondaryNavEditor
+                        isOpen={showSecNavEditor}
+                        onClose={() => setShowSecNavEditor(false)}
+                        activeTab={mainTab}
+                        currentConfig={{ 
+                            [mainTab]: savedSubTabIds[mainTab] || (SUB_TABS[mainTab] || []).map(t => t.id) 
+                        }}
+                        onSave={handleSaveSecondaryNavConfig}
+                        allOptions={SUB_TABS[mainTab] || []}
+                    />
                 )}
             </div>
         );

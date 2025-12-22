@@ -260,201 +260,281 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
     };
 
     return (
-        <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-140px)]`}>
-
-
+        <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-140px)] p-1`}>
 
             {/* Left Column: Avatar/Video Area */}
-            <div className={`lg:col-span-2 flex flex-col rounded-2xl overflow-hidden shadow-2xl ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                <div className="flex-1 relative bg-black flex items-center justify-center">
+            <div className={`lg:col-span-2 flex flex-col rounded-3xl overflow-hidden shadow-2xl relative group ${darkMode ? 'bg-black border border-gray-800' : 'bg-white border border-gray-200'}`}>
+                
+                {/* Decorative Elements */}
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-emerald-500 z-10"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl opacity-20 blur group-hover:opacity-30 transition duration-1000"></div>
+                
+                <div className="flex-1 relative bg-black flex items-center justify-center overflow-hidden z-0">
+                    {/* Background Grid Pattern (Subtle) */}
+                    <div className="absolute inset-0 opacity-20 pointer-events-none" 
+                        style={{userSelect: 'none', backgroundImage: 'radial-gradient(circle, #3b82f6 1px, transparent 1px)', backgroundSize: '40px 40px'}}>
+                    </div>
+
                     {tavusStatus === 'connected' && conversationUrl ? (
-                        <div className="w-full h-full">
+                        <div className="w-full h-full relative z-10">
                             <iframe 
                                 src={conversationUrl} 
                                 allow="camera; microphone; autoplay; display-capture; fullscreen"
-                                style={{ width: '100%', height: '100%', border: 'none', borderRadius: 0 }}
+                                style={{ width: '100%', height: '100%', border: 'none' }}
                                 className="tavus-video-iframe"
                             ></iframe>
                         </div>
                     ) : (
-                        <div className="text-center p-10">
-                            <div className="w-32 h-32 mx-auto bg-gray-700 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20">
-                                <i className="iconoir-user text-6xl text-gray-400"></i>
+                        <div className="text-center p-10 relative z-10">
+                            <div className="relative w-40 h-40 mx-auto mb-8 group-hover:scale-105 transition-transform duration-500">
+                                <div className="absolute inset-0 bg-blue-500 rounded-full opacity-20 blur-xl animate-pulse"></div>
+                                <div className="absolute inset-0 border-2 border-blue-500/30 rounded-full animate-[spin_10s_linear_infinite]"></div>
+                                <div className={`w-full h-full rounded-full flex items-center justify-center shadow-2xl relative overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                                    <div className="absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-black/50 to-transparent"></div>
+                                    <img 
+                                        src={darkMode ? 'emma-avatar-gob-dark.jpg' : 'emma-avatar-gob-light.jpg'} 
+                                        alt="Avatar" 
+                                        className="w-full h-full object-cover opacity-90" 
+                                        onError={(e) => { e.target.style.display='none'; e.target.parentElement.querySelector('i').style.display='block'; }}
+                                    />
+                                    <i className="iconoir-user text-6xl text-gray-400 hidden absolute"></i>
+                                </div>
+                                {/* Online Status Dot on Avatar */}
+                                <div className={`absolute bottom-2 right-2 w-6 h-6 rounded-full border-4 border-black ${tavusStatus === 'connecting' ? 'bg-yellow-500 animate-pulse' : 'bg-red-500'}`}></div>
                             </div>
-                            <h3 className="text-2xl font-bold text-white mb-2">Assistant Virtuel</h3>
-                            <p className="text-gray-400 mb-8 max-w-md mx-auto">Connectez-vous pour interagir avec votre assistant vidéo alimenté par Tavus et Gemini.</p>
-                            <button title="Action"
+                            
+                            <h3 className="text-3xl font-bold text-white mb-2 tracking-tight">Emma Live</h3>
+                            <p className="text-gray-400 mb-8 max-w-md mx-auto text-lg font-light">
+                                <span className="text-emerald-400 font-medium">IA Conversationnelle</span> synchronisée en temps réel.
+                            </p>
+                            
+                            <button 
                                 onClick={connectTavus}
                                 disabled={tavusStatus === 'connecting'}
-                                className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold transition-all transform hover:scale-105 shadow-lg shadow-blue-600/30 flex items-center gap-2 mx-auto"
+                                className="group relative px-8 py-4 bg-white text-black rounded-full font-bold transition-all transform hover:scale-105 hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-500/50 disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden"
                             >
-                                {tavusStatus === 'connecting' ? (
-                                    <>
-                                        <i className="iconoir-system-restart animate-spin"></i>
-                                        Connexion...
-                                    </>
-                                ) : (
-                                    <>
-                                        <i className="iconoir-play-circle"></i>
-                                        Démarrer la session
-                                    </>
-                                )}
+                                <span className="relative z-10 flex items-center gap-3">
+                                    {tavusStatus === 'connecting' ? (
+                                        <>
+                                            <i className="iconoir-system-restart animate-spin text-xl"></i>
+                                            <span>Initialisation...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="iconoir-play-circle text-xl text-blue-600 group-hover:scale-110 transition-transform"></i>
+                                            <span>Démarrer la Session</span>
+                                        </>
+                                    )}
+                                </span>
+                                <div className="absolute inset-0 bg-gradient-to-r from-blue-100 to-white opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             </button>
+                            
+                            <div className="mt-8 flex justify-center gap-4 text-xs text-gray-500 font-mono">
+                                <span className="flex items-center gap-1"><i className="iconoir-check-circle text-green-500"></i> Vidéo HD</span>
+                                <span className="flex items-center gap-1"><i className="iconoir-check-circle text-green-500"></i> Audio Spatial</span>
+                                <span className="flex items-center gap-1"><i className="iconoir-check-circle text-green-500"></i> Latence Faible</span>
+                            </div>
                         </div>
                     )}
 
-                    {/* Status Indicator */}
-                    <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${tavusStatus === 'connected' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                        <span className="text-xs font-medium text-white uppercase tracking-wider">
-                            {tavusStatus === 'connected' ? 'En ligne' : 'Hors ligne'}
+                    {/* Status Overlay */}
+                    <div className="absolute top-6 right-6 px-4 py-2 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 flex items-center gap-3 shadow-lg z-20">
+                        <div className={`relative w-2.5 h-2.5`}>
+                            <div className={`absolute inset-0 rounded-full animate-ping opacity-75 ${tavusStatus === 'connected' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                            <div className={`relative w-2.5 h-2.5 rounded-full ${tavusStatus === 'connected' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                        </div>
+                        <span className="text-xs font-bold text-white uppercase tracking-wider">
+                            {tavusStatus === 'connected' ? 'LIVE' : 'OFFLINE'}
                         </span>
                     </div>
                 </div>
             </div>
 
             {/* Right Column: Chat Interface */}
-            <div className={`flex flex-col rounded-2xl overflow-hidden shadow-xl border ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
-                {/* Header */}
-                <div className={`p-4 border-b flex justify-between items-center ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
-                            <i className="iconoir-sparkles text-xl"></i>
+            <div className={`flex flex-col rounded-3xl overflow-hidden shadow-2xl border relative z-10 ${darkMode ? 'bg-[#0f141e] border-gray-800' : 'bg-white border-gray-200'}`}>
+                {/* Header Glassmorphic */}
+                <div className={`px-6 py-4 border-b backdrop-blur-md sticky top-0 z-10 flex justify-between items-center ${
+                    darkMode ? 'bg-gray-900/80 border-gray-800' : 'bg-white/80 border-gray-100'
+                }`}>
+                    <div className="flex items-center gap-4">
+                        <div className="relative">
+                            <div className="absolute -inset-1 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full blur opacity-40"></div>
+                            <div className={`relative w-10 h-10 rounded-full flex items-center justify-center text-white shadow-inner ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                <span className="text-xl">🎙️</span>
+                            </div>
                         </div>
                         <div>
-                            <h3 className={`font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>JSL Assistant</h3>
-                            <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Propulsé par Gemini 3 Flash</p>
+                            <h3 className={`font-bold text-sm leading-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>Transcript Live</h3>
+                            <p className={`text-[10px] font-medium tracking-wide uppercase ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                                {isRecording ? '• Écoute en cours' : '• En attente'}
+                            </p>
                         </div>
                     </div>
                     <button
                         onClick={() => setShowSettings(!showSettings)}
-                        className={`p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-200 text-gray-600'}`}
+                        className={`p-2.5 rounded-xl transition-all duration-200 group ${
+                            darkMode ? 'hover:bg-gray-800 text-gray-400 hover:text-white' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'
+                        }`}
+                        title="Paramètres Audio"
                     >
-                        <i className="iconoir-settings text-xl"></i>
+                        <i className="iconoir-settings text-xl group-hover:rotate-90 transition-transform duration-500"></i>
                     </button>
                 </div>
 
-                {/* Settings Panel (Conditional) */}
-                {showSettings && (
-                    <div className={`p-4 border-b ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-                        <h4 className={`text-sm font-bold mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Configuration</h4>
-                        <div className="space-y-3">
-                            {/* Language Selector */}
-                            <div>
-                                <label className={`block text-xs mb-1 font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Langue</label>
-                                <div className="flex bg-gray-900 rounded-lg p-1 border border-gray-700">
+                {/* Settings Panel (Animated Expand) */}
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out border-b ${
+                    showSettings ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0 border-none'
+                } ${darkMode ? 'bg-gray-800/50 border-gray-800' : 'bg-gray-50/50 border-gray-100'}`}>
+                    <div className="p-5 space-y-4">
+                        <div className="flex items-center justify-between">
+                            <span className={`text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Langue</span>
+                            <div className="flex bg-black/20 rounded-lg p-1">
+                                {['fr-CA', 'en-CA'].map(lang => (
                                     <button
-                                        onClick={() => setLanguage('fr-CA')}
-                                        className={`flex-1 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${language === 'fr-CA' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
+                                        key={lang}
+                                        onClick={() => setLanguage(lang)}
+                                        className={`px-3 py-1 rounded-md text-[10px] font-bold transition-colors ${
+                                            language === lang 
+                                                ? (darkMode ? 'bg-gray-700 text-white shadow' : 'bg-white text-black shadow') 
+                                                : 'text-gray-500 hover:text-gray-300'
+                                        }`}
                                     >
-                                        Français (CA)
+                                        {lang === 'fr-CA' ? 'FR' : 'EN'}
                                     </button>
-                                    <button
-                                        onClick={() => setLanguage('en-CA')}
-                                        className={`flex-1 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${language === 'en-CA' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
-                                    >
-                                        English (CA)
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Accent Toggle (Only for French) */}
-                            {language === 'fr-CA' && (
-                                <div>
-                                    <label className={`block text-xs mb-1 font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Accent</label>
-                                    <button
-                                        onClick={() => setUseAccent(!useAccent)}
-                                        className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border text-xs font-medium transition-all ${useAccent ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-600'}`}
-                                    >
-                                        <span className="flex items-center gap-2">
-                                            <span className={`w-2 h-2 rounded-full ${useAccent ? 'bg-emerald-500' : 'bg-gray-600'}`}></span>
-                                            Accent Québécois
-                                        </span>
-                                        <span>{useAccent ? 'Activé' : 'Désactivé'}</span>
-                                    </button>
-                                </div>
-                            )}
-
-                            {/* TTS Toggle */}
-                            <div>
-                                <label className={`block text-xs mb-1 font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Synthèse Vocale (TTS)</label>
-                                <button
-                                    onClick={() => setIsTtsEnabled(!isTtsEnabled)}
-                                    className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border text-xs font-medium transition-all ${isTtsEnabled ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-600'}`}
-                                >
-                                    <span className="flex items-center gap-2">
-                                        <span className={`w-2 h-2 rounded-full ${isTtsEnabled ? 'bg-emerald-500' : 'bg-gray-600'}`}></span>
-                                        Réponses Vocales
-                                    </span>
-                                    <span>{isTtsEnabled ? 'Activée' : 'Désactivée'}</span>
-                                </button>
+                                ))}
                             </div>
                         </div>
-                    </div>
-                )}
+                        
+                        {language === 'fr-CA' && (
+                            <div className="flex items-center justify-between">
+                                <span className={`text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Accent Québécois</span>
+                                <button
+                                    onClick={() => setUseAccent(!useAccent)}
+                                    className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${useAccent ? 'bg-emerald-500' : 'bg-gray-600'}`}
+                                >
+                                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform duration-200 shadow-sm ${useAccent ? 'translate-x-5' : 'translate-x-0'}`}></span>
+                                </button>
+                            </div>
+                        )}
 
-                {/* Chat Messages */}
+                        <div className="flex items-center justify-between">
+                            <span className={`text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Réponses Vocales</span>
+                            <button
+                                onClick={() => setIsTtsEnabled(!isTtsEnabled)}
+                                className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${isTtsEnabled ? 'bg-blue-500' : 'bg-gray-600'}`}
+                            >
+                                <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform duration-200 shadow-sm ${isTtsEnabled ? 'translate-x-5' : 'translate-x-0'}`}></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Chat Messages Area */}
                 <div
                     ref={chatContainerRef}
-                    className={`flex-1 overflow-y-auto p-4 space-y-4 ${darkMode ? 'bg-gray-900' : 'bg-white'}`}
+                    className={`flex-1 overflow-y-auto p-5 space-y-6 scroll-smooth ${
+                        darkMode 
+                            ? 'bg-[#0B0F17]' // Darker background for contrast
+                            : 'bg-[#FAFAFA]'
+                    }`}
                 >
                     {messages.map((msg, idx) => (
-                        <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${msg.role === 'user'
-                                ? 'bg-blue-600 text-white rounded-br-none'
-                                : (darkMode ? 'bg-gray-800 text-gray-200 rounded-bl-none' : 'bg-gray-100 text-gray-800 rounded-bl-none')
+                        <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                            {/* Avatar Icon */}
+                            <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-white shadow-md text-xs mt-1 ${
+                                msg.role === 'user' 
+                                    ? 'bg-gradient-to-br from-indigo-500 to-purple-600' 
+                                    : 'bg-gradient-to-br from-emerald-500 to-teal-600'
+                            }`}>
+                                {msg.role === 'user' ? 'MOI' : 'IA'}
+                            </div>
+
+                            <div className={`max-w-[85%] space-y-1`}>
+                                <div className={`px-5 py-3.5 rounded-2xl shadow-sm border text-[0.9rem] leading-relaxed ${
+                                    msg.role === 'user'
+                                        ? 'bg-indigo-600 text-white border-transparent rounded-tr-none'
+                                        : (darkMode 
+                                            ? 'bg-[#1a202c] text-gray-100 border-gray-800 rounded-tl-none' 
+                                            : 'bg-white text-gray-800 border-gray-100 rounded-tl-none')
                                 }`}>
-                                {msg.content}
+                                    {msg.content}
+                                </div>
+                                {/* Message Role Label */}
+                                <div className={`text-[10px] uppercase font-bold tracking-wider px-1 ${
+                                    darkMode ? 'text-gray-600' : 'text-gray-400'
+                                } ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                                    {msg.role === 'user' ? 'Vous' : 'Emma'}
+                                </div>
                             </div>
                         </div>
                     ))}
+                    
                     {isLoading && (
-                        <div className="flex justify-start">
-                            <div className={`rounded-2xl px-4 py-3 rounded-bl-none ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
-                                <div className="flex gap-1">
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
-                                </div>
+                        <div className="flex gap-3">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-xs mt-1 animate-pulse">
+                                IA
+                            </div>
+                            <div className={`px-5 py-3.5 rounded-2xl rounded-tl-none flex items-center gap-2 border ${
+                                darkMode ? 'bg-[#1a202c] border-gray-800' : 'bg-white border-gray-100'
+                            }`}>
+                                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce"></div>
+                                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce delay-150"></div>
+                                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce delay-300"></div>
                             </div>
                         </div>
                     )}
                 </div>
 
-                {/* Input Area */}
-                <div className={`p-4 border-t ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
-                    <div className="relative flex items-center gap-2">
+                {/* Floating Input Area */}
+                <div className={`p-4 border-t relative z-20 ${darkMode ? 'border-gray-800 bg-[#0B0F17]' : 'border-gray-100 bg-white'}`}>
+                    <div className={`relative flex items-center gap-2 p-1.5 rounded-full border shadow-lg transition-all focus-within:ring-2 focus-within:ring-blue-500/50 ${
+                        darkMode ? 'bg-[#1a202c] border-gray-700' : 'bg-white border-gray-200'
+                    }`}>
                         <button
                             onClick={toggleRecording}
-                            className={`p-3 rounded-full transition-all ${isRecording
-                                ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/30'
-                                : (darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-600 hover:bg-gray-300')
+                            className={`p-3 rounded-full transition-all duration-300 shrink-0 ${isRecording
+                                ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/40 scale-110'
+                                : (darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200')
                                 }`}
+                                title={isRecording ? "Arrêter l'enregistrement" : "Démarrer l'enregistrement"}
                         >
                             <i className={isRecording ? "iconoir-mic-speaking" : "iconoir-microphone"}></i>
                         </button>
+                        
                         <input
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                            placeholder="Posez une question..."
-                            className={`flex-1 rounded-full px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${darkMode
-                                ? 'bg-gray-900 text-white placeholder-gray-500'
-                                : 'bg-gray-100 text-gray-900 placeholder-gray-400'
+                            placeholder={isRecording ? "Je vous écoute..." : "Écrivez votre message..."}
+                            disabled={isRecording}
+                            className={`flex-1 bg-transparent px-2 py-2 focus:outline-none text-sm ${darkMode
+                                ? 'text-white placeholder-gray-500'
+                                : 'text-gray-900 placeholder-gray-400'
                                 }`}
                         />
+                        
                         <button
                             onClick={() => handleSend()}
                             disabled={!input.trim() || isLoading}
-                            className={`p-3 rounded-full bg-blue-600 text-white hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-600/20`}
+                            className={`p-3 rounded-full transition-all duration-300 transform active:scale-95 shrink-0 ${
+                                !input.trim() || isLoading 
+                                    ? (darkMode ? 'bg-gray-800 text-gray-600' : 'bg-gray-100 text-gray-400')
+                                    : 'bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-600/30'
+                            }`}
                         >
-                            <i className="iconoir-send-diagonal"></i>
+                            {isLoading ? (
+                                <i className="iconoir-system-restart animate-spin"></i>
+                            ) : (
+                                <i className="iconoir-send-diagonal"></i>
+                            )}
                         </button>
                     </div>
-                    <p className={`text-center text-[10px] mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                        L'IA peut faire des erreurs. Vérifiez les informations importantes.
-                    </p>
+                    {isRecording && (
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-red-500/90 text-white text-[10px] font-bold px-3 py-1 rounded-full animate-bounce shadow-lg backdrop-blur-sm">
+                            ENREGISTREMENT...
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
