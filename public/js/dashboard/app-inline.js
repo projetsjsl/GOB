@@ -25944,24 +25944,25 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
         // Configuration des onglets (sans "Plus" dans la liste principale - il sera ajouté dynamiquement)
         const allTabs = useMemo(() => [
+            { id: 'admin-jsla', label: 'Admin', icon: 'iconoir-settings', component: AdminJSLaiTab },
             { id: 'markets-economy', label: 'Marchés', icon: 'iconoir-globe', component: MarketsEconomyTab },
             { id: 'nouvelles', label: 'Nouvelles', icon: 'iconoir-newspaper', component: NouvellesTab },
-            { id: 'advanced-analysis', label: 'Titres', icon: 'iconoir-candlestick-chart', component: (props) => window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab isDarkMode={isDarkMode} {...props} /> : <div>Chargement...</div> },
             { id: 'ask-emma', label: 'AskEmma', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
-            { id: 'admin-jsla', label: 'Admin', icon: 'iconoir-settings', component: AdminJSLaiTab },
-            // Secondary / Optional Tabs
             { id: 'emma-config', label: 'Config', icon: 'iconoir-tools', component: EmmaConfigTab },
             { id: 'jlab', label: 'JLab™', icon: 'iconoir-flask', component: JLabUnifiedTab },
+            { id: 'fastgraphs', label: 'FastGraphs', icon: 'iconoir-graph-up', component: FastGraphsTab },
+            { id: 'scrapping-sa', label: 'Seeking', icon: 'iconoir-search', component: ScrappingSATab },
+            { id: 'seeking-alpha', label: 'Stocks', icon: 'iconoir-graph-up', component: SeekingAlphaTab },
+            { id: 'tests-tab', label: 'TESTS', icon: 'iconoir-test-tube', component: InvestingCalendarTabInternal },
+            
+            // Secondary / Optional Tabs (moved to end or hidden depending on config)
+            { id: 'advanced-analysis', label: 'Titres', icon: 'iconoir-candlestick-chart', component: (props) => window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab isDarkMode={isDarkMode} {...props} /> : <div>Chargement...</div> },
             { id: 'groupchat', label: 'RobotWeb', icon: 'iconoir-robot', component: window.GroupChatTab || (() => <div>Chargement...</div>) },
             { id: 'assistant-vocal', label: 'Assistant', icon: 'iconoir-microphone', component: VoiceAssistantTab },
             { id: 'finvox', label: 'FinVox', icon: 'iconoir-voice-circle', component: FinVoxTab },
             { id: 'emmaia', label: 'EmmAIA', icon: 'iconoir-brain', component: EmmAIATab },
-            { id: 'fastgraphs', label: 'FastGraphs', icon: 'iconoir-graph-up', component: FastGraphsTab },
-            { id: 'scrapping-sa', label: 'Seeking', icon: 'iconoir-search', component: ScrappingSATab },
-            { id: 'seeking-alpha', label: 'Stocks', icon: 'iconoir-graph-up', component: SeekingAlphaTab },
             { id: 'finance-pro', label: 'Finance Pro (3p1)', icon: 'iconoir-pie-chart', component: FinanceProTab },
             { id: 'email-briefings', label: 'Emma', icon: 'iconoir-antenna-signal', component: EmailBriefingsTab },
-            { id: 'tests-tab', label: 'TESTS', icon: 'iconoir-test-tube', component: InvestingCalendarTabInternal },
         ], []);
 
         // Filter tabs based on Primary Navigation Config (visibility settings)
