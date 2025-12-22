@@ -162,10 +162,14 @@
      */
     displayUserInfo() {
       // Chercher un endroit pour afficher les infos utilisateur
-      const header = document.querySelector('header') || document.querySelector('.container');
+      // Try multiple selectors for different dashboard layouts
+      const header = document.querySelector('header') || 
+                     document.querySelector('.container') || 
+                     document.querySelector('#root') ||
+                     document.body;
 
-      if (!header) {
-        console.warn('Impossible de trouver le header pour afficher les infos utilisateur');
+      if (!header || header === document.body) {
+        // This is expected for dashboards that manage their own user display
         return;
       }
 

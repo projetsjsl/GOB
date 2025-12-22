@@ -231,6 +231,26 @@
             };
             window.LucideIcon = window.IconoirIcon;
 
+            // Add Admin button to header after dashboard loads
+            window.addEventListener('dash:ready', function() {
+                setTimeout(function() {
+                    var header = document.querySelector('header') || document.querySelector('.header') || document.querySelector('[class*="header"]');
+                    if (header && !document.getElementById('admin-btn')) {
+                        var btn = document.createElement('button');
+                        btn.id = 'admin-btn';
+                        btn.innerHTML = '🧩';
+                        btn.title = 'Component Manager';
+                        btn.style.cssText = 'position:fixed;top:10px;right:10px;z-index:9999;width:40px;height:40px;border-radius:10px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:transform 0.2s;';
+                        btn.onmouseover = function() { this.style.transform = 'scale(1.1)'; };
+                        btn.onmouseout = function() { this.style.transform = 'scale(1)'; };
+                        btn.onclick = function() { if(window.openComponentManager) window.openComponentManager(); else alert('Component Manager not loaded'); };
+                        document.body.appendChild(btn);
+                    }
+                }, 1000);
+            });
+
+
+
             // Safe JSON fetch utility - handles non-JSON responses gracefully
             window.fetchJsonSafe = async function(url, opts = {}) {
                 try {
@@ -332,6 +352,7 @@
     </script>
 
     <!-- Performance Optimizer - Réduit le temps de chargement -->
+    <script src="/js/dashboard/logger.js"></script>
     <script src="/js/dashboard/performance-optimizer.js"></script>
     <!-- Constantes partagées exposées globalement -->
     <script src="/js/dashboard/constants.js"></script>
