@@ -512,29 +512,41 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         );
     };
 
+
     // ============================================================================
     // IMPORT TAB COMPONENTS FROM WINDOW
     // Tabs loaded from external files need to be imported from window object
     // before they can be used in JSX syntax
     // ============================================================================
-    const DansWatchlistTab = window.DansWatchlistTab;
-    const ScrappingSATab = window.ScrappingSATab;
-    const EmailBriefingsTab = window.EmailBriefingsTab;
-    const SeekingAlphaTab = window.SeekingAlphaTab;
-    const EconomicCalendarTab = window.EconomicCalendarTab;
-    const InvestingCalendarTab = window.InvestingCalendarTab;
-    const FinVoxTab = window.FinVoxTab;
-    const EmmAIATab = window.EmmAIATab;
-    const FastGraphsTab = window.FastGraphsTab;
-    const VoiceAssistantTab = window.VoiceAssistantTab;
-    const PlusTab = window.PlusTab;
-    const AskEmmaTab = window.AskEmmaTab;
-    const TerminalEmmaIATab = window.TerminalEmmaIATab;
-    const ChatGPTGroupTab = window.ChatGPTGroupTab;
-    const JLabTab = window.JLabTab;
-    const StocksNewsTab = window.StocksNewsTab;
-    const YieldCurveTab = window.YieldCurveTab;
-    const AdvancedAnalysisTab = window.AdvancedAnalysisTab;
+    
+    // Placeholder component for missing tabs
+    const MissingTab = ({ name }) => (
+        <div className="h-full flex flex-col items-center justify-center p-6 bg-amber-900/20 border-2 border-dashed border-amber-500/30 rounded-lg">
+            <span className="text-4xl mb-3">⚠️</span>
+            <h3 className="font-bold text-lg text-amber-400 mb-2">Module non chargé</h3>
+            <p className="text-sm text-amber-300/70 text-center">{name || 'Composant inconnu'}</p>
+        </div>
+    );
+    
+    const DansWatchlistTab = window.DansWatchlistTab || (() => <MissingTab name="DansWatchlistTab" />);
+    const ScrappingSATab = window.ScrappingSATab || (() => <MissingTab name="ScrappingSATab" />);
+    const EmailBriefingsTab = window.EmailBriefingsTab || (() => <MissingTab name="EmailBriefingsTab" />);
+    const SeekingAlphaTab = window.SeekingAlphaTab || (() => <MissingTab name="SeekingAlphaTab" />);
+    const EconomicCalendarTab = window.EconomicCalendarTab || (() => <MissingTab name="EconomicCalendarTab" />);
+    const InvestingCalendarTab = window.InvestingCalendarTab || (() => <MissingTab name="InvestingCalendarTab" />);
+    const FinVoxTab = window.FinVoxTab || (() => <MissingTab name="FinVoxTab" />);
+    const EmmAIATab = window.EmmAIATab || (() => <MissingTab name="EmmAIATab" />);
+    const FastGraphsTab = window.FastGraphsTab || (() => <MissingTab name="FastGraphsTab" />);
+    const VoiceAssistantTab = window.VoiceAssistantTab || (() => <MissingTab name="VoiceAssistantTab" />);
+    const PlusTab = window.PlusTab || (() => <MissingTab name="PlusTab" />);
+    const AskEmmaTab = window.AskEmmaTab || (() => <MissingTab name="AskEmmaTab" />);
+    const TerminalEmmaIATab = window.TerminalEmmaIATab || (() => <MissingTab name="TerminalEmmaIATab" />);
+    const ChatGPTGroupTab = window.ChatGPTGroupTab || (() => <MissingTab name="ChatGPTGroupTab" />);
+    const JLabTab = window.JLabTab || (() => <MissingTab name="JLabTab" />);
+    const StocksNewsTab = window.StocksNewsTab || (() => <MissingTab name="StocksNewsTab" />);
+    const YieldCurveTab = window.YieldCurveTab || (() => <MissingTab name="YieldCurveTab" />);
+    const AdvancedAnalysisTab = window.AdvancedAnalysisTab || (() => <MissingTab name="AdvancedAnalysisTab" />);
+
 
     // ============================================================================
     // CONSTANTS & CONFIGURATION
