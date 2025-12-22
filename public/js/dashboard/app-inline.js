@@ -25946,17 +25946,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         const allTabs = useMemo(() => [
             { id: 'admin-jsla', label: 'Admin', icon: 'iconoir-settings', component: AdminJSLaiTab },
             { id: 'markets-economy', label: 'Marchés', icon: 'iconoir-globe', component: MarketsEconomyTab },
-            { id: 'nouvelles', label: 'Nouvelles', icon: 'iconoir-newspaper', component: NouvellesTab },
-            { id: 'ask-emma', label: 'AskEmma', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
-            { id: 'emma-config', label: 'Config', icon: 'iconoir-tools', component: EmmaConfigTab },
+            { id: 'advanced-analysis', label: 'Titres', icon: 'iconoir-candlestick-chart', component: (props) => window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab isDarkMode={isDarkMode} {...props} /> : <div>Chargement...</div> },
             { id: 'jlab', label: 'JLab™', icon: 'iconoir-flask', component: JLabUnifiedTab },
+            { id: 'ask-emma', label: 'Emma IA', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
+            { id: 'tests-tab', label: 'Tests', icon: 'iconoir-test-tube', component: InvestingCalendarTabInternal },
+            
+            // Secondary / Optional Tabs (moved to end or hidden depending on config)
+            { id: 'nouvelles', label: 'Nouvelles', icon: 'iconoir-newspaper', component: NouvellesTab },
+            { id: 'emma-config', label: 'Config', icon: 'iconoir-tools', component: EmmaConfigTab },
             { id: 'fastgraphs', label: 'FastGraphs', icon: 'iconoir-graph-up', component: FastGraphsTab },
             { id: 'scrapping-sa', label: 'Seeking', icon: 'iconoir-search', component: ScrappingSATab },
             { id: 'seeking-alpha', label: 'Stocks', icon: 'iconoir-graph-up', component: SeekingAlphaTab },
-            { id: 'tests-tab', label: 'TESTS', icon: 'iconoir-test-tube', component: InvestingCalendarTabInternal },
-            
-            // Secondary / Optional Tabs (moved to end or hidden depending on config)
-            { id: 'advanced-analysis', label: 'Titres', icon: 'iconoir-candlestick-chart', component: (props) => window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab isDarkMode={isDarkMode} {...props} /> : <div>Chargement...</div> },
             { id: 'groupchat', label: 'RobotWeb', icon: 'iconoir-robot', component: window.GroupChatTab || (() => <div>Chargement...</div>) },
             { id: 'assistant-vocal', label: 'Assistant', icon: 'iconoir-microphone', component: VoiceAssistantTab },
             { id: 'finvox', label: 'FinVox', icon: 'iconoir-voice-circle', component: FinVoxTab },
