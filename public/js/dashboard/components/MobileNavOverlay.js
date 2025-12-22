@@ -3,7 +3,7 @@ const MobileNavOverlay = ({
     activeTab,
     onTabChange,
     isDarkMode,
-    position = 'left' 
+    position = 'right'  // Changed default from 'left' to 'right'
 }) => {
     const [isOpen, setIsOpen] = React.useState(false);
     
@@ -21,13 +21,13 @@ const MobileNavOverlay = ({
         <div className="fixed z-[9999]" style={{ top: '50%', [isRight ? 'right' : 'left']: '0', transform: 'translateY(-50%)' }}>
             <div className="relative flex items-center">
                 
-                {/* Toggle Button */}
+                {/* Toggle Button - Made BIGGER */}
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                     className={`
                         absolute top-1/2 -translate-y-1/2
                         ${isRight ? 'right-0' : 'left-0'}
-                        p-3 shadow-lg backdrop-blur-md border transition-transform duration-300
+                        p-4 shadow-lg backdrop-blur-md border transition-transform duration-300
                         ${isDarkMode 
                             ? 'bg-neutral-900/90 border-neutral-700 text-white' 
                             : 'bg-white/90 border-gray-200 text-gray-900'
@@ -42,7 +42,7 @@ const MobileNavOverlay = ({
                 >
                     <window.LucideIcon 
                         name={isOpen ? (isRight ? "ChevronRight" : "ChevronLeft") : "Menu"} 
-                        className="w-5 h-5" 
+                        className="w-7 h-7" 
                     />
                 </button>
 

@@ -3590,6 +3590,41 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         // État de chargement initial pour éviter les réactualisations
         const [initialLoadComplete, setInitialLoadComplete] = useState(false);
         const [showLoadingScreen, setShowLoadingScreen] = useState(true);
+        
+        // 🎯 SCROLL-HIDE: Auto-hide navigation during scroll for better reading experience
+        const [isNavHidden, setIsNavHidden] = useState(false);
+        const lastScrollY = useRef(0);
+        const scrollTimeout = useRef(null);
+        
+        useEffect(() => {
+            const handleScroll = () => {
+                const currentScrollY = window.scrollY;
+                const scrollDelta = currentScrollY - lastScrollY.current;
+                
+                // Hide on scroll down (more than 10px), show on scroll up
+                if (scrollDelta > 10 && currentScrollY > 100) {
+                    setIsNavHidden(true);
+                } else if (scrollDelta < -5) {
+                    setIsNavHidden(false);
+                }
+                
+                lastScrollY.current = currentScrollY;
+                
+                // Auto-show after 2 seconds of no scrolling
+                if (scrollTimeout.current) {
+                    clearTimeout(scrollTimeout.current);
+                }
+                scrollTimeout.current = setTimeout(() => {
+                    setIsNavHidden(false);
+                }, 2000);
+            };
+            
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            return () => {
+                window.removeEventListener('scroll', handleScroll);
+                if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+            };
+        }, []);
 
         // Fonction pour charger les tickers depuis Supabase
         const loadTickersFromSupabase = async () => {
@@ -26824,15 +26859,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </button>
                 )}
 
-                {/* Bottom Navigation Bar - Tous les écrans */}
+                {/* Bottom Navigation Bar - Tous les écrans - AUTO-HIDE ON SCROLL */}
                 <nav 
                     ref={navRef}
                     className={`fixed bottom-0 left-0 right-0 backdrop-blur-md transition-all duration-300 z-40 shadow-2xl hidden md:block ${isDarkMode
                     ? 'bg-black/95 border-t border-green-500/20'
                     : 'bg-white/95 border-t-2 border-gray-200'
-                        } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                        } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : ''} ${isNavHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
                 >
-                    <div className="flex items-center overflow-x-auto scrollbar-hide px-2 py-3 gap-1 bg-white" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
+                    <div className="flex items-center justify-center overflow-x-auto scrollbar-hide px-2 py-3 gap-1 bg-white" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
                         {(window.RolesPermissions && window.userPermissions 
                             ? window.RolesPermissions.filterTabsByPermissions(tabs)
                             : tabs
