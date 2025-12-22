@@ -152,17 +152,20 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
 
         try {
             const model = config.gemini?.model || 'gemini-3-flash-preview';
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+            const response = await fetch('/api/gemini-proxy', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: prompt }]
-                    }]
+                    model: model,
+                    data: {
+                        contents: [{
+                            parts: [{ text: prompt }]
+                        }]
+                    }
                 })
-            });
+            });;
 
             const data = await response.json();
 
