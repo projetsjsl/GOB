@@ -869,6 +869,7 @@ const DashboardGridWrapper = ({
                             useCSSTransforms={true}
                             preventCollision={false}
                             transformScale={1}
+                            resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
                         >
                             {filteredLayout.map(item => {
                                 const config = TAB_TO_WIDGET_MAP[item.i];

@@ -11841,7 +11841,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                             Modifiez les prompts utilisés pour les briefings automatisés. Les changements sont synchronisés avec n8n et GitHub.
                         </p>
 
-                        <PromptManager />
+                        {typeof PromptManager !== 'undefined' ? <PromptManager /> : <div className="p-4 text-red-500">Erreur: PromptManager non chargé</div>}
                     </div>
 
                     {/* SECTION 2.5.5: GESTION DES HORAIRES ET AUTOMATISATIONS */}
@@ -25840,6 +25840,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             }
 
             // Si admin et l'onglet admin n'est pas visible, le forcer en retirant le dernier onglet si nécessaire
+            const adminTab = filteredAllTabs.find(t => t.id === 'admin-jsla');
             if (isAdmin && adminTab && !visible.some(t => t.id === 'admin-jsla')) {
                 if (visible.length > 0) {
                     const lastTab = visible.pop();
