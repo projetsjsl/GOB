@@ -43095,6 +43095,11 @@ async function fetchMarketData(ticker2) {
   }
   return null;
 }
+const marketDataCache = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  fetchMarketData,
+  fetchMarketDataBatch
+}, Symbol.toStringTag, { value: "Module" }));
 async function loadCurrentSnapshotFromSupabase(ticker2) {
   try {
     const response = await fetch(
@@ -57777,7 +57782,35 @@ Vérifiez les logs de la console pour plus de détails.`;
         }
         setActiveId(upperSymbol);
         setData(existingProfile.data);
-        setAssumptions(existingProfile.assumptions);
+        try {
+          const { fetchMarketData: fetchMarketData2 } = await __vitePreload(async () => {
+            const { fetchMarketData: fetchMarketData3 } = await Promise.resolve().then(() => marketDataCache);
+            return { fetchMarketData: fetchMarketData3 };
+          }, true ? void 0 : void 0, import.meta.url);
+          const marketData = await fetchMarketData2(upperSymbol);
+          if (marketData && marketData.currentPrice > 0) {
+            const updatedAssumptions = {
+              ...existingProfile.assumptions,
+              currentPrice: marketData.currentPrice
+            };
+            setAssumptions(updatedAssumptions);
+            setLibrary((prev) => ({
+              ...prev,
+              [upperSymbol]: {
+                ...prev[upperSymbol],
+                assumptions: updatedAssumptions,
+                lastModified: Date.now()
+              }
+            }));
+            console.log(`✅ Prix mis à jour pour ${upperSymbol}: $${marketData.currentPrice.toFixed(2)}`);
+          } else {
+            setAssumptions(existingProfile.assumptions);
+            console.log(`⚠️ Prix de marché non disponible pour ${upperSymbol}, utilisation du cache`);
+          }
+        } catch (priceError) {
+          console.warn(`⚠️ Erreur récupération prix pour ${upperSymbol}:`, priceError);
+          setAssumptions(existingProfile.assumptions);
+        }
         setNotes(existingProfile.notes);
         console.log(`✅ Loaded existing profile for ${upperSymbol}`);
         return;

@@ -2354,7 +2354,39 @@ export default function App() {
                 
                 setActiveId(upperSymbol);
                 setData(existingProfile.data);
-                setAssumptions(existingProfile.assumptions);
+                
+                // ✅ FIX: Mettre à jour le prix actuel depuis l'API de marché si le profil existe
+                // Cela garantit que le prix est toujours à jour même pour les profils en cache
+                try {
+                    const { fetchMarketData } = await import('./services/marketDataCache');
+                    const marketData = await fetchMarketData(upperSymbol);
+                    
+                    if (marketData && marketData.currentPrice > 0) {
+                        const updatedAssumptions = {
+                            ...existingProfile.assumptions,
+                            currentPrice: marketData.currentPrice
+                        };
+                        setAssumptions(updatedAssumptions);
+                        
+                        // Aussi mettre à jour dans la library pour persistance
+                        setLibrary(prev => ({
+                            ...prev,
+                            [upperSymbol]: {
+                                ...prev[upperSymbol],
+                                assumptions: updatedAssumptions,
+                                lastModified: Date.now()
+                            }
+                        }));
+                        console.log(`✅ Prix mis à jour pour ${upperSymbol}: $${marketData.currentPrice.toFixed(2)}`);
+                    } else {
+                        setAssumptions(existingProfile.assumptions);
+                        console.log(`⚠️ Prix de marché non disponible pour ${upperSymbol}, utilisation du cache`);
+                    }
+                } catch (priceError) {
+                    console.warn(`⚠️ Erreur récupération prix pour ${upperSymbol}:`, priceError);
+                    setAssumptions(existingProfile.assumptions);
+                }
+                
                 setNotes(existingProfile.notes);
                 console.log(`✅ Loaded existing profile for ${upperSymbol}`);
                 return;
