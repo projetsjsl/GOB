@@ -2,6 +2,10 @@
 // Component: SeekingAlphaTab
 
 const SeekingAlphaTab = (props) => {
+    // Safety check for data
+    const seekingAlphaData = props.seekingAlphaData || { stocks: [] };
+    const seekingAlphaStockData = props.seekingAlphaStockData || { stocks: {} };
+    
     const {
         isDarkMode,
         loading,
@@ -13,11 +17,11 @@ const SeekingAlphaTab = (props) => {
         generateScrapingScript,
         addScrapingLog,
         tickers,
-        seekingAlphaData,
+        
         analyzeWithClaude,
         selectedStock,
         setSelectedStock,
-        seekingAlphaStockData,
+        
         cleanText,
         getGradeColor,
         openPeersComparison,
@@ -82,7 +86,7 @@ const SeekingAlphaTab = (props) => {
                             addScrapingLog('🤖 Démarrage de l\'analyse Perplexity sur les données existantes...', 'info');
                             try {
                                 for (const ticker of tickers) {
-                                    const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
+                                    const seekingAlphaItem = seekingAlphaData?.stocks?.find(s => s.ticker === ticker);
                                     if (seekingAlphaItem?.parsedData) {
                                         await analyzeWithClaude(ticker, seekingAlphaItem.parsedData);
                                     }
@@ -114,8 +118,8 @@ const SeekingAlphaTab = (props) => {
                     
                     {/* Fiche détaillée comme dans les images */}
                     {(() => {
-                        const claudeData = seekingAlphaStockData.stocks?.[selectedStock];
-                        const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === selectedStock);
+                        const claudeData = seekingAlphaStockData?.stocks?.[selectedStock];
+                        const seekingAlphaItem = seekingAlphaData?.stocks?.find(s => s.ticker === selectedStock);
                         const parsedData = seekingAlphaItem?.parsedData;
                         
                         if (claudeData || parsedData) {
@@ -340,7 +344,7 @@ const SeekingAlphaTab = (props) => {
             )}
 
             {/* Message si aucune donnée et aucun ticker */}
-            {(!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && tickers.length === 0 && (
+            {(!seekingAlphaData?.stocks || seekingAlphaData?.stocks?.length === 0) && tickers.length === 0 && (
                 <div className={`backdrop-blur-sm rounded-lg p-8 border transition-colors duration-300 ${
                     isDarkMode ? 'bg-yellow-900/20 border-yellow-700' : 'bg-yellow-50 border-yellow-300'
                 }`}>
@@ -363,10 +367,10 @@ const SeekingAlphaTab = (props) => {
             )}
             
             {/* Affichage des analyses en cartes */}
-            {seekingAlphaData.stocks && seekingAlphaData.stocks.length > 0 && (
+            {seekingAlphaData?.stocks && seekingAlphaData?.stocks?.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {seekingAlphaData.stocks.map((stock, index) => {
-                        const claudeData = seekingAlphaStockData.stocks?.[stock.ticker];
+                    {(seekingAlphaData?.stocks || []).map((stock, index) => {
+                        const claudeData = seekingAlphaStockData?.stocks?.[stock.ticker];
                         const parsedData = stock.parsedData;
 
                         // Afficher la carte même sans données complètes
@@ -455,7 +459,7 @@ const SeekingAlphaTab = (props) => {
             )}
 
             {/* Liste des tickers disponibles si aucune donnée Seeking Alpha */}
-            {!selectedStock && (!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && tickers.length > 0 && (
+            {!selectedStock && (!seekingAlphaData?.stocks || seekingAlphaData?.stocks.length === 0) && tickers.length > 0 && (
                 <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
                     isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'
                 }`}>
@@ -492,7 +496,7 @@ const SeekingAlphaTab = (props) => {
             )}
 
             {/* Affichage en  liste si pas de cartes */}
-            {!selectedStock && (!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && tickers.length === 0 && (
+            {!selectedStock && (!seekingAlphaData?.stocks || seekingAlphaData?.stocks.length === 0) && tickers.length === 0 && (
                 <div className="seeking-alpha-card rounded-lg p-6 border border-gray-600">
                     <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                         <Icon emoji="📋" size={24} />
@@ -511,17 +515,17 @@ const SeekingAlphaTab = (props) => {
             )}
 
             {/* Affichage en liste avec données */}
-            {!selectedStock && seekingAlphaData.stocks && seekingAlphaData.stocks.length > 0 && (
+            {!selectedStock && seekingAlphaData?.stocks && seekingAlphaData?.stocks.length > 0 && (
                 <div className="seeking-alpha-card rounded-lg p-6 border border-gray-600">
                     <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                         <Icon emoji="📋" size={24} />
                         Analyses Seeking Alpha
                     </h3>
                     <div className="space-y-4">
-                        {seekingAlphaData.stocks.map((stock, index) => {
+                        {(seekingAlphaData?.stocks || []).map((stock, index) => {
                             const ticker = stock.ticker;
-                            const claudeData = seekingAlphaStockData.stocks?.[ticker];
-                            const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
+                            const claudeData = seekingAlphaStockData?.stocks?.[ticker];
+                            const seekingAlphaItem = seekingAlphaData?.stocks?.find(s => s.ticker === ticker);
                             const parsedData = seekingAlphaItem?.parsedData;
                             
                             if (!claudeData && !parsedData) return null;

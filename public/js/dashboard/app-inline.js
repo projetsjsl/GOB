@@ -27967,7 +27967,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             console.log('✅ React, ReactDOM et BetaCombinedDashboard sont disponibles');
             try {
                 // Utiliser ReactDOM.render (compatible avec React 18 via Babel)
-                ReactDOM.render(<DashboardComponent />, rootElement);
+                                ReactDOM.render(<DashboardComponent />, rootElement);
+                
+                // Signal that dashboard is ready for God Mode and other scripts
+                window.__DASH_READY__ = true;
+                window.dispatchEvent(new CustomEvent("dash:ready"));
+                console.log('🎉 Dashboard ready event dispatched');
                 console.log('✅ Application React montée avec succès !');
             } catch (renderError) {
                 console.error('❌ Erreur lors du ReactDOM.render:', renderError);

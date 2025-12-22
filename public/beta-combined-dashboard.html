@@ -130,6 +130,14 @@
             }
 
             // Add require polyfill for UMD modules
+            
+            // Unhandled Rejection Handler to keep console clean
+            window.addEventListener("unhandledrejection", function(event) {
+                console.warn("Unhandled promise rejection:", event.reason);
+                event.preventDefault(); // Stop noise
+            });
+
+            // Global Error Boundary (UI Fallback)
             if (typeof window.require === 'undefined') {
                 window.require = function(moduleName) {
                     // For react-grid-layout dependencies

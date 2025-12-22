@@ -138,6 +138,14 @@
   ],
   "rewrites": [
     {
+      "source": "/api/calendar-earnings",
+      "destination": "/api/fmp?endpoint=earnings-calendar"
+    },
+    {
+      "source": "/api/calendar-economic",
+      "destination": "/api/fmp?endpoint=economic-calendar"
+    },
+    {
       "source": "/api/marketdata",
       "destination": "/api/fmp"
     },

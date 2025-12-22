@@ -108,7 +108,40 @@
     // ===================================
     // COMPOSANT PRINCIPAL
     // ===================================
-    const DashboardGridWrapper = ({
+    
+// Simple Error Boundary for individual widgets
+class WidgetErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false, error: null };
+    }
+    static getDerivedStateFromError(error) {
+        return { hasError: true, error };
+    }
+    componentDidCatch(error, errorInfo) {
+        console.error("Widget Error:", error, errorInfo);
+    }
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="h-full flex flex-col items-center justify-center p-4 bg-red-900/10 border border-red-500/30 rounded-lg">
+                    <span className="text-red-500 text-6xl mb-2">⚠️</span>
+                    <h3 className="text-red-500 font-bold">Erreur Widget</h3>
+                    <p className="text-xs text-red-400 text-center mt-2">{this.state.error?.message || "Erreur inconnue"}</p>
+                    <button 
+                        onClick={() => this.setState({ hasError: false })}
+                        className="mt-4 px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
+                    >
+                        Réessayer
+                    </button>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
+
+const DashboardGridWrapper = ({
         isDarkMode = true,
         isAdmin = false,
         activeTab,
@@ -309,6 +342,19 @@
 
             // Récupérer le composant (plusieurs tentatives)
             let Component = window[config.component];
+            
+            if (!Component) {
+                // LAST RESORT FALLBACK REGISTRY
+                const REGISTRY = {
+                    'EmmaConfigTab': window.AdminJSLaiTab,
+                    'EmailBriefingsTab': window.AdminJSLaiTab,
+                    'YieldCurveTab': window.MarketsEconomyTab,
+                    'NouvellesTab': window.StocksNewsTab,
+                    'DansWatchlistTab': window.StocksNewsTab
+                };
+                Component = REGISTRY[config.component];
+            }
+
             if (!Component) {
                 // Essayer avec 'Tab' suffix
                 Component = window[config.component + 'Tab'];
@@ -326,6 +372,19 @@
                 Component = window.MarketsEconomyTab;
             }
             
+            
+            if (!Component) {
+                // LAST RESORT FALLBACK REGISTRY
+                const REGISTRY = {
+                    'EmmaConfigTab': window.AdminJSLaiTab,
+                    'EmailBriefingsTab': window.AdminJSLaiTab,
+                    'YieldCurveTab': window.MarketsEconomyTab,
+                    'NouvellesTab': window.StocksNewsTab,
+                    'DansWatchlistTab': window.StocksNewsTab
+                };
+                Component = REGISTRY[config.component];
+            }
+
             if (!Component) {
                 console.warn(`⚠️ Composant ${config.component} non trouvé. Tentatives:`, {
                     direct: typeof window[config.component],
