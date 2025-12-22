@@ -1776,7 +1776,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 };
 
                 return (
-                    <div className="space-y-6">
+                    <div className="h-full flex flex-col gap-4 p-2 overflow-hidden">
                         {/* Navigation Secondaire */}
 
                         <div className="flex justify-end items-center">
@@ -1827,7 +1827,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             <div className="relative">
                                 <div
                                     ref={chatContainerRef}
-                                    className="h-[500px] overflow-y-auto mb-4 p-4 rounded-lg transition-colors duration-300"
+                                    className="flex-1 min-h-0 overflow-y-auto mb-4 p-4 rounded-lg transition-colors duration-300 border"
                                     style={{ backgroundColor: 'var(--theme-bg, white)' }}
                                 >
                                 {historyLoading ? (
