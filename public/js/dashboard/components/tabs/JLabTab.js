@@ -375,7 +375,8 @@ const JLabTab = () => {
             if (!quote) errors.push('Quote manquant');
             if (!profile) errors.push('Profile manquant');
             if (!ratios) errors.push('Ratios manquant');
-            if (!news) errors.push('News manquant');
+            // News is optional - don't add to errors
+            // if (!news) errors.push('News manquant');
 
             if (errors.length > 0) {
                 console.warn('⚠️ Données manquantes:', errors);
@@ -969,25 +970,38 @@ const JLabTab = () => {
 
                 // Essayer d'abord avec les vraies APIs
                 const realData = await fetchRealStockData(selectedStock, timeframe);
-                if (realData && realData.quote && realData.quote.price > 0) {
-                    setStockDataJLab(realData);
+                // Normalize data - ensure arrays exist
+                const normalizedData = {
+                    ...realData,
+                    news: Array.isArray(realData?.news) ? realData.news : [],
+                    intraday: Array.isArray(realData?.intraday) ? realData.intraday : [],
+                    analyst: realData?.analyst || null,
+                    earnings: realData?.earnings || null,
+                };
+                
+                // Accept data if we have at least a valid quote
+                if (normalizedData && normalizedData.quote && normalizedData.quote.price > 0) {
+                    setStockDataJLab(normalizedData);
                     setConnected(true);
                     setLastUpdateJLab(new Date());
                     console.log('✅ Données chargées avec succès');
 
                     // Vérifier si les données intraday sont disponibles
-                    if (!realData.intraday || realData.intraday.length === 0) {
+                    if (!normalizedData.intraday || normalizedData.intraday.length === 0) {
                         setViolations(prev => {
-                            // Éviter les doublons
                             if (prev.find(v => v.code === 'intraday_missing')) return prev;
                             return [
                                 ...prev,
-                                { code: 'intraday_missing', severity: 'low', message: 'Données intraday non disponibles - utilisation des données quote uniquement.' }
+                                { code: 'intraday_missing', severity: 'low', message: 'Données intraday non disponibles.' }
                             ];
                         });
                     }
                 } else {
-                    throw new Error('Données invalides reçues de l\'API');
+                    // Don't throw - use mock data instead
+                    console.warn('⚠️ Données incomplètes, utilisation des données de fallback');
+                    const mockData = generateMockData(selectedStock);
+                    setStockDataJLab(mockData);
+                    setConnected(false);
                 }
             } catch (error) {
                 console.error('❌ Erreur lors du chargement:', error?.message || String(error));

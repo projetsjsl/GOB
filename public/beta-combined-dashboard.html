@@ -1303,6 +1303,15 @@
     <script type="text/babel" src="/js/dashboard/components/AnnouncementBarManager.js"></script>
     <script type="text/babel" src="/js/dashboard/components/ThemeSelector.js"></script>
 
+
+    <!-- Signal that all components are loaded -->
+    <script>
+        // Mark components as ready after all scripts are parsed
+        window.__COMPONENTS_READY__ = true;
+        window.dispatchEvent(new CustomEvent('components-ready'));
+        console.log('✅ All component scripts loaded, components-ready event dispatched');
+    </script>
+
     <!-- Inline (legacy) bundle to preserve existing design -->
     <script type="text/babel" data-presets="react" src="/js/dashboard/app-inline.js"></script>
 

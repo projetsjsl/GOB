@@ -548,6 +548,77 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     const AdvancedAnalysisTab = window.AdvancedAnalysisTab || (() => <MissingTab name="AdvancedAnalysisTab" />);
 
 
+
+    // ============================================================================
+    // ROBUST API FETCH UTILITY
+    // ============================================================================
+    const fetchJSON = async (url, options = {}) => {
+        try {
+            const resp = await fetch(url, options);
+            const text = await resp.text();
+            
+            if (!resp.ok) {
+                console.error('[API] Non-OK response', resp.status, url, text.slice(0, 200));
+                return { success: false, error: `HTTP ${resp.status}`, data: null };
+            }
+            
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                console.error('[API] Invalid JSON', url, text.slice(0, 200));
+                return { success: false, error: 'Invalid JSON response', data: null };
+            }
+        } catch (e) {
+            console.error('[API] Fetch error', url, e.message);
+            return { success: false, error: e.message, data: null };
+        }
+    };
+    
+    // Expose globally
+    window.fetchJSON = fetchJSON;
+
+
+    // ============================================================================
+    // GLOBAL ERROR BOUNDARY
+    // ============================================================================
+    class GlobalErrorBoundary extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = { hasError: false, error: null, errorInfo: null };
+        }
+        
+        static getDerivedStateFromError(error) {
+            return { hasError: true, error };
+        }
+        
+        componentDidCatch(error, errorInfo) {
+            console.error('[GlobalErrorBoundary] Caught error:', error);
+            console.error('[GlobalErrorBoundary] Error info:', errorInfo);
+            this.setState({ errorInfo });
+        }
+        
+        render() {
+            if (this.state.hasError) {
+                return (
+                    <div style={{ padding: '40px', textAlign: 'center', background: '#2d1f1f', border: '2px solid #7f2d2d', margin: '20px', borderRadius: '12px', fontFamily: 'system-ui', color: '#fff' }}>
+                        <h2 style={{ color: '#f87171', marginBottom: '20px' }}>⚠️ Erreur de Rendu</h2>
+                        <p style={{ color: '#fca5a5', marginBottom: '10px' }}><strong>Erreur:</strong> {this.state.error?.message || 'Unknown error'}</p>
+                        <details style={{ textAlign: 'left', background: '#1f1515', padding: '10px', borderRadius: '8px', marginTop: '20px' }}>
+                            <summary style={{ cursor: 'pointer', color: '#fca5a5' }}>Stack Trace</summary>
+                            <pre style={{ whiteSpace: 'pre-wrap', fontSize: '11px', color: '#d1d5db', marginTop: '10px' }}>
+                                {this.state.error?.stack || 'No stack available'}
+                            </pre>
+                        </details>
+                        <button onClick={() => window.location.reload()} style={{ marginTop: '20px', padding: '12px 24px', background: '#dc2626', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                            Rafraîchir la page
+                        </button>
+                    </div>
+                );
+            }
+            return this.props.children;
+        }
+    }
+
     // ============================================================================
     // CONSTANTS & CONFIGURATION
     // ============================================================================
@@ -28006,7 +28077,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             console.log('✅ React, ReactDOM et BetaCombinedDashboard sont disponibles');
             try {
                 // Utiliser ReactDOM.render (compatible avec React 18 via Babel)
-                                ReactDOM.render(<DashboardComponent />, rootElement);
+                                ReactDOM.render(<GlobalErrorBoundary><DashboardComponent /></GlobalErrorBoundary>, rootElement);
                 
                 // Signal that dashboard is ready for God Mode and other scripts
                 window.__DASH_READY__ = true;
