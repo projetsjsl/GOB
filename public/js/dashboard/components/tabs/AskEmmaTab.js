@@ -601,7 +601,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         if (response.ok) {
                             const data = await response.json();
                             setEmmaApiKey(data.apiKey ? '••••••••••••••••' : '');
-                            setEmmaConnected(!!data.apiKey);
+                            setEmmaConnected(data.configured === true || !!data.apiKey);
                             return;
                         }
                     } catch (error) {
