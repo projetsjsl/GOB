@@ -2,69 +2,24 @@
  * Global Real-time Sync for GOB Dashboard
  * 
  * Provides centralized Supabase Realtime subscription.
- * Dispatches 'tickersUpdated' event when changes occur in 'tickers' table.
+ * Uses event-based approach instead of polling.
  */
 (function() {
     console.log('📡 Real-time Sync: Initializing...');
 
-    // Retry mechanism for Supabase SDK
-    let retryCount = 0;
-    const maxRetries = 10;
-    const retryDelay = 500;
-
-    const initRealtime = () => {
-        // 1. Get Supabase Config
-        const SUPABASE_URL = window.SUPABASE_URL || window.ENV_CONFIG?.SUPABASE_URL;
-        const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || window.ENV_CONFIG?.SUPABASE_ANON_KEY;
-
-        if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-            console.warn('⚠️ Real-time Sync: Missing Supabase config. Skipping subscription.');
+    function startRealtime(supabaseClient) {
+        if (!supabaseClient) {
+            console.warn('⚠️ Real-time Sync: No client provided');
             return;
         }
 
-        // Check for Supabase SDK - either on window.supabase or already created client
-        const supabaseLib = window.supabase;
-        
-        // If SDK not available yet, retry
-        if (!supabaseLib && !window.__SUPABASE__) {
-            retryCount++;
-            if (retryCount < maxRetries) {
-                console.log('📡 Real-time Sync: Waiting for Supabase SDK... (attempt ' + retryCount + '/' + maxRetries + ')');
-                setTimeout(initRealtime, retryDelay);
-                return;
-            } else {
-                console.warn('⚠️ Real-time Sync: Supabase SDK not found after ' + maxRetries + ' attempts. Skipping.');
-                return;
-            }
-        }
-
-        // 2. Use global client if available, otherwise create one
-        let supabase = window.__SUPABASE__;
-        
-        if (!supabase && supabaseLib && typeof supabaseLib.createClient === 'function') {
-            try {
-                supabase = supabaseLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                window.__SUPABASE__ = supabase;
-                console.log('📡 Real-time Sync: Created and exposed global Supabase client');
-            } catch (e) {
-                console.error('❌ Real-time Sync: Failed to create Supabase client:', e);
-                return;
-            }
-        }
-        
-        if (!supabase) {
-            console.warn('⚠️ Real-time Sync: No Supabase client available. Skipping.');
-            return;
-        }
-
-        // 3. Subscribe to Tickers
         try {
-            const channel = supabase
+            const channel = supabaseClient
                 .channel('dashboard-realtime-tickers')
                 .on('postgres_changes', 
                     { event: '*', schema: 'public', table: 'tickers' }, 
                     (payload) => {
-                        console.log('📡 Real-time Sync: Ticker update received!', payload);
+                        console.log('�� Real-time Sync: Ticker update received!', payload);
                         
                         window.dispatchEvent(new CustomEvent('tickersUpdated', { 
                             detail: payload 
@@ -81,19 +36,51 @@
                     }
                 )
                 .subscribe((status) => {
-                    console.log('�� Real-time Sync: Subscription status:', status);
+                    console.log('📡 Real-time Sync: Subscription status:', status);
                 });
 
             window.addEventListener('beforeunload', () => {
-                try { supabase.removeChannel(channel); } catch(e) {}
+                try { supabaseClient.removeChannel(channel); } catch(e) {}
             });
             
             console.log('✅ Real-time Sync: Subscription active');
         } catch (e) {
             console.error('❌ Real-time Sync: Subscription error:', e);
         }
-    };
+    }
 
-    // Start with a delay to allow Supabase SDK to load
-    setTimeout(initRealtime, 1000);
+    function initRealtime() {
+        // Check if client already exists
+        const existingClient = window.__SUPABASE__;
+        if (existingClient) {
+            console.log('📡 Real-time Sync: Using existing global client');
+            startRealtime(existingClient);
+            return;
+        }
+
+        // Wait for supabase:ready event from app-inline.js
+        console.log('📡 Real-time Sync: Waiting for supabase:ready event...');
+        window.addEventListener('supabase:ready', (e) => {
+            console.log('📡 Real-time Sync: Received supabase:ready event');
+            const client = e.detail?.client || window.__SUPABASE__;
+            if (client) {
+                startRealtime(client);
+            } else {
+                console.warn('⚠️ Real-time Sync: Event received but no client found');
+            }
+        }, { once: true });
+
+        // Fallback: check again after React mounts (dash:ready event)
+        window.addEventListener('dash:ready', () => {
+            if (!window.__SUPABASE__) {
+                console.warn('⚠️ Real-time Sync: Dashboard ready but no Supabase client');
+                return;
+            }
+            // Client might have been set after our listener was added
+            startRealtime(window.__SUPABASE__);
+        }, { once: true });
+    }
+
+    // Start initialization
+    initRealtime();
 })();

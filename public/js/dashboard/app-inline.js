@@ -3586,6 +3586,13 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                     setTeamTickers(data.team_tickers || []);
                     setWatchlistTickers(data.watchlist_tickers || []);
                     setTickers(data.team_tickers || []); // Utiliser team_tickers par défaut
+                    // Update global state and dispatch event for other components
+                    window.__DASH_STATE__ = window.__DASH_STATE__ || {};
+                    window.__DASH_STATE__.teamTickers = data.team_tickers || [];
+                    window.__DASH_STATE__.watchlistTickers = data.watchlist_tickers || [];
+                    window.dispatchEvent(new CustomEvent('tickers:updated', { 
+                        detail: { team: data.team_tickers, watchlist: data.watchlist_tickers }
+                    }));
                     console.log(`✅ Tickers chargés: ${data.team_tickers?.length || 0} équipe, ${data.watchlist_tickers?.length || 0} watchlist`);
                 } else {
                     throw new Error(data.error || 'Failed to fetch tickers');
@@ -3601,6 +3608,13 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 setTeamTickers(fallbackTickers);
                 setWatchlistTickers(fallbackTickers);
                 setTickers(fallbackTickers);
+                // Update global state for fallback
+                window.__DASH_STATE__ = window.__DASH_STATE__ || {};
+                window.__DASH_STATE__.teamTickers = fallbackTickers;
+                window.__DASH_STATE__.watchlistTickers = fallbackTickers;
+                window.dispatchEvent(new CustomEvent('tickers:updated', { 
+                    detail: { team: fallbackTickers, watchlist: fallbackTickers }
+                }));
                 console.log('⚠️ Utilisation des tickers de fallback');
             }
         };
@@ -13655,7 +13669,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         setSupabaseClient(client);
                         // Expose globally for other scripts (realtime-sync, roles-permissions)
                         window.__SUPABASE__ = client;
-                        console.log('✅ Client Supabase initialisé et exposé globalement');
+                        // Dispatch event for scripts waiting for Supabase
+                        window.dispatchEvent(new CustomEvent('supabase:ready', { detail: { client } }));
+                        console.log('✅ Client Supabase initialisé et exposé globalement + event dispatched');
                     } catch (error) {
                         console.error('❌ Erreur initialisation Supabase:', error);
                         console.warn('⚠️ Utilisation des sections par défaut');
