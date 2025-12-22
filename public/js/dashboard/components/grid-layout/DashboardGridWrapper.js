@@ -254,9 +254,18 @@ const DashboardGridWrapper = ({
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     // Vérifier que le layout contient des widgets valides
-                    const validLayout = parsed.filter(item => TAB_TO_WIDGET_MAP[item.i]);
+                    let validLayout = parsed.filter(item => TAB_TO_WIDGET_MAP[item.i]);
+                    
+                    // DEDUPLICATION STRICTE
+                    const seen = new Set();
+                    validLayout = validLayout.filter(item => {
+                        if (seen.has(item.i)) return false;
+                        seen.add(item.i);
+                        return true;
+                    });
+
                     if (validLayout.length > 0) {
-                        console.log(`✅ Layout chargé depuis localStorage: ${validLayout.length} widgets`);
+                        console.log(`✅ Layout chargé depuis localStorage: ${validLayout.length} widgets (après déduplication)`);
                         return validLayout;
                     } else {
                         console.warn('⚠️ Layout sauvegardé invalide, utilisation du layout par défaut');
@@ -276,14 +285,29 @@ const DashboardGridWrapper = ({
             return defaultLayout;
         });
 
-        // S'assurer que le layout n'est jamais vide
+        // S'assurer que le layout n'est jamais vide et sans doublons
         useEffect(() => {
             if (!layout || layout.length === 0) {
                 console.warn('⚠️ Layout vide détecté, recréation du layout par défaut');
                 const defaultLayout = getDefaultLayout();
                 setLayout(defaultLayout);
+            } else {
+                // Vérification post-render des doublons
+                const seen = new Set();
+                const uniqueLayout = layout.filter(item => {
+                    if (seen.has(item.i)) return false;
+                    seen.add(item.i);
+                    return true;
+                });
+                
+                if (uniqueLayout.length !== layout.length) {
+                    console.warn(`⚠️ Doublons détectés et supprimés (${layout.length} -> ${uniqueLayout.length})`);
+                    setLayout(uniqueLayout);
+                    // Update storage immediately
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(uniqueLayout));
+                }
             }
-        }, []);
+        }, [layout]);
 
         const [isEditing, setIsEditing] = useState(false);
         const [currentBreakpoint, setCurrentBreakpoint] = useState('lg');
