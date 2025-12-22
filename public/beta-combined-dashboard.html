@@ -198,6 +198,31 @@
             window.extractMoveReason = window.extractMoveReason || function(ticker, change) {
                 return "Analyse en cours...";
             };
+            
+            // Early LucideIcon/IconoirIcon polyfill - MUST be before component scripts
+            window.IconoirIcon = function(props) {
+                var name = props.name || 'Activity';
+                var className = props.className || 'w-4 h-4';
+                var iconMap = {
+                    'Activity': 'activity', 'Wifi': 'wifi', 'RefreshCw': 'refresh-double',
+                    'ChevronDown': 'nav-arrow-down', 'Bell': 'bell', 'Search': 'search',
+                    'Settings': 'settings', 'X': 'xmark', 'Plus': 'plus', 'Minus': 'minus',
+                    'PieChart': 'pie-chart', 'BarChart3': 'stat-up', 'TrendingUp': 'trending-up',
+                    'TrendingDown': 'trending-down', 'Calendar': 'calendar', 'Star': 'star',
+                    'Layout': 'view-grid', 'Grid3x3': 'view-grid', 'Newspaper': 'newspaper',
+                    'Target': 'target', 'Fire': 'sparks', 'ArrowUpRight': 'arrow-tr',
+                    'Database': 'database', 'Mail': 'mail', 'Monitor': 'pc-monitor'
+                };
+                var iconClass = iconMap[name] || 'activity';
+                if (typeof React === 'undefined') {
+                    return null;
+                }
+                return React.createElement('i', { 
+                    className: 'iconoir-' + iconClass + ' ' + className, 
+                    style: { fontSize: 'inherit' } 
+                });
+            };
+            window.LucideIcon = window.IconoirIcon;
 
             if (typeof window.exports === 'undefined') {
                 window.exports = {};
