@@ -3593,22 +3593,19 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         
         // 🎯 SCROLL-HIDE: Auto-hide navigation during scroll for better reading experience
         const [isNavHidden, setIsNavHidden] = useState(false);
-        const lastScrollY = useRef(0);
         const scrollTimeout = useRef(null);
         
         useEffect(() => {
-            const handleScroll = () => {
-                const currentScrollY = window.scrollY;
-                const scrollDelta = currentScrollY - lastScrollY.current;
+            // Use wheel event which works for internal scroll containers too
+            const handleWheel = (e) => {
+                const deltaY = e.deltaY;
                 
-                // Hide on scroll down (more than 10px), show on scroll up
-                if (scrollDelta > 10 && currentScrollY > 100) {
+                // Hide on scroll down, show on scroll up
+                if (deltaY > 20) {
                     setIsNavHidden(true);
-                } else if (scrollDelta < -5) {
+                } else if (deltaY < -20) {
                     setIsNavHidden(false);
                 }
-                
-                lastScrollY.current = currentScrollY;
                 
                 // Auto-show after 2 seconds of no scrolling
                 if (scrollTimeout.current) {
@@ -3619,9 +3616,10 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 }, 2000);
             };
             
-            window.addEventListener('scroll', handleScroll, { passive: true });
+            // Listen on document to catch all wheel events
+            document.addEventListener('wheel', handleWheel, { passive: true });
             return () => {
-                window.removeEventListener('scroll', handleScroll);
+                document.removeEventListener('wheel', handleWheel);
                 if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
             };
         }, []);
@@ -27305,7 +27303,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         activeTab={activeSubTab}
                                         onTabChange={handleNewTabChange}
                                         isDarkMode={isDarkMode}
-                                        position="left" 
+                                        position="right" 
                                     />
                                 )}
                             </>
