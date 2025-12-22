@@ -2212,7 +2212,6 @@ export default function App() {
     };
 
     const handleSelectTicker = async (symbol: string) => {
-        console.log(`🔍 handleSelectTicker appelé avec: ${symbol}`);
         const upperSymbol = symbol.toUpperCase();
         if (library[upperSymbol]) {
             // Load existing profile data
@@ -2224,10 +2223,8 @@ export default function App() {
             const hasNoPrice = !existingProfile.assumptions?.currentPrice || existingProfile.assumptions.currentPrice === 0;
             const hasCorruptedDataValue = hasCorruptedData(existingProfile.data || []);
             
-            console.log(`🔍 ${upperSymbol} conditions: isSkeleton=${isSkeleton}, hasNoData=${hasNoData}, hasNoPrice=${hasNoPrice}, hasCorruptedData=${hasCorruptedDataValue}, currentPrice=${existingProfile.assumptions?.currentPrice}`);
             
             if (isSkeleton || hasNoData || hasNoPrice || hasCorruptedDataValue) {
-                console.log(`🔍 ${upperSymbol}: Entering IF block (needs reload)`);
                 if (hasCorruptedDataValue) {
                     console.warn(`⚠️ ${upperSymbol}: Données corrompues détectées (toutes les valeurs à 0) - Re-synchronisation forcée...`);
                     showNotification(`⚠️ ${upperSymbol}: Données corrompues détectées. Re-synchronisation en cours...`, 'warning');

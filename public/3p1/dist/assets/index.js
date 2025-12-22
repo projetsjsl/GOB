@@ -57678,8 +57678,7 @@ Vérifiez les logs de la console pour plus de détails.`;
     return allZero;
   };
   const handleSelectTicker = async (symbol) => {
-    var _a4, _b3, _c, _d, _e, _f, _g, _h;
-    console.log(`🔍 handleSelectTicker appelé avec: ${symbol}`);
+    var _a4, _b3, _c, _d, _e, _f, _g;
     const upperSymbol = symbol.toUpperCase();
     if (library[upperSymbol]) {
       const existingProfile = library[upperSymbol];
@@ -57687,9 +57686,7 @@ Vérifiez les logs de la console pour plus de détails.`;
       const hasNoData = !existingProfile.data || existingProfile.data.length === 0;
       const hasNoPrice = !((_a4 = existingProfile.assumptions) == null ? void 0 : _a4.currentPrice) || existingProfile.assumptions.currentPrice === 0;
       const hasCorruptedDataValue = hasCorruptedData(existingProfile.data || []);
-      console.log(`🔍 ${upperSymbol} conditions: isSkeleton=${isSkeleton}, hasNoData=${hasNoData}, hasNoPrice=${hasNoPrice}, hasCorruptedData=${hasCorruptedDataValue}, currentPrice=${(_b3 = existingProfile.assumptions) == null ? void 0 : _b3.currentPrice}`);
       if (isSkeleton || hasNoData || hasNoPrice || hasCorruptedDataValue) {
-        console.log(`🔍 ${upperSymbol}: Entering IF block (needs reload)`);
         if (hasCorruptedDataValue) {
           console.warn(`⚠️ ${upperSymbol}: Données corrompues détectées (toutes les valeurs à 0) - Re-synchronisation forcée...`);
           showNotification(`⚠️ ${upperSymbol}: Données corrompues détectées. Re-synchronisation en cours...`, "warning");
@@ -57954,9 +57951,9 @@ Vérifiez les logs de la console pour plus de détails.`;
           ...(existingProfile == null ? void 0 : existingProfile.info) || {},
           symbol,
           name: result.info.name || symbol,
-          sector: result.info.sector || ((_c = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _c.sector) || "",
-          securityRank: result.info.securityRank || ((_d = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _d.securityRank) || "N/A",
-          marketCap: result.info.marketCap || ((_e = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _e.marketCap) || "N/A",
+          sector: result.info.sector || ((_b3 = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _b3.sector) || "",
+          securityRank: result.info.securityRank || ((_c = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _c.securityRank) || "N/A",
+          marketCap: result.info.marketCap || ((_d = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _d.marketCap) || "N/A",
           ...result.info
         },
         notes: (existingProfile == null ? void 0 : existingProfile.notes) || "",
@@ -57977,9 +57974,9 @@ Vérifiez les logs de la console pour plus de détails.`;
       const completeInfo = {
         symbol,
         name: result.info.name || symbol,
-        sector: result.info.sector || ((_f = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _f.sector) || "",
-        securityRank: result.info.securityRank || ((_g = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _g.securityRank) || "N/A",
-        marketCap: result.info.marketCap || ((_h = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _h.marketCap) || "N/A",
+        sector: result.info.sector || ((_e = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _e.sector) || "",
+        securityRank: result.info.securityRank || ((_f = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _f.securityRank) || "N/A",
+        marketCap: result.info.marketCap || ((_g = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _g.marketCap) || "N/A",
         ...result.info,
         ...(existingProfile == null ? void 0 : existingProfile.info) || {}
       };
