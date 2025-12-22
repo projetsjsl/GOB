@@ -756,6 +756,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                 };
 
                 const generatePerplexityResponse = async (userMessage) => {
+                    const channelSim = 'web';
                     try {
                         void('🔍 Génération de réponse Emma Agent pour:', userMessage);
 

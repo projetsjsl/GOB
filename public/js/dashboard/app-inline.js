@@ -671,7 +671,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         'emma': [
             { id: 'emma-chat', label: 'Chat Emma', icon: 'MessageSquare', component: 'AskEmmaTab' },
             { id: 'emma-vocal', label: 'Assistant Vocal', icon: 'Mic', component: 'VoiceAssistantTab' },
-            { id: 'emma-group', label: 'Group Chat', icon: 'Users', component: 'GroupChatTab' },
+            { id: 'emma-group', label: 'Group Chat', icon: 'Users', component: 'ChatGPTGroupTab' },
             { id: 'emma-terminal', label: 'Terminal', icon: 'Monitor', component: 'TerminalEmmaIATab' },
             { id: 'emma-live', label: 'EmmAIA Live', icon: 'Radio', component: 'EmmAIATab' },
             { id: 'emma-finvox', label: 'FinVox', icon: 'Headphones', component: 'FinVoxTab' }
@@ -680,6 +680,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             { id: 'tests-rgl', label: 'Layout RGL', icon: 'LayoutDashboard', component: 'RglDashboard' },
             { id: 'tests-canvas', label: 'Modulaire (Bêta)', icon: 'Move', component: 'redirect:modular-dashboard-beta.html' },
             { id: 'tests-calendar', label: 'Calendrier', icon: 'Calendar', component: 'InvestingCalendarTab' },
+            { id: 'tests-roboweb', label: 'RobotWeb', icon: 'Bot', component: 'GroupChatTab' },
             { id: 'tests-sandbox', label: 'Sandbox', icon: 'Box', component: 'TestSandboxTab' },
             { id: 'tests-debug', label: 'Debug', icon: 'Bug', component: 'DebugTab' }
         ]
@@ -27708,13 +27709,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         activeTab={activeTab}
                     />}
                     {activeTab === 'emma-vocal' && <VoiceAssistantTab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
-                    {activeTab === 'emma-group' && window.GroupChatTab && React.createElement(window.GroupChatTab, { isDarkMode: isDarkMode, dashboardTab: activeTab, onDashboardTabChange: setActiveTab })}
+                    {activeTab === 'emma-group' && window.ChatGPTGroupTab && React.createElement(window.ChatGPTGroupTab, { isDarkMode: isDarkMode, dashboardTab: activeTab, onDashboardTabChange: setActiveTab })}
                     {activeTab === 'emma-terminal' && <TerminalEmmaIATab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
                     {activeTab === 'emma-live' && <EmmAIATab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
                     {activeTab === 'emma-finvox' && <FinVoxTab isDarkMode={isDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />}
 
                     {/* TESTS Sub-tabs */}
                     {activeTab === 'tests-calendar' && <InvestingCalendarTab key={`tests-calendar-${tabMountKeys['investing-calendar'] || 0}`} />}
+                    {activeTab === 'tests-roboweb' && window.GroupChatTab && React.createElement(window.GroupChatTab, { isDarkMode: isDarkMode, dashboardTab: activeTab, onDashboardTabChange: setActiveTab })}
                     {activeTab === 'tests-sandbox' && <InvestingCalendarTabInternal />}
                     {activeTab === 'tests-debug' && (
                         <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-neutral-900 text-white' : 'bg-white text-gray-900'}`}>

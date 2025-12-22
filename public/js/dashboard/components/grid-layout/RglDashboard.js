@@ -345,7 +345,9 @@
                 <div className="p-4">
                     <ResponsiveGridLayout className="layout" layouts={layouts} breakpoints={BREAKPOINTS} cols={COLS} rowHeight={ROW_HEIGHT}
                         onLayoutChange={handleLayoutChange} onBreakpointChange={setCurrentBreakpoint}
-                        isDraggable={isEditing} isResizable={isEditing} compactType="vertical" margin={[16, 16]}>
+                        isDraggable={isEditing} isResizable={isEditing} compactType="vertical" margin={[16, 16]}
+                        resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
+                    >
                         {layouts.lg.map(item => (
                             <div key={item.i} className={isEditing ? 'cursor-move ring-2 ring-emerald-500/50' : ''}>
                                 <WidgetRenderer widgetId={item.i} isDarkMode={isDarkMode}/>
