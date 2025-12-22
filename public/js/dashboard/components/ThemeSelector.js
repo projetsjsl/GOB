@@ -286,8 +286,8 @@ const ThemeSelector = () => {
                 <i className="iconoir-nav-arrow-down text-xs" style={{ color: 'var(--theme-primary, #3b82f6)' }}></i>
             </button>
 
-            {/* Fenêtre Popup - Style similaire au panneau "Modifier ressources" */}
-            {isOpen && (
+            {/* Fenêtre Popup - Portail vers body pour éviter les problèmes de z-index/transform */}
+            {isOpen && ReactDOM.createPortal(
                 <div style={{ position: 'fixed', inset: 0, zIndex: 10000, pointerEvents: 'none' }}>
                     {/* Overlay semi-transparent pour fermer en cliquant à l'extérieur */}
                     <div 
@@ -387,7 +387,8 @@ const ThemeSelector = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );

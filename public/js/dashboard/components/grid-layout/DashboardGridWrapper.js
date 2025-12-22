@@ -721,7 +721,7 @@ const DashboardGridWrapper = ({
         return (
             <div className={`min-h-screen ${isDarkMode ? 'bg-black' : 'bg-white'}`}>
                 {/* Barre de contrôle */}
-                <div className={`sticky top-0 z-50 flex items-center justify-between p-4 border-b ${isDarkMode ? 'bg-neutral-900 border-neutral-700' : 'bg-white border-gray-200'}`}>
+                <div className={`sticky top-0 z-40 flex items-center justify-between p-4 border-b ${isDarkMode ? 'bg-neutral-900 border-neutral-700' : 'bg-white border-gray-200'}`}>
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
                             <div className={`w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shadow-lg`}>
