@@ -2222,9 +2222,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </div>
                             </div>
                         )}
-                    </div>
-                );
-                        </div>
 
                         {/* Éditeur de prompt */}
                         {showPromptEditor && (
@@ -2650,5 +2647,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             });
 
             // Composant onglet Stocks & News
+
 
 window.AskEmmaTab = AskEmmaTab;
