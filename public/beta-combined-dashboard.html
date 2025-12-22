@@ -540,6 +540,219 @@
             console.log('ℹ️ Note: Les avertissements Tailwind/Babel sont normaux pour ce fichier standalone');
             console.log('ℹ️ Ce fichier utilise intentionnellement des CDN pour la portabilité');
         });
+
+        // ============================================
+        // 🔍 FREEZE DIAGNOSTICS & FAILSAFE SYSTEM
+        // ============================================
+        (function() {
+            'use strict';
+            
+            // Store last known freeze state
+            window._freezeDiagnostics = {
+                lastClickTime: Date.now(),
+                clickCount: 0,
+                blockerHistory: [],
+                isMonitoring: false
+            };
+
+            // 🔍 DIAGNOSTIC: Identify what element is blocking clicks
+            window.diagnoseFreeze = function() {
+                console.log('🔍 DIAGNOSE FREEZE - Running...');
+                console.log('==================================================');
+                
+                // 1) What element is at center of screen?
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                const topElement = document.elementFromPoint(centerX, centerY);
+                
+                console.log('📍 TOP ELEMENT at center:', topElement);
+                if (topElement) {
+                    console.log('   id:', topElement.id || '(none)');
+                    console.log('   class:', topElement.className || '(none)');
+                    console.log('   tagName:', topElement.tagName);
+                    topElement.style.outline = '4px solid red';
+                    console.log('   ✅ Outlined in RED');
+                }
+                
+                // 2) Check pointer-events on body, html, root
+                const bodyPE = getComputedStyle(document.body).pointerEvents;
+                const htmlPE = getComputedStyle(document.documentElement).pointerEvents;
+                const root = document.querySelector('#root');
+                const rootPE = root ? getComputedStyle(root).pointerEvents : 'N/A';
+                
+                console.log('\n🖱️ POINTER-EVENTS:');
+                console.log('   body:', bodyPE, bodyPE === 'none' ? '❌ BLOCKED!' : '✅');
+                console.log('   html:', htmlPE, htmlPE === 'none' ? '❌ BLOCKED!' : '✅');
+                console.log('   #root:', rootPE, rootPE === 'none' ? '❌ BLOCKED!' : '✅');
+                
+                // 3) Find all fixed/absolute overlays with high z-index
+                const allElements = document.querySelectorAll('div, section, aside, dialog, [role="dialog"]');
+                const blockers = [];
+                
+                allElements.forEach(el => {
+                    const style = getComputedStyle(el);
+                    const pos = style.position;
+                    const zIndex = parseInt(style.zIndex || '0', 10);
+                    const display = style.display;
+                    const visibility = style.visibility;
+                    const opacity = parseFloat(style.opacity);
+                    
+                    // Check if it's a potential blocker
+                    if ((pos === 'fixed' || pos === 'absolute') && 
+                        zIndex >= 40 && 
+                        display !== 'none' && 
+                        visibility !== 'hidden') {
+                        
+                        const rect = el.getBoundingClientRect();
+                        const coversCenter = rect.left <= centerX && rect.right >= centerX && 
+                                           rect.top <= centerY && rect.bottom >= centerY;
+                        
+                        if (coversCenter || (rect.width > window.innerWidth * 0.5 && rect.height > window.innerHeight * 0.5)) {
+                            blockers.push({
+                                element: el,
+                                id: el.id || '(none)',
+                                className: el.className?.toString()?.slice(0, 80) || '(none)',
+                                zIndex: zIndex,
+                                position: pos,
+                                opacity: opacity,
+                                pointerEvents: style.pointerEvents,
+                                size: `${Math.round(rect.width)}x${Math.round(rect.height)}`
+                            });
+                        }
+                    }
+                });
+                
+                console.log('\n🚧 POTENTIAL BLOCKERS (z-index >= 40, covers center):');
+                if (blockers.length === 0) {
+                    console.log('   ✅ None found');
+                } else {
+                    blockers.sort((a, b) => b.zIndex - a.zIndex);
+                    blockers.slice(0, 10).forEach((b, i) => {
+                        console.log(`   ${i+1}. z:${b.zIndex} | ${b.position} | PE:${b.pointerEvents} | ${b.size}`);
+                        console.log(`      id="${b.id}" class="${b.className}"`);
+                        b.element.style.outline = '2px dashed orange';
+                    });
+                }
+                
+                // 4) Check for loading overlays specifically
+                const loadingSelectors = [
+                    '#loadingOverlay', '.loading-overlay', '.loading-screen',
+                    '[class*="loading"]', '[class*="spinner"]', '[class*="overlay"]',
+                    '.modal-backdrop', '.click-shield', '[class*="backdrop"]'
+                ];
+                
+                console.log('\n⏳ LOADING/MODAL OVERLAYS:');
+                let foundLoading = false;
+                loadingSelectors.forEach(sel => {
+                    const els = document.querySelectorAll(sel);
+                    els.forEach(el => {
+                        const style = getComputedStyle(el);
+                        if (style.display !== 'none' && style.visibility !== 'hidden' && parseFloat(style.opacity) > 0) {
+                            console.log(`   ⚠️ VISIBLE: ${sel}`, el);
+                            foundLoading = true;
+                        }
+                    });
+                });
+                if (!foundLoading) console.log('   ✅ None visible');
+                
+                // 5) Check ReactGridLayout drag layer
+                const rglDragLayer = document.querySelector('.react-grid-layout');
+                if (rglDragLayer) {
+                    const rglStyle = getComputedStyle(rglDragLayer);
+                    console.log('\n📐 REACT GRID LAYOUT:');
+                    console.log('   pointerEvents:', rglStyle.pointerEvents);
+                    console.log('   zIndex:', rglStyle.zIndex);
+                    
+                    const placeholders = document.querySelectorAll('.react-grid-placeholder, .react-draggable-dragging');
+                    if (placeholders.length > 0) {
+                        console.log('   ⚠️ Active drag/placeholder elements:', placeholders.length);
+                    }
+                }
+                
+                console.log('\n==================================================');
+                console.log('💡 TO FIX: Run window.forceUnfreeze() to restore pointer-events');
+                
+                return { topElement, bodyPE, htmlPE, rootPE, blockers };
+            };
+
+            // 🔧 FORCE UNFREEZE: Restore pointer-events and remove stuck overlays
+            window.forceUnfreeze = function() {
+                console.log('🔧 FORCE UNFREEZE - Restoring UI...');
+                
+                // Restore pointer-events
+                document.body.style.pointerEvents = 'auto';
+                document.documentElement.style.pointerEvents = 'auto';
+                const root = document.querySelector('#root');
+                if (root) root.style.pointerEvents = 'auto';
+                
+                // Remove/hide common blockers
+                const blockerSelectors = [
+                    '.loading-overlay', '.loading-screen', '#loadingOverlay',
+                    '.modal-backdrop', '.click-shield', '[class*="backdrop"]:not(.header-backdrop)'
+                ];
+                
+                blockerSelectors.forEach(sel => {
+                    document.querySelectorAll(sel).forEach(el => {
+                        const style = getComputedStyle(el);
+                        if (style.display !== 'none' && style.position === 'fixed') {
+                            console.log('   Hiding blocker:', sel, el);
+                            el.style.display = 'none';
+                            el.style.pointerEvents = 'none';
+                        }
+                    });
+                });
+                
+                // Remove any stuck drag states from RGL
+                document.querySelectorAll('.react-draggable-dragging').forEach(el => {
+                    el.classList.remove('react-draggable-dragging');
+                });
+                
+                console.log('✅ UI should be responsive now');
+            };
+
+            // ⚡ AUTO-FAILSAFE: Periodically check and restore pointer-events
+            setInterval(function() {
+                const bodyPE = getComputedStyle(document.body).pointerEvents;
+                const htmlPE = getComputedStyle(document.documentElement).pointerEvents;
+                
+                if (bodyPE === 'none' || htmlPE === 'none') {
+                    console.warn('[Failsafe] ⚠️ pointer-events blocked, restoring...');
+                    document.body.style.pointerEvents = 'auto';
+                    document.documentElement.style.pointerEvents = 'auto';
+                    const root = document.querySelector('#root');
+                    if (root) root.style.pointerEvents = 'auto';
+                }
+            }, 2000);
+
+            // 📊 CLICK MONITOR: Log clicks to detect if they're being captured
+            document.addEventListener('click', function(e) {
+                window._freezeDiagnostics.lastClickTime = Date.now();
+                window._freezeDiagnostics.clickCount++;
+                
+                if (window._freezeDiagnostics.isMonitoring) {
+                    console.log('[CLICK]', {
+                        target: e.target,
+                        id: e.target.id,
+                        class: e.target.className,
+                        defaultPrevented: e.defaultPrevented,
+                        propagationStopped: e._propagationStopped || false
+                    });
+                }
+            }, true); // capture phase
+
+            // 🎯 START CLICK MONITORING
+            window.startClickMonitor = function() {
+                window._freezeDiagnostics.isMonitoring = true;
+                console.log('👁️ Click monitoring ENABLED - all clicks will be logged');
+            };
+
+            window.stopClickMonitor = function() {
+                window._freezeDiagnostics.isMonitoring = false;
+                console.log('👁️ Click monitoring DISABLED');
+            };
+
+            console.log('✅ Freeze Diagnostics loaded. Commands: diagnoseFreeze(), forceUnfreeze(), startClickMonitor()');
+        })();
     </script>
 
     <!-- Emma Configuration - Centralized prompts and settings -->
