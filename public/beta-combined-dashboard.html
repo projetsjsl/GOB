@@ -102,6 +102,23 @@
         // Polyfill for CommonJS to prevent Babel and UMD errors
         // MUST run before React Grid Layout and any Babel transpilation
         (function() {
+            // GLOBAL FALLBACKS & COMPONENTS to prevent ReferenceErrors in components
+            window.showSlashSuggestions = false;
+            window.setShowSlashSuggestions = function() {};
+            window.Icon = function(props) {
+                var emoji = props.emoji || '';
+                var size = props.size || 20;
+                var className = props.className || '';
+                if (typeof React === 'undefined') return emoji;
+                return React.createElement('span', { 
+                    className: 'inline-block ' + className, 
+                    style: { fontSize: size + 'px' } 
+                }, emoji);
+            };
+            window.extractMoveReason = window.extractMoveReason || function(ticker, change) {
+                return "Analyse en cours...";
+            };
+
             if (typeof window.exports === 'undefined') {
                 window.exports = {};
             }
@@ -119,18 +136,7 @@
 
                     console.warn('require() called for unknown module:', moduleName);
 
-            // GLOBAL FALLBACKS & COMPONENTS to prevent ReferenceErrors in Babel components
-            window.showSlashSuggestions = false;
-            window.setShowSlashSuggestions = function() {};
-            window.Icon = function(props) {
-                var emoji = props.emoji || '';
-                var size = props.size || 20;
-                var className = props.className || '';
-                return React.createElement('span', { 
-                    className: 'inline-block ' + className, 
-                    style: { fontSize: size + 'px' } 
-                }, emoji);
-            };
+
 
                     return {};
                 };
