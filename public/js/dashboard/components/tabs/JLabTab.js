@@ -48,6 +48,15 @@ const JLabTab = () => {
     const [showPeerComparison, setShowPeerComparison] = useState(false);
     const [showScenarioAnalysis, setShowScenarioAnalysis] = useState(false);
     const [showAdvancedScreener, setShowAdvancedScreener] = useState(false);
+    
+    // Screener filters with defaults
+    const [screenerFilters, setScreenerFilters] = useState({
+        minMarketCap: 0,
+        maxPE: 50,
+        minROE: 0,
+        maxDebtEquity: 2,
+        sector: 'all'
+    });
 
     // 🎯 Configuration du Score JSLAI™ (pondérations)
     const [jslaiConfig, setJslaiConfig] = useState(() => {
