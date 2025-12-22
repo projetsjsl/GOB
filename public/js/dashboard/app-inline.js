@@ -678,7 +678,6 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         ],
         'tests': [
             { id: 'tests-rgl', label: 'Layout RGL', icon: 'LayoutDashboard', component: 'RglDashboard' },
-            { id: 'tests-canvas', label: 'Modulaire (Bêta)', icon: 'Move', component: 'redirect:modular-dashboard-beta.html' },
             { id: 'tests-calendar', label: 'Calendrier', icon: 'Calendar', component: 'InvestingCalendarTab' },
             { id: 'tests-roboweb', label: 'RobotWeb', icon: 'Bot', component: 'GroupChatTab' },
             { id: 'tests-sandbox', label: 'Sandbox', icon: 'Box', component: 'TestSandboxTab' },
