@@ -4513,7 +4513,7 @@ export default function App() {
                     <Sidebar
                         profiles={Object.values(library).filter(p => p.id !== DEFAULT_PROFILE.id)}
                         currentId={activeId}
-                        onSelect={setActiveId}
+                        onSelect={handleSelectTicker}
                         onAdd={handleAddTicker}
                         onDelete={handleDeleteTicker}
                         onDuplicate={handleDuplicateTicker}
@@ -4637,7 +4637,7 @@ export default function App() {
                                     <KPIDashboard
                                         profiles={Object.values(library)}
                                         currentId={activeId}
-                                        onSelect={setActiveId}
+                                        onSelect={handleSelectTicker}
                                         onBulkSync={handleBulkSyncAllTickers}
                                         onSyncNA={handleSyncSpecificTickers}
                                         isBulkSyncing={isBulkSyncing}

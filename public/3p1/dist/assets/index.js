@@ -59464,7 +59464,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
           {
             profiles: Object.values(library).filter((p) => p.id !== DEFAULT_PROFILE.id),
             currentId: activeId,
-            onSelect: setActiveId,
+            onSelect: handleSelectTicker,
             onAdd: handleAddTicker,
             onDelete: handleDeleteTicker,
             onDuplicate: handleDuplicateTicker,
@@ -59578,7 +59578,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
           {
             profiles: Object.values(library),
             currentId: activeId,
-            onSelect: setActiveId,
+            onSelect: handleSelectTicker,
             onBulkSync: handleBulkSyncAllTickers,
             onSyncNA: handleSyncSpecificTickers,
             isBulkSyncing,
