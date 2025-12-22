@@ -38082,8 +38082,10 @@ const TickerSearch = ({ onSelect, onClose }) => {
         const data = await response.json();
         if (Array.isArray(data)) {
           setResults(data);
+        } else if (data && Array.isArray(data.results)) {
+          setResults(data.results);
         } else {
-          console.warn("Search API returned non-array:", data);
+          console.warn("Search API returned unexpected format:", data);
           setResults([]);
         }
         setSelectedIndex(0);
@@ -59211,11 +59213,15 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
       bv: Math.max((baseYearData2 == null ? void 0 : baseYearData2.bookValuePerShare) || 0, 0),
       div: Math.max(assumptions.currentDividend || 0, 0)
     };
+    const safeGrowthEPS = assumptions.growthRateEPS !== void 0 && assumptions.growthRateEPS !== 0 ? assumptions.growthRateEPS : calculateHistoricalGrowth(data, "earningsPerShare", 5);
+    const safeGrowthCF = assumptions.growthRateCF !== void 0 && assumptions.growthRateCF !== 0 ? assumptions.growthRateCF : calculateHistoricalGrowth(data, "cashFlowPerShare", 5);
+    const safeGrowthBV = assumptions.growthRateBV !== void 0 && assumptions.growthRateBV !== 0 ? assumptions.growthRateBV : calculateHistoricalGrowth(data, "bookValuePerShare", 5);
+    const safeGrowthDiv = assumptions.growthRateDiv !== void 0 && assumptions.growthRateDiv !== 0 ? assumptions.growthRateDiv : calculateHistoricalGrowth(data, "dividendPerShare", 5);
     const futureValues = {
-      eps: projectFutureValue(baseValues.eps, assumptions.growthRateEPS || 0, 5),
-      cf: projectFutureValue(baseValues.cf, assumptions.growthRateCF || 0, 5),
-      bv: projectFutureValue(baseValues.bv, assumptions.growthRateBV || 0, 5),
-      div: projectFutureValue(baseValues.div, assumptions.growthRateDiv || 0, 5)
+      eps: projectFutureValue(baseValues.eps, safeGrowthEPS, 5),
+      cf: projectFutureValue(baseValues.cf, safeGrowthCF, 5),
+      bv: projectFutureValue(baseValues.bv, safeGrowthBV, 5),
+      div: projectFutureValue(baseValues.div, safeGrowthDiv, 5)
     };
     const targets = {
       eps: futureValues.eps > 0 && assumptions.targetPE > 0 ? futureValues.eps * assumptions.targetPE : null,

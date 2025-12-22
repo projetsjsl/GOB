@@ -45,10 +45,14 @@ export const TickerSearch: React.FC<TickerSearchProps> = ({ onSelect, onClose })
 
                 const data = await response.json();
 
+                // Handle both array format and object with results property
                 if (Array.isArray(data)) {
                     setResults(data);
+                } else if (data && Array.isArray(data.results)) {
+                    // API returns {query: string, results: [], count: number}
+                    setResults(data.results);
                 } else {
-                    console.warn('Search API returned non-array:', data);
+                    console.warn('Search API returned unexpected format:', data);
                     setResults([]);
                 }
                 setSelectedIndex(0);
