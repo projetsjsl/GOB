@@ -301,7 +301,7 @@ const ThemeSelector = () => {
                         ref={modalRef}
                         className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl max-h-[85vh] rounded-xl shadow-2xl flex flex-col overflow-hidden"
                         style={{
-                            background: themeId === 'ia' || themeId === 'lightglass' 
+                            background: currentTheme === 'ia' || currentTheme === 'lightglass' 
                                 ? 'var(--theme-surface-dark, #111827)' // Use darker opacity for glass themes
                                 : 'var(--theme-surface, #111827)',
                             border: '1px solid var(--theme-border, #374151)',
