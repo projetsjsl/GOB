@@ -47,6 +47,10 @@ export default async function handler(req, res) {
 
     // Route based on endpoint type (Updated to /stable/ endpoints - Aug 2025)
     switch (endpoint) {
+      case 'intraday':
+        const interval = req.query.interval || '5min';
+        fmpUrl = `${v3Base}/historical-chart/${interval}/${symbolParam || 'AAPL'}?apikey=${apiKey}`;
+        break;
       case 'news':
         // General market news (latest)
         const limitParam = limit || 50;
@@ -157,6 +161,7 @@ export default async function handler(req, res) {
         fmpUrl = `${v3Base}/stock-screener?${screenerParams.toString()}`;
         break;
 
+      case 'earnings':
       case 'earnings-calendar':
         // Upcoming and past earnings announcements
         // Optional: from/to date range, or specific symbol

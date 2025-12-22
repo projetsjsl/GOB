@@ -103,6 +103,9 @@
         // MUST run before React Grid Layout and any Babel transpilation
         (function() {
             // GLOBAL FALLBACKS & COMPONENTS to prevent ReferenceErrors in components
+            
+            window.ENVIRONMENT = "production";
+            window.NODE_ENV = "production";
             window.showSlashSuggestions = false;
             window.setShowSlashSuggestions = function() {};
             window.Icon = function(props) {
@@ -133,6 +136,11 @@
                     if (moduleName === 'react') return window.React;
                     if (moduleName === 'react-dom') return window.ReactDOM;
                     if (moduleName === 'prop-types') return window.PropTypes || {};
+                    if (moduleName === "@emotion/is-prop-valid") {
+                        const fn = (p) => true;
+                        fn.default = fn;
+                        return fn;
+                    }
 
                     console.warn('require() called for unknown module:', moduleName);
 
