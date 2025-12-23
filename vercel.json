@@ -156,12 +156,12 @@
     {
       "source": "/",
       "has": [{ "type": "host", "value": "jlab.jslai.app" }],
-      "destination": "/jlab-dashboard.html"
+      "destination": "/jlab-settings.html"
     },
     {
-      "source": "/settings",
+      "source": "/dashboard",
       "has": [{ "type": "host", "value": "jlab.jslai.app" }],
-      "destination": "/jlab-settings.html"
+      "destination": "/jlab-dashboard.html"
     },
     {
       "source": "/hub",
