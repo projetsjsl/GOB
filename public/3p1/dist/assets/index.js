@@ -34696,7 +34696,7 @@ const ValuationCharts = ({
     ] })
   ] });
 };
-const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, isAdmin = false, onToggleAdmin }) => {
+const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, onOpenDataExplorer, isAdmin = false, onToggleAdmin }) => {
   React.useEffect(() => {
     console.log(`📋 Sidebar: ${profiles.length} profil(s) reçu(s)`, profiles.map((p) => p.id).slice(0, 10));
   }, [profiles.length]);
@@ -34951,6 +34951,18 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$9, { className: "w-4 h-4" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Admin Warehouse" })
+          ]
+        }
+      ),
+      isAdmin && onOpenDataExplorer && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "button",
+        {
+          onClick: onOpenDataExplorer,
+          className: "w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-200 hover:text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors mt-2 border border-emerald-700",
+          title: "Data Explorer - Supabase Tables\\n\\n• Visualiser toutes les tables 3P1\\n• Voir les dernières mises à jour\\n• Exporter en Excel/CSV\\n• Synchronisation sélective",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-4 h-4" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Data Explorer" })
           ]
         }
       )
@@ -56017,6 +56029,7 @@ function useRealtimeSync(tableName, onDataChange, options) {
 }
 const KPIDashboard = React.lazy(() => __vitePreload(() => import("./KPIDashboard.js"), true ? [] : void 0, import.meta.url).then((m) => ({ default: m.KPIDashboard })));
 const AdminDashboard = React.lazy(() => __vitePreload(() => import("./AdminDashboard.js"), true ? [] : void 0, import.meta.url).then((m) => ({ default: m.AdminDashboard })));
+const DataExplorerPanel = React.lazy(() => __vitePreload(() => import("./DataExplorerPanel.js"), true ? [] : void 0, import.meta.url));
 const LoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-64 bg-gray-900", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-3", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500" }),
   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400 text-sm", children: "Chargement..." })
@@ -56090,7 +56103,7 @@ const ProgressBar = ({ current, total }) => {
   ) });
 };
 function App() {
-  var _a3, _b2;
+  var _a3, _b2, _c;
   reactExports.useEffect(() => {
     console.log("🚀 3p1 App v2.1.0 - Filtres/Tri & Rapports Visuels activés");
     console.log("✅ Modifications disponibles:");
@@ -56121,6 +56134,7 @@ function App() {
     }, 5e3);
   };
   const [showAdmin, setShowAdmin] = reactExports.useState(false);
+  const [showDataExplorer, setShowDataExplorer] = reactExports.useState(false);
   const [isRepairing, setIsRepairing] = reactExports.useState(null);
   const [guardrailConfig, setGuardrailConfig] = reactExports.useState(() => loadConfig());
   const [isSettingsOpen, setIsSettingsOpen] = reactExports.useState(false);
@@ -56144,14 +56158,14 @@ function App() {
   const realtimeTimeoutRef = reactExports.useRef(null);
   const loadTickersFromSupabaseRef = reactExports.useRef(null);
   useRealtimeSync("tickers", (payload) => {
-    var _a4, _b3, _c, _d, _e;
+    var _a4, _b3, _c2, _d, _e;
     console.log("📡 [3p1] Realtime ticker change:", payload.eventType, ((_a4 = payload.new) == null ? void 0 : _a4.ticker) || ((_b3 = payload.old) == null ? void 0 : _b3.ticker));
     if (realtimeTimeoutRef.current) {
       clearTimeout(realtimeTimeoutRef.current);
       realtimeTimeoutRef.current = null;
     }
     if (payload.eventType === "INSERT" && payload.new) {
-      const symbol = (_c = payload.new.ticker) == null ? void 0 : _c.toUpperCase();
+      const symbol = (_c2 = payload.new.ticker) == null ? void 0 : _c2.toUpperCase();
       if (symbol) {
         showNotification(`📡 Nouveau ticker ajouté par un autre utilisateur: ${symbol}`, "info");
         storage.removeItem(STORAGE_KEY).catch(console.warn);
@@ -57043,7 +57057,7 @@ Vérifiez votre connexion et réessayez.`,
     setShowAdvancedSyncDialog(true);
   };
   const performSync = async (saveCurrentVersion, syncOptions) => {
-    var _a4, _b3, _c, _d, _e, _f, _g;
+    var _a4, _b3, _c2, _d, _e, _f, _g;
     setIsLoading(true);
     try {
       if (saveCurrentVersion) {
@@ -57171,7 +57185,7 @@ Vérifiez votre connexion et réessayez.`,
           mergedDataYears: mergedData.map((d) => d.year),
           lastYearEPS: (_a4 = mergedData[mergedData.length - 1]) == null ? void 0 : _a4.earningsPerShare,
           lastYearCF: (_b3 = mergedData[mergedData.length - 1]) == null ? void 0 : _b3.cashFlowPerShare,
-          lastYearBV: (_c = mergedData[mergedData.length - 1]) == null ? void 0 : _c.bookValuePerShare,
+          lastYearBV: (_c2 = mergedData[mergedData.length - 1]) == null ? void 0 : _c2.bookValuePerShare,
           allMergedData: mergedData.map((d) => ({
             year: d.year,
             eps: d.earningsPerShare,
@@ -57679,7 +57693,7 @@ Vérifiez les logs de la console pour plus de détails.`;
     return allZero;
   };
   const handleSelectTicker = async (symbol) => {
-    var _a4, _b3, _c, _d, _e, _f, _g;
+    var _a4, _b3, _c2, _d, _e, _f, _g;
     const upperSymbol = symbol.toUpperCase();
     if (library[upperSymbol]) {
       const existingProfile = library[upperSymbol];
@@ -57953,7 +57967,7 @@ Vérifiez les logs de la console pour plus de détails.`;
           symbol,
           name: result.info.name || symbol,
           sector: result.info.sector || ((_b3 = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _b3.sector) || "",
-          securityRank: result.info.securityRank || ((_c = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _c.securityRank) || "N/A",
+          securityRank: result.info.securityRank || ((_c2 = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _c2.securityRank) || "N/A",
           marketCap: result.info.marketCap || ((_d = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _d.marketCap) || "N/A",
           ...result.info
         },
@@ -58006,8 +58020,8 @@ Vérifiez les logs de la console pour plus de détails.`;
       if (remaining.length > 0) {
         const sortedRemaining = remaining.sort(
           (a2, b) => {
-            var _a4, _b3, _c, _d;
-            return (((_b3 = (_a4 = library[a2]) == null ? void 0 : _a4.info) == null ? void 0 : _b3.preferredSymbol) || a2).localeCompare(((_d = (_c = library[b]) == null ? void 0 : _c.info) == null ? void 0 : _d.preferredSymbol) || b);
+            var _a4, _b3, _c2, _d;
+            return (((_b3 = (_a4 = library[a2]) == null ? void 0 : _a4.info) == null ? void 0 : _b3.preferredSymbol) || a2).localeCompare(((_d = (_c2 = library[b]) == null ? void 0 : _c2.info) == null ? void 0 : _d.preferredSymbol) || b);
           }
         );
         setActiveId(sortedRemaining[0]);
@@ -58087,12 +58101,12 @@ Vérifiez les logs de la console pour plus de détails.`;
   };
   const [syncReportData, setSyncReportData] = reactExports.useState(null);
   const [showSyncReport, setShowSyncReport] = reactExports.useState(false);
-  const handleBulkSyncAllTickersWithOptions = async (options) => {
+  const handleBulkSyncAllTickersWithOptions = async (options, specificTickers) => {
     setIsBulkSyncing(true);
     abortSync.current = false;
     isSyncPaused.current = false;
     setSyncPausedState(false);
-    const allTickers = Object.keys(library);
+    const allTickers = specificTickers || Object.keys(library);
     setBulkSyncProgress({ current: 0, total: allTickers.length });
     setSyncStats({ successCount: 0, errorCount: 0 });
     const startTime = Date.now();
@@ -58210,7 +58224,7 @@ Vérifiez les logs de la console pour plus de détails.`;
             const TICKER_TIMEOUT_MS = 6e4;
             return Promise.race([
               (async () => {
-                var _a4, _b3, _c;
+                var _a4, _b3, _c2;
                 let tickerResult = {
                   ticker: tickerSymbol,
                   success: false,
@@ -58371,7 +58385,7 @@ Vérifiez les logs de la console pour plus de détails.`;
                   }
                   tickerResult.dataRetrieved = {
                     years: ((_b3 = result.data) == null ? void 0 : _b3.length) || 0,
-                    dataPoints: ((_c = result.data) == null ? void 0 : _c.length) || 0,
+                    dataPoints: ((_c2 = result.data) == null ? void 0 : _c2.length) || 0,
                     hasProfile: !!result.info,
                     hasKeyMetrics: !!(result.data && result.data.length > 0),
                     hasQuotes: !!(result.currentPrice && result.currentPrice > 0),
@@ -59474,6 +59488,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
             isBulkSyncing,
             bulkSyncProgress,
             onOpenAdmin: () => setShowAdmin(true),
+            onOpenDataExplorer: () => setShowDataExplorer(true),
             isAdmin,
             onToggleAdmin: handleToggleAdmin
           }
@@ -59864,12 +59879,17 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
         isOpen: showAdvancedSyncDialog,
         ticker: isAdvancedSyncForBulk ? void 0 : activeId,
         hasManualData: hasManualEdits(data),
-        totalTickers: isAdvancedSyncForBulk ? Object.keys(library).length : 1,
-        onCancel: () => setShowAdvancedSyncDialog(false),
+        totalTickers: isAdvancedSyncForBulk ? ((_c = window._pendingSyncTickers) == null ? void 0 : _c.length) || Object.keys(library).length : 1,
+        onCancel: () => {
+          setShowAdvancedSyncDialog(false);
+          window._pendingSyncTickers = null;
+        },
         onConfirm: async (options) => {
           setShowAdvancedSyncDialog(false);
           if (isAdvancedSyncForBulk) {
-            await handleBulkSyncAllTickersWithOptions(options);
+            const pendingTickers = window._pendingSyncTickers;
+            await handleBulkSyncAllTickersWithOptions(options, pendingTickers);
+            window._pendingSyncTickers = null;
           } else {
             await performSync(options.saveBeforeSync, options);
           }
@@ -59920,6 +59940,19 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
         onClose: () => setIsReportsOpen(false)
       }
     ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(reactExports.Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx(LoadingFallback, {}), children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      DataExplorerPanel,
+      {
+        isOpen: showDataExplorer,
+        onClose: () => setShowDataExplorer(false),
+        onSyncSelected: async (tickers) => {
+          setShowDataExplorer(false);
+          setIsAdvancedSyncForBulk(true);
+          setShowAdvancedSyncDialog(true);
+          window._pendingSyncTickers = tickers;
+        }
+      }
+    ) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       SyncReportDialog,
       {
@@ -59949,7 +59982,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
               setIsBulkSyncing(true);
               try {
                 const options = { ...syncReportData.options, syncAllTickers: false };
-                await handleBulkSyncAllTickersWithOptions(options);
+                await handleBulkSyncAllTickersWithOptions(options, failedTickers);
               } finally {
                 setIsBulkSyncing(false);
               }
@@ -59991,5 +60024,9 @@ export {
   listSnapshots as p,
   ForwardRef$9 as q,
   reactExports as r,
-  ForwardRef$5 as s
+  ForwardRef$5 as s,
+  ForwardRef$O as t,
+  ForwardRef$p as u,
+  ForwardRef$v as v,
+  ForwardRef$h as w
 };
