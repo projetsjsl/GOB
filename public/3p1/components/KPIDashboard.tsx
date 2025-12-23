@@ -2045,14 +2045,18 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       <div className={`text-[10px] font-semibold mb-1 ${metric.hasInvalidData ? 'opacity-50' : ''}`}>
                         {(metric as any)._isLoading ? (
                          <div className="flex flex-col items-center">
-                           <ArrowPathIcon className="w-5 h-5 text-blue-300 animate-spin mb-1" />
-                           <span className="text-[10px]">Chargement...</span>
+                           <ArrowPathIcon className="w-5 h-5 text-white/50 animate-spin mb-1" />
+                           <span className="text-[9px] opacity-75">Sync...</span>
                          </div>
                         ) : metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`}
                       </div>
                        <div className={`text-[8px] opacity-90 ${(metric as any)._isLoading || metric.hasInvalidData || metric.jpegy === null ? 'opacity-50' : ''}`}>
-                        JPEGY: {(metric as any)._isLoading ? '...' : (metric.jpegy !== null && metric.jpegy !== undefined ? metric.jpegy.toFixed(1) : 'N/A')}
-                        {metric.jpegy === null && <span className="ml-1 text-red-400">⚠️</span>}
+                        {(metric as any)._isLoading ? (
+                          <span className="animate-pulse">Calcul...</span>
+                        ) : (
+                          <>JPEGY: {metric.jpegy !== null && metric.jpegy !== undefined ? metric.jpegy.toFixed(1) : <span className="text-white/50">N/A</span>}</>
+                        )}
+                        {!((metric as any)._isLoading) && metric.jpegy === null && <span className="ml-1 text-red-200">⚠️</span>}
                       </div>
                       {metric.hasApprovedVersion && !metric.hasInvalidData && (
                         <CheckCircleIcon className="w-4 h-4 mt-1 text-white" />
