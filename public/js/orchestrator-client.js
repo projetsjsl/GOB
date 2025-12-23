@@ -320,6 +320,54 @@
         },
 
         // =============================================================
+        // PORTFOLIO API - Portfolio management
+        // =============================================================
+
+        async createPortfolio(portfolioId, name, holdings = []) {
+            return this.agent('portfolio', 'create_portfolio', { portfolioId, name, holdings });
+        },
+
+        async getPortfolio(portfolioId = 'default') {
+            return this.agent('portfolio', 'get_portfolio', { portfolioId });
+        },
+
+        async addHolding(ticker, shares, costBasis, portfolioId = 'default') {
+            return this.agent('portfolio', 'add_holding', { portfolioId, ticker, shares, costBasis });
+        },
+
+        async analyzePortfolio(portfolioId = 'default') {
+            return this.agent('portfolio', 'analyze_portfolio', { portfolioId });
+        },
+
+        async getPortfolioDividends(portfolioId = 'default') {
+            return this.agent('portfolio', 'get_dividends', { portfolioId });
+        },
+
+        async suggestRebalance(portfolioId = 'default') {
+            return this.agent('portfolio', 'suggest_rebalance', { portfolioId });
+        },
+
+        // =============================================================
+        // ALERT API - Price alerts & notifications
+        // =============================================================
+
+        async createAlert(ticker, type, value, channels = ['email']) {
+            return this.agent('alert', 'create_alert', { ticker, type, value, channels });
+        },
+
+        async getAlerts(ticker) {
+            return this.agent('alert', 'get_alerts', { ticker });
+        },
+
+        async checkAlerts() {
+            return this.agent('alert', 'check_alerts', {});
+        },
+
+        async setAlertChannel(channel, destination) {
+            return this.agent('alert', 'set_notification_channel', { channel, destination });
+        },
+
+        // =============================================================
         // METADATA API - Get orchestrator info
         // =============================================================
 
