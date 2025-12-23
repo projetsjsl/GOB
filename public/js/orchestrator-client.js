@@ -159,6 +159,103 @@
         },
 
         // =============================================================
+        // STREAMING API - Real-time responses
+        // =============================================================
+
+        /**
+         * Stream a response word-by-word (returns EventSource)
+         * @param {string} message - The message
+         * @param {object} options - Options (persona, tickers)
+         * @param {function} onChunk - Callback for each chunk
+         * @param {function} onDone - Callback when complete
+         * @param {function} onError - Callback on error
+         */
+        askStream(message, options = {}, callbacks = {}) {
+            const { persona, tickers } = options;
+            const { onChunk, onDone, onError, onStart } = callbacks;
+            
+            const params = new URLSearchParams({ message });
+            if (persona) params.append('persona', persona);
+            if (tickers) params.append('tickers', tickers.join(','));
+            
+            const eventSource = new EventSource(`/api/orchestrator-stream?${params}`);
+            let responseText = '';
+            
+            eventSource.addEventListener('start', (e) => {
+                const data = JSON.parse(e.data);
+                if (onStart) onStart(data);
+            });
+            
+            eventSource.addEventListener('chunk', (e) => {
+                const data = JSON.parse(e.data);
+                responseText += data.text;
+                if (onChunk) onChunk(data.text, responseText);
+            });
+            
+            eventSource.addEventListener('done', (e) => {
+                const data = JSON.parse(e.data);
+                eventSource.close();
+                if (onDone) onDone({ ...data, response: responseText });
+            });
+            
+            eventSource.addEventListener('error', (e) => {
+                eventSource.close();
+                if (onError) onError(e);
+            });
+            
+            // Return control object
+            return {
+                eventSource,
+                stop: () => eventSource.close(),
+                getResponse: () => responseText
+            };
+        },
+
+        // =============================================================
+        // CONTEXT API - Session management
+        // =============================================================
+
+        async getContext(sessionId = 'default') {
+            return this.agent('context', 'get_context', { sessionId });
+        },
+
+        async addToHistory(role, content, sessionId = 'default') {
+            return this.agent('context', 'add_message', { sessionId, role, content });
+        },
+
+        async getHistory(limit = 20, sessionId = 'default') {
+            return this.agent('context', 'get_history', { sessionId, limit });
+        },
+
+        async clearHistory(sessionId = 'default') {
+            return this.agent('context', 'clear_history', { sessionId });
+        },
+
+        async setPreferences(preferences, sessionId = 'default') {
+            return this.agent('context', 'set_user_preferences', { sessionId, preferences });
+        },
+
+        // =============================================================
+        // MCP API - Model Context Protocol tools
+        // =============================================================
+
+        async listMCPTools() {
+            return this.agent('mcp', 'list_mcp_tools', {});
+        },
+
+        async callMCP(server, tool, params = {}) {
+            return this.agent('mcp', 'execute_mcp_tool', { server, tool, params });
+        },
+
+        async perplexityAsk(query) {
+            return this.agent('mcp', 'perplexity_ask', { query });
+        },
+
+        async supabaseQuery(query, projectId) {
+            return this.agent('mcp', 'supabase_query', { query, projectId });
+        },
+
+        // =============================================================
         // METADATA API - Get orchestrator info
         // =============================================================
 
