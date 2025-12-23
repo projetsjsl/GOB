@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JLAB Orchestrator Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a25;
+            --bg-hover: #252535;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b2;
+            --accent-blue: #3b82f6;
+            --accent-green: #22c55e;
+            --accent-yellow: #eab308;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --border-color: #2a2a3a;
+            --glow-blue: rgba(59, 130, 246, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .logo span {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .agent-card:hover {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 30px var(--glow-blue);
+            transform: translateY(-2px);
+        }
+
+        .agent-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .agent-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .agent-icon.core { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .agent-icon.data { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .agent-icon.action { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .agent-icon.utility { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+        .agent-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .agent-type {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .agent-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .agent-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .action-badge {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-family: monospace;
+        }
+
+        .agent-footer {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .console-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-top: 2rem;
+            overflow: hidden;
+        }
+
+        .console-header {
+            background: var(--bg-secondary);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .console-body {
+            display: flex;
+            height: 400px;
+        }
+
+        .console-input {
+            flex: 1;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .console-input textarea {
+            flex: 1;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            padding: 1rem;
+            resize: none;
+        }
+
+        .console-input textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .console-output {
+            flex: 1;
+            padding: 1rem;
+            border-left: 1px solid var(--border-color);
+            overflow: auto;
+        }
+
+        .console-output pre {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            overflow: auto;
+            height: 100%;
+            white-space: pre-wrap;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .status-dot.active { background: var(--accent-green); }
+        .status-dot.pending { background: var(--accent-yellow); }
+        .status-dot.error { background: var(--accent-red); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">🧪</div>
+            <div>
+                <h1>JLAB Orchestrator</h1>
+                <span>Multi-Agent AI System</span>
+            </div>
+        </div>
+        <div class="header-stats">
+            <div class="stat-box">
+                <div class="stat-value" id="agentCount">15</div>
+                <div class="stat-label">Agents</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="personaCount">8</div>
+                <div class="stat-label">Personas</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="requestCount">0</div>
+                <div class="stat-label">Requests</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="uptime">--</div>
+                <div class="stat-label">Uptime</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">🤖 Registered Agents</h2>
+        
+        <div class="grid" id="agentGrid">
+            <!-- Agent cards will be inserted here -->
+        </div>
+
+        <div class="console-panel">
+            <div class="console-header">
+                <h3>🖥️ Test Console</h3>
+                <div>
+                    <select id="agentSelect" class="btn btn-secondary" style="margin-right: 0.5rem;">
+                        <option value="">Select Agent...</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="executeCommand()">Execute</button>
+                </div>
+            </div>
+            <div class="console-body">
+                <div class="console-input">
+                    <textarea id="commandInput" placeholder='{"message": "Analyse AAPL"}'></textarea>
+                    <div class="quick-actions">
+                        <button class="btn btn-secondary" onclick="loadExample('chat')">💬 Chat</button>
+                        <button class="btn btn-secondary" onclick="loadExample('research')">🔬 Research</button>
+                        <button class="btn btn-secondary" onclick="loadExample('tools')">🔧 Tools</button>
+                        <button class="btn btn-secondary" onclick="loadExample('portfolio')">💼 Portfolio</button>
+                    </div>
+                </div>
+                <div class="console-output">
+                    <pre id="outputPre">// Output will appear here...</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/orchestrator-client.js"></script>
+    <script>
+        // Agent definitions
+        const agents = [
+            { id: 'modelSelector', name: 'Model Selector', icon: '🧠', type: 'core', 
+              description: 'Selects optimal AI model based on task requirements.',
+              actions: ['select_model', 'get_capabilities'] },
+            { id: 'workflow', name: 'Workflow', icon: '⚙️', type: 'core',
+              description: 'Executes multi-step workflows and automations.',
+              actions: ['execute_workflow', 'schedule', 'list_workflows'] },
+            { id: 'context', name: 'Context', icon: '💬', type: 'core',
+              description: 'Manages conversation history and preferences.',
+              actions: ['get_context', 'add_message', 'get_history'] },
+            { id: 'analytics', name: 'Analytics', icon: '📊', type: 'core',
+              description: 'Tracks usage, performance, and generates insights.',
+              actions: ['get_stats', 'get_latency_report', 'export'] },
+            { id: 'mcp', name: 'MCP Tools', icon: '🔌', type: 'core',
+              description: 'Accesses Model Context Protocol tools.',
+              actions: ['perplexity_ask', 'supabase_query', 'list_tools'] },
+            { id: 'data', name: 'Data', icon: '📈', type: 'data',
+              description: 'Fetches real-time market data and quotes.',
+              actions: ['get_stock_quote', 'get_company_data'] },
+            { id: 'tools', name: 'Tools', icon: '🔧', type: 'data',
+              description: 'OpenAI-style function calling for structured data.',
+              actions: ['get_stock_price', 'calculate_dcf', 'compare_stocks'] },
+            { id: 'research', name: 'Research', icon: '🔬', type: 'data',
+              description: 'Deep financial analysis and thesis generation.',
+              actions: ['analyze_stock', 'deep_dive', 'generate_thesis'] },
+            { id: 'news', name: 'News', icon: '📰', type: 'data',
+              description: 'Monitors and aggregates market news.',
+              actions: ['monitor_news', 'weekly_digest'] },
+            { id: 'earnings', name: 'Earnings', icon: '📅', type: 'data',
+              description: 'Tracks earnings calendar and announcements.',
+              actions: ['daily_check', 'prepare_analysis'] },
+            { id: 'portfolio', name: 'Portfolio', icon: '💼', type: 'action',
+              description: 'Manages portfolios with P&L tracking.',
+              actions: ['analyze_portfolio', 'get_dividends', 'suggest_rebalance'] },
+            { id: 'alert', name: 'Alert', icon: '🔔', type: 'action',
+              description: 'Price alerts with multi-channel notifications.',
+              actions: ['create_alert', 'check_alerts', 'trigger_alert'] },
+            { id: 'briefing', name: 'Briefing', icon: '📧', type: 'action',
+              description: 'Generates and sends email briefings.',
+              actions: ['generate_morning', 'generate_weekly'] },
+            { id: 'sms', name: 'SMS', icon: '📱', type: 'action',
+              description: 'Sends SMS notifications and alerts.',
+              actions: ['send_sms', 'send_briefing_sms'] },
+            { id: 'scheduler', name: 'Scheduler', icon: '⏰', type: 'utility',
+              description: 'Cron-based task scheduling and automation.',
+              actions: ['create_schedule', 'run_now', 'get_next_runs'] }
+        ];
+
+        // Render agent cards
+        function renderAgents() {
+            const grid = document.getElementById('agentGrid');
+            const select = document.getElementById('agentSelect');
+            
+            grid.innerHTML = agents.map(agent => `
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-icon ${agent.type}">${agent.icon}</div>
+                        <div>
+                            <div class="agent-name">${agent.name}</div>
+                            <div class="agent-type">${agent.id} • ${agent.type}</div>
+                        </div>
+                    </div>
+                    <div class="agent-description">${agent.description}</div>
+                    <div class="agent-actions">
+                        ${agent.actions.map(a => `<span class="action-badge">${a}</span>`).join('')}
+                    </div>
+                    <div class="agent-footer">
+                        <button class="btn btn-primary" onclick="testAgent('${agent.id}')">Test</button>
+                        <button class="btn btn-secondary" onclick="showDocs('${agent.id}')">Docs</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Populate select
+            select.innerHTML = '<option value="">Select Agent...</option>' +
+                agents.map(a => `<option value="${a.id}">${a.icon} ${a.name}</option>`).join('');
+        }
+
+        // Test an agent
+        async function testAgent(agentId) {
+            const agent = agents.find(a => a.id === agentId);
+            if (!agent) return;
+
+            const action = agent.actions[0];
+            const input = {
+                agent: agentId,
+                action: action
+            };
+
+            // Add default params based on agent
+            if (agentId === 'research') input.ticker = 'AAPL';
+            if (agentId === 'tools') input.ticker = 'AAPL';
+            if (agentId === 'analytics') input.timeRange = '24h';
+
+            document.getElementById('commandInput').value = JSON.stringify(input, null, 2);
+            executeCommand();
+        }
+
+        // Load example command
+        function loadExample(type) {
+            const examples = {
+                chat: { message: "Analyse AAPL en français", persona: "finance" },
+                research: { agent: "research", action: "analyze_stock", ticker: "MSFT" },
+                tools: { agent: "tools", action: "get_stock_price", ticker: "NVDA" },
+                portfolio: { agent: "portfolio", action: "create_portfolio", portfolioId: "test", name: "Test Portfolio", holdings: [{ ticker: "AAPL", shares: 100, costBasis: 150 }] }
+            };
+            document.getElementById('commandInput').value = JSON.stringify(examples[type], null, 2);
+        }
+
+        // Execute command
+        async function executeCommand() {
+            const input = document.getElementById('commandInput').value;
+            const output = document.getElementById('outputPre');
+            
+            output.textContent = '⏳ Executing...';
+            output.classList.add('loading');
+
+            try {
+                const body = JSON.parse(input);
+                const response = await fetch('/api/orchestrator', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await response.json();
+                output.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                output.textContent = `Error: ${error.message}`;
+            } finally {
+                output.classList.remove('loading');
+            }
+        }
+
+        // Show docs (placeholder)
+        function showDocs(agentId) {
+            window.open(`https://github.com/projetsjsl/GOB/blob/main/.agent/docs/ORCHESTRATOR_AGENTS.md#-${agentId}-agent`, '_blank');
+        }
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const status = await emma?.getStatus?.() || {};
+                if (status.success) {
+                    document.getElementById('agentCount').textContent = status.status?.availableAgents?.length || 15;
+                    document.getElementById('personaCount').textContent = status.status?.availablePersonas?.length || 8;
+                }
+
+                const analytics = await emma?.getAnalytics?.('24h') || {};
+                if (analytics.success) {
+                    document.getElementById('requestCount').textContent = analytics.stats?.totalRequests || 0;
+                    document.getElementById('uptime').textContent = analytics.stats?.uptime || '--';
+                }
+            } catch (e) {
+                console.log('Stats loading...');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAgents();
+            loadStats();
+        });
+    </script>
+</body>
+</html>
