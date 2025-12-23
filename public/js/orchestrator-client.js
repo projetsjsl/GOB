@@ -256,6 +256,70 @@
         },
 
         // =============================================================
+        // RESEARCH API - Deep financial analysis
+        // =============================================================
+
+        async analyzeStock(ticker) {
+            return this.agent('research', 'analyze_stock', { ticker });
+        },
+
+        async comparePeers(ticker, peers) {
+            return this.agent('research', 'compare_peers', { ticker, peers });
+        },
+
+        async getBullBear(ticker) {
+            return this.agent('research', 'generate_bull_bear', { ticker });
+        },
+
+        async assessRisk(ticker) {
+            return this.agent('research', 'assess_risk', { ticker });
+        },
+
+        async deepDive(ticker) {
+            return this.agent('research', 'deep_dive', { ticker });
+        },
+
+        async generateThesis(ticker, stance = 'neutral') {
+            return this.agent('research', 'generate_thesis', { ticker, stance });
+        },
+
+        // =============================================================
+        // TOOLS API - Function calling
+        // =============================================================
+
+        async getTools() {
+            return this.agent('tools', 'list_tools', {});
+        },
+
+        async executeTool(toolName, args) {
+            return this.agent('tools', 'execute_tool', { toolName, arguments: args });
+        },
+
+        async calculateDCF(ticker, growthRate, discountRate) {
+            return this.agent('tools', 'calculate_dcf', { ticker, growthRate, discountRate });
+        },
+
+        async getYieldCurve(country = 'both') {
+            return this.agent('tools', 'get_yield_curve', { country });
+        },
+
+        // =============================================================
+        // ANALYTICS API - Usage tracking
+        // =============================================================
+
+        async getAnalytics(timeRange = '24h') {
+            return this.agent('analytics', 'get_stats', { timeRange });
+        },
+
+        async getLatencyReport() {
+            return this.agent('analytics', 'get_latency_report', {});
+        },
+
+        async exportAnalytics() {
+            return this.agent('analytics', 'export_analytics', {});
+        },
+
+        // =============================================================
         // METADATA API - Get orchestrator info
         // =============================================================
 
@@ -343,34 +407,49 @@
          */
         help() {
             console.log(`
-╔══════════════════════════════════════════════════════════════════╗
-║              🎯 ORCHESTRATOR CLIENT - QUICK REFERENCE            ║
-╠══════════════════════════════════════════════════════════════════╣
-║                                                                   ║
-║  CHAT (natural language):                                        ║
-║    orchestratorClient.ask("Analyse AAPL")                        ║
-║    orchestratorClient.askFinance("TSLA valuation")               ║
-║    orchestratorClient.askCritic("Risques marché")                ║
-║    orchestratorClient.askWriter("Briefing matinal")              ║
-║                                                                   ║
-║  AGENTS (direct calls):                                          ║
-║    orchestratorClient.getStockQuote("AAPL")                      ║
-║    orchestratorClient.getNews(["AAPL", "MSFT"])                  ║
-║    orchestratorClient.getEarnings(7)                             ║
-║    orchestratorClient.generateBriefing("morning")                ║
-║    orchestratorClient.runWorkflow("morning_briefing")            ║
-║                                                                   ║
-║  INFO:                                                           ║
-║    orchestratorClient.getStatus()                                ║
-║    orchestratorClient.getPersonas()                              ║
-║    orchestratorClient.getAgents()                                ║
-║                                                                   ║
-║  PERSONAS: finance, critic, researcher, writer,                  ║
-║            geek, ceo, macro, politics                            ║
-║                                                                   ║
-║  AGENTS: data, news, earnings, briefing, sms, workflow           ║
-║                                                                   ║
-╚══════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    🧪 JLAB ORCHESTRATOR - QUICK REFERENCE                    ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║                                                                               ║
+║  📝 CHAT (natural language):                                                  ║
+║    emma.ask("Analyse AAPL")              // Auto persona selection            ║
+║    emma.askFinance("TSLA valuation")     // Finance persona                   ║
+║    emma.askCritic("Risques marché")      // Critic persona                    ║
+║    emma.askStream("Analyse", {}, {onChunk: fn})  // Streaming                 ║
+║                                                                               ║
+║  🔬 RESEARCH (deep analysis):                                                 ║
+║    emma.analyzeStock("AAPL")             // Full analysis                     ║
+║    emma.deepDive("MSFT")                 // Comprehensive deep dive           ║
+║    emma.getBullBear("TSLA")              // Bull/Bear cases                   ║
+║    emma.assessRisk("NVDA")               // Risk assessment                   ║
+║    emma.generateThesis("GOOGL", "bull")  // Investment thesis                 ║
+║    emma.comparePeers("AAPL", ["MSFT"])   // Peer comparison                   ║
+║                                                                               ║
+║  🔧 TOOLS (function calling):                                                 ║
+║    emma.getStockQuote("AAPL")            // Real-time quote                   ║
+║    emma.calculateDCF("MSFT", 10, 12)     // DCF valuation                     ║
+║    emma.getYieldCurve("us")              // Yield curve data                  ║
+║    emma.getTools()                       // List all tools                    ║
+║                                                                               ║
+║  📊 ANALYTICS:                                                                ║
+║    emma.getAnalytics("24h")              // Usage stats                       ║
+║    emma.getLatencyReport()               // Performance metrics               ║
+║                                                                               ║
+║  💬 CONTEXT:                                                                  ║
+║    emma.getHistory()                     // Conversation history              ║
+║    emma.clearHistory()                   // Clear history                     ║
+║    emma.setPreferences({persona:'fin'})  // Set preferences                   ║
+║                                                                               ║
+║  🔌 MCP:                                                                      ║
+║    emma.listMCPTools()                   // List MCP servers                  ║
+║    emma.perplexityAsk("query")           // Web search                        ║
+║                                                                               ║
+║  ℹ️  INFO:                                                                    ║
+║    emma.getStatus() | emma.getPersonas() | emma.getAgents()                   ║
+║                                                                               ║
+║  🎭 PERSONAS: finance, critic, researcher, writer, geek, ceo, macro, politics║
+║  🤖 AGENTS: data, news, earnings, briefing, research, tools, analytics, mcp  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
             `);
         }
     };
