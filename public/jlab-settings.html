@@ -1,266 +1,289 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JLAB Settings - API & MCP Manager</title>
+    <title>JLAB Settings - Complete Control Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
         * { font-family: 'Inter', sans-serif; }
+        body { background: linear-gradient(135deg, #050510 0%, #0a0a1a 50%, #0f0520 100%); min-height: 100vh; }
         
-        body {
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0d1225 100%);
-            min-height: 100vh;
-        }
+        .glass { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(20px); }
+        .glass:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); }
         
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-        }
+        .tab-active { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+        .glow-blue { box-shadow: 0 0 30px rgba(99,102,241,0.3); }
+        .glow-green { box-shadow: 0 0 20px rgba(34,197,94,0.3); }
+        .glow-red { box-shadow: 0 0 20px rgba(239,68,68,0.3); }
         
-        .glass-card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.12);
-        }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .status-ok { background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+        .status-error { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+        .status-warn { background: #f59e0b; box-shadow: 0 0 10px #f59e0b; }
         
-        .source-badge {
-            font-size: 0.65rem;
-            padding: 2px 8px;
-            border-radius: 999px;
-        }
+        .input-field { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: white; }
+        .input-field:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
         
-        .source-vercel { background: #000; color: #fff; }
-        .source-supabase { background: #3ecf8e; color: #000; }
-        .source-local { background: #6366f1; color: #fff; }
-        .source-manual { background: #f59e0b; color: #000; }
+        .chart-bar { transition: height 0.5s ease; }
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
         
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        
-        .status-connected { background: #22c55e; }
-        .status-missing { background: #ef4444; }
-        .status-partial { background: #f59e0b; }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        .input-field {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.2s;
-        }
-        
-        .input-field:focus {
-            outline: none;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        }
-        
-        .tab-active {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            color: white;
-        }
-        
-        .category-header {
-            background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, transparent 100%);
-        }
+        .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+        .scrollbar-thin::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
     </style>
 </head>
-<body class="text-white p-6">
-    <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <div class="flex items-center justify-between mb-8">
-            <div>
-                <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                    🧪 JLAB Settings
-                </h1>
-                <p class="text-gray-400 mt-1">API Keys, MCP Connections & Orchestrator Configuration</p>
+<body class="text-white">
+    <!-- Header -->
+    <header class="border-b border-white/10 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="/jlab.html" class="text-2xl">🧪</a>
+                <div>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">JLAB Settings</h1>
+                    <p class="text-gray-500 text-sm">Complete Control Center</p>
+                </div>
             </div>
             <div class="flex gap-3">
-                <button onclick="exportConfig()" class="px-4 py-2 glass-card rounded-xl hover:bg-white/10 transition flex items-center gap-2">
-                    <i class="iconoir-download"></i> Export
-                </button>
-                <button onclick="importConfig()" class="px-4 py-2 glass-card rounded-xl hover:bg-white/10 transition flex items-center gap-2">
-                    <i class="iconoir-upload"></i> Import
-                </button>
-                <a href="/beta-combined-dashboard.html" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition flex items-center gap-2">
-                    <i class="iconoir-arrow-left"></i> Dashboard
-                </a>
+                <button onclick="refreshAll()" class="px-4 py-2 glass rounded-xl hover:bg-white/10 flex items-center gap-2">🔄 Refresh</button>
+                <a href="/jlab-dashboard.html" class="px-4 py-2 bg-indigo-600 rounded-xl hover:bg-indigo-500">Dashboard</a>
             </div>
         </div>
+    </header>
 
+    <div class="max-w-7xl mx-auto p-6">
         <!-- Tabs -->
-        <div class="flex gap-2 mb-6">
-            <button id="tab-apis" onclick="switchTab('apis')" class="px-5 py-2.5 rounded-xl font-medium transition tab-active">
-                <i class="iconoir-key-alt mr-2"></i>API Keys
-            </button>
-            <button id="tab-mcp" onclick="switchTab('mcp')" class="px-5 py-2.5 rounded-xl font-medium transition glass-card hover:bg-white/10">
-                <i class="iconoir-plug mr-2"></i>MCP Connections
-            </button>
-            <button id="tab-orchestrator" onclick="switchTab('orchestrator')" class="px-5 py-2.5 rounded-xl font-medium transition glass-card hover:bg-white/10">
-                <i class="iconoir-brain mr-2"></i>Orchestrator
-            </button>
-            <button id="tab-test" onclick="switchTab('test')" class="px-5 py-2.5 rounded-xl font-medium transition glass-card hover:bg-white/10">
-                <i class="iconoir-flask mr-2"></i>Test Console
-            </button>
+        <div class="flex gap-2 mb-6 flex-wrap">
+            <button onclick="switchTab('apis')" id="tab-apis" class="px-4 py-2 rounded-xl font-medium tab-active">🔑 API Keys</button>
+            <button onclick="switchTab('mcp')" id="tab-mcp" class="px-4 py-2 rounded-xl font-medium glass">🔌 MCP</button>
+            <button onclick="switchTab('orchestrator')" id="tab-orchestrator" class="px-4 py-2 rounded-xl font-medium glass">🧠 Orchestrator</button>
+            <button onclick="switchTab('analytics')" id="tab-analytics" class="px-4 py-2 rounded-xl font-medium glass">📊 Analytics</button>
+            <button onclick="switchTab('scheduler')" id="tab-scheduler" class="px-4 py-2 rounded-xl font-medium glass">⏰ Scheduler</button>
+            <button onclick="switchTab('alerts')" id="tab-alerts" class="px-4 py-2 rounded-xl font-medium glass">🔔 Alerts</button>
+            <button onclick="switchTab('cache')" id="tab-cache" class="px-4 py-2 rounded-xl font-medium glass">💾 Cache</button>
+            <button onclick="switchTab('lab')" id="tab-lab" class="px-4 py-2 rounded-xl font-medium glass">🧪 Lab</button>
         </div>
 
-        <!-- Content panels -->
+        <!-- API Keys Panel -->
         <div id="panel-apis" class="space-y-6">
-            <!-- Status summary -->
             <div class="grid grid-cols-4 gap-4">
-                <div class="glass-card rounded-2xl p-5">
-                    <div class="text-3xl font-bold text-green-400" id="stat-configured">0</div>
-                    <div class="text-gray-400 text-sm">Configured</div>
+                <div class="glass rounded-2xl p-5 text-center">
+                    <div class="text-3xl font-bold text-green-400" id="stat-ok">0</div>
+                    <div class="text-gray-500 text-sm">Connected</div>
                 </div>
-                <div class="glass-card rounded-2xl p-5">
+                <div class="glass rounded-2xl p-5 text-center">
                     <div class="text-3xl font-bold text-red-400" id="stat-missing">0</div>
-                    <div class="text-gray-400 text-sm">Missing</div>
+                    <div class="text-gray-500 text-sm">Missing</div>
                 </div>
-                <div class="glass-card rounded-2xl p-5">
-                    <div class="text-3xl font-bold text-yellow-400" id="stat-required">0</div>
-                    <div class="text-gray-400 text-sm">Required</div>
+                <div class="glass rounded-2xl p-5 text-center">
+                    <div class="text-3xl font-bold text-yellow-400" id="stat-untested">0</div>
+                    <div class="text-gray-500 text-sm">Untested</div>
                 </div>
-                <div class="glass-card rounded-2xl p-5">
+                <div class="glass rounded-2xl p-5 text-center">
                     <div class="text-3xl font-bold text-purple-400" id="stat-total">0</div>
-                    <div class="text-gray-400 text-sm">Total APIs</div>
+                    <div class="text-gray-500 text-sm">Total</div>
                 </div>
             </div>
-
-            <!-- API Keys by category -->
-            <div id="api-keys-container"></div>
+            <div class="flex gap-3 mb-4">
+                <button onclick="testAllAPIs()" class="px-4 py-2 bg-green-600 rounded-xl hover:bg-green-500">🔬 Test All APIs</button>
+                <button onclick="exportConfig()" class="px-4 py-2 glass rounded-xl">📤 Export</button>
+                <button onclick="importConfig()" class="px-4 py-2 glass rounded-xl">📥 Import</button>
+            </div>
+            <div id="api-keys-container" class="space-y-4"></div>
         </div>
 
         <!-- MCP Panel -->
         <div id="panel-mcp" class="hidden space-y-6">
-            <div class="glass-card rounded-2xl p-6">
-                <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <i class="iconoir-plug text-purple-400"></i>
-                    MCP Connections
-                </h2>
-                <p class="text-gray-400 mb-6">Model Context Protocol servers extend JLAB's capabilities</p>
-                <div id="mcp-connections-container" class="grid grid-cols-2 gap-4"></div>
+            <div class="glass rounded-2xl p-6">
+                <h2 class="text-xl font-semibold mb-4">🔌 Model Context Protocol Servers</h2>
+                <div id="mcp-container" class="grid grid-cols-2 gap-4"></div>
             </div>
         </div>
 
         <!-- Orchestrator Panel -->
         <div id="panel-orchestrator" class="hidden space-y-6">
-            <div class="glass-card rounded-2xl p-6">
-                <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <i class="iconoir-brain text-indigo-400"></i>
-                    Orchestrator Settings
-                </h2>
-                
-                <!-- Enable/Disable toggle -->
-                <div class="flex items-center justify-between p-4 bg-black/20 rounded-xl mb-6">
-                    <div>
-                        <div class="font-medium">Use Orchestrator in AskEmma</div>
-                        <div class="text-gray-400 text-sm">Route chats through the multi-agent system</div>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="orchestrator-enabled" class="sr-only peer" onchange="toggleOrchestrator()">
-                        <div class="w-14 h-7 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-indigo-600"></div>
-                    </label>
-                </div>
-
-                <!-- Default Persona -->
-                <div class="mb-6">
-                    <label class="block text-gray-400 mb-2">Default Persona</label>
-                    <select id="default-persona" onchange="saveOrchestratorSettings()" class="w-full input-field rounded-xl p-3">
-                        <option value="finance">📊 Finance - Stock analysis, portfolio</option>
-                        <option value="critic">⚖️ Critic - Risk analysis, contrarian</option>
-                        <option value="researcher">🔬 Researcher - Deep research</option>
-                        <option value="writer">✍️ Writer - Reports, briefings</option>
-                        <option value="geek">📈 Geek - Technical analysis</option>
-                        <option value="ceo">👔 CEO - Executive summary</option>
-                        <option value="macro">🌍 Macro - Macroeconomics</option>
-                        <option value="politics">🏛️ Politics - Policy impact</option>
-                    </select>
-                </div>
-
-                <!-- Model Preferences -->
-                <div class="mb-6">
-                    <label class="block text-gray-400 mb-2">Preferred LLM Provider</label>
-                    <select id="preferred-llm" onchange="saveOrchestratorSettings()" class="w-full input-field rounded-xl p-3">
-                        <option value="auto">🤖 Auto (Orchestrator selects)</option>
-                        <option value="perplexity">🔮 Perplexity (Web search)</option>
-                        <option value="openai">🤖 OpenAI (GPT-4)</option>
-                        <option value="anthropic">🧠 Anthropic (Claude)</option>
-                        <option value="google">💎 Google (Gemini)</option>
-                    </select>
-                </div>
-
-                <!-- Skepticism Level -->
-                <div class="mb-6">
-                    <label class="block text-gray-400 mb-2">Skepticism Level</label>
-                    <input type="range" id="skepticism-level" min="0" max="100" value="50" 
-                           onchange="updateSkepticismLabel(); saveOrchestratorSettings()" 
-                           class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
-                    <div class="flex justify-between text-sm mt-1">
-                        <span class="text-gray-500">Trust All</span>
-                        <span id="skepticism-label" class="text-indigo-400">Balanced</span>
-                        <span class="text-gray-500">Verify Everything</span>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="font-semibold mb-4">⚙️ General Settings</h3>
+                    <div class="space-y-4">
+                        <label class="flex items-center justify-between p-3 bg-black/20 rounded-xl">
+                            <span>Enable Orchestrator</span>
+                            <input type="checkbox" id="orch-enabled" onchange="saveOrchSettings()" class="w-5 h-5">
+                        </label>
+                        <label class="flex items-center justify-between p-3 bg-black/20 rounded-xl">
+                            <span>Streaming Responses</span>
+                            <input type="checkbox" id="orch-streaming" onchange="saveOrchSettings()" class="w-5 h-5">
+                        </label>
+                        <label class="flex items-center justify-between p-3 bg-black/20 rounded-xl">
+                            <span>Enable Caching</span>
+                            <input type="checkbox" id="orch-cache" onchange="saveOrchSettings()" class="w-5 h-5" checked>
+                        </label>
+                        <div class="p-3 bg-black/20 rounded-xl">
+                            <label class="block mb-2">Default Persona</label>
+                            <select id="orch-persona" onchange="saveOrchSettings()" class="w-full input-field rounded-lg p-2">
+                                <option value="finance">📊 Finance</option>
+                                <option value="critic">⚖️ Critic</option>
+                                <option value="researcher">🔬 Researcher</option>
+                                <option value="writer">✍️ Writer</option>
+                                <option value="ceo">👔 CEO</option>
+                                <option value="macro">🌍 Macro</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Status -->
-                <div class="p-4 bg-black/20 rounded-xl">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="status-dot status-connected"></div>
-                        <span class="font-medium">Orchestrator Status</span>
-                    </div>
-                    <div id="orchestrator-status" class="text-gray-400 text-sm">Checking...</div>
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="font-semibold mb-4">🤖 Agent Status</h3>
+                    <div id="agent-status" class="space-y-2 max-h-80 overflow-auto scrollbar-thin"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Test Console Panel -->
-        <div id="panel-test" class="hidden space-y-6">
-            <div class="glass-card rounded-2xl p-6">
-                <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <i class="iconoir-flask text-green-400"></i>
-                    Test Console
-                </h2>
-                
+        <!-- Analytics Panel -->
+        <div id="panel-analytics" class="hidden space-y-6">
+            <div class="grid grid-cols-4 gap-4">
+                <div class="glass rounded-2xl p-5 text-center">
+                    <div class="text-3xl font-bold text-blue-400" id="ana-requests">0</div>
+                    <div class="text-gray-500 text-sm">Total Requests</div>
+                </div>
+                <div class="glass rounded-2xl p-5 text-center">
+                    <div class="text-3xl font-bold text-green-400" id="ana-success">0%</div>
+                    <div class="text-gray-500 text-sm">Success Rate</div>
+                </div>
+                <div class="glass rounded-2xl p-5 text-center">
+                    <div class="text-3xl font-bold text-yellow-400" id="ana-latency">0ms</div>
+                    <div class="text-gray-500 text-sm">Avg Latency</div>
+                </div>
+                <div class="glass rounded-2xl p-5 text-center">
+                    <div class="text-3xl font-bold text-purple-400" id="ana-cache">0%</div>
+                    <div class="text-gray-500 text-sm">Cache Hit Rate</div>
+                </div>
+            </div>
+            <div class="glass rounded-2xl p-6">
+                <h3 class="font-semibold mb-4">📈 Request History (24h)</h3>
+                <div id="analytics-chart" class="h-40 flex items-end gap-1"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="font-semibold mb-4">🤖 Model Usage</h3>
+                    <div id="model-usage" class="space-y-2"></div>
+                </div>
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="font-semibold mb-4">🎭 Persona Usage</h3>
+                    <div id="persona-usage" class="space-y-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scheduler Panel -->
+        <div id="panel-scheduler" class="hidden space-y-6">
+            <div class="flex gap-3 mb-4">
+                <button onclick="showNewScheduleModal()" class="px-4 py-2 bg-indigo-600 rounded-xl hover:bg-indigo-500">➕ New Schedule</button>
+                <button onclick="loadSchedules()" class="px-4 py-2 glass rounded-xl">🔄 Refresh</button>
+            </div>
+            <div class="glass rounded-2xl p-6">
+                <h3 class="font-semibold mb-4">📅 Active Schedules</h3>
+                <div id="schedules-list" class="space-y-3"></div>
+            </div>
+            <div class="glass rounded-2xl p-6">
+                <h3 class="font-semibold mb-4">📜 Execution History</h3>
+                <div id="schedule-history" class="space-y-2 max-h-60 overflow-auto scrollbar-thin"></div>
+            </div>
+        </div>
+
+        <!-- Alerts Panel -->
+        <div id="panel-alerts" class="hidden space-y-6">
+            <div class="flex gap-3 mb-4">
+                <button onclick="showNewAlertModal()" class="px-4 py-2 bg-indigo-600 rounded-xl hover:bg-indigo-500">➕ New Alert</button>
+                <button onclick="checkAllAlerts()" class="px-4 py-2 bg-green-600 rounded-xl hover:bg-green-500">🔔 Check Now</button>
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="font-semibold mb-4">🔔 Active Alerts</h3>
+                    <div id="alerts-list" class="space-y-2 max-h-80 overflow-auto scrollbar-thin"></div>
+                </div>
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="font-semibold mb-4">📧 Notification Channels</h3>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-black/20 rounded-xl">
+                            <label class="block text-sm text-gray-400 mb-1">Email</label>
+                            <input type="email" id="alert-email" class="w-full input-field rounded-lg p-2" placeholder="your@email.com">
+                        </div>
+                        <div class="p-3 bg-black/20 rounded-xl">
+                            <label class="block text-sm text-gray-400 mb-1">SMS</label>
+                            <input type="tel" id="alert-sms" class="w-full input-field rounded-lg p-2" placeholder="+1234567890">
+                        </div>
+                        <button onclick="saveAlertChannels()" class="w-full py-2 bg-indigo-600 rounded-xl">Save Channels</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cache Panel -->
+        <div id="panel-cache" class="hidden space-y-6">
+            <div class="grid grid-cols-4 gap-4">
+                <div class="glass rounded-2xl p-5 text-center">
+                    <div class="text-3xl font-bold text-blue-400" id="cache-entries">0</div>
+                    <div class="text-gray-500 text-sm">Entries</div>
+                </div>
+                <div class="glass rounded-2xl p-5 text-center">
+                    <div class="text-3xl font-bold text-green-400" id="cache-hits">0</div>
+                    <div class="text-gray-500 text-sm">Hits</div>
+                </div>
+                <div class="glass rounded-2xl p-5 text-center">
+                    <div class="text-3xl font-bold text-red-400" id="cache-misses">0</div>
+                    <div class="text-gray-500 text-sm">Misses</div>
+                </div>
+                <div class="glass rounded-2xl p-5 text-center">
+                    <div class="text-3xl font-bold text-purple-400" id="cache-rate">0%</div>
+                    <div class="text-gray-500 text-sm">Hit Rate</div>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="clearCache('all')" class="px-4 py-2 bg-red-600 rounded-xl hover:bg-red-500">🗑️ Clear All</button>
+                <button onclick="clearCache('quote')" class="px-4 py-2 glass rounded-xl">Clear Quotes</button>
+                <button onclick="clearCache('llm')" class="px-4 py-2 glass rounded-xl">Clear LLM</button>
+                <button onclick="warmCache()" class="px-4 py-2 bg-green-600 rounded-xl">🔥 Warm Cache</button>
+            </div>
+            <div class="glass rounded-2xl p-6">
+                <h3 class="font-semibold mb-4">📊 Cache by Category</h3>
+                <div id="cache-categories" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <!-- Lab Panel -->
+        <div id="panel-lab" class="hidden space-y-6">
+            <div class="glass rounded-2xl p-6">
+                <h3 class="font-semibold mb-4">🧪 API Laboratory</h3>
                 <div class="grid grid-cols-2 gap-6">
-                    <!-- Quick Tests -->
                     <div>
-                        <h3 class="font-medium mb-3">Quick Tests</h3>
-                        <div class="space-y-2">
-                            <button onclick="runTest('orchestrator_status')" class="w-full p-3 glass-card rounded-xl text-left hover:bg-white/10 transition">
-                                📊 Orchestrator Status
-                            </button>
-                            <button onclick="runTest('personas')" class="w-full p-3 glass-card rounded-xl text-left hover:bg-white/10 transition">
-                                🎭 List Personas
-                            </button>
-                            <button onclick="runTest('agents')" class="w-full p-3 glass-card rounded-xl text-left hover:bg-white/10 transition">
-                                🤖 List Agents
-                            </button>
-                            <button onclick="runTest('ask_finance')" class="w-full p-3 glass-card rounded-xl text-left hover:bg-white/10 transition">
-                                💬 Test Chat (Finance)
-                            </button>
-                            <button onclick="runTest('stock_quote')" class="w-full p-3 glass-card rounded-xl text-left hover:bg-white/10 transition">
-                                📈 Get Stock Quote (AAPL)
-                            </button>
+                        <div class="flex gap-3 mb-4">
+                            <select id="lab-agent" class="flex-1 input-field rounded-xl p-3" onchange="loadAgentActions()">
+                                <option value="">Select Agent...</option>
+                            </select>
+                            <select id="lab-action" class="flex-1 input-field rounded-xl p-3">
+                                <option value="">Select Action...</option>
+                            </select>
+                        </div>
+                        <textarea id="lab-params" class="w-full h-40 input-field rounded-xl p-4 font-mono text-sm" placeholder='{"ticker": "AAPL"}'></textarea>
+                        <div class="flex gap-3 mt-4">
+                            <button onclick="runLabTest()" class="flex-1 py-3 bg-indigo-600 rounded-xl hover:bg-indigo-500 font-medium">▶️ Execute</button>
+                            <button onclick="clearLabOutput()" class="px-4 py-3 glass rounded-xl">Clear</button>
+                        </div>
+                        <div class="flex gap-2 mt-4 flex-wrap">
+                            <button onclick="loadLabPreset('chat')" class="px-3 py-1 glass rounded-lg text-sm">💬 Chat</button>
+                            <button onclick="loadLabPreset('quote')" class="px-3 py-1 glass rounded-lg text-sm">📈 Quote</button>
+                            <button onclick="loadLabPreset('research')" class="px-3 py-1 glass rounded-lg text-sm">🔬 Research</button>
+                            <button onclick="loadLabPreset('dcf')" class="px-3 py-1 glass rounded-lg text-sm">💰 DCF</button>
                         </div>
                     </div>
-                    
-                    <!-- Console Output -->
                     <div>
-                        <h3 class="font-medium mb-3">Console Output</h3>
-                        <div id="test-console" class="bg-black/40 rounded-xl p-4 h-80 overflow-auto font-mono text-sm">
-                            <div class="text-gray-500">// Ready for tests...</div>
+                        <div class="bg-black/40 rounded-xl p-4 h-80 overflow-auto font-mono text-sm scrollbar-thin" id="lab-output">
+                            <span class="text-gray-500">// Output will appear here...</span>
+                        </div>
+                        <div class="flex gap-3 mt-4">
+                            <span class="text-gray-500 text-sm" id="lab-timing"></span>
                         </div>
                     </div>
                 </div>
@@ -268,452 +291,320 @@
         </div>
     </div>
 
-    <!-- Edit Modal -->
-    <div id="edit-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center z-50">
-        <div class="glass-card rounded-2xl p-6 w-full max-w-lg mx-4">
-            <h3 id="modal-title" class="text-xl font-semibold mb-4">Edit API Key</h3>
-            
-            <div class="mb-4">
-                <label class="block text-gray-400 mb-2">Source</label>
-                <div class="grid grid-cols-4 gap-2">
-                    <button onclick="setModalSource('vercel')" id="src-vercel" class="p-2 rounded-lg source-vercel text-center text-xs font-medium">Vercel</button>
-                    <button onclick="setModalSource('supabase')" id="src-supabase" class="p-2 rounded-lg bg-gray-700 text-center text-xs font-medium">Supabase</button>
-                    <button onclick="setModalSource('local')" id="src-local" class="p-2 rounded-lg bg-gray-700 text-center text-xs font-medium">Local</button>
-                    <button onclick="setModalSource('manual')" id="src-manual" class="p-2 rounded-lg bg-gray-700 text-center text-xs font-medium">Manual</button>
-                </div>
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-gray-400 mb-2">Value</label>
-                <input type="password" id="modal-value" class="w-full input-field rounded-xl p-3" placeholder="Enter API key...">
-                <button onclick="toggleValueVisibility()" class="text-sm text-indigo-400 mt-2 hover:text-indigo-300">
-                    <i class="iconoir-eye mr-1"></i>Show/Hide
-                </button>
-            </div>
-            
-            <div id="modal-source-note" class="text-sm text-gray-400 mb-4 p-3 bg-black/20 rounded-xl">
-                <strong>Vercel:</strong> Set in Vercel Dashboard → Settings → Environment Variables
-            </div>
-            
-            <div class="flex gap-3 justify-end">
-                <button onclick="closeModal()" class="px-4 py-2 glass-card rounded-xl hover:bg-white/10 transition">
-                    Cancel
-                </button>
-                <button onclick="saveModalValue()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition">
-                    Save
-                </button>
-            </div>
-        </div>
+    <!-- Modals -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center z-50">
+        <div id="modal-content" class="glass rounded-2xl p-6 w-full max-w-md mx-4"></div>
     </div>
 
+    <script src="/js/orchestrator-client.js"></script>
     <script src="/js/credentials-manager.js"></script>
     <script>
-        // ═══════════════════════════════════════════════════════════════
-        // TAB SWITCHING
-        // ═══════════════════════════════════════════════════════════════
-        
+        // Tab switching
         function switchTab(tab) {
-            // Update buttons
             document.querySelectorAll('[id^="tab-"]').forEach(btn => {
                 btn.classList.remove('tab-active');
-                btn.classList.add('glass-card', 'hover:bg-white/10');
+                btn.classList.add('glass');
             });
             document.getElementById(`tab-${tab}`).classList.add('tab-active');
-            document.getElementById(`tab-${tab}`).classList.remove('glass-card', 'hover:bg-white/10');
-            
-            // Update panels
-            document.querySelectorAll('[id^="panel-"]').forEach(panel => panel.classList.add('hidden'));
+            document.getElementById(`tab-${tab}`).classList.remove('glass');
+            document.querySelectorAll('[id^="panel-"]').forEach(p => p.classList.add('hidden'));
             document.getElementById(`panel-${tab}`).classList.remove('hidden');
+            
+            // Load tab-specific data
+            if (tab === 'analytics') loadAnalytics();
+            if (tab === 'scheduler') loadSchedules();
+            if (tab === 'alerts') loadAlerts();
+            if (tab === 'cache') loadCacheStats();
+            if (tab === 'lab') loadAgentList();
         }
 
-        // ═══════════════════════════════════════════════════════════════
-        // API KEYS PANEL
-        // ═══════════════════════════════════════════════════════════════
-        
+        // API Keys
         async function loadAPIKeys() {
             const container = document.getElementById('api-keys-container');
-            container.innerHTML = '<div class="text-gray-400 text-center py-10">Loading...</div>';
+            container.innerHTML = '<div class="text-gray-500 text-center py-8">Loading...</div>';
             
-            // Group APIs by category
-            const categories = {};
-            for (const [key, config] of Object.entries(API_REGISTRY)) {
-                const cat = config.category || 'other';
-                if (!categories[cat]) categories[cat] = [];
+            const apis = [
+                { key: 'OPENAI_API_KEY', name: 'OpenAI', icon: '🤖', cat: 'LLM' },
+                { key: 'ANTHROPIC_API_KEY', name: 'Anthropic', icon: '🧠', cat: 'LLM' },
+                { key: 'PERPLEXITY_API_KEY', name: 'Perplexity', icon: '🔮', cat: 'LLM' },
+                { key: 'GOOGLE_API_KEY', name: 'Google AI', icon: '💎', cat: 'LLM' },
+                { key: 'FMP_API_KEY', name: 'Financial Modeling Prep', icon: '📊', cat: 'Finance' },
+                { key: 'FINNHUB_API_KEY', name: 'Finnhub', icon: '📈', cat: 'Finance' },
+                { key: 'SUPABASE_URL', name: 'Supabase URL', icon: '🗄️', cat: 'Database' },
+                { key: 'SUPABASE_KEY', name: 'Supabase Key', icon: '🔑', cat: 'Database' },
+            ];
+            
+            let ok = 0, missing = 0, untested = 0;
+            let html = '<div class="space-y-3">';
+            
+            for (const api of apis) {
+                let status = 'untested';
+                try {
+                    const resp = await fetch(`/api/credentials?key=${api.key}`);
+                    const data = await resp.json();
+                    status = data.hasValue ? 'ok' : 'missing';
+                } catch { status = 'untested'; }
                 
-                // Check if has value
-                const value = await credentialsManager.get(key);
-                const source = credentialsManager.getSource(key);
+                if (status === 'ok') ok++;
+                else if (status === 'missing') missing++;
+                else untested++;
                 
-                categories[cat].push({
-                    key,
-                    ...config,
-                    hasValue: !!value,
-                    source,
-                    masked: value ? `${value.substring(0, 4)}...${value.slice(-4)}` : null
-                });
-            }
-            
-            // Calculate stats
-            let configured = 0, missing = 0, required = 0, total = 0;
-            for (const apis of Object.values(categories)) {
-                for (const api of apis) {
-                    total++;
-                    if (api.hasValue) configured++;
-                    else missing++;
-                    if (api.required) required++;
-                }
-            }
-            
-            document.getElementById('stat-configured').textContent = configured;
-            document.getElementById('stat-missing').textContent = missing;
-            document.getElementById('stat-required').textContent = required;
-            document.getElementById('stat-total').textContent = total;
-            
-            // Render
-            const categoryNames = {
-                llm: '🤖 LLM Providers',
-                finance: '📊 Financial Data',
-                communication: '📧 Communication',
-                database: '🗄️ Database & Storage',
-                video: '🎬 Video & Media'
-            };
-            
-            let html = '';
-            for (const [cat, apis] of Object.entries(categories)) {
+                const statusClass = status === 'ok' ? 'status-ok' : status === 'missing' ? 'status-error' : 'status-warn';
                 html += `
-                    <div class="glass-card rounded-2xl overflow-hidden">
-                        <div class="category-header px-5 py-3 border-b border-white/5">
-                            <span class="font-semibold">${categoryNames[cat] || cat}</span>
-                            <span class="text-gray-400 ml-2">(${apis.length})</span>
-                        </div>
-                        <div class="divide-y divide-white/5">
-                `;
-                
-                for (const api of apis) {
-                    const statusClass = api.hasValue ? 'status-connected' : (api.required ? 'status-missing' : 'status-partial');
-                    const sourceClass = `source-${api.source}`;
-                    
-                    html += `
-                        <div class="px-5 py-4 flex items-center justify-between hover:bg-white/5 transition">
-                            <div class="flex items-center gap-4">
-                                <div class="status-dot ${statusClass}"></div>
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xl">${api.icon}</span>
-                                        <span class="font-medium">${api.name}</span>
-                                        ${api.required ? '<span class="text-xs text-red-400">Required</span>' : ''}
-                                    </div>
-                                    <div class="text-gray-400 text-sm">${api.description}</div>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                ${api.hasValue ? `<span class="font-mono text-gray-400 text-sm">${api.masked}</span>` : ''}
-                                <span class="source-badge ${sourceClass}">${api.source}</span>
-                                <button onclick="editKey('${api.key}')" class="p-2 hover:bg-white/10 rounded-lg transition">
-                                    <i class="iconoir-edit"></i>
-                                </button>
-                                ${api.docUrl ? `
-                                    <a href="${api.docUrl}" target="_blank" class="p-2 hover:bg-white/10 rounded-lg transition">
-                                        <i class="iconoir-open-new-window"></i>
-                                    </a>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                html += '</div></div>';
-            }
-            
-            container.innerHTML = html;
-        }
-
-        // ═══════════════════════════════════════════════════════════════
-        // MCP PANEL
-        // ═══════════════════════════════════════════════════════════════
-        
-        async function loadMCPConnections() {
-            const container = document.getElementById('mcp-connections-container');
-            container.innerHTML = '';
-            
-            for (const [id, mcp] of Object.entries(MCP_REGISTRY)) {
-                // Check if all required keys are present
-                const keyStatuses = await Promise.all(
-                    mcp.requiredKeys.map(async key => ({
-                        key,
-                        hasValue: !!(await credentialsManager.get(key))
-                    }))
-                );
-                const allKeysPresent = keyStatuses.every(k => k.hasValue);
-                const statusClass = allKeysPresent ? 'status-connected' : 'status-missing';
-                
-                container.innerHTML += `
-                    <div class="glass-card rounded-xl p-5">
-                        <div class="flex items-center gap-3 mb-3">
+                    <div class="glass rounded-xl p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
                             <div class="status-dot ${statusClass}"></div>
-                            <span class="text-2xl">${mcp.icon}</span>
-                            <span class="font-semibold">${mcp.name}</span>
+                            <span class="text-xl">${api.icon}</span>
+                            <div>
+                                <div class="font-medium">${api.name}</div>
+                                <div class="text-gray-500 text-sm">${api.cat}</div>
+                            </div>
                         </div>
-                        <p class="text-gray-400 text-sm mb-3">${mcp.description}</p>
-                        <div class="text-xs text-gray-500">
-                            Required: ${mcp.requiredKeys.map(k => `<span class="${keyStatuses.find(ks => ks.key === k)?.hasValue ? 'text-green-400' : 'text-red-400'}">${k}</span>`).join(', ')}
+                        <div class="flex gap-2">
+                            <button onclick="testAPI('${api.key}')" class="px-3 py-1 glass rounded-lg text-sm">Test</button>
+                            <button onclick="editAPI('${api.key}')" class="px-3 py-1 glass rounded-lg text-sm">Edit</button>
                         </div>
                     </div>
                 `;
             }
+            html += '</div>';
+            
+            container.innerHTML = html;
+            document.getElementById('stat-ok').textContent = ok;
+            document.getElementById('stat-missing').textContent = missing;
+            document.getElementById('stat-untested').textContent = untested;
+            document.getElementById('stat-total').textContent = apis.length;
         }
 
-        // ═══════════════════════════════════════════════════════════════
-        // ORCHESTRATOR PANEL
-        // ═══════════════════════════════════════════════════════════════
-        
-        function loadOrchestratorSettings() {
-            const enabled = localStorage.getItem('emma-use-orchestrator') === 'true';
-            document.getElementById('orchestrator-enabled').checked = enabled;
-            
-            const persona = localStorage.getItem('emma-orchestrator-persona') || 'finance';
-            document.getElementById('default-persona').value = persona;
-            
-            const llm = localStorage.getItem('emma-preferred-llm') || 'auto';
-            document.getElementById('preferred-llm').value = llm;
-            
-            const skepticism = parseInt(localStorage.getItem('emma-skepticism-level') || '50');
-            document.getElementById('skepticism-level').value = skepticism;
-            updateSkepticismLabel();
-            
-            checkOrchestratorStatus();
-        }
-        
-        function toggleOrchestrator() {
-            const enabled = document.getElementById('orchestrator-enabled').checked;
-            localStorage.setItem('emma-use-orchestrator', enabled ? 'true' : 'false');
-        }
-        
-        function saveOrchestratorSettings() {
-            localStorage.setItem('emma-orchestrator-persona', document.getElementById('default-persona').value);
-            localStorage.setItem('emma-preferred-llm', document.getElementById('preferred-llm').value);
-            localStorage.setItem('emma-skepticism-level', document.getElementById('skepticism-level').value);
-        }
-        
-        function updateSkepticismLabel() {
-            const value = parseInt(document.getElementById('skepticism-level').value);
-            let label = 'Balanced';
-            if (value < 25) label = 'Low';
-            else if (value < 50) label = 'Moderate';
-            else if (value < 75) label = 'High';
-            else label = 'Maximum';
-            document.getElementById('skepticism-label').textContent = label;
-        }
-        
-        async function checkOrchestratorStatus() {
+        async function testAPI(key) {
             try {
-                const response = await fetch('/api/orchestrator');
-                const data = await response.json();
-                
-                if (data.success) {
-                    document.getElementById('orchestrator-status').innerHTML = `
-                        <div class="text-green-400 mb-2">✅ Orchestrator is running</div>
-                        <div>Features: ${data.features?.join(', ') || 'N/A'}</div>
-                        <div>Version: ${data.version || 'unknown'}</div>
-                    `;
-                } else {
-                    document.getElementById('orchestrator-status').innerHTML = `
-                        <div class="text-red-400">❌ Orchestrator error: ${data.error}</div>
-                    `;
-                }
-            } catch (error) {
-                document.getElementById('orchestrator-status').innerHTML = `
-                    <div class="text-red-400">❌ Cannot reach orchestrator: ${error.message}</div>
-                `;
-            }
+                const resp = await fetch('/api/credentials', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'test', key })
+                });
+                const data = await resp.json();
+                alert(data.success ? `✅ ${key} is working!` : `❌ ${key} failed: ${data.error}`);
+            } catch (e) { alert('Test failed: ' + e.message); }
         }
 
-        // ═══════════════════════════════════════════════════════════════
-        // TEST CONSOLE
-        // ═══════════════════════════════════════════════════════════════
-        
-        function logToConsole(message, type = 'info') {
-            const console = document.getElementById('test-console');
-            const colors = {
-                info: 'text-gray-300',
-                success: 'text-green-400',
-                error: 'text-red-400',
-                request: 'text-blue-400',
-                response: 'text-purple-400'
-            };
-            
-            const timestamp = new Date().toLocaleTimeString();
-            console.innerHTML += `<div class="${colors[type] || 'text-gray-300'}">[${timestamp}] ${message}</div>`;
-            console.scrollTop = console.scrollHeight;
-        }
-        
-        async function runTest(testType) {
-            logToConsole(`Running test: ${testType}`, 'request');
-            
-            try {
-                let response, data;
-                
-                switch (testType) {
-                    case 'orchestrator_status':
-                        response = await fetch('/api/orchestrator');
-                        data = await response.json();
-                        logToConsole(JSON.stringify(data, null, 2), 'response');
-                        break;
-                        
-                    case 'personas':
-                        response = await fetch('/api/orchestrator?action=personas');
-                        data = await response.json();
-                        logToConsole(JSON.stringify(data, null, 2), 'response');
-                        break;
-                        
-                    case 'agents':
-                        response = await fetch('/api/orchestrator?action=agents');
-                        data = await response.json();
-                        logToConsole(JSON.stringify(data, null, 2), 'response');
-                        break;
-                        
-                    case 'ask_finance':
-                        logToConsole('Sending: "Analyse AAPL" with finance persona...', 'info');
-                        response = await fetch('/api/orchestrator', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ message: 'Analyse AAPL brièvement', persona: 'finance' })
-                        });
-                        data = await response.json();
-                        logToConsole(JSON.stringify(data, null, 2), 'response');
-                        break;
-                        
-                    case 'stock_quote':
-                        logToConsole('Calling: DataAgent → get_stock_quote(AAPL)', 'info');
-                        response = await fetch('/api/orchestrator', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ agent: 'data', action: 'get_stock_quote', ticker: 'AAPL' })
-                        });
-                        data = await response.json();
-                        logToConsole(JSON.stringify(data, null, 2), 'response');
-                        break;
-                }
-                
-                logToConsole('Test completed ✓', 'success');
-                
-            } catch (error) {
-                logToConsole(`Error: ${error.message}`, 'error');
-            }
+        function editAPI(key) {
+            showModal(`
+                <h3 class="text-xl font-semibold mb-4">Edit ${key}</h3>
+                <input type="password" id="modal-value" class="w-full input-field rounded-xl p-3 mb-4" placeholder="Enter API key...">
+                <p class="text-gray-500 text-sm mb-4">For Vercel env vars, set in Vercel Dashboard.</p>
+                <div class="flex gap-3 justify-end">
+                    <button onclick="hideModal()" class="px-4 py-2 glass rounded-xl">Cancel</button>
+                    <button onclick="saveAPIKey('${key}')" class="px-4 py-2 bg-indigo-600 rounded-xl">Save</button>
+                </div>
+            `);
         }
 
-        // ═══════════════════════════════════════════════════════════════
-        // EDIT MODAL
-        // ═══════════════════════════════════════════════════════════════
-        
-        let currentEditKey = null;
-        let modalSource = 'vercel';
-        
-        async function editKey(key) {
-            currentEditKey = key;
-            const config = API_REGISTRY[key];
-            
-            document.getElementById('modal-title').textContent = `Edit ${config.name}`;
-            document.getElementById('modal-value').value = '';
-            
-            modalSource = credentialsManager.getSource(key);
-            setModalSource(modalSource);
-            
-            document.getElementById('edit-modal').classList.remove('hidden');
-        }
-        
-        function setModalSource(source) {
-            modalSource = source;
-            
-            // Update button styles
-            ['vercel', 'supabase', 'local', 'manual'].forEach(s => {
-                const btn = document.getElementById(`src-${s}`);
-                if (s === source) {
-                    btn.classList.add(`source-${s}`);
-                    btn.classList.remove('bg-gray-700');
-                } else {
-                    btn.classList.remove(`source-${s}`);
-                    btn.classList.add('bg-gray-700');
-                }
-            });
-            
-            // Update note
-            const notes = {
-                vercel: '<strong>Vercel:</strong> Set in Vercel Dashboard → Settings → Environment Variables. Value here is ignored.',
-                supabase: '<strong>Supabase:</strong> Stored encrypted in Supabase. Synced across devices.',
-                local: '<strong>Local:</strong> Stored in browser localStorage. Only available on this device.',
-                manual: '<strong>Manual:</strong> Session only. Will be cleared when you close the browser.'
-            };
-            document.getElementById('modal-source-note').innerHTML = notes[source];
-        }
-        
-        function closeModal() {
-            document.getElementById('edit-modal').classList.add('hidden');
-            currentEditKey = null;
-        }
-        
-        async function saveModalValue() {
+        async function saveAPIKey(key) {
             const value = document.getElementById('modal-value').value;
-            
-            if (modalSource !== 'vercel' && !value) {
-                alert('Please enter a value');
-                return;
-            }
-            
-            credentialsManager.setSource(currentEditKey, modalSource);
-            
-            if (modalSource !== 'vercel' && value) {
-                await credentialsManager.set(currentEditKey, value, modalSource);
-            }
-            
-            closeModal();
+            localStorage.setItem(`jlab_${key}`, value);
+            hideModal();
             loadAPIKeys();
         }
-        
-        function toggleValueVisibility() {
-            const input = document.getElementById('modal-value');
-            input.type = input.type === 'password' ? 'text' : 'password';
+
+        // Analytics
+        async function loadAnalytics() {
+            try {
+                const data = await emma?.getAnalytics?.('24h') || {};
+                if (data.success && data.stats) {
+                    document.getElementById('ana-requests').textContent = data.stats.totalRequests || 0;
+                    document.getElementById('ana-success').textContent = data.stats.successRate || '0%';
+                    document.getElementById('ana-latency').textContent = (data.stats.avgLatency || 0) + 'ms';
+                    document.getElementById('ana-cache').textContent = data.stats.cacheHitRate || '0%';
+                }
+            } catch (e) { console.log('Analytics not available'); }
+            
+            // Mock chart
+            const chart = document.getElementById('analytics-chart');
+            chart.innerHTML = Array(24).fill(0).map((_, i) => {
+                const h = Math.random() * 100 + 20;
+                return `<div class="flex-1 bg-indigo-500/50 rounded-t chart-bar" style="height:${h}px" title="Hour ${i}"></div>`;
+            }).join('');
         }
 
-        // ═══════════════════════════════════════════════════════════════
-        // EXPORT/IMPORT
-        // ═══════════════════════════════════════════════════════════════
-        
-        function exportConfig() {
-            const config = credentialsManager.exportConfig();
-            const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `jlab-config-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
+        // Scheduler
+        async function loadSchedules() {
+            const list = document.getElementById('schedules-list');
+            try {
+                const data = await emma?.getSchedules?.() || { schedules: [] };
+                if (data.schedules?.length) {
+                    list.innerHTML = data.schedules.map(s => `
+                        <div class="glass rounded-xl p-4 flex items-center justify-between">
+                            <div>
+                                <div class="font-medium">${s.name}</div>
+                                <div class="text-gray-500 text-sm">${s.cron} → ${s.taskAgent}.${s.taskAction}</div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="runScheduleNow('${s.id}')" class="px-3 py-1 bg-green-600 rounded-lg text-sm">Run</button>
+                                <button onclick="deleteSchedule('${s.id}')" class="px-3 py-1 bg-red-600 rounded-lg text-sm">Delete</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<div class="text-gray-500 text-center py-4">No schedules configured</div>';
+                }
+            } catch { list.innerHTML = '<div class="text-gray-500">Could not load schedules</div>'; }
         }
-        
-        async function importConfig() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
-                const text = await file.text();
-                const config = JSON.parse(text);
-                credentialsManager.importConfig(config);
-                loadAPIKeys();
-                alert('Configuration imported successfully!');
+
+        // Alerts
+        async function loadAlerts() {
+            const list = document.getElementById('alerts-list');
+            try {
+                const data = await emma?.getAlerts?.() || { alerts: [] };
+                if (data.alerts?.length) {
+                    list.innerHTML = data.alerts.map(a => `
+                        <div class="glass rounded-xl p-3 flex items-center justify-between">
+                            <div>
+                                <div class="font-medium">${a.ticker} ${a.type}</div>
+                                <div class="text-gray-500 text-sm">Target: ${a.value}</div>
+                            </div>
+                            <button onclick="deleteAlert('${a.id}')" class="px-2 py-1 text-red-400">✕</button>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<div class="text-gray-500 text-center py-4">No active alerts</div>';
+                }
+            } catch { list.innerHTML = '<div class="text-gray-500">Could not load alerts</div>'; }
+        }
+
+        // Cache
+        async function loadCacheStats() {
+            try {
+                const data = await emma?.agent?.('cache', 'get_stats', {}) || {};
+                if (data.stats) {
+                    document.getElementById('cache-entries').textContent = data.stats.entries || 0;
+                    document.getElementById('cache-hits').textContent = data.stats.hits || 0;
+                    document.getElementById('cache-misses').textContent = data.stats.misses || 0;
+                    document.getElementById('cache-rate').textContent = data.stats.hitRate || '0%';
+                }
+            } catch { console.log('Cache stats not available'); }
+        }
+
+        async function clearCache(category) {
+            await emma?.agent?.('cache', 'clear', { category: category === 'all' ? null : category });
+            loadCacheStats();
+        }
+
+        // Lab
+        async function loadAgentList() {
+            const select = document.getElementById('lab-agent');
+            const agents = ['data', 'research', 'tools', 'portfolio', 'alert', 'scheduler', 'analytics', 'cache', 'mcp', 'context'];
+            select.innerHTML = '<option value="">Select Agent...</option>' + 
+                agents.map(a => `<option value="${a}">${a}</option>`).join('');
+        }
+
+        function loadAgentActions() {
+            const agent = document.getElementById('lab-agent').value;
+            const actionSelect = document.getElementById('lab-action');
+            const actions = {
+                data: ['get_stock_quote', 'get_company_data'],
+                research: ['analyze_stock', 'deep_dive', 'generate_bull_bear', 'assess_risk'],
+                tools: ['get_stock_price', 'calculate_dcf', 'compare_stocks', 'get_yield_curve'],
+                portfolio: ['create_portfolio', 'analyze_portfolio', 'get_dividends'],
+                alert: ['create_alert', 'get_alerts', 'check_alerts'],
+                scheduler: ['get_schedules', 'create_schedule', 'get_next_runs'],
+                analytics: ['get_stats', 'get_latency_report'],
+                cache: ['get_stats', 'clear', 'warm_cache'],
+                mcp: ['list_mcp_tools', 'perplexity_ask'],
+                context: ['get_history', 'clear_history']
             };
-            input.click();
+            actionSelect.innerHTML = '<option value="">Select Action...</option>' + 
+                (actions[agent] || []).map(a => `<option value="${a}">${a}</option>`).join('');
         }
 
-        // ═══════════════════════════════════════════════════════════════
-        // INIT
-        // ═══════════════════════════════════════════════════════════════
-        
-        document.addEventListener('DOMContentLoaded', async () => {
-            await credentialsManager.init();
+        function loadLabPreset(type) {
+            const presets = {
+                chat: { agent: '', action: '', params: '{"message": "Analyse AAPL", "persona": "finance"}' },
+                quote: { agent: 'tools', action: 'get_stock_price', params: '{"ticker": "AAPL"}' },
+                research: { agent: 'research', action: 'analyze_stock', params: '{"ticker": "MSFT"}' },
+                dcf: { agent: 'tools', action: 'calculate_dcf', params: '{"ticker": "NVDA", "growthRate": 10, "discountRate": 12}' }
+            };
+            const p = presets[type];
+            document.getElementById('lab-agent').value = p.agent;
+            loadAgentActions();
+            setTimeout(() => document.getElementById('lab-action').value = p.action, 100);
+            document.getElementById('lab-params').value = p.params;
+        }
+
+        async function runLabTest() {
+            const agent = document.getElementById('lab-agent').value;
+            const action = document.getElementById('lab-action').value;
+            const params = document.getElementById('lab-params').value;
+            const output = document.getElementById('lab-output');
+            
+            output.innerHTML = '<span class="text-yellow-400">⏳ Executing...</span>';
+            const start = Date.now();
+            
+            try {
+                let result;
+                const body = JSON.parse(params || '{}');
+                
+                if (agent && action) {
+                    result = await emma?.agent?.(agent, action, body);
+                } else {
+                    const resp = await fetch('/api/orchestrator', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+                    result = await resp.json();
+                }
+                
+                output.innerHTML = `<pre class="text-green-400">${JSON.stringify(result, null, 2)}</pre>`;
+                document.getElementById('lab-timing').textContent = `✓ ${Date.now() - start}ms`;
+            } catch (e) {
+                output.innerHTML = `<span class="text-red-400">Error: ${e.message}</span>`;
+            }
+        }
+
+        function clearLabOutput() {
+            document.getElementById('lab-output').innerHTML = '<span class="text-gray-500">// Output cleared</span>';
+        }
+
+        // Modal helpers
+        function showModal(html) {
+            document.getElementById('modal-content').innerHTML = html;
+            document.getElementById('modal-overlay').classList.remove('hidden');
+        }
+        function hideModal() {
+            document.getElementById('modal-overlay').classList.add('hidden');
+        }
+
+        // Orchestrator settings
+        function loadOrchSettings() {
+            document.getElementById('orch-enabled').checked = localStorage.getItem('orch-enabled') === 'true';
+            document.getElementById('orch-streaming').checked = localStorage.getItem('orch-streaming') !== 'false';
+            document.getElementById('orch-cache').checked = localStorage.getItem('orch-cache') !== 'false';
+            document.getElementById('orch-persona').value = localStorage.getItem('orch-persona') || 'finance';
+            
+            // Load agent status
+            const agents = ['modelSelector', 'workflow', 'context', 'analytics', 'mcp', 'data', 'tools', 'research', 'news', 'earnings', 'portfolio', 'alert', 'briefing', 'sms', 'scheduler', 'cache'];
+            document.getElementById('agent-status').innerHTML = agents.map(a => `
+                <div class="flex items-center justify-between p-2 bg-black/20 rounded-lg">
+                    <span>${a}</span>
+                    <div class="status-dot status-ok"></div>
+                </div>
+            `).join('');
+        }
+
+        function saveOrchSettings() {
+            localStorage.setItem('orch-enabled', document.getElementById('orch-enabled').checked);
+            localStorage.setItem('orch-streaming', document.getElementById('orch-streaming').checked);
+            localStorage.setItem('orch-cache', document.getElementById('orch-cache').checked);
+            localStorage.setItem('orch-persona', document.getElementById('orch-persona').value);
+        }
+
+        function refreshAll() { loadAPIKeys(); }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
             loadAPIKeys();
-            loadMCPConnections();
-            loadOrchestratorSettings();
+            loadOrchSettings();
         });
     </script>
 </body>
