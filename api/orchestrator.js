@@ -158,10 +158,11 @@ export default async function handler(req, res) {
             if (!message && !agent) {
                 return res.status(400).json({
                     success: false,
-                    error: 'Either message or agent is required',
-                    usage: {
-                        chat: '{ "message": "Analyse AAPL", "persona": "finance" }',
-                        agent: '{ "agent": "data", "action": "get_stock_quote", "ticker": "AAPL" }'
+                    error: 'Format de requête invalide. Un "message" (pour chat) ou un "agent" (pour action directe) est requis.',
+                    usage: 'Consultez la documentation ou utilisez les exemples ci-dessous.',
+                    examples: {
+                        chat: { message: "Analyse AAPL", persona: "finance" },
+                        agent: { agent: "data", action: "get_stock_quote", ticker: "AAPL" }
                     }
                 });
             }
@@ -169,7 +170,7 @@ export default async function handler(req, res) {
             console.log(`\n═══════════════════════════════════════════════════`);
             console.log(`📨 [Orchestrator API] Request received`);
             console.log(`   Type: ${agent ? 'Agent Call' : 'Chat'}`);
-            if (message) console.log(`   Message: ${(message || '').substring(0, 50)}...`);
+            if (message && typeof message === 'string') console.log(`   Message: ${message.substring(0, 50)}...`);
             if (agent) console.log(`   Agent: ${agent}, Action: ${action}`);
             console.log(`   Persona: ${persona || 'auto'}`);
             console.log(`═══════════════════════════════════════════════════`);

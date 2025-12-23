@@ -42,6 +42,8 @@ const JLabTab = () => {
     const [violations, setViolations] = useState([]);
     // Screener visibility
     const [showScreener, setShowScreener] = useState(false);
+    const [loadingScreener, setLoadingScreener] = useState(false);
+    const [screenerResults, setScreenerResults] = useState([]);
     // Stock Analysis Modal
     const [showAnalysisModal, setShowAnalysisModal] = useState(false);
     // Advanced Modals

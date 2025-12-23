@@ -366,6 +366,9 @@
                     </div>
                 </div>
                 <div class="console-output">
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem;">
+                        <button onclick="resetConsole()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem;">🗑️ Clear</button>
+                    </div>
                     <pre id="outputPre">// Output will appear here...</pre>
                 </div>
             </div>
@@ -454,6 +457,7 @@
         }
 
         // Test an agent
+        // Test an agent
         async function testAgent(agentId) {
             const agent = agents.find(a => a.id === agentId);
             if (!agent) return;
@@ -468,9 +472,17 @@
             if (agentId === 'research') input.ticker = 'AAPL';
             if (agentId === 'tools') input.ticker = 'AAPL';
             if (agentId === 'analytics') input.timeRange = '24h';
-
+            if (agentId === 'data') input.ticker = 'TSLA';
+            
+            // UI Updates
             document.getElementById('commandInput').value = JSON.stringify(input, null, 2);
-            executeCommand();
+            document.getElementById('agentSelect').value = agentId; // Update dropdown
+            
+            // Scroll to console
+            document.querySelector('.console').scrollIntoView({ behavior: 'smooth' });
+            
+            // Optional: Auto-execute or let user click
+            // executeCommand(); 
         }
 
         // Load example command
@@ -481,7 +493,21 @@
                 tools: { agent: "tools", action: "get_stock_price", ticker: "NVDA" },
                 portfolio: { agent: "portfolio", action: "create_portfolio", portfolioId: "test", name: "Test Portfolio", holdings: [{ ticker: "AAPL", shares: 100, costBasis: 150 }] }
             };
-            document.getElementById('commandInput').value = JSON.stringify(examples[type], null, 2);
+            
+            const payload = examples[type];
+            document.getElementById('commandInput').value = JSON.stringify(payload, null, 2);
+            
+            // Sync dropdown if agent is present in payload
+            if (payload && payload.agent) {
+                document.getElementById('agentSelect').value = payload.agent;
+            } else {
+                document.getElementById('agentSelect').value = ""; // Reset for chat/generic
+            }
+        }
+        
+        function resetConsole() {
+            document.getElementById('outputPre').textContent = '// Output will appear here...';
+            document.getElementById('outputPre').classList.remove('loading');
         }
 
         // Execute command
@@ -494,6 +520,14 @@
 
             try {
                 const body = JSON.parse(input);
+                
+                // Increment request counter visually
+                const countEl = document.getElementById('requestCount');
+                if (countEl) {
+                    const current = parseInt(countEl.textContent.replace(/[^0-9]/g, '') || '0');
+                    countEl.textContent = current + 1;
+                }
+
                 const response = await fetch('/api/orchestrator', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -516,19 +550,28 @@
         // Load stats
         async function loadStats() {
             try {
+                // Set agent count immediately from definition
+                document.getElementById('agentCount').textContent = agents.length;
+                
                 const status = await emma?.getStatus?.() || {};
                 if (status.success) {
-                    document.getElementById('agentCount').textContent = status.status?.availableAgents?.length || 15;
-                    document.getElementById('personaCount').textContent = status.status?.availablePersonas?.length || 8;
+                    if (status.status?.availablePersonas?.length) {
+                        document.getElementById('personaCount').textContent = status.status.availablePersonas.length;
+                    }
                 }
 
                 const analytics = await emma?.getAnalytics?.('24h') || {};
                 if (analytics.success) {
-                    document.getElementById('requestCount').textContent = analytics.stats?.totalRequests || 0;
-                    document.getElementById('uptime').textContent = analytics.stats?.uptime || '--';
+                    // Only update if we have real numbers, otherwise keep existing
+                    if (analytics.stats?.totalRequests) {
+                        document.getElementById('requestCount').textContent = analytics.stats.totalRequests;
+                    }
+                    if (analytics.stats?.uptime) {
+                        document.getElementById('uptime').textContent = analytics.stats.uptime;
+                    }
                 }
             } catch (e) {
-                console.log('Stats loading...');
+                console.log('Stats loading issue (minor):', e.message);
             }
         }
 
