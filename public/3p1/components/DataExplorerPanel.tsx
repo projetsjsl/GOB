@@ -60,8 +60,15 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
   
   // Filtering & sorting
   const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState('created_at');
+  const [sortBy, setSortBy] = useState<string | undefined>(undefined);
   const [sortAsc, setSortAsc] = useState(false);
+  
+  // Advanced Filtering
+  const [activeFilters, setActiveFilters] = useState<{[key: string]: string}>({});
+  const [showFilterBar, setShowFilterBar] = useState(false);
+  
+  // Feedback
+  const [notifications, setNotifications] = useState<{id: number, type: 'success' | 'error', message: string}[]>([]);
   
   // Selection for sync
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
@@ -107,18 +114,23 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
   const loadTableData = async () => {
     if (!selectedTable) return;
     setLoading(true);
+    setError(null); // Clear previous errors
     try {
       const params = new URLSearchParams({
         action: 'data',
         table: selectedTable,
         page: page.toString(),
         limit: limit.toString(),
-        orderBy: sortBy,
         ascending: sortAsc.toString()
       });
+      if (sortBy) params.append('orderBy', sortBy);
       if (search) params.append('search', search);
       
-      const res = await fetch(`/api/data-explorer?${params}`);
+      const res = await fetch(`/api/data-explorer?${params}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filters: activeFilters })
+      });
       const data = await res.json();
       if (data.success) {
         setTableData(data.data);
@@ -133,6 +145,14 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
     } finally {
       setLoading(false);
     }
+  };
+
+  const addNotification = (type: 'success' | 'error', message: string) => {
+    const id = Date.now();
+    setNotifications(prev => [...prev, { id, type, message }]);
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }, 4000);
   };
 
   const handleSort = (column: string) => {
@@ -221,14 +241,17 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
       
       const result = await res.json();
       if (result.success) {
+        addNotification('success', isNew ? 'Enregistrement créé avec succès' : 'Modification enregistrée');
         setIsEditModalOpen(false);
         setEditingRow(null);
         loadTableData();
         loadTables(); // Refresh counts
       } else {
+        addNotification('error', result.error);
         setError(result.error);
       }
     } catch (e: any) {
+      addNotification('error', e.message);
       setError(e.message);
     } finally {
       setLoading(false);
@@ -251,13 +274,39 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
       
       const result = await res.json();
       if (result.success) {
+        addNotification('success', 'Enregistrement supprimé');
         loadTableData();
         loadTables();
       } else {
+        addNotification('error', result.error);
         setError(result.error);
       }
     } catch (e: any) {
+      addNotification('error', e.message);
       setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleSyncFMP = async (ticker: string) => {
+    if (!ticker) return;
+    setLoading(true);
+    addNotification('success', `Synchro FMP démarrée pour ${ticker}...`);
+    try {
+      const res = await fetch('/api/fmp-sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'sync-all', symbol: ticker })
+      });
+      const data = await res.json();
+      if (data.success) {
+        addNotification('success', `Synchro terminée pour ${ticker}`);
+        loadTableData();
+      } else {
+        addNotification('error', data.error || 'Erreur inconnue');
+      }
+    } catch (e: any) {
+      addNotification('error', e.message);
     } finally {
       setLoading(false);
     }
@@ -420,10 +469,64 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                       className="w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none"
                     />
                   </div>
+                  
+                  <button
+                    onClick={() => setShowFilterBar(!showFilterBar)}
+                    className={`p-2 rounded-lg border transition-all ${
+                      showFilterBar || Object.keys(activeFilters).length > 0
+                        ? 'bg-blue-600/20 border-blue-500 text-blue-400'
+                        : 'bg-slate-900 border-slate-600 text-slate-400 hover:text-white'
+                    }`}
+                    title="Filtres avancés"
+                  >
+                    <FunnelIcon className="w-5 h-5" />
+                  </button>
+
                   <div className="text-sm text-slate-400">
                     {totalRows.toLocaleString()} enregistrements
                   </div>
                 </div>
+
+                {/* Advanced Filter Bar */}
+                {showFilterBar && (
+                  <div className="px-4 py-3 bg-slate-800/80 border-b border-slate-700 flex flex-wrap gap-2 items-center animate-in slide-in-from-top duration-200">
+                    <span className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1">
+                      <FunnelIcon className="w-3 h-3" />
+                      Filtres:
+                    </span>
+                    {columns.slice(0, 5).map(col => (
+                      <div key={col.name} className="flex-1 min-w-[150px]">
+                        <input
+                          type="text"
+                          placeholder={col.name}
+                          value={activeFilters[col.name] || ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setActiveFilters(prev => {
+                              const next = { ...prev };
+                              if (val) next[col.name] = val;
+                              else delete next[col.name];
+                              return next;
+                            });
+                          }}
+                          className="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg px-2 py-1 text-xs text-white placeholder-slate-600 focus:border-blue-500 outline-none"
+                        />
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => { setActiveFilters({}); loadTableData(); }}
+                      className="text-xs text-slate-400 hover:text-white px-2 py-1 underline"
+                    >
+                      Effacer tout
+                    </button>
+                    <button
+                      onClick={loadTableData}
+                      className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded-lg font-bold transition-all"
+                    >
+                      Appliquer
+                    </button>
+                  </div>
+                )}
 
                 {/* Data Grid */}
                 <div className="flex-1 overflow-auto">
@@ -497,6 +600,15 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                                 >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                 </button>
+                                {row.ticker && (
+                                  <button
+                                    onClick={() => handleSyncFMP(row.ticker)}
+                                    className="p-1 hover:bg-slate-700 rounded text-green-400 transition-colors"
+                                    title="Synchroniser FMP"
+                                  >
+                                    <ArrowPathIcon className="w-4 h-4" />
+                                  </button>
+                                )}
                                 <button
                                   onClick={() => handleDeleteRow(row.id || row.ticker)}
                                   className="p-1 hover:bg-slate-700 rounded text-red-400 transition-colors"
@@ -570,6 +682,14 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                             </div>
                           )}
                         </div>
+                        <div className="mt-4 pt-4 border-t border-slate-700/50 flex gap-2">
+                          <button
+                            onClick={() => { setSelectedTable(t.name); setShowSummary(false); }}
+                            className="flex-1 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-xs font-bold rounded-lg transition-colors border border-blue-500/30"
+                          >
+                            Explorer
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -623,6 +743,31 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
             onSave={handleSaveRow}
           />
         )}
+
+        {/* Notifications / Toast Stack */}
+        <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2">
+          {notifications.map(n => (
+            <div
+              key={n.id}
+              className={`p-4 rounded-xl shadow-2xl flex items-center gap-3 animate-in slide-in-from-right duration-300 ${
+                n.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
+              }`}
+            >
+              {n.type === 'success' ? (
+                <CheckIcon className="w-5 h-5" />
+              ) : (
+                <ExclamationCircleIcon className="w-5 h-5" />
+              )}
+              <span className="font-medium">{n.message}</span>
+              <button
+                onClick={() => setNotifications(prev => prev.filter(x => x.id !== n.id))}
+                className="ml-4 p-1 hover:bg-black/10 rounded"
+              >
+                <XMarkIcon className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -652,7 +797,32 @@ const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onCl
             return (
               <div key={col.name}>
                 <label className="block text-sm font-medium text-slate-400 mb-1 capitalize">{col.name.replace(/_/g, ' ')}</label>
-                {typeof formData[col.name] === 'object' ? (
+                {col.name === 'ticker' ? (
+                  <input
+                    type="text"
+                    value={formData[col.name] || ''}
+                    onChange={(e) => setFormData({ ...formData, [col.name]: e.target.value.toUpperCase() })}
+                    className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-bold uppercase transition-all focus:border-blue-500 outline-none"
+                    placeholder="AAPL"
+                  />
+                ) : typeof formData[col.name] === 'boolean' || col.type === 'boolean' ? (
+                  <div className="flex bg-slate-900 border border-slate-600 rounded-lg p-1">
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, [col.name]: true })}
+                      className={`flex-1 py-2 rounded-md text-xs font-bold transition-all ${formData[col.name] === true ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-white'}`}
+                    >
+                      TRUE
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, [col.name]: false })}
+                      className={`flex-1 py-2 rounded-md text-xs font-bold transition-all ${formData[col.name] === false ? 'bg-slate-700 text-white' : 'text-slate-500 hover:text-white'}`}
+                    >
+                      FALSE
+                    </button>
+                  </div>
+                ) : typeof formData[col.name] === 'object' ? (
                   <textarea
                     value={JSON.stringify(formData[col.name], null, 2)}
                     onChange={(e) => {
@@ -663,14 +833,14 @@ const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onCl
                         // Handle invalid JSON while typing
                       }
                     }}
-                    className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-mono text-sm h-32"
+                    className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-mono text-sm h-32 focus:border-blue-500 outline-none"
                   />
                 ) : (
                   <input
-                    type={col.type === 'number' ? 'number' : 'text'}
-                    value={formData[col.name] || ''}
-                    onChange={(e) => setFormData({ ...formData, [col.name]: e.target.value })}
-                    className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white"
+                    type={col.type === 'number' || typeof formData[col.name] === 'number' ? 'number' : 'text'}
+                    value={formData[col.name] === null ? '' : formData[col.name]}
+                    onChange={(e) => setFormData({ ...formData, [col.name]: col.type === 'number' ? parseFloat(e.target.value) : e.target.value })}
+                    className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
                   />
                 )}
               </div>

@@ -1,4 +1,4 @@
-import { r as reactExports, j as jsxRuntimeExports, s as ForwardRef$1, t as ForwardRef$2, g as ForwardRef$3, F as ForwardRef$4, u as ForwardRef$5, v as ForwardRef$6, w as ForwardRef$7, l as ForwardRef$8, m as ForwardRef$9 } from "./index.js";
+import { r as reactExports, j as jsxRuntimeExports, s as ForwardRef$1, t as ForwardRef$2, g as ForwardRef$3, F as ForwardRef$4, u as ForwardRef$5, v as ForwardRef$6, w as ForwardRef$7, a as ForwardRef$8, l as ForwardRef$9, m as ForwardRef$a } from "./index.js";
 function CheckIcon({
   title,
   titleId,
@@ -35,8 +35,11 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
   const [totalRows, setTotalRows] = reactExports.useState(0);
   const limit = 50;
   const [search, setSearch] = reactExports.useState("");
-  const [sortBy, setSortBy] = reactExports.useState("created_at");
+  const [sortBy, setSortBy] = reactExports.useState(void 0);
   const [sortAsc, setSortAsc] = reactExports.useState(false);
+  const [activeFilters, setActiveFilters] = reactExports.useState({});
+  const [showFilterBar, setShowFilterBar] = reactExports.useState(false);
+  const [notifications, setNotifications] = reactExports.useState([]);
   const [selectedRows, setSelectedRows] = reactExports.useState(/* @__PURE__ */ new Set());
   const [showSyncPanel, setShowSyncPanel] = reactExports.useState(false);
   const [editingRow, setEditingRow] = reactExports.useState(null);
@@ -72,17 +75,22 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
   const loadTableData = async () => {
     if (!selectedTable) return;
     setLoading(true);
+    setError(null);
     try {
       const params = new URLSearchParams({
         action: "data",
         table: selectedTable,
         page: page.toString(),
         limit: limit.toString(),
-        orderBy: sortBy,
         ascending: sortAsc.toString()
       });
+      if (sortBy) params.append("orderBy", sortBy);
       if (search) params.append("search", search);
-      const res = await fetch(`/api/data-explorer?${params}`);
+      const res = await fetch(`/api/data-explorer?${params}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filters: activeFilters })
+      });
       const data = await res.json();
       if (data.success) {
         setTableData(data.data);
@@ -97,6 +105,13 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
     } finally {
       setLoading(false);
     }
+  };
+  const addNotification = (type, message) => {
+    const id = Date.now();
+    setNotifications((prev) => [...prev, { id, type, message }]);
+    setTimeout(() => {
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+    }, 4e3);
   };
   const handleSort = (column) => {
     if (sortBy === column) {
@@ -172,14 +187,17 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
       });
       const result = await res.json();
       if (result.success) {
+        addNotification("success", isNew ? "Enregistrement créé avec succès" : "Modification enregistrée");
         setIsEditModalOpen(false);
         setEditingRow(null);
         loadTableData();
         loadTables();
       } else {
+        addNotification("error", result.error);
         setError(result.error);
       }
     } catch (e) {
+      addNotification("error", e.message);
       setError(e.message);
     } finally {
       setLoading(false);
@@ -200,13 +218,39 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
       });
       const result = await res.json();
       if (result.success) {
+        addNotification("success", "Enregistrement supprimé");
         loadTableData();
         loadTables();
       } else {
+        addNotification("error", result.error);
         setError(result.error);
       }
     } catch (e) {
+      addNotification("error", e.message);
       setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleSyncFMP = async (ticker) => {
+    if (!ticker) return;
+    setLoading(true);
+    addNotification("success", `Synchro FMP démarrée pour ${ticker}...`);
+    try {
+      const res = await fetch("/api/fmp-sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "sync-all", symbol: ticker })
+      });
+      const data = await res.json();
+      if (data.success) {
+        addNotification("success", `Synchro terminée pour ${ticker}`);
+        loadTableData();
+      } else {
+        addNotification("error", data.error || "Erreur inconnue");
+      }
+    } catch (e) {
+      addNotification("error", e.message);
     } finally {
       setLoading(false);
     }
@@ -376,10 +420,62 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
               }
             )
           ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: () => setShowFilterBar(!showFilterBar),
+              className: `p-2 rounded-lg border transition-all ${showFilterBar || Object.keys(activeFilters).length > 0 ? "bg-blue-600/20 border-blue-500 text-blue-400" : "bg-slate-900 border-slate-600 text-slate-400 hover:text-white"}`,
+              title: "Filtres avancés",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$8, { className: "w-5 h-5" })
+            }
+          ),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-slate-400", children: [
             totalRows.toLocaleString(),
             " enregistrements"
           ] })
+        ] }),
+        showFilterBar && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 py-3 bg-slate-800/80 border-b border-slate-700 flex flex-wrap gap-2 items-center animate-in slide-in-from-top duration-200", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs font-bold text-slate-500 uppercase flex items-center gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$8, { className: "w-3 h-3" }),
+            "Filtres:"
+          ] }),
+          columns.slice(0, 5).map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 min-w-[150px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "text",
+              placeholder: col.name,
+              value: activeFilters[col.name] || "",
+              onChange: (e) => {
+                const val = e.target.value;
+                setActiveFilters((prev) => {
+                  const next = { ...prev };
+                  if (val) next[col.name] = val;
+                  else delete next[col.name];
+                  return next;
+                });
+              },
+              className: "w-full bg-slate-900/50 border border-slate-700/50 rounded-lg px-2 py-1 text-xs text-white placeholder-slate-600 focus:border-blue-500 outline-none"
+            }
+          ) }, col.name)),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: () => {
+                setActiveFilters({});
+                loadTableData();
+              },
+              className: "text-xs text-slate-400 hover:text-white px-2 py-1 underline",
+              children: "Effacer tout"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: loadTableData,
+              className: "bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded-lg font-bold transition-all",
+              children: "Appliquer"
+            }
+          )
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-auto", children: loading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-8 h-8 text-blue-400 animate-spin" }) }) : error ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center h-full text-red-400", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-6 h-6 mr-2" }),
@@ -402,7 +498,7 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
                 className: "p-3 text-left text-slate-300 cursor-pointer hover:text-white transition-colors",
                 children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate max-w-[120px]", children: col.name }),
-                  sortBy === col.name && (sortAsc ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$8, { className: "w-3 h-3" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$9, { className: "w-3 h-3" }))
+                  sortBy === col.name && (sortAsc ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$9, { className: "w-3 h-3" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-3 h-3" }))
                 ] })
               },
               col.name
@@ -435,6 +531,15 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
                       className: "p-1 hover:bg-slate-700 rounded text-blue-400 transition-colors",
                       title: "Modifier",
                       children: /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-4 h-4", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", d: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" }) })
+                    }
+                  ),
+                  row.ticker && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "button",
+                    {
+                      onClick: () => handleSyncFMP(row.ticker),
+                      className: "p-1 hover:bg-slate-700 rounded text-green-400 transition-colors",
+                      title: "Synchroniser FMP",
+                      children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-4 h-4" })
                     }
                   ),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -501,7 +606,18 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-white", children: formatLastUpdate(t.lastUpdate) })
             ] }),
             t.error && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4 p-3 bg-red-950/50 border border-red-900 rounded-lg text-red-300 text-xs font-mono", children: t.error })
-          ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4 pt-4 border-t border-slate-700/50 flex gap-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: () => {
+                setSelectedTable(t.name);
+                setShowSummary(false);
+              },
+              className: "flex-1 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-xs font-bold rounded-lg transition-colors border border-blue-500/30",
+              children: "Explorer"
+            }
+          ) })
         ] }, t.name)) })
       ] }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 flex items-center justify-center text-slate-500", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-16 h-16 mx-auto mb-4 opacity-50" }),
@@ -543,7 +659,26 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
         onClose: () => setIsEditModalOpen(false),
         onSave: handleSaveRow
       }
-    )
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed bottom-6 right-6 z-[100] flex flex-col gap-2", children: notifications.map((n) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        className: `p-4 rounded-xl shadow-2xl flex items-center gap-3 animate-in slide-in-from-right duration-300 ${n.type === "success" ? "bg-emerald-600 text-white" : "bg-red-600 text-white"}`,
+        children: [
+          n.type === "success" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-5 h-5" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-5 h-5" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: n.message }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: () => setNotifications((prev) => prev.filter((x) => x.id !== n.id)),
+              className: "ml-4 p-1 hover:bg-black/10 rounded",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-4 h-4" })
+            }
+          )
+        ]
+      },
+      n.id
+    )) })
   ] }) });
 };
 const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
@@ -557,7 +692,35 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
       if (["id", "created_at", "updated_at"].includes(col.name)) return null;
       return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-slate-400 mb-1 capitalize", children: col.name.replace(/_/g, " ") }),
-        typeof formData[col.name] === "object" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+        col.name === "ticker" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "input",
+          {
+            type: "text",
+            value: formData[col.name] || "",
+            onChange: (e) => setFormData({ ...formData, [col.name]: e.target.value.toUpperCase() }),
+            className: "w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-bold uppercase transition-all focus:border-blue-500 outline-none",
+            placeholder: "AAPL"
+          }
+        ) : typeof formData[col.name] === "boolean" || col.type === "boolean" ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex bg-slate-900 border border-slate-600 rounded-lg p-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              type: "button",
+              onClick: () => setFormData({ ...formData, [col.name]: true }),
+              className: `flex-1 py-2 rounded-md text-xs font-bold transition-all ${formData[col.name] === true ? "bg-blue-600 text-white shadow-lg" : "text-slate-500 hover:text-white"}`,
+              children: "TRUE"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              type: "button",
+              onClick: () => setFormData({ ...formData, [col.name]: false }),
+              className: `flex-1 py-2 rounded-md text-xs font-bold transition-all ${formData[col.name] === false ? "bg-slate-700 text-white" : "text-slate-500 hover:text-white"}`,
+              children: "FALSE"
+            }
+          )
+        ] }) : typeof formData[col.name] === "object" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
           "textarea",
           {
             value: JSON.stringify(formData[col.name], null, 2),
@@ -568,15 +731,15 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
               } catch {
               }
             },
-            className: "w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-mono text-sm h-32"
+            className: "w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-mono text-sm h-32 focus:border-blue-500 outline-none"
           }
         ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
           "input",
           {
-            type: col.type === "number" ? "number" : "text",
-            value: formData[col.name] || "",
-            onChange: (e) => setFormData({ ...formData, [col.name]: e.target.value }),
-            className: "w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white"
+            type: col.type === "number" || typeof formData[col.name] === "number" ? "number" : "text",
+            value: formData[col.name] === null ? "" : formData[col.name],
+            onChange: (e) => setFormData({ ...formData, [col.name]: col.type === "number" ? parseFloat(e.target.value) : e.target.value }),
+            className: "w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
           }
         )
       ] }, col.name);

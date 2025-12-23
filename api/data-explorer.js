@@ -171,13 +171,30 @@ async function getTableData(req, res, supabase) {
     
     // Search in common fields
     if (search) {
-        query = query.or(`ticker.ilike.%${search}%,notes.ilike.%${search}%`);
+        // Try to determine if search is for a specific column
+        if (search.includes(':')) {
+            const [col, val] = search.split(':');
+            query = query.ilike(col.trim(), `%${val.trim()}%`);
+        } else {
+            // Default search logic
+            query = query.or(`ticker.ilike.%${search}%,notes.ilike.%${search}%`);
+        }
+    }
+
+    // Apply multiple filters from body if provided
+    const { filters: bodyFilters } = req.body || {};
+    if (bodyFilters && typeof bodyFilters === 'object') {
+        Object.entries(bodyFilters).forEach(([col, val]) => {
+            if (val === null) query = query.is(col, null);
+            else if (typeof val === 'boolean') query = query.eq(col, val);
+            else query = query.ilike(col, `%${val}%`);
+        });
     }
     
     // Determine default sort if not provided
     let finalOrderBy = orderBy;
-    if (!finalOrderBy) {
-        // Try to find a good default column
+    if (!finalOrderBy || finalOrderBy === 'undefined') {
+        // Try to find a good default column by getting one row
         const { data: sample } = await supabase.from(table).select('*').limit(1);
         const cols = sample && sample.length > 0 ? Object.keys(sample[0]) : [];
         if (cols.includes('updated_at')) finalOrderBy = 'updated_at';
