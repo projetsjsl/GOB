@@ -1010,7 +1010,14 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       {globalStats && (
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-blue-200">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📊 Statistiques Globales du Portefeuille</h3>
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">
+              📊 Statistiques Globales du Portefeuille 
+              {globalStats.validCount < globalStats.count && (
+                 <span className="ml-2 text-sm font-normal text-blue-600 animate-pulse">
+                   (Chargement... {globalStats.validCount}/{globalStats.count})
+                 </span>
+              )}
+            </h3>
             <button
               onClick={() => toggleSection('globalStats')}
               className="p-1.5 hover:bg-blue-100 rounded transition-colors cursor-help"
