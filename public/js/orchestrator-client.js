@@ -1,224 +1,307 @@
 /**
- * ORCHESTRATOR CLIENT
+ * ORCHESTRATOR CLIENT - Universal AI Interface for Frontend
  * 
- * Frontend client for interacting with the Multi-Agent Orchestrator API.
- * Use this in React components, dashboard tabs, or standalone scripts.
+ * This client provides easy access to the Multi-Agent Orchestrator
+ * from any frontend code, chatbot, or prompt interface.
  * 
- * Usage:
- *   import { orchestratorClient } from './orchestrator-client.js';
- *   
- *   // Simple query
- *   const result = await orchestratorClient.ask("Analyse AAPL");
- *   
- *   // With persona
- *   const criticism = await orchestratorClient.askAs("critic", "Risques Tesla");
- *   
- *   // Full options
- *   const analysis = await orchestratorClient.process({
- *     message: "Analyse complète",
- *     persona: "finance",
- *     tickers: ["AAPL", "MSFT"],
- *     options: { comprehensive: true }
- *   });
+ * Load in your HTML:
+ *   <script src="/js/orchestrator-client.js"></script>
+ * 
+ * Then use anywhere:
+ *   const response = await orchestratorClient.ask("Analyse AAPL");
+ *   const financeResponse = await orchestratorClient.askFinance("TSLA");
+ *   const data = await orchestratorClient.agent("data", "get_stock_quote", { ticker: "AAPL" });
  */
 
-class OrchestratorClient {
-    constructor(baseUrl = '/api/orchestrator') {
-        this.baseUrl = baseUrl;
-        this.currentPersona = 'finance';
-        this.lastResponse = null;
-    }
+(function(global) {
+    'use strict';
 
-    /**
-     * Simple ask - auto persona selection
-     */
-    async ask(message, options = {}) {
-        return this.process({ message, ...options });
-    }
+    const API_ENDPOINT = '/api/orchestrator';
 
-    /**
-     * Ask with specific persona
-     */
-    async askAs(persona, message, options = {}) {
-        return this.process({ message, persona, ...options });
-    }
+    // ═══════════════════════════════════════════════════════════════════
+    // CORE CLIENT
+    // ═══════════════════════════════════════════════════════════════════
 
-    // =========================================================
-    // PERSONA SHORTCUTS
-    // =========================================================
+    const orchestratorClient = {
+        version: '2.0',
+        initialized: false,
+        lastResponse: null,
 
-    /**
-     * Ask Emma Finance (stock analysis)
-     */
-    async askFinance(message, tickers = []) {
-        return this.askAs('finance', message, { tickers });
-    }
+        // =============================================================
+        // INITIALIZATION
+        // =============================================================
 
-    /**
-     * Ask Emma Critic (contrarian view)
-     */
-    async askCritic(message, tickers = []) {
-        return this.askAs('critic', message, { tickers });
-    }
-
-    /**
-     * Ask Emma Researcher (deep research)
-     */
-    async askResearcher(message) {
-        return this.askAs('researcher', message, { options: { comprehensive: true } });
-    }
-
-    /**
-     * Ask Emma Writer (briefings, emails)
-     */
-    async askWriter(message, format = 'briefing') {
-        return this.askAs('writer', message, { options: { format } });
-    }
-
-    /**
-     * Ask Emma Geek (technical analysis)
-     */
-    async askGeek(message, tickers = []) {
-        return this.askAs('geek', message, { tickers });
-    }
-
-    /**
-     * Ask Emma Macro (macroeconomic analysis)
-     */
-    async askMacro(message) {
-        return this.askAs('macro', message);
-    }
-
-    /**
-     * CEO Mode (simulate CEO responses)
-     */
-    async askCEO(company, question) {
-        return this.askAs('ceo', `En tant que CEO de ${company}: ${question}`);
-    }
-
-    // =========================================================
-    // CORE METHODS
-    // =========================================================
-
-    /**
-     * Full process method
-     */
-    async process(request) {
-        const { message, persona, tickers, channel, options } = request;
-
-        try {
-            const response = await fetch(this.baseUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message,
-                    persona: persona || this.currentPersona,
-                    tickers: tickers || [],
-                    channel: channel || 'web',
-                    options: options || {}
-                })
-            });
-
-            const data = await response.json();
-            this.lastResponse = data;
-
-            if (data.success) {
-                console.log(`✅ [OrchestratorClient] Response received from ${data.persona?.name || 'Orchestrator'}`);
-            } else {
-                console.warn(`⚠️ [OrchestratorClient] Error: ${data.error}`);
+        async init() {
+            if (this.initialized) return this;
+            
+            try {
+                const status = await this.getStatus();
+                this.initialized = status.success;
+                console.log('🎯 [OrchestratorClient] Initialized', status.status?.ready ? '✅' : '⚠️');
+            } catch (error) {
+                console.warn('⚠️ [OrchestratorClient] Init failed:', error.message);
             }
+            
+            return this;
+        },
 
-            return data;
+        // =============================================================
+        // MAIN CHAT API - Universal message processing
+        // =============================================================
 
-        } catch (error) {
-            console.error('❌ [OrchestratorClient] Request failed:', error);
-            return {
-                success: false,
-                error: error.message,
-                response: null
-            };
+        /**
+         * Send a message to the orchestrator (auto persona selection)
+         * @param {string} message - The user message
+         * @param {object} options - Additional options
+         * @returns {Promise<object>} Response from orchestrator
+         */
+        async ask(message, options = {}) {
+            return this._post({ message, ...options });
+        },
+
+        /**
+         * Send a message with a specific persona
+         * @param {string} persona - The Emma persona to use
+         * @param {string} message - The user message
+         * @param {object} options - Additional options
+         * @returns {Promise<object>} Response from orchestrator
+         */
+        async askWithPersona(persona, message, options = {}) {
+            return this._post({ message, persona, ...options });
+        },
+
+        // =============================================================
+        // PERSONA SHORTCUTS - Quick access to each Emma personality
+        // =============================================================
+
+        /** 📊 Finance persona - Stock analysis, dividends, portfolio */
+        async askFinance(message, options = {}) {
+            return this.askWithPersona('finance', message, options);
+        },
+
+        /** ⚖️ Critic persona - Risk analysis, contrarian views */
+        async askCritic(message, options = {}) {
+            return this.askWithPersona('critic', message, options);
+        },
+
+        /** 🔬 Researcher persona - Deep research, citations */
+        async askResearcher(message, options = {}) {
+            return this.askWithPersona('researcher', message, options);
+        },
+
+        /** ✍️ Writer persona - Briefings, emails, reports */
+        async askWriter(message, options = {}) {
+            return this.askWithPersona('writer', message, options);
+        },
+
+        /** 📈 Geek persona - Technical analysis, charts */
+        async askGeek(message, options = {}) {
+            return this.askWithPersona('geek', message, options);
+        },
+
+        /** 👔 CEO persona - Strategic decisions, executive summary */
+        async askCEO(message, options = {}) {
+            return this.askWithPersona('ceo', message, options);
+        },
+
+        /** 🌍 Macro persona - Macroeconomics, rates */
+        async askMacro(message, options = {}) {
+            return this.askWithPersona('macro', message, options);
+        },
+
+        /** 🏛️ Politics persona - Policy impact, regulations */
+        async askPolitics(message, options = {}) {
+            return this.askWithPersona('politics', message, options);
+        },
+
+        // =============================================================
+        // AGENT API - Direct agent calls
+        // =============================================================
+
+        /**
+         * Call a specific agent directly
+         * @param {string} agentName - The agent to call (data, news, earnings, etc.)
+         * @param {string} action - The action to execute
+         * @param {object} params - Action parameters
+         * @returns {Promise<object>} Agent response
+         */
+        async agent(agentName, action, params = {}) {
+            return this._post({
+                agent: agentName,
+                action,
+                ...params
+            });
+        },
+
+        // Agent shortcuts
+        async getStockQuote(ticker) {
+            return this.agent('data', 'get_stock_quote', { ticker });
+        },
+
+        async getCompanyData(ticker) {
+            return this.agent('data', 'get_company_data', { ticker });
+        },
+
+        async getNews(tickers, lookbackMinutes = 60) {
+            return this.agent('news', 'monitor_news', { tickers, lookbackMinutes });
+        },
+
+        async getEarnings(daysAhead = 7) {
+            return this.agent('earnings', 'daily_earnings_check', { daysAhead });
+        },
+
+        async generateBriefing(type = 'morning') {
+            return this.agent('briefing', `generate_${type}_briefing`, {});
+        },
+
+        async runWorkflow(workflowId) {
+            return this.agent('workflow', 'execute_workflow', { workflowId });
+        },
+
+        // =============================================================
+        // METADATA API - Get orchestrator info
+        // =============================================================
+
+        async getStatus() {
+            return this._get('status');
+        },
+
+        async getPersonas() {
+            return this._get('personas');
+        },
+
+        async getModels(taskType = 'stock_analysis') {
+            return this._get(`models&taskType=${taskType}`);
+        },
+
+        async getAgents() {
+            return this._get('agents');
+        },
+
+        // =============================================================
+        // INTERNAL METHODS
+        // =============================================================
+
+        async _post(body) {
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+                this.lastResponse = data;
+                
+                if (!response.ok) {
+                    console.error('❌ [OrchestratorClient] Error:', data.error);
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('❌ [OrchestratorClient] Network error:', error);
+                return { success: false, error: error.message };
+            }
+        },
+
+        async _get(action) {
+            try {
+                const response = await fetch(`${API_ENDPOINT}?action=${action}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('❌ [OrchestratorClient] GET error:', error);
+                return { success: false, error: error.message };
+            }
+        },
+
+        // =============================================================
+        // UTILITY METHODS
+        // =============================================================
+
+        /**
+         * Get just the response text from a result
+         */
+        getResponseText(result) {
+            if (!result) return '';
+            return result.response || result.result?.response || result.result || '';
+        },
+
+        /**
+         * Check if last response used real-time data
+         */
+        wasRealtime() {
+            return this.lastResponse?.metadata?.realtimeUsed || false;
+        },
+
+        /**
+         * Get the model used in last response
+         */
+        getLastModel() {
+            return this.lastResponse?.model || this.lastResponse?.result?.model || null;
+        },
+
+        /**
+         * Print help in console
+         */
+        help() {
+            console.log(`
+╔══════════════════════════════════════════════════════════════════╗
+║              🎯 ORCHESTRATOR CLIENT - QUICK REFERENCE            ║
+╠══════════════════════════════════════════════════════════════════╣
+║                                                                   ║
+║  CHAT (natural language):                                        ║
+║    orchestratorClient.ask("Analyse AAPL")                        ║
+║    orchestratorClient.askFinance("TSLA valuation")               ║
+║    orchestratorClient.askCritic("Risques marché")                ║
+║    orchestratorClient.askWriter("Briefing matinal")              ║
+║                                                                   ║
+║  AGENTS (direct calls):                                          ║
+║    orchestratorClient.getStockQuote("AAPL")                      ║
+║    orchestratorClient.getNews(["AAPL", "MSFT"])                  ║
+║    orchestratorClient.getEarnings(7)                             ║
+║    orchestratorClient.generateBriefing("morning")                ║
+║    orchestratorClient.runWorkflow("morning_briefing")            ║
+║                                                                   ║
+║  INFO:                                                           ║
+║    orchestratorClient.getStatus()                                ║
+║    orchestratorClient.getPersonas()                              ║
+║    orchestratorClient.getAgents()                                ║
+║                                                                   ║
+║  PERSONAS: finance, critic, researcher, writer,                  ║
+║            geek, ceo, macro, politics                            ║
+║                                                                   ║
+║  AGENTS: data, news, earnings, briefing, sms, workflow           ║
+║                                                                   ║
+╚══════════════════════════════════════════════════════════════════╝
+            `);
         }
+    };
+
+    // ═══════════════════════════════════════════════════════════════════
+    // EXPORT TO GLOBAL SCOPE
+    // ═══════════════════════════════════════════════════════════════════
+
+    // Make available globally
+    global.orchestratorClient = orchestratorClient;
+    
+    // Also expose as window.emma for convenience
+    global.emma = orchestratorClient;
+
+    // Auto-init on load
+    if (typeof document !== 'undefined') {
+        document.addEventListener('DOMContentLoaded', () => {
+            orchestratorClient.init().then(() => {
+                console.log('🎯 Orchestrator ready. Type orchestratorClient.help() for commands.');
+            });
+        });
     }
 
-    /**
-     * Get orchestrator status
-     */
-    async getStatus() {
-        try {
-            const response = await fetch(`${this.baseUrl}?action=status`);
-            return await response.json();
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
+    // AMD/CommonJS support
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = orchestratorClient;
+    } else if (typeof define === 'function' && define.amd) {
+        define([], function() { return orchestratorClient; });
     }
 
-    /**
-     * Get available personas
-     */
-    async getPersonas() {
-        try {
-            const response = await fetch(`${this.baseUrl}?action=personas`);
-            return await response.json();
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
-    }
-
-    /**
-     * Get recommended model for task type
-     */
-    async getRecommendedModel(taskType = 'stock_analysis') {
-        try {
-            const response = await fetch(`${this.baseUrl}?action=models&taskType=${taskType}`);
-            return await response.json();
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
-    }
-
-    /**
-     * Set default persona
-     */
-    setPersona(persona) {
-        this.currentPersona = persona;
-        console.log(`🎭 [OrchestratorClient] Default persona set to: ${persona}`);
-    }
-
-    /**
-     * Get last response
-     */
-    getLastResponse() {
-        return this.lastResponse;
-    }
-}
-
-// Singleton instance
-export const orchestratorClient = new OrchestratorClient();
-
-// Also export class for custom instances
-export default OrchestratorClient;
-
-/**
- * USAGE FROM BROWSER CONSOLE:
- * 
- * // Simple ask
- * await orchestratorClient.ask("Analyse AAPL")
- * 
- * // With persona
- * await orchestratorClient.askCritic("Quels sont les risques de Tesla?")
- * 
- * // Get personas
- * await orchestratorClient.getPersonas()
- * 
- * // Check status
- * await orchestratorClient.getStatus()
- */
-
-// Make available globally in browser
-if (typeof window !== 'undefined') {
-    window.orchestratorClient = orchestratorClient;
-    window.OrchestratorClient = OrchestratorClient;
-    console.log('🤖 OrchestratorClient available globally as window.orchestratorClient');
-}
+})(typeof window !== 'undefined' ? window : global);

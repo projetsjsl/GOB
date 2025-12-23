@@ -112,6 +112,21 @@ const AskEmmaTab = React.memo(({
                 const [emmaPrompt, setEmmaPrompt] = useState(DEFAULT_EMMA_PROMPT);
                 const [promptSource, setPromptSource] = useState('default'); // 'api', 'localStorage', 'default'
 
+                // ═══════════════════════════════════════════════════════════════════
+                // ORCHESTRATOR INTEGRATION (Feature Flag)
+                // Enable via: localStorage.setItem('emma-use-orchestrator', 'true')
+                // ═══════════════════════════════════════════════════════════════════
+                const [useOrchestrator, setUseOrchestrator] = useState(() => {
+                    try {
+                        return localStorage.getItem('emma-use-orchestrator') === 'true';
+                    } catch { return false; }
+                });
+                const [orchestratorPersona, setOrchestratorPersona] = useState(() => {
+                    try {
+                        return localStorage.getItem('emma-orchestrator-persona') || 'finance';
+                    } catch { return 'finance'; }
+                });
+
                 // Initialiser Emma au chargement (APRÈS que useState ait chargé l'historique)
                 React.useEffect(() => {
                     // Utiliser un délai pour s'assurer que useState a terminé son initialisation
@@ -297,12 +312,57 @@ const AskEmmaTab = React.memo(({
                         // Les données sont déjà incluses dans realTimeContext via stockData, newsData, apiStatus
                         void('✅ Utilisation des données existantes du dashboard');
                         
-                        // Utiliser l'API Perplexity avec les données fraîches
-                        const responseData = await generatePerplexityResponse(emmaInput);
-                        const response = typeof responseData === 'string' ? responseData : responseData.text;
-                        const model = typeof responseData === 'object' ? responseData.model : null;
-                        const modelReason = typeof responseData === 'object' ? responseData.modelReason : null;
-                        const isCached = typeof responseData === 'object' ? responseData.cached : false;
+                        let response, model, modelReason, isCached;
+                        
+                        // ═══════════════════════════════════════════════════════════════
+                        // NEW: Orchestrator path (if enabled)
+                        // Toggle via: localStorage.setItem('emma-use-orchestrator', 'true')
+                        // ═══════════════════════════════════════════════════════════════
+                        if (useOrchestrator) {
+                            try {
+                                void('🎯 [Orchestrator] Sending via orchestrator...');
+                                const orchestratorResponse = await fetch('/api/orchestrator', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        message: emmaInput,
+                                        persona: orchestratorPersona,
+                                        tickers: tickers,
+                                        channel: 'web'
+                                    })
+                                });
+                                
+                                if (orchestratorResponse.ok) {
+                                    const data = await orchestratorResponse.json();
+                                    if (data.success && data.response) {
+                                        response = data.response;
+                                        model = data.model || 'orchestrator';
+                                        modelReason = data.metadata?.modelReason || `via ${orchestratorPersona} persona`;
+                                        isCached = false;
+                                        void('✅ [Orchestrator] Response received');
+                                    } else {
+                                        throw new Error(data.error || 'Empty orchestrator response');
+                                    }
+                                } else {
+                                    throw new Error(`Orchestrator HTTP ${orchestratorResponse.status}`);
+                                }
+                            } catch (orchestratorError) {
+                                console.warn('⚠️ [Orchestrator] Fallback to Perplexity:', orchestratorError.message);
+                                // Fallback to original Perplexity path
+                                const responseData = await generatePerplexityResponse(emmaInput);
+                                response = typeof responseData === 'string' ? responseData : responseData.text;
+                                model = typeof responseData === 'object' ? responseData.model : null;
+                                modelReason = typeof responseData === 'object' ? responseData.modelReason : null;
+                                isCached = typeof responseData === 'object' ? responseData.cached : false;
+                            }
+                        } else {
+                            // Original path: Direct Perplexity call
+                            const responseData = await generatePerplexityResponse(emmaInput);
+                            response = typeof responseData === 'string' ? responseData : responseData.text;
+                            model = typeof responseData === 'object' ? responseData.model : null;
+                            modelReason = typeof responseData === 'object' ? responseData.modelReason : null;
+                            isCached = typeof responseData === 'object' ? responseData.cached : false;
+                        }
 
                         // Mode Web normal (Chatbot 100% Web)
                         const messageId = Date.now() + 1;
