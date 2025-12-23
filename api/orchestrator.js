@@ -169,7 +169,7 @@ export default async function handler(req, res) {
             console.log(`\n═══════════════════════════════════════════════════`);
             console.log(`📨 [Orchestrator API] Request received`);
             console.log(`   Type: ${agent ? 'Agent Call' : 'Chat'}`);
-            if (message) console.log(`   Message: ${message.substring(0, 50)}...`);
+            if (message) console.log(`   Message: ${(message || '').substring(0, 50)}...`);
             if (agent) console.log(`   Agent: ${agent}, Action: ${action}`);
             console.log(`   Persona: ${persona || 'auto'}`);
             console.log(`═══════════════════════════════════════════════════`);

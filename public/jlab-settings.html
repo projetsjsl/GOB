@@ -235,7 +235,33 @@
         <div id="panel-mcp" class="hidden space-y-6">
             <div class="glass rounded-2xl p-6">
                 <h2 class="text-xl font-semibold mb-4">🔌 Model Context Protocol Servers</h2>
-                <div id="mcp-container" class="grid grid-cols-2 gap-4"></div>
+                <div id="mcp-container" class="grid grid-cols-2 gap-4">
+                    <div class="glass rounded-xl p-4">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="text-2xl">🔮</div>
+                            <div>
+                                <div class="font-semibold">Perplexity</div>
+                                <div class="text-gray-500 text-sm">perplexity-ask</div>
+                            </div>
+                            <div class="ml-auto status-dot status-ok"></div>
+                        </div>
+                        <div class="text-sm text-gray-400">Web search and real-time information</div>
+                        <button onclick="testMCP('perplexity')" class="mt-3 px-3 py-1 text-sm glass rounded-lg">Test</button>
+                    </div>
+                    <div class="glass rounded-xl p-4">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="text-2xl">🗄️</div>
+                            <div>
+                                <div class="font-semibold">Supabase</div>
+                                <div class="text-gray-500 text-sm">supabase-mcp-server</div>
+                            </div>
+                            <div class="ml-auto status-dot status-ok"></div>
+                        </div>
+                        <div class="text-sm text-gray-400">Database queries and migrations</div>
+                        <button onclick="testMCP('supabase')" class="mt-3 px-3 py-1 text-sm glass rounded-lg">Test</button>
+                    </div>
+                </div>
+                <p class="text-gray-500 text-sm mt-4">MCP servers provide external tool integration. Configure in Antigravity settings.</p>
             </div>
         </div>
 
@@ -247,11 +273,11 @@
                     <div class="space-y-4">
                         <label class="flex items-center justify-between p-3 bg-black/20 rounded-xl">
                             <span>Enable Orchestrator</span>
-                            <input type="checkbox" id="orch-enabled" onchange="saveOrchSettings()" class="w-5 h-5">
+                            <input type="checkbox" id="orch-enabled" onchange="saveOrchSettings()" class="w-5 h-5" checked>
                         </label>
                         <label class="flex items-center justify-between p-3 bg-black/20 rounded-xl">
                             <span>Streaming Responses</span>
-                            <input type="checkbox" id="orch-streaming" onchange="saveOrchSettings()" class="w-5 h-5">
+                            <input type="checkbox" id="orch-streaming" onchange="saveOrchSettings()" class="w-5 h-5" checked>
                         </label>
                         <label class="flex items-center justify-between p-3 bg-black/20 rounded-xl">
                             <span>Enable Caching</span>
@@ -784,7 +810,8 @@
 
         // Orchestrator settings
         function loadOrchSettings() {
-            document.getElementById('orch-enabled').checked = localStorage.getItem('orch-enabled') === 'true';
+            // Default to enabled if not set
+            document.getElementById('orch-enabled').checked = localStorage.getItem('orch-enabled') !== 'false';
             document.getElementById('orch-streaming').checked = localStorage.getItem('orch-streaming') !== 'false';
             document.getElementById('orch-cache').checked = localStorage.getItem('orch-cache') !== 'false';
             document.getElementById('orch-persona').value = localStorage.getItem('orch-persona') || 'finance';
@@ -807,6 +834,24 @@
         }
 
         function refreshAll() { loadAPIKeys(); }
+
+        // MCP test function
+        async function testMCP(server) {
+            alert(`Testing ${server} MCP connection... Check console for details.`);
+            try {
+                if (server === 'perplexity') {
+                    const result = await emma?.perplexityAsk?.('What is the current date?');
+                    console.log('Perplexity MCP test:', result);
+                    alert(result?.success ? '✅ Perplexity MCP working!' : '❌ Perplexity MCP failed');
+                } else if (server === 'supabase') {
+                    const result = await emma?.agent?.('mcp', 'list_mcp_tools', {});
+                    console.log('Supabase MCP test:', result);
+                    alert(result?.success ? '✅ Supabase MCP working!' : '❌ Supabase MCP failed');
+                }
+            } catch (e) {
+                alert(`❌ MCP test failed: ${e.message}`);
+            }
+        }
 
         // Prompts functions (emma-config integration)
         async function loadPrompts() {
@@ -839,11 +884,21 @@
             }
             
             try {
-                const resp = await fetch('/api/admin/emma-config?key=system_base');
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 3000);
+                const resp = await fetch('/api/admin/emma-config?key=system_base', { signal: controller.signal });
+                clearTimeout(timeout);
                 const data = await resp.json();
-                document.getElementById('system-prompt').value = data.value || '';
-            } catch {}
+                document.getElementById('system-prompt').value = data.value || DEFAULT_SYSTEM_PROMPT;
+            } catch {
+                document.getElementById('system-prompt').value = DEFAULT_SYSTEM_PROMPT;
+            }
         }
+
+        const DEFAULT_SYSTEM_PROMPT = `Tu es Emma, une experte en analyse financière et en investissement.
+Tu travailles pour JSLAI Wealth Management.
+Tu fournis des analyses professionnelles, objectives et basées sur les données.
+Tu parles français par défaut sauf si l'utilisateur parle anglais.`;
 
         async function saveSystemPrompt() {
             const value = document.getElementById('system-prompt').value;
