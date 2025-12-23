@@ -368,6 +368,36 @@
         },
 
         // =============================================================
+        // SCHEDULER API - Cron-based automation
+        // =============================================================
+
+        async createSchedule(name, cron, taskAgent, taskAction, taskParams = {}) {
+            return this.agent('scheduler', 'create_schedule', { 
+                name, cron, taskAgent, taskAction, taskParams 
+            });
+        },
+
+        async getSchedules() {
+            return this.agent('scheduler', 'get_schedules', {});
+        },
+
+        async pauseSchedule(scheduleId) {
+            return this.agent('scheduler', 'pause_schedule', { scheduleId });
+        },
+
+        async resumeSchedule(scheduleId) {
+            return this.agent('scheduler', 'resume_schedule', { scheduleId });
+        },
+
+        async runScheduleNow(scheduleId) {
+            return this.agent('scheduler', 'run_now', { scheduleId });
+        },
+
+        async getNextRuns(count = 10) {
+            return this.agent('scheduler', 'get_next_runs', { count });
+        },
+
+        // =============================================================
         // METADATA API - Get orchestrator info
         // =============================================================
 
@@ -459,44 +489,33 @@
 ║                    🧪 JLAB ORCHESTRATOR - QUICK REFERENCE                    ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                               ║
-║  📝 CHAT (natural language):                                                  ║
-║    emma.ask("Analyse AAPL")              // Auto persona selection            ║
-║    emma.askFinance("TSLA valuation")     // Finance persona                   ║
-║    emma.askCritic("Risques marché")      // Critic persona                    ║
-║    emma.askStream("Analyse", {}, {onChunk: fn})  // Streaming                 ║
+║  📝 CHAT:  emma.ask("Analyse AAPL") | emma.askFinance() | emma.askStream()   ║
 ║                                                                               ║
-║  🔬 RESEARCH (deep analysis):                                                 ║
-║    emma.analyzeStock("AAPL")             // Full analysis                     ║
-║    emma.deepDive("MSFT")                 // Comprehensive deep dive           ║
-║    emma.getBullBear("TSLA")              // Bull/Bear cases                   ║
-║    emma.assessRisk("NVDA")               // Risk assessment                   ║
-║    emma.generateThesis("GOOGL", "bull")  // Investment thesis                 ║
-║    emma.comparePeers("AAPL", ["MSFT"])   // Peer comparison                   ║
+║  🔬 RESEARCH:  emma.analyzeStock("AAPL") | emma.deepDive() | emma.getBullBear()║
+║                emma.assessRisk() | emma.generateThesis() | emma.comparePeers()║
 ║                                                                               ║
-║  🔧 TOOLS (function calling):                                                 ║
-║    emma.getStockQuote("AAPL")            // Real-time quote                   ║
-║    emma.calculateDCF("MSFT", 10, 12)     // DCF valuation                     ║
-║    emma.getYieldCurve("us")              // Yield curve data                  ║
-║    emma.getTools()                       // List all tools                    ║
+║  💼 PORTFOLIO:  emma.createPortfolio() | emma.addHolding() | emma.analyzePortfolio()║
+║                 emma.getPortfolioDividends() | emma.suggestRebalance()        ║
 ║                                                                               ║
-║  📊 ANALYTICS:                                                                ║
-║    emma.getAnalytics("24h")              // Usage stats                       ║
-║    emma.getLatencyReport()               // Performance metrics               ║
+║  🔔 ALERTS:  emma.createAlert("AAPL", "price_above", 200) | emma.checkAlerts()║
+║              emma.setAlertChannel("email", "you@email.com")                   ║
 ║                                                                               ║
-║  💬 CONTEXT:                                                                  ║
-║    emma.getHistory()                     // Conversation history              ║
-║    emma.clearHistory()                   // Clear history                     ║
-║    emma.setPreferences({persona:'fin'})  // Set preferences                   ║
+║  ⏰ SCHEDULER:  emma.createSchedule("Morning", "@daily", "briefing", "generate")║
+║                 emma.getSchedules() | emma.runScheduleNow() | emma.getNextRuns()║
 ║                                                                               ║
-║  🔌 MCP:                                                                      ║
-║    emma.listMCPTools()                   // List MCP servers                  ║
-║    emma.perplexityAsk("query")           // Web search                        ║
+║  🔧 TOOLS:  emma.getStockQuote() | emma.calculateDCF() | emma.getYieldCurve() ║
 ║                                                                               ║
-║  ℹ️  INFO:                                                                    ║
-║    emma.getStatus() | emma.getPersonas() | emma.getAgents()                   ║
+║  📊 ANALYTICS:  emma.getAnalytics("24h") | emma.getLatencyReport()            ║
+║                                                                               ║
+║  💬 CONTEXT:  emma.getHistory() | emma.clearHistory() | emma.setPreferences() ║
+║                                                                               ║
+║  🔌 MCP:  emma.listMCPTools() | emma.perplexityAsk() | emma.supabaseQuery()   ║
+║                                                                               ║
+║  ℹ️  INFO:  emma.getStatus() | emma.getPersonas() | emma.getAgents()          ║
 ║                                                                               ║
 ║  🎭 PERSONAS: finance, critic, researcher, writer, geek, ceo, macro, politics║
-║  🤖 AGENTS: data, news, earnings, briefing, research, tools, analytics, mcp  ║
+║  🤖 AGENTS (15): data, news, earnings, briefing, research, tools, analytics, ║
+║                  mcp, context, portfolio, alert, scheduler, workflow, model   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
             `);
         }
