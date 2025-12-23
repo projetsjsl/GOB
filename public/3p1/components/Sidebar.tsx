@@ -14,7 +14,8 @@ import {
   BarsArrowDownIcon,
   XMarkIcon,
   ChevronDownIcon,
-  ChevronUpIcon
+  ChevronUpIcon,
+  TableCellsIcon
 } from '@heroicons/react/24/outline';
 import { AnalysisProfile, Recommendation } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
@@ -36,6 +37,7 @@ interface SidebarProps {
   isBulkSyncing?: boolean;
   bulkSyncProgress?: { current: number; total: number };
   onOpenAdmin?: () => void;
+  onOpenDataExplorer?: () => void;
   isAdmin?: boolean;
   onToggleAdmin?: () => void;
 }
@@ -43,7 +45,7 @@ interface SidebarProps {
 type SortOption = 'alphabetical' | 'alphabetical-desc' | 'lastModified' | 'lastModified-desc' | 'recommendation' | 'sector';
 type FilterOption = 'all' | 'portfolio' | 'watchlist';
 
-export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, isAdmin = false, onToggleAdmin }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, onOpenDataExplorer, isAdmin = false, onToggleAdmin }) => {
   // ✅ DEBUG: Log pour vérifier que les profils sont bien reçus
   React.useEffect(() => {
     console.log(`📋 Sidebar: ${profiles.length} profil(s) reçu(s)`, profiles.map(p => p.id).slice(0, 10));
@@ -344,6 +346,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
           >
             <ShieldCheckIcon className="w-4 h-4" />
             <span>Admin Warehouse</span>
+          </button>
+        )}
+        {isAdmin && onOpenDataExplorer && (
+          <button
+            onClick={onOpenDataExplorer}
+            className="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-200 hover:text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors mt-2 border border-emerald-700"
+            title="Data Explorer - Supabase Tables\n\n• Visualiser toutes les tables 3P1\n• Voir les dernières mises à jour\n• Exporter en Excel/CSV\n• Synchronisation sélective"
+          >
+            <TableCellsIcon className="w-4 h-4" />
+            <span>Data Explorer</span>
           </button>
         )}
       </div>

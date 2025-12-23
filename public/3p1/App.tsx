@@ -40,6 +40,7 @@ import { useRealtimeSync } from './hooks/useRealtimeSync';
 // Lazy load heavy components for better initial load performance
 const KPIDashboard = React.lazy(() => import('./components/KPIDashboard').then(m => ({ default: m.KPIDashboard })));
 const AdminDashboard = React.lazy(() => import('./components/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const DataExplorerPanel = React.lazy(() => import('./components/DataExplorerPanel'));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -176,6 +177,7 @@ export default function App() {
 
     // --- ADMIN DASHBOARD STATE ---
     const [showAdmin, setShowAdmin] = useState(false);
+    const [showDataExplorer, setShowDataExplorer] = useState(false);
     const [isRepairing, setIsRepairing] = useState<string | null>(null);
 
     // --- CONFIG SYSTEM ---
@@ -2761,14 +2763,14 @@ export default function App() {
     const [syncReportData, setSyncReportData] = useState<any>(null);
     const [showSyncReport, setShowSyncReport] = useState(false);
 
-    const handleBulkSyncAllTickersWithOptions = async (options: SyncOptions) => {
+    const handleBulkSyncAllTickersWithOptions = async (options: SyncOptions, specificTickers?: string[]) => {
         setIsBulkSyncing(true);
         // Reset controls
         abortSync.current = false;
         isSyncPaused.current = false;
         setSyncPausedState(false);
 
-        const allTickers = Object.keys(library);
+        const allTickers = specificTickers || Object.keys(library);
         setBulkSyncProgress({ current: 0, total: allTickers.length });
         setSyncStats({ successCount: 0, errorCount: 0 });
 
@@ -4522,6 +4524,7 @@ export default function App() {
                         isBulkSyncing={isBulkSyncing}
                         bulkSyncProgress={bulkSyncProgress}
                         onOpenAdmin={() => setShowAdmin(true)}
+                        onOpenDataExplorer={() => setShowDataExplorer(true)}
                         isAdmin={isAdmin}
                         onToggleAdmin={handleToggleAdmin}
                     />
@@ -4910,15 +4913,20 @@ export default function App() {
                 isOpen={showAdvancedSyncDialog}
                 ticker={isAdvancedSyncForBulk ? undefined : activeId}
                 hasManualData={hasManualEdits(data)}
-                totalTickers={isAdvancedSyncForBulk ? Object.keys(library).length : 1}
-                onCancel={() => setShowAdvancedSyncDialog(false)}
+                totalTickers={isAdvancedSyncForBulk 
+                    ? ((window as any)._pendingSyncTickers?.length || Object.keys(library).length) 
+                    : 1}
+                onCancel={() => {
+                    setShowAdvancedSyncDialog(false);
+                    (window as any)._pendingSyncTickers = null;
+                }}
                 onConfirm={async (options) => {
                     setShowAdvancedSyncDialog(false);
                     if (isAdvancedSyncForBulk) {
-                        // Appeler handleBulkSyncAllTickers avec options
-                        await handleBulkSyncAllTickersWithOptions(options);
+                        const pendingTickers = (window as any)._pendingSyncTickers;
+                        await handleBulkSyncAllTickersWithOptions(options, pendingTickers);
+                        (window as any)._pendingSyncTickers = null;
                     } else {
-                        // Appeler performSync avec options
                         await performSync(options.saveBeforeSync, options);
                     }
                 }}
@@ -4965,13 +4973,29 @@ export default function App() {
                 />
             )}
 
-            {/* SYNC REPORT DIALOG */}
+            {/* DATA EXPLORER PANEL */}
+            <Suspense fallback={<LoadingFallback />}>
+                <DataExplorerPanel
+                    isOpen={showDataExplorer}
+                    onClose={() => setShowDataExplorer(false)}
+                    onSyncSelected={async (tickers) => {
+                        setShowDataExplorer(false);
+                        // Open advanced sync dialog for the selected tickers
+                        setIsAdvancedSyncForBulk(true);
+                        setShowAdvancedSyncDialog(true);
+                        // Custom logic to handle the sync after individual selection
+                        // We'll use a temporary state to store the tickers being synced
+                        // if we want to sync a specific subset
+                        (window as any)._pendingSyncTickers = tickers;
+                    }}
+                />
+            </Suspense>
+
             <SyncReportDialog
                 isOpen={showSyncReport}
                 reportData={syncReportData}
                 onClose={() => setShowSyncReport(false)}
                 onRetryTicker={async (ticker) => {
-                    // Réessayer la synchronisation pour un ticker spécifique
                     if (syncReportData?.options) {
                         const profile = library[ticker];
                         if (profile) {
@@ -4985,21 +5009,16 @@ export default function App() {
                     }
                 }}
                 onRetryFailed={async () => {
-                    // Réessayer tous les tickers en échec
                     if (syncReportData?.options && syncReportData?.tickerResults) {
                         const failedTickers = syncReportData.tickerResults
-                            .filter(r => !r.success && !r.error?.includes('introuvable'))
-                            .map(r => r.ticker);
+                            .filter((r: any) => !r.success && !r.error?.includes('introuvable'))
+                            .map((r: any) => r.ticker);
                         
                         if (failedTickers.length > 0) {
                             setIsBulkSyncing(true);
                             try {
-                                // Créer une nouvelle synchronisation avec seulement les tickers en échec
                                 const options = { ...syncReportData.options, syncAllTickers: false };
-                                // Note: handleBulkSyncAllTickersWithOptions traite tous les tickers
-                                // Il faudrait créer une version qui accepte une liste de tickers
-                                // Pour l'instant, on utilise la version existante
-                                await handleBulkSyncAllTickersWithOptions(options);
+                                await handleBulkSyncAllTickersWithOptions(options, failedTickers);
                             } finally {
                                 setIsBulkSyncing(false);
                             }
