@@ -67,6 +67,12 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [showSyncPanel, setShowSyncPanel] = useState(false);
 
+  // CRUD State
+  const [editingRow, setEditingRow] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showSummary, setShowSummary] = useState(true);
+
   // Load tables on mount
   useEffect(() => {
     if (isOpen) {
@@ -194,6 +200,69 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
     setShowSyncPanel(false);
   };
 
+  const handleSaveRow = async (data: any) => {
+    if (!selectedTable) return;
+    setLoading(true);
+    try {
+      const isNew = !editingRow?.id && !editingRow?.ticker;
+      const action = isNew ? 'insert' : 'update';
+      const pk = tables.find(t => t.name === selectedTable)?.primaryKey || 'id';
+      
+      const res = await fetch('/api/data-explorer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          table: selectedTable,
+          id: editingRow ? (editingRow[pk]) : undefined,
+          data
+        })
+      });
+      
+      const result = await res.json();
+      if (result.success) {
+        setIsEditModalOpen(false);
+        setEditingRow(null);
+        loadTableData();
+        loadTables(); // Refresh counts
+      } else {
+        setError(result.error);
+      }
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteRow = async (id: string) => {
+    if (!selectedTable || !confirm('Êtes-vous sûr de vouloir supprimer cet enregistrement ?')) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/data-explorer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete',
+          table: selectedTable,
+          id
+        })
+      });
+      
+      const result = await res.json();
+      if (result.success) {
+        loadTableData();
+        loadTables();
+      } else {
+        setError(result.error);
+      }
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const formatValue = (value: any, column: string): string => {
     if (value === null || value === undefined) return '-';
     if (typeof value === 'object') {
@@ -241,6 +310,13 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
             {selectedTable && (
               <>
                 <button
+                  onClick={() => { setEditingRow(null); setIsEditModalOpen(true); }}
+                  className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm text-white transition-colors"
+                >
+                  <CheckIcon className="w-4 h-4" />
+                  Ajouter
+                </button>
+                <button
                   onClick={exportToExcel}
                   className="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-sm text-white transition-colors"
                 >
@@ -270,6 +346,20 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
         <div className="flex flex-1 overflow-hidden">
           {/* Sidebar - Table List */}
           <div className="w-64 border-r border-slate-700 p-4 overflow-y-auto">
+            <button
+              onClick={() => { setSelectedTable(null); setShowSummary(true); }}
+              className={`w-full text-left p-3 rounded-xl mb-4 transition-all ${
+                showSummary && !selectedTable
+                  ? 'bg-emerald-600/20 border border-emerald-500/50'
+                  : 'hover:bg-slate-800 border border-transparent'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <TableCellsIcon className="w-5 h-5 text-emerald-400" />
+                <span className="font-bold text-white">Rapport Global</span>
+              </div>
+            </button>
+
             <h3 className="text-sm font-semibold text-slate-400 mb-3 uppercase tracking-wider">Tables</h3>
             <div className="space-y-2">
               {tables.map(table => (
@@ -372,6 +462,7 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                               </div>
                             </th>
                           ))}
+                          <th className="p-3 text-right text-slate-300">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -397,6 +488,24 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                                 </div>
                               </td>
                             ))}
+                            <td className="p-3 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => { setEditingRow(row); setIsEditModalOpen(true); }}
+                                  className="p-1 hover:bg-slate-700 rounded text-blue-400 transition-colors"
+                                  title="Modifier"
+                                >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteRow(row.id || row.ticker)}
+                                  className="p-1 hover:bg-slate-700 rounded text-red-400 transition-colors"
+                                  title="Supprimer"
+                                >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </button>
+                              </div>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -427,6 +536,45 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                   </div>
                 </div>
               </>
+            ) : showSummary ? (
+              <div className="flex-1 overflow-auto p-8">
+                <div className="max-w-4xl mx-auto">
+                  <h1 className="text-3xl font-bold text-white mb-2">Rapport de Données 3P1</h1>
+                  <p className="text-slate-400 mb-8">Vue d'ensemble de la santé des tables Supabase et colonnes visibles.</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {tables.map(t => (
+                      <div key={t.name} className={`p-6 rounded-2xl border ${t.error ? 'bg-red-900/10 border-red-800' : 'bg-slate-800/50 border-slate-700'}`}>
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl">{t.icon}</span>
+                            <h3 className="text-lg font-bold text-white">{t.label}</h3>
+                          </div>
+                          <span className={`px-2 py-1 rounded text-xs font-bold ${t.error ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                            {t.error ? 'ERREUR' : 'ACTIF'}
+                          </span>
+                        </div>
+                        
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-slate-400">Total Lignes:</span>
+                            <span className="text-white font-mono">{t.count.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-slate-400">Dernière Sync:</span>
+                            <span className="text-white">{formatLastUpdate(t.lastUpdate)}</span>
+                          </div>
+                          {t.error && (
+                            <div className="mt-4 p-3 bg-red-950/50 border border-red-900 rounded-lg text-red-300 text-xs font-mono">
+                              {t.error}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             ) : (
               <div className="flex-1 flex items-center justify-center text-slate-500">
                 <div className="text-center">
@@ -464,6 +612,75 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
             </div>
           </div>
         )}
+
+        {/* Edit Modal */}
+        {isEditModalOpen && (
+          <EditModal
+            title={editingRow ? 'Modifier l\'enregistrement' : 'Nouvel enregistrement'}
+            initialData={editingRow || {}}
+            columns={columns}
+            onClose={() => setIsEditModalOpen(false)}
+            onSave={handleSaveRow}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
+interface EditModalProps {
+  title: string;
+  initialData: any;
+  columns: Column[];
+  onClose: () => void;
+  onSave: (data: any) => void;
+}
+
+const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onClose, onSave }) => {
+  const [formData, setFormData] = useState<any>({ ...initialData });
+
+  return (
+    <div className="absolute inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
+      <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col max-h-[80vh]">
+        <div className="p-4 border-b border-slate-700 flex justify-between items-center">
+          <h3 className="text-xl font-bold text-white">{title}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-slate-700 rounded-lg"><XMarkIcon className="w-5 h-5" /></button>
+        </div>
+        <div className="p-6 overflow-y-auto space-y-4">
+          {columns.map(col => {
+            if (['id', 'created_at', 'updated_at'].includes(col.name)) return null;
+            return (
+              <div key={col.name}>
+                <label className="block text-sm font-medium text-slate-400 mb-1 capitalize">{col.name.replace(/_/g, ' ')}</label>
+                {typeof formData[col.name] === 'object' ? (
+                  <textarea
+                    value={JSON.stringify(formData[col.name], null, 2)}
+                    onChange={(e) => {
+                      try {
+                        const val = JSON.parse(e.target.value);
+                        setFormData({ ...formData, [col.name]: val });
+                      } catch {
+                        // Handle invalid JSON while typing
+                      }
+                    }}
+                    className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-mono text-sm h-32"
+                  />
+                ) : (
+                  <input
+                    type={col.type === 'number' ? 'number' : 'text'}
+                    value={formData[col.name] || ''}
+                    onChange={(e) => setFormData({ ...formData, [col.name]: e.target.value })}
+                    className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white"
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className="p-4 border-t border-slate-700 flex gap-3">
+          <button onClick={onClose} className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 rounded-xl text-white font-bold transition-all">Annuler</button>
+          <button onClick={() => onSave(formData)} className="flex-1 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl text-white font-bold shadow-lg shadow-blue-900/20 transition-all">Enregistrer</button>
+        </div>
       </div>
     </div>
   );

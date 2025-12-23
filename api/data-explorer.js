@@ -15,14 +15,14 @@ const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABA
 
 // Tables related to 3P1 Finance Pro
 const P3P1_TABLES = [
-    { name: 'finance_pro_snapshots', label: 'Snapshots 3P1', icon: '📸' },
-    { name: 'tickers', label: 'Tickers Database', icon: '📊' },
-    { name: 'watchlist', label: 'Watchlist', icon: '⭐' },
-    { name: 'user_profiles', label: 'User Profiles', icon: '👤' },
-    { name: 'validation_settings', label: 'Validation Settings', icon: '⚙️' },
-    { name: 'emma_config', label: 'Emma Config', icon: '🤖' },
-    { name: 'news_cache', label: 'News Cache', icon: '📰' },
-    { name: 'llm_models', label: 'LLM Models', icon: '🧠' }
+    { name: 'finance_pro_snapshots', label: 'Snapshots 3P1', icon: '📸', primaryKey: 'id' },
+    { name: 'tickers', label: 'Tickers Database', icon: '📊', primaryKey: 'ticker' },
+    { name: 'watchlist', label: 'Watchlist', icon: '⭐', primaryKey: 'ticker' },
+    { name: 'user_profiles', label: 'User Profiles', icon: '👤', primaryKey: 'id' },
+    { name: 'validation_settings', label: 'Validation Settings', icon: '⚙️', primaryKey: 'id' },
+    { name: 'emma_config', label: 'Emma Config', icon: '🤖', primaryKey: 'id' },
+    { name: 'news_cache', label: 'News Cache', icon: '📰', primaryKey: 'id' },
+    { name: 'llm_models', label: 'LLM Models', icon: '🧠', primaryKey: 'id' }
 ];
 
 export default async function handler(req, res) {
@@ -44,6 +44,12 @@ export default async function handler(req, res) {
 
     try {
         switch (action) {
+            case 'insert':
+                return await insertData(req, res, supabase);
+            case 'update':
+                return await updateData(req, res, supabase);
+            case 'delete':
+                return await deleteData(req, res, supabase);
             case 'tables':
                 return await listTables(req, res, supabase);
             case 'data':
@@ -57,7 +63,7 @@ export default async function handler(req, res) {
             default:
                 return res.status(400).json({ 
                     error: 'Action required', 
-                    available: ['tables', 'data', 'metadata', 'export', 'sync-selected'] 
+                    available: ['tables', 'data', 'metadata', 'export', 'sync-selected', 'insert', 'update', 'delete'] 
                 });
         }
     } catch (error) {
@@ -89,17 +95,28 @@ async function listTables(req, res, supabase) {
                 continue;
             }
 
-            // Try to get last update (from updated_at or created_at column)
+            // Try to get last update safely
             let lastUpdate = null;
             try {
-                const { data: lastRow } = await supabase
-                    .from(table.name)
-                    .select('updated_at, created_at, snapshot_date')
-                    .order('updated_at', { ascending: false, nullsFirst: false })
-                    .limit(1)
-                    .single();
+                // Get one row to see which columns exist
+                const { data: sampleRow } = await supabase.from(table.name).select('*').limit(1).single();
+                const availableCols = sampleRow ? Object.keys(sampleRow) : [];
                 
-                lastUpdate = lastRow?.updated_at || lastRow?.created_at || lastRow?.snapshot_date || null;
+                let orderCol = null;
+                if (availableCols.includes('updated_at')) orderCol = 'updated_at';
+                else if (availableCols.includes('created_at')) orderCol = 'created_at';
+                else if (availableCols.includes('snapshot_date')) orderCol = 'snapshot_date';
+
+                if (orderCol) {
+                    const { data: lastRow } = await supabase
+                        .from(table.name)
+                        .select(orderCol)
+                        .order(orderCol, { ascending: false, nullsFirst: false })
+                        .limit(1)
+                        .single();
+                    
+                    lastUpdate = lastRow?.[orderCol] || null;
+                }
             } catch (e) {
                 // Column doesn't exist, ignore
             }
@@ -130,7 +147,7 @@ async function listTables(req, res, supabase) {
  * Get paginated table data
  */
 async function getTableData(req, res, supabase) {
-    const { table, page = 1, limit = 50, ticker, search, orderBy = 'created_at', ascending = 'false' } = req.query;
+    const { table, page = 1, limit = 50, ticker, search, orderBy, ascending = 'false' } = req.query;
     
     if (!table) {
         return res.status(400).json({ error: 'Table name required' });
@@ -157,10 +174,24 @@ async function getTableData(req, res, supabase) {
         query = query.or(`ticker.ilike.%${search}%,notes.ilike.%${search}%`);
     }
     
+    // Determine default sort if not provided
+    let finalOrderBy = orderBy;
+    if (!finalOrderBy) {
+        // Try to find a good default column
+        const { data: sample } = await supabase.from(table).select('*').limit(1);
+        const cols = sample && sample.length > 0 ? Object.keys(sample[0]) : [];
+        if (cols.includes('updated_at')) finalOrderBy = 'updated_at';
+        else if (cols.includes('created_at')) finalOrderBy = 'created_at';
+        else if (cols.includes('ticker')) finalOrderBy = 'ticker';
+        else if (cols.length > 0) finalOrderBy = cols[0];
+    }
+
     // Order and paginate
-    query = query
-        .order(orderBy, { ascending: ascending === 'true' })
-        .range(offset, offset + parseInt(limit) - 1);
+    if (finalOrderBy) {
+        query = query.order(finalOrderBy, { ascending: ascending === 'true' });
+    }
+    
+    query = query.range(offset, offset + parseInt(limit) - 1);
     
     const { data, error, count } = await query;
     
@@ -292,7 +323,17 @@ async function exportData(req, res, supabase) {
         query = query.lte('created_at', filters.dateTo);
     }
     
-    const { data, error } = await query.order('created_at', { ascending: false });
+    // Apply sort safely
+    const { data: sortSample } = await supabase.from(table).select('*').limit(1);
+    const availableCols = sortSample && sortSample.length > 0 ? Object.keys(sortSample[0]) : [];
+    
+    if (availableCols.includes('created_at')) {
+        query = query.order('created_at', { ascending: false });
+    } else if (availableCols.includes('updated_at')) {
+        query = query.order('updated_at', { ascending: false });
+    }
+
+    const { data, error } = await query;
     
     if (error) {
         return res.status(500).json({ error: error.message });
@@ -317,27 +358,57 @@ async function exportData(req, res, supabase) {
 }
 
 /**
- * Sync selected tickers/data
+ * Insert new row
  */
-async function syncSelected(req, res, supabase) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'POST required' });
-    }
-
-    const { tickers, options = {} } = req.body;
+async function insertData(req, res, supabase) {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'POST required' });
+    const { table, data } = req.body;
     
-    if (!tickers || !Array.isArray(tickers) || tickers.length === 0) {
-        return res.status(400).json({ error: 'Tickers array required' });
-    }
+    if (!table || !data) return res.status(400).json({ error: 'Table and data required' });
+    if (!P3P1_TABLES.some(t => t.name === table)) return res.status(400).json({ error: 'Invalid table' });
 
-    // This will be handled by the frontend calling the existing sync APIs
-    // Just return the selected tickers for processing
-    return res.status(200).json({
-        success: true,
-        message: 'Ready to sync',
-        tickers: tickers.map(t => t.toUpperCase()),
-        options
-    });
+    const { data: result, error } = await supabase.from(table).insert(data).select();
+    
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ success: true, data: result });
+}
+
+/**
+ * Update existing row
+ */
+async function updateData(req, res, supabase) {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'POST required' });
+    const { table, id, data } = req.body;
+    
+    if (!table || !id || !data) return res.status(400).json({ error: 'Table, ID and data required' });
+    if (!P3P1_TABLES.some(t => t.name === table)) return res.status(400).json({ error: 'Invalid table' });
+
+    const tableConfig = P3P1_TABLES.find(t => t.name === table);
+    const pk = tableConfig.primaryKey || 'id';
+
+    const { data: result, error } = await supabase.from(table).update(data).eq(pk, id).select();
+    
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ success: true, data: result });
+}
+
+/**
+ * Delete row
+ */
+async function deleteData(req, res, supabase) {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'POST required' });
+    const { table, id } = req.body;
+    
+    if (!table || !id) return res.status(400).json({ error: 'Table and ID required' });
+    if (!P3P1_TABLES.some(t => t.name === table)) return res.status(400).json({ error: 'Invalid table' });
+
+    const tableConfig = P3P1_TABLES.find(t => t.name === table);
+    const pk = tableConfig.primaryKey || 'id';
+
+    const { error } = await supabase.from(table).delete().eq(pk, id);
+    
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ success: true });
 }
 
 /**

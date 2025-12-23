@@ -1,4 +1,28 @@
-import { r as reactExports, j as jsxRuntimeExports, s as ForwardRef, t as ForwardRef$1, g as ForwardRef$2, F as ForwardRef$3, u as ForwardRef$4, v as ForwardRef$5, w as ForwardRef$6, l as ForwardRef$7, m as ForwardRef$8 } from "./index.js";
+import { r as reactExports, j as jsxRuntimeExports, s as ForwardRef$1, t as ForwardRef$2, g as ForwardRef$3, F as ForwardRef$4, u as ForwardRef$5, v as ForwardRef$6, w as ForwardRef$7, l as ForwardRef$8, m as ForwardRef$9 } from "./index.js";
+function CheckIcon({
+  title,
+  titleId,
+  ...props
+}, svgRef) {
+  return /* @__PURE__ */ reactExports.createElement("svg", Object.assign({
+    xmlns: "http://www.w3.org/2000/svg",
+    fill: "none",
+    viewBox: "0 0 24 24",
+    strokeWidth: 1.5,
+    stroke: "currentColor",
+    "aria-hidden": "true",
+    "data-slot": "icon",
+    ref: svgRef,
+    "aria-labelledby": titleId
+  }, props), title ? /* @__PURE__ */ reactExports.createElement("title", {
+    id: titleId
+  }, title) : null, /* @__PURE__ */ reactExports.createElement("path", {
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    d: "m4.5 12.75 6 6 9-13.5"
+  }));
+}
+const ForwardRef = /* @__PURE__ */ reactExports.forwardRef(CheckIcon);
 const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
   const [tables, setTables] = reactExports.useState([]);
   const [selectedTable, setSelectedTable] = reactExports.useState(null);
@@ -15,6 +39,10 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
   const [sortAsc, setSortAsc] = reactExports.useState(false);
   const [selectedRows, setSelectedRows] = reactExports.useState(/* @__PURE__ */ new Set());
   const [showSyncPanel, setShowSyncPanel] = reactExports.useState(false);
+  const [editingRow, setEditingRow] = reactExports.useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = reactExports.useState(false);
+  const [isDeleting, setIsDeleting] = reactExports.useState(false);
+  const [showSummary, setShowSummary] = reactExports.useState(true);
   reactExports.useEffect(() => {
     if (isOpen) {
       loadTables();
@@ -124,6 +152,65 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
     }
     setShowSyncPanel(false);
   };
+  const handleSaveRow = async (data) => {
+    var _a;
+    if (!selectedTable) return;
+    setLoading(true);
+    try {
+      const isNew = !(editingRow == null ? void 0 : editingRow.id) && !(editingRow == null ? void 0 : editingRow.ticker);
+      const action = isNew ? "insert" : "update";
+      const pk = ((_a = tables.find((t) => t.name === selectedTable)) == null ? void 0 : _a.primaryKey) || "id";
+      const res = await fetch("/api/data-explorer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action,
+          table: selectedTable,
+          id: editingRow ? editingRow[pk] : void 0,
+          data
+        })
+      });
+      const result = await res.json();
+      if (result.success) {
+        setIsEditModalOpen(false);
+        setEditingRow(null);
+        loadTableData();
+        loadTables();
+      } else {
+        setError(result.error);
+      }
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleDeleteRow = async (id) => {
+    if (!selectedTable || !confirm("Êtes-vous sûr de vouloir supprimer cet enregistrement ?")) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/data-explorer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "delete",
+          table: selectedTable,
+          id
+        })
+      });
+      const result = await res.json();
+      if (result.success) {
+        loadTableData();
+        loadTables();
+      } else {
+        setError(result.error);
+      }
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
   const formatValue = (value, column) => {
     if (value === null || value === void 0) return "-";
     if (typeof value === "object") {
@@ -154,7 +241,7 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-7xl h-[90vh] flex flex-col shadow-2xl", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-4 border-b border-slate-700", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-6 h-6 text-blue-400" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-6 h-6 text-blue-400" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-bold text-white", children: "Data Explorer" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-400", children: "Supabase 3P1 Tables" })
@@ -165,10 +252,24 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
           /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
             {
+              onClick: () => {
+                setEditingRow(null);
+                setIsEditModalOpen(true);
+              },
+              className: "flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm text-white transition-colors",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-4 h-4" }),
+                "Ajouter"
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
               onClick: exportToExcel,
               className: "flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-sm text-white transition-colors",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$2, { className: "w-4 h-4" }),
                 "Export Excel"
               ]
             }
@@ -179,7 +280,7 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
               onClick: () => setShowSyncPanel(true),
               className: "flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm text-white transition-colors",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$2, { className: "w-4 h-4" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-4 h-4" }),
                 "Sync (",
                 selectedRows.size,
                 ")"
@@ -192,13 +293,27 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
           {
             onClick: onClose,
             className: "p-2 hover:bg-slate-700 rounded-lg transition-colors",
-            children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-5 h-5 text-slate-400" })
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-5 h-5 text-slate-400" })
           }
         )
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-1 overflow-hidden", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-64 border-r border-slate-700 p-4 overflow-y-auto", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => {
+              setSelectedTable(null);
+              setShowSummary(true);
+            },
+            className: `w-full text-left p-3 rounded-xl mb-4 transition-all ${showSummary && !selectedTable ? "bg-emerald-600/20 border border-emerald-500/50" : "hover:bg-slate-800 border border-transparent"}`,
+            children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-5 h-5 text-emerald-400" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold text-white", children: "Rapport Global" })
+            ] })
+          }
+        ),
         /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-slate-400 mb-3 uppercase tracking-wider", children: "Tables" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2", children: tables.map((table) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "button",
@@ -219,12 +334,12 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
                       table.count.toLocaleString(),
                       " rows"
                     ] }),
-                    table.error && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-3 h-3 text-red-400" })
+                    table.error && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-3 h-3 text-red-400" })
                   ] })
                 ] })
               ] }),
               table.lastUpdate && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 mt-2 text-xs text-slate-500", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-3 h-3" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$6, { className: "w-3 h-3" }),
                 formatLastUpdate(table.lastUpdate)
               ] })
             ]
@@ -237,7 +352,7 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
             onClick: loadTables,
             className: "w-full mt-4 p-2 flex items-center justify-center gap-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$2, { className: "w-4 h-4" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-4 h-4" }),
               "Actualiser"
             ]
           }
@@ -246,7 +361,7 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 flex flex-col overflow-hidden", children: selectedTable ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 p-4 border-b border-slate-700 bg-slate-800/50", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex-1 max-w-md", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$6, { className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "input",
               {
@@ -266,8 +381,8 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
             " enregistrements"
           ] })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-auto", children: loading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$2, { className: "w-8 h-8 text-blue-400 animate-spin" }) }) : error ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center h-full text-red-400", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-6 h-6 mr-2" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-auto", children: loading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-8 h-8 text-blue-400 animate-spin" }) }) : error ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center h-full text-red-400", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-6 h-6 mr-2" }),
           error
         ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-slate-800 sticky top-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
@@ -287,11 +402,12 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
                 className: "p-3 text-left text-slate-300 cursor-pointer hover:text-white transition-colors",
                 children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate max-w-[120px]", children: col.name }),
-                  sortBy === col.name && (sortAsc ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-3 h-3" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$8, { className: "w-3 h-3" }))
+                  sortBy === col.name && (sortAsc ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$8, { className: "w-3 h-3" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$9, { className: "w-3 h-3" }))
                 ] })
               },
               col.name
-            ))
+            )),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-3 text-right text-slate-300", children: "Actions" })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: tableData.map((row, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "tr",
@@ -307,7 +423,30 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
                     className: "rounded bg-slate-700 border-slate-600"
                   }
                 ) }),
-                columns.slice(0, 8).map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-slate-300", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "truncate max-w-[200px]", title: formatValue(row[col.name], col.name), children: formatValue(row[col.name], col.name) }) }, col.name))
+                columns.slice(0, 8).map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-slate-300", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "truncate max-w-[200px]", title: formatValue(row[col.name], col.name), children: formatValue(row[col.name], col.name) }) }, col.name)),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "button",
+                    {
+                      onClick: () => {
+                        setEditingRow(row);
+                        setIsEditModalOpen(true);
+                      },
+                      className: "p-1 hover:bg-slate-700 rounded text-blue-400 transition-colors",
+                      title: "Modifier",
+                      children: /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-4 h-4", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", d: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" }) })
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "button",
+                    {
+                      onClick: () => handleDeleteRow(row.id || row.ticker),
+                      className: "p-1 hover:bg-slate-700 rounded text-red-400 transition-colors",
+                      title: "Supprimer",
+                      children: /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-4 h-4", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", d: "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" }) })
+                    }
+                  )
+                ] }) })
               ]
             },
             row.id || idx
@@ -341,8 +480,31 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
             )
           ] })
         ] })
-      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 flex items-center justify-center text-slate-500", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-16 h-16 mx-auto mb-4 opacity-50" }),
+      ] }) : showSummary ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-auto p-8", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-4xl mx-auto", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-3xl font-bold text-white mb-2", children: "Rapport de Données 3P1" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-slate-400 mb-8", children: "Vue d'ensemble de la santé des tables Supabase et colonnes visibles." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6", children: tables.map((t) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `p-6 rounded-2xl border ${t.error ? "bg-red-900/10 border-red-800" : "bg-slate-800/50 border-slate-700"}`, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-2xl", children: t.icon }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-white", children: t.label })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `px-2 py-1 rounded text-xs font-bold ${t.error ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"}`, children: t.error ? "ERREUR" : "ACTIF" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 text-sm", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-slate-400", children: "Total Lignes:" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-white font-mono", children: t.count.toLocaleString() })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-slate-400", children: "Dernière Sync:" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-white", children: formatLastUpdate(t.lastUpdate) })
+            ] }),
+            t.error && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4 p-3 bg-red-950/50 border border-red-900 rounded-lg text-red-300 text-xs font-mono", children: t.error })
+          ] })
+        ] }, t.name)) })
+      ] }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 flex items-center justify-center text-slate-500", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-16 h-16 mx-auto mb-4 opacity-50" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg", children: "Sélectionnez une table" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm mt-2", children: "pour visualiser les données" })
       ] }) }) })
@@ -371,7 +533,58 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
           }
         )
       ] })
-    ] }) })
+    ] }) }),
+    isEditModalOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      EditModal,
+      {
+        title: editingRow ? "Modifier l'enregistrement" : "Nouvel enregistrement",
+        initialData: editingRow || {},
+        columns,
+        onClose: () => setIsEditModalOpen(false),
+        onSave: handleSaveRow
+      }
+    )
+  ] }) });
+};
+const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
+  const [formData, setFormData] = reactExports.useState({ ...initialData });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 z-[60] bg-black/60 flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col max-h-[80vh]", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 border-b border-slate-700 flex justify-between items-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold text-white", children: title }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: onClose, className: "p-2 hover:bg-slate-700 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-5 h-5" }) })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6 overflow-y-auto space-y-4", children: columns.map((col) => {
+      if (["id", "created_at", "updated_at"].includes(col.name)) return null;
+      return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-slate-400 mb-1 capitalize", children: col.name.replace(/_/g, " ") }),
+        typeof formData[col.name] === "object" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "textarea",
+          {
+            value: JSON.stringify(formData[col.name], null, 2),
+            onChange: (e) => {
+              try {
+                const val = JSON.parse(e.target.value);
+                setFormData({ ...formData, [col.name]: val });
+              } catch {
+              }
+            },
+            className: "w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-mono text-sm h-32"
+          }
+        ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "input",
+          {
+            type: col.type === "number" ? "number" : "text",
+            value: formData[col.name] || "",
+            onChange: (e) => setFormData({ ...formData, [col.name]: e.target.value }),
+            className: "w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white"
+          }
+        )
+      ] }, col.name);
+    }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 border-t border-slate-700 flex gap-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: onClose, className: "flex-1 py-3 bg-slate-700 hover:bg-slate-600 rounded-xl text-white font-bold transition-all", children: "Annuler" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => onSave(formData), className: "flex-1 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl text-white font-bold shadow-lg shadow-blue-900/20 transition-all", children: "Enregistrer" })
+    ] })
   ] }) });
 };
 export {
