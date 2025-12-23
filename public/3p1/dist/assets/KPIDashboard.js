@@ -1392,7 +1392,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
   const profileMetrics = reactExports.useMemo(() => {
     if (profiles.length === 0) return [];
     return profiles.map((profile) => {
-      if (profile._isSkeleton || !profile.data || profile.data.length === 0) {
+      if (profile._isSkeleton) {
         return {
           profile,
           recommendation: null,
@@ -1410,7 +1410,30 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
           historicalGrowth: null,
           volatility: null,
           _isLoading: true
-          // Flag pour afficher un indicateur de chargement
+          // Affiche le spinner
+        };
+      }
+      if (!profile.data || profile.data.length === 0) {
+        return {
+          profile,
+          recommendation: null,
+          jpegy: null,
+          totalReturnPercent: null,
+          ratio31: null,
+          downsideRisk: null,
+          upsidePotential: null,
+          hasApprovedVersion: false,
+          targetPrice: null,
+          currentPE: null,
+          currentPCF: null,
+          currentPBV: null,
+          currentYield: null,
+          historicalGrowth: null,
+          volatility: null,
+          _isLoading: false,
+          // Pas de spinner
+          hasInvalidData: true,
+          invalidReason: "Données manquantes ou échec chargement"
         };
       }
       const { recommendation, targetPrice } = calculateRecommendation(profile.data, profile.assumptions);

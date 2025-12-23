@@ -56485,6 +56485,11 @@ Vérifiez votre connexion et réessayez.`,
           newTickers = result.tickers.filter((t) => {
             const symbol = t.ticker.toUpperCase();
             if (existingSymbols.has(symbol)) {
+              const existingProfile = prev[symbol];
+              if (existingProfile._isSkeleton || !existingProfile.data || existingProfile.data.length === 0) {
+                console.log(`🔄 Reloading skeleton/empty profile: ${symbol}`);
+                return true;
+              }
               return false;
             }
             if (isMutualFund(symbol, t.company_name)) {

@@ -86,8 +86,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   const profileMetrics = useMemo(() => {
     if (profiles.length === 0) return [];
     return profiles.map(profile => {
-      // ✅ OPTIMISATION : Si c'est un profil squelette (données incomplètes), retourner des valeurs par défaut
-      if (profile._isSkeleton || !profile.data || profile.data.length === 0) {
+      // ✅ CAS 1: Profil Squelette en cours de chargement
+      if (profile._isSkeleton) {
         return {
           profile,
           recommendation: null,
@@ -104,7 +104,31 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
           currentYield: null,
           historicalGrowth: null,
           volatility: null,
-          _isLoading: true // Flag pour afficher un indicateur de chargement
+          _isLoading: true // Affiche le spinner
+        };
+      }
+
+      // ✅ CAS 2: Données manquantes ou vides (Échec chargement)
+      if (!profile.data || profile.data.length === 0) {
+        return {
+          profile,
+          recommendation: null,
+          jpegy: null,
+          totalReturnPercent: null,
+          ratio31: null,
+          downsideRisk: null,
+          upsidePotential: null,
+          hasApprovedVersion: false,
+          targetPrice: null,
+          currentPE: null,
+          currentPCF: null,
+          currentPBV: null,
+          currentYield: null,
+          historicalGrowth: null,
+          volatility: null,
+          _isLoading: false, // Pas de spinner
+          hasInvalidData: true,
+          invalidReason: "Données manquantes ou échec chargement"
         };
       }
       

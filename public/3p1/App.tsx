@@ -677,6 +677,14 @@ export default function App() {
                         const symbol = t.ticker.toUpperCase();
                         // Exclure si déjà dans library
                         if (existingSymbols.has(symbol)) {
+                            // ✅ FIX: Si c'est un profil squelette ou vide, on doit le recharger (le considérer comme nouveau)
+                            const existingProfile = prev[symbol];
+                            if (existingProfile._isSkeleton || !existingProfile.data || existingProfile.data.length === 0) {
+                                // C'est un squelette/vide, on le garde dans newTickers pour déclencher le chargement
+                                console.log(`🔄 Reloading skeleton/empty profile: ${symbol}`);
+                                return true;
+                            }
+                            // Sinon c'est un profil complet, on l'ignore
                             return false;
                         }
                         // Exclure les fonds mutuels
