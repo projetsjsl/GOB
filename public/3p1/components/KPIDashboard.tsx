@@ -958,10 +958,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   const globalStats = useMemo(() => {
     if (filteredMetrics.length === 0) return null;
     
-    // Filtrer les valeurs null/undefined avant de calculer les statistiques
-    const returns = filteredMetrics.map(m => m.totalReturnPercent).filter((r): r is number => r !== null && r !== undefined);
-    const jpegyValues = filteredMetrics.map(m => m.jpegy).filter((j): j is number => j !== null && j !== undefined);
-    const ratios = filteredMetrics.map(m => m.ratio31).filter((r): r is number => r !== null && r !== undefined);
+    // Filtrer les valeurs null/undefined/invalides avant de calculer les statistiques
+    // IMPORTANT: Exclure explicitement les profils en cours de chargement ou avec erreur
+    const validMetrics = filteredMetrics.filter(m => !m.hasInvalidData && !(m as any)._isLoading);
+    
+    const returns = validMetrics.map(m => m.totalReturnPercent).filter((r): r is number => r !== null && r !== undefined && isFinite(r));
+    const jpegyValues = validMetrics.map(m => m.jpegy).filter((j): j is number => j !== null && j !== undefined && isFinite(j));
+    const ratios = validMetrics.map(m => m.ratio31).filter((r): r is number => r !== null && r !== undefined && isFinite(r));
     
     const avg = (arr: number[]) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
     const median = (arr: number[]) => {
