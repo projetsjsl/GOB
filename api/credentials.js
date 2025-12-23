@@ -31,7 +31,7 @@ export default async function handler(req, res) {
                 // Return list of available credentials (just keys, not values)
                 const available = [];
                 const envKeys = [
-                    'PERPLEXITY_API_KEY', 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'GOOGLE_API_KEY',
+                    'PERPLEXITY_API_KEY', 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'GOOGLE_API_KEY', 'GEMINI_API_KEY',
                     'FMP_API_KEY', 'FINNHUB_API_KEY', 'RESEND_API_KEY',
                     'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN',
                     'SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY',
