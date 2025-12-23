@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JLAB Settings - API & MCP Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * { font-family: 'Inter', sans-serif; }
+        
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0d1225 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+        }
+        
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+        
+        .source-badge {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 999px;
+        }
+        
+        .source-vercel { background: #000; color: #fff; }
+        .source-supabase { background: #3ecf8e; color: #000; }
+        .source-local { background: #6366f1; color: #fff; }
+        .source-manual { background: #f59e0b; color: #000; }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-connected { background: #22c55e; }
+        .status-missing { background: #ef4444; }
+        .status-partial { background: #f59e0b; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .input-field {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.2s;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        
+        .tab-active {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+        }
+        
+        .category-header {
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, transparent 100%);
+        }
+    </style>
+</head>
+<body class="text-white p-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                    🧪 JLAB Settings
+                </h1>
+                <p class="text-gray-400 mt-1">API Keys, MCP Connections & Orchestrator Configuration</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="exportConfig()" class="px-4 py-2 glass-card rounded-xl hover:bg-white/10 transition flex items-center gap-2">
+                    <i class="iconoir-download"></i> Export
+                </button>
+                <button onclick="importConfig()" class="px-4 py-2 glass-card rounded-xl hover:bg-white/10 transition flex items-center gap-2">
+                    <i class="iconoir-upload"></i> Import
+                </button>
+                <a href="/beta-combined-dashboard.html" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition flex items-center gap-2">
+                    <i class="iconoir-arrow-left"></i> Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-2 mb-6">
+            <button id="tab-apis" onclick="switchTab('apis')" class="px-5 py-2.5 rounded-xl font-medium transition tab-active">
+                <i class="iconoir-key-alt mr-2"></i>API Keys
+            </button>
+            <button id="tab-mcp" onclick="switchTab('mcp')" class="px-5 py-2.5 rounded-xl font-medium transition glass-card hover:bg-white/10">
+                <i class="iconoir-plug mr-2"></i>MCP Connections
+            </button>
+            <button id="tab-orchestrator" onclick="switchTab('orchestrator')" class="px-5 py-2.5 rounded-xl font-medium transition glass-card hover:bg-white/10">
+                <i class="iconoir-brain mr-2"></i>Orchestrator
+            </button>
+            <button id="tab-test" onclick="switchTab('test')" class="px-5 py-2.5 rounded-xl font-medium transition glass-card hover:bg-white/10">
+                <i class="iconoir-flask mr-2"></i>Test Console
+            </button>
+        </div>
+
+        <!-- Content panels -->
+        <div id="panel-apis" class="space-y-6">
+            <!-- Status summary -->
+            <div class="grid grid-cols-4 gap-4">
+                <div class="glass-card rounded-2xl p-5">
+                    <div class="text-3xl font-bold text-green-400" id="stat-configured">0</div>
+                    <div class="text-gray-400 text-sm">Configured</div>
+                </div>
+                <div class="glass-card rounded-2xl p-5">
+                    <div class="text-3xl font-bold text-red-400" id="stat-missing">0</div>
+                    <div class="text-gray-400 text-sm">Missing</div>
+                </div>
+                <div class="glass-card rounded-2xl p-5">
+                    <div class="text-3xl font-bold text-yellow-400" id="stat-required">0</div>
+                    <div class="text-gray-400 text-sm">Required</div>
+                </div>
+                <div class="glass-card rounded-2xl p-5">
+                    <div class="text-3xl font-bold text-purple-400" id="stat-total">0</div>
+                    <div class="text-gray-400 text-sm">Total APIs</div>
+                </div>
+            </div>
+
+            <!-- API Keys by category -->
+            <div id="api-keys-container"></div>
+        </div>
+
+        <!-- MCP Panel -->
+        <div id="panel-mcp" class="hidden space-y-6">
+            <div class="glass-card rounded-2xl p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <i class="iconoir-plug text-purple-400"></i>
+                    MCP Connections
+                </h2>
+                <p class="text-gray-400 mb-6">Model Context Protocol servers extend JLAB's capabilities</p>
+                <div id="mcp-connections-container" class="grid grid-cols-2 gap-4"></div>
+            </div>
+        </div>
+
+        <!-- Orchestrator Panel -->
+        <div id="panel-orchestrator" class="hidden space-y-6">
+            <div class="glass-card rounded-2xl p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <i class="iconoir-brain text-indigo-400"></i>
+                    Orchestrator Settings
+                </h2>
+                
+                <!-- Enable/Disable toggle -->
+                <div class="flex items-center justify-between p-4 bg-black/20 rounded-xl mb-6">
+                    <div>
+                        <div class="font-medium">Use Orchestrator in AskEmma</div>
+                        <div class="text-gray-400 text-sm">Route chats through the multi-agent system</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="orchestrator-enabled" class="sr-only peer" onchange="toggleOrchestrator()">
+                        <div class="w-14 h-7 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-indigo-600"></div>
+                    </label>
+                </div>
+
+                <!-- Default Persona -->
+                <div class="mb-6">
+                    <label class="block text-gray-400 mb-2">Default Persona</label>
+                    <select id="default-persona" onchange="saveOrchestratorSettings()" class="w-full input-field rounded-xl p-3">
+                        <option value="finance">📊 Finance - Stock analysis, portfolio</option>
+                        <option value="critic">⚖️ Critic - Risk analysis, contrarian</option>
+                        <option value="researcher">🔬 Researcher - Deep research</option>
+                        <option value="writer">✍️ Writer - Reports, briefings</option>
+                        <option value="geek">📈 Geek - Technical analysis</option>
+                        <option value="ceo">👔 CEO - Executive summary</option>
+                        <option value="macro">🌍 Macro - Macroeconomics</option>
+                        <option value="politics">🏛️ Politics - Policy impact</option>
+                    </select>
+                </div>
+
+                <!-- Model Preferences -->
+                <div class="mb-6">
+                    <label class="block text-gray-400 mb-2">Preferred LLM Provider</label>
+                    <select id="preferred-llm" onchange="saveOrchestratorSettings()" class="w-full input-field rounded-xl p-3">
+                        <option value="auto">🤖 Auto (Orchestrator selects)</option>
+                        <option value="perplexity">🔮 Perplexity (Web search)</option>
+                        <option value="openai">🤖 OpenAI (GPT-4)</option>
+                        <option value="anthropic">🧠 Anthropic (Claude)</option>
+                        <option value="google">💎 Google (Gemini)</option>
+                    </select>
+                </div>
+
+                <!-- Skepticism Level -->
+                <div class="mb-6">
+                    <label class="block text-gray-400 mb-2">Skepticism Level</label>
+                    <input type="range" id="skepticism-level" min="0" max="100" value="50" 
+                           onchange="updateSkepticismLabel(); saveOrchestratorSettings()" 
+                           class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                    <div class="flex justify-between text-sm mt-1">
+                        <span class="text-gray-500">Trust All</span>
+                        <span id="skepticism-label" class="text-indigo-400">Balanced</span>
+                        <span class="text-gray-500">Verify Everything</span>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="p-4 bg-black/20 rounded-xl">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="status-dot status-connected"></div>
+                        <span class="font-medium">Orchestrator Status</span>
+                    </div>
+                    <div id="orchestrator-status" class="text-gray-400 text-sm">Checking...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Console Panel -->
+        <div id="panel-test" class="hidden space-y-6">
+            <div class="glass-card rounded-2xl p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <i class="iconoir-flask text-green-400"></i>
+                    Test Console
+                </h2>
+                
+                <div class="grid grid-cols-2 gap-6">
+                    <!-- Quick Tests -->
+                    <div>
+                        <h3 class="font-medium mb-3">Quick Tests</h3>
+                        <div class="space-y-2">
+                            <button onclick="runTest('orchestrator_status')" class="w-full p-3 glass-card rounded-xl text-left hover:bg-white/10 transition">
+                                📊 Orchestrator Status
+                            </button>
+                            <button onclick="runTest('personas')" class="w-full p-3 glass-card rounded-xl text-left hover:bg-white/10 transition">
+                                🎭 List Personas
+                            </button>
+                            <button onclick="runTest('agents')" class="w-full p-3 glass-card rounded-xl text-left hover:bg-white/10 transition">
+                                🤖 List Agents
+                            </button>
+                            <button onclick="runTest('ask_finance')" class="w-full p-3 glass-card rounded-xl text-left hover:bg-white/10 transition">
+                                💬 Test Chat (Finance)
+                            </button>
+                            <button onclick="runTest('stock_quote')" class="w-full p-3 glass-card rounded-xl text-left hover:bg-white/10 transition">
+                                📈 Get Stock Quote (AAPL)
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Console Output -->
+                    <div>
+                        <h3 class="font-medium mb-3">Console Output</h3>
+                        <div id="test-console" class="bg-black/40 rounded-xl p-4 h-80 overflow-auto font-mono text-sm">
+                            <div class="text-gray-500">// Ready for tests...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center z-50">
+        <div class="glass-card rounded-2xl p-6 w-full max-w-lg mx-4">
+            <h3 id="modal-title" class="text-xl font-semibold mb-4">Edit API Key</h3>
+            
+            <div class="mb-4">
+                <label class="block text-gray-400 mb-2">Source</label>
+                <div class="grid grid-cols-4 gap-2">
+                    <button onclick="setModalSource('vercel')" id="src-vercel" class="p-2 rounded-lg source-vercel text-center text-xs font-medium">Vercel</button>
+                    <button onclick="setModalSource('supabase')" id="src-supabase" class="p-2 rounded-lg bg-gray-700 text-center text-xs font-medium">Supabase</button>
+                    <button onclick="setModalSource('local')" id="src-local" class="p-2 rounded-lg bg-gray-700 text-center text-xs font-medium">Local</button>
+                    <button onclick="setModalSource('manual')" id="src-manual" class="p-2 rounded-lg bg-gray-700 text-center text-xs font-medium">Manual</button>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-400 mb-2">Value</label>
+                <input type="password" id="modal-value" class="w-full input-field rounded-xl p-3" placeholder="Enter API key...">
+                <button onclick="toggleValueVisibility()" class="text-sm text-indigo-400 mt-2 hover:text-indigo-300">
+                    <i class="iconoir-eye mr-1"></i>Show/Hide
+                </button>
+            </div>
+            
+            <div id="modal-source-note" class="text-sm text-gray-400 mb-4 p-3 bg-black/20 rounded-xl">
+                <strong>Vercel:</strong> Set in Vercel Dashboard → Settings → Environment Variables
+            </div>
+            
+            <div class="flex gap-3 justify-end">
+                <button onclick="closeModal()" class="px-4 py-2 glass-card rounded-xl hover:bg-white/10 transition">
+                    Cancel
+                </button>
+                <button onclick="saveModalValue()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition">
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/credentials-manager.js"></script>
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        // TAB SWITCHING
+        // ═══════════════════════════════════════════════════════════════
+        
+        function switchTab(tab) {
+            // Update buttons
+            document.querySelectorAll('[id^="tab-"]').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('glass-card', 'hover:bg-white/10');
+            });
+            document.getElementById(`tab-${tab}`).classList.add('tab-active');
+            document.getElementById(`tab-${tab}`).classList.remove('glass-card', 'hover:bg-white/10');
+            
+            // Update panels
+            document.querySelectorAll('[id^="panel-"]').forEach(panel => panel.classList.add('hidden'));
+            document.getElementById(`panel-${tab}`).classList.remove('hidden');
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // API KEYS PANEL
+        // ═══════════════════════════════════════════════════════════════
+        
+        async function loadAPIKeys() {
+            const container = document.getElementById('api-keys-container');
+            container.innerHTML = '<div class="text-gray-400 text-center py-10">Loading...</div>';
+            
+            // Group APIs by category
+            const categories = {};
+            for (const [key, config] of Object.entries(API_REGISTRY)) {
+                const cat = config.category || 'other';
+                if (!categories[cat]) categories[cat] = [];
+                
+                // Check if has value
+                const value = await credentialsManager.get(key);
+                const source = credentialsManager.getSource(key);
+                
+                categories[cat].push({
+                    key,
+                    ...config,
+                    hasValue: !!value,
+                    source,
+                    masked: value ? `${value.substring(0, 4)}...${value.slice(-4)}` : null
+                });
+            }
+            
+            // Calculate stats
+            let configured = 0, missing = 0, required = 0, total = 0;
+            for (const apis of Object.values(categories)) {
+                for (const api of apis) {
+                    total++;
+                    if (api.hasValue) configured++;
+                    else missing++;
+                    if (api.required) required++;
+                }
+            }
+            
+            document.getElementById('stat-configured').textContent = configured;
+            document.getElementById('stat-missing').textContent = missing;
+            document.getElementById('stat-required').textContent = required;
+            document.getElementById('stat-total').textContent = total;
+            
+            // Render
+            const categoryNames = {
+                llm: '🤖 LLM Providers',
+                finance: '📊 Financial Data',
+                communication: '📧 Communication',
+                database: '🗄️ Database & Storage',
+                video: '🎬 Video & Media'
+            };
+            
+            let html = '';
+            for (const [cat, apis] of Object.entries(categories)) {
+                html += `
+                    <div class="glass-card rounded-2xl overflow-hidden">
+                        <div class="category-header px-5 py-3 border-b border-white/5">
+                            <span class="font-semibold">${categoryNames[cat] || cat}</span>
+                            <span class="text-gray-400 ml-2">(${apis.length})</span>
+                        </div>
+                        <div class="divide-y divide-white/5">
+                `;
+                
+                for (const api of apis) {
+                    const statusClass = api.hasValue ? 'status-connected' : (api.required ? 'status-missing' : 'status-partial');
+                    const sourceClass = `source-${api.source}`;
+                    
+                    html += `
+                        <div class="px-5 py-4 flex items-center justify-between hover:bg-white/5 transition">
+                            <div class="flex items-center gap-4">
+                                <div class="status-dot ${statusClass}"></div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xl">${api.icon}</span>
+                                        <span class="font-medium">${api.name}</span>
+                                        ${api.required ? '<span class="text-xs text-red-400">Required</span>' : ''}
+                                    </div>
+                                    <div class="text-gray-400 text-sm">${api.description}</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                ${api.hasValue ? `<span class="font-mono text-gray-400 text-sm">${api.masked}</span>` : ''}
+                                <span class="source-badge ${sourceClass}">${api.source}</span>
+                                <button onclick="editKey('${api.key}')" class="p-2 hover:bg-white/10 rounded-lg transition">
+                                    <i class="iconoir-edit"></i>
+                                </button>
+                                ${api.docUrl ? `
+                                    <a href="${api.docUrl}" target="_blank" class="p-2 hover:bg-white/10 rounded-lg transition">
+                                        <i class="iconoir-open-new-window"></i>
+                                    </a>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                html += '</div></div>';
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // MCP PANEL
+        // ═══════════════════════════════════════════════════════════════
+        
+        async function loadMCPConnections() {
+            const container = document.getElementById('mcp-connections-container');
+            container.innerHTML = '';
+            
+            for (const [id, mcp] of Object.entries(MCP_REGISTRY)) {
+                // Check if all required keys are present
+                const keyStatuses = await Promise.all(
+                    mcp.requiredKeys.map(async key => ({
+                        key,
+                        hasValue: !!(await credentialsManager.get(key))
+                    }))
+                );
+                const allKeysPresent = keyStatuses.every(k => k.hasValue);
+                const statusClass = allKeysPresent ? 'status-connected' : 'status-missing';
+                
+                container.innerHTML += `
+                    <div class="glass-card rounded-xl p-5">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="status-dot ${statusClass}"></div>
+                            <span class="text-2xl">${mcp.icon}</span>
+                            <span class="font-semibold">${mcp.name}</span>
+                        </div>
+                        <p class="text-gray-400 text-sm mb-3">${mcp.description}</p>
+                        <div class="text-xs text-gray-500">
+                            Required: ${mcp.requiredKeys.map(k => `<span class="${keyStatuses.find(ks => ks.key === k)?.hasValue ? 'text-green-400' : 'text-red-400'}">${k}</span>`).join(', ')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // ORCHESTRATOR PANEL
+        // ═══════════════════════════════════════════════════════════════
+        
+        function loadOrchestratorSettings() {
+            const enabled = localStorage.getItem('emma-use-orchestrator') === 'true';
+            document.getElementById('orchestrator-enabled').checked = enabled;
+            
+            const persona = localStorage.getItem('emma-orchestrator-persona') || 'finance';
+            document.getElementById('default-persona').value = persona;
+            
+            const llm = localStorage.getItem('emma-preferred-llm') || 'auto';
+            document.getElementById('preferred-llm').value = llm;
+            
+            const skepticism = parseInt(localStorage.getItem('emma-skepticism-level') || '50');
+            document.getElementById('skepticism-level').value = skepticism;
+            updateSkepticismLabel();
+            
+            checkOrchestratorStatus();
+        }
+        
+        function toggleOrchestrator() {
+            const enabled = document.getElementById('orchestrator-enabled').checked;
+            localStorage.setItem('emma-use-orchestrator', enabled ? 'true' : 'false');
+        }
+        
+        function saveOrchestratorSettings() {
+            localStorage.setItem('emma-orchestrator-persona', document.getElementById('default-persona').value);
+            localStorage.setItem('emma-preferred-llm', document.getElementById('preferred-llm').value);
+            localStorage.setItem('emma-skepticism-level', document.getElementById('skepticism-level').value);
+        }
+        
+        function updateSkepticismLabel() {
+            const value = parseInt(document.getElementById('skepticism-level').value);
+            let label = 'Balanced';
+            if (value < 25) label = 'Low';
+            else if (value < 50) label = 'Moderate';
+            else if (value < 75) label = 'High';
+            else label = 'Maximum';
+            document.getElementById('skepticism-label').textContent = label;
+        }
+        
+        async function checkOrchestratorStatus() {
+            try {
+                const response = await fetch('/api/orchestrator');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('orchestrator-status').innerHTML = `
+                        <div class="text-green-400 mb-2">✅ Orchestrator is running</div>
+                        <div>Features: ${data.features?.join(', ') || 'N/A'}</div>
+                        <div>Version: ${data.version || 'unknown'}</div>
+                    `;
+                } else {
+                    document.getElementById('orchestrator-status').innerHTML = `
+                        <div class="text-red-400">❌ Orchestrator error: ${data.error}</div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('orchestrator-status').innerHTML = `
+                    <div class="text-red-400">❌ Cannot reach orchestrator: ${error.message}</div>
+                `;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // TEST CONSOLE
+        // ═══════════════════════════════════════════════════════════════
+        
+        function logToConsole(message, type = 'info') {
+            const console = document.getElementById('test-console');
+            const colors = {
+                info: 'text-gray-300',
+                success: 'text-green-400',
+                error: 'text-red-400',
+                request: 'text-blue-400',
+                response: 'text-purple-400'
+            };
+            
+            const timestamp = new Date().toLocaleTimeString();
+            console.innerHTML += `<div class="${colors[type] || 'text-gray-300'}">[${timestamp}] ${message}</div>`;
+            console.scrollTop = console.scrollHeight;
+        }
+        
+        async function runTest(testType) {
+            logToConsole(`Running test: ${testType}`, 'request');
+            
+            try {
+                let response, data;
+                
+                switch (testType) {
+                    case 'orchestrator_status':
+                        response = await fetch('/api/orchestrator');
+                        data = await response.json();
+                        logToConsole(JSON.stringify(data, null, 2), 'response');
+                        break;
+                        
+                    case 'personas':
+                        response = await fetch('/api/orchestrator?action=personas');
+                        data = await response.json();
+                        logToConsole(JSON.stringify(data, null, 2), 'response');
+                        break;
+                        
+                    case 'agents':
+                        response = await fetch('/api/orchestrator?action=agents');
+                        data = await response.json();
+                        logToConsole(JSON.stringify(data, null, 2), 'response');
+                        break;
+                        
+                    case 'ask_finance':
+                        logToConsole('Sending: "Analyse AAPL" with finance persona...', 'info');
+                        response = await fetch('/api/orchestrator', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message: 'Analyse AAPL brièvement', persona: 'finance' })
+                        });
+                        data = await response.json();
+                        logToConsole(JSON.stringify(data, null, 2), 'response');
+                        break;
+                        
+                    case 'stock_quote':
+                        logToConsole('Calling: DataAgent → get_stock_quote(AAPL)', 'info');
+                        response = await fetch('/api/orchestrator', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ agent: 'data', action: 'get_stock_quote', ticker: 'AAPL' })
+                        });
+                        data = await response.json();
+                        logToConsole(JSON.stringify(data, null, 2), 'response');
+                        break;
+                }
+                
+                logToConsole('Test completed ✓', 'success');
+                
+            } catch (error) {
+                logToConsole(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // EDIT MODAL
+        // ═══════════════════════════════════════════════════════════════
+        
+        let currentEditKey = null;
+        let modalSource = 'vercel';
+        
+        async function editKey(key) {
+            currentEditKey = key;
+            const config = API_REGISTRY[key];
+            
+            document.getElementById('modal-title').textContent = `Edit ${config.name}`;
+            document.getElementById('modal-value').value = '';
+            
+            modalSource = credentialsManager.getSource(key);
+            setModalSource(modalSource);
+            
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+        
+        function setModalSource(source) {
+            modalSource = source;
+            
+            // Update button styles
+            ['vercel', 'supabase', 'local', 'manual'].forEach(s => {
+                const btn = document.getElementById(`src-${s}`);
+                if (s === source) {
+                    btn.classList.add(`source-${s}`);
+                    btn.classList.remove('bg-gray-700');
+                } else {
+                    btn.classList.remove(`source-${s}`);
+                    btn.classList.add('bg-gray-700');
+                }
+            });
+            
+            // Update note
+            const notes = {
+                vercel: '<strong>Vercel:</strong> Set in Vercel Dashboard → Settings → Environment Variables. Value here is ignored.',
+                supabase: '<strong>Supabase:</strong> Stored encrypted in Supabase. Synced across devices.',
+                local: '<strong>Local:</strong> Stored in browser localStorage. Only available on this device.',
+                manual: '<strong>Manual:</strong> Session only. Will be cleared when you close the browser.'
+            };
+            document.getElementById('modal-source-note').innerHTML = notes[source];
+        }
+        
+        function closeModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+            currentEditKey = null;
+        }
+        
+        async function saveModalValue() {
+            const value = document.getElementById('modal-value').value;
+            
+            if (modalSource !== 'vercel' && !value) {
+                alert('Please enter a value');
+                return;
+            }
+            
+            credentialsManager.setSource(currentEditKey, modalSource);
+            
+            if (modalSource !== 'vercel' && value) {
+                await credentialsManager.set(currentEditKey, value, modalSource);
+            }
+            
+            closeModal();
+            loadAPIKeys();
+        }
+        
+        function toggleValueVisibility() {
+            const input = document.getElementById('modal-value');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // EXPORT/IMPORT
+        // ═══════════════════════════════════════════════════════════════
+        
+        function exportConfig() {
+            const config = credentialsManager.exportConfig();
+            const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `jlab-config-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        async function importConfig() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                const text = await file.text();
+                const config = JSON.parse(text);
+                credentialsManager.importConfig(config);
+                loadAPIKeys();
+                alert('Configuration imported successfully!');
+            };
+            input.click();
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // INIT
+        // ═══════════════════════════════════════════════════════════════
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            await credentialsManager.init();
+            loadAPIKeys();
+            loadMCPConnections();
+            loadOrchestratorSettings();
+        });
+    </script>
+</body>
+</html>
