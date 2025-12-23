@@ -156,22 +156,17 @@
     {
       "source": "/",
       "has": [{ "type": "host", "value": "jlab.jslai.app" }],
-      "destination": "/jlab-settings.html"
+      "destination": "/jlab-dashboard.html"
     },
     {
-      "source": "/dashboard",
+      "source": "/settings",
       "has": [{ "type": "host", "value": "jlab.jslai.app" }],
-      "destination": "/jlab-dashboard.html"
+      "destination": "/jlab-settings.html"
     },
     {
       "source": "/hub",
       "has": [{ "type": "host", "value": "jlab.jslai.app" }],
       "destination": "/jlab.html"
-    },
-    {
-      "source": "/(.*)",
-      "has": [{ "type": "host", "value": "jlaj.jslai.app" }],
-      "destination": "/jlab-dashboard.html"
     }
   ],
   "crons": [],
