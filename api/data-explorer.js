@@ -1,0 +1,360 @@
+/**
+ * Data Explorer API - Supabase Table Browser
+ * 
+ * Endpoints:
+ * - GET ?action=tables - List all 3P1-related tables with row counts
+ * - GET ?action=data&table=finance_pro_snapshots - Get table data with pagination
+ * - GET ?action=metadata&table=X - Get column info and last update times
+ * - POST ?action=export - Export selected data to JSON/CSV
+ */
+
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
+
+// Tables related to 3P1 Finance Pro
+const P3P1_TABLES = [
+    { name: 'finance_pro_snapshots', label: 'Snapshots 3P1', icon: '📸' },
+    { name: 'tickers', label: 'Tickers Database', icon: '📊' },
+    { name: 'watchlist', label: 'Watchlist', icon: '⭐' },
+    { name: 'user_profiles', label: 'User Profiles', icon: '👤' },
+    { name: 'validation_settings', label: 'Validation Settings', icon: '⚙️' },
+    { name: 'emma_config', label: 'Emma Config', icon: '🤖' },
+    { name: 'news_cache', label: 'News Cache', icon: '📰' },
+    { name: 'llm_models', label: 'LLM Models', icon: '🧠' }
+];
+
+export default async function handler(req, res) {
+    // CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
+    if (!SUPABASE_URL || !SUPABASE_KEY) {
+        return res.status(500).json({ error: 'Supabase configuration missing' });
+    }
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    const { action } = req.query;
+
+    try {
+        switch (action) {
+            case 'tables':
+                return await listTables(req, res, supabase);
+            case 'data':
+                return await getTableData(req, res, supabase);
+            case 'metadata':
+                return await getTableMetadata(req, res, supabase);
+            case 'export':
+                return await exportData(req, res, supabase);
+            case 'sync-selected':
+                return await syncSelected(req, res, supabase);
+            default:
+                return res.status(400).json({ 
+                    error: 'Action required', 
+                    available: ['tables', 'data', 'metadata', 'export', 'sync-selected'] 
+                });
+        }
+    } catch (error) {
+        console.error('❌ Data Explorer API error:', error);
+        return res.status(500).json({ error: error.message });
+    }
+}
+
+/**
+ * List all 3P1 tables with row counts and last update
+ */
+async function listTables(req, res, supabase) {
+    const results = [];
+    
+    for (const table of P3P1_TABLES) {
+        try {
+            // Get row count
+            const { count, error: countError } = await supabase
+                .from(table.name)
+                .select('*', { count: 'exact', head: true });
+            
+            if (countError) {
+                results.push({
+                    ...table,
+                    count: 0,
+                    lastUpdate: null,
+                    error: countError.message
+                });
+                continue;
+            }
+
+            // Try to get last update (from updated_at or created_at column)
+            let lastUpdate = null;
+            try {
+                const { data: lastRow } = await supabase
+                    .from(table.name)
+                    .select('updated_at, created_at, snapshot_date')
+                    .order('updated_at', { ascending: false, nullsFirst: false })
+                    .limit(1)
+                    .single();
+                
+                lastUpdate = lastRow?.updated_at || lastRow?.created_at || lastRow?.snapshot_date || null;
+            } catch (e) {
+                // Column doesn't exist, ignore
+            }
+
+            results.push({
+                ...table,
+                count: count || 0,
+                lastUpdate
+            });
+        } catch (e) {
+            results.push({
+                ...table,
+                count: 0,
+                lastUpdate: null,
+                error: e.message
+            });
+        }
+    }
+
+    return res.status(200).json({
+        success: true,
+        tables: results,
+        timestamp: new Date().toISOString()
+    });
+}
+
+/**
+ * Get paginated table data
+ */
+async function getTableData(req, res, supabase) {
+    const { table, page = 1, limit = 50, ticker, search, orderBy = 'created_at', ascending = 'false' } = req.query;
+    
+    if (!table) {
+        return res.status(400).json({ error: 'Table name required' });
+    }
+
+    // Validate table name (security)
+    if (!P3P1_TABLES.some(t => t.name === table)) {
+        return res.status(400).json({ error: 'Invalid table name' });
+    }
+
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    
+    let query = supabase
+        .from(table)
+        .select('*', { count: 'exact' });
+    
+    // Filter by ticker if provided
+    if (ticker) {
+        query = query.eq('ticker', ticker.toUpperCase());
+    }
+    
+    // Search in common fields
+    if (search) {
+        query = query.or(`ticker.ilike.%${search}%,notes.ilike.%${search}%`);
+    }
+    
+    // Order and paginate
+    query = query
+        .order(orderBy, { ascending: ascending === 'true' })
+        .range(offset, offset + parseInt(limit) - 1);
+    
+    const { data, error, count } = await query;
+    
+    if (error) {
+        console.error(`Get ${table} data error:`, error);
+        return res.status(500).json({ error: error.message });
+    }
+
+    // Get column info from first row
+    const columns = data.length > 0 
+        ? Object.keys(data[0]).map(key => ({
+            name: key,
+            type: typeof data[0][key],
+            sample: data[0][key]
+        }))
+        : [];
+
+    return res.status(200).json({
+        success: true,
+        table,
+        data,
+        columns,
+        pagination: {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            total: count,
+            totalPages: Math.ceil(count / parseInt(limit))
+        }
+    });
+}
+
+/**
+ * Get table metadata (columns, types, stats)
+ */
+async function getTableMetadata(req, res, supabase) {
+    const { table } = req.query;
+    
+    if (!table) {
+        return res.status(400).json({ error: 'Table name required' });
+    }
+
+    if (!P3P1_TABLES.some(t => t.name === table)) {
+        return res.status(400).json({ error: 'Invalid table name' });
+    }
+
+    // Get sample data to infer columns
+    const { data: sample, error: sampleError } = await supabase
+        .from(table)
+        .select('*')
+        .limit(5);
+    
+    if (sampleError) {
+        return res.status(500).json({ error: sampleError.message });
+    }
+
+    // Get row count
+    const { count } = await supabase
+        .from(table)
+        .select('*', { count: 'exact', head: true });
+
+    // Infer column info
+    const columns = sample.length > 0 
+        ? Object.entries(sample[0]).map(([key, value]) => ({
+            name: key,
+            type: Array.isArray(value) ? 'array' : typeof value,
+            isNullable: sample.some(row => row[key] === null),
+            sampleValues: [...new Set(sample.map(row => 
+                typeof row[key] === 'object' ? JSON.stringify(row[key]).slice(0, 50) : String(row[key]).slice(0, 50)
+            ))].slice(0, 3)
+        }))
+        : [];
+
+    // Get ticker-specific stats if applicable
+    let tickerStats = null;
+    if (columns.some(c => c.name === 'ticker')) {
+        const { data: tickers } = await supabase
+            .from(table)
+            .select('ticker')
+            .order('ticker');
+        
+        tickerStats = {
+            uniqueTickers: [...new Set(tickers?.map(t => t.ticker) || [])],
+            totalTickers: new Set(tickers?.map(t => t.ticker) || []).size
+        };
+    }
+
+    return res.status(200).json({
+        success: true,
+        table,
+        rowCount: count,
+        columns,
+        tickerStats,
+        tableInfo: P3P1_TABLES.find(t => t.name === table)
+    });
+}
+
+/**
+ * Export data in various formats
+ */
+async function exportData(req, res, supabase) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'POST required' });
+    }
+
+    const { table, format = 'json', filters = {}, columns: selectedColumns } = req.body;
+    
+    if (!table) {
+        return res.status(400).json({ error: 'Table name required' });
+    }
+
+    if (!P3P1_TABLES.some(t => t.name === table)) {
+        return res.status(400).json({ error: 'Invalid table name' });
+    }
+
+    // Build query
+    let query = supabase.from(table).select(selectedColumns?.join(',') || '*');
+    
+    // Apply filters
+    if (filters.ticker) {
+        query = query.eq('ticker', filters.ticker.toUpperCase());
+    }
+    if (filters.is_current !== undefined) {
+        query = query.eq('is_current', filters.is_current);
+    }
+    if (filters.dateFrom) {
+        query = query.gte('created_at', filters.dateFrom);
+    }
+    if (filters.dateTo) {
+        query = query.lte('created_at', filters.dateTo);
+    }
+    
+    const { data, error } = await query.order('created_at', { ascending: false });
+    
+    if (error) {
+        return res.status(500).json({ error: error.message });
+    }
+
+    // Format based on requested type
+    if (format === 'csv') {
+        const csv = convertToCSV(data);
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename="${table}_export.csv"`);
+        return res.status(200).send(csv);
+    }
+
+    // JSON format (default)
+    return res.status(200).json({
+        success: true,
+        table,
+        exportedAt: new Date().toISOString(),
+        rowCount: data.length,
+        data
+    });
+}
+
+/**
+ * Sync selected tickers/data
+ */
+async function syncSelected(req, res, supabase) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'POST required' });
+    }
+
+    const { tickers, options = {} } = req.body;
+    
+    if (!tickers || !Array.isArray(tickers) || tickers.length === 0) {
+        return res.status(400).json({ error: 'Tickers array required' });
+    }
+
+    // This will be handled by the frontend calling the existing sync APIs
+    // Just return the selected tickers for processing
+    return res.status(200).json({
+        success: true,
+        message: 'Ready to sync',
+        tickers: tickers.map(t => t.toUpperCase()),
+        options
+    });
+}
+
+/**
+ * Helper: Convert data array to CSV
+ */
+function convertToCSV(data) {
+    if (!data || data.length === 0) return '';
+    
+    const headers = Object.keys(data[0]);
+    const rows = data.map(row => 
+        headers.map(h => {
+            const val = row[h];
+            if (val === null || val === undefined) return '';
+            if (typeof val === 'object') return JSON.stringify(val).replace(/"/g, '""');
+            return String(val).replace(/"/g, '""');
+        }).map(v => `"${v}"`).join(',')
+    );
+    
+    return [headers.join(','), ...rows].join('\n');
+}
