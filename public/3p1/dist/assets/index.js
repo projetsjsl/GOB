@@ -56752,8 +56752,8 @@ Vérifiez votre connexion et réessayez.`,
           setIsLoadingTickers(false);
           console.log(`✅ ${validTickers.length} profils squelettes créés - affichage immédiat`);
           const loadFMPDataInBackground = async () => {
-            const batchSize = 50;
-            const delayBetweenBatches = 200;
+            const batchSize = 5;
+            const delayBetweenBatches = 1e3;
             for (let i = 0; i < validTickers.length; i += batchSize) {
               const batch = validTickers.slice(i, i + batchSize);
               if (i > 0) {
@@ -56766,6 +56766,28 @@ Vérifiez votre connexion et réessayez.`,
                   if (!supabaseTicker.ticker) return;
                   const symbol = supabaseTicker.ticker.toUpperCase();
                   if (!symbol || symbol.trim() === "") return;
+                  const markAsInvalid = (reason) => {
+                    console.warn(`❌ ${symbol}: ${reason} - Marking as invalid/loaded`);
+                    setLibrary((prev) => {
+                      var _a4, _b3;
+                      return {
+                        ...prev,
+                        [symbol]: {
+                          ...prev[symbol],
+                          _isSkeleton: false,
+                          data: [],
+                          info: {
+                            symbol,
+                            name: ((_b3 = (_a4 = prev[symbol]) == null ? void 0 : _a4.info) == null ? void 0 : _b3.name) || symbol,
+                            sector: "",
+                            financials: { currency: "USD" },
+                            // minimal stub
+                            analysisData: {}
+                          }
+                        }
+                      };
+                    });
+                  };
                   const supabaseResult = supabaseResults[symbol];
                   try {
                     let result2;
@@ -56776,7 +56798,7 @@ Vérifiez votre connexion et réessayez.`,
                       console.log(`⚠️ ${symbol}: Pas de snapshot Supabase → Chargement FMP`);
                       const fmpResult = await fetchCompanyData(symbol);
                       if (!fmpResult.data || fmpResult.data.length === 0) {
-                        console.error(`❌ ${symbol}: Aucune donnée FMP disponible`);
+                        markAsInvalid("Aucune donnée FMP disponible");
                         return;
                       }
                       result2 = {
@@ -56814,15 +56836,18 @@ Vérifiez votre connexion et réessayez.`,
                       }
                     }
                     if (!result2.data || result2.data.length === 0) {
+                      markAsInvalid("Données vides après chargement");
                       return;
                     }
                     if (!result2.currentPrice || result2.currentPrice <= 0) {
+                      markAsInvalid(`Prix invalide: ${result2.currentPrice}`);
                       return;
                     }
                     const hasValidData = result2.data.some(
                       (d) => d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
                     );
                     if (!hasValidData) {
+                      markAsInvalid("Aucune année avec données suffisantes (EPS/CF/BV > 0)");
                       return;
                     }
                     const isWatchlist2 = mapSourceToIsWatchlist(supabaseTicker.source);
@@ -56965,13 +56990,16 @@ Vérifiez votre connexion et réessayez.`,
           isLoadingProfileRef.current = false;
         });
       });
-    } else {
-      if (activeId !== "ACN") {
-        showNotification(
-          `⚠️ Le ticker ${activeId} n'est pas dans votre portefeuille. Cliquez sur "Sync. Données" pour charger les données depuis l'API ou ajoutez-le depuis la sidebar.`,
-          "warning"
-        );
-      }
+    }
+    if (profile2 && (profile2._isSkeleton || !profile2.data || profile2.data.length === 0)) {
+      console.log(`🚀 Chargement PRIORITAIRE pour le profil actif: ${activeId}`);
+      const timeoutId = setTimeout(() => {
+        const currentProfile = library[activeId];
+        if (currentProfile && (currentProfile._isSkeleton || !currentProfile.data || currentProfile.data.length === 0)) {
+          performSync(false).catch(console.error);
+        }
+      }, 50);
+      return () => clearTimeout(timeoutId);
     }
   }, [activeId, isInitialized, library]);
   reactExports.useEffect(() => {
@@ -60028,5 +60056,6 @@ export {
   ForwardRef$O as t,
   ForwardRef$p as u,
   ForwardRef$v as v,
-  ForwardRef$h as w
+  ForwardRef$h as w,
+  ForwardRef$u as x
 };

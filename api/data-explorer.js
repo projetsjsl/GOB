@@ -416,8 +416,9 @@ async function deleteData(req, res, supabase) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'POST required' });
     const { table, id } = req.body;
     
-    if (!table || !id) return res.status(400).json({ error: 'Table and ID required' });
-    if (!P3P1_TABLES.some(t => t.name === table)) return res.status(400).json({ error: 'Invalid table' });
+    if (!table) return res.status(400).json({ error: 'Missing table name in request body' });
+    if (!id) return res.status(400).json({ error: 'Missing ID in request body' });
+    if (!P3P1_TABLES.some(t => t.name === table)) return res.status(400).json({ error: `Invalid table: ${table}. Allowed: ${P3P1_TABLES.map(t => t.name).join(', ')}` });
 
     const tableConfig = P3P1_TABLES.find(t => t.name === table);
     const pk = tableConfig.primaryKey || 'id';

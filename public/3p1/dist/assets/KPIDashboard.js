@@ -3091,10 +3091,13 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-xs font-bold ${metric.hasInvalidData ? "line-through opacity-70" : ""}`, children: metric.profile.id }),
                 metric.profile.isWatchlist ?? false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-3 h-3 text-blue-300", title: "Watchlist" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-3 h-3 text-yellow-400", title: "Portefeuille" })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-[10px] font-semibold mb-1 ${metric.hasInvalidData ? "opacity-50" : ""}`, children: metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === void 0 ? "N/A" : `${metric.totalReturnPercent.toFixed(0)}%` }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `text-[8px] opacity-90 ${metric.hasInvalidData || metric.jpegy === null ? "opacity-50" : ""}`, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-[10px] font-semibold mb-1 ${metric.hasInvalidData ? "opacity-50" : ""}`, children: metric._isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: "w-5 h-5 text-blue-300 animate-spin mb-1" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px]", children: "Chargement..." })
+              ] }) : metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === void 0 ? "N/A" : `${metric.totalReturnPercent.toFixed(0)}%` }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `text-[8px] opacity-90 ${metric._isLoading || metric.hasInvalidData || metric.jpegy === null ? "opacity-50" : ""}`, children: [
                 "JPEGY: ",
-                metric.jpegy !== null && metric.jpegy !== void 0 ? metric.jpegy.toFixed(1) : "N/A",
+                metric._isLoading ? "..." : metric.jpegy !== null && metric.jpegy !== void 0 ? metric.jpegy.toFixed(1) : "N/A",
                 metric.jpegy === null && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-1 text-red-400", children: "⚠️" })
               ] }),
               metric.hasApprovedVersion && !metric.hasInvalidData && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$e, { className: "w-4 h-4 mt-1 text-white" })
@@ -3144,7 +3147,10 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: metric.profile.info.sector })
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-right", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `font-bold text-lg ${metric.hasInvalidData ? "text-gray-400" : getReturnTextClass(metric.totalReturnPercent)}`, children: metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === void 0 ? "N/A" : `${metric.totalReturnPercent.toFixed(1)}%` }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `font-bold text-lg ${metric._isLoading ? "text-gray-400" : metric.hasInvalidData ? "text-gray-400" : getReturnTextClass(metric.totalReturnPercent)}`, children: metric._isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: "w-4 h-4 animate-spin" }),
+                    " ..."
+                  ] }) : metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === void 0 ? "N/A" : `${metric.totalReturnPercent.toFixed(1)}%` }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: "Rendement" })
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-right", children: [
@@ -3202,7 +3208,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `font-bold ${metric.hasInvalidData ? "line-through" : ""}`, children: metric.profile.id }),
                 metric.profile.isWatchlist ?? false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-2.5 h-2.5 text-blue-300", title: "Watchlist" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-2.5 h-2.5 text-yellow-400", title: "Portefeuille" })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[8px]", children: metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === void 0 ? "N/A" : `${metric.totalReturnPercent.toFixed(0)}%` })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[8px]", children: metric._isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: "w-3 h-3 animate-spin mx-auto" }) : metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === void 0 ? "N/A" : `${metric.totalReturnPercent.toFixed(0)}%` })
             ] })
           },
           metric.profile.id

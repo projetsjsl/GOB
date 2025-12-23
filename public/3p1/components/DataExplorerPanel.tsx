@@ -20,7 +20,8 @@ import {
   CheckIcon,
   ClockIcon,
   ExclamationCircleIcon,
-  FunnelIcon
+  FunnelIcon,
+  CloudArrowDownIcon
 } from '@heroicons/react/24/outline';
 
 interface TableInfo {
@@ -228,11 +229,10 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
       const action = isNew ? 'insert' : 'update';
       const pk = tables.find(t => t.name === selectedTable)?.primaryKey || 'id';
       
-      const res = await fetch('/api/data-explorer', {
+      const res = await fetch(`/api/data-explorer?action=${action}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action,
           table: selectedTable,
           id: editingRow ? (editingRow[pk]) : undefined,
           data
@@ -258,15 +258,30 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
     }
   };
 
-  const handleDeleteRow = async (id: string) => {
-    if (!selectedTable || !confirm('Êtes-vous sûr de vouloir supprimer cet enregistrement ?')) return;
+  const handleDeleteRow = async (row: any) => {
+    if (!selectedTable) return;
+    
+    // Determine ID based on table config
+    const tableConfig = tables.find(t => t.name === selectedTable);
+    const pk = (tableConfig as any)?.primaryKey || 'id'; // Default to id, but respect config
+    // Fallback: check standard keys if pk value is missing in row
+    const id = row[pk] || row.id || row.ticker;
+
+    console.log(`[DataExplorer] Deleting from ${selectedTable}, PK=${pk}, ID=${id}`, row);
+
+    if (!id) {
+       addNotification('error', `Impossible de trouver l'ID (clé primaire: ${pk}) pour cet enregistrement`);
+       return;
+    }
+
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer cet enregistrement ?\nTable: ${selectedTable}\nID: ${id}`)) return;
+    
     setLoading(true);
     try {
-      const res = await fetch('/api/data-explorer', {
+      const res = await fetch('/api/data-explorer?action=delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'delete',
           table: selectedTable,
           id
         })
@@ -275,13 +290,16 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
       const result = await res.json();
       if (result.success) {
         addNotification('success', 'Enregistrement supprimé');
-        loadTableData();
-        loadTables();
+        // Remove from local state immediately for better UI feedback
+        setTableData(prev => prev.filter(r => (r[pk] || r.id || r.ticker) !== id));
+        loadTables(); // Refresh counts in background
       } else {
-        addNotification('error', result.error);
+        console.error('Delete failed:', result);
+        addNotification('error', result.error || 'Erreur de suppression');
         setError(result.error);
       }
     } catch (e: any) {
+      console.error('Delete exception:', e);
       addNotification('error', e.message);
       setError(e.message);
     } finally {
@@ -610,7 +628,7 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                                   </button>
                                 )}
                                 <button
-                                  onClick={() => handleDeleteRow(row.id || row.ticker)}
+                                  onClick={() => handleDeleteRow(row)}
                                   className="p-1 hover:bg-slate-700 rounded text-red-400 transition-colors"
                                   title="Supprimer"
                                 >
@@ -783,6 +801,118 @@ interface EditModalProps {
 
 const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onClose, onSave }) => {
   const [formData, setFormData] = useState<any>({ ...initialData });
+  const [loadingField, setLoadingField] = useState<string | null>(null);
+  const [tickerResults, setTickerResults] = useState<any[]>([]);
+  const [showTickerResults, setShowTickerResults] = useState(false);
+  const [fmpValues, setFmpValues] = useState<{[key: string]: any}>({});
+  const tickerInputRef = useRef<HTMLInputElement>(null);
+
+  // Mapping from table column names to FMP API result paths
+  const FMP_MAPPING: {[key: string]: string} = {
+    price: 'currentPrice',
+    current_price: 'currentPrice',
+    sector: 'info.sector',
+    industry: 'info.industry',
+    description: 'info.description',
+    beta: 'info.beta',
+    market_cap: 'info.mktCap',
+    marketCap: 'info.mktCap',
+    website: 'info.website',
+    ceo: 'info.ceo',
+    exchange: 'info.exchange',
+    country: 'info.country',
+    full_time_employees: 'info.fullTimeEmployees',
+    image: 'info.image',
+    currency: 'info.currency'
+  };
+
+  // Close ticker results when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (tickerInputRef.current && !tickerInputRef.current.contains(event.target as Node)) {
+        // Delay hiding to allow click on result
+        setTimeout(() => setShowTickerResults(false), 200);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleTickerSearch = async (query: string) => {
+    setFormData((prev: any) => ({ ...prev, ticker: query.toUpperCase() }));
+    
+    if (query.length < 2) {
+      setTickerResults([]);
+      setShowTickerResults(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/fmp-search?query=${encodeURIComponent(query)}&limit=5`);
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setTickerResults(data);
+        setShowTickerResults(true);
+      } else if (data && data.results) {
+        setTickerResults(data.results);
+        setShowTickerResults(true);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const selectTicker = (symbol: string) => {
+    setFormData((prev: any) => ({ ...prev, ticker: symbol }));
+    setShowTickerResults(false);
+  };
+
+  const handleFetchField = async (fieldName: string) => {
+    const ticker = formData.ticker;
+    if (!ticker) {
+      alert("Veuillez d'abord saisir un Ticker");
+      return;
+    }
+
+    setLoadingField(fieldName);
+    try {
+      const res = await fetch(`/api/fmp-company-data?symbol=${encodeURIComponent(ticker)}`);
+      const result = await res.json();
+      
+      const mapping = FMP_MAPPING[fieldName];
+      let value: any = undefined;
+
+      if (mapping === 'currentPrice') {
+        value = result.currentPrice;
+      } else if (mapping.startsWith('info.')) {
+        const key = mapping.split('.')[1];
+        value = result.info ? result.info[key] : undefined;
+      }
+
+      if (value !== undefined && value !== null) {
+        // Store FMP value for selection instead of overwriting immediately
+        setFmpValues(prev => ({ ...prev, [fieldName]: value }));
+      } else {
+        alert("Donnée non trouvée chez FMP pour ce champ.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Erreur lors de la récupération FMP");
+    } finally {
+      setLoadingField(null);
+    }
+  };
+
+  const applyFmpValue = (fieldName: string) => {
+    const val = fmpValues[fieldName];
+    if (val !== undefined) {
+      setFormData((prev: any) => ({ ...prev, [fieldName]: val }));
+      // Clear specific FMP value after applying
+      const newFmpValues = { ...fmpValues };
+      delete newFmpValues[fieldName];
+      setFmpValues(newFmpValues);
+    }
+  };
 
   return (
     <div className="absolute inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
@@ -794,17 +924,66 @@ const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onCl
         <div className="p-6 overflow-y-auto space-y-4">
           {columns.map(col => {
             if (['id', 'created_at', 'updated_at'].includes(col.name)) return null;
+            
+            const isFmpField = !!FMP_MAPPING[col.name];
+            const hasFmpValue = fmpValues[col.name] !== undefined;
+
             return (
-              <div key={col.name}>
-                <label className="block text-sm font-medium text-slate-400 mb-1 capitalize">{col.name.replace(/_/g, ' ')}</label>
+              <div key={col.name} className="relative">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm font-medium text-slate-400 capitalize">
+                    {col.name.replace(/_/g, ' ')}
+                  </label>
+                  {isFmpField && (
+                    <div className="flex items-center gap-2">
+                      {hasFmpValue && (
+                        <span className="text-[10px] text-green-400 font-bold animate-pulse">
+                          Valeur dispo !
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleFetchField(col.name)}
+                        disabled={!!loadingField}
+                        className={`flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded transition-colors disabled:opacity-50 ${hasFmpValue ? 'bg-green-600/20 text-green-400' : 'bg-blue-600/20 text-blue-400 hover:bg-blue-600/30'}`}
+                        title="Récupérer depuis FMP"
+                      >
+                        {loadingField === col.name ? (
+                          <ArrowPathIcon className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <CloudArrowDownIcon className="w-3 h-3" />
+                        )}
+                        <span>FMP</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
                 {col.name === 'ticker' ? (
-                  <input
-                    type="text"
-                    value={formData[col.name] || ''}
-                    onChange={(e) => setFormData({ ...formData, [col.name]: e.target.value.toUpperCase() })}
-                    className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-bold uppercase transition-all focus:border-blue-500 outline-none"
-                    placeholder="AAPL"
-                  />
+                  <div className="relative" ref={tickerInputRef as any}>
+                    <input
+                      type="text"
+                      value={formData[col.name] || ''}
+                      onChange={(e) => handleTickerSearch(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-bold uppercase transition-all focus:border-blue-500 outline-none"
+                      placeholder="AAPL"
+                    />
+                    {showTickerResults && tickerResults.length > 0 && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-600 rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto">
+                        {tickerResults.map((r, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => selectTicker(r.symbol)}
+                            className="w-full text-left px-4 py-2 hover:bg-slate-700 text-white flex justify-between items-center"
+                          >
+                            <span className="font-bold">{r.symbol}</span>
+                            <span className="text-xs text-slate-400 truncate max-w-[150px]">{r.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ) : typeof formData[col.name] === 'boolean' || col.type === 'boolean' ? (
                   <div className="flex bg-slate-900 border border-slate-600 rounded-lg p-1">
                     <button
@@ -836,12 +1015,44 @@ const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onCl
                     className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-mono text-sm h-32 focus:border-blue-500 outline-none"
                   />
                 ) : (
-                  <input
-                    type={col.type === 'number' || typeof formData[col.name] === 'number' ? 'number' : 'text'}
-                    value={formData[col.name] === null ? '' : formData[col.name]}
-                    onChange={(e) => setFormData({ ...formData, [col.name]: col.type === 'number' ? parseFloat(e.target.value) : e.target.value })}
-                    className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500 outline-none"
-                  />
+                  <div className="relative">
+                    <input
+                      type={col.type === 'number' || typeof formData[col.name] === 'number' ? 'number' : 'text'}
+                      value={formData[col.name] === null ? '' : formData[col.name]}
+                      onChange={(e) => setFormData({ ...formData, [col.name]: col.type === 'number' ? parseFloat(e.target.value) : e.target.value })}
+                      className={`w-full bg-slate-900 border-slate-600 rounded-lg p-3 text-white focus:border-blue-500 outline-none border ${hasFmpValue ? 'border-green-500/50' : ''}`}
+                    />
+                    {hasFmpValue && (
+                       <div className="absolute top-full left-0 mt-1 z-10 w-full animate-in fade-in slide-in-from-top-1 duration-200">
+                         <div className="bg-slate-800 border border-green-500/50 rounded-lg shadow-xl p-2 flex items-center justify-between gap-3">
+                           <div className="flex flex-col">
+                             <span className="text-[10px] text-green-400 font-bold uppercase">Suggestion FMP</span>
+                             <span className="text-white font-mono text-sm truncate">{String(fmpValues[col.name])}</span>
+                           </div>
+                           <div className="flex gap-1">
+                             <button
+                               type="button"
+                               onClick={() => {
+                                 const newFmpValues = { ...fmpValues };
+                                 delete newFmpValues[col.name];
+                                 setFmpValues(newFmpValues);
+                               }}
+                               className="p-1 hover:bg-slate-700/50 rounded text-slate-400 hover:text-white"
+                             >
+                               <XMarkIcon className="w-4 h-4" />
+                             </button>
+                             <button
+                               type="button"
+                               onClick={() => applyFmpValue(col.name)}
+                               className="px-2 py-1 bg-green-600 hover:bg-green-500 rounded text-xs font-bold text-white shadow-lg"
+                             >
+                               Appliquer
+                             </button>
+                           </div>
+                         </div>
+                       </div>
+                    )}
+                  </div>
                 )}
               </div>
             );

@@ -1019,8 +1019,8 @@ export default function App() {
                     // ✅ ÉTAPE 2 : Charger les données depuis Supabase d'abord, puis FMP si nécessaire
                     // Utiliser requestIdleCallback pour ne pas bloquer l'UI
                     const loadFMPDataInBackground = async () => {
-                        const batchSize = 50; // Plus grand batch car Supabase est rapide
-                        const delayBetweenBatches = 200; // Délai réduit
+                        const batchSize = 5; // Reduced from 50 to 5 to prevent rate limiting (429)
+                        const delayBetweenBatches = 1000; // Increased delay to 1s
 
                         for (let i = 0; i < validTickers.length; i += batchSize) {
                             const batch = validTickers.slice(i, i + batchSize);
@@ -1043,6 +1043,25 @@ export default function App() {
                                     const symbol = supabaseTicker.ticker.toUpperCase();
                                     if (!symbol || symbol.trim() === '') return; // ✅ Double check
                                     
+                                    const markAsInvalid = (reason: string) => {
+                                        console.warn(`❌ ${symbol}: ${reason} - Marking as invalid/loaded`);
+                                        setLibrary(prev => ({
+                                            ...prev,
+                                            [symbol]: {
+                                                ...prev[symbol],
+                                                _isSkeleton: false,
+                                                data: [],
+                                                info: {
+                                                    symbol,
+                                                    name: prev[symbol]?.info?.name || symbol,
+                                                    sector: '',
+                                                    financials: { currency: 'USD' }, // minimal stub
+                                                    analysisData: {}
+                                                } as any
+                                            }
+                                        }));
+                                    };
+
                                     const supabaseResult = supabaseResults[symbol];
                                     
                                     try {
@@ -1060,7 +1079,7 @@ export default function App() {
                                             const fmpResult = await fetchCompanyData(symbol);
                                             
                                             if (!fmpResult.data || fmpResult.data.length === 0) {
-                                                console.error(`❌ ${symbol}: Aucune donnée FMP disponible`);
+                                                markAsInvalid('Aucune donnée FMP disponible');
                                                 return;
                                             }
                                             
@@ -1102,10 +1121,12 @@ export default function App() {
                                         
                                         // VALIDATION : Vérifier que les données sont valides
                                         if (!result.data || result.data.length === 0) {
+                                            markAsInvalid('Données vides après chargement');
                                             return;
                                         }
                                         
                                         if (!result.currentPrice || result.currentPrice <= 0) {
+                                            markAsInvalid(`Prix invalide: ${result.currentPrice}`);
                                             return;
                                         }
                                         
@@ -1115,6 +1136,7 @@ export default function App() {
                                         );
                                         
                                         if (!hasValidData) {
+                                            markAsInvalid('Aucune année avec données suffisantes (EPS/CF/BV > 0)');
                                             return;
                                         }
                                     
@@ -1298,14 +1320,28 @@ export default function App() {
                 });
             });
         } else {
-            // ⚠️ Profil non trouvé dans la library - données placeholder affichées
-            // Afficher un avertissement si ce n'est pas le profil initial (ACN)
-            if (activeId !== 'ACN') {
-                showNotification(
-                    `⚠️ Le ticker ${activeId} n'est pas dans votre portefeuille. Cliquez sur "Sync. Données" pour charger les données depuis l'API ou ajoutez-le depuis la sidebar.`,
-                    'warning'
-                );
+            // ⚠️ Profil non trouvé dans la library - peut-être un nouveau ticker ou chargement initial
+            // Si c'est un profil squelette ou manquant, on tente de forcer le chargement
+             // Afficher un avertissement si ce n'est pas le profil initial (ACN) ou si on vient de delete
+            if (activeId !== 'ACN' && activeId !== '') {
+                 // Ne pas afficher d'erreur tout de suite, cela peut être transitoire
             }
+        }
+        
+        // ✅ PRIORITÉ CRITIQUE : Si le profil actif est un squelette (vide), le charger IMMÉDIATEMENT
+        // Ne pas attendre le chargement en arrière-plan (trop lent)
+        if (profile && (profile._isSkeleton || !profile.data || profile.data.length === 0)) {
+            console.log(`🚀 Chargement PRIORITAIRE pour le profil actif: ${activeId}`);
+            // Appeler performSync pour charger les données immédiatement
+            // Utiliser un timeout pour ne pas bloquer le rendu actuel
+            const timeoutId = setTimeout(() => {
+                // Vérifier si toujours actif et vide
+                const currentProfile = library[activeId];
+                if (currentProfile && (currentProfile._isSkeleton || !currentProfile.data || currentProfile.data.length === 0)) {
+                     performSync(false).catch(console.error);
+                }
+            }, 50); // Petit délai pour laisser l'interface s'afficher
+            return () => clearTimeout(timeoutId);
         }
     }, [activeId, isInitialized, library]);
 

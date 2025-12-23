@@ -33,14 +33,18 @@ export function generateLogoUrls(options: LogoFallbackOptions): string[] {
   
   // Générer les URLs pour chaque symbole avec toutes les variantes
   uniqueSymbols.forEach(sym => {
-    // Nettoyer le symbole de base
-    const baseSym = sym.replace(/\.TO$/i, '').toUpperCase();
+    // 1. Essayer le symbole tel quel (ex: EXE.TO -> EXE.TO.png)
+    const rawSym = sym.toUpperCase();
+    variants.push(`https://financialmodelingprep.com/image-stock/${rawSym}.png`);
+    variants.push(`https://images.financialmodelingprep.com/symbol/${rawSym}.png`);
+
+    // 2. Nettoyer le symbole de base (ex: EXE.TO -> EXE)
+    const baseSym = rawSym.replace(/\.TO$/i, '').replace(/\.TRT$/i, ''); // Supporter d'autres suffixes si besoin
     
-    // Format 1: image-stock (standard FMP) - symbole original
-    variants.push(`https://financialmodelingprep.com/image-stock/${baseSym}.png`);
-    
-    // Format 2: images/symbol (alternatif FMP) - symbole original
-    variants.push(`https://images.financialmodelingprep.com/symbol/${baseSym}.png`);
+    if (baseSym !== rawSym) {
+         variants.push(`https://financialmodelingprep.com/image-stock/${baseSym}.png`);
+         variants.push(`https://images.financialmodelingprep.com/symbol/${baseSym}.png`);
+    }
     
     // Variantes avec tirets pour les classes d'actions (BRK.B -> BRK-B)
     if (baseSym.includes('.')) {
@@ -54,13 +58,6 @@ export function generateLogoUrls(options: LogoFallbackOptions): string[] {
       const dotVariant = baseSym.replace(/-/g, '.');
       variants.push(`https://financialmodelingprep.com/image-stock/${dotVariant}.png`);
       variants.push(`https://images.financialmodelingprep.com/symbol/${dotVariant}.png`);
-    }
-    
-    // Pour les symboles canadiens, essayer aussi sans suffixe
-    if (sym.toUpperCase().endsWith('.TO')) {
-      const withoutTO = baseSym.replace(/\.TO$/i, '');
-      variants.push(`https://financialmodelingprep.com/image-stock/${withoutTO}.png`);
-      variants.push(`https://images.financialmodelingprep.com/symbol/${withoutTO}.png`);
     }
   });
   

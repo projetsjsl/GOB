@@ -23,6 +23,20 @@ input[type=number]::-webkit-outer-spin-button {
   margin: 0; 
 }
 
+/* --- DASHBOARD LAYOUT FIXES --- */
+html, body {
+  height: 100%;
+  overflow: hidden; /* Prevent body scroll, let dashboard/app container handle it */
+  overscroll-behavior: none; /* Prevent bounce effect */
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Ensure root doesn't scroll excessively */
+}
+
 /* Mobile optimizations */
 @media (max-width: 640px) {
   body {
@@ -59,4 +73,3 @@ input[type=number]::-webkit-outer-spin-button {
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
-
