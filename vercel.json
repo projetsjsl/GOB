@@ -152,6 +152,21 @@
     {
       "source": "/api/finnhub",
       "destination": "/api/marketdata"
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "jlab.jslai.app" }],
+      "destination": "/jlab-settings.html"
+    },
+    {
+      "source": "/dashboard",
+      "has": [{ "type": "host", "value": "jlab.jslai.app" }],
+      "destination": "/jlab-dashboard.html"
+    },
+    {
+      "source": "/hub",
+      "has": [{ "type": "host", "value": "jlab.jslai.app" }],
+      "destination": "/jlab.html"
     }
   ],
   "crons": [],
