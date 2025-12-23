@@ -999,7 +999,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       medianJPEGY,
       avgRatio,
       medianRatio,
-      count: filteredMetrics.length
+      count: filteredMetrics.length,
+      validCount: validMetrics.length
     };
   }, [filteredMetrics]);
 
@@ -1026,8 +1027,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
             <div className="bg-white p-2 sm:p-3 md:p-4 rounded-lg shadow border border-gray-200">
               <div className="text-xs text-gray-500 mb-1">Rendement Moyen</div>
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">{globalStats.avgReturn !== null && globalStats.avgReturn !== undefined ? globalStats.avgReturn.toFixed(1) : 'N/A'}%</div>
-              <div className="text-xs text-gray-400 mt-1">Médiane: {globalStats.medianReturn !== null && globalStats.medianReturn !== undefined ? globalStats.medianReturn.toFixed(1) : 'N/A'}%</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
+                {globalStats.validCount > 0 ? (globalStats.avgReturn?.toFixed(1) ?? 'N/A') + '%' : <span className="text-sm font-normal text-gray-400">En attente...</span>}
+              </div>
+              <div className="text-xs text-gray-400 mt-1">Médiane: {globalStats.validCount > 0 ? (globalStats.medianReturn?.toFixed(1) ?? 'N/A') + '%' : '-'}</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
               <div className="text-xs text-gray-500 mb-1">Écart-Type</div>
