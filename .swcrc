@@ -1,0 +1,17 @@
+{
+  "jsc": {
+    "parser": {
+      "syntax": "ecmascript",
+      "jsx": true
+    },
+    "transform": {
+      "react": {
+        "runtime": "classic",
+        "pragma": "React.createElement",
+        "pragmaFrag": "React.Fragment"
+      }
+    },
+    "target": "es2020"
+  },
+  "minify": false
+}
