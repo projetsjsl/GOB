@@ -27912,7 +27912,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 )}
 
                 {showEmmaAvatar && (
-                    <div className="fixed bottom-10 right-6 z-50 flex flex-col items-end gap-0.5 pointer-events-none">
+                    <div className="fixed bottom-32 right-6 z-50 flex flex-col items-end gap-0.5 pointer-events-none">
                         <span className={`px-2 py-1 rounded-full text-xs font-semibold border pointer-events-auto ${isDarkMode ? 'bg-blue-500 text-white border-blue-300' : 'bg-blue-600 text-white border-blue-400'
                             }`}>
                             Emma IA

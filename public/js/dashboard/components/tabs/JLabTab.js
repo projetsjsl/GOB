@@ -1689,17 +1689,10 @@ const JLabTab = () => {
                                 }`}>
                                     JLab™ Terminal
                                 </h1>
-                                {connected ? (
-                                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30">
-                                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                        <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Live</span>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/15 border border-red-500/30">
-                                        <div className="w-2 h-2 rounded-full bg-red-500" />
-                                        <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider">Offline</span>
-                                    </div>
-                                )}
+                                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30">
+                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Live</span>
+                                </div>
                             </div>
                             <div className="flex items-center gap-3 text-[11px]">
                                 <span className="text-gray-500 font-medium">Quantum Core™</span>

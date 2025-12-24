@@ -20,18 +20,15 @@ const MarketsEconomyTab = ({
     const [selectedMarket, setSelectedMarket] = useState('all'); // Filtre marché
     const [selectedTheme, setSelectedTheme] = useState('all'); // Filtre thème
     const [localFilteredNews, setLocalFilteredNews] = useState([]);
-    const [activeView, setActiveView] = useState('overview'); // 'overview' ou 'screener'
 
     // Refs pour les widgets TradingView
     const marketOverviewRef = useRef(null);
     const heatmapRef = useRef(null);
-    const screenerRef = useRef(null);
     
     // Track which widgets are loaded (lazy loading)
     const [widgetsLoaded, setWidgetsLoaded] = useState({
         marketOverview: false,
-        heatmap: false,
-        screener: false
+        heatmap: false
     });
 
     // Listes de filtres
@@ -39,127 +36,118 @@ const MarketsEconomyTab = ({
     const markets = ['US', 'Canada', 'Europe', 'Asie'];
     const themes = ['Tech', 'Finance', 'Énergie', 'Santé', 'Crypto', 'IA'];
 
-    // ⚡ LAZY LOAD: Market Overview Widget (load first, after 300ms)
+    // ⚡ LAZY LOAD: Market Overview Widget (load first, after 500ms)
     React.useEffect(() => {
         if (!marketOverviewRef.current || widgetsLoaded.marketOverview) return;
         
+        let mounted = true;
         const timer = setTimeout(() => {
-            if (!marketOverviewRef.current) return;
-            
-            const script = document.createElement('script');
-            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
-            script.async = true;
-            script.innerHTML = JSON.stringify({
-                "colorTheme": isDarkMode ? "dark" : "light",
-                "dateRange": "1D",
-                "showChart": true,
-                "locale": "fr",
-                "width": "100%",
-                "height": "100%",
-                "largeChartUrl": "",
-                "isTransparent": false,
-                "showSymbolLogo": true,
-                "showFloatingTooltip": true,
-                "tabs": [
-                    {
-                        "title": "Indices",
-                        "symbols": [
-                            {"s": "FOREXCOM:SPXUSD", "d": "S&P 500"},
-                            {"s": "FOREXCOM:NSXUSD", "d": "US 100"},
-                            {"s": "FOREXCOM:DJI", "d": "Dow 30"},
-                            {"s": "INDEX:NKY", "d": "Nikkei 225"},
-                            {"s": "INDEX:DEU40", "d": "DAX Index"},
-                            {"s": "FOREXCOM:UKXGBP", "d": "UK 100"}
-                        ]
-                    },
-                    {
-                        "title": "Forex",
-                        "symbols": [
-                            {"s": "FX:EURUSD", "d": "EUR/USD"},
-                            {"s": "FX:GBPUSD", "d": "GBP/USD"},
-                            {"s": "FX:USDJPY", "d": "USD/JPY"},
-                            {"s": "FX:USDCAD", "d": "USD/CAD"}
-                        ]
-                    },
-                    {
-                        "title": "Crypto",
-                        "symbols": [
-                            {"s": "BINANCE:BTCUSDT", "d": "Bitcoin"},
-                            {"s": "BINANCE:ETHUSDT", "d": "Ethereum"},
-                            {"s": "BINANCE:BNBUSDT", "d": "BNB"},
-                            {"s": "BINANCE:SOLUSDT", "d": "Solana"}
-                        ]
-                    }
-                ]
-            });
-            marketOverviewRef.current.appendChild(script);
-            setWidgetsLoaded(prev => ({ ...prev, marketOverview: true }));
-        }, 300); // Load after 300ms to let React render first
+            try {
+                if (!mounted || !marketOverviewRef.current) return;
+                
+                const script = document.createElement('script');
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
+                script.async = true;
+                script.onerror = () => console.warn('[TradingView] Market Overview failed to load');
+                script.innerHTML = JSON.stringify({
+                    "colorTheme": isDarkMode ? "dark" : "light",
+                    "dateRange": "1D",
+                    "showChart": true,
+                    "locale": "fr",
+                    "width": "100%",
+                    "height": "100%",
+                    "largeChartUrl": "",
+                    "isTransparent": false,
+                    "showSymbolLogo": true,
+                    "showFloatingTooltip": true,
+                    "tabs": [
+                        {
+                            "title": "Indices",
+                            "symbols": [
+                                {"s": "FOREXCOM:SPXUSD", "d": "S&P 500"},
+                                {"s": "FOREXCOM:NSXUSD", "d": "US 100"},
+                                {"s": "FOREXCOM:DJI", "d": "Dow 30"},
+                                {"s": "INDEX:NKY", "d": "Nikkei 225"},
+                                {"s": "INDEX:DEU40", "d": "DAX Index"},
+                                {"s": "FOREXCOM:UKXGBP", "d": "UK 100"}
+                            ]
+                        },
+                        {
+                            "title": "Forex",
+                            "symbols": [
+                                {"s": "FX:EURUSD", "d": "EUR/USD"},
+                                {"s": "FX:GBPUSD", "d": "GBP/USD"},
+                                {"s": "FX:USDJPY", "d": "USD/JPY"},
+                                {"s": "FX:USDCAD", "d": "USD/CAD"}
+                            ]
+                        },
+                        {
+                            "title": "Crypto",
+                            "symbols": [
+                                {"s": "BINANCE:BTCUSDT", "d": "Bitcoin"},
+                                {"s": "BINANCE:ETHUSDT", "d": "Ethereum"},
+                                {"s": "BINANCE:BNBUSDT", "d": "BNB"},
+                                {"s": "BINANCE:SOLUSDT", "d": "Solana"}
+                            ]
+                        }
+                    ]
+                });
+                marketOverviewRef.current.appendChild(script);
+                setWidgetsLoaded(prev => ({ ...prev, marketOverview: true }));
+            } catch (error) {
+                console.error('[TradingView] Market Overview error:', error);
+            }
+        }, 500);
         
-        return () => clearTimeout(timer);
+        return () => {
+            mounted = false;
+            clearTimeout(timer);
+        };
     }, [isDarkMode]);
 
     // ⚡ LAZY LOAD: Heatmap Widget (load second, after 800ms)
     React.useEffect(() => {
         if (!heatmapRef.current || widgetsLoaded.heatmap) return;
         
+        let mounted = true;
         const timer = setTimeout(() => {
-            if (!heatmapRef.current) return;
-            
-            const script = document.createElement('script');
-            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
-            script.async = true;
-            script.innerHTML = JSON.stringify({
-                "exchanges": [],
-                "dataSource": "SPX500",
-                "grouping": "sector",
-                "blockSize": "market_cap_basic",
-                "blockColor": "change",
-                "locale": "fr",
-                "symbolUrl": "",
-                "colorTheme": isDarkMode ? "dark" : "light",
-                "hasTopBar": true,
-                "isDataSetEnabled": true,
-                "isZoomEnabled": true,
-                "hasSymbolTooltip": true,
-                "width": "100%",
-                "height": "100%"
-            });
-            heatmapRef.current.appendChild(script);
-            setWidgetsLoaded(prev => ({ ...prev, heatmap: true }));
-        }, 800); // Load after 800ms (give time for Market Overview)
+            try {
+                if (!mounted || !heatmapRef.current) return;
+                
+                const script = document.createElement('script');
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+                script.async = true;
+                script.onerror = () => console.warn('[TradingView] Heatmap failed to load');
+                script.innerHTML = JSON.stringify({
+                    "exchanges": [],
+                    "dataSource": "SPX500",
+                    "grouping": "sector",
+                    "blockSize": "market_cap_basic",
+                    "blockColor": "change",
+                    "locale": "fr",
+                    "symbolUrl": "",
+                    "colorTheme": isDarkMode ? "dark" : "light",
+                    "hasTopBar": true,
+                    "isDataSetEnabled": true,
+                    "isZoomEnabled": true,
+                    "hasSymbolTooltip": true,
+                    "width": "100%",
+                    "height": "100%"
+                });
+                heatmapRef.current.appendChild(script);
+                setWidgetsLoaded(prev => ({ ...prev, heatmap: true }));
+            } catch (error) {
+                console.error('[TradingView] Heatmap error:', error);
+            }
+        }, 800);
         
-        return () => clearTimeout(timer);
+        return () => {
+            mounted = false;
+            clearTimeout(timer);
+        };
     }, [isDarkMode]);
 
-    // ⚡ LAZY LOAD: Screener Widget (ONLY load when user switches to screener view)
-    React.useEffect(() => {
-        if (activeView !== 'screener' || !screenerRef.current || widgetsLoaded.screener) return;
-        
-        // Small delay to let view transition complete
-        const timer = setTimeout(() => {
-            if (!screenerRef.current) return;
-            
-            const script = document.createElement('script');
-            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
-            script.async = true;
-            script.innerHTML = JSON.stringify({
-                "width": "100%",
-                "height": "100%",
-                "defaultColumn": "overview",
-                "defaultScreen": "most_capitalized",
-                "market": "america",
-                "showToolbar": true,
-                "colorTheme": isDarkMode ? "dark" : "light",
-                "locale": "fr",
-                "isTransparent": false
-            });
-            screenerRef.current.appendChild(script);
-            setWidgetsLoaded(prev => ({ ...prev, screener: true }));
-        }, 200);
-        
-        return () => clearTimeout(timer);
-    }, [activeView, isDarkMode]);
+    // NOTE: Screener widget moved to Titres section
 
     // Fonction pour détecter la source avec variations de noms
     const matchesSource = (articleSource, selectedSource) => {
@@ -332,37 +320,6 @@ const MarketsEconomyTab = ({
                     </div>
                 </div>
 
-                {/* Navigation entre les vues */}
-                <div className={`flex gap-2 p-1 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
-                    <button
-                        onClick={() => setActiveView('overview')}
-                        className={`flex-1 px-4 py-2 rounded-md font-semibold transition-all duration-300 ${
-                            activeView === 'overview'
-                                ? isDarkMode
-                                    ? 'bg-blue-600 text-white shadow-lg'
-                                    : 'bg-blue-500 text-white shadow-md'
-                                : isDarkMode
-                                    ? 'text-gray-400 hover:text-white hover:bg-gray-700'
-                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
-                        }`}
-                    >
-                        📊 Vue d'ensemble
-                    </button>
-                    <button
-                        onClick={() => setActiveView('screener')}
-                        className={`flex-1 px-4 py-2 rounded-md font-semibold transition-all duration-300 ${
-                            activeView === 'screener'
-                                ? isDarkMode
-                                    ? 'bg-purple-600 text-white shadow-lg'
-                                    : 'bg-purple-500 text-white shadow-md'
-                                : isDarkMode
-                                    ? 'text-gray-400 hover:text-white hover:bg-gray-700'
-                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
-                        }`}
-                    >
-                        🚀 Screener - Top Gainers & Losers
-                    </button>
-                </div>
             </div>
 
             {lastUpdate && (
@@ -372,7 +329,8 @@ const MarketsEconomyTab = ({
             )}
 
             {/* ===== WIDGETS TRADING VIEW VISUELS ===== */}
-            {activeView === 'overview' ? (
+            {/* Always show Overview - Screener moved to Titres section */}
+            {true && (
                 <div className="grid grid-cols-1 gap-6 mt-6">
                     {/* Market Overview Widget */}
                     <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
@@ -429,38 +387,6 @@ const MarketsEconomyTab = ({
                                     <div className="text-center">
                                         <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
                                         <p className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>Chargement de la heatmap...</p>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            ) : (
-                <div className="mt-6">
-                    {/* Screener Widget - Top Gainers/Losers - Vue dédiée */}
-                    <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
-                        isDarkMode
-                            ? 'bg-gray-800/50 border-purple-500/30'
-                            : 'bg-white border-purple-400/40'
-                    }`}>
-                        <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                            <h3 className={`text-lg font-bold transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>
-                                🚀 Screener - Top Gainers & Losers
-                            </h3>
-                            <p className={`text-sm transition-colors duration-300 ${
-                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
-                                Actions les plus performantes et en baisse
-                            </p>
-                        </div>
-                        <div ref={screenerRef} style={{height: '700px'}}>
-                            {!widgetsLoaded.screener && (
-                                <div className="flex items-center justify-center h-full">
-                                    <div className="text-center">
-                                        <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                                        <p className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>Chargement du screener...</p>
                                     </div>
                                 </div>
                             )}
