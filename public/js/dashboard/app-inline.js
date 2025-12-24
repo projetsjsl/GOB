@@ -4007,9 +4007,14 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                             
                             // Debug: Log la structure de la réponse
                             console.log('📊 Structure réponse batch:', {
-                                quotesKeys: Object.keys(quotes).slice(0, 5),
-                                fundamentalsKeys: Object.keys(fundamentals).slice(0, 5),
-                                requestedTickers: initialTickers.slice(0, 5)
+                                quotesKeys: Object.keys(quotes),
+                                quotesCount: Object.keys(quotes).length,
+                                fundamentalsKeys: Object.keys(fundamentals),
+                                fundamentalsCount: Object.keys(fundamentals).length,
+                                requestedTickers: initialTickers,
+                                requestedCount: initialTickers.length,
+                                batchDataKeys: Object.keys(batchData.data || {}),
+                                metadata: batchData.metadata || {}
                             });
 
                             let foundCount = 0;
