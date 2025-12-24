@@ -141,6 +141,10 @@ class OptimizedWidgetLoader {
             const widgetDiv = document.createElement('div');
             widgetDiv.className = 'tradingview-widget-container__widget';
             widgetDiv.setAttribute('data-widget-type', widgetType);
+            // Forcer la hauteur à 100% pour hériter de la hauteur du parent
+            widgetDiv.style.width = '100%';
+            widgetDiv.style.height = '100%';
+            widgetDiv.style.minHeight = '400px'; // Hauteur minimale pour éviter les widgets trop petits
             container.appendChild(widgetDiv);
 
             // Créer le script
