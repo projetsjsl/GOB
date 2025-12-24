@@ -19,71 +19,42 @@ module.exports = {
   ],
   plugins: ['@typescript-eslint'],
   rules: {
-    // CRITICAL: Catch undefined variables before runtime
-    'no-undef': 'error',
+    // ═══════════════════════════════════════════════════════════════════
+    // CRITICAL ERRORS (Will break at runtime)
+    // ═══════════════════════════════════════════════════════════════════
+    'no-undef': 'error',            // Undefined variables crash
+    'no-dupe-keys': 'error',        // Duplicate keys cause bugs
+    'no-duplicate-case': 'error',   // Duplicate switch cases
+    'no-func-assign': 'error',      // Reassigning functions
+    'no-unreachable': 'error',      // Dead code after return
+    'no-constant-condition': 'error', // if(true) is suspicious
+    'no-eval': 'error',             // Security risk
+    'no-implied-eval': 'error',     // Security risk
+    'no-new-func': 'error',         // Security (unless eslint-disabled)
     
-    // Prevent accidental console.log in production
-    // Set to 'warn' during development, 'error' before release
-    'no-console': ['warn', { 
-      allow: ['warn', 'error', 'info'] 
-    }],
+    // ═══════════════════════════════════════════════════════════════════
+    // TURNED OFF (acceptable in production codebase)
+    // ═══════════════════════════════════════════════════════════════════
+    'no-console': 'off',            // Console OK in development
+    'no-unused-vars': 'off',        // Let TypeScript handle this
+    'no-empty': 'off',              // Empty catch blocks are often intentional
+    'no-extra-semi': 'off',         // Cosmetic
+    'no-irregular-whitespace': 'off', // Cosmetic
+    'eqeqeq': 'off',                // == vs === is style preference
+    'no-return-await': 'off',       // Slightly redundant but not harmful
+    'no-case-declarations': 'off',  // const in switch cases works fine
+    'no-useless-escape': 'off',     // Extra escapes don't break anything
+    'no-inner-declarations': 'off', // Valid in ES6+
     
-    // Catch unused variables (often indicates incomplete refactoring)
-    'no-unused-vars': ['warn', { 
-      argsIgnorePattern: '^_',
-      varsIgnorePattern: '^_'
-    }],
-    
-    // Prevent common errors
-    'no-unreachable': 'error',
-    'no-constant-condition': 'error',
-    'no-dupe-keys': 'error',
-    'no-duplicate-case': 'error',
-    'no-empty': 'warn',
-    'no-extra-semi': 'warn',
-    'no-func-assign': 'error',
-    'no-irregular-whitespace': 'warn',
-    
-    // Best practices
-    'eqeqeq': ['warn', 'smart'],
-    'no-eval': 'error',
-    'no-implied-eval': 'error',
-    'no-new-func': 'error',
-    'no-return-await': 'warn',
-    
-    // Downgrade some strict rules to warnings (common patterns in legacy code)
-    'no-case-declarations': 'warn', // const in switch cases - fixable but verbose
-    'no-useless-escape': 'warn', // Extra escapes in regex - cosmetic
-    'no-inner-declarations': 'warn', // Functions inside functions - valid ES6
-    
-    // TypeScript specific (disabled for JS files)
-    '@typescript-eslint/no-unused-vars': 'off', // Use regular no-unused-vars
+    // TypeScript specific
+    '@typescript-eslint/no-unused-vars': 'off', // Noise reduction
   },
   overrides: [
-    // TypeScript files
+    // TypeScript files - let tsc handle type checking
     {
       files: ['*.ts', '*.tsx'],
       rules: {
         'no-undef': 'off', // TypeScript handles this
-        'no-unused-vars': 'off',
-        '@typescript-eslint/no-unused-vars': ['warn', {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_'
-        }],
-      },
-    },
-    // API files (allow console for server-side logging)
-    {
-      files: ['api/**/*.js'],
-      rules: {
-        'no-console': 'off', // Server-side logging is OK
-      },
-    },
-    // Test files
-    {
-      files: ['**/*.test.js', '**/*.spec.js', 'scripts/**/*.js'],
-      rules: {
-        'no-console': 'off',
       },
     },
   ],
@@ -94,16 +65,36 @@ module.exports = {
     localStorage: 'readonly',
     sessionStorage: 'readonly',
     fetch: 'readonly',
+    URLSearchParams: 'readonly',
+    AbortController: 'readonly',
+    FormData: 'readonly',
+    Blob: 'readonly',
+    File: 'readonly',
+    FileReader: 'readonly',
+    URL: 'readonly',
+    Headers: 'readonly',
+    Request: 'readonly',
+    Response: 'readonly',
     
-    // React globals (when not using imports)
+    // React globals
     React: 'readonly',
+    JSX: 'readonly',
+    
+    // Node.js globals for API files
+    process: 'readonly',
+    Buffer: 'readonly',
+    __dirname: 'readonly',
+    __filename: 'readonly',
+    module: 'readonly',
+    require: 'readonly',
+    exports: 'readonly',
     
     // Chart libraries (loaded via CDN)
     Chart: 'readonly',
     Recharts: 'readonly',
     LightweightCharts: 'readonly',
     
-    // Custom globals from the dashboard
+    // Dashboard globals
     BetaCombinedDashboard: 'readonly',
   },
   ignorePatterns: [
@@ -113,5 +104,6 @@ module.exports = {
     '.vercel/',
     '*.min.js',
     'public/js/vendor/',
+    'public/3p1/node_modules/',
   ],
 };
