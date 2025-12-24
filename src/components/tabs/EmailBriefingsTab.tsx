@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import type { TabProps } from '../../types';
 import EmailRecipientsManager from './EmailRecipientsManager';
 import PromptManager from './PromptManager';
@@ -9,7 +9,7 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-export const EmailBriefingsTab: React.FC<TabProps> = (props) => {
+export const EmailBriefingsTab: React.FC<TabProps> = memo((props) => {
     const { isDarkMode = true } = props;
     const noop = () => {};
 
@@ -2922,5 +2922,10 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                     </div>
                 );
             };
+
+});
+
+// Set display name for debugging
+EmailBriefingsTab.displayName = 'EmailBriefingsTab';
 
 export default EmailBriefingsTab;

@@ -1,9 +1,9 @@
 // Auto-converted from monolithic dashboard file
 // Component: DansWatchlistTab (legacy markup preserved)
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import type { TabProps } from '../../types';
 
-const DansWatchlistTab: React.FC<TabProps> = (props) => {
+const DansWatchlistTab: React.FC<TabProps> = memo((props) => {
     const dashboard = typeof window !== 'undefined' ? (window as any).BetaCombinedDashboard || {} : {};
     const isDarkMode = props.isDarkMode ?? dashboard.isDarkMode ?? true;
     const initialTickers = Array.isArray(props.watchlistTickers) && props.watchlistTickers.length > 0
@@ -834,7 +834,10 @@ const DansWatchlistTab: React.FC<TabProps> = (props) => {
             )}
         </div>
     );
-};
+});
+
+// Set display name for debugging
+DansWatchlistTab.displayName = 'DansWatchlistTab';
 
 if (typeof window !== 'undefined') {
     (window as any).DansWatchlistTab = DansWatchlistTab;

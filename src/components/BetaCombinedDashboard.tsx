@@ -1,19 +1,26 @@
-import React, { useState, useEffect } from 'react';
-
-// Import des tabs
-import AdminJSLaiTab from './tabs/AdminJSLaiTab';
-import PlusTab from './tabs/PlusTab';
-import DansWatchlistTab from './tabs/DansWatchlistTab';
-import StocksNewsTab from './tabs/StocksNewsTab';
-import IntelliStocksTab from './tabs/IntelliStocksTab';
-import EconomicCalendarTab from './tabs/EconomicCalendarTab';
-import EmmaConfigTab from './tabs/EmmaConfigTab';
-import AskEmmaTab from './tabs/AskEmmaTab';
-import EmailBriefingsTab from './tabs/EmailBriefingsTab';
-import TestOnlyTab from './tabs/TestOnlyTab';
-import NouvellesTab from './tabs/NouvellesTab';
-import FinanceProTab from './tabs/FinanceProTab';
+import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from 'react';
 import type { TabName, StockData, NewsArticle, SeekingAlphaData } from '../types';
+
+// Lazy load all tabs for code splitting - reduces initial bundle by ~21K lines
+const AdminJSLaiTab = lazy(() => import('./tabs/AdminJSLaiTab'));
+const PlusTab = lazy(() => import('./tabs/PlusTab'));
+const DansWatchlistTab = lazy(() => import('./tabs/DansWatchlistTab'));
+const StocksNewsTab = lazy(() => import('./tabs/StocksNewsTab'));
+const IntelliStocksTab = lazy(() => import('./tabs/IntelliStocksTab'));
+const EconomicCalendarTab = lazy(() => import('./tabs/EconomicCalendarTab'));
+const EmmaConfigTab = lazy(() => import('./tabs/EmmaConfigTab'));
+const AskEmmaTab = lazy(() => import('./tabs/AskEmmaTab'));
+const EmailBriefingsTab = lazy(() => import('./tabs/EmailBriefingsTab'));
+const TestOnlyTab = lazy(() => import('./tabs/TestOnlyTab'));
+const NouvellesTab = lazy(() => import('./tabs/NouvellesTab'));
+const FinanceProTab = lazy(() => import('./tabs/FinanceProTab'));
+
+// Loading fallback component
+const TabLoadingFallback = () => (
+    <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+    </div>
+);
 
 export const BetaCombinedDashboard: React.FC = () => {
     const [activeTab, setActiveTab] = useState<TabName>('stocks-news');
@@ -43,10 +50,12 @@ export const BetaCombinedDashboard: React.FC = () => {
     const [showLengthEditor, setShowLengthEditor] = useState(false);
 
     // Configuration API
-    const API_BASE_URL = typeof window !== 'undefined' ? window.location.origin : '';
+    const API_BASE_URL = useMemo(() =>
+        typeof window !== 'undefined' ? window.location.origin : '',
+    []);
 
-    // Fonction utilitaire: fetch stock data
-    const fetchStockData = async (ticker: string) => {
+    // Fonction utilitaire: fetch stock data - memoized to prevent re-creation
+    const fetchStockData = useCallback(async (ticker: string) => {
         try {
             const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=${ticker}&source=auto`);
             if (!response.ok) throw new Error(`API error: ${response.status}`);
@@ -55,29 +64,30 @@ export const BetaCombinedDashboard: React.FC = () => {
             console.error(`Erreur fetch ${ticker}:`, error);
             return null;
         }
-    };
+    }, [API_BASE_URL]);
 
-    // Fonction utilitaire: afficher message toast
-    const showMessage = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
-        console.log(`[${type.toUpperCase()}] ${message}`);
-        // TODO: Implémenter un vrai système de toast notifications
-    };
+    // Fonction utilitaire: afficher message toast - memoized
+    const showMessage = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+    }, []);
 
-    // Fonction utilitaire: obtenir logo company
-    const getCompanyLogo = (ticker: string) => {
+    // Fonction utilitaire: obtenir logo company - memoized
+    const getCompanyLogo = useCallback((ticker: string) => {
         return `https://financialmodelingprep.com/image-stock/${ticker}.png`;
-    };
+    }, []);
 
-    // Fonction utilitaire: Emma populate watchlist (placeholder)
-    const emmaPopulateWatchlist = async () => {
-        console.log('Emma populate watchlist appelé');
-        // TODO: Implémenter logique Emma
-    };
+    // Fonction utilitaire: Emma populate watchlist (placeholder) - memoized
+    const emmaPopulateWatchlist = useCallback(async () => {
+        if (process.env.NODE_ENV === 'development') {
+            console.log('Emma populate watchlist appelé');
+        }
+    }, []);
 
-    // Fonction: charger les news générales
-    const fetchNews = async (context: string = 'general', limit: number = 20) => {
+    // Fonction: charger les news générales - memoized
+    const fetchNews = useCallback(async (context: string = 'general', limit: number = 20) => {
         try {
-            console.log(`📰 Chargement des news (context: ${context}, limit: ${limit})...`);
             const response = await fetch(`${API_BASE_URL}/api/news?context=${context}&limit=${limit}`);
 
             if (!response.ok) {
@@ -88,33 +98,29 @@ export const BetaCombinedDashboard: React.FC = () => {
 
             if (data.success && data.articles) {
                 setNewsData(data.articles);
-                console.log(`✅ ${data.articles.length} news chargées depuis ${data.sources?.join(', ') || 'API'}`);
                 return data.articles;
             } else {
-                console.warn('⚠️ Aucune news disponible');
                 return [];
             }
         } catch (error) {
             console.error('❌ Erreur chargement news:', error);
             return [];
         }
-    };
+    }, [API_BASE_URL]);
 
-    const extractMoveReason = (articles: NewsArticle[]) => {
+    const extractMoveReason = useCallback((articles: NewsArticle[]) => {
         if (!articles || articles.length === 0) return '';
         const primary = articles[0];
         return primary?.title || primary?.text || primary?.url || '';
-    };
+    }, []);
 
-    // Fonction: charger les news spécifiques pour chaque ticker
-    const fetchLatestNewsForTickers = async () => {
+    // Fonction: charger les news spécifiques pour chaque ticker - memoized
+    const fetchLatestNewsForTickers = useCallback(async () => {
         if (tickers.length === 0) {
-            console.log('⚠️ Aucun ticker pour charger les news');
             return;
         }
 
         try {
-            console.log(`📰 Chargement des news pour ${tickers.length} tickers...`);
             const scopedTickers = tickers.slice(0, 10);
             const newsPromises = scopedTickers.map(async (ticker) => {
                 try {
@@ -123,7 +129,6 @@ export const BetaCombinedDashboard: React.FC = () => {
                     const articles = data.success ? data.articles : [];
                     return { ticker, articles };
                 } catch (error) {
-                    console.error(`❌ Erreur news ${ticker}:`, error);
                     return { ticker, articles: [] };
                 }
             });
@@ -152,23 +157,21 @@ export const BetaCombinedDashboard: React.FC = () => {
             }
 
             if (tickerNewsList.length > 0) {
-                // Merge avec les news générales et dédupliquer par URL
-                const allNews = [...newsData, ...tickerNewsList];
-                const uniqueNews = Array.from(
-                    new Map(allNews.map(article => [article.url, article])).values()
-                );
-                setNewsData(uniqueNews);
-                console.log(`✅ ${tickerNewsList.length} news spécifiques aux tickers chargées`);
+                setNewsData(prev => {
+                    const allNews = [...prev, ...tickerNewsList];
+                    return Array.from(
+                        new Map(allNews.map(article => [article.url, article])).values()
+                    );
+                });
             }
         } catch (error) {
             console.error('❌ Erreur chargement news tickers:', error);
         }
-    };
+    }, [tickers, API_BASE_URL, extractMoveReason]);
 
-    // Fonction: charger tous les tickers depuis Supabase
-    const loadTickersFromSupabase = async () => {
+    // Fonction: charger tous les tickers depuis Supabase - memoized
+    const loadTickersFromSupabase = useCallback(async () => {
         try {
-            console.log('📊 Rechargement watchlist depuis Supabase...');
             const response = await fetch('/api/supabase-watchlist');
 
             if (response.ok) {
@@ -181,7 +184,6 @@ export const BetaCombinedDashboard: React.FC = () => {
                     if (teamTickers.length === 0) {
                         setTeamTickers(tickersFromSupabase);
                     }
-                    console.log(`✅ ${tickersFromSupabase.length} tickers rechargés`);
                     return tickersFromSupabase;
                 }
             }
@@ -190,18 +192,16 @@ export const BetaCombinedDashboard: React.FC = () => {
             console.error('❌ Erreur rechargement watchlist:', error);
             return [];
         }
-    };
+    }, [teamTickers.length]);
 
-    // Fonction: rafraîchir tous les stocks
-    const refreshAllStocks = async () => {
+    // Fonction: rafraîchir tous les stocks - memoized
+    const refreshAllStocks = useCallback(async () => {
         if (tickers.length === 0) {
-            console.log('⚠️ Aucun ticker à rafraîchir');
             return;
         }
 
         setLoading(true);
         try {
-            console.log(`🔄 Rafraîchissement de ${tickers.length} stocks...`);
             const promises = tickers.map((ticker) => fetchStockData(ticker));
             const results = await Promise.all(promises);
 
@@ -220,34 +220,35 @@ export const BetaCombinedDashboard: React.FC = () => {
 
             setStockData(newStockData);
             setLastUpdate(new Date());
-            console.log(`✅ ${Object.keys(newStockData).length} stocks rafraîchis`);
         } catch (error) {
             console.error('❌ Erreur rafraîchissement stocks:', error);
         } finally {
             setLoading(false);
         }
-    };
+    }, [tickers, fetchStockData]);
 
     // Effet: charger watchlist depuis Supabase puis les données
     useEffect(() => {
+        let isMounted = true;
+
         const loadInitialData = async () => {
             setLoading(true);
             try {
                 // 1. Charger watchlist depuis Supabase
-                console.log('📊 Chargement watchlist depuis Supabase...');
                 const watchlistRes = await fetch('/api/supabase-watchlist');
 
-                if (watchlistRes.ok) {
+                if (watchlistRes.ok && isMounted) {
                     const watchlistData = await watchlistRes.json();
                     const tickersFromSupabase = watchlistData.data?.map((item: any) => item.symbol) || [];
 
                     if (tickersFromSupabase.length > 0) {
-                        console.log(`✅ ${tickersFromSupabase.length} tickers chargés depuis Supabase:`, tickersFromSupabase);
                         setTickers(tickersFromSupabase);
 
                         // 2. Charger données pour ces tickers
                         const promises = tickersFromSupabase.map((ticker: string) => fetchStockData(ticker));
                         const results = await Promise.all(promises);
+
+                        if (!isMounted) return;
 
                         const newStockData: Record<string, StockData> = {};
                         results.forEach((data, index) => {
@@ -268,47 +269,55 @@ export const BetaCombinedDashboard: React.FC = () => {
                         // 3. Charger les news générales
                         await fetchNews('general', 20);
 
-                        // 4. Charger les news spécifiques aux tickers (après avoir les news générales)
-                        // On attend un peu pour ne pas surcharger l'API
-                        setTimeout(() => {
-                            fetchLatestNewsForTickers();
-                        }, 1000);
-                    } else {
-                        console.log('ℹ️ Watchlist vide dans Supabase - aucun ticker chargé');
+                        // 4. Charger les news spécifiques aux tickers (use requestIdleCallback for better perf)
+                        if ('requestIdleCallback' in window) {
+                            requestIdleCallback(() => {
+                                if (isMounted) fetchLatestNewsForTickers();
+                            });
+                        } else {
+                            setTimeout(() => {
+                                if (isMounted) fetchLatestNewsForTickers();
+                            }, 500);
+                        }
                     }
-                } else {
-                    console.warn('⚠️ Impossible de charger watchlist depuis Supabase, utilisation locale');
+                } else if (isMounted) {
                     // Fallback: tickers par défaut si Supabase échoue
                     const defaultTickers = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA'];
                     setTickers(defaultTickers);
                 }
 
-                setInitialLoadComplete(true);
+                if (isMounted) setInitialLoadComplete(true);
             } catch (error) {
                 console.error('❌ Erreur chargement initial:', error);
-                // Fallback en cas d'erreur
-                setTickers(['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA']);
-                setInitialLoadComplete(true);
+                if (isMounted) {
+                    setTickers(['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA']);
+                    setInitialLoadComplete(true);
+                }
             } finally {
-                setLoading(false);
+                if (isMounted) setLoading(false);
             }
         };
 
         if (!initialLoadComplete) {
             loadInitialData();
         }
-    }, []);
 
-    // Effet: charger les news spécifiques aux tickers quand la liste change
+        return () => { isMounted = false; };
+    }, [fetchStockData, fetchNews, fetchLatestNewsForTickers, initialLoadComplete]);
+
+    // Effet: charger les news spécifiques aux tickers quand la liste change (debounced)
     useEffect(() => {
-        if (initialLoadComplete && tickers.length > 0 && newsData.length > 0) {
-            console.log('📰 Tickers mis à jour, rechargement des news spécifiques...');
-            fetchLatestNewsForTickers();
-        }
-    }, [tickers.length, initialLoadComplete]);
+        if (!initialLoadComplete || tickers.length === 0) return;
 
-    // Props complètes pour les tabs
-    const tabProps = {
+        const timeoutId = setTimeout(() => {
+            fetchLatestNewsForTickers();
+        }, 300);
+
+        return () => clearTimeout(timeoutId);
+    }, [tickers.length, initialLoadComplete, fetchLatestNewsForTickers]);
+
+    // Memoize tabProps to prevent unnecessary re-renders of children
+    const tabProps = useMemo(() => ({
         isDarkMode,
         tickers,
         setTickers,
@@ -361,114 +370,112 @@ export const BetaCombinedDashboard: React.FC = () => {
         setShowTemperatureEditor,
         showLengthEditor,
         setShowLengthEditor
-    };
-
-    useEffect(() => {
-        if (typeof window === 'undefined') {
-            return;
-        }
-
-        window.BetaCombinedDashboard = {
-            ...(window.BetaCombinedDashboard || {}),
-            isDarkMode,
-            tickers,
-            stockData,
-            newsData,
-            tickerLatestNews,
-            tickerMoveReasons,
-            loading,
-            lastUpdate,
-            selectedStock,
-            seekingAlphaData,
-            seekingAlphaStockData,
-            teamTickers,
-            watchlistTickers,
-            apiStatus,
-            processLog,
-            prefillMessage,
-            autoSend,
-            showPromptEditor,
-            showTemperatureEditor,
-            showLengthEditor,
-            emmaConnected,
-            API_BASE_URL,
-            setActiveTab,
-            setSelectedStock,
-            setTickers,
-            setStockData,
-            setNewsData,
-            setTickerLatestNews,
-            setTickerMoveReasons,
-            setSeekingAlphaData,
-            setSeekingAlphaStockData,
-            setLoading,
-            setLastUpdate,
-            setTeamTickers,
-            setWatchlistTickers,
-            setApiStatus,
-            setProcessLog,
-            setPrefillMessage,
-            setAutoSend,
-            setShowPromptEditor,
-            setShowTemperatureEditor,
-            setShowLengthEditor,
-            setEmmaConnected,
-            fetchNews,
-            fetchLatestNewsForTickers,
-            loadTickersFromSupabase,
-            refreshAllStocks,
-            fetchStockData,
-            showMessage,
-            getCompanyLogo,
-            emmaPopulateWatchlist
-        };
-
-        window.BetaCombinedDashboardData = {
-            ...(window.BetaCombinedDashboardData || {}),
-            getCompanyLogo,
-            emmaPopulateWatchlist
-        };
-    }, [
-        isDarkMode,
-        tickers,
-        stockData,
-        newsData,
-        tickerLatestNews,
-        tickerMoveReasons,
-        loading,
-        lastUpdate,
-        selectedStock,
-        seekingAlphaData,
-        seekingAlphaStockData,
-        teamTickers,
-        watchlistTickers,
-        apiStatus,
-        processLog,
-        prefillMessage,
-        autoSend,
-        showPromptEditor,
-        showTemperatureEditor,
-        showLengthEditor,
-        emmaConnected
+    }), [
+        isDarkMode, tickers, stockData, newsData, tickerLatestNews, tickerMoveReasons,
+        loading, lastUpdate, initialLoadComplete, API_BASE_URL, fetchStockData, showMessage,
+        getCompanyLogo, emmaPopulateWatchlist, fetchNews, fetchLatestNewsForTickers,
+        loadTickersFromSupabase, refreshAllStocks, seekingAlphaData, seekingAlphaStockData,
+        selectedStock, teamTickers, watchlistTickers, apiStatus, processLog, emmaConnected,
+        prefillMessage, autoSend, showPromptEditor, showTemperatureEditor, showLengthEditor
     ]);
 
-    const renderActiveTab = () => {
-        switch (activeTab) {
-            case 'stocks-news': return <StocksNewsTab {...tabProps} />;
-            case 'nouvelles': return <NouvellesTab {...tabProps} />;
-            case 'intellistocks': return <IntelliStocksTab {...tabProps} />;
-            case 'admin-jslai': return <AdminJSLaiTab {...tabProps} />;
-            case 'ask-emma': return <AskEmmaTab {...tabProps} />;
-            case 'emma-config': return <EmmaConfigTab {...tabProps} />;
-            case 'testonly': return <TestOnlyTab {...tabProps} />;
-            case 'email-briefings': return <EmailBriefingsTab {...tabProps} />;
-            case 'plus': return <PlusTab {...tabProps} />;
-            case 'watchlist': return <DansWatchlistTab {...tabProps} />;
-            case 'economic-calendar': return <EconomicCalendarTab {...tabProps} />;
-            case 'finance-pro': return <FinanceProTab {...tabProps} />;
-            default: return <StocksNewsTab {...tabProps} />;
-        }
-    };
+    // Debounced window sync - only updates window object every 100ms max
+    // This prevents performance issues from constant state updates triggering window syncs
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        const timeoutId = setTimeout(() => {
+            window.BetaCombinedDashboard = {
+                isDarkMode,
+                tickers,
+                stockData,
+                newsData,
+                tickerLatestNews,
+                tickerMoveReasons,
+                loading,
+                lastUpdate,
+                selectedStock,
+                seekingAlphaData,
+                seekingAlphaStockData,
+                teamTickers,
+                watchlistTickers,
+                apiStatus,
+                processLog,
+                prefillMessage,
+                autoSend,
+                showPromptEditor,
+                showTemperatureEditor,
+                showLengthEditor,
+                emmaConnected,
+                API_BASE_URL,
+                setActiveTab,
+                setSelectedStock,
+                setTickers,
+                setStockData,
+                setNewsData,
+                setTickerLatestNews,
+                setTickerMoveReasons,
+                setSeekingAlphaData,
+                setSeekingAlphaStockData,
+                setLoading,
+                setLastUpdate,
+                setTeamTickers,
+                setWatchlistTickers,
+                setApiStatus,
+                setProcessLog,
+                setPrefillMessage,
+                setAutoSend,
+                setShowPromptEditor,
+                setShowTemperatureEditor,
+                setShowLengthEditor,
+                setEmmaConnected,
+                fetchNews,
+                fetchLatestNewsForTickers,
+                loadTickersFromSupabase,
+                refreshAllStocks,
+                fetchStockData,
+                showMessage,
+                getCompanyLogo,
+                emmaPopulateWatchlist
+            };
+
+            window.BetaCombinedDashboardData = {
+                getCompanyLogo,
+                emmaPopulateWatchlist
+            };
+        }, 100);
+
+        return () => clearTimeout(timeoutId);
+    }, [
+        isDarkMode, tickers, stockData, newsData, tickerLatestNews, tickerMoveReasons,
+        loading, lastUpdate, selectedStock, seekingAlphaData, seekingAlphaStockData,
+        teamTickers, watchlistTickers, apiStatus, processLog, prefillMessage, autoSend,
+        showPromptEditor, showTemperatureEditor, showLengthEditor, emmaConnected,
+        API_BASE_URL, fetchNews, fetchLatestNewsForTickers, loadTickersFromSupabase,
+        refreshAllStocks, fetchStockData, showMessage, getCompanyLogo, emmaPopulateWatchlist
+    ]);
+
+    // Memoized active tab component for better performance
+    const activeTabContent = useMemo(() => {
+        const TabComponent = (() => {
+            switch (activeTab) {
+                case 'stocks-news': return StocksNewsTab;
+                case 'nouvelles': return NouvellesTab;
+                case 'intellistocks': return IntelliStocksTab;
+                case 'admin-jslai': return AdminJSLaiTab;
+                case 'ask-emma': return AskEmmaTab;
+                case 'emma-config': return EmmaConfigTab;
+                case 'testonly': return TestOnlyTab;
+                case 'email-briefings': return EmailBriefingsTab;
+                case 'plus': return PlusTab;
+                case 'watchlist': return DansWatchlistTab;
+                case 'economic-calendar': return EconomicCalendarTab;
+                case 'finance-pro': return FinanceProTab;
+                default: return StocksNewsTab;
+            }
+        })();
+        return <TabComponent {...tabProps} />;
+    }, [activeTab, tabProps]);
 
     return (
         <div className="min-h-screen bg-gray-900 text-white">
@@ -517,9 +524,11 @@ export const BetaCombinedDashboard: React.FC = () => {
                 </div>
             </nav>
 
-            {/* Content */}
+            {/* Content - Wrapped in Suspense for lazy loaded tabs */}
             <main className="p-6">
-                {renderActiveTab()}
+                <Suspense fallback={<TabLoadingFallback />}>
+                    {activeTabContent}
+                </Suspense>
             </main>
         </div>
     );

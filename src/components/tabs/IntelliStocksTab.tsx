@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import type { TabProps } from '../../types';
 
 declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-export const IntelliStocksTab: React.FC<TabProps> = (props) => {
+export const IntelliStocksTab: React.FC<TabProps> = memo((props) => {
     const {
         isDarkMode = true,
         API_BASE_URL = '',
@@ -2914,15 +2914,9 @@ console.log('✅ Données hybrides récupérées:', {
                 );
             };
 
-            // ============================================================================
-            // COMPOSANT PERPLEXITY AI - SUPPRIMÉ (Redondant avec Emma En Direct)
-            // La fonctionnalité Perplexity est maintenant intégrée dans EmailBriefingsTab
-            // ============================================================================
+});
 
-
-            // ============================================================================
-            // COMPOSANT CALENDRIER ÉCONOMIQUE AMÉLIORÉ
-            // ============================================================================
-
+// Set display name for debugging
+IntelliStocksTab.displayName = 'IntelliStocksTab';
 
 export default IntelliStocksTab;

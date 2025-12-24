@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import type { TabProps } from '../../types';
 
-export const NouvellesTab: React.FC<TabProps> = (props) => {
+export const NouvellesTab: React.FC<TabProps> = memo((props) => {
     const {
         isDarkMode = true,
         newsData: newsDataProp = [],
@@ -521,7 +521,10 @@ export const NouvellesTab: React.FC<TabProps> = (props) => {
             </div>
         </div>
     );
-};
+});
+
+// Set display name for debugging
+NouvellesTab.displayName = 'NouvellesTab';
 
 export default NouvellesTab;
 

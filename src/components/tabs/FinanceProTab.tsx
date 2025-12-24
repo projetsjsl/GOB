@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import type { TabProps } from '../../types';
 
 // Types pour Finance Pro
@@ -57,7 +57,7 @@ interface ScreenerFilter {
 
 type ViewMode = 'portfolio' | 'analysis' | 'screener' | 'compare' | 'ratios' | 'history';
 
-export const FinanceProTab: React.FC<TabProps> = (props) => {
+export const FinanceProTab: React.FC<TabProps> = memo((props) => {
     const {
         isDarkMode = true,
         API_BASE_URL = '',
@@ -1178,6 +1178,9 @@ export const FinanceProTab: React.FC<TabProps> = (props) => {
             {renderContent()}
         </div>
     );
-};
+});
+
+// Set display name for debugging
+FinanceProTab.displayName = 'FinanceProTab';
 
 export default FinanceProTab;

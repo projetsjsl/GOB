@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import type { TabProps } from '../../types';
 import Icon from '../shared/Icon';
 
@@ -6,7 +6,7 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-export const AdminJSLaiTab: React.FC<TabProps> = (props) => {
+export const AdminJSLaiTab: React.FC<TabProps> = memo((props) => {
     const noop = () => {};
 
     const isDarkMode = props.isDarkMode ?? true;
@@ -2714,5 +2714,9 @@ CONTRAINTES:
             );
 
 
-};
+});
+
+// Set display name for debugging
+AdminJSLaiTab.displayName = 'AdminJSLaiTab';
+
 export default AdminJSLaiTab;

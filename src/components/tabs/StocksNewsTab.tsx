@@ -1,9 +1,9 @@
 // Auto-converted from monolithic dashboard file
 // Component: StocksNewsTab (legacy markup preserved)
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import type { TabProps } from '../../types';
 
-const StocksNewsTab: React.FC<TabProps> = (props) => {
+const StocksNewsTab: React.FC<TabProps> = memo((props) => {
         // Récupère les données/handlers depuis la surface globale du dashboard avec fallback props
         const dashboard = typeof window !== 'undefined' ? (window as any).BetaCombinedDashboard || {} : {};
         const isDarkMode = props.isDarkMode ?? dashboard.isDarkMode ?? true;
@@ -1643,7 +1643,10 @@ const StocksNewsTab: React.FC<TabProps> = (props) => {
 
         </div>
     );
-};
+});
+
+// Set display name for debugging
+StocksNewsTab.displayName = 'StocksNewsTab';
 
 if (typeof window !== 'undefined') {
     (window as any).StocksNewsTab = StocksNewsTab;
