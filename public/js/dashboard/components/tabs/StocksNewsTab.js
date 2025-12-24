@@ -242,7 +242,7 @@ const StocksNewsTab = (props) => {
         return (
         <div className="space-y-6">
             {/* Message d'état si pas de données */}
-            {tickers.length === 0 && (
+            {tickers.length === 0 && stockDataCount === 0 && newsData.length === 0 && (
                 <div className={`p-6 rounded-xl border-2 transition-colors duration-300 ${
                     isDarkMode
                         ? 'bg-gray-800 border-yellow-500/30'
