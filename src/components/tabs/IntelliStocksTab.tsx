@@ -2912,8 +2912,6 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
                     </div>
                 );
-            };
-
 });
 
 // Set display name for debugging
