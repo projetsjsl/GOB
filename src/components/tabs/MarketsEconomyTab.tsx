@@ -147,6 +147,15 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
             });
             economicCalendarRef.current.appendChild(script);
         }
+        
+        // CLEANUP: Prevent memory leaks by removing widget content on unmount/re-render
+        return () => {
+            if (marketOverviewRef.current) marketOverviewRef.current.innerHTML = '';
+            if (heatmapRef.current) heatmapRef.current.innerHTML = '';
+            if (screenerRef.current) screenerRef.current.innerHTML = '';
+            if (forexHeatmapRef.current) forexHeatmapRef.current.innerHTML = '';
+            if (economicCalendarRef.current) economicCalendarRef.current.innerHTML = '';
+        };
     }, [isDarkMode]);
 
     return (

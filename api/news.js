@@ -471,6 +471,10 @@ async function fetchRSSNews(feedKeys, limit, query) {
     // FIXED: Filter by query if provided - previously only filtered when query.length > 5
     // This caused tickers (1-5 chars) to return unfiltered RSS news
     if (query) {
+      // Declare variables from query
+      const queryLower = query.toLowerCase();
+      const tickerBase = query.toUpperCase().replace(/[^A-Z]/g, '');
+      
       // Prepare regex for word boundary matching to avoid partial matches
       // e.g. "T" matching "The", "AI" matching "Main"
       const regex = new RegExp(`\\b(${queryLower}|${tickerBase})\\b`, 'i');

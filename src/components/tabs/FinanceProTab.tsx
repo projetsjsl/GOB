@@ -987,7 +987,7 @@ export const FinanceProTab: React.FC<TabProps> = memo((props) => {
                                                 <div
                                                     className={`h-full rounded-full ${isGood ? 'bg-green-500' : 'bg-yellow-500'}`}
                                                     style={{
-                                                        width: `${Math.min(100, (ratio.format === 'percent' ? ratio.value * 100 : ratio.value) / (ratio.good * (ratio.format === 'percent' ? 100 : 1)) * 50)}%`
+                                                        width: `${Math.min(100, (ratio.format === 'percent' ? ratio.value * 100 : ratio.value) / (ratio.good * (ratio.format === 'percent' ? 100 : 1)) * 100)}%`
                                                     }}
                                                 />
                                             </div>

@@ -146,6 +146,13 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                 });
                 screenerRef.current.appendChild(script);
             }
+            
+            // CLEANUP: Prevent memory leaks by removing widget content on unmount/re-render
+            return () => {
+                if (marketOverviewRef.current) marketOverviewRef.current.innerHTML = '';
+                if (heatmapRef.current) heatmapRef.current.innerHTML = '';
+                if (screenerRef.current) screenerRef.current.innerHTML = '';
+            };
         }, [isDarkMode]);
 
         const renderMarketBadge = window.DASHBOARD_UTILS?.renderMarketBadge
