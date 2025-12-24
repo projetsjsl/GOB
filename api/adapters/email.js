@@ -72,13 +72,11 @@ export default async function handler(req, res) {
           keys: Object.keys(req.body || {})
         },
         expected: {
-          from: 'user@example.com (expéditeur)',
-          text: 'Contenu texte de l'email (ou html)',
-          html: 'Contenu HTML de l'email (optionnel si text présent)'
+          from: 'user@example.com (expediteur)',
+          text: 'Contenu texte de email (ou html)',
+          html: 'Contenu HTML de email (optionnel si text present)'
         },
         note: 'Cet endpoint est conçu pour recevoir des webhooks n8n/ImprovMX, pas des appels directs'
-      });
-    }
       });
     }
 

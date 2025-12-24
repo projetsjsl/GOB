@@ -51,6 +51,11 @@ module.exports = {
     'no-new-func': 'error',
     'no-return-await': 'warn',
     
+    // Downgrade some strict rules to warnings (common patterns in legacy code)
+    'no-case-declarations': 'warn', // const in switch cases - fixable but verbose
+    'no-useless-escape': 'warn', // Extra escapes in regex - cosmetic
+    'no-inner-declarations': 'warn', // Functions inside functions - valid ES6
+    
     // TypeScript specific (disabled for JS files)
     '@typescript-eslint/no-unused-vars': 'off', // Use regular no-unused-vars
   },

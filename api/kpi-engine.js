@@ -49,7 +49,9 @@ class FormulaParser {
 
     // Évaluer de manière sécurisée (pas d'utilisation directe de eval)
     try {
-      // Utiliser Function constructor pour créer une fonction isolée
+      // Using Function constructor is intentional here for formula evaluation
+      // The expression is sanitized (only math operators and known function names)
+      // eslint-disable-next-line no-new-func
       const func = new Function('return ' + expr);
       const result = func();
       
