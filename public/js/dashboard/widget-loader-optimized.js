@@ -200,6 +200,20 @@ class OptimizedWidgetLoader {
                     // On peut ignorer ces erreurs car les widgets fonctionnent quand même
                     iframe.setAttribute('loading', 'lazy');
                     iframe.setAttribute('title', `TradingView ${widgetType} widget`);
+                    
+                    // Forcer la hauteur de l'iframe à 100% pour qu'elle hérite du parent
+                    iframe.style.height = '100%';
+                    iframe.style.width = '100%';
+                    iframe.style.minHeight = '400px';
+                }
+                
+                // Forcer aussi la hauteur du widgetDiv après création de l'iframe
+                if (widgetDiv) {
+                    const containerHeight = container.getBoundingClientRect().height;
+                    if (containerHeight > 200) {
+                        widgetDiv.style.height = containerHeight + 'px';
+                        widgetDiv.style.minHeight = '400px';
+                    }
                 }
             }, 500);
 
