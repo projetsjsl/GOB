@@ -56,17 +56,25 @@ const TradingViewTicker = React.memo(({
         // Ajouter le script à son conteneur
         container.appendChild(script);
 
+        // Store cleanup references
+        let checkForIframeInterval = null;
+        let iframeTimeoutId = null;
+        let messageHandler = null;
+        let clickHandler = null;
+        let overlay = null;
+
         // Intercepter les clics et navigations depuis le TickerBanner
         const setupTickerInterception = () => {
             // Attendre que l'iframe soit créé
-            const checkForIframe = setInterval(() => {
+            checkForIframeInterval = setInterval(() => {
                 const iframe = container.querySelector('iframe');
                 
                 if (iframe) {
-                    clearInterval(checkForIframe);
+                    clearInterval(checkForIframeInterval);
+                    checkForIframeInterval = null;
                     
                     // Intercepter les messages postMessage de TradingView
-                    const messageHandler = (event) => {
+                    messageHandler = (event) => {
                         // TradingView peut envoyer des messages avec des URLs
                         if (event.data && typeof event.data === 'object') {
                             if (event.data.url || event.data.href || event.data.symbol) {
@@ -92,7 +100,7 @@ const TradingViewTicker = React.memo(({
                     window.addEventListener('message', messageHandler);
                     
                     // Intercepter les clics sur le conteneur du widget
-                    const clickHandler = (e) => {
+                    clickHandler = (e) => {
                         // Vérifier si le clic est sur un élément cliquable du ticker
                         const clickableElement = e.target.closest('a, button, [role="button"], [onclick]');
                         
@@ -125,7 +133,7 @@ const TradingViewTicker = React.memo(({
                     };
                     
                     // Ajouter un overlay transparent pour capturer les clics
-                    const overlay = document.createElement('div');
+                    overlay = document.createElement('div');
                     overlay.style.cssText = `
                         position: absolute;
                         top: 0;
@@ -145,21 +153,40 @@ const TradingViewTicker = React.memo(({
                     }
                     
                     widgetContainer.appendChild(overlay);
-                    
-                    // Handler de nettoyage spécifique pour l'interval
-                    return () => {
-                        window.removeEventListener('message', messageHandler);
-                        overlay.removeEventListener('click', clickHandler, true);
-                        overlay.remove();
-                    };
                 }
             }, 100);
             
-            // Timeout de sécurité
-            setTimeout(() => clearInterval(checkForIframe), 10000);
+            // Timeout de sécurité - clear interval after 10 seconds
+            iframeTimeoutId = setTimeout(() => {
+                if (checkForIframeInterval) {
+                    clearInterval(checkForIframeInterval);
+                    checkForIframeInterval = null;
+                }
+            }, 10000);
         };
         
         setupTickerInterception();
+
+        // ✅ CRITICAL: Proper cleanup function
+        return () => {
+            if (checkForIframeInterval) {
+                clearInterval(checkForIframeInterval);
+            }
+            if (iframeTimeoutId) {
+                clearTimeout(iframeTimeoutId);
+            }
+            if (messageHandler) {
+                window.removeEventListener('message', messageHandler);
+            }
+            if (overlay && clickHandler) {
+                overlay.removeEventListener('click', clickHandler, true);
+                overlay.remove();
+            }
+            // Clear container
+            if (container) {
+                container.innerHTML = '';
+            }
+        };
 
     }, [isDarkMode, selectedIndices]); // Re-render only when theme or selection changes
 
