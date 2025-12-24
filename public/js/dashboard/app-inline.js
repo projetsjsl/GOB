@@ -1571,22 +1571,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             setTabLoading(true);
 
             requestAnimationFrame(() => {
-                // 1) Gestion des redirects définis dans SUB_TABS
-                for (const [main, subs] of Object.entries(SUB_TABS)) {
-                    if (!Array.isArray(subs)) continue;
-                    const sub = subs.find(s => s.id === tabId);
-                    if (sub && typeof sub.component === 'string' && sub.component.startsWith('redirect:')) {
-                        window.location.href = sub.component.replace('redirect:', '');
-                        return;
-                    }
-                }
-
-                // 2) Précharger le composant si TabLazyLoader est disponible
-                if (window.TabLazyLoader?.load) {
-                    window.TabLazyLoader.load(tabId).catch(() => {});
-                }
-
-                // 3) Déterminer s'il s'agit d'un onglet principal ou secondaire
+                // 1) Déterminer s'il s'agit d'un onglet principal ou secondaire AVANT de vérifier les redirects
                 const isMainTab = MAIN_TABS.find(t => t.id === tabId);
                 let targetTabId = tabId;
 
@@ -1600,6 +1585,30 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                     setMainTab(mainTabId);
                     setActiveSubTab(tabId);
                     targetTabId = tabId;
+                }
+
+                // 2) Gestion des redirects définis dans SUB_TABS (uniquement pour les sous-onglets)
+                // Ne vérifier les redirects que si ce n'est PAS un onglet principal
+                if (!isMainTab) {
+                    for (const [main, subs] of Object.entries(SUB_TABS)) {
+                        if (!Array.isArray(subs)) continue;
+                        const sub = subs.find(s => s.id === targetTabId);
+                        if (sub && typeof sub.component === 'string' && sub.component.startsWith('redirect:')) {
+                            const redirectUrl = sub.component.replace('redirect:', '').trim();
+                            // Valider que l'URL n'est pas vide avant de rediriger
+                            if (redirectUrl && redirectUrl !== 'about:blank' && redirectUrl !== '') {
+                                window.location.href = redirectUrl;
+                                return;
+                            } else {
+                                console.warn(`⚠️ Redirect invalide pour ${targetTabId}: "${redirectUrl}"`);
+                            }
+                        }
+                    }
+                }
+
+                // 3) Précharger le composant si TabLazyLoader est disponible
+                if (window.TabLazyLoader?.load) {
+                    window.TabLazyLoader.load(targetTabId).catch(() => {});
                 }
 
                 // 4) Appliquer la navigation legacy (historique, intros, etc.)

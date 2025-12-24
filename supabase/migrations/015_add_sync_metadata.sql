@@ -14,3 +14,6 @@ COMMENT ON COLUMN finance_pro_snapshots.sync_metadata IS 'JSON object containing
 
 
 
+
+
+

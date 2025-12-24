@@ -20,22 +20,23 @@ Si le serveur MCP Supabase n'est pas encore configuré dans Cursor, voici commen
          "command": "npx",
          "args": [
            "-y",
-           "@supabase/mcp-server"
+           "@supabase/mcp-server-supabase"
          ],
          "env": {
            "SUPABASE_URL": "https://boyuxgdplbpkknplxbxp.supabase.co",
-           "SUPABASE_SERVICE_ROLE_KEY": "votre-service-role-key"
+           "SUPABASE_ACCESS_TOKEN": "votre-service-key"
          }
        }
      }
    }
    ```
 
-3. **Obtenir la SERVICE_ROLE_KEY**
+3. **Obtenir la clé d'accès**
    - Allez sur: https://supabase.com/dashboard
    - Sélectionnez votre projet
    - Allez dans Settings → API
    - Copiez la "service_role" key (⚠️ gardez-la secrète!)
+   - Utilisez-la comme SUPABASE_ACCESS_TOKEN
 
 4. **Redémarrer Cursor**
    - Après avoir ajouté la configuration, redémarrez Cursor
@@ -57,6 +58,9 @@ En attendant la configuration MCP, vous pouvez exécuter les migrations manuelle
 2. Ouvrez "SQL Editor"
 3. Copiez-collez le contenu de `supabase/migrations/013_add_task_dates.sql`
 4. Cliquez sur "Run"
+
+
+
 
 
 
