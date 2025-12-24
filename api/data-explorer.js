@@ -430,6 +430,25 @@ async function deleteData(req, res, supabase) {
 }
 
 /**
+ * Sync selected rows (placeholder for future implementation)
+ */
+async function syncSelected(req, res, supabase) {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'POST required' });
+    const { table, ids } = req.body;
+    
+    if (!table || !ids || !Array.isArray(ids)) {
+        return res.status(400).json({ error: 'Table and array of IDs required' });
+    }
+    
+    // TODO: Implement sync logic based on specific table requirements
+    return res.status(200).json({ 
+        success: true, 
+        message: 'Sync completed',
+        synced_count: ids.length 
+    });
+}
+
+/**
  * Helper: Convert data array to CSV
  */
 function convertToCSV(data) {

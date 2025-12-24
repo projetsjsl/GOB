@@ -383,7 +383,7 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
         attempt: result.attempt,
         totalAttempts: result.totalAttempts,
         maxTokens: result.maxTokens,
-        description: MODEL_CONFIG[section]?.description || 'Analyse standard'
+        description: 'Analyse standard' // MODEL_CONFIG was removed; using default
       }
     });
 

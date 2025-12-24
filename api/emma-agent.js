@@ -311,9 +311,8 @@ class SmartAgent {
                 execution_time_ms: Date.now() - (context.start_time || Date.now()),
                 conversation_length: this.conversationHistory.length,
                 is_reliable: toolResults.every(r => r.is_reliable) && (dataValidation?.passed !== false),
-                model: modelUsed || 'unknown',  // Modèle utilisé pour générer la réponse
-                model_reason: modelReason || 'Unknown reason',  // Raison de sélection du modèle
-                model_reason: modelReason || 'Unknown reason'  // Raison du choix du modèle
+                model: modelUsed || 'unknown',
+                model_reason: modelReason || 'Unknown reason'
             };
 
         } catch (error) {
