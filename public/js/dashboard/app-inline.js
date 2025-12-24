@@ -4004,13 +4004,25 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                             const quotes = batchData.data.quote || {};
                             const fundamentals = batchData.data.fundamentals || {};
                             const newStockData = {};
+                            
+                            // Debug: Log la structure de la réponse
+                            console.log('📊 Structure réponse batch:', {
+                                quotesKeys: Object.keys(quotes).slice(0, 5),
+                                fundamentalsKeys: Object.keys(fundamentals).slice(0, 5),
+                                requestedTickers: initialTickers.slice(0, 5)
+                            });
+
+                            let foundCount = 0;
+                            let notFoundTickers = [];
 
                             initialTickers.forEach(ticker => {
                                 const tickerUpper = ticker.toUpperCase();
-                                const quote = quotes[tickerUpper];
-                                const fundamental = fundamentals[tickerUpper];
+                                // Essayer plusieurs variantes du ticker
+                                const quote = quotes[tickerUpper] || quotes[ticker] || quotes[tickerUpper.replace('.TO', '')];
+                                const fundamental = fundamentals[tickerUpper] || fundamentals[ticker] || fundamentals[tickerUpper.replace('.TO', '')];
 
                                 if (quote || fundamental) {
+                                    foundCount++;
                                     // FMP quote format: { price, change, changesPercentage, dayLow, dayHigh, open, volume, etc. }
                                     // Finnhub format: { c, d, dp, h, l, o, v, etc. }
                                     // Mapper les deux formats
@@ -4039,8 +4051,26 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                                     if (price === 0) {
                                         console.warn(`⚠️ Prix à 0 pour ${ticker}:`, { quote, fundamental });
                                     }
+                                } else {
+                                    notFoundTickers.push(ticker);
                                 }
                             });
+                            
+                            // Log détaillé pour déboguer
+                            if (foundCount === 0 && initialTickers.length > 0) {
+                                console.error('❌ Aucun ticker trouvé dans la réponse batch!', {
+                                    requested: initialTickers.length,
+                                    quotesAvailable: Object.keys(quotes).length,
+                                    fundamentalsAvailable: Object.keys(fundamentals).length,
+                                    sampleQuotes: Object.keys(quotes).slice(0, 3),
+                                    sampleRequested: initialTickers.slice(0, 3),
+                                    notFound: notFoundTickers.slice(0, 5)
+                                });
+                            } else if (foundCount < initialTickers.length) {
+                                console.warn(`⚠️ Seulement ${foundCount}/${initialTickers.length} tickers trouvés`, {
+                                    notFound: notFoundTickers.slice(0, 10)
+                                });
+                            }
 
                             console.log(`✅ Données chargées pour ${Object.keys(newStockData).length} tickers`);
                             setStockData(prevData => ({ ...prevData, ...newStockData })); // Fusionner avec les données existantes
