@@ -951,33 +951,48 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             return 'jlab'; // default
         };
         
-        // Enhanced tab change handler for new structure
+        // Tab loading state for visual feedback
+        const [tabLoading, setTabLoading] = useState(false);
+        
+        // Enhanced tab change handler for new structure with loading feedback
         const handleNewTabChange = (tabId) => {
-             // 1. Check redirects first
-            for (const [main, subs] of Object.entries(SUB_TABS)) {
-                if (!Array.isArray(subs)) continue; // Protection
-                const sub = subs.find(s => s.id === tabId);
-                if (sub && typeof sub.component === 'string' && sub.component.startsWith('redirect:')) {
-                    window.location.href = sub.component.replace('redirect:', '');
-                    return;
+            // Show loading state immediately for visual feedback
+            setTabLoading(true);
+            
+            // Use requestAnimationFrame to allow UI to update before heavy work
+            requestAnimationFrame(() => {
+                // 1. Check redirects first
+                for (const [main, subs] of Object.entries(SUB_TABS)) {
+                    if (!Array.isArray(subs)) continue;
+                    const sub = subs.find(s => s.id === tabId);
+                    if (sub && typeof sub.component === 'string' && sub.component.startsWith('redirect:')) {
+                        window.location.href = sub.component.replace('redirect:', '');
+                        return;
+                    }
                 }
-            }
 
-            // Check if it's a main tab
-            const isMainTab = MAIN_TABS.find(t => t.id === tabId);
-            if (isMainTab) {
-                setMainTab(tabId);
-                const defaultSub = DEFAULT_SUB_TABS[tabId];
-                setActiveSubTab(defaultSub);
-                // Also update legacy activeTab for backwards compatibility
-                setActiveTab(defaultSub);
-            } else {
-                // It's a sub-tab
-                const mainTabId = getMainTabFromId(tabId);
-                setMainTab(mainTabId);
-                setActiveSubTab(tabId);
-                setActiveTab(tabId);
-            }
+                // 2. Trigger lazy load if available
+                if (window.TabLazyLoader && window.TabLazyLoader.load) {
+                    window.TabLazyLoader.load(tabId).catch(() => {});
+                }
+
+                // 3. Check if it's a main tab
+                const isMainTab = MAIN_TABS.find(t => t.id === tabId);
+                if (isMainTab) {
+                    setMainTab(tabId);
+                    const defaultSub = DEFAULT_SUB_TABS[tabId];
+                    setActiveSubTab(defaultSub);
+                    setActiveTab(defaultSub);
+                } else {
+                    const mainTabId = getMainTabFromId(tabId);
+                    setMainTab(mainTabId);
+                    setActiveSubTab(tabId);
+                    setActiveTab(tabId);
+                }
+                
+                // Hide loading state after a brief delay to allow render
+                setTimeout(() => setTabLoading(false), 100);
+            });
         };
         
         const [navigationHistory, setNavigationHistory] = useState([]); // Historique de navigation pour le bouton Back
@@ -27407,6 +27422,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     ) : (
                         // VUE ONGLETS (CLASSIQUE)
                         <>
+                    {/* Tab Loading Overlay - Visual feedback during navigation */}
+                    {tabLoading && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm pointer-events-none">
+                            <div className={`flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl ${isDarkMode ? 'bg-neutral-800' : 'bg-white'}`}>
+                                <div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                                <span className={isDarkMode ? 'text-white' : 'text-gray-800'}>Chargement...</span>
+                            </div>
+                        </div>
+                    )}
+                    <div className={`tab-content-active ${tabLoading ? 'opacity-50' : ''}`}>
                     {activeTab === 'markets-economy' && <MarketsEconomyTab key={`markets-economy-${tabMountKeys['markets-economy'] || 0}`} />}
                     {activeTab === 'nouvelles' && <NouvellesTab key={`nouvelles-${tabMountKeys['nouvelles'] || 0}`} />}
                     {activeTab === 'advanced-analysis' && window.AdvancedAnalysisTab && <window.AdvancedAnalysisTab key={`advanced-analysis-${tabMountKeys['advanced-analysis'] || 0}`} isDarkMode={isDarkMode} />}
@@ -27664,6 +27689,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Chargement RGL...</p>
                         </div>
                     )}
+                    </div>{/* Close tab-content-active wrapper */}
                         </>
                     )}
 

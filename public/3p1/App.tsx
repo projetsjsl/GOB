@@ -1338,7 +1338,7 @@ export default function App() {
         
         // ✅ PRIORITÉ CRITIQUE : Si le profil actif est un squelette (vide), le charger IMMÉDIATEMENT
         // Ne pas attendre le chargement en arrière-plan (trop lent)
-        if (profile && (profile._isSkeleton || !profile.data || profile.data.length === 0)) {
+        if (activeId && profile && (profile._isSkeleton || !profile.data || profile.data.length === 0)) {
             console.log(`🚀 Chargement PRIORITAIRE pour le profil actif: ${activeId}`);
             // Appeler performSync pour charger les données immédiatement
             // Utiliser un timeout pour ne pas bloquer le rendu actuel

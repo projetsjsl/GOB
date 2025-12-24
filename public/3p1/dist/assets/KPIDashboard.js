@@ -1349,7 +1349,7 @@ const StatusBadge = ({
   );
 };
 const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isBulkSyncing = false, onUpdateProfile, onOpenSettings }) => {
-  var _a, _b, _c, _d;
+  var _a, _b, _c, _d, _e, _f;
   const [sortConfig, setSortConfig] = reactExports.useState({ key: "totalReturnPercent", direction: "desc" });
   const [showSyncDialog, setShowSyncDialog] = reactExports.useState(false);
   const [showGuideDialog, setShowGuideDialog] = reactExports.useState(false);
@@ -2057,9 +2057,10 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
   }
   const globalStats = reactExports.useMemo(() => {
     if (filteredMetrics.length === 0) return null;
-    const returns = filteredMetrics.map((m) => m.totalReturnPercent).filter((r) => r !== null && r !== void 0);
-    const jpegyValues = filteredMetrics.map((m) => m.jpegy).filter((j) => j !== null && j !== void 0);
-    const ratios = filteredMetrics.map((m) => m.ratio31).filter((r) => r !== null && r !== void 0);
+    const validMetrics = filteredMetrics.filter((m) => !m.hasInvalidData && !m._isLoading);
+    const returns = validMetrics.map((m) => m.totalReturnPercent).filter((r) => r !== null && r !== void 0 && isFinite(r));
+    const jpegyValues = validMetrics.map((m) => m.jpegy).filter((j) => j !== null && j !== void 0 && isFinite(j));
+    const ratios = validMetrics.map((m) => m.ratio31).filter((r) => r !== null && r !== void 0 && isFinite(r));
     const avg = (arr) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
     const median = (arr) => {
       if (arr.length === 0) return 0;
@@ -2089,13 +2090,23 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
       medianJPEGY,
       avgRatio,
       medianRatio,
-      count: filteredMetrics.length
+      count: filteredMetrics.length,
+      validCount: validMetrics.length
     };
   }, [filteredMetrics]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     globalStats && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-blue-50 to-indigo-50 p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-blue-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: "📊 Statistiques Globales du Portefeuille" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: [
+          "📊 Statistiques Globales du Portefeuille",
+          globalStats.validCount < globalStats.count && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-2 text-sm font-normal text-blue-600 animate-pulse", children: [
+            "(Chargement... ",
+            globalStats.validCount,
+            "/",
+            globalStats.count,
+            ")"
+          ] })
+        ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "button",
           {
@@ -2109,14 +2120,10 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
       sectionsVisibility.globalStats && globalStats && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-2 sm:p-3 md:p-4 rounded-lg shadow border border-gray-200", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-1", children: "Rendement Moyen" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-lg sm:text-xl md:text-2xl font-bold text-blue-600", children: [
-            globalStats.avgReturn !== null && globalStats.avgReturn !== void 0 ? globalStats.avgReturn.toFixed(1) : "N/A",
-            "%"
-          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg sm:text-xl md:text-2xl font-bold text-blue-600", children: globalStats.validCount > 0 ? (((_a = globalStats.avgReturn) == null ? void 0 : _a.toFixed(1)) ?? "N/A") + "%" : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-normal text-gray-400", children: "En attente..." }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 mt-1", children: [
             "Médiane: ",
-            globalStats.medianReturn !== null && globalStats.medianReturn !== void 0 ? globalStats.medianReturn.toFixed(1) : "N/A",
-            "%"
+            globalStats.validCount > 0 ? (((_b = globalStats.medianReturn) == null ? void 0 : _b.toFixed(1)) ?? "N/A") + "%" : "-"
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
@@ -2144,7 +2151,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-1", children: "JPEGY Moyen" }),
           globalStats.avgJPEGY != null && isFinite(globalStats.avgJPEGY) ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-2xl font-bold ${getJpegyTextClass(globalStats.avgJPEGY)}`, children: ((_a = globalStats.avgJPEGY) == null ? void 0 : _a.toFixed(2)) ?? "N/A" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-2xl font-bold ${getJpegyTextClass(globalStats.avgJPEGY)}`, children: ((_c = globalStats.avgJPEGY) == null ? void 0 : _c.toFixed(2)) ?? "N/A" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 mt-1", children: [
               "Médiane: ",
               globalStats.medianJPEGY != null && isFinite(globalStats.medianJPEGY) ? globalStats.medianJPEGY.toFixed(2) : "N/A"
@@ -3115,13 +3122,15 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                 metric.profile.isWatchlist ?? false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-3 h-3 text-blue-300", title: "Watchlist" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-3 h-3 text-yellow-400", title: "Portefeuille" })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-[10px] font-semibold mb-1 ${metric.hasInvalidData ? "opacity-50" : ""}`, children: metric._isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: "w-5 h-5 text-blue-300 animate-spin mb-1" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px]", children: "Chargement..." })
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: "w-5 h-5 text-white/50 animate-spin mb-1" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[9px] opacity-75", children: "Sync..." })
               ] }) : metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === void 0 ? "N/A" : `${metric.totalReturnPercent.toFixed(0)}%` }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `text-[8px] opacity-90 ${metric._isLoading || metric.hasInvalidData || metric.jpegy === null ? "opacity-50" : ""}`, children: [
-                "JPEGY: ",
-                metric._isLoading ? "..." : metric.jpegy !== null && metric.jpegy !== void 0 ? metric.jpegy.toFixed(1) : "N/A",
-                metric.jpegy === null && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-1 text-red-400", children: "⚠️" })
+                metric._isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "animate-pulse", children: "Calcul..." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                  "JPEGY: ",
+                  metric.jpegy !== null && metric.jpegy !== void 0 ? metric.jpegy.toFixed(1) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-white/50", children: "N/A" })
+                ] }),
+                !metric._isLoading && metric.jpegy === null && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-1 text-red-200", children: "⚠️" })
               ] }),
               metric.hasApprovedVersion && !metric.hasInvalidData && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$e, { className: "w-4 h-4 mt-1 text-white" })
             ] })
@@ -3246,7 +3255,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-blue-600", children: currentId }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-normal text-gray-500 ml-2", children: [
             "(",
-            ((_c = (_b = profiles.find((p) => p.id === currentId)) == null ? void 0 : _b.info) == null ? void 0 : _c.name) || "Inconnu",
+            ((_e = (_d = profiles.find((p) => p.id === currentId)) == null ? void 0 : _d.info) == null ? void 0 : _e.name) || "Inconnu",
             ")"
           ] })
         ] }),
@@ -3260,7 +3269,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           }
         )
       ] }),
-      sectionsVisibility.detailedAnalysis && profiles.find((p) => p.id === currentId) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: ((_d = profiles.find((p) => p.id === currentId)) == null ? void 0 : _d.data) && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+      sectionsVisibility.detailedAnalysis && profiles.find((p) => p.id === currentId) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: ((_f = profiles.find((p) => p.id === currentId)) == null ? void 0 : _f.data) && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           AdditionalMetrics,
           {
@@ -4372,7 +4381,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           )
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { className: "divide-y divide-gray-100", children: filteredMetrics.map((metric) => {
-          var _a2, _b2, _c2, _d2, _e, _f, _g, _h, _i;
+          var _a2, _b2, _c2, _d2, _e2, _f2, _g, _h, _i;
           return /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "tr",
             {
@@ -4413,7 +4422,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                         " ÷ (",
                         ((_d2 = metric.historicalGrowth) == null ? void 0 : _d2.toFixed(1)) ?? "Growth",
                         "% + ",
-                        ((_e = metric.currentYield) == null ? void 0 : _e.toFixed(2)) ?? "Yield",
+                        ((_e2 = metric.currentYield) == null ? void 0 : _e2.toFixed(2)) ?? "Yield",
                         "%)"
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -4443,7 +4452,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px]", children: "..." })
                 ] }) : metric.downsideRisk !== null && metric.downsideRisk !== void 0 ? `${metric.downsideRisk.toFixed(1)}%` : "N/A" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-2 sm:p-3 text-center ${!displayOptions.visibleColumns.pe ? "hidden" : ""} ${displayOptions.density === "compact" ? "hidden lg:table-cell" : "lg:table-cell"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs sm:text-sm", children: [
-                  ((_f = metric.currentPE) == null ? void 0 : _f.toFixed(1)) ?? "N/A",
+                  ((_f2 = metric.currentPE) == null ? void 0 : _f2.toFixed(1)) ?? "N/A",
                   "x"
                 ] }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-2 sm:p-3 text-center ${!displayOptions.visibleColumns.yield ? "hidden" : ""} ${displayOptions.density === "compact" ? "hidden lg:table-cell" : "lg:table-cell"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs sm:text-sm", children: [

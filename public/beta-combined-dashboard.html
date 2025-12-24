@@ -380,6 +380,8 @@
     <!-- Performance Optimizer - Réduit le temps de chargement -->
     <script src="/js/dashboard/logger.js"></script>
     <script src="/js/dashboard/performance-optimizer.js"></script>
+    <!-- Tab Lazy Loader - Prepares on-demand loading -->
+    <script src="/js/dashboard/tab-lazy-loader.js"></script>
     <!-- Constantes partagées exposées globalement -->
     <script src="/js/dashboard/constants.js"></script>
     <!-- Utilitaires partagés exposés globalement -->
@@ -388,8 +390,8 @@
     <script src="/js/dashboard/briefing-prompts.js"></script>
     <!-- Système de thèmes -->
     <script src="/js/dashboard/theme-system.js"></script>
-    <!-- Voice Assistant Component -->
-    <script type="text/babel" src="js/dashboard/components/tabs/VoiceAssistantTab.js"></script>
+    
+    <!-- ⚡ ESSENTIAL COMPONENTS (Load first - required for initial view) -->
     <!-- Auto-Expand: Ajoute boutons fullscreen à TOUTES les sections -->
     <script src="js/dashboard/components/shared/auto-expand-init.js"></script>
     <!-- Theme Selector Component -->

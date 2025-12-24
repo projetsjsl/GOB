@@ -56996,7 +56996,7 @@ Vérifiez votre connexion et réessayez.`,
         });
       });
     }
-    if (profile2 && (profile2._isSkeleton || !profile2.data || profile2.data.length === 0)) {
+    if (activeId && profile2 && (profile2._isSkeleton || !profile2.data || profile2.data.length === 0)) {
       console.log(`🚀 Chargement PRIORITAIRE pour le profil actif: ${activeId}`);
       const timeoutId = setTimeout(() => {
         const currentProfile = library[activeId];
