@@ -24750,10 +24750,59 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
 
 
-            // Charger les widgets TradingView
+            // Charger les widgets TradingView avec optimizedWidgetLoader
             React.useEffect(() => {
+                const loader = window.optimizedWidgetLoader;
+                
                 // Market Overview Widget
-                if (marketOverviewRef.current) {
+                if (marketOverviewRef.current && loader) {
+                    loader.releaseWidget(marketOverviewRef.current);
+                    const config = {
+                        "colorTheme": isDarkMode ? "dark" : "light",
+                        "dateRange": "1D",
+                        "showChart": true,
+                        "locale": "fr",
+                        "width": "100%",
+                        "height": "100%",
+                        "largeChartUrl": "",
+                        "isTransparent": false,
+                        "showSymbolLogo": true,
+                        "showFloatingTooltip": true,
+                        "tabs": [
+                            {
+                                "title": "Indices",
+                                "symbols": [
+                                    { "s": "FOREXCOM:SPXUSD", "d": "S&P 500" },
+                                    { "s": "FOREXCOM:NSXUSD", "d": "US 100" },
+                                    { "s": "FOREXCOM:DJI", "d": "Dow 30" },
+                                    { "s": "INDEX:NKY", "d": "Nikkei 225" },
+                                    { "s": "INDEX:DEU40", "d": "DAX Index" },
+                                    { "s": "FOREXCOM:UKXGBP", "d": "UK 100" }
+                                ]
+                            },
+                            {
+                                "title": "Forex",
+                                "symbols": [
+                                    { "s": "FX:EURUSD", "d": "EUR/USD" },
+                                    { "s": "FX:GBPUSD", "d": "GBP/USD" },
+                                    { "s": "FX:USDJPY", "d": "USD/JPY" },
+                                    { "s": "FX:USDCAD", "d": "USD/CAD" }
+                                ]
+                            },
+                            {
+                                "title": "Crypto",
+                                "symbols": [
+                                    { "s": "BINANCE:BTCUSDT", "d": "Bitcoin" },
+                                    { "s": "BINANCE:ETHUSDT", "d": "Ethereum" },
+                                    { "s": "BINANCE:BNBUSDT", "d": "BNB" },
+                                    { "s": "BINANCE:SOLUSDT", "d": "Solana" }
+                                ]
+                            }
+                        ]
+                    };
+                    loader.loadWidget(marketOverviewRef.current, 'market-overview', config, false);
+                } else if (marketOverviewRef.current) {
+                    // Fallback si loader n'existe pas
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
                     script.async = true;
@@ -24804,7 +24853,27 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 }
 
                 // Heatmap Widget
-                if (heatmapRef.current) {
+                if (heatmapRef.current && loader) {
+                    loader.releaseWidget(heatmapRef.current);
+                    const config = {
+                        "exchanges": [],
+                        "dataSource": "SPX500",
+                        "grouping": "sector",
+                        "blockSize": "market_cap_basic",
+                        "blockColor": "change",
+                        "locale": "fr",
+                        "symbolUrl": "",
+                        "colorTheme": isDarkMode ? "dark" : "light",
+                        "hasTopBar": true,
+                        "isDataSetEnabled": true,
+                        "isZoomEnabled": true,
+                        "hasSymbolTooltip": true,
+                        "width": "100%",
+                        "height": "100%"
+                    };
+                    loader.loadWidget(heatmapRef.current, 'stock-heatmap', config, false);
+                } else if (heatmapRef.current) {
+                    // Fallback si loader n'existe pas
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
                     script.async = true;
@@ -24828,7 +24897,23 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 }
 
                 // Screener Widget
-                if (screenerRef.current) {
+                if (screenerRef.current && loader) {
+                    loader.releaseWidget(screenerRef.current);
+                    const config = {
+                        "width": "100%",
+                        "height": "100%",
+                        "defaultColumn": "overview",
+                        "defaultScreen": "most_capitalized",
+                        "market": "america",
+                        "showToolbar": true,
+                        "colorTheme": isDarkMode ? "dark" : "light",
+                        "locale": "fr",
+                        "isTransparent": false,
+                        "environment": "production"
+                    };
+                    loader.loadWidget(screenerRef.current, 'screener', config, false);
+                } else if (screenerRef.current) {
+                    // Fallback si loader n'existe pas
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
                     script.async = true;
@@ -24841,10 +24926,20 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         "showToolbar": true,
                         "colorTheme": isDarkMode ? "dark" : "light",
                         "locale": "fr",
-                        "isTransparent": false
+                        "isTransparent": false,
+                        "environment": "production"
                     });
                     screenerRef.current.appendChild(script);
                 }
+                
+                return () => {
+                    // Cleanup
+                    if (loader) {
+                        if (marketOverviewRef.current) loader.releaseWidget(marketOverviewRef.current);
+                        if (heatmapRef.current) loader.releaseWidget(heatmapRef.current);
+                        if (screenerRef.current) loader.releaseWidget(screenerRef.current);
+                    }
+                };
             }, [isDarkMode]);
 
             return (
