@@ -2921,8 +2921,6 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         )}
                     </div>
                 );
-            };
-
 });
 
 // Set display name for debugging
