@@ -162,7 +162,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
     // Fonction generateMockDataForType SUPPRIMÉE - Plus de données simulées
 
-    const { useState, useEffect, useRef, useCallback } = React;
+    const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
     // Composant d'icônes SVG inline (remplace Lucide) - Défini globalement
     // Iconoir Icon Component (remplace LucideIcon)
