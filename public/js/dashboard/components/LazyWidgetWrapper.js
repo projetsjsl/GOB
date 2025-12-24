@@ -1,16 +1,18 @@
 const LazyWidgetWrapper = ({ children, height = '300px', threshold = 0.1, placeholderTitle = 'Chargement...', forceLoad = false }) => {
+    // Si forceLoad est true, rendre immédiatement sans lazy loading
+    if (forceLoad) {
+        return React.createElement('div', { 
+            style: { minHeight: height, position: 'relative', width: '100%' },
+            className: "w-full transition-all duration-300"
+        }, children);
+    }
+    
     const [isVisible, setIsVisible] = React.useState(false);
     const containerRef = React.useRef(null);
     const isMountedRef = React.useRef(true);
 
     React.useEffect(() => {
         isMountedRef.current = true;
-
-        // Si forceLoad est true, charger immédiatement
-        if (forceLoad) {
-            setIsVisible(true);
-            return;
-        }
 
         // Vérifier si le container est déjà visible au montage
         const checkInitialVisibility = () => {
