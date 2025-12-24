@@ -1037,6 +1037,14 @@ console.log('✅ Données hybrides récupérées:', {
                         container.appendChild(script);
                         console.log(`📊 TradingView Mini Chart rechargé pour ${selectedStock}`);
                     }
+                    
+                    // CLEANUP: Prevent memory leaks by removing widget content on unmount/re-render
+                    return () => {
+                        const container = document.getElementById('tradingview-mini-chart-jlab');
+                        if (container) {
+                            container.innerHTML = '';
+                        }
+                    };
                 }, [selectedStock, isDarkMode]);
 
                 // ⚡ AUTO-REFRESH: Désactivé - Chargement unique à l'arrivée sur la page

@@ -28,6 +28,7 @@ const DansWatchlistTab: React.FC<TabProps> = memo((props) => {
         minMarketCap: 0,
         maxPE: 50,
         minROE: 0,
+        maxDebtEquity: 2,
         sector: 'all'
     });
     const WATCHLIST_FILE = '/dans-watchlist.json'; // servi depuis /public
@@ -438,6 +439,14 @@ const DansWatchlistTab: React.FC<TabProps> = memo((props) => {
                 widgetContainer.appendChild(script);
             }
         }
+        
+        // CLEANUP: Prevent memory leaks by removing widget content on unmount/re-render
+        return () => {
+            const existingWidget = document.getElementById('tradingview-ticker-dan-watchlist');
+            if (existingWidget) {
+                existingWidget.innerHTML = '';
+            }
+        };
     }, [watchlistTickers, isDarkMode]);
 
     return (
