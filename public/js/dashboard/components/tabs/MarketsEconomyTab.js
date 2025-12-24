@@ -13,13 +13,10 @@ const MarketOverviewWidget = ({ isDarkMode }) => {
     const containerRef = useRef(null);
 
     useEffect(() => {
-        if (!containerRef.current) return;
-        
-        containerRef.current.innerHTML = '';
-        const script = document.createElement('script');
-        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
-        script.async = true;
-        script.innerHTML = JSON.stringify({
+        const container = containerRef.current;
+        if (!container) return;
+
+        const config = {
             "colorTheme": isDarkMode ? "dark" : "light",
             "dateRange": "1D",
             "showChart": true,
@@ -61,8 +58,32 @@ const MarketOverviewWidget = ({ isDarkMode }) => {
                     ]
                 }
             ]
-        });
-        containerRef.current.appendChild(script);
+        };
+
+        const loader = window.optimizedWidgetLoader;
+        let fallbackScript;
+
+        if (loader) {
+            loader.releaseWidget(container);
+            loader.loadWidget(container, 'market-overview', config, false);
+        } else {
+            container.innerHTML = '';
+            fallbackScript = document.createElement('script');
+            fallbackScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
+            fallbackScript.async = true;
+            fallbackScript.innerHTML = JSON.stringify(config);
+            container.appendChild(fallbackScript);
+        }
+
+        return () => {
+            if (loader) {
+                loader.releaseWidget(container);
+            }
+            container.innerHTML = '';
+            if (fallbackScript) {
+                fallbackScript.remove();
+            }
+        };
     }, [isDarkMode]);
 
     return React.createElement('div', { ref: containerRef, style: { height: '100%', width: '100%' } });
@@ -72,13 +93,10 @@ const HeatmapWidget = ({ isDarkMode }) => {
     const containerRef = useRef(null);
 
     useEffect(() => {
-        if (!containerRef.current) return;
-        
-        containerRef.current.innerHTML = '';
-        const script = document.createElement('script');
-        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
-        script.async = true;
-        script.innerHTML = JSON.stringify({
+        const container = containerRef.current;
+        if (!container) return;
+
+        const config = {
             "exchanges": [],
             "dataSource": "SPX500",
             "grouping": "sector",
@@ -93,8 +111,32 @@ const HeatmapWidget = ({ isDarkMode }) => {
             "hasSymbolTooltip": true,
             "width": "100%",
             "height": "100%"
-        });
-        containerRef.current.appendChild(script);
+        };
+
+        const loader = window.optimizedWidgetLoader;
+        let fallbackScript;
+
+        if (loader) {
+            loader.releaseWidget(container);
+            loader.loadWidget(container, 'stock-heatmap', config, false);
+        } else {
+            container.innerHTML = '';
+            fallbackScript = document.createElement('script');
+            fallbackScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+            fallbackScript.async = true;
+            fallbackScript.innerHTML = JSON.stringify(config);
+            container.appendChild(fallbackScript);
+        }
+
+        return () => {
+            if (loader) {
+                loader.releaseWidget(container);
+            }
+            container.innerHTML = '';
+            if (fallbackScript) {
+                fallbackScript.remove();
+            }
+        };
     }, [isDarkMode]);
 
     return React.createElement('div', { ref: containerRef, style: { height: '100%', width: '100%' } });

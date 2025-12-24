@@ -953,47 +953,6 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         // Tab loading state for visual feedback
         const [tabLoading, setTabLoading] = useState(false);
         
-        // Enhanced tab change handler for new structure with loading feedback
-        const handleNewTabChange = (tabId) => {
-            // Show loading state immediately for visual feedback
-            setTabLoading(true);
-            
-            // Use requestAnimationFrame to allow UI to update before heavy work
-            requestAnimationFrame(() => {
-                // 1. Check redirects first
-                for (const [main, subs] of Object.entries(SUB_TABS)) {
-                    if (!Array.isArray(subs)) continue;
-                    const sub = subs.find(s => s.id === tabId);
-                    if (sub && typeof sub.component === 'string' && sub.component.startsWith('redirect:')) {
-                        window.location.href = sub.component.replace('redirect:', '');
-                        return;
-                    }
-                }
-
-                // 2. Trigger lazy load if available
-                if (window.TabLazyLoader && window.TabLazyLoader.load) {
-                    window.TabLazyLoader.load(tabId).catch(() => {});
-                }
-
-                // 3. Check if it's a main tab
-                const isMainTab = MAIN_TABS.find(t => t.id === tabId);
-                if (isMainTab) {
-                    setMainTab(tabId);
-                    const defaultSub = DEFAULT_SUB_TABS[tabId];
-                    setActiveSubTab(defaultSub);
-                    setActiveTab(defaultSub);
-                } else {
-                    const mainTabId = getMainTabFromId(tabId);
-                    setMainTab(mainTabId);
-                    setActiveSubTab(tabId);
-                    setActiveTab(tabId);
-                }
-                
-                // Hide loading state after a brief delay to allow render
-                setTimeout(() => setTabLoading(false), 100);
-            });
-        };
-        
         const [navigationHistory, setNavigationHistory] = useState([]); // Historique de navigation pour le bouton Back
         const [tickers, setTickers] = useState([]);
         const [teamTickers, setTeamTickers] = useState([]);
@@ -1605,6 +1564,49 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 fetchSeekingAlphaData();
                 fetchSeekingAlphaStockData();
             }
+        };
+
+        // Enhanced tab change handler pour la nouvelle navigation (onglets principaux & sous-onglets)
+        const handleNewTabChange = (tabId) => {
+            setTabLoading(true);
+
+            requestAnimationFrame(() => {
+                // 1) Gestion des redirects définis dans SUB_TABS
+                for (const [main, subs] of Object.entries(SUB_TABS)) {
+                    if (!Array.isArray(subs)) continue;
+                    const sub = subs.find(s => s.id === tabId);
+                    if (sub && typeof sub.component === 'string' && sub.component.startsWith('redirect:')) {
+                        window.location.href = sub.component.replace('redirect:', '');
+                        return;
+                    }
+                }
+
+                // 2) Précharger le composant si TabLazyLoader est disponible
+                if (window.TabLazyLoader?.load) {
+                    window.TabLazyLoader.load(tabId).catch(() => {});
+                }
+
+                // 3) Déterminer s'il s'agit d'un onglet principal ou secondaire
+                const isMainTab = MAIN_TABS.find(t => t.id === tabId);
+                let targetTabId = tabId;
+
+                if (isMainTab) {
+                    setMainTab(tabId);
+                    const defaultSub = DEFAULT_SUB_TABS[tabId] || tabId;
+                    setActiveSubTab(defaultSub);
+                    targetTabId = defaultSub;
+                } else {
+                    const mainTabId = getMainTabFromId(tabId);
+                    setMainTab(mainTabId);
+                    setActiveSubTab(tabId);
+                    targetTabId = tabId;
+                }
+
+                // 4) Appliquer la navigation legacy (historique, intros, etc.)
+                handleTabChange(targetTabId);
+
+                setTimeout(() => setTabLoading(false), 100);
+            });
         };
 
         // Fonction pour charger les données du ticker (sans auto-refresh)
@@ -20602,7 +20604,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 const analysisRequest = `Analyse approfondie de ${selectedStock}: fondamentaux, techniques, actualités et recommandation d'investissement`;
                                                 // Set prefill message first, then switch tab after a short delay
                                                 setEmmaPrefillMessage(analysisRequest);
-                                                setTimeout(() => handleTabChange('ask-emma'), 50);
+                                                setTimeout(() => handleNewTabChange('ask-emma'), 50);
                                             }}
                                             className={`flex items-center gap-2 px-4 py-1.5 rounded text-sm font-semibold border-2 transition-all hover:scale-105 ${isDarkMode
                                                 ? 'bg-purple-900/30 hover:bg-purple-800/40 text-purple-400 border-purple-600'
@@ -26951,7 +26953,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         <button
                                                             key={hiddenTab.id}
                                                             onClick={() => {
-                                                                handleTabChange(hiddenTab.id);
+                                                                handleNewTabChange(hiddenTab.id);
                                                                 setShowPlusMenu(false);
                                                             }}
                                                             className={`w-full text-left px-4 py-3 flex items-center gap-3 transition-colors ${
@@ -26991,7 +26993,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     ref={el => { if (el) tabRefs.current[tab.id] = el; }}
                                     onMouseDown={withRipple}
                                     onClick={() => {
-                                        handleTabChange(tab.id);
+                                        handleNewTabChange(tab.id);
                                         setShowPlusMenu(false);
                                         setShowTitresSubmenu(false);
                                     }}
@@ -27111,7 +27113,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         <button
                                             key={tab.id}
                                             onClick={() => {
-                                                handleTabChange(tab.id);
+                                                handleNewTabChange(tab.id);
                                                 setMobileMenuOpen(false);
                                             }}
                                             className={`w-full text-left px-4 py-3.5 rounded-xl flex items-center gap-4 transition-all duration-200 group ${

@@ -297,6 +297,74 @@ const DashboardGridWrapper = ({
             }
         }, [layout]);
 
+        // Synchroniser le layout avec mainTab : ajouter les widgets par défaut si nécessaire
+        useEffect(() => {
+            if (!mainTab) {
+                console.log('[DashboardGridWrapper] ⏸️ Synchronisation layout/mainTab ignorée: mainTab vide');
+                return;
+            }
+            
+            // Utiliser la fonction setLayout avec une fonction pour éviter les dépendances
+            setLayout(currentLayout => {
+                if (!currentLayout || currentLayout.length === 0) {
+                    console.log('[DashboardGridWrapper] ⏸️ Layout vide, synchronisation ignorée');
+                    return currentLayout;
+                }
+                
+                // Obtenir les IDs des widgets pour le mainTab actuel
+                const prefixMap = {
+                    'admin': 'admin-',
+                    'marches': 'marches-',
+                    'titres': 'titres-',
+                    'jlab': 'jlab-',
+                    'emma': 'emma-',
+                    'tests': 'tests-'
+                };
+                const prefix = prefixMap[mainTab];
+                const validIds = prefix 
+                    ? Object.keys(TAB_TO_WIDGET_MAP).filter(k => k.startsWith(prefix))
+                    : Object.keys(TAB_TO_WIDGET_MAP);
+                
+                const existingIds = currentLayout.filter(item => validIds.includes(item.i)).map(item => item.i);
+                
+                console.log('[DashboardGridWrapper] 🔍 Synchronisation layout/mainTab:', { 
+                    mainTab, 
+                    validIdsCount: validIds.length, 
+                    validIds: validIds.slice(0, 3),
+                    existingIdsCount: existingIds.length,
+                    existingIds: existingIds.slice(0, 3),
+                    currentLayoutLength: currentLayout.length
+                });
+                
+                // Si aucun widget du mainTab n'existe dans le layout, ajouter les widgets par défaut
+                if (existingIds.length === 0 && validIds.length > 0) {
+                    console.log('[DashboardGridWrapper] ➕ Ajout des widgets par défaut pour mainTab:', mainTab);
+                    const newItems = validIds.map((id, idx) => {
+                        const config = TAB_TO_WIDGET_MAP[id] || {};
+                        const defaultSize = config.defaultSize || { w: 6, h: 8 };
+                        const minSize = config.minSize || { w: 4, h: 6 };
+                        return {
+                            i: id,
+                            x: (idx % 2) * 6,
+                            y: Math.floor(idx / 2) * 8,
+                            w: defaultSize.w,
+                            h: defaultSize.h,
+                            minW: minSize.w,
+                            minH: minSize.h
+                        };
+                    });
+                    
+                    // Ajouter les nouveaux widgets au layout existant (garder les autres widgets)
+                    const updatedLayout = [...currentLayout, ...newItems];
+                    localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(updatedLayout));
+                    console.log('[DashboardGridWrapper] ✅ Layout mis à jour avec', newItems.length, 'nouveaux widgets');
+                    return updatedLayout;
+                }
+                
+                return currentLayout;
+            });
+        }, [mainTab]); // Ne dépendre que de mainTab pour éviter les boucles infinies
+
         const [isEditing, setIsEditing] = useState(false);
         const [currentBreakpoint, setCurrentBreakpoint] = useState('lg');
 

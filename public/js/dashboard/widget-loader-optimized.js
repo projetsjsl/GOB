@@ -11,6 +11,21 @@ class OptimizedWidgetLoader {
         this.maxConcurrentLoads = 2; // Maximum 2 widgets en parallèle
     }
 
+    _ensureWidgetId(container, widgetType) {
+        if (!container) {
+            return `${widgetType}-${Math.random().toString(36).slice(2)}`;
+        }
+        if (!container.id) {
+            container.id = `tv-${widgetType}-${Math.random().toString(36).slice(2, 8)}`;
+        }
+        const baseId = container.dataset?.widgetLoaderKey || container.id;
+        if (container.dataset) {
+            container.dataset.widgetLoaderKey = baseId;
+            container.dataset.widgetLoaderId = `${widgetType}-${baseId}`;
+        }
+        return `${widgetType}-${baseId}`;
+    }
+
     /**
      * Charge un widget TradingView de manière optimisée
      * @param {HTMLElement} container - Container où charger le widget
@@ -21,7 +36,7 @@ class OptimizedWidgetLoader {
     async loadWidget(container, widgetType, config, lazy = true) {
         if (!container) return;
 
-        const widgetId = `${widgetType}-${container.id || Math.random().toString(36)}`;
+        const widgetId = this._ensureWidgetId(container, widgetType);
         
         // Éviter les chargements en double
         if (this.loadedWidgets.has(widgetId)) {
@@ -131,6 +146,14 @@ class OptimizedWidgetLoader {
                 }
             }
         });
+    }
+
+    releaseWidget(container) {
+        if (!container || !container.dataset) return;
+        const widgetId = container.dataset.widgetLoaderId;
+        if (widgetId) {
+            this.loadedWidgets.delete(widgetId);
+        }
     }
 }
 
