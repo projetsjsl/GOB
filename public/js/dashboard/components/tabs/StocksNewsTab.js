@@ -62,12 +62,10 @@ const MarketOverviewWidget = ({ isDarkMode }) => {
 const ScreenerWidget = ({ isDarkMode }) => {
     const containerRef = useRef(null);
     useEffect(() => {
-        if (!containerRef.current) return;
-        containerRef.current.innerHTML = '';
-        const script = document.createElement('script');
-        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
-        script.async = true;
-        script.innerHTML = JSON.stringify({
+        const container = containerRef.current;
+        if (!container) return;
+
+        const config = {
             "width": "100%",
             "height": "100%",
             "defaultColumn": "overview",
@@ -77,8 +75,32 @@ const ScreenerWidget = ({ isDarkMode }) => {
             "colorTheme": isDarkMode ? "dark" : "light",
             "locale": "fr",
             "isTransparent": false
-        });
-        containerRef.current.appendChild(script);
+        };
+
+        const loader = window.optimizedWidgetLoader;
+        let fallbackScript;
+
+        if (loader) {
+            loader.releaseWidget(container);
+            loader.loadWidget(container, 'screener', config, false);
+        } else {
+            container.innerHTML = '';
+            fallbackScript = document.createElement('script');
+            fallbackScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
+            fallbackScript.async = true;
+            fallbackScript.innerHTML = JSON.stringify(config);
+            container.appendChild(fallbackScript);
+        }
+
+        return () => {
+            if (loader) {
+                loader.releaseWidget(container);
+            }
+            container.innerHTML = '';
+            if (fallbackScript) {
+                fallbackScript.remove();
+            }
+        };
     }, [isDarkMode]);
     return React.createElement('div', { ref: containerRef, style: { height: '100%', width: '100%' } });
 };

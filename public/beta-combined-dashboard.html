@@ -541,18 +541,38 @@
                 event.preventDefault();
                 return true;
             }
+            // Filtre pour éviter les erreurs TradingView répétitives
+            const errorMsg = event.message || event.error?.message || 'Unknown error';
+            const source = event.filename || 'unknown';
+            
+            // Filtrer les erreurs TradingView répétitives (contentWindow, invalid environment)
+            if (source.includes('tradingview.com') || source.includes('embed-widget')) {
+                if (errorMsg.includes('contentWindow is not available') || 
+                    errorMsg.includes('Invalid environment') ||
+                    errorMsg.includes('Cannot listen to the event')) {
+                    // Ces erreurs sont normales pour TradingView (sandbox restrictions)
+                    // Logger seulement en mode debug pour éviter la pollution de la console
+                    if (window.DEBUG_MODE) {
+                        console.debug(`[TradingView] ${errorMsg.substring(0, 100)}`);
+                    }
+                    return; // Ne pas logger ces erreurs répétitives
+                }
+            }
+
             // OPTIMISATION: Logger les erreurs dashboard pour debugging
             if (event.filename && event.filename.includes('dashboard')) {
-                console.error('❌ Erreur dashboard:', event.message, 'at', event.filename + ':' + event.lineno);
+                console.error('❌ Erreur dashboard:', errorMsg, 'at', event.filename + ':' + event.lineno);
                 if (event.error && event.error.stack) {
                     console.error('Stack:', event.error.stack);
                 }
             }
             // Log VM errors (from Babel transpilation)
-            if (!event.filename || event.filename.includes('VM')) {
-                console.error('❌ Erreur transpilation:', event.message);
+            else if (!event.filename || event.filename.includes('VM')) {
+                console.error('❌ Erreur transpilation:', errorMsg);
                 if (event.error && event.error.stack) {
                     console.error('Stack:', event.error.stack);
+                } else if (event.filename) {
+                    console.error('Fichier:', event.filename, 'Ligne:', event.lineno);
                 }
             }
         }, true);
