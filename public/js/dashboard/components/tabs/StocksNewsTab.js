@@ -1,4 +1,85 @@
 const { useState, useEffect, useRef, useCallback } = React;
+const LazyWidgetWrapper = window.LazyWidgetWrapper || (({ children }) => children);
+
+const MarketOverviewWidget = ({ isDarkMode }) => {
+    const containerRef = useRef(null);
+    useEffect(() => {
+        if (!containerRef.current) return;
+        containerRef.current.innerHTML = '';
+        const script = document.createElement('script');
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
+        script.async = true;
+        script.innerHTML = JSON.stringify({
+            "colorTheme": isDarkMode ? "dark" : "light",
+            "dateRange": "1D",
+            "showChart": true,
+            "locale": "fr",
+            "width": "100%",
+            "height": "100%",
+            "largeChartUrl": "",
+            "isTransparent": false,
+            "showSymbolLogo": true,
+            "showFloatingTooltip": true,
+            "tabs": [
+                {
+                    "title": "Indices",
+                    "symbols": [
+                        {"s": "FOREXCOM:SPXUSD", "d": "S&P 500"},
+                        {"s": "FOREXCOM:NSXUSD", "d": "US 100"},
+                        {"s": "FOREXCOM:DJI", "d": "Dow 30"},
+                        {"s": "INDEX:NKY", "d": "Nikkei 225"},
+                        {"s": "INDEX:DEU40", "d": "DAX Index"},
+                        {"s": "FOREXCOM:UKXGBP", "d": "UK 100"}
+                    ]
+                },
+                {
+                    "title": "Forex",
+                    "symbols": [
+                        {"s": "FX:EURUSD", "d": "EUR/USD"},
+                        {"s": "FX:GBPUSD", "d": "GBP/USD"},
+                        {"s": "FX:USDJPY", "d": "USD/JPY"},
+                        {"s": "FX:USDCAD", "d": "USD/CAD"}
+                    ]
+                },
+                {
+                    "title": "Crypto",
+                    "symbols": [
+                        {"s": "BINANCE:BTCUSDT", "d": "Bitcoin"},
+                        {"s": "BINANCE:ETHUSDT", "d": "Ethereum"},
+                        {"s": "BINANCE:BNBUSDT", "d": "BNB"},
+                        {"s": "BINANCE:SOLUSDT", "d": "Solana"}
+                    ]
+                }
+            ]
+        });
+        containerRef.current.appendChild(script);
+    }, [isDarkMode]);
+    return React.createElement('div', { ref: containerRef, style: { height: '100%', width: '100%' } });
+};
+
+const ScreenerWidget = ({ isDarkMode }) => {
+    const containerRef = useRef(null);
+    useEffect(() => {
+        if (!containerRef.current) return;
+        containerRef.current.innerHTML = '';
+        const script = document.createElement('script');
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
+        script.async = true;
+        script.innerHTML = JSON.stringify({
+            "width": "100%",
+            "height": "100%",
+            "defaultColumn": "overview",
+            "defaultScreen": "most_capitalized",
+            "market": "america",
+            "showToolbar": true,
+            "colorTheme": isDarkMode ? "dark" : "light",
+            "locale": "fr",
+            "isTransparent": false
+        });
+        containerRef.current.appendChild(script);
+    }, [isDarkMode]);
+    return React.createElement('div', { ref: containerRef, style: { height: '100%', width: '100%' } });
+};
 
 const StocksNewsTab = (props) => {
         // Récupère les données/handlers depuis la surface globale du dashboard avec fallback props
@@ -44,122 +125,32 @@ const StocksNewsTab = (props) => {
         const safeSetActiveTab = typeof setActiveTab === 'function' ? setActiveTab : () => {};
         const safeSetSelectedStock = typeof setSelectedStock === 'function' ? setSelectedStock : () => {};
 
+        // Fonction pour extraire la raison du mouvement depuis les news
+        const extractMoveReason = (ticker, changePercent) => {
+            // PRIORITÉ 1: Utiliser l'explication "Why Is It Moving?" de Finviz si disponible
+            const whyMoving = tickerMoveReasons[ticker];
+            if (whyMoving && whyMoving.explanation) {
+                const explanation = whyMoving.explanation_enriched || whyMoving.explanation;
+                return explanation.length > 120 ? explanation.substring(0, 120) + '...' : explanation;
+            }
+        
+            // PRIORITÉ 2: Utiliser la news récente depuis tickerLatestNews
+            let news = tickerLatestNews[ticker];
+            if (news && news.title) {
+                return news.title.length > 120 ? news.title.substring(0, 120) + '...' : news.title;
+            }
+        
+            // FALLBACK: Message générique
+            const directionLabel = changePercent > 0 ? 'hausse' : 'baisse';
+            return `Variation en ${directionLabel} de ${Math.abs(changePercent).toFixed(2)}% sans actualité confirmée.`;
+        };
+
         const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
         const [expandedStock, setExpandedStock] = useState(null);
         const [expandedArticle, setExpandedArticle] = useState(null); // Article expandu avec iframe
 
-        // Refs pour les widgets TradingView
-        const marketOverviewRef = useRef(null);
-        const heatmapRef = useRef(null);
-        const screenerRef = useRef(null);
+        // Logic moved to sub-components
 
-        // Charger les widgets TradingView
-        useEffect(() => {
-            // Market Overview Widget
-            if (marketOverviewRef.current) {
-                marketOverviewRef.current.innerHTML = '';
-                const script = document.createElement('script');
-                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
-                script.async = true;
-                script.innerHTML = JSON.stringify({
-                    "colorTheme": isDarkMode ? "dark" : "light",
-                    "dateRange": "1D",
-                    "showChart": true,
-                    "locale": "fr",
-                    "width": "100%",
-                    "height": "100%",
-                    "largeChartUrl": "",
-                    "isTransparent": false,
-                    "showSymbolLogo": true,
-                    "showFloatingTooltip": true,
-                    "tabs": [
-                        {
-                            "title": "Indices",
-                            "symbols": [
-                                {"s": "FOREXCOM:SPXUSD", "d": "S&P 500"},
-                                {"s": "FOREXCOM:NSXUSD", "d": "US 100"},
-                                {"s": "FOREXCOM:DJI", "d": "Dow 30"},
-                                {"s": "INDEX:NKY", "d": "Nikkei 225"},
-                                {"s": "INDEX:DEU40", "d": "DAX Index"},
-                                {"s": "FOREXCOM:UKXGBP", "d": "UK 100"}
-                            ]
-                        },
-                        {
-                            "title": "Forex",
-                            "symbols": [
-                                {"s": "FX:EURUSD", "d": "EUR/USD"},
-                                {"s": "FX:GBPUSD", "d": "GBP/USD"},
-                                {"s": "FX:USDJPY", "d": "USD/JPY"},
-                                {"s": "FX:USDCAD", "d": "USD/CAD"}
-                            ]
-                        },
-                        {
-                            "title": "Crypto",
-                            "symbols": [
-                                {"s": "BINANCE:BTCUSDT", "d": "Bitcoin"},
-                                {"s": "BINANCE:ETHUSDT", "d": "Ethereum"},
-                                {"s": "BINANCE:BNBUSDT", "d": "BNB"},
-                                {"s": "BINANCE:SOLUSDT", "d": "Solana"}
-                            ]
-                        }
-                    ]
-                });
-                marketOverviewRef.current.appendChild(script);
-            }
-
-            // Heatmap Widget
-            if (heatmapRef.current) {
-                // void('🔄 [Heatmap SPX500] Chargement du widget TradingView...');
-                heatmapRef.current.innerHTML = '';
-                const script = document.createElement('script');
-                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
-                script.async = true;
-                script.onload = () => {
-                    // void('✅ [Heatmap SPX500] Widget TradingView chargé');
-                };
-                script.onerror = (error) => {
-                    console.error('❌ [Heatmap SPX500] Erreur chargement widget:', error);
-                };
-                script.innerHTML = JSON.stringify({
-                    "exchanges": [],
-                    "dataSource": "SPX500",
-                    "grouping": "sector",
-                    "blockSize": "market_cap_basic",
-                    "blockColor": "change",
-                    "locale": "fr",
-                    "symbolUrl": "",
-                    "colorTheme": isDarkMode ? "dark" : "light",
-                    "hasTopBar": true,
-                    "isDataSetEnabled": true,
-                    "isZoomEnabled": true,
-                    "hasSymbolTooltip": true,
-                    "width": "100%",
-                    "height": "100%"
-                });
-                heatmapRef.current.appendChild(script);
-            }
-            // Note: heatmapRef.current may be null on first render, this is normal
-
-            // Screener Widget
-            if (screenerRef.current) {
-                screenerRef.current.innerHTML = '';
-                const script = document.createElement('script');
-                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
-                script.async = true;
-                script.innerHTML = JSON.stringify({
-                    "width": "100%",
-                    "height": "100%",
-                    "defaultColumn": "overview",
-                    "defaultScreen": "most_capitalized",
-                    "market": "america",
-                    "showToolbar": true,
-                    "colorTheme": isDarkMode ? "dark" : "light",
-                    "locale": "fr",
-                    "isTransparent": false
-                });
-                screenerRef.current.appendChild(script);
-            }
-        }, [isDarkMode]);
 
         const renderMarketBadge = window.DASHBOARD_UTILS?.renderMarketBadge
             ? (type) => window.DASHBOARD_UTILS.renderMarketBadge(type, isDarkMode)
@@ -341,7 +332,11 @@ const StocksNewsTab = (props) => {
                             Indices majeurs, Forex, Crypto - Données en direct
                         </p>
                     </div>
-                    <div ref={marketOverviewRef} style={{height: '800px'}}></div>
+                    <div style={{height: '800px'}}>
+                         <LazyWidgetWrapper height="800px" placeholderTitle="Chargement Vue d'ensemble...">
+                            <MarketOverviewWidget isDarkMode={isDarkMode} />
+                        </LazyWidgetWrapper>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -350,7 +345,7 @@ const StocksNewsTab = (props) => {
                         isDarkMode
                             ? 'bg-gray-800/50 border-purple-500/30'
                             : 'bg-white border-purple-400/40'
-                    }`} style={{width: '1047px', height: '800px'}}>
+                    }`} style={{width: '100%', height: '800px'}}>
                         <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                             <h3 className={`text-lg font-bold transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
@@ -358,7 +353,11 @@ const StocksNewsTab = (props) => {
                                 🚀 Screener
                             </h3>
                         </div>
-                        <div ref={screenerRef} style={{height: '700px'}}></div>
+                        <div style={{height: '700px'}}>
+                           <LazyWidgetWrapper height="700px" placeholderTitle="Chargement Screener...">
+                                <ScreenerWidget isDarkMode={isDarkMode} />
+                            </LazyWidgetWrapper>
+                        </div>
                     </div>
                 </div>
             </div>

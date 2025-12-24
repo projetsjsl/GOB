@@ -1,4 +1,6 @@
-const TradingViewTicker = React.memo(({
+const LazyWidgetWrapper = window.LazyWidgetWrapper || (({ children }) => children);
+
+const TradingViewTickerContent = React.memo(({
     isDarkMode,
     selectedIndices,
     setTickerExpandableUrl,
@@ -196,5 +198,13 @@ const TradingViewTicker = React.memo(({
         </div>
     );
 });
+
+const TradingViewTicker = (props) => {
+    return (
+        <LazyWidgetWrapper height="74px" placeholderTitle="Chargement Ticker...">
+            <TradingViewTickerContent {...props} />
+        </LazyWidgetWrapper>
+    );
+};
 
 window.TradingViewTicker = TradingViewTicker;

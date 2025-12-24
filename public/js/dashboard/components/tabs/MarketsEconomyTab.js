@@ -1,7 +1,100 @@
 // Auto-converted from monolithic dashboard file
 // Component: MarketsEconomyTab
 
+const { useState, useEffect, useRef } = React;
+// Ensure LazyWidgetWrapper is available
+const LazyWidgetWrapper = window.LazyWidgetWrapper || (({ children }) => children);
 
+const MarketOverviewWidget = ({ isDarkMode }) => {
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+        if (!containerRef.current) return;
+        
+        containerRef.current.innerHTML = '';
+        const script = document.createElement('script');
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
+        script.async = true;
+        script.innerHTML = JSON.stringify({
+            "colorTheme": isDarkMode ? "dark" : "light",
+            "dateRange": "1D",
+            "showChart": true,
+            "locale": "fr",
+            "width": "100%",
+            "height": "100%",
+            "largeChartUrl": "",
+            "isTransparent": false,
+            "showSymbolLogo": true,
+            "showFloatingTooltip": true,
+            "tabs": [
+                {
+                    "title": "Indices",
+                    "symbols": [
+                        {"s": "FOREXCOM:SPXUSD", "d": "S&P 500"},
+                        {"s": "FOREXCOM:NSXUSD", "d": "US 100"},
+                        {"s": "FOREXCOM:DJI", "d": "Dow 30"},
+                        {"s": "INDEX:NKY", "d": "Nikkei 225"},
+                        {"s": "INDEX:DEU40", "d": "DAX Index"},
+                        {"s": "FOREXCOM:UKXGBP", "d": "UK 100"}
+                    ]
+                },
+                {
+                    "title": "Forex",
+                    "symbols": [
+                        {"s": "FX:EURUSD", "d": "EUR/USD"},
+                        {"s": "FX:GBPUSD", "d": "GBP/USD"},
+                        {"s": "FX:USDJPY", "d": "USD/JPY"},
+                        {"s": "FX:USDCAD", "d": "USD/CAD"}
+                    ]
+                },
+                {
+                    "title": "Crypto",
+                    "symbols": [
+                        {"s": "BINANCE:BTCUSDT", "d": "Bitcoin"},
+                        {"s": "BINANCE:ETHUSDT", "d": "Ethereum"},
+                        {"s": "BINANCE:BNBUSDT", "d": "BNB"},
+                        {"s": "BINANCE:SOLUSDT", "d": "Solana"}
+                    ]
+                }
+            ]
+        });
+        containerRef.current.appendChild(script);
+    }, [isDarkMode]);
+
+    return React.createElement('div', { ref: containerRef, style: { height: '100%', width: '100%' } });
+};
+
+const HeatmapWidget = ({ isDarkMode }) => {
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+        if (!containerRef.current) return;
+        
+        containerRef.current.innerHTML = '';
+        const script = document.createElement('script');
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+        script.async = true;
+        script.innerHTML = JSON.stringify({
+            "exchanges": [],
+            "dataSource": "SPX500",
+            "grouping": "sector",
+            "blockSize": "market_cap_basic",
+            "blockColor": "change",
+            "locale": "fr",
+            "symbolUrl": "",
+            "colorTheme": isDarkMode ? "dark" : "light",
+            "hasTopBar": true,
+            "isDataSetEnabled": true,
+            "isZoomEnabled": true,
+            "hasSymbolTooltip": true,
+            "width": "100%",
+            "height": "100%"
+        });
+        containerRef.current.appendChild(script);
+    }, [isDarkMode]);
+
+    return React.createElement('div', { ref: containerRef, style: { height: '100%', width: '100%' } });
+};
 
 const MarketsEconomyTab = ({
     isDarkMode = false,
@@ -21,134 +114,12 @@ const MarketsEconomyTab = ({
     const [selectedTheme, setSelectedTheme] = useState('all'); // Filtre thème
     const [localFilteredNews, setLocalFilteredNews] = useState([]);
 
-    // Refs pour les widgets TradingView
-    const marketOverviewRef = useRef(null);
-    const heatmapRef = useRef(null);
-    
-    // Track which widgets are loaded (lazy loading)
-    const [widgetsLoaded, setWidgetsLoaded] = useState({
-        marketOverview: false,
-        heatmap: false
-    });
-
     // Listes de filtres
     const sources = ['Bloomberg', 'Reuters', 'WSJ', 'CNBC', 'MarketWatch', 'La Presse', 'Les Affaires'];
     const markets = ['US', 'Canada', 'Europe', 'Asie'];
     const themes = ['Tech', 'Finance', 'Énergie', 'Santé', 'Crypto', 'IA'];
 
-    // ⚡ LAZY LOAD: Market Overview Widget (load first, after 500ms)
-    React.useEffect(() => {
-        if (!marketOverviewRef.current || widgetsLoaded.marketOverview) return;
-        
-        let mounted = true;
-        const timer = setTimeout(() => {
-            try {
-                if (!mounted || !marketOverviewRef.current) return;
-                
-                const script = document.createElement('script');
-                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
-                script.async = true;
-                script.onerror = () => console.warn('[TradingView] Market Overview failed to load');
-                script.innerHTML = JSON.stringify({
-                    "colorTheme": isDarkMode ? "dark" : "light",
-                    "dateRange": "1D",
-                    "showChart": true,
-                    "locale": "fr",
-                    "width": "100%",
-                    "height": "100%",
-                    "largeChartUrl": "",
-                    "isTransparent": false,
-                    "showSymbolLogo": true,
-                    "showFloatingTooltip": true,
-                    "tabs": [
-                        {
-                            "title": "Indices",
-                            "symbols": [
-                                {"s": "FOREXCOM:SPXUSD", "d": "S&P 500"},
-                                {"s": "FOREXCOM:NSXUSD", "d": "US 100"},
-                                {"s": "FOREXCOM:DJI", "d": "Dow 30"},
-                                {"s": "INDEX:NKY", "d": "Nikkei 225"},
-                                {"s": "INDEX:DEU40", "d": "DAX Index"},
-                                {"s": "FOREXCOM:UKXGBP", "d": "UK 100"}
-                            ]
-                        },
-                        {
-                            "title": "Forex",
-                            "symbols": [
-                                {"s": "FX:EURUSD", "d": "EUR/USD"},
-                                {"s": "FX:GBPUSD", "d": "GBP/USD"},
-                                {"s": "FX:USDJPY", "d": "USD/JPY"},
-                                {"s": "FX:USDCAD", "d": "USD/CAD"}
-                            ]
-                        },
-                        {
-                            "title": "Crypto",
-                            "symbols": [
-                                {"s": "BINANCE:BTCUSDT", "d": "Bitcoin"},
-                                {"s": "BINANCE:ETHUSDT", "d": "Ethereum"},
-                                {"s": "BINANCE:BNBUSDT", "d": "BNB"},
-                                {"s": "BINANCE:SOLUSDT", "d": "Solana"}
-                            ]
-                        }
-                    ]
-                });
-                marketOverviewRef.current.appendChild(script);
-                setWidgetsLoaded(prev => ({ ...prev, marketOverview: true }));
-            } catch (error) {
-                console.error('[TradingView] Market Overview error:', error);
-            }
-        }, 500);
-        
-        return () => {
-            mounted = false;
-            clearTimeout(timer);
-        };
-    }, [isDarkMode]);
-
-    // ⚡ LAZY LOAD: Heatmap Widget (load second, after 800ms)
-    React.useEffect(() => {
-        if (!heatmapRef.current || widgetsLoaded.heatmap) return;
-        
-        let mounted = true;
-        const timer = setTimeout(() => {
-            try {
-                if (!mounted || !heatmapRef.current) return;
-                
-                const script = document.createElement('script');
-                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
-                script.async = true;
-                script.onerror = () => console.warn('[TradingView] Heatmap failed to load');
-                script.innerHTML = JSON.stringify({
-                    "exchanges": [],
-                    "dataSource": "SPX500",
-                    "grouping": "sector",
-                    "blockSize": "market_cap_basic",
-                    "blockColor": "change",
-                    "locale": "fr",
-                    "symbolUrl": "",
-                    "colorTheme": isDarkMode ? "dark" : "light",
-                    "hasTopBar": true,
-                    "isDataSetEnabled": true,
-                    "isZoomEnabled": true,
-                    "hasSymbolTooltip": true,
-                    "width": "100%",
-                    "height": "100%"
-                });
-                heatmapRef.current.appendChild(script);
-                setWidgetsLoaded(prev => ({ ...prev, heatmap: true }));
-            } catch (error) {
-                console.error('[TradingView] Heatmap error:', error);
-            }
-        }, 800);
-        
-        return () => {
-            mounted = false;
-            clearTimeout(timer);
-        };
-    }, [isDarkMode]);
-
-    // NOTE: Screener widget moved to Titres section
-
+    // Filters logic kept intact
     // Fonction pour détecter la source avec variations de noms
     const matchesSource = (articleSource, selectedSource) => {
         if (!articleSource || !selectedSource) return false;
@@ -182,7 +153,7 @@ const MarketsEconomyTab = ({
     const [isApproximateMatch, setIsApproximateMatch] = useState(false);
 
     // Filtrer les nouvelles à l'affichage avec système de fallback intelligent
-    React.useEffect(() => {
+    useEffect(() => {
         let filtered = newsData;
         let hasExactMatches = true;
 
@@ -283,9 +254,6 @@ const MarketsEconomyTab = ({
 
     return (
         <div className="space-y-6">
-
-
-
             {/* Header */}
             <div className="space-y-4">
                 <div className="flex justify-between items-center">
@@ -319,7 +287,6 @@ const MarketsEconomyTab = ({
                         </button>
                     </div>
                 </div>
-
             </div>
 
             {lastUpdate && (
@@ -328,72 +295,58 @@ const MarketsEconomyTab = ({
                 </p>
             )}
 
-            {/* ===== WIDGETS TRADING VIEW VISUELS ===== */}
-            {/* Always show Overview - Screener moved to Titres section */}
-            {true && (
-                <div className="grid grid-cols-1 gap-6 mt-6">
-                    {/* Market Overview Widget */}
-                    <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
-                        isDarkMode
-                            ? 'bg-gray-800/50 border-blue-500/30'
-                            : 'bg-white border-blue-400/40'
-                    }`}>
-                        <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                            <h3 className={`text-lg font-bold transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>
-                                📊 Vue d'ensemble des Marchés (Temps Réel)
-                            </h3>
-                            <p className={`text-sm transition-colors duration-300 ${
-                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
-                                Indices majeurs, Forex, Crypto - Données en direct
-                            </p>
-                        </div>
-                        <div ref={marketOverviewRef} style={{height: '400px'}}>
-                            {/* Loading placeholder - hidden once widget loads */}
-                            {!widgetsLoaded.marketOverview && (
-                                <div className="flex items-center justify-center h-full">
-                                    <div className="text-center">
-                                        <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                                        <p className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>Chargement du widget...</p>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+            {/* ===== WIDGETS TRADING VIEW LAZY LOADED ===== */}
+            <div className="grid grid-cols-1 gap-6 mt-6">
+                {/* Market Overview Widget */}
+                <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                    isDarkMode
+                        ? 'bg-gray-800/50 border-blue-500/30'
+                        : 'bg-white border-blue-400/40'
+                }`}>
+                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                        <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>
+                            📊 Vue d'ensemble des Marchés (Temps Réel)
+                        </h3>
+                        <p className={`text-sm transition-colors duration-300 ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                            Indices majeurs, Forex, Crypto - Données en direct
+                        </p>
                     </div>
-
-                    {/* Stock Heatmap Widget */}
-                    <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
-                        isDarkMode
-                            ? 'bg-gray-800/50 border-green-500/30'
-                            : 'bg-white border-green-400/40'
-                    }`}>
-                        <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                            <h3 className={`text-lg font-bold transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>
-                                🔥 Heatmap Boursière
-                            </h3>
-                            <p className={`text-sm transition-colors duration-300 ${
-                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
-                                Visualisation des performances par secteur
-                            </p>
-                        </div>
-                        <div ref={heatmapRef} style={{height: '500px'}}>
-                            {!widgetsLoaded.heatmap && (
-                                <div className="flex items-center justify-center h-full">
-                                    <div className="text-center">
-                                        <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                                        <p className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>Chargement de la heatmap...</p>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                    <div style={{height: '400px'}}>
+                        <LazyWidgetWrapper height="400px" placeholderTitle="Chargement Vue d'ensemble...">
+                            <MarketOverviewWidget isDarkMode={isDarkMode} />
+                        </LazyWidgetWrapper>
                     </div>
                 </div>
-            )}
+
+                {/* Stock Heatmap Widget */}
+                <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                    isDarkMode
+                        ? 'bg-gray-800/50 border-green-500/30'
+                        : 'bg-white border-green-400/40'
+                }`}>
+                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                        <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>
+                            🔥 Heatmap Boursière
+                        </h3>
+                        <p className={`text-sm transition-colors duration-300 ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                            Visualisation des performances par secteur
+                        </p>
+                    </div>
+                    <div style={{height: '500px'}}>
+                        <LazyWidgetWrapper height="500px" placeholderTitle="Chargement Heatmap...">
+                            <HeatmapWidget isDarkMode={isDarkMode} />
+                        </LazyWidgetWrapper>
+                    </div>
+                </div>
+            </div>
 
             {/* Statistiques */}
             <div className={`p-4 rounded-xl transition-colors duration-300 ${
