@@ -66,6 +66,7 @@ const MarketOverviewWidget = ({ isDarkMode }) => {
 
         if (loader) {
             loader.releaseWidget(container);
+            // Force load immédiatement pour les widgets critiques
             loader.loadWidget(container, 'market-overview', config, false);
         } else {
             container.innerHTML = '';
@@ -119,6 +120,7 @@ const HeatmapWidget = ({ isDarkMode }) => {
 
         if (loader) {
             loader.releaseWidget(container);
+            // Force load immédiatement pour les widgets critiques
             loader.loadWidget(container, 'stock-heatmap', config, false);
         } else {
             container.innerHTML = '';
@@ -364,7 +366,7 @@ const MarketsEconomyTab = ({
                     </div>
                     <div style={{height: '400px'}}>
                         {React.createElement(window.LazyWidgetWrapper || (({ children }) => children), 
-                            { height: "400px", placeholderTitle: "Chargement Vue d'ensemble..." },
+                            { height: "400px", placeholderTitle: "Chargement Vue d'ensemble...", forceLoad: true },
                             React.createElement(MarketOverviewWidget, { isDarkMode: isDarkMode })
                         )}
                     </div>
@@ -390,7 +392,7 @@ const MarketsEconomyTab = ({
                     </div>
                     <div style={{height: '500px'}}>
                         {React.createElement(window.LazyWidgetWrapper || (({ children }) => children), 
-                            { height: "500px", placeholderTitle: "Chargement Heatmap..." },
+                            { height: "500px", placeholderTitle: "Chargement Heatmap...", forceLoad: true },
                             React.createElement(HeatmapWidget, { isDarkMode: isDarkMode })
                         )}
                     </div>

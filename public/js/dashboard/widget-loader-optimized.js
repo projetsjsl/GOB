@@ -78,8 +78,23 @@ class OptimizedWidgetLoader {
             
             observer.observe(container);
         } else {
-            // Chargement immédiat mais avec délai pour stabilité
-            await new Promise(resolve => setTimeout(resolve, 50));
+            // Chargement immédiat - vérifier d'abord si le container est dans le DOM et visible
+            if (!container.parentNode) {
+                console.warn(`⚠️ Container ${widgetType} pas dans le DOM, attente...`);
+                await new Promise(resolve => {
+                    const checkInterval = setInterval(() => {
+                        if (container.parentNode) {
+                            clearInterval(checkInterval);
+                            resolve();
+                        }
+                    }, 50);
+                    setTimeout(() => {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }, 2000);
+                });
+            }
+            // Pas de délai pour les widgets critiques - charger immédiatement
             await this._loadWidgetNow(container, widgetType, config, widgetId);
         }
     }

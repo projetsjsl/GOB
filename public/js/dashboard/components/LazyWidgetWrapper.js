@@ -1,10 +1,39 @@
-const LazyWidgetWrapper = ({ children, height = '300px', threshold = 0.1, placeholderTitle = 'Chargement...' }) => {
+const LazyWidgetWrapper = ({ children, height = '300px', threshold = 0.1, placeholderTitle = 'Chargement...', forceLoad = false }) => {
     const [isVisible, setIsVisible] = React.useState(false);
     const containerRef = React.useRef(null);
     const isMountedRef = React.useRef(true);
 
     React.useEffect(() => {
         isMountedRef.current = true;
+
+        // Si forceLoad est true, charger immédiatement
+        if (forceLoad) {
+            setIsVisible(true);
+            return;
+        }
+
+        // Vérifier si le container est déjà visible au montage
+        const checkInitialVisibility = () => {
+            if (!containerRef.current) return false;
+            const rect = containerRef.current.getBoundingClientRect();
+            const isInViewport = (
+                rect.top < window.innerHeight + 200 && // rootMargin de 200px
+                rect.bottom > -200 &&
+                rect.left < window.innerWidth + 200 &&
+                rect.right > -200
+            );
+            return isInViewport;
+        };
+
+        // Si déjà visible, charger immédiatement
+        if (checkInitialVisibility()) {
+            setTimeout(() => {
+                if (isMountedRef.current && containerRef.current) {
+                    setIsVisible(true);
+                }
+            }, 50);
+            return;
+        }
 
         const observer = new IntersectionObserver(([entry]) => {
             if (entry.isIntersecting) {
@@ -25,11 +54,24 @@ const LazyWidgetWrapper = ({ children, height = '300px', threshold = 0.1, placeh
             observer.observe(containerRef.current);
         }
 
+        // Fallback: Si après 2 secondes le container n'est toujours pas visible mais existe, charger quand même
+        const fallbackTimeout = setTimeout(() => {
+            if (!isVisible && containerRef.current && isMountedRef.current) {
+                const rect = containerRef.current.getBoundingClientRect();
+                // Si le container a une taille, charger même s'il n'est pas dans le viewport
+                if (rect.width > 0 && rect.height > 0) {
+                    setIsVisible(true);
+                    observer.disconnect();
+                }
+            }
+        }, 2000);
+
         return () => {
             isMountedRef.current = false;
+            clearTimeout(fallbackTimeout);
             observer.disconnect();
         };
-    }, [threshold]);
+    }, [threshold, forceLoad]);
 
     return React.createElement('div', { 
         ref: containerRef, 
