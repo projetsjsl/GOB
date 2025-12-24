@@ -2,8 +2,9 @@
 // Component: MarketsEconomyTab
 
 const { useState, useEffect, useRef } = React;
-// Ensure LazyWidgetWrapper is available
-const LazyWidgetWrapper = window.LazyWidgetWrapper || (({ children }) => children);
+// Use LazyWidgetWrapper from window (loaded globally, don't redeclare with const)
+// Create a function that returns the component to avoid redeclaration conflicts
+const getLazyWrapper = () => (window.LazyWidgetWrapper || (({ children }) => children));
 // Ensure LucideIcon is available with fallback
 const LucideIcon = window.LucideIcon ||
     (typeof window !== 'undefined' ? window.DASHBOARD_UTILS?.LucideIcon : undefined) ||
@@ -362,9 +363,10 @@ const MarketsEconomyTab = ({
                         </p>
                     </div>
                     <div style={{height: '400px'}}>
-                        <LazyWidgetWrapper height="400px" placeholderTitle="Chargement Vue d'ensemble...">
-                            <MarketOverviewWidget isDarkMode={isDarkMode} />
-                        </LazyWidgetWrapper>
+                        {React.createElement(window.LazyWidgetWrapper || (({ children }) => children), 
+                            { height: "400px", placeholderTitle: "Chargement Vue d'ensemble..." },
+                            React.createElement(MarketOverviewWidget, { isDarkMode: isDarkMode })
+                        )}
                     </div>
                 </div>
 
@@ -387,9 +389,10 @@ const MarketsEconomyTab = ({
                         </p>
                     </div>
                     <div style={{height: '500px'}}>
-                        <LazyWidgetWrapper height="500px" placeholderTitle="Chargement Heatmap...">
-                            <HeatmapWidget isDarkMode={isDarkMode} />
-                        </LazyWidgetWrapper>
+                        {React.createElement(window.LazyWidgetWrapper || (({ children }) => children), 
+                            { height: "500px", placeholderTitle: "Chargement Heatmap..." },
+                            React.createElement(HeatmapWidget, { isDarkMode: isDarkMode })
+                        )}
                     </div>
                 </div>
             </div>

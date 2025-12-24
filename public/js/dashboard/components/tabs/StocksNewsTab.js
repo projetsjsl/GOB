@@ -1,5 +1,7 @@
 const { useState, useEffect, useRef, useCallback } = React;
-const LazyWidgetWrapper = window.LazyWidgetWrapper || (({ children }) => children);
+// Use LazyWidgetWrapper from window without redeclaring (avoid const conflict)
+// Create local reference with different name to avoid Babel transpilation conflicts
+const LazyWrapper = window.LazyWidgetWrapper || (({ children }) => children);
 
 const MarketOverviewWidget = ({ isDarkMode }) => {
     const containerRef = useRef(null);
@@ -334,9 +336,9 @@ const StocksNewsTab = (props) => {
                         </p>
                     </div>
                     <div style={{height: '800px'}}>
-                         <LazyWidgetWrapper height="800px" placeholderTitle="Chargement Vue d'ensemble...">
+                         <LazyWrapper height="800px" placeholderTitle="Chargement Vue d'ensemble...">
                             <MarketOverviewWidget isDarkMode={isDarkMode} />
-                        </LazyWidgetWrapper>
+                        </LazyWrapper>
                     </div>
                 </div>
 
@@ -355,9 +357,9 @@ const StocksNewsTab = (props) => {
                             </h3>
                         </div>
                         <div style={{height: '700px'}}>
-                           <LazyWidgetWrapper height="700px" placeholderTitle="Chargement Screener...">
+                           <LazyWrapper height="700px" placeholderTitle="Chargement Screener...">
                                 <ScreenerWidget isDarkMode={isDarkMode} />
-                            </LazyWidgetWrapper>
+                            </LazyWrapper>
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,5 @@
-const LazyWidgetWrapper = window.LazyWidgetWrapper || (({ children }) => children);
+// Use LazyWidgetWrapper from window without redeclaring (avoid const conflict)
+const LazyWrapper = window.LazyWidgetWrapper || (({ children }) => children);
 
 const TradingViewTickerContent = React.memo(({
     isDarkMode,
@@ -201,9 +202,9 @@ const TradingViewTickerContent = React.memo(({
 
 const TradingViewTicker = (props) => {
     return (
-        <LazyWidgetWrapper height="74px" placeholderTitle="Chargement Ticker...">
+        <LazyWrapper height="74px" placeholderTitle="Chargement Ticker...">
             <TradingViewTickerContent {...props} />
-        </LazyWidgetWrapper>
+        </LazyWrapper>
     );
 };
 
