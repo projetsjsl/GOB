@@ -26,16 +26,26 @@ const MarketsEconomyTab = ({
     const marketOverviewRef = useRef(null);
     const heatmapRef = useRef(null);
     const screenerRef = useRef(null);
+    
+    // Track which widgets are loaded (lazy loading)
+    const [widgetsLoaded, setWidgetsLoaded] = useState({
+        marketOverview: false,
+        heatmap: false,
+        screener: false
+    });
 
     // Listes de filtres
     const sources = ['Bloomberg', 'Reuters', 'WSJ', 'CNBC', 'MarketWatch', 'La Presse', 'Les Affaires'];
     const markets = ['US', 'Canada', 'Europe', 'Asie'];
     const themes = ['Tech', 'Finance', 'Énergie', 'Santé', 'Crypto', 'IA'];
 
-    // Charger les widgets TradingView
+    // ⚡ LAZY LOAD: Market Overview Widget (load first, after 300ms)
     React.useEffect(() => {
-        // Market Overview Widget
-        if (marketOverviewRef.current) {
+        if (!marketOverviewRef.current || widgetsLoaded.marketOverview) return;
+        
+        const timer = setTimeout(() => {
+            if (!marketOverviewRef.current) return;
+            
             const script = document.createElement('script');
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
             script.async = true;
@@ -83,10 +93,19 @@ const MarketsEconomyTab = ({
                 ]
             });
             marketOverviewRef.current.appendChild(script);
-        }
+            setWidgetsLoaded(prev => ({ ...prev, marketOverview: true }));
+        }, 300); // Load after 300ms to let React render first
+        
+        return () => clearTimeout(timer);
+    }, [isDarkMode]);
 
-        // Heatmap Widget
-        if (heatmapRef.current) {
+    // ⚡ LAZY LOAD: Heatmap Widget (load second, after 800ms)
+    React.useEffect(() => {
+        if (!heatmapRef.current || widgetsLoaded.heatmap) return;
+        
+        const timer = setTimeout(() => {
+            if (!heatmapRef.current) return;
+            
             const script = document.createElement('script');
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
             script.async = true;
@@ -107,10 +126,20 @@ const MarketsEconomyTab = ({
                 "height": "100%"
             });
             heatmapRef.current.appendChild(script);
-        }
+            setWidgetsLoaded(prev => ({ ...prev, heatmap: true }));
+        }, 800); // Load after 800ms (give time for Market Overview)
+        
+        return () => clearTimeout(timer);
+    }, [isDarkMode]);
 
-        // Screener Widget
-        if (screenerRef.current) {
+    // ⚡ LAZY LOAD: Screener Widget (ONLY load when user switches to screener view)
+    React.useEffect(() => {
+        if (activeView !== 'screener' || !screenerRef.current || widgetsLoaded.screener) return;
+        
+        // Small delay to let view transition complete
+        const timer = setTimeout(() => {
+            if (!screenerRef.current) return;
+            
             const script = document.createElement('script');
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
             script.async = true;
@@ -126,8 +155,11 @@ const MarketsEconomyTab = ({
                 "isTransparent": false
             });
             screenerRef.current.appendChild(script);
-        }
-    }, [isDarkMode]);
+            setWidgetsLoaded(prev => ({ ...prev, screener: true }));
+        }, 200);
+        
+        return () => clearTimeout(timer);
+    }, [activeView, isDarkMode]);
 
     // Fonction pour détecter la source avec variations de noms
     const matchesSource = (articleSource, selectedSource) => {
@@ -360,7 +392,17 @@ const MarketsEconomyTab = ({
                                 Indices majeurs, Forex, Crypto - Données en direct
                             </p>
                         </div>
-                        <div ref={marketOverviewRef} style={{height: '400px'}}></div>
+                        <div ref={marketOverviewRef} style={{height: '400px'}}>
+                            {/* Loading placeholder - hidden once widget loads */}
+                            {!widgetsLoaded.marketOverview && (
+                                <div className="flex items-center justify-center h-full">
+                                    <div className="text-center">
+                                        <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                                        <p className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>Chargement du widget...</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Stock Heatmap Widget */}
@@ -381,7 +423,16 @@ const MarketsEconomyTab = ({
                                 Visualisation des performances par secteur
                             </p>
                         </div>
-                        <div ref={heatmapRef} style={{height: '500px'}}></div>
+                        <div ref={heatmapRef} style={{height: '500px'}}>
+                            {!widgetsLoaded.heatmap && (
+                                <div className="flex items-center justify-center h-full">
+                                    <div className="text-center">
+                                        <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                                        <p className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>Chargement de la heatmap...</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             ) : (
@@ -404,7 +455,16 @@ const MarketsEconomyTab = ({
                                 Actions les plus performantes et en baisse
                             </p>
                         </div>
-                        <div ref={screenerRef} style={{height: '700px'}}></div>
+                        <div ref={screenerRef} style={{height: '700px'}}>
+                            {!widgetsLoaded.screener && (
+                                <div className="flex items-center justify-center h-full">
+                                    <div className="text-center">
+                                        <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                                        <p className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>Chargement du screener...</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
