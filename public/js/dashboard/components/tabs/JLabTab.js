@@ -2,7 +2,23 @@
 // Component: JLabTab
 
 const { useState, useEffect } = React;
-const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, AreaChart, Area } = Recharts;
+
+// Safe Recharts destructuring with fallback
+const RechartsLib = (typeof Recharts !== 'undefined') ? Recharts : (typeof window !== 'undefined' ? window.Recharts : null);
+const {
+    LineChart = () => null,
+    Line = () => null,
+    XAxis = () => null,
+    YAxis = () => null,
+    CartesianGrid = () => null,
+    Tooltip = () => null,
+    ResponsiveContainer = ({ children }) => children,
+    BarChart = () => null,
+    Bar = () => null,
+    Legend = () => null,
+    AreaChart = () => null,
+    Area = () => null
+} = RechartsLib || {};
 
 
 
@@ -1395,11 +1411,16 @@ const JLabTab = () => {
     // Composant de graphique simple (alternative à Recharts)
     const SimpleChart = ({ data, type = 'line', width = 300, height = 200 }) => {
         const chartRef = useRef(null);
+        const chartInstanceRef = useRef(null);
 
         useEffect(() => {
             if (chartRef.current && typeof Chart !== 'undefined') {
+                // Destroy previous chart instance to prevent memory leak
+                if (chartInstanceRef.current) {
+                    chartInstanceRef.current.destroy();
+                }
                 const ctx = chartRef.current.getContext('2d');
-                new Chart(ctx, {
+                chartInstanceRef.current = new Chart(ctx, {
                     type: type,
                     data: data,
                     options: {
@@ -1413,6 +1434,12 @@ const JLabTab = () => {
                     }
                 });
             }
+            return () => {
+                if (chartInstanceRef.current) {
+                    chartInstanceRef.current.destroy();
+                    chartInstanceRef.current = null;
+                }
+            };
         }, [data, type]);
 
         return (
@@ -1422,8 +1449,10 @@ const JLabTab = () => {
         );
     };
 
-    // Référence locale pour utiliser le composant global
-    const LucideIcon = window.LucideIcon;
+    // Référence locale pour utiliser le composant global avec fallback
+    const LucideIcon = window.LucideIcon ||
+        (typeof window !== 'undefined' ? window.DASHBOARD_UTILS?.LucideIcon : undefined) ||
+        (({ name, className = '' }) => <span className={`icon-${name} ${className}`}></span>);
 
     return (
         <div className={`min-h-screen p-2 transition-colors duration-300 ${isDarkMode ? 'bg-neutral-950 text-gray-100' : 'bg-gray-50 text-gray-900'
