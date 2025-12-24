@@ -43200,34 +43200,44 @@ async function loadProfilesBatchFromSupabase(tickers) {
     (ticker2) => loadCurrentSnapshotFromSupabase(ticker2.toUpperCase())
   );
   const snapshots = await Promise.allSettled(snapshotPromises);
-  const pricePromises = tickers.map(
-    (ticker2) => fetchMarketData(ticker2.toUpperCase())
-  );
-  const prices = await Promise.allSettled(pricePromises);
+  let priceMap = /* @__PURE__ */ new Map();
+  try {
+    const batchResult = await fetchMarketDataBatch(tickers.map((t) => t.toUpperCase()));
+    if (batchResult.success && batchResult.data) {
+      batchResult.data.forEach((md) => {
+        if (md.currentPrice > 0) {
+          priceMap.set(md.ticker.toUpperCase(), md.currentPrice);
+        }
+      });
+    }
+  } catch (e) {
+    console.warn("⚠️ fetchMarketDataBatch failed, using snapshot prices:", e);
+  }
   tickers.forEach((ticker2, index2) => {
-    var _a3, _b2, _c;
+    var _a3;
     const upperTicker = ticker2.toUpperCase();
     const snapshotResult = snapshots[index2];
-    const priceResult = prices[index2];
     if (snapshotResult.status === "fulfilled" && snapshotResult.value) {
       const snapshot = snapshotResult.value;
-      const marketData = priceResult.status === "fulfilled" ? priceResult.value : null;
-      const currentPrice = ((marketData == null ? void 0 : marketData.currentPrice) || 0) > 0 ? marketData.currentPrice : ((_a3 = snapshot.assumptions) == null ? void 0 : _a3.currentPrice) || 0;
+      const batchPrice = priceMap.get(upperTicker) || 0;
+      const snapshotPrice = ((_a3 = snapshot.assumptions) == null ? void 0 : _a3.currentPrice) || 0;
+      const currentPrice = batchPrice > 0 ? batchPrice : snapshotPrice;
       results[upperTicker] = {
         data: snapshot.annual_data || [],
         info: snapshot.company_info || {},
         currentPrice,
         assumptions: sanitizeAssumptionsSync({
           ...snapshot.assumptions,
-          currentPrice: currentPrice > 0 ? currentPrice : ((_b2 = snapshot.assumptions) == null ? void 0 : _b2.currentPrice) || 0
+          currentPrice: currentPrice > 0 ? currentPrice : snapshotPrice
         }),
         source: "supabase"
       };
     } else {
+      const batchPrice = priceMap.get(upperTicker) || 0;
       results[upperTicker] = {
         data: [],
         info: {},
-        currentPrice: priceResult.status === "fulfilled" ? ((_c = priceResult.value) == null ? void 0 : _c.currentPrice) || 0 : 0,
+        currentPrice: batchPrice,
         source: "error"
       };
     }

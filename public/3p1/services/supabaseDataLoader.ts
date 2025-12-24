@@ -6,7 +6,7 @@
  */
 
 import { AnnualData, CompanyInfo, Assumptions, AnalysisProfile } from '../types';
-import { fetchMarketData } from './marketDataCache';
+import { fetchMarketData, fetchMarketDataBatch } from './marketDataCache';
 import { sanitizeAssumptionsSync } from '../utils/validation';
 
 export interface SupabaseSnapshotData {
@@ -161,24 +161,32 @@ export async function loadProfilesBatchFromSupabase(
 
   const snapshots = await Promise.allSettled(snapshotPromises);
 
-  // Charger les prix en batch
-  const pricePromises = tickers.map(ticker => 
-    fetchMarketData(ticker.toUpperCase())
-  );
-  const prices = await Promise.allSettled(pricePromises);
+  // ✅ OPTIMISATION: Charger tous les prix en UN SEUL appel batch au lieu de 50+ appels individuels
+  let priceMap: Map<string, number> = new Map();
+  try {
+    const batchResult = await fetchMarketDataBatch(tickers.map(t => t.toUpperCase()));
+    if (batchResult.success && batchResult.data) {
+      batchResult.data.forEach(md => {
+        if (md.currentPrice > 0) {
+          priceMap.set(md.ticker.toUpperCase(), md.currentPrice);
+        }
+      });
+    }
+  } catch (e) {
+    console.warn('⚠️ fetchMarketDataBatch failed, using snapshot prices:', e);
+  }
 
   // Combiner les résultats
   tickers.forEach((ticker, index) => {
     const upperTicker = ticker.toUpperCase();
     const snapshotResult = snapshots[index];
-    const priceResult = prices[index];
 
     if (snapshotResult.status === 'fulfilled' && snapshotResult.value) {
       const snapshot = snapshotResult.value;
-      const marketData = priceResult.status === 'fulfilled' ? priceResult.value : null;
-      const currentPrice = (marketData?.currentPrice || 0) > 0
-        ? marketData.currentPrice
-        : (snapshot.assumptions?.currentPrice || 0);
+      // Use batch price if available, otherwise fallback to snapshot price
+      const batchPrice = priceMap.get(upperTicker) || 0;
+      const snapshotPrice = snapshot.assumptions?.currentPrice || 0;
+      const currentPrice = batchPrice > 0 ? batchPrice : snapshotPrice;
 
       // ✅ SANITISER les assumptions pour éviter les valeurs aberrantes
       results[upperTicker] = {
@@ -187,16 +195,17 @@ export async function loadProfilesBatchFromSupabase(
         currentPrice,
         assumptions: sanitizeAssumptionsSync({
           ...snapshot.assumptions,
-          currentPrice: currentPrice > 0 ? currentPrice : snapshot.assumptions?.currentPrice || 0
+          currentPrice: currentPrice > 0 ? currentPrice : snapshotPrice
         }),
         source: 'supabase' as const
       };
     } else {
       // Pas de snapshot - marquer pour chargement FMP ultérieur
+      const batchPrice = priceMap.get(upperTicker) || 0;
       results[upperTicker] = {
         data: [],
         info: {},
-        currentPrice: priceResult.status === 'fulfilled' ? (priceResult.value?.currentPrice || 0) : 0,
+        currentPrice: batchPrice,
         source: 'error' as const
       };
     }
@@ -204,4 +213,5 @@ export async function loadProfilesBatchFromSupabase(
 
   return results;
 }
+
 
