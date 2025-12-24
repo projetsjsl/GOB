@@ -13,7 +13,8 @@
     "typecheck": "tsc --noEmit --skipLibCheck",
     "qa": "npm run lint && npm run build",
     "verify-3p1": "node scripts/verify-3p1-build.js",
-    "test-3p1": "cd public/3p1 && npm run build && cd ../.. && node scripts/verify-3p1-build.js"
+    "test-3p1": "cd public/3p1 && npm run build && cd ../.. && node scripts/verify-3p1-build.js",
+    "build:dashboard": "esbuild public/js/dashboard/app-inline.js --bundle --outfile=public/js/dashboard/app-inline.compiled.js --format=iife --loader:.js=jsx --target=es2020 --minify"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.17.0",
@@ -45,6 +46,7 @@
     "@typescript-eslint/eslint-plugin": "^8.20.0",
     "@typescript-eslint/parser": "^8.20.0",
     "@vitejs/plugin-react": "^5.1.1",
+    "esbuild": "^0.27.2",
     "eslint": "^8.57.0",
     "pg": "^8.16.3",
     "typescript": "^5.9.3",
