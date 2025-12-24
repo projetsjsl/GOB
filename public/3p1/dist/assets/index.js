@@ -56800,48 +56800,17 @@ Vérifiez votre connexion et réessayez.`,
                     let result2;
                     if (supabaseResult && supabaseResult.source === "supabase" && supabaseResult.data && supabaseResult.data.length > 0) {
                       result2 = supabaseResult;
-                      console.log(`✅ ${symbol}: Chargé depuis Supabase (snapshot existant)`);
                     } else {
-                      console.log(`⚠️ ${symbol}: Pas de snapshot Supabase → Chargement FMP`);
-                      const fmpResult = await fetchCompanyData(symbol);
-                      if (!fmpResult.data || fmpResult.data.length === 0) {
-                        markAsInvalid("Aucune donnée FMP disponible");
-                        return;
-                      }
-                      result2 = {
-                        data: fmpResult.data,
-                        info: fmpResult.info,
-                        currentPrice: fmpResult.currentPrice,
-                        source: "fmp"
-                      };
-                      try {
-                        const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-                          fmpResult.data,
-                          fmpResult.currentPrice,
-                          INITIAL_ASSUMPTIONS
-                        );
-                        await saveSnapshot(
-                          symbol,
-                          fmpResult.data,
-                          {
-                            ...INITIAL_ASSUMPTIONS,
-                            ...autoFilledAssumptions
-                          },
-                          {
-                            symbol,
-                            name: fmpResult.info.name || symbol,
-                            ...fmpResult.info
-                          },
-                          `Auto-sauvegarde après chargement initial - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
-                          true,
-                          // is_current
-                          true
-                          // auto_fetched
-                        );
-                      } catch (saveError) {
-                        console.warn(`⚠️ ${symbol}: Erreur sauvegarde snapshot (non bloquant):`, saveError);
-                      }
+                      markAsInvalid("Pas de snapshot Supabase - sync requise");
+                      return;
                     }
+                    result2 = {
+                      data: supabaseResult.data,
+                      info: supabaseResult.info || {},
+                      currentPrice: supabaseResult.currentPrice || 0,
+                      assumptions: supabaseResult.assumptions,
+                      source: "supabase"
+                    };
                     if (!result2.data || result2.data.length === 0) {
                       markAsInvalid("Données vides après chargement");
                       return;

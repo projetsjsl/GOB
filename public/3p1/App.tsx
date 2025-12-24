@@ -1080,57 +1080,28 @@ export default function App() {
                                     try {
                                         let result: any;
                                         
-                                        // ✅ LOGIQUE SIMPLIFIÉE : Utiliser Supabase si disponible, sinon FMP
+                                        // ✅ LOGIQUE SIMPLIFIÉE : Utiliser Supabase si disponible
+                                        // ❌ NE PAS appeler FMP ici - c'est ce qui causait les 429 et la lenteur
                                         if (supabaseResult && supabaseResult.source === 'supabase' && 
                                             supabaseResult.data && supabaseResult.data.length > 0) {
-                                            // ✅ CAS 1 : Snapshot Supabase existe → Utiliser directement (PAS de FMP)
+                                            // ✅ CAS 1 : Snapshot Supabase existe → Utiliser directement
                                             result = supabaseResult;
-                                            console.log(`✅ ${symbol}: Chargé depuis Supabase (snapshot existant)`);
+                                            // Log silencieux pour ne pas spammer la console
                                         } else {
-                                            // ✅ CAS 2 : Pas de snapshot → Charger depuis FMP (première fois)
-                                            console.log(`⚠️ ${symbol}: Pas de snapshot Supabase → Chargement FMP`);
-                                            const fmpResult = await fetchCompanyData(symbol);
-                                            
-                                            if (!fmpResult.data || fmpResult.data.length === 0) {
-                                                markAsInvalid('Aucune donnée FMP disponible');
-                                                return;
-                                            }
-                                            
-                                            result = {
-                                                data: fmpResult.data,
-                                                info: fmpResult.info,
-                                                currentPrice: fmpResult.currentPrice,
-                                                source: 'fmp' as const
-                                            };
-                                            
-                                            // ✅ IMPORTANT : Sauvegarder dans Supabase après chargement FMP
-                                            try {
-                                                const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-                                                    fmpResult.data,
-                                                    fmpResult.currentPrice,
-                                                    INITIAL_ASSUMPTIONS
-                                                );
-                                                
-                                                await saveSnapshot(
-                                                    symbol,
-                                                    fmpResult.data,
-                                                    {
-                                                        ...INITIAL_ASSUMPTIONS,
-                                                        ...autoFilledAssumptions
-                                                    },
-                                                    {
-                                                        symbol: symbol,
-                                                        name: fmpResult.info.name || symbol,
-                                                        ...fmpResult.info
-                                                    } as CompanyInfo,
-                                                    `Auto-sauvegarde après chargement initial - ${new Date().toLocaleString()}`,
-                                                    true,  // is_current
-                                                    true   // auto_fetched
-                                                );
-                                            } catch (saveError) {
-                                                console.warn(`⚠️ ${symbol}: Erreur sauvegarde snapshot (non bloquant):`, saveError);
-                                            }
+                                            // ✅ CAS 2 : Pas de snapshot → Marquer comme N/A (sync manuelle requise)
+                                            // NE PAS appeler FMP ici - l'utilisateur peut sync manuellement
+                                            markAsInvalid('Pas de snapshot Supabase - sync requise');
+                                            return;
                                         }
+                                        
+                                        // ✅ Utiliser directement les données Supabase
+                                        result = {
+                                            data: supabaseResult.data,
+                                            info: supabaseResult.info || {},
+                                            currentPrice: supabaseResult.currentPrice || 0,
+                                            assumptions: supabaseResult.assumptions,
+                                            source: 'supabase' as const
+                                        };
                                         
                                         // VALIDATION : Vérifier que les données sont valides
                                         if (!result.data || result.data.length === 0) {
