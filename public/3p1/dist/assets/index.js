@@ -56757,14 +56757,16 @@ Vérifiez votre connexion et réessayez.`,
           setIsLoadingTickers(false);
           console.log(`✅ ${validTickers.length} profils squelettes créés - affichage immédiat`);
           const loadFMPDataInBackground = async () => {
-            const batchSize = 5;
-            const delayBetweenBatches = 1e3;
+            const batchSize = 50;
+            const delayBetweenBatches = 200;
+            console.log(`🚀 Démarrage du chargement optimisé pour ${validTickers.length} tickers (Batch: ${batchSize})`);
             for (let i = 0; i < validTickers.length; i += batchSize) {
               const batch = validTickers.slice(i, i + batchSize);
               if (i > 0) {
                 await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
               }
               const tickerSymbols = batch.map((t) => t.ticker.toUpperCase());
+              console.log(`📥 Chargement batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(validTickers.length / batchSize)}: ${tickerSymbols.length} tickers...`);
               const supabaseResults = await loadProfilesBatchFromSupabase(tickerSymbols);
               await Promise.allSettled(
                 batch.map(async (supabaseTicker) => {
@@ -57510,7 +57512,7 @@ Vérifiez les logs de la console pour plus de détails.`;
     console.log(`📜 Loaded snapshot v${snapshot.version} from ${snapshot.snapshot_date}`);
   };
   const handleRevertToCurrent = async () => {
-    const result = await listSnapshots(activeId, 50);
+    const result = await listSnapshots(activeId, 100);
     if (result.success && result.snapshots && result.snapshots.length > 0) {
       const currentSnap = result.snapshots.find((s2) => s2.is_current);
       if (currentSnap) {
@@ -57530,7 +57532,7 @@ Vérifiez les logs de la console pour plus de détails.`;
   };
   const handleRestoreFromSnapshot = async () => {
     try {
-      const result = await listSnapshots(activeId, 50);
+      const result = await listSnapshots(activeId, 100);
       if (result.success && result.snapshots && result.snapshots.length > 0) {
         const currentSnap = result.snapshots.find((s2) => s2.is_current) || result.snapshots[0];
         if (currentSnap) {

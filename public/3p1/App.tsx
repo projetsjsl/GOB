@@ -1027,19 +1027,24 @@ export default function App() {
                     // ✅ ÉTAPE 2 : Charger les données depuis Supabase d'abord, puis FMP si nécessaire
                     // Utiliser requestIdleCallback pour ne pas bloquer l'UI
                     const loadFMPDataInBackground = async () => {
-                        const batchSize = 5; // Reduced from 50 to 5 to prevent rate limiting (429)
-                        const delayBetweenBatches = 1000; // Increased delay to 1s
+                        // ✅ OPTIMISATION MASSIVE : Supabase est rapide, on peut charger de gros batchs
+                        const batchSize = 50; // Increased to 50 for faster loading (Supabase handles this easily)
+                        const delayBetweenBatches = 200; // Reduced delay to 200ms
+
+                        console.log(`🚀 Démarrage du chargement optimisé pour ${validTickers.length} tickers (Batch: ${batchSize})`);
 
                         for (let i = 0; i < validTickers.length; i += batchSize) {
                             const batch = validTickers.slice(i, i + batchSize);
                             
-                            // Petit délai entre batches pour ne pas surcharger
+                            // Petit délai entre batches pour ne pas surcharger le navigateur (pas le serveur)
                             if (i > 0) {
                                 await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
                             }
 
-                            // ✅ OPTIMISATION : Charger depuis Supabase en batch (beaucoup plus rapide)
+                            // ✅ OPTIMISATION : Charger depuis Supabase en batch
                             const tickerSymbols = batch.map(t => t.ticker.toUpperCase());
+                            console.log(`📥 Chargement batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(validTickers.length/batchSize)}: ${tickerSymbols.length} tickers...`);
+                            
                             const supabaseResults = await loadProfilesBatchFromSupabase(tickerSymbols);
 
                             // Traiter chaque résultat
@@ -1977,7 +1982,7 @@ export default function App() {
     };
 
     const handleRevertToCurrent = async () => {
-        const result = await listSnapshots(activeId, 50);
+        const result = await listSnapshots(activeId, 100);
 
         if (result.success && result.snapshots && result.snapshots.length > 0) {
             const currentSnap = result.snapshots.find(s => s.is_current);
@@ -2013,7 +2018,7 @@ export default function App() {
 
     const handleRestoreFromSnapshot = async () => {
         try {
-            const result = await listSnapshots(activeId, 50);
+            const result = await listSnapshots(activeId, 100);
 
             if (result.success && result.snapshots && result.snapshots.length > 0) {
                 // Trouver le snapshot actuel (is_current) ou le plus récent
