@@ -115,6 +115,9 @@
     },
     "api/cron/fmp-batch-sync.js": {
       "maxDuration": 300
+    },
+    "api/3p1-sync-na.js": {
+      "maxDuration": 120
     }
   },
   "headers": [
