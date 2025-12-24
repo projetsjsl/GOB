@@ -43132,6 +43132,8 @@ async function loadCurrentSnapshotFromSupabase(ticker2) {
       snapshots = result.snapshots;
     } else if (result.ticker && result.snapshots) {
       snapshots = result.snapshots;
+    } else if (result.data && Array.isArray(result.data)) {
+      snapshots = result.data;
     }
     if (snapshots.length === 0) {
       return null;
@@ -43148,6 +43150,49 @@ async function loadCurrentSnapshotFromSupabase(ticker2) {
   } catch (error) {
     console.error(`❌ Erreur chargement snapshot Supabase pour ${ticker2}:`, error);
     return null;
+  }
+}
+let allSnapshotsCache = null;
+let allSnapshotsCacheTimestamp = 0;
+const CACHE_TTL_MS = 5 * 60 * 1e3;
+async function loadAllCurrentSnapshotsFromSupabase() {
+  const now = Date.now();
+  if (allSnapshotsCache && now - allSnapshotsCacheTimestamp < CACHE_TTL_MS) {
+    console.log(`📦 Using cached snapshots (${allSnapshotsCache.size} tickers, age: ${Math.round((now - allSnapshotsCacheTimestamp) / 1e3)}s)`);
+    return allSnapshotsCache;
+  }
+  try {
+    console.log("🚀 Loading ALL current snapshots from Supabase in single API call...");
+    const startTime = Date.now();
+    const response = await fetch("/api/finance-snapshots?all=true&current=true&limit=2000");
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+    const result = await response.json();
+    const snapshotMap = /* @__PURE__ */ new Map();
+    const snapshots = result.data || result.snapshots || result || [];
+    if (Array.isArray(snapshots)) {
+      snapshots.forEach((snapshot) => {
+        if (snapshot.ticker) {
+          snapshotMap.set(snapshot.ticker.toUpperCase(), {
+            annual_data: snapshot.annual_data || [],
+            assumptions: snapshot.assumptions || {},
+            company_info: snapshot.company_info || {},
+            snapshot_date: snapshot.snapshot_date,
+            is_current: snapshot.is_current,
+            auto_fetched: snapshot.auto_fetched
+          });
+        }
+      });
+    }
+    const loadTime = Date.now() - startTime;
+    console.log(`✅ Loaded ${snapshotMap.size} current snapshots in ${loadTime}ms (single API call)`);
+    allSnapshotsCache = snapshotMap;
+    allSnapshotsCacheTimestamp = now;
+    return snapshotMap;
+  } catch (error) {
+    console.error("❌ Error loading all snapshots from Supabase:", error);
+    return /* @__PURE__ */ new Map();
   }
 }
 async function loadProfileFromSupabase(ticker2, fallbackToFMP = true) {
@@ -43196,29 +43241,28 @@ async function loadProfileFromSupabase(ticker2, fallbackToFMP = true) {
 }
 async function loadProfilesBatchFromSupabase(tickers) {
   const results = {};
-  const snapshotPromises = tickers.map(
-    (ticker2) => loadCurrentSnapshotFromSupabase(ticker2.toUpperCase())
-  );
-  const snapshots = await Promise.allSettled(snapshotPromises);
+  const allSnapshots = await loadAllCurrentSnapshotsFromSupabase();
   let priceMap = /* @__PURE__ */ new Map();
   try {
-    const batchResult = await fetchMarketDataBatch(tickers.map((t) => t.toUpperCase()));
-    if (batchResult.success && batchResult.data) {
-      batchResult.data.forEach((md) => {
-        if (md.currentPrice > 0) {
-          priceMap.set(md.ticker.toUpperCase(), md.currentPrice);
-        }
-      });
+    const tickersToFetch = tickers.slice(0, 100).map((t) => t.toUpperCase());
+    if (tickersToFetch.length > 0) {
+      const batchResult = await fetchMarketDataBatch(tickersToFetch);
+      if (batchResult.success && batchResult.data) {
+        batchResult.data.forEach((md) => {
+          if (md.currentPrice > 0) {
+            priceMap.set(md.ticker.toUpperCase(), md.currentPrice);
+          }
+        });
+      }
     }
   } catch (e) {
     console.warn("⚠️ fetchMarketDataBatch failed, using snapshot prices:", e);
   }
-  tickers.forEach((ticker2, index2) => {
+  tickers.forEach((ticker2) => {
     var _a3;
     const upperTicker = ticker2.toUpperCase();
-    const snapshotResult = snapshots[index2];
-    if (snapshotResult.status === "fulfilled" && snapshotResult.value) {
-      const snapshot = snapshotResult.value;
+    const snapshot = allSnapshots.get(upperTicker);
+    if (snapshot && snapshot.annual_data && snapshot.annual_data.length > 0) {
       const batchPrice = priceMap.get(upperTicker) || 0;
       const snapshotPrice = ((_a3 = snapshot.assumptions) == null ? void 0 : _a3.currentPrice) || 0;
       const currentPrice = batchPrice > 0 ? batchPrice : snapshotPrice;
@@ -43246,6 +43290,7 @@ async function loadProfilesBatchFromSupabase(tickers) {
 }
 const supabaseDataLoader = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
+  loadAllCurrentSnapshotsFromSupabase,
   loadCurrentSnapshotFromSupabase,
   loadProfileFromSupabase,
   loadProfilesBatchFromSupabase

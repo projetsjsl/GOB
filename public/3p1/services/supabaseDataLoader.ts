@@ -48,6 +48,9 @@ export async function loadCurrentSnapshotFromSupabase(
     } else if (result.ticker && result.snapshots) {
       // Format { ticker: 'AAPL', snapshots: [...] }
       snapshots = result.snapshots;
+    } else if (result.data && Array.isArray(result.data)) {
+      // Format { success: true, data: [...] }
+      snapshots = result.data;
     }
     
     if (snapshots.length === 0) {
@@ -68,6 +71,72 @@ export async function loadCurrentSnapshotFromSupabase(
   } catch (error) {
     console.error(`❌ Erreur chargement snapshot Supabase pour ${ticker}:`, error);
     return null;
+  }
+}
+
+// ✅ CACHE GLOBAL: Store all snapshots in memory after first load
+let allSnapshotsCache: Map<string, SupabaseSnapshotData> | null = null;
+let allSnapshotsCacheTimestamp: number = 0;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Charge TOUS les snapshots actuels depuis Supabase en UN SEUL appel API
+ * Utilise ?all=true&current=true pour récupérer tous les snapshots is_current=true
+ * 
+ * Cette fonction est le cœur de l'optimisation - au lieu de 1000+ appels API,
+ * on fait UN SEUL appel qui charge tout en mémoire
+ */
+export async function loadAllCurrentSnapshotsFromSupabase(): Promise<Map<string, SupabaseSnapshotData>> {
+  // Check cache first
+  const now = Date.now();
+  if (allSnapshotsCache && (now - allSnapshotsCacheTimestamp) < CACHE_TTL_MS) {
+    console.log(`📦 Using cached snapshots (${allSnapshotsCache.size} tickers, age: ${Math.round((now - allSnapshotsCacheTimestamp) / 1000)}s)`);
+    return allSnapshotsCache;
+  }
+
+  try {
+    console.log('🚀 Loading ALL current snapshots from Supabase in single API call...');
+    const startTime = Date.now();
+    
+    const response = await fetch('/api/finance-snapshots?all=true&current=true&limit=2000');
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    
+    const snapshotMap = new Map<string, SupabaseSnapshotData>();
+    
+    // L'API retourne { success: true, data: [...] }
+    const snapshots = result.data || result.snapshots || result || [];
+    
+    if (Array.isArray(snapshots)) {
+      snapshots.forEach((snapshot: any) => {
+        if (snapshot.ticker) {
+          snapshotMap.set(snapshot.ticker.toUpperCase(), {
+            annual_data: snapshot.annual_data || [],
+            assumptions: snapshot.assumptions || {},
+            company_info: snapshot.company_info || {},
+            snapshot_date: snapshot.snapshot_date,
+            is_current: snapshot.is_current,
+            auto_fetched: snapshot.auto_fetched
+          });
+        }
+      });
+    }
+
+    const loadTime = Date.now() - startTime;
+    console.log(`✅ Loaded ${snapshotMap.size} current snapshots in ${loadTime}ms (single API call)`);
+    
+    // Update cache
+    allSnapshotsCache = snapshotMap;
+    allSnapshotsCacheTimestamp = now;
+    
+    return snapshotMap;
+  } catch (error) {
+    console.error('❌ Error loading all snapshots from Supabase:', error);
+    return new Map();
   }
 }
 
@@ -141,7 +210,7 @@ export async function loadProfileFromSupabase(
 
 /**
  * Charge plusieurs profils depuis Supabase en batch
- * Optimisé pour charger tous les tickers rapidement
+ * ✅ OPTIMISÉ: Utilise loadAllCurrentSnapshotsFromSupabase pour charger tous les snapshots en UN SEUL appel
  */
 export async function loadProfilesBatchFromSupabase(
   tickers: string[]
@@ -154,35 +223,35 @@ export async function loadProfilesBatchFromSupabase(
 }>> {
   const results: Record<string, any> = {};
 
-  // Charger les snapshots en parallèle (batch)
-  const snapshotPromises = tickers.map(ticker => 
-    loadCurrentSnapshotFromSupabase(ticker.toUpperCase())
-  );
+  // ✅ OPTIMISATION MAJEURE: Charger TOUS les snapshots en UN SEUL appel API
+  // Au lieu de 50+ appels individuels, on utilise le cache global
+  const allSnapshots = await loadAllCurrentSnapshotsFromSupabase();
 
-  const snapshots = await Promise.allSettled(snapshotPromises);
-
-  // ✅ OPTIMISATION: Charger tous les prix en UN SEUL appel batch au lieu de 50+ appels individuels
+  // ✅ OPTIMISATION: Charger tous les prix en UN SEUL appel batch
   let priceMap: Map<string, number> = new Map();
   try {
-    const batchResult = await fetchMarketDataBatch(tickers.map(t => t.toUpperCase()));
-    if (batchResult.success && batchResult.data) {
-      batchResult.data.forEach(md => {
-        if (md.currentPrice > 0) {
-          priceMap.set(md.ticker.toUpperCase(), md.currentPrice);
-        }
-      });
+    // Limiter à 100 tickers max par requête (limite API)
+    const tickersToFetch = tickers.slice(0, 100).map(t => t.toUpperCase());
+    if (tickersToFetch.length > 0) {
+      const batchResult = await fetchMarketDataBatch(tickersToFetch);
+      if (batchResult.success && batchResult.data) {
+        batchResult.data.forEach(md => {
+          if (md.currentPrice > 0) {
+            priceMap.set(md.ticker.toUpperCase(), md.currentPrice);
+          }
+        });
+      }
     }
   } catch (e) {
     console.warn('⚠️ fetchMarketDataBatch failed, using snapshot prices:', e);
   }
 
   // Combiner les résultats
-  tickers.forEach((ticker, index) => {
+  tickers.forEach((ticker) => {
     const upperTicker = ticker.toUpperCase();
-    const snapshotResult = snapshots[index];
+    const snapshot = allSnapshots.get(upperTicker);
 
-    if (snapshotResult.status === 'fulfilled' && snapshotResult.value) {
-      const snapshot = snapshotResult.value;
+    if (snapshot && snapshot.annual_data && snapshot.annual_data.length > 0) {
       // Use batch price if available, otherwise fallback to snapshot price
       const batchPrice = priceMap.get(upperTicker) || 0;
       const snapshotPrice = snapshot.assumptions?.currentPrice || 0;
