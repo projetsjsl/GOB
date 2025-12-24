@@ -84,6 +84,32 @@
             }
         }
 
+        /* ⚡ Tab Transition Performance */
+        @keyframes tabFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .tab-content-active {
+            animation: tabFadeIn 0.15s ease-out;
+        }
+        
+        /* Visual feedback during tab loading */
+        .tab-loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        /* content-visibility for offscreen content */
+        .tab-content-hidden {
+            content-visibility: hidden;
+            contain-intrinsic-size: 0 500px;
+        }
+
         .scrollbar-hide {
             -ms-overflow-style: none;
             scrollbar-width: none;
@@ -429,7 +455,6 @@
         };
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- PDF Export Dependencies -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -711,6 +736,8 @@
             };
 
             // ⚡ AUTO-FAILSAFE: Periodically check and restore pointer-events
+            // Using longer interval (10s) to reduce main thread blocking
+            const failsafeInterval = window._performanceOptimizedFailsafeInterval || 10000;
             setInterval(function() {
                 const bodyPE = getComputedStyle(document.body).pointerEvents;
                 const htmlPE = getComputedStyle(document.documentElement).pointerEvents;
@@ -722,7 +749,7 @@
                     const root = document.querySelector('#root');
                     if (root) root.style.pointerEvents = 'auto';
                 }
-            }, 2000);
+            }, failsafeInterval);
 
             // 📊 CLICK MONITOR: Log clicks to detect if they're being captured
             document.addEventListener('click', function(e) {
@@ -1669,15 +1696,17 @@
     <script src="/js/dashboard/pdfExporter.js"></script>
 
     <!-- Main Tabs Components -->
-    <script type="text/babel" src="/js/dashboard/components/tabs/EconomicCalendarTab.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/tabs/FastGraphsTab.js"></script>
+    <!-- DUPLICATE REMOVED: EconomicCalendarTab.js & FastGraphsTab.js already loaded above -->
+    <!-- <script type="text/babel" src="/js/dashboard/components/tabs/EconomicCalendarTab.js"></script> -->
+    <!-- <script type="text/babel" src="/js/dashboard/components/tabs/FastGraphsTab.js"></script> -->
     <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisModals.js"></script>
     <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisTab.js"></script>
 
     <!-- Announcement Bars System (Gemini-powered) -->
     <script type="text/babel" src="/js/dashboard/components/AnnouncementBar.js"></script>
     <script type="text/babel" src="/js/dashboard/components/AnnouncementBarManager.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/ThemeSelector.js"></script>
+    <!-- DUPLICATE REMOVED: ThemeSelector.js already loaded above -->
+    <!-- <script type="text/babel" src="/js/dashboard/components/ThemeSelector.js"></script> -->
     <script type="text/babel" src="/js/dashboard/components/TradingViewTicker.js"></script>
     <script type="text/babel" src="/js/dashboard/components/MobileNavOverlay.js"></script>
     <script type="text/babel" src="/js/dashboard/components/SecondaryNavEditor.js"></script>

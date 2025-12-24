@@ -1,41 +1,46 @@
 /**
- * Performance Optimizer - Réduit le temps de chargement du dashboard
+ * Performance Optimizer V2 - Réduit le temps de chargement et les freezes du dashboard
  * 
  * Problèmes résolus :
  * 1. Trop de widgets TradingView chargés simultanément
  * 2. Babel prend trop de temps à traiter app-inline.js
  * 3. Erreurs répétées de TradingView
+ * 4. [NEW] Tab navigation freezes
+ * 5. [NEW] Heavy DOM operations blocking main thread
  */
 
 (function() {
     'use strict';
 
-    console.log('🚀 Performance Optimizer: Initialisation...');
+    console.log('🚀 Performance Optimizer V2: Initialisation...');
 
-    // 1. DÉLAI DE CHARGEMENT DES WIDGETS TRADINGVIEW
-    // Attendre que la page soit prête avant de charger les widgets
-    let widgetsLoaded = 0;
-    const MAX_WIDGETS_INITIAL = 2; // Maximum 2 widgets au démarrage
-    const WIDGET_LOAD_DELAY = 500; // 500ms entre chaque widget
-
-    function loadWidgetWithDelay(container, delay) {
-        if (!container || widgetsLoaded >= MAX_WIDGETS_INITIAL) {
-            // Charger en lazy loading si trop de widgets
-            setTimeout(() => {
-                if (isElementVisible(container)) {
-                    loadWidget(container);
-                }
-            }, delay + (widgetsLoaded * WIDGET_LOAD_DELAY));
-            return;
+    // ============================================
+    // TAB NAVIGATION OPTIMIZATION
+    // ============================================
+    
+    // Debounce tab changes to prevent rapid re-renders
+    let tabChangeTimeout = null;
+    window._debouncedTabChange = function(callback, delay = 50) {
+        if (tabChangeTimeout) {
+            clearTimeout(tabChangeTimeout);
         }
+        tabChangeTimeout = setTimeout(callback, delay);
+    };
 
-        setTimeout(() => {
-            if (isElementVisible(container)) {
-                loadWidget(container);
-                widgetsLoaded++;
-            }
-        }, delay);
-    }
+    // Use requestIdleCallback for non-critical updates
+    const scheduleIdleTask = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
+    
+    window._scheduleNonCritical = function(callback) {
+        scheduleIdleTask(callback, { timeout: 2000 });
+    };
+
+    // ============================================
+    // TRADINGVIEW WIDGET OPTIMIZATION
+    // ============================================
+    
+    let widgetsLoaded = 0;
+    const MAX_WIDGETS_INITIAL = 2;
+    const WIDGET_LOAD_DELAY = 500;
 
     function isElementVisible(element) {
         if (!element) return false;
@@ -43,15 +48,10 @@
         return rect.top < window.innerHeight + 500 && rect.bottom > -500;
     }
 
-    function loadWidget(container) {
-        // Le widget sera chargé par le code React existant
-        // On ne fait que retarder le chargement
-    }
-
-    // 2. INTERCEPTER LES CHARGEMENTS DE WIDGETS TRADINGVIEW
+    // Intercept TradingView script loading
     const originalCreateElement = document.createElement;
     let tradingViewScriptCount = 0;
-    const MAX_TRADINGVIEW_SCRIPTS = 3; // Maximum 3 scripts TradingView simultanés
+    const MAX_TRADINGVIEW_SCRIPTS = 3;
 
     document.createElement = function(tagName) {
         const element = originalCreateElement.call(document, tagName);
@@ -59,12 +59,10 @@
         if (tagName === 'script' && element.src && element.src.includes('tradingview.com')) {
             tradingViewScriptCount++;
             
-            // Si trop de scripts, ajouter un délai
             if (tradingViewScriptCount > MAX_TRADINGVIEW_SCRIPTS) {
                 const originalSrc = element.src;
-                element.src = ''; // Désactiver temporairement
+                element.src = '';
                 
-                // Réactiver après un délai
                 setTimeout(() => {
                     element.src = originalSrc;
                 }, (tradingViewScriptCount - MAX_TRADINGVIEW_SCRIPTS) * 1000);
@@ -74,50 +72,64 @@
         return element;
     };
 
-    // 3. OPTIMISER BABEL - Réduire les warnings
+    // ============================================
+    // BABEL OPTIMIZATION
+    // ============================================
+    
     if (window.Babel) {
         const originalTransform = window.Babel.transform;
         window.Babel.transform = function(code, options) {
-            // Options optimisées pour performance
             const optimizedOptions = {
                 ...options,
-                compact: false, // Garder la lisibilité pour debug
-                minified: false // Pas de minification (déjà fait)
+                compact: false,
+                minified: false
             };
             return originalTransform.call(this, code, optimizedOptions);
         };
     }
 
-    // 4. DÉSACTIVER LES WIDGETS NON VISIBLES AU SCROLL
+    // ============================================
+    // SCROLL PERFORMANCE (Passive + Debounced)
+    // ============================================
+    
     let scrollTimeout;
+    let lastScrollTime = 0;
+    const SCROLL_DEBOUNCE = 150; // Increased from 300ms
+    
     window.addEventListener('scroll', () => {
+        const now = Date.now();
+        if (now - lastScrollTime < SCROLL_DEBOUNCE) return;
+        lastScrollTime = now;
+        
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => {
-            document.querySelectorAll('.tradingview-widget-container iframe').forEach(iframe => {
-                const rect = iframe.getBoundingClientRect();
-                const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
-                
-                if (!isVisible && iframe.src) {
-                    // Suspendre le widget
-                    iframe.style.display = 'none';
-                } else if (isVisible && iframe.style.display === 'none') {
-                    // Réactiver le widget
-                    iframe.style.display = '';
-                }
+            // Use requestIdleCallback for widget visibility check
+            window._scheduleNonCritical(() => {
+                document.querySelectorAll('.tradingview-widget-container iframe').forEach(iframe => {
+                    const rect = iframe.getBoundingClientRect();
+                    const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+                    
+                    if (!isVisible && iframe.src) {
+                        iframe.style.display = 'none';
+                    } else if (isVisible && iframe.style.display === 'none') {
+                        iframe.style.display = '';
+                    }
+                });
             });
-        }, 300);
+        }, SCROLL_DEBOUNCE);
     }, { passive: true });
 
-    // 5. RETRY LOGIC POUR TRADINGVIEW
+    // ============================================
+    // FETCH OPTIMIZATION (TradingView error suppression)
+    // ============================================
+    
     const originalFetch = window.fetch;
     window.fetch = function(...args) {
         const url = args[0];
         
-        // Si c'est une requête TradingView qui échoue, ne pas retry automatiquement
         if (typeof url === 'string' && url.includes('tradingview-widget.com')) {
             return originalFetch.apply(this, args).catch(error => {
                 console.warn('⚠️ TradingView widget failed to load, skipping retry:', url);
-                // Retourner une réponse vide pour éviter les erreurs en cascade
                 return new Response('', { status: 200, statusText: 'OK' });
             });
         }
@@ -125,24 +137,58 @@
         return originalFetch.apply(this, args);
     };
 
-    // 6. MESURER ET LOGGER LES PERFORMANCES
+    // ============================================
+    // REDUCE FREEZE DIAGNOSTICS OVERHEAD
+    // ============================================
+    
+    // Override the pointer-events check interval (was 2s, now 10s)
+    // This reduces main thread blocking
+    window._performanceOptimizedFailsafeInterval = 10000; // 10 seconds
+
+    // ============================================
+    // DOM MUTATION BATCHING
+    // ============================================
+    
+    let pendingDOMUpdates = [];
+    let domUpdateScheduled = false;
+    
+    window._batchDOMUpdate = function(callback) {
+        pendingDOMUpdates.push(callback);
+        
+        if (!domUpdateScheduled) {
+            domUpdateScheduled = true;
+            requestAnimationFrame(() => {
+                const updates = pendingDOMUpdates;
+                pendingDOMUpdates = [];
+                domUpdateScheduled = false;
+                
+                updates.forEach(cb => {
+                    try { cb(); } catch (e) { console.error('DOM batch update error:', e); }
+                });
+            });
+        }
+    };
+
+    // ============================================
+    // PERFORMANCE METRICS
+    // ============================================
+    
     window.addEventListener('load', () => {
         setTimeout(() => {
             const perfData = performance.getEntriesByType('navigation')[0];
             const loadTime = perfData.loadEventEnd - perfData.fetchStart;
             const domTime = perfData.domContentLoadedEventEnd - perfData.fetchStart;
             
-            console.log('📊 Performance Metrics:');
+            console.log('📊 Performance Metrics V2:');
             console.log(`   - Total Load Time: ${loadTime.toFixed(0)}ms`);
             console.log(`   - DOM Ready: ${domTime.toFixed(0)}ms`);
             console.log(`   - TradingView Scripts: ${tradingViewScriptCount}`);
             
-            if (loadTime > 3000) {
-                console.warn('⚠️ Temps de chargement élevé. Considérez désactiver certains widgets.');
+            if (loadTime > 5000) {
+                console.warn('⚠️ Temps de chargement élevé (>5s). Le dashboard sera optimisé.');
             }
         }, 1000);
     });
 
-    console.log('✅ Performance Optimizer: Actif');
+    console.log('✅ Performance Optimizer V2: Actif');
 })();
-
