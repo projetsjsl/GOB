@@ -59,3 +59,5 @@ En attendant la configuration MCP, vous pouvez exécuter les migrations manuelle
 4. Cliquez sur "Run"
 
 
+
+
