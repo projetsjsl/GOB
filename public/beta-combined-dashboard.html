@@ -540,13 +540,17 @@
             }
             // OPTIMISATION: Logger les erreurs dashboard pour debugging
             if (event.filename && event.filename.includes('dashboard')) {
-                console.error('❌ Erreur dashboard:', {
-                    message: event.message,
-                    filename: event.filename,
-                    lineno: event.lineno,
-                    colno: event.colno,
-                    error: event.error
-                });
+                console.error('❌ Erreur dashboard:', event.message, 'at', event.filename + ':' + event.lineno);
+                if (event.error && event.error.stack) {
+                    console.error('Stack:', event.error.stack);
+                }
+            }
+            // Log VM errors (from Babel transpilation)
+            if (!event.filename || event.filename.includes('VM')) {
+                console.error('❌ Erreur transpilation:', event.message);
+                if (event.error && event.error.stack) {
+                    console.error('Stack:', event.error.stack);
+                }
             }
         }, true);
 

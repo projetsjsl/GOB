@@ -5,6 +5,7 @@ if (typeof window.showSlashSuggestions === "undefined") {
 }
 if (typeof window.setShowSlashSuggestions === "undefined") {
     window.setShowSlashSuggestions = function() {};
+}
 
 // EXPOSE Icon globally for other components (like JLabTab)
 window.Icon = ({ emoji, size = 20, className = '' }) => {
@@ -18,8 +19,6 @@ window.Icon = ({ emoji, size = 20, className = '' }) => {
     }
     return <span className={"inline-block " + className} style={{ fontSize: size + 'px' }}>{emoji}</span>;
 };
-
-}
 /**
  * SAFETY NOTE FOR EDITORS:
  * - This file is huge and parsed by Babel Standalone in the browser; a single unclosed template string/backtick will break production.

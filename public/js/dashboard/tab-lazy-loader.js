@@ -127,16 +127,8 @@
             
             document.body.appendChild(script);
             
-            // Trigger Babel to process the new script
-            if (window.Babel && window.Babel.transformScriptTags) {
-                setTimeout(() => {
-                    try {
-                        window.Babel.transformScriptTags();
-                    } catch (e) {
-                        console.warn('[LazyLoader] Babel transform warning:', e);
-                    }
-                }, 50);
-            }
+            // Babel processes text/babel scripts automatically on load
+            // No need to call transformScriptTags() manually - it causes duplicate processing
         });
 
         tabLoadPromises[scriptPath] = promise;
