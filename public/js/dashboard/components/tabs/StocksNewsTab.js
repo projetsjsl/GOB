@@ -101,7 +101,8 @@ const StocksNewsTab = (props) => {
         const setSelectedStock = props.setSelectedStock || dashboard.setSelectedStock;
         const getCompanyLogo = props.getCompanyLogo
             || (typeof window !== 'undefined' ? window.BetaCombinedDashboardData?.getCompanyLogo : undefined)
-            || dashboard.getCompanyLogo;
+            || dashboard.getCompanyLogo
+            || ((ticker) => `https://financialmodelingprep.com/image-stock/${ticker}.png`);
         const cleanTextUtil = (typeof window !== 'undefined' ? window.DASHBOARD_UTILS?.cleanText : undefined) || ((text) => text || '');
         const getNewsIconUtil = (typeof window !== 'undefined' ? window.DASHBOARD_UTILS?.getNewsIcon : undefined) || (() => ({ icon: 'Info', color: 'text-gray-400' }));
 

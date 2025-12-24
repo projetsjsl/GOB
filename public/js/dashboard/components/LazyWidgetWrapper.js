@@ -1,13 +1,16 @@
 const LazyWidgetWrapper = ({ children, height = '300px', threshold = 0.1, placeholderTitle = 'Chargement...' }) => {
     const [isVisible, setIsVisible] = React.useState(false);
     const containerRef = React.useRef(null);
+    const isMountedRef = React.useRef(true);
 
     React.useEffect(() => {
+        isMountedRef.current = true;
+
         const observer = new IntersectionObserver(([entry]) => {
             if (entry.isIntersecting) {
                 // Add a small delay to avoid loading if user just scrolls past quickly
                 setTimeout(() => {
-                    if (containerRef.current) { // Check if still mounted
+                    if (isMountedRef.current && containerRef.current) {
                         setIsVisible(true);
                     }
                 }, 100);
@@ -23,6 +26,7 @@ const LazyWidgetWrapper = ({ children, height = '300px', threshold = 0.1, placeh
         }
 
         return () => {
+            isMountedRef.current = false;
             observer.disconnect();
         };
     }, [threshold]);

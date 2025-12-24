@@ -4,6 +4,10 @@
 const { useState, useEffect, useRef } = React;
 // Ensure LazyWidgetWrapper is available
 const LazyWidgetWrapper = window.LazyWidgetWrapper || (({ children }) => children);
+// Ensure LucideIcon is available with fallback
+const LucideIcon = window.LucideIcon ||
+    (typeof window !== 'undefined' ? window.DASHBOARD_UTILS?.LucideIcon : undefined) ||
+    (({ name, className = '' }) => React.createElement('span', { className: `icon-${name} ${className}` }));
 
 const MarketOverviewWidget = ({ isDarkMode }) => {
     const containerRef = useRef(null);

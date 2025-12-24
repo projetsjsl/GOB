@@ -190,7 +190,7 @@ const TradingViewTickerContent = React.memo(({
             }
         };
 
-    }, [isDarkMode, selectedIndices]); // Re-render only when theme or selection changes
+    }, [isDarkMode, selectedIndices, setTickerExpandableUrl, setTickerExpandableTitle, setTickerExpandableOpen]);
 
     return (
         <div className="tradingview-widget-container" ref={containerRef}>
