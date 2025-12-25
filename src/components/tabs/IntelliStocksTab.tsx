@@ -1014,7 +1014,7 @@ console.log('✅ Données hybrides récupérées:', {
                 // 🔄 Rechargement du TradingView Mini Chart quand le ticker change - VAGUE 2
                 useEffect(() => {
                     const container = document.getElementById('tradingview-mini-chart-jlab');
-                    if (container) {
+                    if (container && !container.hasChildNodes()) {
                         // Supprimer l'ancien widget
                         container.innerHTML = '';
 
@@ -1035,10 +1035,9 @@ console.log('✅ Données hybrides récupérées:', {
                             "largeChartUrl": ""
                         });
                         container.appendChild(script);
-                        console.log(`📊 TradingView Mini Chart rechargé pour ${selectedStock}`);
                     }
-                    
-                    // CLEANUP: Prevent memory leaks by removing widget content on unmount/re-render
+
+                    // CLEANUP: Prevent memory leaks by removing widget content on unmount
                     return () => {
                         const container = document.getElementById('tradingview-mini-chart-jlab');
                         if (container) {
