@@ -83,6 +83,49 @@ const SpreadChart = ({ usRates, caRates, darkMode }) => {
 };
 
 
+const TradingViewCurve = ({ darkMode }) => {
+    const container = useRef();
+    const LazyWidgetWrapper = window.LazyWidgetWrapper || (({ children }) => <>{children}</>);
+
+    useEffect(() => {
+        if (!container.current) return;
+        
+        // Cleanup content to prevent duplicates/memory leaks
+        container.current.innerHTML = '';
+
+        const script = document.createElement("script");
+        script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+        script.type = "text/javascript";
+        script.async = true;
+        script.innerHTML = JSON.stringify({
+            "autosize": true,
+            "symbol": "TVC:US10Y",
+            "interval": "D",
+            "theme": darkMode ? "dark" : "light",
+            "style": "2",
+            "locale": "fr",
+            "hide_top_toolbar": true,
+            "allow_symbol_change": true,
+            "support_host": "https://www.tradingview.com"
+        });
+        container.current.appendChild(script);
+
+        return () => {
+            if (container.current) container.current.innerHTML = '';
+        };
+    }, [darkMode]);
+
+    return (
+        <div style={{ height: "400px", width: "100%" }}>
+            <LazyWidgetWrapper threshold={0.25} height={400} className="w-full h-full">
+                <div className="tradingview-widget-container" ref={container} style={{ height: "100%", width: "100%" }}>
+                    <div className="tradingview-widget-container__widget"></div>
+                </div>
+            </LazyWidgetWrapper>
+        </div>
+    );
+};
+
 const YieldCurveTab = () => {
     const [yieldData, setYieldData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -180,32 +223,7 @@ const YieldCurveTab = () => {
         return () => chartInstance.current?.destroy();
     }, [yieldData, darkMode]);
 
-    const TradingViewCurve = () => {
-        const container = useRef();
-        useEffect(() => {
-            if (!container.current) return;
-            const script = document.createElement("script");
-            script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
-            script.type = "text/javascript";
-            script.innerHTML = JSON.stringify({
-                "autosize": true,
-                "symbol": "TVC:US10Y",
-                "interval": "D",
-                "theme": darkMode ? "dark" : "light",
-                "style": "2",
-                "locale": "fr",
-                "hide_top_toolbar": true,
-                "allow_symbol_change": true,
-                "support_host": "https://www.tradingview.com"
-            });
-            container.current.appendChild(script);
-        }, []);
-        return (
-            <div className="tradingview-widget-container" ref={container} style={{ height: "400px", width: "100%" }}>
-                <div className="tradingview-widget-container__widget"></div>
-            </div>
-        );
-    };
+
 
     return (
         <div className="space-y-6 max-w-[1600px] mx-auto pb-10">
@@ -258,7 +276,7 @@ const YieldCurveTab = () => {
                 <div className="lg:col-span-2 space-y-6">
                     <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/50">
                         <h3 className="text-sm font-bold uppercase mb-4 text-neutral-400">Courbe de Taux Interactive (TradingView)</h3>
-                        <TradingViewCurve />
+                        <TradingViewCurve darkMode={darkMode} />
                     </div>
                     
                     <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/50">

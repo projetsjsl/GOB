@@ -362,6 +362,12 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             });
             container.appendChild(script);
         }
+
+        
+        return () => {
+            if (financialsContainerRef.current) financialsContainerRef.current.innerHTML = '';
+            if (profileContainerRef.current) profileContainerRef.current.innerHTML = '';
+        };
     }, [activeTab, selectedStock, isDarkMode]);
 
     // 3. Technical Analysis Widget

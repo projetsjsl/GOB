@@ -351,7 +351,6 @@ const MarketsEconomyTab = ({
     const [selectedSource, setSelectedSource] = useState('all');
     const [selectedMarket, setSelectedMarket] = useState('all');
     const [selectedTheme, setSelectedTheme] = useState('all');
-    const [localFilteredNews, setLocalFilteredNews] = useState([]);
     const [activeSection, setActiveSection] = useState('overview'); // 'overview', 'forex', 'calendar', 'canada', 'news'
 
     const sources = ['Bloomberg', 'Reuters', 'WSJ', 'CNBC', 'MarketWatch', 'La Presse', 'Les Affaires'];
@@ -386,10 +385,10 @@ const MarketsEconomyTab = ({
         return false;
     };
 
-    const [isApproximateMatch, setIsApproximateMatch] = useState(false);
-
-    useEffect(() => {
-        let filtered = newsData;
+    // MEMOIZED FILTERING LOGIC
+    // Replaces useEffect/useState to avoid infinite render loops
+    const { filteredNews: localFilteredNews, isApproximateMatch } = React.useMemo(() => {
+        let filtered = newsData || [];
         let hasExactMatches = true;
 
         if (localFrenchOnly) {
@@ -402,7 +401,8 @@ const MarketsEconomyTab = ({
                 matchesSource(article.source?.name, selectedSource)
             );
             if (filtered.length === 0 && beforeFilter > 0) {
-                filtered = newsData.filter(article => {
+                // Fallback: less strict search
+                filtered = (newsData || []).filter(article => {
                     const sourceName = (article.source?.name || '').toLowerCase();
                     const selected = selectedSource.toLowerCase();
                     return sourceName.includes(selected) || selected.includes(sourceName);
@@ -443,13 +443,15 @@ const MarketsEconomyTab = ({
             });
         }
 
-        if (filtered.length === 0 && newsData.length > 0) {
-            filtered = newsData.slice(0, 20);
+        if (filtered.length === 0 && (newsData || []).length > 0) {
+            filtered = (newsData || []).slice(0, 20);
             hasExactMatches = false;
         }
 
-        setIsApproximateMatch(!hasExactMatches);
-        setLocalFilteredNews(filtered);
+        return { 
+            filteredNews: filtered, 
+            isApproximateMatch: !hasExactMatches 
+        };
     }, [newsData, localFrenchOnly, selectedSource, selectedMarket, selectedTheme]);
 
     return (
