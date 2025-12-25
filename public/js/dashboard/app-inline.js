@@ -16437,15 +16437,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 console.log('📊 StocksNewsTab - Composant initialisé');
             }, []);
 
-            // Charger les widgets TradingView (with init guard to prevent spam)
+            // Charger les widgets TradingView (load once when refs are available)
             useEffect(() => {
-                // Global flag to prevent re-initialization spam
-                const initKey = `tradingview_stocks_${isDarkMode}`;
-                if (window[initKey]) return;
-                window[initKey] = true;
-
+                // Only load if refs are available and don't have widgets yet
                 // Market Overview Widget
-                if (marketOverviewRef.current && !marketOverviewRef.current.hasChildNodes()) {
+                if (marketOverviewRef.current && !marketOverviewRef.current.querySelector('iframe')) {
+                    marketOverviewRef.current.innerHTML = ''; // Clear any loading placeholders
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
                     script.async = true;
@@ -16496,7 +16493,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 }
 
                 // Heatmap Widget
-                if (heatmapRef.current && !heatmapRef.current.hasChildNodes()) {
+                if (heatmapRef.current && !heatmapRef.current.querySelector('iframe')) {
+                    heatmapRef.current.innerHTML = ''; // Clear any loading placeholders
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
                     script.async = true;
@@ -16520,7 +16518,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 }
 
                 // Screener Widget
-                if (screenerRef.current && !screenerRef.current.hasChildNodes()) {
+                if (screenerRef.current && !screenerRef.current.querySelector('iframe')) {
+                    screenerRef.current.innerHTML = ''; // Clear any loading placeholders
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
                     script.async = true;
@@ -24896,8 +24895,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         ]
                     };
                     loader.loadWidget(marketOverviewRef.current, 'market-overview', config, false);
-                } else if (marketOverviewRef.current) {
+                } else if (marketOverviewRef.current && !marketOverviewRef.current.querySelector('iframe')) {
                     // Fallback si loader n'existe pas
+                    marketOverviewRef.current.innerHTML = '';
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
                     script.async = true;
@@ -24967,8 +24967,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         "height": "100%"
                     };
                     loader.loadWidget(heatmapRef.current, 'stock-heatmap', config, false);
-                } else if (heatmapRef.current) {
+                } else if (heatmapRef.current && !heatmapRef.current.querySelector('iframe')) {
                     // Fallback si loader n'existe pas
+                    heatmapRef.current.innerHTML = '';
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
                     script.async = true;
@@ -25007,8 +25008,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         "environment": "production"
                     };
                     loader.loadWidget(screenerRef.current, 'screener', config, false);
-                } else if (screenerRef.current) {
+                } else if (screenerRef.current && !screenerRef.current.querySelector('iframe')) {
                     // Fallback si loader n'existe pas
+                    screenerRef.current.innerHTML = '';
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
                     script.async = true;
