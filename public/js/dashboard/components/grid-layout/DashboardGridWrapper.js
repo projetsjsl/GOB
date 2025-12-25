@@ -64,7 +64,7 @@
         
         // TESTS
         'tests-rgl': { component: 'RglDashboard', label: 'Layout RGL', icon: 'LayoutDashboard', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
-        'tests-calendar': { component: 'InvestingCalendarTab', label: 'Calendrier', icon: 'Calendar', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
+        'tests-calendar': { component: 'MarketsEconomyTab', label: 'Calendrier', icon: 'Calendar', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
     };
 
     
@@ -487,7 +487,7 @@ const DashboardGridWrapper = ({
                     'YieldCurveTab': window.MarketsEconomyTab,
                     'NouvellesTab': window.StocksNewsTab,
                     'DansWatchlistTab': window.StocksNewsTab,
-                    'InvestingCalendarTab': window.InvestingCalendarTab || window.InvestingCalendarTabInternal || window.EconomicCalendarTab,
+                    'InvestingCalendarTab': window.MarketsEconomyTab, // Fusionné dans MarketsEconomyTab
                     'EconomicCalendarTab': window.EconomicCalendarTab
                 };
                 Component = REGISTRY[config.component];
@@ -519,7 +519,7 @@ const DashboardGridWrapper = ({
                     'YieldCurveTab': window.MarketsEconomyTab,
                     'NouvellesTab': window.StocksNewsTab,
                     'DansWatchlistTab': window.StocksNewsTab,
-                    'InvestingCalendarTab': window.InvestingCalendarTab || window.InvestingCalendarTabInternal || window.EconomicCalendarTab,
+                    'InvestingCalendarTab': window.MarketsEconomyTab, // Fusionné dans MarketsEconomyTab
                     'EconomicCalendarTab': window.EconomicCalendarTab
                 };
                 Component = REGISTRY[config.component];

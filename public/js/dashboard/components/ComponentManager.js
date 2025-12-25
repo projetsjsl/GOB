@@ -96,12 +96,12 @@ const ComponentManager = (() => {
         },
         { 
             id: 'InvestingCalendarTab', 
-            name: 'Investing Calendar', 
+            name: 'Investing Calendar (→ MarketsEconomyTab)', 
             category: 'Calendar',
-            description: "Calendrier spécifique aux résultats d'entreprises (Earnings) et dividendes.",
-            implications: "Si désactivé : Pas de calendrier des résultats/dividendes.",
+            description: "FUSIONNÉ dans MarketsEconomyTab. Calendrier économique, Forex, TSX.",
+            implications: "Utiliser MarketsEconomyTab à la place.",
             riskLevel: 'low',
-            techDetails: "Données FMP ou Investing.com."
+            techDetails: "Redirige vers MarketsEconomyTab."
         },
 
         // --- NEWS ---

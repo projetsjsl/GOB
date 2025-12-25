@@ -532,7 +532,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     const EmailBriefingsTab = window.EmailBriefingsTab || (() => <MissingTab name="EmailBriefingsTab" />);
     const SeekingAlphaTab = window.SeekingAlphaTab || (() => <MissingTab name="SeekingAlphaTab" />);
     const EconomicCalendarTab = window.EconomicCalendarTab || (() => <MissingTab name="EconomicCalendarTab" />);
-    const InvestingCalendarTab = window.InvestingCalendarTab || (() => <MissingTab name="InvestingCalendarTab" />);
+    const InvestingCalendarTab = window.MarketsEconomyTab || window.InvestingCalendarTab || (() => <MissingTab name="InvestingCalendarTab (fusionné dans MarketsEconomyTab)" />);
     const FinVoxTab = window.FinVoxTab || (() => <MissingTab name="FinVoxTab" />);
     const EmmAIATab = window.EmmAIATab || (() => <MissingTab name="EmmAIATab" />);
     const FastGraphsTab = window.FastGraphsTab || (() => <MissingTab name="FastGraphsTab" />);
@@ -677,7 +677,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         ],
         'tests': [
             { id: 'tests-rgl', label: 'Layout RGL', icon: 'LayoutDashboard', component: 'RglDashboard' },
-            { id: 'tests-calendar', label: 'Calendrier', icon: 'Calendar', component: 'InvestingCalendarTab' },
+            { id: 'tests-calendar', label: 'Calendrier', icon: 'Calendar', component: 'MarketsEconomyTab' },
             { id: 'tests-roboweb', label: 'RobotWeb', icon: 'Bot', component: 'GroupChatTab' },
             { id: 'tests-sandbox', label: 'Sandbox', icon: 'Box', component: 'TestSandboxTab' },
             { id: 'tests-debug', label: 'Debug', icon: 'Bug', component: 'DebugTab' }

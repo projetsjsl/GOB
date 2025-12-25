@@ -67,9 +67,9 @@
         'admin-settings': '/js/dashboard/components/tabs/PlusTab.js',
         'admin-jsla': '/js/dashboard/components/tabs/AdminJSLaiTab.js',
         
-        // Test tabs
-        'investing-calendar': '/js/dashboard/components/tabs/InvestingCalendarTab.js',
-        'tests-calendar': '/js/dashboard/components/tabs/InvestingCalendarTab.js',
+        // Test tabs (InvestingCalendarTab fusionné dans MarketsEconomyTab)
+        'investing-calendar': '/js/dashboard/components/tabs/MarketsEconomyTab.js',
+        'tests-calendar': '/js/dashboard/components/tabs/MarketsEconomyTab.js',
         'tests-roboweb': '/js/dashboard/components/tabs/GroupChatTab.js'
     };
 
