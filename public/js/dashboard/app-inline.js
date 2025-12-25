@@ -13659,8 +13659,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                 }
             ];
 
-            // Initialiser le client Supabase avec retry
+            // Initialiser le client Supabase avec retry (global deduplication)
             useEffect(() => {
+                // Global flag to prevent multiple parallel loops
+                if (window.__SUPABASE_INIT_STARTED__) {
+                    // If Supabase is already initialized, use it
+                    if (window.__SUPABASE__) {
+                        setSupabaseClient(window.__SUPABASE__);
+                    }
+                    return;
+                }
+                window.__SUPABASE_INIT_STARTED__ = true;
+                
                 let attempts = 0;
                 const maxAttempts = 10;
                 
@@ -13684,7 +13694,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         if (attempts < maxAttempts) {
                             setTimeout(initSupabase, 300);
                         } else {
-                            console.warn('⚠️ Supabase SDK non disponible après', maxAttempts, 'tentatives');
+                            console.warn('⚠️ Supabase SDK non disponible après', maxAttempts, 'tentatives (arrêt)');
                         }
                     }
                 };
@@ -16422,16 +16432,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             const screenerRef = useRef(null);
 
             // Log pour diagnostic
+            // Log only once on mount to avoid console spam
             useEffect(() => {
-                console.log('📊 StocksNewsTab - Données disponibles:', {
-                    tickerSource,
-                    teamTickersCount: teamTickers.length,
-                    watchlistTickersCount: watchlistTickers.length,
-                    stockDataCount: Object.keys(stockData).length,
-                    newsDataCount: newsData.length,
-                    displayedTickersCount: (tickerSource === 'watchlist' ? watchlistTickers : teamTickers).length
-                });
-            }, [tickerSource, teamTickers.length, watchlistTickers.length, Object.keys(stockData).length, newsData.length]);
+                console.log('📊 StocksNewsTab - Composant initialisé');
+            }, []);
 
             // Charger les widgets TradingView
             useEffect(() => {
@@ -24542,10 +24546,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 }
                 
                 if (!yieldData || !yieldChartRef.current) {
-                    console.log('⏳ En attente des données ou du canvas:', { 
-                        hasYieldData: !!yieldData, 
-                        hasCanvas: !!yieldChartRef.current 
-                    });
+                    // Removed: excessive console.log spam when waiting for data
                     return;
                 }
                 
