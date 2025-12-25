@@ -711,8 +711,8 @@ const StocksNewsTab = (props) => {
                                                             );
                                                         }
                                                         return (
-                                                            <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
-                                                                Chargement des explications...
+                                                            <div className={`text-xs italic ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                                                Aucune explication disponible
                                                             </div>
                                                         );
                                                     })()}
@@ -1086,8 +1086,8 @@ const StocksNewsTab = (props) => {
                                                                 📰 <span className="italic">{tickerLatestNews[ticker].title.length > 60 ? tickerLatestNews[ticker].title.substring(0, 60) + '...' : tickerLatestNews[ticker].title}</span>
                                                             </div>
                                                         ) : (
-                                                            <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
-                                                                Chargement des explications...
+                                                            <div className={`text-xs italic ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                                                Aucune explication disponible
                                                             </div>
                                                         )}
                                                     </div>
