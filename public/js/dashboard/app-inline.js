@@ -129,6 +129,23 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 };
             }
 
+            // Fonction de fetch avec retry
+            const fetchWithTimeoutAndRetry = async (url, options = {}, timeout = 8000, retries = 1) => {
+                for (let i = 0; i <= retries; i++) {
+                    const controller = new AbortController();
+                    const id = setTimeout(() => controller.abort(), timeout);
+                    try {
+                        const response = await fetch(url, { ...options, signal: controller.signal });
+                        clearTimeout(id);
+                        return response;
+                    } catch (err) {
+                        clearTimeout(id);
+                        if (i === retries) throw err;
+                        console.warn(`Retrying fetch for ${url} (attempt ${i + 1}/${retries + 1})`);
+                    }
+                }
+            };
+
             const response = await fetchWithTimeoutAndRetry(apiUrl, {}, 8000, 1);
             if (!response.ok) {
                 throw new Error(`API ${dataType} échouée: ${response.status}`);
@@ -252,6 +269,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
     // Backward compatibility - redirect LucideIcon to IconoirIcon
     window.LucideIcon = window.IconoirIcon;
+    
+    // Ensure ReactDOM and supabase are available globally
+    window.ReactDOM = window.ReactDOM || ReactDOM;
+    if (typeof supabase !== 'undefined') window.supabaseClient = window.supabase;
+
 
     // Professional Mode System - Toggle entre emojis et icônes Iconoir
     window.ProfessionalModeSystem = {
@@ -545,6 +567,8 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     const StocksNewsTab = window.StocksNewsTab || (() => <MissingTab name="StocksNewsTab" />);
     const YieldCurveTab = window.YieldCurveTab || (() => <MissingTab name="YieldCurveTab" />);
     const AdvancedAnalysisTab = window.AdvancedAnalysisTab || (() => <MissingTab name="AdvancedAnalysisTab" />);
+    const AdminJSLaiTab = window.AdminJSLaiTab || (() => <MissingTab name="AdminJSLaiTab" />);
+
 
 
 
@@ -7796,6 +7820,28 @@ STRUCTURE JSON OBLIGATOIRE:
             return enriched;
         };
 
+        const createCustomBriefingHTML = (analysis, data, topic) => {
+            return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Briefing: ${topic}</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; padding: 20px; line-height: 1.6; color: #1f2937; }
+    .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    h1 { color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Briefing Personnalisé: ${topic}</h1>
+    <div class="content">${analysis}</div>
+  </div>
+</body>
+</html>`;
+        };
+
         const createMorningBriefingHTML = (analysis, data) => {
             // ============================================================================
             // EMMA EN DIRECT - MORNING BRIEFING - TEMPLATE EXPERT
@@ -10734,7 +10780,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         }, 'error');
 
                         // ERREUR : Pas de fallback demo
-                        throw new Error(`Erreur API Perplexity: ${error.message}. Vérifiez votre clé API PERPLEXITY_API_KEY.`);
+                        throw new Error(`Erreur API Perplexity: ${parseError.message}. Vérifiez votre clé API PERPLEXITY_API_KEY.`);
                     }
 
                     addLogEntry('ANALYSIS', 'Analyse parsée', {
@@ -16503,6 +16549,19 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             const globalUtils = typeof window !== 'undefined' ? (window.DASHBOARD_UTILS || {}) : {};
             const LucideIcon = typeof window !== 'undefined' ? (window.LucideIcon || window.IconoirIcon) : (({ name, className = '' }) => <span className={className}>{name}</span>);
             const IconoirIcon = typeof window !== 'undefined' ? (window.IconoirIcon || LucideIcon) : (({ name, className = '' }) => <span className={className}>{name}</span>);
+            
+            // Fix missing state and functions
+            const [watchlistStockData, setWatchlistStockData] = useState({});
+            const supabaseClient = typeof window !== 'undefined' ? window.supabase : null;
+            const formatNumber = (num) => {
+                if (num === undefined || num === null || isNaN(num)) return 'N/A';
+                if (num >= 1e9) return (num / 1e9).toFixed(2) + ' B';
+                if (num >= 1e6) return (num / 1e6).toFixed(2) + ' M';
+                return num.toLocaleString();
+            };
+            const loadWatchlistData = async (tickers, force) => { console.log("loadWatchlistData mock", tickers); };
+            const saveWatchlistToSupabaseAuto = async (ticker, action) => { console.log("saveWatchlist mock", ticker, action); };
+
 
             // Filtrer les tickers selon la source
             const displayedTickers = tickerSource === 'watchlist' ? watchlistTickers : teamTickers;
@@ -18132,6 +18191,24 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // COMPOSANT FINANCE PRO PANEL
         // ============================================
         const FinanceProPanel = ({ isDarkMode }) => {
+            // State for screener
+            const [loadingScreener, setLoadingScreener] = useState(false);
+            const [screenerResults, setScreenerResults] = useState([]);
+            const [screenerFilters, setScreenerFilters] = useState({
+                minMarketCap: 0,
+                maxPE: 50,
+                minROE: 0,
+                maxDebtEquity: 2,
+                sector: 'all'
+            });
+            const LucideIcon = window.IconoirIcon || window.LucideIcon;
+            const formatNumber = (num) => {
+                if (num === undefined || num === null || isNaN(num)) return 'N/A';
+                if (num >= 1e9) return (num / 1e9).toFixed(2) + ' B';
+                if (num >= 1e6) return (num / 1e6).toFixed(2) + ' M';
+                return num.toLocaleString();
+            };
+
             const [viewMode, setViewMode] = useState('overview'); // 'overview', 'screener', 'compare', 'ratios'
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState(null);
@@ -27492,12 +27569,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 setShowTemperatureEditor={setShowTemperatureEditor}
                                 showLengthEditor={showLengthEditor}
                                 setShowLengthEditor={setShowLengthEditor}
-                        showCommandsHelp={showCommandsHelp}
-                        setShowCommandsHelp={setShowCommandsHelp}
-                        showSlashSuggestions={showSlashSuggestions}
-                        setShowSlashSuggestions={setShowSlashSuggestions}
-                        slashSuggestions={slashSuggestions}
-                        setSlashSuggestions={setSlashSuggestions}
                         selectedSuggestionIndex={selectedSuggestionIndex}
                         setSelectedSuggestionIndex={setSelectedSuggestionIndex}
                         isDarkMode={isDarkMode}
