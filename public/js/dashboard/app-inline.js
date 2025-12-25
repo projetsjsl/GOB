@@ -2366,6 +2366,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             }
         };
 
+        // STABLE REFERENCE for fetchNews to prevent re-renders in child tabs
+        const stableFetchNews = React.useCallback((...args) => fetchNews(...args), []);
+
         // Fonction pour récupérer les nouvelles des Top Movers
         const fetchNewsForTopMovers = async (topMoversData) => {
             if (!topMoversData || !topMoversData.data) {
@@ -18218,8 +18221,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             const [searchTerm, setSearchTerm] = useState('');
             const [sortBy, setSortBy] = useState('ticker');
             const [sortOrder, setSortOrder] = useState('asc');
-            const [screenerFilters, setScreenerFilters] = useState([]);
-            const [screenerResults, setScreenerResults] = useState([]);
+
             const [compareList, setCompareList] = useState(['AAPL', 'MSFT', 'GOOGL']);
             const [compareData, setCompareData] = useState({});
 
@@ -27536,8 +27538,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     />
                                 )}
                             </>
-                        );
-                    })()}
+
 
                     {/* Rendu conditionnel: Vue Grille ou Vue Onglets */}
                     {dashboardViewMode === 'grid' ? (
@@ -27569,9 +27570,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 setShowTemperatureEditor={setShowTemperatureEditor}
                                 showLengthEditor={showLengthEditor}
                                 setShowLengthEditor={setShowLengthEditor}
-                        selectedSuggestionIndex={selectedSuggestionIndex}
-                        setSelectedSuggestionIndex={setSelectedSuggestionIndex}
-                        isDarkMode={isDarkMode}
+
                                 showCommandsHelp={showCommandsHelp}
                                 setShowCommandsHelp={setShowCommandsHelp}
                                 showSlashSuggestions={showSlashSuggestions}
@@ -27630,37 +27629,37 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         )
                     ) : (
                         // VUE ONGLETS (CLASSIQUE)
-                        <>
-                    {/* Tab Loading Overlay - Visual feedback during navigation */}
-                    {tabLoading && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm pointer-events-none">
-                            <div className={`flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl ${isDarkMode ? 'bg-neutral-800' : 'bg-white'}`}>
-                                <div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                                <span className={isDarkMode ? 'text-white' : 'text-gray-800'}>Chargement...</span>
-                            </div>
-                        </div>
-                    )}
-                    <div className={`tab-content-active ${tabLoading ? 'opacity-50' : ''}`}>
-                    {activeTab === 'markets-economy' && (
-                        <MarketsEconomyTab 
-                            key={`markets-economy-${tabMountKeys['markets-economy'] || 0}`}
-                            isDarkMode={isDarkMode}
-                            newsData={newsData}
-                            loading={loading}
-                            lastUpdate={lastUpdate}
-                            fetchNews={fetchNews}
-                            summarizeWithEmma={summarizeWithEmma}
-                            isFrenchArticle={isFrenchArticle}
-                            getNewsIcon={getNewsIcon}
-                            getSourceCredibility={getSourceCredibility}
-                            cleanText={cleanText}
-                        />
-                   )}
-                    {activeTab === 'nouvelles' && <NouvellesTab key={`nouvelles-${tabMountKeys['nouvelles'] || 0}`} />}
-                    {activeTab === 'advanced-analysis' && window.AdvancedAnalysisTab && <window.AdvancedAnalysisTab key={`advanced-analysis-${tabMountKeys['advanced-analysis'] || 0}`} isDarkMode={isDarkMode} />}
-                    {/* {activeTab === 'yield-curve' && <YieldCurveTab />} */} {/* Intégré dans Marchés & Économie */}
-                    {activeTab === 'jlab' && <JLabUnifiedTab key={`jlab-${tabMountKeys['jlab'] || 0}`} />}
-                    {activeTab === 'groupchat' && window.GroupChatTab && React.createElement(window.GroupChatTab, { isDarkMode: isDarkMode, dashboardTab: activeTab, onDashboardTabChange: setActiveTab })}
+                            <>
+                            {/* Tab Loading Overlay - Visual feedback during navigation */}
+                            {tabLoading && (
+                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm pointer-events-none">
+                                    <div className={`flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl ${isDarkMode ? 'bg-neutral-800' : 'bg-white'}`}>
+                                        <div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                                        <span className={isDarkMode ? 'text-white' : 'text-gray-800'}>Chargement...</span>
+                                    </div>
+                                </div>
+                            )}
+                            <div className={`tab-content-active ${tabLoading ? 'opacity-50' : ''}`}>
+                            {activeTab === 'markets-economy' && (
+                                <MarketsEconomyTab 
+                                    key={`markets-economy-${tabMountKeys['markets-economy'] || 0}`}
+                                    isDarkMode={isDarkMode}
+                                    newsData={React.useMemo(() => newsData, [newsData])} // Explicit memoization
+                                    loading={loading}
+                                    lastUpdate={lastUpdate}
+                                    fetchNews={stableFetchNews}
+                                    summarizeWithEmma={summarizeWithEmma}
+                                    isFrenchArticle={isFrenchArticle}
+                                    getNewsIcon={getNewsIcon}
+                                    getSourceCredibility={getSourceCredibility}
+                                    cleanText={cleanText}
+                                />
+                           )}
+                            {activeTab === 'nouvelles' && <NouvellesTab key={`nouvelles-${tabMountKeys['nouvelles'] || 0}`} />}
+                            {activeTab === 'advanced-analysis' && window.AdvancedAnalysisTab && <window.AdvancedAnalysisTab key={`advanced-analysis-${tabMountKeys['advanced-analysis'] || 0}`} isDarkMode={isDarkMode} />}
+                            {/* {activeTab === 'yield-curve' && <YieldCurveTab />} */} {/* Intégré dans Marchés & Économie */}
+                            {activeTab === 'jlab' && <JLabTab key={`jlab-${tabMountKeys['jlab'] || 0}`} />}
+                            {activeTab === 'groupchat' && window.GroupChatTab && React.createElement(window.GroupChatTab, { isDarkMode: isDarkMode, dashboardTab: activeTab, onDashboardTabChange: setActiveTab })}
                     {activeTab === 'ask-emma' && <AskEmmaTab
                         prefillMessage={emmaPrefillMessage}
                         setPrefillMessage={setEmmaPrefillMessage}
@@ -27926,7 +27925,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Chargement RGL...</p>
                         </div>
                     )}
-                    </div>{/* Close tab-content-active wrapper */}
                         </>
                     )}
 

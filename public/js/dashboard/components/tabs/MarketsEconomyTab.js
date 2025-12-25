@@ -335,7 +335,7 @@ const MarketQuotesWidget = ({ isDarkMode }) => {
 // MAIN COMPONENT
 // =====================================================
 
-const MarketsEconomyTab = ({
+const MarketsEconomyTab = React.memo(({
     isDarkMode = false,
     newsData = [],
     loading = false,
@@ -835,7 +835,9 @@ const MarketsEconomyTab = ({
             )}
         </div>
     );
-};
+});
+
+MarketsEconomyTab.displayName = 'MarketsEconomyTab';
 
 // Export with React.memo for performance stabilization
 window.MarketsEconomyTab = React.memo(MarketsEconomyTab);

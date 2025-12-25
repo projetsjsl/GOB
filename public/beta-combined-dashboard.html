@@ -196,6 +196,46 @@
         // Polyfill for CommonJS to prevent Babel and UMD errors
         // MUST run before React Grid Layout and any Babel transpilation
         (function() {
+            // =================================================================
+            // 🛡️ CRASH PREVENTION SHIELD
+            // Fixes "TypeError: t.animate is not a function"
+            // =================================================================
+            if (!Object.prototype.animate) {
+                Object.defineProperty(Object.prototype, 'animate', {
+                    configurable: true,
+                    enumerable: false, // Critical: hide from loops
+                    writable: true,
+                    value: function(keyframes, options) {
+                        try {
+                            // If it's a DOM Node, it should have used the native method.
+                            // If we are here, 'this' is likely a library object missing the method.
+                            
+                            // Filter common noise (React internals)
+                            if (this._reactInternals || this.$$typeof) {
+                                return { onfinish: () => {}, cancel: () => {}, play: () => {}, addEventListener: () => {} };
+                            }
+
+                            console.warn('🛡️ PREVENTED CRASH: .animate() called on invalid object:', this);
+                            
+                            // Return mock Animation object
+                            return {
+                                finished: Promise.resolve(),
+                                onfinish: null,
+                                cancel: () => {},
+                                play: () => {},
+                                pause: () => {},
+                                reverse: () => {},
+                                addEventListener: () => {}
+                            };
+                        } catch (e) {
+                            console.error('Shield failed:', e);
+                            return { cancel: () => {} };
+                        }
+                    }
+                });
+            }
+            // =================================================================
+
             // GLOBAL FALLBACKS & COMPONENTS to prevent ReferenceErrors in components
             
 
@@ -416,6 +456,8 @@
     <script type="text/babel" src="js/dashboard/components/tabs/AdminJSLaiTab.js"></script>
     <!-- PlusTab Component -->
     <script type="text/babel" src="js/dashboard/components/tabs/PlusTab.js"></script>
+    <!-- JLab Unified Tab -->
+    <script type="text/babel" src="js/dashboard/components/tabs/JLabUnifiedTab.js"></script>
 
     <!-- Grid Layout Components (library loaded earlier in <head>) -->
     <script type="text/babel" src="js/dashboard/components/grid-layout/RglDashboard.js"></script>
@@ -1762,6 +1804,17 @@
         <span class="separator">|</span>
         <span id="footer-context">public/beta-combined-dashboard.html</span>
     </div>
+    <!-- FAILSAFE: Force remove loader if app hangs -->
+    <script>
+        setTimeout(function() {
+            const loader = document.getElementById('loadingOverlay');
+            if (loader && loader.style.display !== 'none') {
+                console.warn('⚠️ Failsafe triggered: Removing stuck loader');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }
+        }, 10000); // 10 seconds max load time
+    </script>
     <script type="text/babel" src="/js/dashboard/components/DevTimer.js"></script>
 </body>
 

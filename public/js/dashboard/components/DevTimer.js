@@ -375,8 +375,10 @@ window.DevTimerConfig = {
 };
 
 // Auto-mount timer (only if enabled)
-const timerContainer = document.createElement('div');
-timerContainer.id = 'dev-timer-root';
-document.body.appendChild(timerContainer);
-const root = ReactDOM.createRoot(timerContainer);
-root.render(React.createElement(window.DevTimer));
+if (!document.getElementById('dev-timer-root')) {
+    const timerContainer = document.createElement('div');
+    timerContainer.id = 'dev-timer-root';
+    document.body.appendChild(timerContainer);
+    const root = window.ReactDOM.createRoot(timerContainer);
+    root.render(React.createElement(window.DevTimer));
+}
