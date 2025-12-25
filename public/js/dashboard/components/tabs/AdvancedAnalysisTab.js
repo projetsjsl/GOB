@@ -273,17 +273,48 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             calendar: false,
             details: true,
             hide_side_toolbar: false,
+            hide_top_toolbar: false,
+            hide_legend: false,
+            hide_volume: false,
+            hotlist: false,
             interval: 'D',
             locale: 'fr',
             save_image: true,
-            style: '1',
+            style: '3',
             symbol: selectedStock,
             theme: isDarkMode ? 'dark' : 'light',
             timezone: 'America/Toronto',
             backgroundColor: isDarkMode ? '#0F0F0F' : '#FFFFFF',
+            gridColor: 'rgba(242, 242, 242, 0.06)',
+            watchlist: [
+                'FOREXCOM:SPXUSD',
+                'FOREXCOM:NSXUSD',
+                'FOREXCOM:DJI',
+                'NASDAQ:AAPL',
+                'NASDAQ:MSFT',
+                'NASDAQ:GOOGL',
+                'NASDAQ:AMZN',
+                'NASDAQ:NVDA',
+                'NASDAQ:TSLA',
+                'NASDAQ:META',
+                'BITSTAMP:BTCUSD',
+                'BITSTAMP:ETHUSD',
+                'NYSE:JPM',
+                'NYSE:BAC',
+                'NYSE:GS'
+            ],
             withdateranges: true,
+            range: 'YTD',
+            compareSymbols: [],
+            show_popup_button: true,
+            popup_height: '800',
+            popup_width: '1200',
+            studies: [
+                'STD;Smoothed%1Moving%1Average',
+                'STD;RSI'
+            ],
             width: '100%',
-            height: 700
+            height: 800
         });
         container.appendChild(script);
         return () => { if (container) container.innerHTML = ''; };
