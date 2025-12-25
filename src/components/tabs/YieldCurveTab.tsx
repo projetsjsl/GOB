@@ -45,25 +45,20 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                         )}
                     </div>
                 );
-                
-                console.log('📊 YieldCurveTab monté, isDarkMode:', darkMode);
 
                 // Récupérer les données de la yield curve
                 const fetchYieldCurve = async () => {
-                    console.log('🔄 fetchYieldCurve appelé pour country:', selectedCountry);
                     setLoading(true);
                     setError(null);
 
                     try {
                         const response = await fetch(`${apiBase}/api/yield-curve?country=${selectedCountry}`);
-                        console.log('📡 Réponse API yield-curve:', response.status, response.ok);
 
                         if (!response.ok) {
                             throw new Error(`Erreur API: ${response.status}`);
                         }
 
                         const data = await response.json();
-                        console.log('✅ Données yield curve reçues:', data);
                         setYieldData(data);
                         setLoading(false);
                     } catch (err) {
@@ -226,8 +221,6 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                         day: 'numeric'
                     });
                 };
-
-                console.log('🎨 YieldCurveTab render - loading:', loading, 'error:', error, 'yieldData:', yieldData, 'darkMode:', darkMode);
 
                 return (
                     <div className="space-y-6">

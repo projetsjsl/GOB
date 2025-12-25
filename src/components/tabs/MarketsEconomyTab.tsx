@@ -14,10 +14,17 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
     const forexHeatmapRef = useRef<HTMLDivElement>(null);
     const economicCalendarRef = useRef<HTMLDivElement>(null);
 
+    // Refs pour suivre l'état d'initialisation des widgets
+    const marketOverviewInitialized = useRef(false);
+    const heatmapInitialized = useRef(false);
+    const screenerInitialized = useRef(false);
+    const forexHeatmapInitialized = useRef(false);
+    const economicCalendarInitialized = useRef(false);
+
     // Charger les widgets TradingView
     useEffect(() => {
-        // Market Overview Widget
-        if (marketOverviewRef.current) {
+        // Market Overview Widget - Only initialize if not already done
+        if (marketOverviewRef.current && !marketOverviewRef.current.hasChildNodes()) {
             marketOverviewRef.current.innerHTML = '';
             const script = document.createElement('script');
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
@@ -66,10 +73,11 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                 ]
             });
             marketOverviewRef.current.appendChild(script);
+            marketOverviewInitialized.current = true;
         }
 
-        // Heatmap Widget
-        if (heatmapRef.current) {
+        // Heatmap Widget - Only initialize if not already done
+        if (heatmapRef.current && !heatmapRef.current.hasChildNodes()) {
             heatmapRef.current.innerHTML = '';
             const script = document.createElement('script');
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
@@ -91,10 +99,11 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                 "height": "100%"
             });
             heatmapRef.current.appendChild(script);
+            heatmapInitialized.current = true;
         }
 
-        // Screener Widget
-        if (screenerRef.current) {
+        // Screener Widget - Only initialize if not already done
+        if (screenerRef.current && !screenerRef.current.hasChildNodes()) {
             screenerRef.current.innerHTML = '';
             const script = document.createElement('script');
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
@@ -111,10 +120,11 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                 "isTransparent": false
             });
             screenerRef.current.appendChild(script);
+            screenerInitialized.current = true;
         }
 
-        // Forex Heatmap Widget
-        if (forexHeatmapRef.current) {
+        // Forex Heatmap Widget - Only initialize if not already done
+        if (forexHeatmapRef.current && !forexHeatmapRef.current.hasChildNodes()) {
             forexHeatmapRef.current.innerHTML = '';
             const script = document.createElement('script');
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js';
@@ -128,10 +138,11 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                 "locale": "fr"
             });
             forexHeatmapRef.current.appendChild(script);
+            forexHeatmapInitialized.current = true;
         }
 
-        // Economic Calendar Widget
-        if (economicCalendarRef.current) {
+        // Economic Calendar Widget - Only initialize if not already done
+        if (economicCalendarRef.current && !economicCalendarRef.current.hasChildNodes()) {
             economicCalendarRef.current.innerHTML = '';
             const script = document.createElement('script');
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
@@ -146,15 +157,31 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                 "countryFilter": "us,ca,eu,gb,jp,cn"
             });
             economicCalendarRef.current.appendChild(script);
+            economicCalendarInitialized.current = true;
         }
-        
-        // CLEANUP: Prevent memory leaks by removing widget content on unmount/re-render
+
+        // CLEANUP: Prevent memory leaks by removing widget content and resetting flags on unmount
         return () => {
-            if (marketOverviewRef.current) marketOverviewRef.current.innerHTML = '';
-            if (heatmapRef.current) heatmapRef.current.innerHTML = '';
-            if (screenerRef.current) screenerRef.current.innerHTML = '';
-            if (forexHeatmapRef.current) forexHeatmapRef.current.innerHTML = '';
-            if (economicCalendarRef.current) economicCalendarRef.current.innerHTML = '';
+            if (marketOverviewRef.current) {
+                marketOverviewRef.current.innerHTML = '';
+                marketOverviewInitialized.current = false;
+            }
+            if (heatmapRef.current) {
+                heatmapRef.current.innerHTML = '';
+                heatmapInitialized.current = false;
+            }
+            if (screenerRef.current) {
+                screenerRef.current.innerHTML = '';
+                screenerInitialized.current = false;
+            }
+            if (forexHeatmapRef.current) {
+                forexHeatmapRef.current.innerHTML = '';
+                forexHeatmapInitialized.current = false;
+            }
+            if (economicCalendarRef.current) {
+                economicCalendarRef.current.innerHTML = '';
+                economicCalendarInitialized.current = false;
+            }
         };
     }, [isDarkMode]);
 

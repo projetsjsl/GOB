@@ -32,6 +32,21 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 const tradingViewFinancialsRef = useRef(null);
                 const tradingViewTechnicalAnalysisRef = useRef(null);
 
+                // Refs pour suivre l'état d'initialisation des widgets
+                const forexInitialized = useRef(false);
+                const eventsInitialized = useRef(false);
+                const crossRatesInitialized = useRef(false);
+                const heatmapInitialized = useRef(false);
+                const heatmapTSXInitialized = useRef(false);
+                const chartSPYInitialized = useRef(false);
+                const marketQuotesInitialized = useRef(false);
+                const symbolInfoInitialized = useRef(false);
+                const timelineInitialized = useRef(false);
+                const screenerInitialized = useRef(false);
+                const symbolProfileInitialized = useRef(false);
+                const financialsInitialized = useRef(false);
+                const technicalAnalysisInitialized = useRef(false);
+
                 // State pour les symboles configurables
                 const [timelineSymbol, setTimelineSymbol] = useState('BITSTAMP:BTCUSD');
                 const [searchQuery, setSearchQuery] = useState('');
@@ -145,7 +160,7 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 useEffect(() => {
                     // Créer le conteneur du widget
                     const container = tradingViewForexRef.current;
-                    if (!container) return;
+                    if (!container || container.hasChildNodes()) return;
 
                     // Nettoyer le conteneur
                     container.innerHTML = '';
@@ -169,11 +184,13 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                     });
 
                     container.appendChild(script);
+                    forexInitialized.current = true;
 
                     // Cleanup
                     return () => {
                         if (container) {
                             container.innerHTML = '';
+                            forexInitialized.current = false;
                         }
                     };
                 }, [isDarkMode]);
@@ -181,7 +198,7 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Events (Economic Calendar)
                 useEffect(() => {
                     const container = tradingViewEventsRef.current;
-                    if (!container) return;
+                    if (!container || container.hasChildNodes()) return;
 
                     container.innerHTML = '';
 
@@ -203,10 +220,12 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                     });
 
                     container.appendChild(script);
+                    eventsInitialized.current = true;
 
                     return () => {
                         if (container) {
                             container.innerHTML = '';
+                            eventsInitialized.current = false;
                         }
                     };
                 }, []);
@@ -214,7 +233,7 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Forex Cross Rates
                 useEffect(() => {
                     const container = tradingViewCrossRatesRef.current;
-                    if (!container) return;
+                    if (!container || container.hasChildNodes()) return;
 
                     container.innerHTML = '';
 
@@ -243,10 +262,12 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                     });
 
                     container.appendChild(script);
+                    crossRatesInitialized.current = true;
 
                     return () => {
                         if (container) {
                             container.innerHTML = '';
+                            crossRatesInitialized.current = false;
                         }
                     };
                 }, [isDarkMode]);
@@ -254,7 +275,7 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Stock Heatmap
                 useEffect(() => {
                     const container = tradingViewHeatmapRef.current;
-                    if (!container) return;
+                    if (!container || container.hasChildNodes()) return;
 
                     container.innerHTML = '';
 
@@ -281,10 +302,12 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                     });
 
                     container.appendChild(script);
+                    heatmapInitialized.current = true;
 
                     return () => {
                         if (container) {
                             container.innerHTML = '';
+                            heatmapInitialized.current = false;
                         }
                     };
                 }, []);
@@ -292,7 +315,7 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Stock Heatmap TSX
                 useEffect(() => {
                     const container = tradingViewHeatmapTSXRef.current;
-                    if (!container) return;
+                    if (!container || container.hasChildNodes()) return;
 
                     container.innerHTML = '';
 
@@ -319,10 +342,12 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                     });
 
                     container.appendChild(script);
+                    heatmapTSXInitialized.current = true;
 
                     return () => {
                         if (container) {
                             container.innerHTML = '';
+                            heatmapTSXInitialized.current = false;
                         }
                     };
                 }, []);
@@ -330,7 +355,7 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Advanced Chart (synchronisé)
                 useEffect(() => {
                     const container = tradingViewChartSPYRef.current;
-                    if (!container) return;
+                    if (!container || container.hasChildNodes()) return;
 
                     container.innerHTML = '';
 
@@ -388,10 +413,12 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                     });
 
                     container.appendChild(script);
+                    chartSPYInitialized.current = true;
 
                     return () => {
                         if (container) {
                             container.innerHTML = '';
+                            chartSPYInitialized.current = false;
                         }
                     };
                 }, [timelineSymbol]);
@@ -399,7 +426,7 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Market Quotes
                 useEffect(() => {
                     const container = tradingViewMarketQuotesRef.current;
-                    if (!container) return;
+                    if (!container || container.hasChildNodes()) return;
 
                     container.innerHTML = '';
 
@@ -466,10 +493,12 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                     });
 
                     container.appendChild(script);
+                    marketQuotesInitialized.current = true;
 
                     return () => {
                         if (container) {
                             container.innerHTML = '';
+                            marketQuotesInitialized.current = false;
                         }
                     };
                 }, []);
@@ -477,7 +506,7 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Symbol Info (synchronisé)
                 useEffect(() => {
                     const container = tradingViewSymbolInfoRef.current;
-                    if (!container) return;
+                    if (!container || container.hasChildNodes()) return;
 
                     container.innerHTML = '';
 
@@ -494,10 +523,12 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                     });
 
                     container.appendChild(script);
+                    symbolInfoInitialized.current = true;
 
                     return () => {
                         if (container) {
                             container.innerHTML = '';
+                            symbolInfoInitialized.current = false;
                         }
                     };
                 }, [timelineSymbol]);
@@ -505,7 +536,7 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Timeline (configurable)
                 useEffect(() => {
                     const container = tradingViewTimelineRef.current;
-                    if (!container) return;
+                    if (!container || container.hasChildNodes()) return;
 
                     container.innerHTML = '';
 
@@ -525,10 +556,12 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                     });
 
                     container.appendChild(script);
+                    timelineInitialized.current = true;
 
                     return () => {
                         if (container) {
                             container.innerHTML = '';
+                            timelineInitialized.current = false;
                         }
                     };
                 }, [timelineSymbol]);
@@ -536,7 +569,7 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Screener
                 useEffect(() => {
                     const container = tradingViewScreenerRef.current;
-                    if (!container) return;
+                    if (!container || container.hasChildNodes()) return;
 
                     container.innerHTML = '';
 
@@ -561,10 +594,12 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                     });
 
                     container.appendChild(script);
+                    screenerInitialized.current = true;
 
                     return () => {
                         if (container) {
                             container.innerHTML = '';
+                            screenerInitialized.current = false;
                         }
                     };
                 }, []);
@@ -572,7 +607,7 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Symbol Profile (synchronisé)
                 useEffect(() => {
                     const container = tradingViewSymbolProfileRef.current;
-                    if (!container) return;
+                    if (!container || container.hasChildNodes()) return;
 
                     container.innerHTML = '';
 
@@ -594,10 +629,12 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                     });
 
                     container.appendChild(script);
+                    symbolProfileInitialized.current = true;
 
                     return () => {
                         if (container) {
                             container.innerHTML = '';
+                            symbolProfileInitialized.current = false;
                         }
                     };
                 }, [timelineSymbol]);
@@ -605,7 +642,7 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Financials (synchronisé)
                 useEffect(() => {
                     const container = tradingViewFinancialsRef.current;
-                    if (!container) return;
+                    if (!container || container.hasChildNodes()) return;
 
                     container.innerHTML = '';
 
@@ -628,10 +665,12 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                     });
 
                     container.appendChild(script);
+                    financialsInitialized.current = true;
 
                     return () => {
                         if (container) {
                             container.innerHTML = '';
+                            financialsInitialized.current = false;
                         }
                     };
                 }, [timelineSymbol]);
@@ -639,7 +678,7 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Technical Analysis (synchronisé)
                 useEffect(() => {
                     const container = tradingViewTechnicalAnalysisRef.current;
-                    if (!container) return;
+                    if (!container || container.hasChildNodes()) return;
 
                     container.innerHTML = '';
 
@@ -665,10 +704,12 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                     });
 
                     container.appendChild(script);
+                    technicalAnalysisInitialized.current = true;
 
                     return () => {
                         if (container) {
                             container.innerHTML = '';
+                            technicalAnalysisInitialized.current = false;
                         }
                     };
                 }, [timelineSymbol]);

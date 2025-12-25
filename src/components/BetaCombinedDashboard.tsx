@@ -314,7 +314,7 @@ export const BetaCombinedDashboard: React.FC = () => {
         }, 300);
 
         return () => clearTimeout(timeoutId);
-    }, [tickers.length, initialLoadComplete, fetchLatestNewsForTickers]);
+    }, [tickers, initialLoadComplete, fetchLatestNewsForTickers]);
 
     // Memoize tabProps to prevent unnecessary re-renders of children
     const tabProps = useMemo(() => ({

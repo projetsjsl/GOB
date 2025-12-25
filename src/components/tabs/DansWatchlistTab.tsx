@@ -403,44 +403,43 @@ const DansWatchlistTab: React.FC<TabProps> = memo((props) => {
     // Effet pour initialiser le TradingView Ticker Tape avec les tickers de la watchlist
     useEffect(() => {
         if (watchlistTickers.length > 0) {
-            // Supprimer le widget existant s'il existe
-            const existingWidget = document.getElementById('tradingview-ticker-dan-watchlist');
-            if (existingWidget) {
-                existingWidget.innerHTML = '';
-            }
-
-            // Créer les symboles formatés pour TradingView (EXCHANGE:TICKER)
-            // Par défaut, on assume que les tickers US sont sur NASDAQ ou NYSE
-            const tvSymbols = watchlistTickers.map(ticker => {
-                // Détecter les tickers canadiens (qui se terminent souvent par .TO, .V, etc.)
-                if (ticker.includes('.TO') || ticker.includes('.V')) {
-                    return { "proName": `TSX:${ticker.replace(/\.(TO|V)/, '')}`, "title": ticker };
-                }
-                // Par défaut, utiliser NASDAQ pour les tickers US
-                return { "proName": `NASDAQ:${ticker}`, "title": ticker };
-            });
-
-            // Créer le script TradingView
-            const script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
-            script.async = true;
-            script.innerHTML = JSON.stringify({
-                "symbols": tvSymbols.slice(0, 20), // Limiter à 20 symboles pour performance
-                "showSymbolLogo": true,
-                "isTransparent": isDarkMode,
-                "displayMode": "adaptive",
-                "colorTheme": isDarkMode ? "dark" : "light",
-                "locale": "fr"
-            });
-
             const widgetContainer = document.getElementById('tradingview-ticker-dan-watchlist');
-            if (widgetContainer) {
+
+            // Only initialize if container exists and has no children
+            if (widgetContainer && !widgetContainer.hasChildNodes()) {
+                // Supprimer le widget existant s'il existe
+                widgetContainer.innerHTML = '';
+
+                // Créer les symboles formatés pour TradingView (EXCHANGE:TICKER)
+                // Par défaut, on assume que les tickers US sont sur NASDAQ ou NYSE
+                const tvSymbols = watchlistTickers.map(ticker => {
+                    // Détecter les tickers canadiens (qui se terminent souvent par .TO, .V, etc.)
+                    if (ticker.includes('.TO') || ticker.includes('.V')) {
+                        return { "proName": `TSX:${ticker.replace(/\.(TO|V)/, '')}`, "title": ticker };
+                    }
+                    // Par défaut, utiliser NASDAQ pour les tickers US
+                    return { "proName": `NASDAQ:${ticker}`, "title": ticker };
+                });
+
+                // Créer le script TradingView
+                const script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+                script.async = true;
+                script.innerHTML = JSON.stringify({
+                    "symbols": tvSymbols.slice(0, 20), // Limiter à 20 symboles pour performance
+                    "showSymbolLogo": true,
+                    "isTransparent": isDarkMode,
+                    "displayMode": "adaptive",
+                    "colorTheme": isDarkMode ? "dark" : "light",
+                    "locale": "fr"
+                });
+
                 widgetContainer.appendChild(script);
             }
         }
-        
-        // CLEANUP: Prevent memory leaks by removing widget content on unmount/re-render
+
+        // CLEANUP: Prevent memory leaks by removing widget content on unmount
         return () => {
             const existingWidget = document.getElementById('tradingview-ticker-dan-watchlist');
             if (existingWidget) {
