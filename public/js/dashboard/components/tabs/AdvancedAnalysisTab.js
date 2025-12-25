@@ -6,6 +6,9 @@ const { useState, useEffect } = React;
 const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, AreaChart, Area } = window.Recharts || {};
 
 const AdvancedAnalysisTab = ({ isDarkMode }) => {
+    // Lazy Loader Fallback
+    const LazyWidgetWrapper = window.LazyWidgetWrapper || (({ children }) => <>{children}</>);
+
     // Watchlist / Team tickers (loaded from Supabase)
     const [watchlistTickers, setWatchlistTickers] = useState([]);
     const [watchlistLoaded, setWatchlistLoaded] = useState(false);
@@ -683,7 +686,9 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             {/* Chart View */}
             {activeTab === 'chart' && (
                 <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 animate-fade-in">
-                    <div className="tradingview-widget-container h-[700px]" ref={chartContainerRef}></div>
+                    <LazyWidgetWrapper threshold={0.5} height={700}>
+                        <div className="tradingview-widget-container h-[700px]" ref={chartContainerRef}></div>
+                    </LazyWidgetWrapper>
                 </div>
             )}
 
@@ -693,11 +698,15 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-2 bg-gray-800 rounded-xl overflow-hidden border border-gray-700 h-[500px]">
                             <div className="p-4 border-b border-gray-700 font-bold">États Financiers</div>
-                            <div className="tradingview-widget-container h-full" ref={financialsContainerRef}></div>
+                            <LazyWidgetWrapper threshold={0.5} height={440}>
+                                <div className="tradingview-widget-container h-full" ref={financialsContainerRef}></div>
+                            </LazyWidgetWrapper>
                         </div>
                         <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 h-[500px]">
                             <div className="p-4 border-b border-gray-700 font-bold">Profil Société</div>
-                            <div className="tradingview-widget-container h-full" ref={profileContainerRef}></div>
+                            <LazyWidgetWrapper threshold={0.5} height={440}>
+                                <div className="tradingview-widget-container h-full" ref={profileContainerRef}></div>
+                            </LazyWidgetWrapper>
                         </div>
                     </div>
                 </div>
@@ -706,14 +715,18 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             {/* Technical Analysis View */}
             {activeTab === 'analysis' && (
                 <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 animate-fade-in h-[600px]">
-                     <div className="tradingview-widget-container h-full" ref={techAnalysisContainerRef}></div>
+                     <LazyWidgetWrapper threshold={0.5} height={600}>
+                        <div className="tradingview-widget-container h-full" ref={techAnalysisContainerRef}></div>
+                     </LazyWidgetWrapper>
                 </div>
             )}
 
             {/* Timeline View */}
             {activeTab === 'timeline' && (
                 <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 animate-fade-in h-[700px]">
-                     <div className="tradingview-widget-container h-full" ref={timelineContainerRef}></div>
+                     <LazyWidgetWrapper threshold={0.5} height={700}>
+                        <div className="tradingview-widget-container h-full" ref={timelineContainerRef}></div>
+                     </LazyWidgetWrapper>
                 </div>
             )}
 
