@@ -27537,11 +27537,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         activeTab={activeSubTab}
                                         onTabChange={handleNewTabChange}
                                         isDarkMode={isDarkMode}
-                                        position="right" 
+                                        position="right"
                                     />
                                 )}
-                            </>
-
 
                     {/* Rendu conditionnel: Vue Grille ou Vue Onglets */}
                     {dashboardViewMode === 'grid' ? (
