@@ -648,14 +648,12 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         ],
         'marches': [
             { id: 'marches-global', label: 'Vue Globale', icon: 'Globe', component: 'MarketsEconomyTab' },
-            { id: 'marches-flex', label: 'Vue Flex (Bêta)', icon: 'Layout', component: 'MarketsEconomyTabRGL' },
             { id: 'marches-calendar', label: 'Calendrier Éco', icon: 'Calendar', component: 'EconomicCalendarTab' },
             { id: 'marches-yield', label: 'Courbe Taux', icon: 'LineChart', component: 'YieldCurveTab' },
             { id: 'marches-nouvelles', label: 'Nouvelles', icon: 'Newspaper', component: 'NouvellesTab' }
         ],
         'titres': [
             { id: 'titres-portfolio', label: 'Mon Portfolio', icon: 'Wallet', component: 'StocksNewsTab:portfolio' },
-            { id: 'titres-flex', label: 'Dashboard Flex (Bêta)', icon: 'LayoutDashboard', component: 'TitresTabRGL' },
             { id: 'titres-watchlist', label: 'Watchlist', icon: 'Star', component: 'StocksNewsTab:watchlist' },
             { id: 'titres-3p1', label: 'Finance Pro', icon: 'PieChart', component: 'redirect:/3p1' },
             { id: 'titres-seeking', label: 'Seeking Alpha', icon: 'Newspaper', component: 'SeekingAlphaTab' },
