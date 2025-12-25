@@ -777,6 +777,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     // MAIN APP COMPONENT
     // ============================================================================
     const BetaCombinedDashboard = () => {
+        console.log("🐞 DEBUG: BetaCombinedDashboard STARTS NOW");
         // ... existing hooks ...
         
         // State for Secondary Navigation Configuration
@@ -20513,9 +20514,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             // Référence locale pour utiliser le composant global
             const LucideIcon = window.LucideIcon;
 
+            console.log("🐞 DEBUG: BetaCombinedDashboard BEFORE RENDER. showLoadingScreen:", showLoadingScreen);
+
             return (
-                <div className={`min-h-screen p-2 transition-colors duration-300 ${isDarkMode ? 'bg-neutral-950 text-gray-100' : 'bg-gray-50 text-gray-900'
-                    }`}>
+                <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-black text-white' : 'bg-gray-50 text-gray-900'} ${currentThemeId === 'bloomberg' || currentThemeId === 'bloomberg-terminal' ? 'font-mono' : ''}`}>
                     {/* Screener */}
                     {showScreener && (
                         <div className={`mb-2 border rounded-lg p-3 transition-colors duration-300 ${isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
@@ -27059,6 +27061,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 )}
 
                 {/* News Banner - Bandeau d'actualités défilant */}
+                {/* News Banner - Bandeau d'actualités défilant */}
                 {window.NewsBanner ? (
                     React.createElement(window.NewsBanner, { 
                         isDarkMode: isDarkMode,
@@ -27925,6 +27928,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Chargement RGL...</p>
                         </div>
                     )}
+                    </div>
                         </>
                     )}
 

@@ -197,41 +197,72 @@
         // MUST run before React Grid Layout and any Babel transpilation
         (function() {
             // =================================================================
-            // 🛡️ CRASH PREVENTION SHIELD
-            // Fixes "TypeError: t.animate is not a function"
+            // 🛡️ CRASH PREVENTION SHIELD v2
+            // Fixes "TypeError: t.animate is not a function" (specifically on Window)
             // =================================================================
+            const createMockAnimation = () => ({
+                finished: Promise.resolve(),
+                ready: Promise.resolve(),
+                onfinish: null,
+                cancel: () => {},
+                play: () => {},
+                pause: () => {},
+                reverse: () => {},
+                addEventListener: () => {},
+                removeEventListener: () => {},
+                currentTime: 0,
+                startTime: 0,
+                playbackRate: 1,
+                playState: 'finished',
+                id: 'mock-animation',
+                pending: false,
+                replaceState: 'active',
+                effect: null,
+                timeline: null,
+                onremove: null,
+                oncancel: null,
+                commitStyles: () => {},
+                persist: () => {},
+                updatePlaybackRate: () => {}
+            });
+
+            // 1. Critical: Polyfill window.animate (The culprit identified in logs)
+            if (typeof window !== 'undefined' && !window.animate) {
+                window.animate = function(keyframes, options) {
+                    console.warn('🛡️ PREVENTED CRASH: window.animate called!', keyframes);
+                    console.trace('🛡️ Stack Trace for window.animate call:');
+                    return createMockAnimation();
+                };
+            }
+
+            // 2. Element.animate polyfill
+            if (typeof Element !== 'undefined' && !Element.prototype.animate) {
+                 Element.prototype.animate = function(keyframes, options) {
+                    // console.log('Element.animate polyfill', this);
+                    return createMockAnimation();
+                };
+            }
+
+            // 3. Explicit Prototypes (Catch-all)
+            [HTMLElement, SVGElement, Element].forEach(proto => {
+                if (typeof proto !== 'undefined' && !proto.prototype.animate) {
+                    proto.prototype.animate = function(keyframes, options) {
+                        return createMockAnimation();
+                    };
+                }
+            });
+
+            // 4. Fallback ultime pour TOUS les objets (agressif mais nécessaire pour ce crash)
+            // Utilise defineProperty pour éviter d'énumérer la propriété et causer des effets de bord
             if (!Object.prototype.animate) {
                 Object.defineProperty(Object.prototype, 'animate', {
-                    configurable: true,
-                    enumerable: false, // Critical: hide from loops
-                    writable: true,
                     value: function(keyframes, options) {
-                        try {
-                            // If it's a DOM Node, it should have used the native method.
-                            // If we are here, 'this' is likely a library object missing the method.
-                            
-                            // Filter common noise (React internals)
-                            if (this._reactInternals || this.$$typeof) {
-                                return { onfinish: () => {}, cancel: () => {}, play: () => {}, addEventListener: () => {} };
-                            }
-
-                            console.warn('🛡️ PREVENTED CRASH: .animate() called on invalid object:', this);
-                            
-                            // Return mock Animation object
-                            return {
-                                finished: Promise.resolve(),
-                                onfinish: null,
-                                cancel: () => {},
-                                play: () => {},
-                                pause: () => {},
-                                reverse: () => {},
-                                addEventListener: () => {}
-                            };
-                        } catch (e) {
-                            console.error('Shield failed:', e);
-                            return { cancel: () => {} };
-                        }
-                    }
+                        console.warn('🛡️ PREVENTED CRASH: Object.prototype.animate called on:', this);
+                        return createMockAnimation();
+                    },
+                    writable: true,
+                    configurable: true,
+                    enumerable: false
                 });
             }
             // =================================================================
@@ -394,7 +425,7 @@
     <!-- React-Grid-Layout loads after the require polyfill -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/react-grid-layout@1.4.4/css/styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/react-resizable@3.0.5/css/styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/react-grid-layout@1.4.4/dist/react-grid-layout.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/react-grid-layout@1.4.4/dist/react-grid-layout.min.js"></script> -->
 
     <!-- Verify and expose React Grid Layout -->
     <script>
@@ -418,15 +449,16 @@
     </script>
 
     <!-- Performance Optimizer - Réduit le temps de chargement -->
+    <!-- Performance Optimizer - Réduit le temps de chargement -->
     <script src="/js/dashboard/logger.js"></script>
     <!-- Performance Optimizer REMOVED (was causing widget hangs) -->
     <!-- <script src="/js/dashboard/performance-optimizer.js"></script> -->
     <!-- Tab Lazy Loader - Prepares on-demand loading -->
     <script src="/js/dashboard/tab-lazy-loader.js"></script>
     <!-- Lazy Widget Wrapper (Intersection Observer) -->
-    <script src="/js/dashboard/components/LazyWidgetWrapper.js"></script>
+    <!-- <script src="/js/dashboard/components/LazyWidgetWrapper.js"></script> -->
     <!-- Optimized TradingView widget loader -->
-    <script src="/js/dashboard/widget-loader-optimized.js"></script>
+    <!-- <script src="/js/dashboard/widget-loader-optimized.js"></script> -->
 
     <script src="/js/dashboard/constants.js"></script>
     <!-- Utilitaires partagés exposés globalement -->
@@ -446,35 +478,35 @@
     <script type="text/babel" src="js/dashboard/components/tabs/FinVoxTab.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/EmmAIATab.js"></script>
     <!-- Terminal Emma IA Tab -->
-    <script type="text/babel" src="js/dashboard/components/tabs/TerminalEmmaIATab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/FastGraphsTab.js"></script>
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/TerminalEmmaIATab.js"></script> -->
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/FastGraphsTab.js"></script> -->
     <!-- GroupChat Tab (JSLAI RobotWeb Ultimate v5.0) -->
-    <script type="text/babel" src="js/dashboard/components/tabs/GroupChatTab.js"></script>
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/GroupChatTab.js"></script> -->
     <!-- ChatGPT Group Tab (ChatGPT Group Chat Integration) -->
-    <script type="text/babel" src="js/dashboard/components/tabs/ChatGPTGroupTab.js"></script>
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/ChatGPTGroupTab.js"></script> -->
     <!-- AdminJSLai Tab -->
-    <script type="text/babel" src="js/dashboard/components/tabs/AdminJSLaiTab.js"></script>
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/AdminJSLaiTab.js"></script> -->
     <!-- PlusTab Component -->
-    <script type="text/babel" src="js/dashboard/components/tabs/PlusTab.js"></script>
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/PlusTab.js"></script> -->
     <!-- JLab Unified Tab -->
-    <script type="text/babel" src="js/dashboard/components/tabs/JLabUnifiedTab.js"></script>
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/JLabUnifiedTab.js"></script> -->
 
     <!-- Grid Layout Components (library loaded earlier in <head>) -->
-    <script type="text/babel" src="js/dashboard/components/grid-layout/RglDashboard.js"></script>
-    <script type="text/babel" src="js/dashboard/components/grid-layout/DashboardGridWrapper.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/MarketsEconomyTabRGL.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/TitresTabRGL.js"></script>
+    <!-- <script type="text/babel" src="js/dashboard/components/grid-layout/RglDashboard.js"></script> -->
+    <!-- <script type="text/babel" src="js/dashboard/components/grid-layout/DashboardGridWrapper.js"></script> -->
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/MarketsEconomyTabRGL.js"></script> -->
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/TitresTabRGL.js"></script> -->
 
     <!-- Components needed by Grid Layout -->
-    <script type="text/babel" src="js/dashboard/components/tabs/StocksNewsTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/MarketsEconomyTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/AskEmmaTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/VoiceAssistantTab.js"></script>
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/StocksNewsTab.js"></script> -->
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/MarketsEconomyTab.js"></script> -->
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/AskEmmaTab.js"></script> -->
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/VoiceAssistantTab.js"></script> -->
     
     <!-- Script de test GOD MODE (disponible en console) -->
-    <script src="/js/dashboard/test-god-mode-console.js"></script>
+    <!-- <script src="/js/dashboard/test-god-mode-console.js"></script> -->
     <!-- Script de débogage GOD MODE -->
-    <script src="/js/dashboard/debug-god-mode.js"></script>
+    <!-- <script src="/js/dashboard/debug-god-mode.js"></script> -->
     <!-- Quick Fix GOD MODE -->
     <!-- <script src="/js/dashboard/quick-fix-god-mode.js"></script> -->
     <script>
@@ -492,7 +524,7 @@
     </script>
 
     <!-- TradingView Lightweight Charts - Bibliothèque officielle pour graphiques personnalisés -->
-    <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+    <!-- <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script> -->
     <!-- Note: CDN Tailwind utilisé intentionnellement pour ce fichier standalone -->
     <script>
         // Suppress Tailwind CDN warnings in production
@@ -503,23 +535,23 @@
         };
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
     <!-- PDF Export Dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> -->
 
 
     <!-- Iconoir - Beautiful open source icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
     
     <!-- Scripts Tab Seeking Alpha & Scraping -->
-    <script type="text/babel" src="js/dashboard/components/tabs/YieldCurveTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/EconomicCalendarTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/DansWatchlistTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/EmailBriefingsTab.js"></script>
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/YieldCurveTab.js"></script> -->
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/EconomicCalendarTab.js"></script> -->
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/DansWatchlistTab.js"></script> -->
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/EmailBriefingsTab.js"></script> -->
 
-    <script type="text/babel" src="js/dashboard/components/tabs/SeekingAlphaTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/ScrappingSATab.js"></script>
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/SeekingAlphaTab.js"></script> -->
+    <!-- <script type="text/babel" src="js/dashboard/components/tabs/ScrappingSATab.js"></script> -->
     
     <!-- Styles des thèmes -->
     <link rel="stylesheet" href="/css/themes.css">
@@ -1748,40 +1780,40 @@
     <div id="root" class="min-h-screen w-full"></div>
 
     <!-- Stock Analysis Components (fixed API routing) -->
-    <script src="/js/dashboard/stockAnalysisAPI-FIXED.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/StockAnalysisModal.js"></script>
+    <!-- <script src="/js/dashboard/stockAnalysisAPI-FIXED.js"></script> -->
+    <!-- <script type="text/babel" src="/js/dashboard/components/StockAnalysisModal.js"></script> -->
 
     <!-- Advanced Analysis Components -->
-    <script type="text/babel" src="/js/dashboard/components/PeerComparisonModal.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/ScenarioAnalysisModal.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/AdvancedScreenerModal.js"></script>
+    <!-- <script type="text/babel" src="/js/dashboard/components/PeerComparisonModal.js"></script> -->
+    <!-- <script type="text/babel" src="/js/dashboard/components/ScenarioAnalysisModal.js"></script> -->
+    <!-- <script type="text/babel" src="/js/dashboard/components/AdvancedScreenerModal.js"></script> -->
 
     <!-- NEW: Enhanced Analysis Modals with Full API Integration -->
-    <script type="text/babel" src="/js/dashboard/components/AIStockAnalysisModal.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/NewsAndSentimentModal.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/AnalystConsensusModal.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/EarningsCalendarModal.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/EconomicEventsModal.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/WatchlistScreenerModal.js"></script>
+    <!-- <script type="text/babel" src="/js/dashboard/components/AIStockAnalysisModal.js"></script> -->
+    <!-- <script type="text/babel" src="/js/dashboard/components/NewsAndSentimentModal.js"></script> -->
+    <!-- <script type="text/babel" src="/js/dashboard/components/AnalystConsensusModal.js"></script> -->
+    <!-- <script type="text/babel" src="/js/dashboard/components/EarningsCalendarModal.js"></script> -->
+    <!-- <script type="text/babel" src="/js/dashboard/components/EconomicEventsModal.js"></script> -->
+    <!-- <script type="text/babel" src="/js/dashboard/components/WatchlistScreenerModal.js"></script> -->
 
-    <script src="/js/dashboard/pdfExporter.js"></script>
+    <!-- <script src="/js/dashboard/pdfExporter.js"></script> -->
 
     <!-- Main Tabs Components -->
     <!-- DUPLICATE REMOVED: EconomicCalendarTab.js & FastGraphsTab.js already loaded above -->
     <!-- <script type="text/babel" src="/js/dashboard/components/tabs/EconomicCalendarTab.js"></script> -->
     <!-- <script type="text/babel" src="/js/dashboard/components/tabs/FastGraphsTab.js"></script> -->
-    <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisModals.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisTab.js"></script>
+    <!-- <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisModals.js"></script> -->
+    <!-- <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisTab.js"></script> -->
 
     <!-- Announcement Bars System (Gemini-powered) -->
-    <script type="text/babel" src="/js/dashboard/components/AnnouncementBar.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/AnnouncementBarManager.js"></script>
+    <!-- <script type="text/babel" src="/js/dashboard/components/AnnouncementBar.js"></script> -->
+    <!-- <script type="text/babel" src="/js/dashboard/components/AnnouncementBarManager.js"></script> -->
     <!-- DUPLICATE REMOVED: ThemeSelector.js already loaded above -->
     <!-- <script type="text/babel" src="/js/dashboard/components/ThemeSelector.js"></script> -->
-    <script type="text/babel" src="/js/dashboard/components/TradingViewTicker.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/MobileNavOverlay.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/SecondaryNavEditor.js"></script>
-    <script type="text/babel" src="js/dashboard/components/ComponentManager.js"></script>
+    <!-- <script type="text/babel" src="/js/dashboard/components/TradingViewTicker.js"></script> -->
+    <!-- <script type="text/babel" src="/js/dashboard/components/MobileNavOverlay.js"></script> -->
+    <!-- <script type="text/babel" src="/js/dashboard/components/SecondaryNavEditor.js"></script> -->
+    <!-- <script type="text/babel" src="js/dashboard/components/ComponentManager.js"></script> -->
 
 
 
@@ -1815,7 +1847,7 @@
             }
         }, 10000); // 10 seconds max load time
     </script>
-    <script type="text/babel" src="/js/dashboard/components/DevTimer.js"></script>
+    <!-- <script type="text/babel" src="/js/dashboard/components/DevTimer.js"></script> -->
 </body>
 
 </html>
