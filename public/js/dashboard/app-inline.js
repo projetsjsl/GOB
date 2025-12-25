@@ -27570,7 +27570,21 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         </div>
                     )}
                     <div className={`tab-content-active ${tabLoading ? 'opacity-50' : ''}`}>
-                    {activeTab === 'markets-economy' && <MarketsEconomyTab key={`markets-economy-${tabMountKeys['markets-economy'] || 0}`} />}
+                    {activeTab === 'markets-economy' && (
+                        <MarketsEconomyTab 
+                            key={`markets-economy-${tabMountKeys['markets-economy'] || 0}`}
+                            isDarkMode={isDarkMode}
+                            newsData={newsData}
+                            loading={loading}
+                            lastUpdate={lastUpdate}
+                            fetchNews={fetchNews}
+                            summarizeWithEmma={summarizeWithEmma}
+                            isFrenchArticle={isFrenchArticle}
+                            getNewsIcon={getNewsIcon}
+                            getSourceCredibility={getSourceCredibility}
+                            cleanText={cleanText}
+                        />
+                   )}
                     {activeTab === 'nouvelles' && <NouvellesTab key={`nouvelles-${tabMountKeys['nouvelles'] || 0}`} />}
                     {activeTab === 'advanced-analysis' && window.AdvancedAnalysisTab && <window.AdvancedAnalysisTab key={`advanced-analysis-${tabMountKeys['advanced-analysis'] || 0}`} isDarkMode={isDarkMode} />}
                     {/* {activeTab === 'yield-curve' && <YieldCurveTab />} */} {/* Intégré dans Marchés & Économie */}
@@ -27728,7 +27742,21 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     })}
 
                     {/* MARCHÉS Sub-tabs */}
-                    {activeTab === 'marches-global' && <MarketsEconomyTab key={`marches-global-${tabMountKeys['markets-economy'] || 0}`} />}
+                    {activeTab === 'marches-global' && (
+                        <MarketsEconomyTab 
+                            key={`marches-global-${tabMountKeys['markets-economy'] || 0}`}
+                            isDarkMode={isDarkMode}
+                            newsData={newsData}
+                            loading={loading}
+                            lastUpdate={lastUpdate}
+                            fetchNews={fetchNews}
+                            summarizeWithEmma={summarizeWithEmma}
+                            isFrenchArticle={isFrenchArticle}
+                            getNewsIcon={getNewsIcon}
+                            getSourceCredibility={getSourceCredibility}
+                            cleanText={cleanText}
+                        />
+                    )}
                     {activeTab === 'marches-flex' && (window.MarketsEconomyTabRGL ? <window.MarketsEconomyTabRGL isDarkMode={isDarkMode} isAdmin={true} /> : <div>Chargement...</div>)}
                     {activeTab === 'marches-calendar' && <EconomicCalendarTab key={`marches-calendar-${tabMountKeys['economic-calendar'] || 0}`} />}
                     {activeTab === 'marches-yield' && <YieldCurveTab />}

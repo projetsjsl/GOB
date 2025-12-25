@@ -837,4 +837,5 @@ const MarketsEconomyTab = ({
     );
 };
 
-window.MarketsEconomyTab = MarketsEconomyTab;
+// Export with React.memo for performance stabilization
+window.MarketsEconomyTab = React.memo(MarketsEconomyTab);
