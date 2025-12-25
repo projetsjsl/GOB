@@ -358,6 +358,9 @@ const MarketsEconomyTab = ({
     const markets = ['US', 'Canada', 'Europe', 'Asie'];
     const themes = ['Tech', 'Finance', 'Énergie', 'Santé', 'Crypto', 'IA'];
 
+    // Get LazyWidgetWrapper safely
+    const LazyWidgetWrapper = getLazyWrapper();
+
     const matchesSource = (articleSource, selectedSource) => {
         if (!articleSource || !selectedSource) return false;
         const source = articleSource.toLowerCase();
@@ -504,7 +507,9 @@ const MarketsEconomyTab = ({
                             </p>
                         </div>
                         <div style={{height: '450px'}}>
-                            <MarketOverviewWidget isDarkMode={isDarkMode} />
+                            <LazyWidgetWrapper height={450}>
+                                <MarketOverviewWidget isDarkMode={isDarkMode} />
+                            </LazyWidgetWrapper>
                         </div>
                     </div>
 
@@ -520,7 +525,9 @@ const MarketsEconomyTab = ({
                                 </h3>
                             </div>
                             <div style={{height: '500px'}}>
-                                <HeatmapWidget isDarkMode={isDarkMode} dataSource="SPX500" />
+                                <LazyWidgetWrapper height={500}>
+                                    <HeatmapWidget isDarkMode={isDarkMode} dataSource="SPX500" />
+                                </LazyWidgetWrapper>
                             </div>
                         </div>
 
@@ -534,7 +541,9 @@ const MarketsEconomyTab = ({
                                 </h3>
                             </div>
                             <div style={{height: '500px'}}>
-                                <HeatmapWidget isDarkMode={isDarkMode} dataSource="TSX" />
+                                <LazyWidgetWrapper height={500}>
+                                    <HeatmapWidget isDarkMode={isDarkMode} dataSource="TSX" />
+                                </LazyWidgetWrapper>
                             </div>
                         </div>
                     </div>
@@ -552,7 +561,9 @@ const MarketsEconomyTab = ({
                             </p>
                         </div>
                         <div style={{height: '700px'}}>
-                            <MarketQuotesWidget isDarkMode={isDarkMode} />
+                            <LazyWidgetWrapper height={700}>
+                                <MarketQuotesWidget isDarkMode={isDarkMode} />
+                            </LazyWidgetWrapper>
                         </div>
                     </div>
                 </div>
@@ -574,7 +585,9 @@ const MarketsEconomyTab = ({
                             </p>
                         </div>
                         <div style={{height: '450px'}}>
-                            <ForexHeatMapWidget isDarkMode={isDarkMode} />
+                            <LazyWidgetWrapper height={450}>
+                                <ForexHeatMapWidget isDarkMode={isDarkMode} />
+                            </LazyWidgetWrapper>
                         </div>
                     </div>
 
@@ -591,7 +604,9 @@ const MarketsEconomyTab = ({
                             </p>
                         </div>
                         <div style={{height: '450px'}}>
-                            <ForexCrossRatesWidget isDarkMode={isDarkMode} />
+                            <LazyWidgetWrapper height={450}>
+                                <ForexCrossRatesWidget isDarkMode={isDarkMode} />
+                            </LazyWidgetWrapper>
                         </div>
                     </div>
                 </div>
@@ -639,7 +654,9 @@ const MarketsEconomyTab = ({
                             </h3>
                         </div>
                         <div style={{height: '550px'}}>
-                            <EconomicEventsWidget isDarkMode={isDarkMode} />
+                            <LazyWidgetWrapper height={550}>
+                                <EconomicEventsWidget isDarkMode={isDarkMode} />
+                            </LazyWidgetWrapper>
                         </div>
                     </div>
                 </div>
@@ -661,7 +678,9 @@ const MarketsEconomyTab = ({
                             </p>
                         </div>
                         <div style={{height: '700px'}}>
-                            <HeatmapWidget isDarkMode={isDarkMode} dataSource="TSX" />
+                            <LazyWidgetWrapper height={700}>
+                                <HeatmapWidget isDarkMode={isDarkMode} dataSource="TSX" />
+                            </LazyWidgetWrapper>
                         </div>
                     </div>
                 </div>
