@@ -16437,11 +16437,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 console.log('📊 StocksNewsTab - Composant initialisé');
             }, []);
 
-            // Charger les widgets TradingView
+            // Charger les widgets TradingView (with init guard to prevent spam)
             useEffect(() => {
+                // Global flag to prevent re-initialization spam
+                const initKey = `tradingview_stocks_${isDarkMode}`;
+                if (window[initKey]) return;
+                window[initKey] = true;
+
                 // Market Overview Widget
-                if (marketOverviewRef.current) {
-                    marketOverviewRef.current.innerHTML = '';
+                if (marketOverviewRef.current && !marketOverviewRef.current.hasChildNodes()) {
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
                     script.async = true;
@@ -16492,8 +16496,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 }
 
                 // Heatmap Widget
-                if (heatmapRef.current) {
-                    heatmapRef.current.innerHTML = '';
+                if (heatmapRef.current && !heatmapRef.current.hasChildNodes()) {
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
                     script.async = true;
@@ -16517,8 +16520,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 }
 
                 // Screener Widget
-                if (screenerRef.current) {
-                    screenerRef.current.innerHTML = '';
+                if (screenerRef.current && !screenerRef.current.hasChildNodes()) {
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
                     script.async = true;
