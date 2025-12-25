@@ -777,7 +777,6 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     // MAIN APP COMPONENT
     // ============================================================================
     const BetaCombinedDashboard = () => {
-        console.log("🐞 DEBUG: BetaCombinedDashboard STARTS NOW");
         // ... existing hooks ...
         
         // State for Secondary Navigation Configuration
@@ -27645,7 +27644,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <MarketsEconomyTab 
                                     key={`markets-economy-${tabMountKeys['markets-economy'] || 0}`}
                                     isDarkMode={isDarkMode}
-                                    newsData={React.useMemo(() => newsData, [newsData])} // Explicit memoization
+                                    newsData={newsData}
                                     loading={loading}
                                     lastUpdate={lastUpdate}
                                     fetchNews={stableFetchNews}
