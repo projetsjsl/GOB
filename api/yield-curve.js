@@ -12,6 +12,38 @@
  */
 import { createSupabaseClient } from '../lib/supabase-config.js';
 
+const CACHE_CONTROL = 'max-age=0, s-maxage=3600, stale-while-revalidate=86400';
+
+const buckets = new Map();
+const WINDOW_MS = 10_000;
+const MAX_REQ_PER_WINDOW = 30;
+
+function getClientIp(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (typeof forwarded === 'string') {
+    return forwarded.split(',')[0].trim();
+  }
+  return (req.socket?.remoteAddress ?? 'unknown').toString();
+}
+
+function rateLimit(req) {
+  const ip = getClientIp(req);
+  const now = Date.now();
+  const bucket = buckets.get(ip);
+
+  if (!bucket || now - bucket.windowStart > WINDOW_MS) {
+    buckets.set(ip, { count: 1, windowStart: now });
+    return { ok: true };
+  }
+
+  bucket.count += 1;
+  if (bucket.count > MAX_REQ_PER_WINDOW) {
+    return { ok: false, ip };
+  }
+
+  return { ok: true };
+}
+
 // Configuration des taux par maturité
 const US_TREASURY_RATES = {
   '1M': 'DGS1MO',   // 1 mois
@@ -518,6 +550,12 @@ export default async function handler(req, res) {
   }
 
   try {
+    const rate = rateLimit(req);
+    if (!rate.ok) {
+      res.setHeader('Cache-Control', 'no-store');
+      return res.status(429).json({ error: 'Rate limited' });
+    }
+
     const { country = 'both', date = null } = req.query;
 
     console.log(`🔍 Requête yield curve: country=${country}, date=${date || 'actuelle'}`);
@@ -592,10 +630,12 @@ export default async function handler(req, res) {
 
     console.log(`✅ Yield curve récupérée: US=${result.data.us?.count || 0} points, Canada=${result.data.canada?.count || 0} points`);
 
+    res.setHeader('Cache-Control', CACHE_CONTROL);
     return res.status(200).json(result);
 
   } catch (error) {
     console.error('❌ Erreur yield-curve:', error);
+    res.setHeader('Cache-Control', 'no-store');
     return res.status(500).json({
       error: 'Erreur lors de la récupération de la yield curve',
       message: error.message
