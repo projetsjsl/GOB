@@ -1,7 +1,46 @@
 // Auto-converted from monolithic dashboard file
 // Component: YieldCurveTab - UPGRADED TO PREMIUM TERMINAL
 
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, useCallback } = React;
+
+const YIELD_CURVE_TTL_MS = 5 * 60 * 1000;
+const yieldCurveCache = new Map();
+const yieldCurveInflight = new Map();
+
+const getYieldCurveCacheKey = (country) => country || 'both';
+
+const fetchYieldCurveData = async (country, { forceRefresh = false } = {}) => {
+    const cacheKey = getYieldCurveCacheKey(country);
+    const now = Date.now();
+
+    if (!forceRefresh) {
+        const cached = yieldCurveCache.get(cacheKey);
+        if (cached && now - cached.cachedAt < YIELD_CURVE_TTL_MS) {
+            return cached.data;
+        }
+    }
+
+    const existing = yieldCurveInflight.get(cacheKey);
+    if (existing) {
+        return existing;
+    }
+
+    const request = fetch(`/api/yield-curve?country=${encodeURIComponent(country)}`)
+        .then((response) => {
+            if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
+            return response.json();
+        })
+        .then((data) => {
+            yieldCurveCache.set(cacheKey, { data, cachedAt: Date.now() });
+            return data;
+        })
+        .finally(() => {
+            yieldCurveInflight.delete(cacheKey);
+        });
+
+    yieldCurveInflight.set(cacheKey, request);
+    return request;
+};
 
 const SpreadChart = ({ usRates, caRates, darkMode }) => {
     const canvasRef = useRef(null);
@@ -172,25 +211,23 @@ const YieldCurveTab = () => {
     const formatRate = (value) => (value === null || value === undefined ? '—' : Number(value).toFixed(2));
     
     // Récupérer les données de la yield curve
-    const fetchYieldCurve = async () => {
+    const fetchYieldCurve = useCallback(async (forceRefresh = false) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`/api/yield-curve?country=${selectedCountry}`);
-            if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
-            const data = await response.json();
+            const data = await fetchYieldCurveData(selectedCountry, { forceRefresh });
             setYieldData(data);
             setLoading(false);
         } catch (err) {
             console.error('❌ Erreur yield curve:', err);
-            setError(err.message);
+            setError(err instanceof Error ? err.message : String(err));
             setLoading(false);
         }
-    };
+    }, [selectedCountry]);
 
     useEffect(() => {
         fetchYieldCurve();
-    }, [selectedCountry]);
+    }, [fetchYieldCurve]);
 
     // Graphique Chart.js (Comparaison Actuel/M-1)
     useEffect(() => {
@@ -273,7 +310,7 @@ const YieldCurveTab = () => {
                         <option value="us">US Only</option>
                         <option value="canada">Canada Only</option>
                     </select>
-                    <button title="Action" onClick={fetchYieldCurve} className="p-1.5 hover:bg-neutral-800 rounded transition-colors">
+                    <button title="Action" onClick={() => fetchYieldCurve(true)} className="p-1.5 hover:bg-neutral-800 rounded transition-colors">
                         <LucideIcon name="RefreshCw" className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
