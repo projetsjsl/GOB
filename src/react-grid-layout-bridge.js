@@ -9,8 +9,8 @@ import ReactGridLayout from 'react-grid-layout/legacy';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
-// Expose globally for vanilla JS scripts
-window.ReactGridLayout = ReactGridLayout;
-
 // Log successful initialization
 console.log('✅ React Grid Layout v2.1.1 loaded (legacy API)');
+
+// Export as default - esbuild will assign this to the global name
+export default ReactGridLayout;
