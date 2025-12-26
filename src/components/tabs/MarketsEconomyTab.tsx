@@ -23,13 +23,17 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
 
     // Charger les widgets TradingView
     useEffect(() => {
-        // Market Overview Widget - Only initialize if not already done
-        if (marketOverviewRef.current && !marketOverviewRef.current.hasChildNodes()) {
-            marketOverviewRef.current.innerHTML = '';
+        // Market Overview Widget - Only initialize once per ref
+        if (marketOverviewRef.current && marketOverviewRef.current.children.length === 0) {
+            // Don't use innerHTML - use dangerouslySetInnerHTML approach instead
+            const container = document.createElement('div');
+            container.className = 'tradingview-widget-container__widget';
+
             const script = document.createElement('script');
+            script.type = 'text/javascript';
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
             script.async = true;
-            script.innerHTML = JSON.stringify({
+            script.text = JSON.stringify({
                 "colorTheme": isDarkMode ? "dark" : "light",
                 "dateRange": "1D",
                 "showChart": true,
@@ -72,17 +76,22 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                     }
                 ]
             });
-            marketOverviewRef.current.appendChild(script);
+
+            container.appendChild(script);
+            marketOverviewRef.current.appendChild(container);
             marketOverviewInitialized.current = true;
         }
 
-        // Heatmap Widget - Only initialize if not already done
-        if (heatmapRef.current && !heatmapRef.current.hasChildNodes()) {
-            heatmapRef.current.innerHTML = '';
+        // Heatmap Widget - Only initialize once per ref
+        if (heatmapRef.current && heatmapRef.current.children.length === 0) {
+            const container = document.createElement('div');
+            container.className = 'tradingview-widget-container__widget';
+
             const script = document.createElement('script');
+            script.type = 'text/javascript';
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
             script.async = true;
-            script.innerHTML = JSON.stringify({
+            script.text = JSON.stringify({
                 "exchanges": [],
                 "dataSource": "SPX500",
                 "grouping": "sector",
@@ -98,17 +107,22 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                 "width": "100%",
                 "height": "100%"
             });
-            heatmapRef.current.appendChild(script);
+
+            container.appendChild(script);
+            heatmapRef.current.appendChild(container);
             heatmapInitialized.current = true;
         }
 
-        // Screener Widget - Only initialize if not already done
-        if (screenerRef.current && !screenerRef.current.hasChildNodes()) {
-            screenerRef.current.innerHTML = '';
+        // Screener Widget - Only initialize once per ref
+        if (screenerRef.current && screenerRef.current.children.length === 0) {
+            const container = document.createElement('div');
+            container.className = 'tradingview-widget-container__widget';
+
             const script = document.createElement('script');
+            script.type = 'text/javascript';
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
             script.async = true;
-            script.innerHTML = JSON.stringify({
+            script.text = JSON.stringify({
                 "width": "100%",
                 "height": "100%",
                 "defaultColumn": "overview",
@@ -119,17 +133,22 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                 "locale": "fr",
                 "isTransparent": false
             });
-            screenerRef.current.appendChild(script);
+
+            container.appendChild(script);
+            screenerRef.current.appendChild(container);
             screenerInitialized.current = true;
         }
 
-        // Forex Heatmap Widget - Only initialize if not already done
-        if (forexHeatmapRef.current && !forexHeatmapRef.current.hasChildNodes()) {
-            forexHeatmapRef.current.innerHTML = '';
+        // Forex Heatmap Widget - Only initialize once per ref
+        if (forexHeatmapRef.current && forexHeatmapRef.current.children.length === 0) {
+            const container = document.createElement('div');
+            container.className = 'tradingview-widget-container__widget';
+
             const script = document.createElement('script');
+            script.type = 'text/javascript';
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js';
             script.async = true;
-            script.innerHTML = JSON.stringify({
+            script.text = JSON.stringify({
                 "width": "100%",
                 "height": "100%",
                 "currencies": ["EUR", "USD", "JPY", "GBP", "CHF", "AUD", "CAD", "NZD"],
@@ -137,17 +156,22 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                 "colorTheme": isDarkMode ? "dark" : "light",
                 "locale": "fr"
             });
-            forexHeatmapRef.current.appendChild(script);
+
+            container.appendChild(script);
+            forexHeatmapRef.current.appendChild(container);
             forexHeatmapInitialized.current = true;
         }
 
-        // Economic Calendar Widget - Only initialize if not already done
-        if (economicCalendarRef.current && !economicCalendarRef.current.hasChildNodes()) {
-            economicCalendarRef.current.innerHTML = '';
+        // Economic Calendar Widget - Only initialize once per ref
+        if (economicCalendarRef.current && economicCalendarRef.current.children.length === 0) {
+            const container = document.createElement('div');
+            container.className = 'tradingview-widget-container__widget';
+
             const script = document.createElement('script');
+            script.type = 'text/javascript';
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
             script.async = true;
-            script.innerHTML = JSON.stringify({
+            script.text = JSON.stringify({
                 "colorTheme": isDarkMode ? "dark" : "light",
                 "isTransparent": false,
                 "width": "100%",
@@ -156,30 +180,42 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                 "importanceFilter": "-1,0,1",
                 "countryFilter": "us,ca,eu,gb,jp,cn"
             });
-            economicCalendarRef.current.appendChild(script);
+
+            container.appendChild(script);
+            economicCalendarRef.current.appendChild(container);
             economicCalendarInitialized.current = true;
         }
 
-        // CLEANUP: Prevent memory leaks by removing widget content and resetting flags on unmount
+        // CLEANUP: Proper cleanup without innerHTML to avoid TradingView issues
         return () => {
             if (marketOverviewRef.current) {
-                marketOverviewRef.current.innerHTML = '';
+                while (marketOverviewRef.current.firstChild) {
+                    marketOverviewRef.current.removeChild(marketOverviewRef.current.firstChild);
+                }
                 marketOverviewInitialized.current = false;
             }
             if (heatmapRef.current) {
-                heatmapRef.current.innerHTML = '';
+                while (heatmapRef.current.firstChild) {
+                    heatmapRef.current.removeChild(heatmapRef.current.firstChild);
+                }
                 heatmapInitialized.current = false;
             }
             if (screenerRef.current) {
-                screenerRef.current.innerHTML = '';
+                while (screenerRef.current.firstChild) {
+                    screenerRef.current.removeChild(screenerRef.current.firstChild);
+                }
                 screenerInitialized.current = false;
             }
             if (forexHeatmapRef.current) {
-                forexHeatmapRef.current.innerHTML = '';
+                while (forexHeatmapRef.current.firstChild) {
+                    forexHeatmapRef.current.removeChild(forexHeatmapRef.current.firstChild);
+                }
                 forexHeatmapInitialized.current = false;
             }
             if (economicCalendarRef.current) {
-                economicCalendarRef.current.innerHTML = '';
+                while (economicCalendarRef.current.firstChild) {
+                    economicCalendarRef.current.removeChild(economicCalendarRef.current.firstChild);
+                }
                 economicCalendarInitialized.current = false;
             }
         };
