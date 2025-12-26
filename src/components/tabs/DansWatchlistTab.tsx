@@ -406,10 +406,7 @@ const DansWatchlistTab: React.FC<TabProps> = memo((props) => {
             const widgetContainer = document.getElementById('tradingview-ticker-dan-watchlist');
 
             // Only initialize if container exists and has no children
-            if (widgetContainer && !widgetContainer.hasChildNodes()) {
-                // Supprimer le widget existant s'il existe
-                widgetContainer.innerHTML = '';
-
+            if (widgetContainer && widgetContainer.children.length === 0) {
                 // Créer les symboles formatés pour TradingView (EXCHANGE:TICKER)
                 // Par défaut, on assume que les tickers US sont sur NASDAQ ou NYSE
                 const tvSymbols = watchlistTickers.map(ticker => {
@@ -421,12 +418,12 @@ const DansWatchlistTab: React.FC<TabProps> = memo((props) => {
                     return { "proName": `NASDAQ:${ticker}`, "title": ticker };
                 });
 
-                // Créer le script TradingView
+                // Créer le script TradingView (sans innerHTML!)
                 const script = document.createElement('script');
                 script.type = 'text/javascript';
                 script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
                 script.async = true;
-                script.innerHTML = JSON.stringify({
+                script.text = JSON.stringify({
                     "symbols": tvSymbols.slice(0, 20), // Limiter à 20 symboles pour performance
                     "showSymbolLogo": true,
                     "isTransparent": isDarkMode,
@@ -439,11 +436,13 @@ const DansWatchlistTab: React.FC<TabProps> = memo((props) => {
             }
         }
 
-        // CLEANUP: Prevent memory leaks by removing widget content on unmount
+        // CLEANUP: Proper cleanup without innerHTML to avoid TradingView issues
         return () => {
             const existingWidget = document.getElementById('tradingview-ticker-dan-watchlist');
             if (existingWidget) {
-                existingWidget.innerHTML = '';
+                while (existingWidget.firstChild) {
+                    existingWidget.removeChild(existingWidget.firstChild);
+                }
             }
         };
     }, [watchlistTickers, isDarkMode]);

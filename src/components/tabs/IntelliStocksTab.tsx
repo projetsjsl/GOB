@@ -1014,16 +1014,18 @@ console.log('✅ Données hybrides récupérées:', {
                 // 🔄 Rechargement du TradingView Mini Chart quand le ticker change - VAGUE 2
                 useEffect(() => {
                     const container = document.getElementById('tradingview-mini-chart-jlab');
-                    if (container && !container.hasChildNodes()) {
-                        // Supprimer l'ancien widget
-                        container.innerHTML = '';
+                    if (container && container.children.length === 0) {
+                        // ✅ TradingView-compliant: Use appendChild instead of innerHTML
+                        // Reference: https://www.tradingview.com/widget-docs/tutorials/build-page/widget-integration/
+                        const widgetContainer = document.createElement('div');
+                        widgetContainer.className = 'tradingview-widget-container__widget';
 
                         // Créer le nouveau script avec le ticker mis à jour
                         const script = document.createElement('script');
                         script.type = 'text/javascript';
                         script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
                         script.async = true;
-                        script.innerHTML = JSON.stringify({
+                        script.text = JSON.stringify({
                             "symbol": `NASDAQ:${selectedStock}`,
                             "width": "100%",
                             "height": "100%",
@@ -1034,14 +1036,18 @@ console.log('✅ Données hybrides récupérées:', {
                             "autosize": true,
                             "largeChartUrl": ""
                         });
-                        container.appendChild(script);
+                        widgetContainer.appendChild(script);
+                        container.appendChild(widgetContainer);
                     }
 
                     // CLEANUP: Prevent memory leaks by removing widget content on unmount
                     return () => {
                         const container = document.getElementById('tradingview-mini-chart-jlab');
                         if (container) {
-                            container.innerHTML = '';
+                            // ✅ Proper DOM cleanup instead of innerHTML
+                            while (container.firstChild) {
+                                container.removeChild(container.firstChild);
+                            }
                         }
                     };
                 }, [selectedStock, isDarkMode]);
@@ -2197,13 +2203,17 @@ console.log('✅ Données hybrides récupérées:', {
                                             className="tradingview-widget-container"
                                             style={{ height: '100%', width: '100%' }}
                                             ref={(container) => {
-                                                if (container && !container.hasChildNodes()) {
+                                                if (container && container.children.length === 0) {
+                                                    // ✅ TradingView-compliant: Use appendChild instead of innerHTML
+                                                    const widgetContainer = document.createElement('div');
+                                                    widgetContainer.className = 'tradingview-widget-container__widget';
+
                                                     // Créer le script TradingView
                                                     const script = document.createElement('script');
                                                     script.type = 'text/javascript';
                                                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
                                                     script.async = true;
-                                                    script.innerHTML = JSON.stringify({
+                                                    script.text = JSON.stringify({
                                                         "symbol": `NASDAQ:${selectedStock}`,
                                                         "width": "100%",
                                                         "height": "100%",
@@ -2214,7 +2224,8 @@ console.log('✅ Données hybrides récupérées:', {
                                                         "autosize": true,
                                                         "largeChartUrl": ""
                                                     });
-                                                    container.appendChild(script);
+                                                    widgetContainer.appendChild(script);
+                                                    container.appendChild(widgetContainer);
                                                 }
                                             }}
                                         ></div>
