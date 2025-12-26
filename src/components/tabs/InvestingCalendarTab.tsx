@@ -158,23 +158,19 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
 
                 // Charger le script TradingView Forex Heat Map
                 useEffect(() => {
-                    // Créer le conteneur du widget
+                    // ✅ TradingView-compliant widget initialization
                     const container = tradingViewForexRef.current;
-                    if (!container || container.hasChildNodes()) return;
-
-                    // Nettoyer le conteneur
-                    container.innerHTML = '';
+                    if (!container || container.children.length > 0) return;
 
                     // Créer le div du widget
                     const widgetDiv = document.createElement('div');
                     widgetDiv.className = 'tradingview-widget-container__widget';
-                    container.appendChild(widgetDiv);
 
                     // Créer et configurer le script
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js';
                     script.async = true;
-                    script.innerHTML = JSON.stringify({
+                    script.text = JSON.stringify({
                         colorTheme: isDarkMode ? 'dark' : 'light',
                         isTransparent: true,
                         locale: 'fr',
@@ -183,13 +179,16 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                         height: 400
                     });
 
-                    container.appendChild(script);
+                    widgetDiv.appendChild(script);
+                    container.appendChild(widgetDiv);
                     forexInitialized.current = true;
 
                     // Cleanup
                     return () => {
                         if (container) {
-                            container.innerHTML = '';
+                            while (container.firstChild) {
+                                container.removeChild(container.firstChild);
+                            }
                             forexInitialized.current = false;
                         }
                     };
@@ -198,18 +197,15 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Events (Economic Calendar)
                 useEffect(() => {
                     const container = tradingViewEventsRef.current;
-                    if (!container || container.hasChildNodes()) return;
-
-                    container.innerHTML = '';
+                    if (!container || container.children.length > 0) return;
 
                     const widgetDiv = document.createElement('div');
                     widgetDiv.className = 'tradingview-widget-container__widget';
-                    container.appendChild(widgetDiv);
 
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
                     script.async = true;
-                    script.innerHTML = JSON.stringify({
+                    script.text = JSON.stringify({
                         colorTheme: 'light',
                         isTransparent: false,
                         locale: 'en',
@@ -219,12 +215,15 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                         height: 550
                     });
 
-                    container.appendChild(script);
+                    widgetDiv.appendChild(script);
+                    container.appendChild(widgetDiv);
                     eventsInitialized.current = true;
 
                     return () => {
                         if (container) {
-                            container.innerHTML = '';
+                            while (container.firstChild) {
+                                container.removeChild(container.firstChild);
+                            }
                             eventsInitialized.current = false;
                         }
                     };
@@ -233,15 +232,16 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Forex Cross Rates
                 useEffect(() => {
                     const container = tradingViewCrossRatesRef.current;
-                    if (!container || container.hasChildNodes()) return;
+                    if (!container || container.children.length > 0) return;
 
-                    container.innerHTML = '';
+                    const widgetDiv = document.createElement('div');
+                    widgetDiv.className = 'tradingview-widget-container__widget';
 
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-forex-cross-rates.js';
                     script.type = 'text/javascript';
                     script.async = true;
-                    script.innerHTML = JSON.stringify({
+                    script.text = JSON.stringify({
                         colorTheme: isDarkMode ? 'dark' : 'light',
                         isTransparent: false,
                         locale: 'fr',
@@ -261,12 +261,15 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                         height: 400
                     });
 
-                    container.appendChild(script);
+                    widgetDiv.appendChild(script);
+                    container.appendChild(widgetDiv);
                     crossRatesInitialized.current = true;
 
                     return () => {
                         if (container) {
-                            container.innerHTML = '';
+                            while (container.firstChild) {
+                                container.removeChild(container.firstChild);
+                            }
                             crossRatesInitialized.current = false;
                         }
                     };
@@ -275,15 +278,16 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Stock Heatmap
                 useEffect(() => {
                     const container = tradingViewHeatmapRef.current;
-                    if (!container || container.hasChildNodes()) return;
+                    if (!container || container.children.length > 0) return;
 
-                    container.innerHTML = '';
+                    const widgetDiv = document.createElement('div');
+                    widgetDiv.className = 'tradingview-widget-container__widget';
 
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
                     script.type = 'text/javascript';
                     script.async = true;
-                    script.innerHTML = JSON.stringify({
+                    script.text = JSON.stringify({
                         dataSource: 'AllUSA',
                         blockSize: 'market_cap_basic',
                         blockColor: 'change',
@@ -301,12 +305,15 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                         height: '100%'
                     });
 
-                    container.appendChild(script);
+                    widgetDiv.appendChild(script);
+                    container.appendChild(widgetDiv);
                     heatmapInitialized.current = true;
 
                     return () => {
                         if (container) {
-                            container.innerHTML = '';
+                            while (container.firstChild) {
+                                container.removeChild(container.firstChild);
+                            }
                             heatmapInitialized.current = false;
                         }
                     };
@@ -315,15 +322,16 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Stock Heatmap TSX
                 useEffect(() => {
                     const container = tradingViewHeatmapTSXRef.current;
-                    if (!container || container.hasChildNodes()) return;
+                    if (!container || container.children.length > 0) return;
 
-                    container.innerHTML = '';
+                    const widgetDiv = document.createElement('div');
+                    widgetDiv.className = 'tradingview-widget-container__widget';
 
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
                     script.type = 'text/javascript';
                     script.async = true;
-                    script.innerHTML = JSON.stringify({
+                    script.text = JSON.stringify({
                         dataSource: 'TSX',
                         blockSize: 'market_cap_basic',
                         blockColor: 'change',
@@ -341,12 +349,15 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                         height: '100%'
                     });
 
-                    container.appendChild(script);
+                    widgetDiv.appendChild(script);
+                    container.appendChild(widgetDiv);
                     heatmapTSXInitialized.current = true;
 
                     return () => {
                         if (container) {
-                            container.innerHTML = '';
+                            while (container.firstChild) {
+                                container.removeChild(container.firstChild);
+                            }
                             heatmapTSXInitialized.current = false;
                         }
                     };
@@ -355,15 +366,16 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Advanced Chart (synchronisé)
                 useEffect(() => {
                     const container = tradingViewChartSPYRef.current;
-                    if (!container || container.hasChildNodes()) return;
+                    if (!container || container.children.length > 0) return;
 
-                    container.innerHTML = '';
+                    const widgetDiv = document.createElement('div');
+                    widgetDiv.className = 'tradingview-widget-container__widget';
 
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
                     script.type = 'text/javascript';
                     script.async = true;
-                    script.innerHTML = JSON.stringify({
+                    script.text = JSON.stringify({
                         allow_symbol_change: true,
                         calendar: false,
                         details: true,
@@ -412,12 +424,15 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                         height: 800
                     });
 
-                    container.appendChild(script);
+                    widgetDiv.appendChild(script);
+                    container.appendChild(widgetDiv);
                     chartSPYInitialized.current = true;
 
                     return () => {
                         if (container) {
-                            container.innerHTML = '';
+                            while (container.firstChild) {
+                                container.removeChild(container.firstChild);
+                            }
                             chartSPYInitialized.current = false;
                         }
                     };
@@ -426,15 +441,16 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Market Quotes
                 useEffect(() => {
                     const container = tradingViewMarketQuotesRef.current;
-                    if (!container || container.hasChildNodes()) return;
+                    if (!container || container.children.length > 0) return;
 
-                    container.innerHTML = '';
+                    const widgetDiv = document.createElement('div');
+                    widgetDiv.className = 'tradingview-widget-container__widget';
 
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js';
                     script.type = 'text/javascript';
                     script.async = true;
-                    script.innerHTML = JSON.stringify({
+                    script.text = JSON.stringify({
                         colorTheme: 'dark',
                         locale: 'fr',
                         largeChartUrl: '',
@@ -492,12 +508,15 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                         ]
                     });
 
-                    container.appendChild(script);
+                    widgetDiv.appendChild(script);
+                    container.appendChild(widgetDiv);
                     marketQuotesInitialized.current = true;
 
                     return () => {
                         if (container) {
-                            container.innerHTML = '';
+                            while (container.firstChild) {
+                                container.removeChild(container.firstChild);
+                            }
                             marketQuotesInitialized.current = false;
                         }
                     };
@@ -506,15 +525,16 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Symbol Info (synchronisé)
                 useEffect(() => {
                     const container = tradingViewSymbolInfoRef.current;
-                    if (!container || container.hasChildNodes()) return;
+                    if (!container || container.children.length > 0) return;
 
-                    container.innerHTML = '';
+                    const widgetDiv = document.createElement('div');
+                    widgetDiv.className = 'tradingview-widget-container__widget';
 
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js';
                     script.type = 'text/javascript';
                     script.async = true;
-                    script.innerHTML = JSON.stringify({
+                    script.text = JSON.stringify({
                         symbol: timelineSymbol,
                         colorTheme: 'dark',
                         isTransparent: false,
@@ -522,12 +542,15 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                         width: '100%'
                     });
 
-                    container.appendChild(script);
+                    widgetDiv.appendChild(script);
+                    container.appendChild(widgetDiv);
                     symbolInfoInitialized.current = true;
 
                     return () => {
                         if (container) {
-                            container.innerHTML = '';
+                            while (container.firstChild) {
+                                container.removeChild(container.firstChild);
+                            }
                             symbolInfoInitialized.current = false;
                         }
                     };
@@ -536,15 +559,16 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Timeline (configurable)
                 useEffect(() => {
                     const container = tradingViewTimelineRef.current;
-                    if (!container || container.hasChildNodes()) return;
+                    if (!container || container.children.length > 0) return;
 
-                    container.innerHTML = '';
+                    const widgetDiv = document.createElement('div');
+                    widgetDiv.className = 'tradingview-widget-container__widget';
 
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js';
                     script.type = 'text/javascript';
                     script.async = true;
-                    script.innerHTML = JSON.stringify({
+                    script.text = JSON.stringify({
                         feedMode: 'symbol',
                         symbol: timelineSymbol,
                         colorTheme: 'dark',
@@ -555,12 +579,15 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                         height: '100%'
                     });
 
-                    container.appendChild(script);
+                    widgetDiv.appendChild(script);
+                    container.appendChild(widgetDiv);
                     timelineInitialized.current = true;
 
                     return () => {
                         if (container) {
-                            container.innerHTML = '';
+                            while (container.firstChild) {
+                                container.removeChild(container.firstChild);
+                            }
                             timelineInitialized.current = false;
                         }
                     };
@@ -569,19 +596,16 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Screener
                 useEffect(() => {
                     const container = tradingViewScreenerRef.current;
-                    if (!container || container.hasChildNodes()) return;
-
-                    container.innerHTML = '';
+                    if (!container || container.children.length > 0) return;
 
                     const widgetDiv = document.createElement('div');
                     widgetDiv.className = 'tradingview-widget-container__widget';
-                    container.appendChild(widgetDiv);
 
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
                     script.type = 'text/javascript';
                     script.async = true;
-                    script.innerHTML = JSON.stringify({
+                    script.text = JSON.stringify({
                         market: 'america',
                         showToolbar: true,
                         defaultColumn: 'overview',
@@ -593,12 +617,15 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                         height: '100%'
                     });
 
-                    container.appendChild(script);
+                    widgetDiv.appendChild(script);
+                    container.appendChild(widgetDiv);
                     screenerInitialized.current = true;
 
                     return () => {
                         if (container) {
-                            container.innerHTML = '';
+                            while (container.firstChild) {
+                                container.removeChild(container.firstChild);
+                            }
                             screenerInitialized.current = false;
                         }
                     };
@@ -607,19 +634,16 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Symbol Profile (synchronisé)
                 useEffect(() => {
                     const container = tradingViewSymbolProfileRef.current;
-                    if (!container || container.hasChildNodes()) return;
-
-                    container.innerHTML = '';
+                    if (!container || container.children.length > 0) return;
 
                     const widgetDiv = document.createElement('div');
                     widgetDiv.className = 'tradingview-widget-container__widget';
-                    container.appendChild(widgetDiv);
 
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js';
                     script.type = 'text/javascript';
                     script.async = true;
-                    script.innerHTML = JSON.stringify({
+                    script.text = JSON.stringify({
                         symbol: timelineSymbol,
                         colorTheme: 'dark',
                         isTransparent: false,
@@ -628,12 +652,15 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                         height: '100%'
                     });
 
-                    container.appendChild(script);
+                    widgetDiv.appendChild(script);
+                    container.appendChild(widgetDiv);
                     symbolProfileInitialized.current = true;
 
                     return () => {
                         if (container) {
-                            container.innerHTML = '';
+                            while (container.firstChild) {
+                                container.removeChild(container.firstChild);
+                            }
                             symbolProfileInitialized.current = false;
                         }
                     };
@@ -642,19 +669,16 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Financials (synchronisé)
                 useEffect(() => {
                     const container = tradingViewFinancialsRef.current;
-                    if (!container || container.hasChildNodes()) return;
-
-                    container.innerHTML = '';
+                    if (!container || container.children.length > 0) return;
 
                     const widgetDiv = document.createElement('div');
                     widgetDiv.className = 'tradingview-widget-container__widget';
-                    container.appendChild(widgetDiv);
 
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-financials.js';
                     script.type = 'text/javascript';
                     script.async = true;
-                    script.innerHTML = JSON.stringify({
+                    script.text = JSON.stringify({
                         symbol: timelineSymbol,
                         colorTheme: 'dark',
                         displayMode: 'regular',
@@ -664,12 +688,15 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                         height: '100%'
                     });
 
-                    container.appendChild(script);
+                    widgetDiv.appendChild(script);
+                    container.appendChild(widgetDiv);
                     financialsInitialized.current = true;
 
                     return () => {
                         if (container) {
-                            container.innerHTML = '';
+                            while (container.firstChild) {
+                                container.removeChild(container.firstChild);
+                            }
                             financialsInitialized.current = false;
                         }
                     };
@@ -678,19 +705,16 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 // Charger le script TradingView Technical Analysis (synchronisé)
                 useEffect(() => {
                     const container = tradingViewTechnicalAnalysisRef.current;
-                    if (!container || container.hasChildNodes()) return;
-
-                    container.innerHTML = '';
+                    if (!container || container.children.length > 0) return;
 
                     const widgetDiv = document.createElement('div');
                     widgetDiv.className = 'tradingview-widget-container__widget';
-                    container.appendChild(widgetDiv);
 
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
                     script.type = 'text/javascript';
                     script.async = true;
-                    script.innerHTML = JSON.stringify({
+                    script.text = JSON.stringify({
                         colorTheme: 'dark',
                         displayMode: 'multiple',
                         isTransparent: false,
@@ -703,12 +727,15 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                         showIntervalTabs: true
                     });
 
-                    container.appendChild(script);
+                    widgetDiv.appendChild(script);
+                    container.appendChild(widgetDiv);
                     technicalAnalysisInitialized.current = true;
 
                     return () => {
                         if (container) {
-                            container.innerHTML = '';
+                            while (container.firstChild) {
+                                container.removeChild(container.firstChild);
+                            }
                             technicalAnalysisInitialized.current = false;
                         }
                     };
