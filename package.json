@@ -4,8 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run build:rgl && vite build",
     "build:vite": "vite build",
+    "build:rgl": "esbuild src/react-grid-layout-bridge.js --bundle --outfile=public/js/react-grid-layout-bundle.js --format=iife --external:react --external:react-dom --minify",
     "preview": "vite preview",
     "lint": "eslint src/ api/ --ext .js,.ts,.tsx",
     "lint:fix": "eslint src/ api/ --ext .js,.ts,.tsx --fix",
@@ -31,6 +32,7 @@
     "playwright-core": "^1.40.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
+    "react-grid-layout": "^2.1.1",
     "resend": "^3.0.0",
     "twilio": "^4.20.0",
     "zod": "^4.1.13"
