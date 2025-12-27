@@ -1,29 +1,82 @@
 // Auto-converted from monolithic dashboard file
 // Component: YieldCurveTab - UPGRADED TO PREMIUM TERMINAL
+// Uses GLOBAL cache from window.__yieldCurveGlobalCache
 
 const { useState, useEffect, useRef, useCallback } = React;
 
-const YIELD_CURVE_TTL_MS = 5 * 60 * 1000;
-const yieldCurveCache = new Map();
-const yieldCurveInflight = new Map();
-
-const getYieldCurveCacheKey = (country) => country || 'both';
-
+// Use global cache function if available, otherwise create local fallback
 const fetchYieldCurveData = async (country, { forceRefresh = false } = {}) => {
-    const cacheKey = getYieldCurveCacheKey(country);
+    // Prefer global cache function from app-inline.js
+    if (window.fetchYieldCurveWithCache) {
+        console.log('🔗 YieldCurveTab.js using GLOBAL cache function');
+        return window.fetchYieldCurveWithCache(country, { forceRefresh });
+    }
+
+    // Fallback: Initialize global cache if not already done
+    if (!window.__yieldCurveGlobalCache) {
+        window.__yieldCurveGlobalCache = {
+            cache: new Map(),
+            inflight: new Map(),
+            lastFetchTime: new Map(), // Track last fetch time for rate limiting
+            TTL_MS: 5 * 60 * 1000,
+            MIN_FETCH_INTERVAL_MS: 2000, // Minimum 2 seconds between fetches
+            callCount: 0,
+            blockedCount: 0,
+            lastReset: Date.now()
+        };
+        console.log('🚀 YieldCurveTab.js initialized GLOBAL cache (with rate limiting)');
+    }
+
+    const global = window.__yieldCurveGlobalCache;
+    const cacheKey = country || 'both';
     const now = Date.now();
 
+    // Track calls
+    global.callCount++;
+    if (global.callCount > 10) {
+        console.warn(`⚠️ YieldCurveTab.js: ${global.callCount} calls (${global.blockedCount} blocked)`);
+    }
+    if (now - global.lastReset > 60000) {
+        global.callCount = 0;
+        global.blockedCount = 0;
+        global.lastReset = now;
+    }
+
+    // RATE LIMITING - Block rapid repeat calls
+    const lastFetch = global.lastFetchTime.get(cacheKey) || 0;
+    const timeSinceLastFetch = now - lastFetch;
+    if (timeSinceLastFetch < global.MIN_FETCH_INTERVAL_MS) {
+        global.blockedCount++;
+        const cached = global.cache.get(cacheKey);
+        if (cached) {
+            console.log(`🛑 YieldCurveTab.js RATE LIMITED (${cacheKey}) - returning cached`);
+            return cached.data;
+        }
+        const inflightReq = global.inflight.get(cacheKey);
+        if (inflightReq) {
+            console.log(`🛑 YieldCurveTab.js RATE LIMITED (${cacheKey}) - joining inflight`);
+            return inflightReq;
+        }
+    }
+
     if (!forceRefresh) {
-        const cached = yieldCurveCache.get(cacheKey);
-        if (cached && now - cached.cachedAt < YIELD_CURVE_TTL_MS) {
+        const cached = global.cache.get(cacheKey);
+        if (cached && now - cached.cachedAt < global.TTL_MS) {
+            console.log(`✅ YieldCurveTab.js GLOBAL Cache HIT (${cacheKey})`);
             return cached.data;
         }
     }
 
-    const existing = yieldCurveInflight.get(cacheKey);
+    const existing = global.inflight.get(cacheKey);
     if (existing) {
+        console.log(`🔄 YieldCurveTab.js Request DEDUPLICATED (${cacheKey})`);
         return existing;
     }
+
+    // Update last fetch time BEFORE making request
+    global.lastFetchTime.set(cacheKey, now);
+
+    console.log(`🌐 YieldCurveTab.js GLOBAL Cache MISS (${cacheKey})`);
 
     const request = fetch(`/api/yield-curve?country=${encodeURIComponent(country)}`)
         .then((response) => {
@@ -31,14 +84,14 @@ const fetchYieldCurveData = async (country, { forceRefresh = false } = {}) => {
             return response.json();
         })
         .then((data) => {
-            yieldCurveCache.set(cacheKey, { data, cachedAt: Date.now() });
+            global.cache.set(cacheKey, { data, cachedAt: Date.now() });
             return data;
         })
         .finally(() => {
-            yieldCurveInflight.delete(cacheKey);
+            global.inflight.delete(cacheKey);
         });
 
-    yieldCurveInflight.set(cacheKey, request);
+    global.inflight.set(cacheKey, request);
     return request;
 };
 
