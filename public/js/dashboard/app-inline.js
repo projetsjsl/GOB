@@ -22955,6 +22955,63 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // ============================================================================
         // COMPOSANT YIELD CURVE (COURBE DES TAUX)
         // ============================================================================
+
+        // ⚡ MODULE-LEVEL CACHE & REQUEST DEDUPLICATION (SHARED ACROSS ALL INSTANCES)
+        const YIELD_CURVE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+        const yieldCurveModuleCache = new Map(); // Shared cache across all component instances
+        const yieldCurveInflightRequests = new Map(); // Shared inflight map to prevent duplicate requests
+
+        const getYieldCurveCacheKey = (country) => country || 'both';
+
+        const fetchYieldCurveWithCache = async (country, { forceRefresh = false } = {}) => {
+            const cacheKey = getYieldCurveCacheKey(country);
+            const now = Date.now();
+
+            // 1. Check module-level cache first (TTL: 5 min)
+            if (!forceRefresh) {
+                const cached = yieldCurveModuleCache.get(cacheKey);
+                if (cached && now - cached.cachedAt < YIELD_CURVE_TTL_MS) {
+                    console.log(`✅ Yield Curve MODULE Cache HIT (${country}) - age: ${Math.round((now - cached.cachedAt) / 1000)}s`);
+                    return cached.data;
+                }
+            }
+
+            // 2. Check if request is already in-flight (DEDUPLICATION)
+            const existing = yieldCurveInflightRequests.get(cacheKey);
+            if (existing) {
+                console.log(`🔄 Yield Curve Request DEDUPLICATED (${country}) - joining existing request`);
+                return existing;
+            }
+
+            // 3. Make new request
+            console.log(`🌐 Yield Curve MODULE Cache MISS (${country}) - fetching from API...`);
+
+            const request = fetch(`/api/yield-curve?country=${encodeURIComponent(country)}`)
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Erreur API: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    // Store in module-level cache
+                    yieldCurveModuleCache.set(cacheKey, {
+                        data,
+                        cachedAt: Date.now()
+                    });
+                    console.log(`💾 Yield Curve cached for ${country}`);
+                    return data;
+                })
+                .finally(() => {
+                    // Remove from inflight
+                    yieldCurveInflightRequests.delete(cacheKey);
+                });
+
+            // Store as inflight
+            yieldCurveInflightRequests.set(cacheKey, request);
+            return request;
+        };
+
         const YieldCurveTab = () => {
             const [yieldData, setYieldData] = useState(null);
             const [loading, setLoading] = useState(true);
@@ -22993,72 +23050,27 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             console.log('📊 YieldCurveTab monté, isDarkMode:', darkMode);
 
-            // Récupérer les données de la yield curve avec timeout augmenté et cache sessionStorage
-            const fetchYieldCurve = async () => {
-                const cacheKey = `yieldCurve_${selectedCountry}`;
-                
-                // Vérifier le cache en sessionStorage
-                const cachedData = sessionStorage.getItem(cacheKey);
-                if (cachedData) {
-                    try {
-                        const parsed = JSON.parse(cachedData);
-                        const cacheAge = Date.now() - (parsed.timestamp || 0);
-                        // Utiliser le cache si moins de 5 minutes
-                        if (cacheAge < 5 * 60 * 1000) {
-                            console.log('✅ Yield curve chargée depuis le cache sessionStorage');
-                            setYieldData(parsed.data);
-                            setLoading(false);
-                            setError(null);
-                            return;
-                        }
-                    } catch (e) {
-                        console.warn('⚠️ Erreur parsing cache yield curve:', e);
-                    }
-                }
-
-                // Si les données sont déjà en mémoire, ne pas recharger
-                if (yieldData && !error) {
-                    console.log('✅ Yield curve data déjà chargée en mémoire');
-                    return;
-                }
-
-                console.log('🔄 fetchYieldCurve appelé pour country:', selectedCountry);
+            // Récupérer les données de la yield curve (utilise le cache module-level partagé)
+            const fetchYieldCurve = useCallback(async (forceRefresh = false) => {
                 setLoading(true);
                 setError(null);
 
                 try {
-                    const response = await fetchWithTimeoutAndRetry(
-                        `/api/yield-curve?country=${selectedCountry}`,
-                        {},
-                        30000, // Timeout augmenté à 30 secondes
-                        2 // 2 tentatives
-                    );
-                    console.log('📡 Réponse API yield-curve:', response.status, response.ok);
-
-                    if (!response.ok) {
-                        throw new Error(`Erreur API: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-                    console.log('✅ Données yield curve reçues:', data);
+                    // Use module-level cache with deduplication
+                    const data = await fetchYieldCurveWithCache(selectedCountry, { forceRefresh });
                     setYieldData(data);
-                    // Sauvegarder dans le cache sessionStorage
-                    sessionStorage.setItem(cacheKey, JSON.stringify({
-                        data: data,
-                        timestamp: Date.now()
-                    }));
                     setLoading(false);
                 } catch (err) {
                     console.error('❌ Erreur yield curve:', err);
-                    setError(err.message);
+                    setError(err instanceof Error ? err.message : String(err));
                     setLoading(false);
                 }
-            };
+            }, [selectedCountry]);
 
-            // Charger les données au montage UNE SEULE FOIS - restent en mémoire pendant la session
+            // Charger les données au montage et quand selectedCountry change
             useEffect(() => {
                 fetchYieldCurve();
-            }, []); // Charger uniquement au montage, pas quand selectedCountry change
+            }, [fetchYieldCurve]); // Module-level cache prevents duplicate calls
 
             // Créer/mettre à jour le graphique Chart.js
             useEffect(() => {
@@ -23241,7 +23253,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     <option value="canada">Canada uniquement</option>
                                 </select>
                                 <button
-                                    onClick={fetchYieldCurve}
+                                    onClick={() => fetchYieldCurve(true)}
                                     disabled={loading}
                                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
                                 >
@@ -24404,60 +24416,24 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 return () => { if (container) container.innerHTML = ''; };
             }, [activeSubTab, isDarkMode, activeTab, remountKey]);
 
-            // Charger les données de yield curve au montage et au retour sur l'onglet
-            // Cache en sessionStorage pour garder les données pendant toute la session
+            // Charger les données de yield curve au montage (utilise cache module-level partagé)
             React.useEffect(() => {
-                const cacheKey = `yieldCurve_${selectedCountry}`;
-                
-                // Vérifier le cache en sessionStorage
-                const cachedData = sessionStorage.getItem(cacheKey);
-                if (cachedData) {
-                    try {
-                        const parsed = JSON.parse(cachedData);
-                        const cacheAge = Date.now() - (parsed.timestamp || 0);
-                        // Utiliser le cache si moins de 5 minutes
-                        if (cacheAge < 5 * 60 * 1000) {
-                            console.log('✅ Yield curve chargée depuis le cache');
-                            setYieldData(parsed.data);
-                            setYieldLoading(false);
-                            setYieldError(null);
-                            return;
-                        }
-                    } catch (e) {
-                        console.warn('⚠️ Erreur parsing cache yield curve:', e);
-                    }
-                }
-                
                 const fetchYieldCurve = async () => {
                     setYieldLoading(true);
                     setYieldError(null);
                     try {
-                        // Timeout augmenté à 30 secondes pour éviter les erreurs
-                        const response = await fetchWithTimeoutAndRetry(
-                            `/api/yield-curve?country=${selectedCountry}`,
-                            {},
-                            30000, // 30 secondes au lieu de 8
-                            2 // 2 tentatives au lieu de 1
-                        );
-                        if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
-                        const data = await response.json();
+                        // Use module-level cache with deduplication
+                        const data = await fetchYieldCurveWithCache(selectedCountry);
                         setYieldData(data);
-                        // Sauvegarder dans le cache sessionStorage
-                        sessionStorage.setItem(cacheKey, JSON.stringify({
-                            data: data,
-                            timestamp: Date.now()
-                        }));
                         setYieldLoading(false);
-                        console.log('✅ Yield curve chargée avec succès');
                     } catch (err) {
                         console.error('❌ Erreur yield curve:', err);
-                        setYieldError(err.message);
+                        setYieldError(err instanceof Error ? err.message : String(err));
                         setYieldLoading(false);
                     }
                 };
-                // Charger immédiatement au montage
                 fetchYieldCurve();
-            }, []); // Charger UNE SEULE FOIS au montage - les données restent en mémoire pendant la session
+            }, [selectedCountry]); // Recharger si le pays change (mais cache prevent duplicate calls)
 
             // Charger les données historiques US
             React.useEffect(() => {
