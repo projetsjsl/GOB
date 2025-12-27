@@ -11,9 +11,11 @@ type CacheEntry = {
   cachedAt: number;
 };
 
-const TTL_MS = 5 * 60 * 1000;
+const TTL_MS = 5 * 60 * 1000; // 5 minutes cache TTL
+const MIN_FETCH_INTERVAL_MS = 2000; // Minimum 2 seconds between fetches for same key
 const inflight = new Map<string, Promise<YieldCurvePayload>>();
 const cache = new Map<string, CacheEntry>();
+const lastFetchTime = new Map<string, number>(); // Track last fetch time for rate limiting
 
 const buildCacheKey = (country: string, baseUrl: string) => `${baseUrl}::${country}`;
 
@@ -29,6 +31,23 @@ export async function fetchYieldCurve(options: FetchOptions = {}): Promise<Yield
   const cacheKey = buildCacheKey(country, baseUrl);
   const now = Date.now();
 
+  // RATE LIMITING - Block rapid repeat calls
+  const lastFetch = lastFetchTime.get(cacheKey) || 0;
+  const timeSinceLastFetch = now - lastFetch;
+  if (timeSinceLastFetch < MIN_FETCH_INTERVAL_MS) {
+    // Return cached data if available, otherwise return inflight request
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      console.log(`🛑 yieldCurveClient RATE LIMITED (${cacheKey}) - returning cached`);
+      return cached.data;
+    }
+    const inflightReq = inflight.get(cacheKey);
+    if (inflightReq) {
+      console.log(`🛑 yieldCurveClient RATE LIMITED (${cacheKey}) - joining inflight`);
+      return inflightReq;
+    }
+  }
+
   if (!options.forceRefresh) {
     const cached = cache.get(cacheKey);
     if (cached && now - cached.cachedAt < TTL_MS) {
@@ -40,6 +59,9 @@ export async function fetchYieldCurve(options: FetchOptions = {}): Promise<Yield
   if (existing) {
     return existing;
   }
+
+  // Update last fetch time BEFORE making request
+  lastFetchTime.set(cacheKey, now);
 
   const request = fetch(buildYieldCurveUrl(country, baseUrl), {
     method: 'GET',

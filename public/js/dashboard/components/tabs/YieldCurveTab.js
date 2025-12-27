@@ -17,11 +17,14 @@ const fetchYieldCurveData = async (country, { forceRefresh = false } = {}) => {
         window.__yieldCurveGlobalCache = {
             cache: new Map(),
             inflight: new Map(),
+            lastFetchTime: new Map(), // Track last fetch time for rate limiting
             TTL_MS: 5 * 60 * 1000,
+            MIN_FETCH_INTERVAL_MS: 2000, // Minimum 2 seconds between fetches
             callCount: 0,
+            blockedCount: 0,
             lastReset: Date.now()
         };
-        console.log('🚀 YieldCurveTab.js initialized GLOBAL cache');
+        console.log('🚀 YieldCurveTab.js initialized GLOBAL cache (with rate limiting)');
     }
 
     const global = window.__yieldCurveGlobalCache;
@@ -31,11 +34,29 @@ const fetchYieldCurveData = async (country, { forceRefresh = false } = {}) => {
     // Track calls
     global.callCount++;
     if (global.callCount > 10) {
-        console.warn(`⚠️ YieldCurveTab.js: ${global.callCount} calls`);
+        console.warn(`⚠️ YieldCurveTab.js: ${global.callCount} calls (${global.blockedCount} blocked)`);
     }
     if (now - global.lastReset > 60000) {
         global.callCount = 0;
+        global.blockedCount = 0;
         global.lastReset = now;
+    }
+
+    // RATE LIMITING - Block rapid repeat calls
+    const lastFetch = global.lastFetchTime.get(cacheKey) || 0;
+    const timeSinceLastFetch = now - lastFetch;
+    if (timeSinceLastFetch < global.MIN_FETCH_INTERVAL_MS) {
+        global.blockedCount++;
+        const cached = global.cache.get(cacheKey);
+        if (cached) {
+            console.log(`🛑 YieldCurveTab.js RATE LIMITED (${cacheKey}) - returning cached`);
+            return cached.data;
+        }
+        const inflightReq = global.inflight.get(cacheKey);
+        if (inflightReq) {
+            console.log(`🛑 YieldCurveTab.js RATE LIMITED (${cacheKey}) - joining inflight`);
+            return inflightReq;
+        }
     }
 
     if (!forceRefresh) {
@@ -51,6 +72,9 @@ const fetchYieldCurveData = async (country, { forceRefresh = false } = {}) => {
         console.log(`🔄 YieldCurveTab.js Request DEDUPLICATED (${cacheKey})`);
         return existing;
     }
+
+    // Update last fetch time BEFORE making request
+    global.lastFetchTime.set(cacheKey, now);
 
     console.log(`🌐 YieldCurveTab.js GLOBAL Cache MISS (${cacheKey})`);
 

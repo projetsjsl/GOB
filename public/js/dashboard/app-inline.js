@@ -22962,11 +22962,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             window.__yieldCurveGlobalCache = {
                 cache: new Map(),
                 inflight: new Map(),
-                TTL_MS: 5 * 60 * 1000, // 5 minutes
+                lastFetchTime: new Map(), // Track last fetch time per key for rate limiting
+                TTL_MS: 5 * 60 * 1000, // 5 minutes cache TTL
+                MIN_FETCH_INTERVAL_MS: 2000, // Minimum 2 seconds between fetches for same key
                 callCount: 0, // Track total calls for debugging
-                lastReset: Date.now()
+                lastReset: Date.now(),
+                blockedCount: 0 // Track how many calls were blocked by rate limiting
             };
-            console.log('🚀 Yield Curve GLOBAL cache initialized on window');
+            console.log('🚀 Yield Curve GLOBAL cache initialized on window (with rate limiting)');
         }
 
         const yieldCurveGlobal = window.__yieldCurveGlobalCache;
@@ -22984,12 +22987,33 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             yieldCurveGlobal.callCount++;
             if (yieldCurveGlobal.callCount > 10) {
                 const elapsed = (now - yieldCurveGlobal.lastReset) / 1000;
-                console.warn(`⚠️ Yield Curve: ${yieldCurveGlobal.callCount} calls in ${elapsed.toFixed(1)}s`);
+                console.warn(`⚠️ Yield Curve: ${yieldCurveGlobal.callCount} calls in ${elapsed.toFixed(1)}s (${yieldCurveGlobal.blockedCount} blocked)`);
             }
             // Reset counter every 60 seconds
             if (now - yieldCurveGlobal.lastReset > 60000) {
                 yieldCurveGlobal.callCount = 0;
+                yieldCurveGlobal.blockedCount = 0;
                 yieldCurveGlobal.lastReset = now;
+            }
+
+            // 0. RATE LIMITING - Block rapid repeat calls (even with forceRefresh)
+            const lastFetch = yieldCurveGlobal.lastFetchTime.get(cacheKey) || 0;
+            const timeSinceLastFetch = now - lastFetch;
+            if (timeSinceLastFetch < yieldCurveGlobal.MIN_FETCH_INTERVAL_MS) {
+                yieldCurveGlobal.blockedCount++;
+                // Return cached data if available, otherwise return inflight request
+                const cached = yieldCurveGlobal.cache.get(cacheKey);
+                if (cached) {
+                    console.log(`🛑 Yield Curve RATE LIMITED (${cacheKey}) - returning cached data (${timeSinceLastFetch}ms since last fetch)`);
+                    return cached.data;
+                }
+                const inflight = yieldCurveGlobal.inflight.get(cacheKey);
+                if (inflight) {
+                    console.log(`🛑 Yield Curve RATE LIMITED (${cacheKey}) - joining inflight request`);
+                    return inflight;
+                }
+                // No cached data, allow the fetch anyway but log warning
+                console.warn(`🛑 Yield Curve RATE LIMITED but no cache available (${cacheKey}) - allowing fetch`);
             }
 
             // 1. Check global cache first (TTL: 5 min)
@@ -23008,7 +23032,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 return existing;
             }
 
-            // 3. Make new request
+            // 3. Update last fetch time BEFORE making request
+            yieldCurveGlobal.lastFetchTime.set(cacheKey, now);
+
+            // 4. Make new request
             console.log(`🌐 Yield Curve GLOBAL Cache MISS (${cacheKey}) - fetching from API...`);
 
             const url = date
