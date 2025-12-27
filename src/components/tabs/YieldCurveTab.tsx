@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { TabProps } from '../../types';
+import { getYieldCurveClient } from '../../utils/yieldCurveClient';
 
 declare const Chart: any;
 declare const Recharts: any;
@@ -20,6 +21,9 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                 const chartInstance = useRef(null);
 
                 const darkMode = isDarkMode;
+
+                // Get the yield curve client with cache
+                const yieldCurveClient = getYieldCurveClient(apiBase);
 
                 const formatRate = (value) => (value === null || value === undefined ? '—' : Number(value).toFixed(2));
                 const renderRateTable = (title, dataset, badgeEmoji) => (
@@ -46,19 +50,14 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                     </div>
                 );
 
-                // Récupérer les données de la yield curve
+                // Récupérer les données de la yield curve (avec cache client)
                 const fetchYieldCurve = async () => {
                     setLoading(true);
                     setError(null);
 
                     try {
-                        const response = await fetch(`${apiBase}/api/yield-curve?country=${selectedCountry}`);
-
-                        if (!response.ok) {
-                            throw new Error(`Erreur API: ${response.status}`);
-                        }
-
-                        const data = await response.json();
+                        // Use the client with cache and deduplication
+                        const data = await yieldCurveClient.fetchYieldCurve(selectedCountry);
                         setYieldData(data);
                         setLoading(false);
                     } catch (err) {
