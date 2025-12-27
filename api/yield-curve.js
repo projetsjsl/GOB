@@ -242,32 +242,66 @@ async function getUSTreasury(targetDate = null) {
   console.log(`📊 Récupération des taux US Treasury${targetDate ? ` pour la date ${targetDate}` : ' (actuels)'}...`);
 
   const rates = {};
-  let source = 'FRED';
+  let source = 'FMP';
   let fetchDate = null;
 
-  // Essayer FRED en premier
-  for (const [maturity, seriesId] of Object.entries(US_TREASURY_RATES)) {
-    const data = await fetchFromFRED(seriesId, targetDate);
-    if (data) {
-      rates[maturity] = data; // Stocker l'objet complet {value, change1M...}
-      if (!fetchDate) fetchDate = data.date;
-    }
-  }
+  // Pour données historiques, utiliser FRED (plus complet pour l'historique)
+  // Pour données actuelles, utiliser FMP (1 seul appel au lieu de 11!)
+  if (targetDate) {
+    console.log('📊 Données historiques - utilisation de FRED...');
+    source = 'FRED';
+    // Paralléliser les appels FRED pour l'historique
+    const freddPromises = Object.entries(US_TREASURY_RATES).map(async ([maturity, seriesId]) => {
+      const data = await fetchFromFRED(seriesId, targetDate);
+      return data ? { maturity, data } : null;
+    });
 
-  // Si FRED n'a pas retourné assez de données, essayer FMP
-  const validRates = Object.keys(rates).length;
-  if (validRates < 5) {
-    console.log('⚠️ FRED incomplet, tentative FMP...');
+    const results = await Promise.all(freddPromises);
+    for (const result of results) {
+      if (result) {
+        rates[result.maturity] = result.data;
+        if (!fetchDate) fetchDate = result.data.date;
+      }
+    }
+  } else {
+    // Données actuelles: essayer FMP en premier (1 seul appel API!)
+    console.log('📊 Données actuelles - tentative FMP (1 seul appel)...');
     const fmpData = await fetchFromFMP();
 
     if (fmpData) {
       source = 'FMP';
       fetchDate = fmpData.date;
 
-      // Merger les données FMP (Note: FMP ne donne pas l'historique dans cette fonction, change1M sera null)
+      // FMP ne donne pas l'historique change1M
       for (const [maturity, value] of Object.entries(fmpData)) {
-        if (maturity !== 'date' && value !== null && !rates[maturity]) {
+        if (maturity !== 'date' && value !== null) {
           rates[maturity] = { value, change1M: null, prevValue: null };
+        }
+      }
+    }
+  }
+
+  // Fallback sur FRED si FMP a échoué pour les données actuelles
+  const validRates = Object.keys(rates).length;
+  if (validRates < 5) {
+    console.log(`⚠️ ${source} incomplet (${validRates} taux), fallback sur ${source === 'FMP' ? 'FRED' : 'FMP'}...`);
+
+    if (source === 'FMP') {
+      // FMP a échoué, essayer FRED en parallèle
+      source = 'FRED';
+      const freddPromises = Object.entries(US_TREASURY_RATES).map(async ([maturity, seriesId]) => {
+        if (!rates[maturity]) {
+          const data = await fetchFromFRED(seriesId, targetDate);
+          return data ? { maturity, data } : null;
+        }
+        return null;
+      });
+
+      const results = await Promise.all(freddPromises);
+      for (const result of results) {
+        if (result) {
+          rates[result.maturity] = result.data;
+          if (!fetchDate) fetchDate = result.data.date;
         }
       }
     }
@@ -383,12 +417,18 @@ async function getCanadaRates(targetDate = null) {
   const rates = {};
   let fetchDate = null;
 
-  // Récupérer depuis Bank of Canada
-  for (const [maturity, seriesId] of Object.entries(CANADA_RATES)) {
+  // Paralléliser les appels Bank of Canada (10 appels en parallèle au lieu de séquentiels!)
+  console.log('📊 Appels Bank of Canada en parallèle...');
+  const bocPromises = Object.entries(CANADA_RATES).map(async ([maturity, seriesId]) => {
     const data = await fetchFromBoC(seriesId, targetDate);
-    if (data) {
-      rates[maturity] = data; // Stocker l'objet complet
-      if (!fetchDate) fetchDate = data.date;
+    return data ? { maturity, data } : null;
+  });
+
+  const results = await Promise.all(bocPromises);
+  for (const result of results) {
+    if (result) {
+      rates[result.maturity] = result.data;
+      if (!fetchDate) fetchDate = result.data.date;
     }
   }
 

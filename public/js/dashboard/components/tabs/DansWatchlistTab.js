@@ -16,6 +16,7 @@ const DansWatchlistTab = () => {
         minMarketCap: 0,
         maxPE: 50,
         minROE: 0,
+        maxDebtEquity: 2.0,
         sector: 'all'
     });
     const WATCHLIST_FILE = '/dans-watchlist.json'; // servi depuis /public
@@ -389,12 +390,11 @@ const DansWatchlistTab = () => {
 
     // Effet pour initialiser le TradingView TickerBanner avec les tickers de la watchlist
     useEffect(() => {
-        if (watchlistTickers.length > 0) {
-            // Supprimer le widget existant s'il existe
-            const existingWidget = document.getElementById('tradingview-ticker-dan-watchlist');
-            if (existingWidget) {
-                existingWidget.innerHTML = '';
-            }
+        const widgetContainer = document.getElementById('tradingview-ticker-dan-watchlist');
+
+        if (watchlistTickers.length > 0 && widgetContainer) {
+            // Supprimer le contenu existant
+            widgetContainer.innerHTML = '';
 
             // Créer les symboles formatés pour TradingView (EXCHANGE:TICKER)
             // Par défaut, on assume que les tickers US sont sur NASDAQ ou NYSE
@@ -421,11 +421,15 @@ const DansWatchlistTab = () => {
                 "locale": "fr"
             });
 
-            const widgetContainer = document.getElementById('tradingview-ticker-dan-watchlist');
-            if (widgetContainer) {
-                widgetContainer.appendChild(script);
-            }
+            widgetContainer.appendChild(script);
         }
+
+        // Cleanup function to prevent memory leaks
+        return () => {
+            if (widgetContainer) {
+                widgetContainer.innerHTML = '';
+            }
+        };
     }, [watchlistTickers, isDarkMode]);
 
     return (
