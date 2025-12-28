@@ -400,7 +400,16 @@
                     // For react-grid-layout dependencies
                     if (moduleName === 'react') return window.React;
                     if (moduleName === 'react-dom') return window.ReactDOM;
+                    if (moduleName === 'react-dom/client') return window.ReactDOM;
                     if (moduleName === 'prop-types') return window.PropTypes || {};
+                    // React 18+ JSX runtime - return the React object which has jsx functions
+                    if (moduleName === 'react/jsx-runtime' || moduleName === 'react/jsx-dev-runtime') {
+                        return {
+                            jsx: React.createElement,
+                            jsxs: React.createElement,
+                            Fragment: React.Fragment
+                        };
+                    }
                     if (moduleName === "@emotion/is-prop-valid") {
                         const fn = (p) => true;
                         fn.default = fn;

@@ -11,12 +11,12 @@
 (function() {
     'use strict';
 
-    const { useState, useEffect, useCallback, useMemo, useRef } = React;
+    // Note: React hooks imported for future extensibility if needed
 
     // ===================================
     // COMPOSANT PRINCIPAL - WRAPPER
     // ===================================
-    const TitresTabRGL = ({ isDarkMode = true, isAdmin = true }) => {
+    const TitresTabRGL = ({ isDarkMode = true, isAdmin = false }) => {
         // We simply render the main AdvancedAnalysisTab (Titres) within this RGL container
         // This ensures 100% consistency with the main dashboard.
         

@@ -205,9 +205,12 @@ async function fetchFMPNews(query, limit) {
 }
 
 /**
- * Récupère news depuis Finnhub
+ * Récupère news depuis Finnhub avec gestion du rate limiting
  */
-async function fetchFinnhubNews(query, limit) {
+async function fetchFinnhubNews(query, limit, retryCount = 0) {
+  const MAX_RETRIES = 2;
+  const RETRY_DELAY_MS = 1000; // 1 second base delay
+
   try {
     const apiKey = process.env.FINNHUB_API_KEY;
     let url;
@@ -223,6 +226,18 @@ async function fetchFinnhubNews(query, limit) {
     }
 
     const response = await fetch(url);
+
+    // Handle rate limiting (429)
+    if (response.status === 429) {
+      if (retryCount < MAX_RETRIES) {
+        const delay = RETRY_DELAY_MS * Math.pow(2, retryCount); // Exponential backoff
+        console.warn(`⚠️ Finnhub rate limited (429), retrying in ${delay}ms... (attempt ${retryCount + 1}/${MAX_RETRIES})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return fetchFinnhubNews(query, limit, retryCount + 1);
+      }
+      console.warn('⚠️ Finnhub rate limit exceeded, skipping source');
+      return [];
+    }
 
     if (!response.ok) {
       throw new Error(`Finnhub API error: ${response.status}`);
@@ -250,7 +265,7 @@ async function fetchFinnhubNews(query, limit) {
       if (query && query.length <= 5) {
         const text = ((article.title || '') + ' ' + (article.summary || '')).toLowerCase();
         const qLower = query.toLowerCase();
-        
+
         // Check for Ticker as whole word
         const regex = new RegExp(`\\b${qLower}\\b`, 'i');
         return regex.test(text);

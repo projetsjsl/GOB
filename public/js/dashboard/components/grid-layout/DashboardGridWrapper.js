@@ -8,7 +8,7 @@
 (function() {
     'use strict';
 
-    const { useState, useEffect, useMemo, useCallback, useRef } = React;
+    const { useState, useEffect, useMemo, useCallback } = React;
 
     // ===================================
     // CONSTANTES & CONFIGURATION
@@ -21,6 +21,9 @@
 
     // Cache to prevent log spam for missing components
     const _loggedMissingComponents = {};
+
+    // Flag to prevent ResponsiveGridLayout error spam (logs only once)
+    let _loggedRGLError = false;
 
 
     const COLS = { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 };
@@ -67,22 +70,6 @@
         'tests-calendar': { component: 'MarketsEconomyTab', label: 'Calendrier', icon: 'Calendar', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
     };
 
-    
-    // Mapping from main tab to widget IDs to show
-    const MAIN_TAB_TO_WIDGETS = {
-        'admin': ['admin-jsla', 'admin-config', 'admin-briefings', 'admin-scraping', 'admin-fastgraphs'],
-        'marches': ['marches-global', 'marches-flex', 'marches-calendar', 'marches-yield', 'marches-nouvelles'],
-        'titres': ['titres-portfolio', 'titres-flex', 'titres-watchlist', 'titres-seeking'],
-        'jlab': ['jlab-terminal', 'jlab-advanced'],
-        'emma': ['emma-chat', 'emma-vocal', 'emma-group', 'emma-terminal', 'emma-live', 'emma-finvox'],
-        'tests': ['tests-rgl', 'tests-calendar']
-    };
-    
-    // Get widgets for a main tab
-    const getWidgetsForTab = (mainTab) => {
-        return MAIN_TAB_TO_WIDGETS[mainTab] || Object.keys(TAB_TO_WIDGET_MAP);
-    };
-
     // Layout par défaut basé sur les tabs les plus utilisés
     const getDefaultLayout = (activeTabs = []) => {
         const defaultTabs = activeTabs.length > 0 ? activeTabs : [
@@ -121,10 +108,28 @@
     const LAYOUT_PRESETS = {
         default: loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout(),
         developer: loadSavedPreset(STORAGE_KEY_DEV) || [
-             // Developer preset defaults to everything mostly visible for testing
+            // Developer preset: admin tools and testing
             { i: 'admin-jsla', x: 0, y: 0, w: 12, h: 12, minW: 8, minH: 8 },
             { i: 'tests-rgl', x: 0, y: 12, w: 6, h: 10, minW: 6, minH: 6 },
             { i: 'emma-terminal', x: 6, y: 12, w: 6, h: 10, minW: 6, minH: 6 },
+        ],
+        trading: [
+            // Trading preset: focus on markets and portfolio
+            { i: 'titres-portfolio', x: 0, y: 0, w: 8, h: 12, minW: 6, minH: 8 },
+            { i: 'marches-global', x: 8, y: 0, w: 4, h: 12, minW: 4, minH: 6 },
+            { i: 'marches-yield', x: 0, y: 12, w: 6, h: 10, minW: 6, minH: 6 },
+            { i: 'marches-calendar', x: 6, y: 12, w: 6, h: 10, minW: 6, minH: 6 },
+        ],
+        research: [
+            // Research preset: news, analysis and AI
+            { i: 'titres-seeking', x: 0, y: 0, w: 6, h: 12, minW: 6, minH: 8 },
+            { i: 'emma-chat', x: 6, y: 0, w: 6, h: 12, minW: 4, minH: 8 },
+            { i: 'jlab-terminal', x: 0, y: 12, w: 12, h: 14, minW: 8, minH: 10 },
+        ],
+        minimal: [
+            // Minimal preset: just the essentials
+            { i: 'titres-portfolio', x: 0, y: 0, w: 12, h: 14, minW: 8, minH: 8 },
+            { i: 'emma-chat', x: 0, y: 14, w: 12, h: 10, minW: 4, minH: 8 },
         ]
     };
 
@@ -246,7 +251,6 @@ const DashboardGridWrapper = ({
         isFrenchArticle = () => false,
         getNewsIcon = () => ({ icon: 'Newspaper', color: 'text-gray-500' }),
         getSourceCredibility = () => 50,
-        tabMountKeys = {},
         Icon = null,
         MASTER_NAV_LINKS = [],
         allTabs = []
@@ -402,8 +406,7 @@ const DashboardGridWrapper = ({
 
             // Vérifier si le widget existe déjà
             if (layout.some(item => item.i === tabId)) {
-                void(`Widget ${tabId} existe déjà`);
-                return;
+                return; // Widget already exists
             }
 
             const newItem = {
@@ -478,51 +481,31 @@ const DashboardGridWrapper = ({
 
             // Récupérer le composant (plusieurs tentatives)
             let Component = window[config.component];
-            
-            if (!Component) {
-                // LAST RESORT FALLBACK REGISTRY
-                const REGISTRY = {
-                    'EmmaConfigTab': window.AdminJSLaiTab,
-                    'EmailBriefingsTab': window.AdminJSLaiTab,
-                    'YieldCurveTab': window.MarketsEconomyTab,
-                    'NouvellesTab': window.StocksNewsTab,
-                    'DansWatchlistTab': window.StocksNewsTab,
-                    'InvestingCalendarTab': window.MarketsEconomyTab, // Fusionné dans MarketsEconomyTab
-                    'EconomicCalendarTab': window.EconomicCalendarTab
-                };
-                Component = REGISTRY[config.component];
-            }
 
+            // Fallback: essayer avec 'Tab' suffix
             if (!Component) {
-                // Essayer avec 'Tab' suffix
                 Component = window[config.component + 'Tab'];
             }
+
+            // Fallback spécifique pour JLab
             if (!Component && config.component === 'JLabUnifiedTab') {
-                // Fallback pour JLab
-                Component = window.JLabTab || window.JLabUnifiedTab;
+                Component = window.JLabTab;
             }
-            if (!Component && config.component === 'StocksNewsTab') {
-                // StocksNewsTab peut être défini différemment
-                Component = window.StocksNewsTab;
-            }
-            if (!Component && config.component === 'MarketsEconomyTab') {
-                // MarketsEconomyTab peut être défini différemment
-                Component = window.MarketsEconomyTab;
-            }
-            
-            
+
+            // Fallback registry pour composants renommés ou fusionnés
             if (!Component) {
-                // LAST RESORT FALLBACK REGISTRY
-                const REGISTRY = {
+                const FALLBACK_REGISTRY = {
                     'EmmaConfigTab': window.AdminJSLaiTab,
                     'EmailBriefingsTab': window.AdminJSLaiTab,
                     'YieldCurveTab': window.MarketsEconomyTab,
                     'NouvellesTab': window.StocksNewsTab,
                     'DansWatchlistTab': window.StocksNewsTab,
-                    'InvestingCalendarTab': window.MarketsEconomyTab, // Fusionné dans MarketsEconomyTab
-                    'EconomicCalendarTab': window.EconomicCalendarTab
+                    'InvestingCalendarTab': window.MarketsEconomyTab,
+                    'EconomicCalendarTab': window.EconomicCalendarTab,
+                    'AdvancedAnalysisTab': window.JLabTab,
+                    'VoiceAssistantTab': window.AskEmmaTab
                 };
-                Component = REGISTRY[config.component];
+                Component = FALLBACK_REGISTRY[config.component];
             }
 
             if (!Component) {
@@ -690,7 +673,9 @@ const DashboardGridWrapper = ({
                     </div>
                     {/* Widget Content */}
                     <div className="flex-1 overflow-auto">
-                        {React.createElement(Component, { ...commonProps, ...componentProps })}
+                        <WidgetErrorBoundary>
+                            {React.createElement(Component, { ...commonProps, ...componentProps })}
+                        </WidgetErrorBoundary>
                     </div>
                 </div>
             );
@@ -768,8 +753,24 @@ const DashboardGridWrapper = ({
         return existing;
     }, [layout, mainTab]);
 
+        // ⚠️ IMPORTANT: All hooks must be called before any early returns (React Rules of Hooks)
+        // Log only on initial mount for performance
+        useEffect(() => {
+            if (ResponsiveGridLayout) {
+                console.log('🔍 DashboardGridWrapper - Montage initial:', {
+                    layoutLength: layout?.length || 0,
+                    ResponsiveGridLayoutAvailable: true
+                });
+            }
+        }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+        // Early return for loading state (after all hooks)
         if (!ResponsiveGridLayout) {
-            console.error('❌ ResponsiveGridLayout non disponible');
+            // Only log once to prevent console spam
+            if (!_loggedRGLError) {
+                _loggedRGLError = true;
+                console.error('❌ ResponsiveGridLayout non disponible');
+            }
             return (
                 <div className={`p-6 ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
                     <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>
@@ -779,16 +780,6 @@ const DashboardGridWrapper = ({
                 </div>
             );
         }
-
-        // ⚠️ CORRECTION PERFORMANCE: Logs uniquement au montage initial
-        useEffect(() => {
-            void('🔍 DashboardGridWrapper - Montage initial:', {
-                layoutLength: layout?.length || 0,
-                ResponsiveGridLayoutAvailable: !!ResponsiveGridLayout
-            });
-        }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-        // ⚠️ SUPPRIMÉ: console.log dans le render causait des logs excessifs
 
         return (
             <div className={`min-h-screen ${isDarkMode ? 'bg-black' : 'bg-white'}`}>
@@ -908,7 +899,7 @@ const DashboardGridWrapper = ({
                                     onClick={() => {
                                         const defaultLayout = getDefaultLayout();
                                         setLayout(defaultLayout);
-                                        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultLayout));
+                                        localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(defaultLayout));
                                     }}
                                     className={`px-4 py-2 rounded-lg font-medium text-sm ${
                                         isDarkMode 
@@ -989,8 +980,8 @@ const DashboardGridWrapper = ({
         );
     };
 
+    // Export component to window
     window.DashboardGridWrapper = DashboardGridWrapper;
-    void('✅ DashboardGridWrapper chargé');
-    void('📊 Layout par défaut:', getDefaultLayout());
-    void('🧩 Composants disponibles:', Object.keys(TAB_TO_WIDGET_MAP).slice(0, 5), '...');
+
+    console.log('✅ DashboardGridWrapper chargé');
 })();

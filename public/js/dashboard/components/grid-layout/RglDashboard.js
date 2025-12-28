@@ -11,7 +11,7 @@
 (function() {
     'use strict';
 
-    const { useState, useEffect, useCallback, useMemo } = React;
+    const { useState, useCallback, useMemo } = React;
 
     // ============================================================================
     // CONSTANTS & DEFAULT LAYOUTS
@@ -164,7 +164,7 @@
         return (
             <div className={`h-full rounded-xl p-4 flex flex-col justify-between ${isDarkMode ? 'bg-neutral-800' : 'bg-white'} shadow-lg`}>
                 <div className={`p-2 rounded-lg bg-gradient-to-br ${colorMap[def.color]} w-fit`}>
-                    <LucideIcon name={def.icon} className="w-5 h-5 text-white" />
+                    <window.LucideIcon name={def.icon} className="w-5 h-5 text-white" />
                 </div>
                 <div>
                     <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{value}</p>
@@ -301,7 +301,13 @@
 
     const RglDashboard = ({ isDarkMode = true, isAdmin = false }) => {
         const [layouts, setLayouts] = useState(() => {
-            try { const s = localStorage.getItem(STORAGE_KEY); return s ? JSON.parse(s) : DEFAULT_LAYOUTS; } catch { return DEFAULT_LAYOUTS; }
+            try {
+                const s = localStorage.getItem(STORAGE_KEY);
+                return s ? JSON.parse(s) : DEFAULT_LAYOUTS;
+            } catch (e) {
+                console.error('Error loading RGL layout:', e);
+                return DEFAULT_LAYOUTS;
+            }
         });
         const [isEditing, setIsEditing] = useState(false);
         const [currentBreakpoint, setCurrentBreakpoint] = useState('lg');
@@ -360,8 +366,10 @@
         );
     };
 
+    // Export to window
     window.RglDashboard = RglDashboard;
     window.RGL_DEFAULT_LAYOUTS = DEFAULT_LAYOUTS;
     window.RGL_WIDGET_DEFINITIONS = WIDGET_DEFINITIONS;
-    void('✅ RglDashboard loaded');
+
+    console.log('✅ RglDashboard loaded');
 })();

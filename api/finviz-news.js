@@ -204,10 +204,13 @@ async function fetchFMPNews(type = 'all', limit = 30) {
 
 /**
  * Fetch news from Finnhub - Sources: Bloomberg, WSJ, Reuters, CNBC, MarketWatch, etc.
+ * Includes rate limiting protection with retry logic
  */
-async function fetchFinnhubNews(type = 'all', limit = 30) {
+async function fetchFinnhubNews(type = 'all', limit = 30, retryCount = 0) {
     const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
-    
+    const MAX_RETRIES = 2;
+    const RETRY_DELAY_MS = 1000;
+
     if (!FINNHUB_API_KEY) {
         console.warn('FINNHUB_API_KEY non configurée, skip Finnhub news');
         return [];
@@ -227,10 +230,10 @@ async function fetchFinnhubNews(type = 'all', limit = 30) {
             'ipo': 'general',
             'mergers': 'general'
         };
-        
+
         const category = categoryMap[type] || 'general';
         const finnhubUrl = `https://finnhub.io/api/v1/news?category=${category}&token=${FINNHUB_API_KEY}`;
-        
+
         const response = await fetch(finnhubUrl, {
             headers: {
                 'Accept': 'application/json',
@@ -238,6 +241,18 @@ async function fetchFinnhubNews(type = 'all', limit = 30) {
             },
             signal: AbortSignal.timeout(15000) // 15 secondes timeout
         });
+
+        // Handle rate limiting (429)
+        if (response.status === 429) {
+            if (retryCount < MAX_RETRIES) {
+                const delay = RETRY_DELAY_MS * Math.pow(2, retryCount);
+                console.warn(`⚠️ Finnhub rate limited (429), retrying in ${delay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return fetchFinnhubNews(type, limit, retryCount + 1);
+            }
+            console.warn('⚠️ Finnhub rate limit exceeded, skipping source');
+            return [];
+        }
 
         if (!response.ok) {
             throw new Error(`Finnhub API error: ${response.status}`);
@@ -979,42 +994,68 @@ async function translateNews(newsItems) {
         const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
         const translatedNews = [];
-        
+        let apiKeyValid = true; // Track if API key is still valid
+
         // Translate in batches of 5 to avoid rate limits
         for (let i = 0; i < newsItems.length; i += 5) {
             const batch = newsItems.slice(i, i + 5);
+
+            // Skip translation if API key is known to be invalid
+            if (!apiKeyValid) {
+                batch.forEach(item => translatedNews.push(item));
+                continue;
+            }
+
             const headlines = batch.map(item => item.headline).join('\n');
-            
+
             const prompt = `Traduis ces titres d'actualités financières en français. Garde le style professionnel et les termes techniques financiers appropriés. Retourne uniquement les traductions, une par ligne, dans le même ordre:\n\n${headlines}`;
-            
+
             try {
                 const result = await model.generateContent(prompt);
                 const response = await result.response;
                 const translatedText = response.text().trim();
                 const translations = translatedText.split('\n').map(t => t.trim()).filter(t => t);
-                
+
                 batch.forEach((item, index) => {
                     translatedNews.push({
                         ...item,
                         headline: translations[index] || item.headline
                     });
                 });
-                
+
                 // Small delay to avoid rate limits
                 if (i + 5 < newsItems.length) {
                     await new Promise(resolve => setTimeout(resolve, 500));
                 }
             } catch (translateError) {
-                console.error('Erreur traduction batch:', translateError);
+                const errorMessage = translateError.message || '';
+                // Check for API key expiry/invalid errors
+                if (errorMessage.includes('API key expired') ||
+                    errorMessage.includes('API_KEY_INVALID') ||
+                    errorMessage.includes('PERMISSION_DENIED') ||
+                    errorMessage.includes('invalid api key')) {
+                    console.warn('⚠️ Gemini API key invalid/expired, skipping translation');
+                    apiKeyValid = false;
+                } else {
+                    console.error('Erreur traduction batch:', translateError.message);
+                }
                 // Fallback: use original headlines
                 batch.forEach(item => translatedNews.push(item));
             }
         }
-        
+
         return translatedNews.length > 0 ? translatedNews : newsItems;
-        
+
     } catch (error) {
-        console.error('Erreur traduction:', error);
+        const errorMessage = error.message || '';
+        // Check for API key expiry/invalid at module level
+        if (errorMessage.includes('API key expired') ||
+            errorMessage.includes('API_KEY_INVALID') ||
+            errorMessage.includes('PERMISSION_DENIED')) {
+            console.warn('⚠️ Gemini API key invalid/expired, returning news in English');
+        } else {
+            console.error('Erreur traduction:', error.message);
+        }
         return newsItems;
     }
 }

@@ -2,8 +2,14 @@
  * TREASURY RATES API
  * Récupère les taux obligataires US et Canada
  *
+ * ⚠️ NOTE: This endpoint overlaps with /api/yield-curve which is more complete:
+ * - yield-curve.js: Has Treasury.gov as primary source (no API key needed)
+ * - yield-curve.js: Stores data in Supabase cache
+ * - yield-curve.js: Includes 1-month change tracking
+ * Consider using /api/yield-curve?country=both for new integrations
+ *
  * Sources:
- * - Canada: Banque du Canada API
+ * - Canada: Banque du Canada API (Updated Dec 2024 with new series IDs)
  * - USA: FRED (Federal Reserve Economic Data)
  * - Fallback: FMP Treasury Rates
  *
@@ -33,11 +39,10 @@ export default async function handler(req, res) {
     try {
         const { country = 'both' } = req.query;
 
-        // Validate country parameter
+        // Validate and normalize country parameter
         const validCountries = ['US', 'CA', 'both'];
-        // Normaliser 'both' en acceptant les deux formats
         const normalizedCountry = country.toLowerCase() === 'both' ? 'both' : country.toUpperCase();
-        if (!validCountries.includes(country.toUpperCase())) {
+        if (!validCountries.includes(normalizedCountry)) {
             return res.status(400).json({
                 error: 'Pays invalide',
                 valid_countries: validCountries,
@@ -45,22 +50,22 @@ export default async function handler(req, res) {
             });
         }
 
-        console.log(`📊 [Treasury Rates] Fetching rates for: ${country}`);
+        console.log(`📊 [Treasury Rates] Fetching rates for: ${normalizedCountry}`);
 
         const results = {};
 
         // Fetch US rates
-        if (country.toUpperCase() === 'US' || country.toLowerCase() === 'both') {
+        if (normalizedCountry === 'US' || normalizedCountry === 'both') {
             results.us = await fetchUSTreasuryRates();
         }
 
         // Fetch Canada rates
-        if (country.toUpperCase() === 'CA' || country.toLowerCase() === 'both') {
+        if (normalizedCountry === 'CA' || normalizedCountry === 'both') {
             results.canada = await fetchCanadaTreasuryRates();
         }
 
         // Calculate spreads if both countries
-        if (country.toLowerCase() === 'both' && results.us && results.canada) {
+        if (normalizedCountry === 'both' && results.us && results.canada) {
             results.comparison = calculateSpreads(results.us, results.canada);
         }
 
@@ -176,39 +181,38 @@ async function fetchUSTreasuryRates() {
 
 /**
  * Fetch Canada Treasury Rates from Bank of Canada
+ * Updated Dec 2024: Uses new series IDs (bond_yields_all + tbill_all groups)
  */
 async function fetchCanadaTreasuryRates() {
     const rates = {};
 
     try {
-        // Bank of Canada API
-        const bocUrl = 'https://www.bankofcanada.ca/valet/observations/group/bond_yields_canadian/json';
+        // Bank of Canada API - Use both groups for complete data
+        const [bondsResponse, tbillsResponse] = await Promise.all([
+            fetch('https://www.bankofcanada.ca/valet/observations/group/bond_yields_all/json?recent=5'),
+            fetch('https://www.bankofcanada.ca/valet/observations/group/tbill_all/json?recent=5')
+        ]);
 
-        const response = await fetch(bocUrl);
-
-        if (response.ok) {
-            const data = await response.json();
+        // Process bond yields (2Y, 3Y, 5Y, 7Y, 10Y, 30Y)
+        if (bondsResponse.ok) {
+            const data = await bondsResponse.json();
             const observations = data.observations || [];
 
             if (observations.length > 0) {
                 const latest = observations[observations.length - 1];
 
-                // Map BoC series to maturities
-                const mapping = {
-                    'V122531': '1M',
-                    'V122532': '3M',
-                    'V122533': '6M',
-                    'V122541': '1Y',
-                    'V122543': '2Y',
-                    'V122544': '3Y',
-                    'V122545': '5Y',
-                    'V122546': '7Y',
-                    'V122487': '10Y',
-                    'V122552': '30Y'
+                // Updated mapping for bond yields (Dec 2024)
+                const bondMapping = {
+                    'BD.CDN.2YR.DQ.YLD': '2Y',
+                    'BD.CDN.3YR.DQ.YLD': '3Y',
+                    'BD.CDN.5YR.DQ.YLD': '5Y',
+                    'BD.CDN.7YR.DQ.YLD': '7Y',
+                    'BD.CDN.10YR.DQ.YLD': '10Y',
+                    'BD.CDN.LONG.DQ.YLD': '30Y'
                 };
 
-                for (const [seriesId, maturity] of Object.entries(mapping)) {
-                    if (latest[seriesId]) {
+                for (const [seriesId, maturity] of Object.entries(bondMapping)) {
+                    if (latest[seriesId] && latest[seriesId].v) {
                         const value = parseFloat(latest[seriesId].v);
                         if (!isNaN(value)) {
                             rates[maturity] = {
@@ -218,10 +222,40 @@ async function fetchCanadaTreasuryRates() {
                         }
                     }
                 }
-
-                console.log(`✅ [BoC] Fetched ${Object.keys(rates).length} Canada rates`);
             }
         }
+
+        // Process treasury bills (1M, 3M, 6M, 1Y)
+        if (tbillsResponse.ok) {
+            const data = await tbillsResponse.json();
+            const observations = data.observations || [];
+
+            if (observations.length > 0) {
+                const latest = observations[observations.length - 1];
+
+                // Updated mapping for T-bills (Dec 2024)
+                const tbillMapping = {
+                    'V80691342': '1M',
+                    'V80691344': '3M',
+                    'V80691345': '6M',
+                    'V80691346': '1Y'
+                };
+
+                for (const [seriesId, maturity] of Object.entries(tbillMapping)) {
+                    if (latest[seriesId] && latest[seriesId].v) {
+                        const value = parseFloat(latest[seriesId].v);
+                        if (!isNaN(value)) {
+                            rates[maturity] = {
+                                rate: value,
+                                date: latest.d
+                            };
+                        }
+                    }
+                }
+            }
+        }
+
+        console.log(`✅ [BoC] Fetched ${Object.keys(rates).length} Canada rates`);
 
         // Fallback to FMP if BoC failed or incomplete
         if (Object.keys(rates).length < 6) {

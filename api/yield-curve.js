@@ -59,34 +59,36 @@ const US_TREASURY_RATES = {
   '30Y': 'DGS30'    // 30 ans
 };
 
+// Updated Bank of Canada series IDs (December 2024)
+// Old V39xxx series are deprecated
 const CANADA_RATES = {
-  // Treasury Bills (Bons du Trésor) - Secondary Market
-  '1M': 'V39063',
-  '2M': 'V39064',
-  '3M': 'V39065',
-  '6M': 'V39066',
-  '1Y': 'V39067',
+  // Treasury Bills (Bons du Trésor) - from tbill_all group
+  '1M': 'V80691342',
+  '3M': 'V80691344',
+  '6M': 'V80691345',
+  '1Y': 'V80691346',
 
-  // Benchmark Bonds (Obligations Gouvernementales)
-  '2Y': 'V39051',
-  '3Y': 'V39052',
-  '5Y': 'V39053',
-  '7Y': 'V39054',
-  '10Y': 'V39055',
-  '30Y': 'V39056'
+  // Benchmark Bonds (Obligations Gouvernementales) - from bond_yields_all group
+  '2Y': 'BD.CDN.2YR.DQ.YLD',
+  '3Y': 'BD.CDN.3YR.DQ.YLD',
+  '5Y': 'BD.CDN.5YR.DQ.YLD',
+  '7Y': 'BD.CDN.7YR.DQ.YLD',
+  '10Y': 'BD.CDN.10YR.DQ.YLD',
+  '30Y': 'BD.CDN.LONG.DQ.YLD'
 };
 
+// Updated fallback values based on Dec 2024 rates (only used if all APIs fail)
 const CANADA_FALLBACK = [
-  { maturity: '1M', rate: 2.25 },
-  { maturity: '3M', rate: 2.35 },
-  { maturity: '6M', rate: 2.45 },
-  { maturity: '1Y', rate: 2.50 },
-  { maturity: '2Y', rate: 2.58 },
-  { maturity: '3Y', rate: 2.75 },
-  { maturity: '5Y', rate: 2.96 },
-  { maturity: '7Y', rate: 3.15 },
-  { maturity: '10Y', rate: 3.40 },
-  { maturity: '30Y', rate: 3.84 }
+  { maturity: '1M', rate: 2.12 },
+  { maturity: '3M', rate: 2.17 },
+  { maturity: '6M', rate: 2.22 },
+  { maturity: '1Y', rate: 2.38 },
+  { maturity: '2Y', rate: 2.57 },
+  { maturity: '3Y', rate: 2.56 },
+  { maturity: '5Y', rate: 2.94 },
+  { maturity: '7Y', rate: 3.09 },
+  { maturity: '10Y', rate: 3.42 },
+  { maturity: '30Y', rate: 3.83 }
 ];
 
 // Convertir la maturité en mois pour le tri
@@ -184,6 +186,97 @@ async function fetchFromFRED(seriesId, targetDate = null) {
 }
 
 /**
+ * Récupère les données directement depuis Treasury.gov (NO API KEY REQUIRED)
+ * Source officielle du gouvernement américain - très fiable
+ */
+async function fetchFromTreasuryGov() {
+  try {
+    const currentYear = new Date().getFullYear();
+    const url = `https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/${currentYear}/all?type=daily_treasury_yield_curve&field_tdr_date_value=${currentYear}&page&_format=csv`;
+
+    console.log('📊 Tentative Treasury.gov (source officielle, sans API key)...');
+
+    const response = await fetch(url, {
+      headers: {
+        'Accept': 'text/csv',
+        'User-Agent': 'GOB-Financial-Dashboard/1.0'
+      },
+      signal: AbortSignal.timeout(15000)
+    });
+
+    if (!response.ok) {
+      console.warn(`⚠️ Treasury.gov erreur: ${response.status}`);
+      return null;
+    }
+
+    const csvText = await response.text();
+    const lines = csvText.trim().split('\n');
+
+    if (lines.length < 2) {
+      console.warn('⚠️ Treasury.gov: données insuffisantes');
+      return null;
+    }
+
+    // Parse header to find column indices
+    const header = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+    const colMap = {
+      '1M': header.findIndex(h => h === '1 Mo'),
+      '2M': header.findIndex(h => h === '2 Mo'),
+      '3M': header.findIndex(h => h === '3 Mo'),
+      '6M': header.findIndex(h => h === '6 Mo'),
+      '1Y': header.findIndex(h => h === '1 Yr'),
+      '2Y': header.findIndex(h => h === '2 Yr'),
+      '3Y': header.findIndex(h => h === '3 Yr'),
+      '5Y': header.findIndex(h => h === '5 Yr'),
+      '7Y': header.findIndex(h => h === '7 Yr'),
+      '10Y': header.findIndex(h => h === '10 Yr'),
+      '20Y': header.findIndex(h => h === '20 Yr'),
+      '30Y': header.findIndex(h => h === '30 Yr')
+    };
+
+    // Get most recent data (last row with valid data)
+    let latestRow = null;
+    let prevRow = null;
+
+    for (let i = lines.length - 1; i >= 1; i--) {
+      const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+      if (values[colMap['10Y']] && !isNaN(parseFloat(values[colMap['10Y']]))) {
+        if (!latestRow) {
+          latestRow = values;
+        } else if (!prevRow && i < lines.length - 20) {
+          prevRow = values;
+          break;
+        }
+      }
+    }
+
+    if (!latestRow) {
+      console.warn('⚠️ Treasury.gov: pas de données valides');
+      return null;
+    }
+
+    const dateIdx = header.findIndex(h => h === 'Date');
+    const result = { date: latestRow[dateIdx] || new Date().toISOString().split('T')[0] };
+
+    for (const [maturity, idx] of Object.entries(colMap)) {
+      if (idx >= 0 && latestRow[idx]) {
+        const value = parseFloat(latestRow[idx]);
+        if (!isNaN(value)) {
+          result[maturity] = value;
+        }
+      }
+    }
+
+    console.log(`✅ Treasury.gov: ${Object.keys(result).length - 1} taux récupérés`);
+    return result;
+
+  } catch (error) {
+    console.error('❌ Erreur Treasury.gov:', error.message);
+    return null;
+  }
+}
+
+/**
  * Récupère les données depuis FMP API (fallback pour US Treasury)
  */
 async function fetchFromFMP() {
@@ -197,7 +290,9 @@ async function fetchFromFMP() {
   try {
     const url = `https://financialmodelingprep.com/api/v4/treasury?apikey=${FMP_API_KEY}`;
 
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      signal: AbortSignal.timeout(10000)
+    });
 
     if (!response.ok) {
       console.warn(`⚠️ FMP API erreur: ${response.status}`);
@@ -213,6 +308,7 @@ async function fetchFromFMP() {
     // FMP retourne les taux au format: { date, month1, month2, month3, year1, year2, etc. }
     const latest = data[0];
 
+    console.log('✅ FMP: taux US récupérés');
     return {
       '1M': latest.month1 || null,
       '2M': latest.month2 || null,
@@ -236,17 +332,20 @@ async function fetchFromFMP() {
 
 /**
  * Récupère la courbe des taux US Treasury
+ * Ordre de priorité pour fiabilité maximale:
+ * 1. Treasury.gov (source officielle, PAS DE CLÉ API REQUISE)
+ * 2. FMP (1 seul appel API)
+ * 3. FRED (multiples appels, nécessite API key)
  * @param {string} targetDate - Date cible au format YYYY-MM-DD (optionnel, pour données historiques)
  */
 async function getUSTreasury(targetDate = null) {
   console.log(`📊 Récupération des taux US Treasury${targetDate ? ` pour la date ${targetDate}` : ' (actuels)'}...`);
 
   const rates = {};
-  let source = 'FMP';
+  let source = 'Treasury.gov';
   let fetchDate = null;
 
   // Pour données historiques, utiliser FRED (plus complet pour l'historique)
-  // Pour données actuelles, utiliser FMP (1 seul appel au lieu de 11!)
   if (targetDate) {
     console.log('📊 Données historiques - utilisation de FRED...');
     source = 'FRED';
@@ -264,31 +363,45 @@ async function getUSTreasury(targetDate = null) {
       }
     }
   } else {
-    // Données actuelles: essayer FMP en premier (1 seul appel API!)
-    console.log('📊 Données actuelles - tentative FMP (1 seul appel)...');
-    const fmpData = await fetchFromFMP();
+    // Données actuelles: essayer Treasury.gov EN PREMIER (source officielle, pas de clé API!)
+    console.log('📊 Données actuelles - tentative Treasury.gov (source officielle, sans API key)...');
+    const treasuryData = await fetchFromTreasuryGov();
 
-    if (fmpData) {
-      source = 'FMP';
-      fetchDate = fmpData.date;
+    if (treasuryData) {
+      source = 'Treasury.gov';
+      fetchDate = treasuryData.date;
 
-      // FMP ne donne pas l'historique change1M
-      for (const [maturity, value] of Object.entries(fmpData)) {
-        if (maturity !== 'date' && value !== null) {
+      for (const [maturity, value] of Object.entries(treasuryData)) {
+        if (maturity !== 'date' && value !== null && typeof value === 'number') {
           rates[maturity] = { value, change1M: null, prevValue: null };
         }
       }
     }
-  }
 
-  // Fallback sur FRED si FMP a échoué pour les données actuelles
-  const validRates = Object.keys(rates).length;
-  if (validRates < 5) {
-    console.log(`⚠️ ${source} incomplet (${validRates} taux), fallback sur ${source === 'FMP' ? 'FRED' : 'FMP'}...`);
+    // Fallback 1: FMP si Treasury.gov a échoué ou incomplet
+    let validRates = Object.keys(rates).length;
+    if (validRates < 5) {
+      console.log(`⚠️ Treasury.gov incomplet (${validRates} taux), tentative FMP...`);
+      const fmpData = await fetchFromFMP();
 
-    if (source === 'FMP') {
-      // FMP a échoué, essayer FRED en parallèle
+      if (fmpData) {
+        source = 'FMP';
+        if (!fetchDate) fetchDate = fmpData.date;
+
+        for (const [maturity, value] of Object.entries(fmpData)) {
+          if (maturity !== 'date' && value !== null && !rates[maturity]) {
+            rates[maturity] = { value, change1M: null, prevValue: null };
+          }
+        }
+      }
+    }
+
+    // Fallback 2: FRED si les sources précédentes ont échoué
+    validRates = Object.keys(rates).length;
+    if (validRates < 5) {
+      console.log(`⚠️ Sources insuffisantes (${validRates} taux), fallback FRED...`);
       source = 'FRED';
+
       const freddPromises = Object.entries(US_TREASURY_RATES).map(async ([maturity, seriesId]) => {
         if (!rates[maturity]) {
           const data = await fetchFromFRED(seriesId, targetDate);
@@ -318,6 +431,9 @@ async function getUSTreasury(targetDate = null) {
     }))
     .sort((a, b) => a.months - b.months);
 
+  // Log final source utilisée
+  console.log(`✅ US Treasury: ${ratesArray.length} taux via ${source}`);
+
   return {
     country: 'US',
     currency: 'USD',
@@ -332,11 +448,15 @@ async function getUSTreasury(targetDate = null) {
  * Récupère les données depuis Bank of Canada Valet API pour une date spécifique
  * @param {string} seriesId - ID de la série BoC
  * @param {string} targetDate - Date cible au format YYYY-MM-DD (optionnel)
+ * @param {number} retryCount - Compteur de tentatives pour retry automatique
  */
-async function fetchFromBoC(seriesId, targetDate = null) {
+async function fetchFromBoC(seriesId, targetDate = null, retryCount = 0) {
+  const MAX_RETRIES = 2;
+  const RETRY_DELAY_MS = 500;
+
   try {
     let url;
-    
+
     if (targetDate) {
       // Pour données historiques, récupérer une plage autour de la date cible
       const target = new Date(targetDate);
@@ -344,17 +464,31 @@ async function fetchFromBoC(seriesId, targetDate = null) {
       startDate.setDate(startDate.getDate() - 30);
       const endDate = new Date(target);
       endDate.setDate(endDate.getDate() + 5);
-      
+
       url = `https://www.bankofcanada.ca/valet/observations/${seriesId}/json?start_date=${startDate.toISOString().split('T')[0]}&end_date=${endDate.toISOString().split('T')[0]}`;
     } else {
       // Récupérer les 30 derniers jours pour trouver la comparaison M-1
       url = `https://www.bankofcanada.ca/valet/observations/${seriesId}/json?recent=30`;
     }
-    
-    const response = await fetch(url);
+
+    const response = await fetch(url, {
+      signal: AbortSignal.timeout(10000) // 10 second timeout
+    });
+
+    // Handle rate limiting or server errors with retry
+    if (response.status === 429 || response.status >= 500) {
+      if (retryCount < MAX_RETRIES) {
+        const delay = RETRY_DELAY_MS * Math.pow(2, retryCount);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return fetchFromBoC(seriesId, targetDate, retryCount + 1);
+      }
+    }
 
     if (!response.ok) {
-      console.warn(`⚠️ BoC API erreur pour ${seriesId}: ${response.status}`);
+      // Only log once to avoid spam (first attempt only)
+      if (retryCount === 0) {
+        console.warn(`⚠️ BoC API erreur pour ${seriesId}: ${response.status}`);
+      }
       return null;
     }
 
@@ -408,27 +542,140 @@ async function fetchFromBoC(seriesId, targetDate = null) {
 }
 
 /**
+ * Récupère tous les taux Canada via les groupes API (1-2 appels au lieu de 10+)
+ * Plus rapide et plus fiable que les appels individuels
+ */
+async function fetchCanadaFromGroups() {
+  const rates = {};
+  let fetchDate = null;
+
+  try {
+    // Fetch bond yields and treasury bills in parallel (2 calls instead of 10+)
+    const [bondsResponse, tbillsResponse] = await Promise.all([
+      fetch('https://www.bankofcanada.ca/valet/observations/group/bond_yields_all/json?recent=30', {
+        signal: AbortSignal.timeout(15000)
+      }),
+      fetch('https://www.bankofcanada.ca/valet/observations/group/tbill_all/json?recent=30', {
+        signal: AbortSignal.timeout(15000)
+      })
+    ]);
+
+    // Process bond yields
+    if (bondsResponse.ok) {
+      const bondsData = await bondsResponse.json();
+      const observations = bondsData.observations || [];
+
+      if (observations.length > 0) {
+        // Get most recent observation
+        const latest = observations[observations.length - 1];
+        fetchDate = latest.d;
+
+        // Map series to maturities
+        const bondSeriesMap = {
+          'BD.CDN.2YR.DQ.YLD': '2Y',
+          'BD.CDN.3YR.DQ.YLD': '3Y',
+          'BD.CDN.5YR.DQ.YLD': '5Y',
+          'BD.CDN.7YR.DQ.YLD': '7Y',
+          'BD.CDN.10YR.DQ.YLD': '10Y',
+          'BD.CDN.LONG.DQ.YLD': '30Y'
+        };
+
+        for (const [seriesId, maturity] of Object.entries(bondSeriesMap)) {
+          if (latest[seriesId] && latest[seriesId].v) {
+            const value = parseFloat(latest[seriesId].v);
+            // Find previous value (~21 days ago)
+            let prevValue = null;
+            const prevIdx = Math.max(0, observations.length - 22);
+            if (observations[prevIdx] && observations[prevIdx][seriesId]) {
+              prevValue = parseFloat(observations[prevIdx][seriesId].v);
+            }
+            rates[maturity] = {
+              value,
+              date: fetchDate,
+              prevValue,
+              change1M: prevValue !== null ? value - prevValue : null
+            };
+          }
+        }
+      }
+    }
+
+    // Process treasury bills
+    if (tbillsResponse.ok) {
+      const tbillsData = await tbillsResponse.json();
+      const observations = tbillsData.observations || [];
+
+      if (observations.length > 0) {
+        const latest = observations[observations.length - 1];
+        if (!fetchDate) fetchDate = latest.d;
+
+        const tbillSeriesMap = {
+          'V80691342': '1M',
+          'V80691344': '3M',
+          'V80691345': '6M',
+          'V80691346': '1Y'
+        };
+
+        for (const [seriesId, maturity] of Object.entries(tbillSeriesMap)) {
+          if (latest[seriesId] && latest[seriesId].v) {
+            const value = parseFloat(latest[seriesId].v);
+            let prevValue = null;
+            const prevIdx = Math.max(0, observations.length - 22);
+            if (observations[prevIdx] && observations[prevIdx][seriesId]) {
+              prevValue = parseFloat(observations[prevIdx][seriesId].v);
+            }
+            rates[maturity] = {
+              value,
+              date: fetchDate,
+              prevValue,
+              change1M: prevValue !== null ? value - prevValue : null
+            };
+          }
+        }
+      }
+    }
+
+    console.log(`✅ Bank of Canada group API: ${Object.keys(rates).length} taux récupérés`);
+    return { rates, fetchDate };
+
+  } catch (error) {
+    console.error('❌ Erreur Bank of Canada group API:', error.message);
+    return { rates: {}, fetchDate: null };
+  }
+}
+
+/**
  * Récupère la courbe des taux Canada
  * @param {string} targetDate - Date cible au format YYYY-MM-DD (optionnel, pour données historiques)
  */
 async function getCanadaRates(targetDate = null) {
   console.log(`📊 Récupération des taux Canada (via Bank of Canada)${targetDate ? ` pour la date ${targetDate}` : ' (actuels)'}...`);
 
-  const rates = {};
+  let rates = {};
   let fetchDate = null;
 
-  // Paralléliser les appels Bank of Canada (10 appels en parallèle au lieu de séquentiels!)
-  console.log('📊 Appels Bank of Canada en parallèle...');
-  const bocPromises = Object.entries(CANADA_RATES).map(async ([maturity, seriesId]) => {
-    const data = await fetchFromBoC(seriesId, targetDate);
-    return data ? { maturity, data } : null;
-  });
+  // For current data, try the optimized group API first (2 calls instead of 10+)
+  if (!targetDate) {
+    console.log('📊 Tentative via group API (optimisé)...');
+    const groupResult = await fetchCanadaFromGroups();
+    rates = groupResult.rates;
+    fetchDate = groupResult.fetchDate;
+  }
 
-  const results = await Promise.all(bocPromises);
-  for (const result of results) {
-    if (result) {
-      rates[result.maturity] = result.data;
-      if (!fetchDate) fetchDate = result.data.date;
+  // Fallback to individual series calls if group API failed or for historical data
+  if (Object.keys(rates).length < 5) {
+    console.log('📊 Fallback: appels individuels Bank of Canada...');
+    const bocPromises = Object.entries(CANADA_RATES).map(async ([maturity, seriesId]) => {
+      const data = await fetchFromBoC(seriesId, targetDate);
+      return data ? { maturity, data } : null;
+    });
+
+    const results = await Promise.all(bocPromises);
+    for (const result of results) {
+      if (result && !rates[result.maturity]) {
+        rates[result.maturity] = result.data;
+        if (!fetchDate) fetchDate = result.data.date;
+      }
     }
   }
 
