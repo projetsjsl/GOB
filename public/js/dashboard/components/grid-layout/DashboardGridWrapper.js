@@ -764,6 +764,19 @@ const DashboardGridWrapper = ({
             }
         }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+        // TEMPORARY DEBUG: Always return placeholder to isolate error
+        // Remove this block after debugging
+        if (true) {
+            return (
+                <div className={`p-6 ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
+                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-700'}`}>
+                        <p className="font-medium">🔍 DEBUG: DashboardGridWrapper placeholder</p>
+                        <p className="text-sm mt-1">Si ce message s'affiche, le problème n'est pas dans DashboardGridWrapper</p>
+                    </div>
+                </div>
+            );
+        }
+
         // Early return for loading state (after all hooks)
         if (!ResponsiveGridLayout) {
             // Only log once to prevent console spam
