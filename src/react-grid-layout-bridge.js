@@ -47,20 +47,20 @@ function WidthProvider(ComposedComponent) {
     }
 
     render() {
-      const { measureBeforeMount, ...rest } = this.props;
+      const { measureBeforeMount, className, style, ...rest } = this.props;
 
       if (measureBeforeMount && !this.mounted) {
         return React.createElement('div', {
           ref: this.containerRef,
-          style: { width: '100%' },
-          className: this.props.className
+          style: { ...style, width: '100%' },
+          className: className
         });
       }
 
       return React.createElement('div', {
         ref: this.containerRef,
-        style: { width: '100%' },
-        className: this.props.className
+        style: { ...style, width: '100%' },
+        className: className
       },
         React.createElement(ComposedComponent, {
           ...rest,
