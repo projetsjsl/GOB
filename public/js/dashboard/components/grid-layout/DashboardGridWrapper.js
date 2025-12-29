@@ -374,37 +374,12 @@ const DashboardGridWrapper = ({
 
         const RGL = window.ReactGridLayout;
 
-        // Debug: log what's available in RGL
-        useEffect(() => {
-            if (RGL) {
-                console.log('🔍 RGL exports:', {
-                    hasDefault: !!RGL.default,
-                    hasResponsive: !!RGL.Responsive,
-                    hasWidthProvider: !!RGL.WidthProvider,
-                    defaultType: typeof RGL.default,
-                    responsiveType: typeof RGL.Responsive,
-                    keys: Object.keys(RGL).slice(0, 10)
-                });
-            }
-        }, [RGL]);
-
-        // Use ResponsiveGridLayout with our custom WidthProvider
-        const ResponsiveGridLayout = useMemo(() => {
-            if (!RGL) return null;
-            // RGL.Responsive should be the ResponsiveGridLayout component
-            // RGL.WidthProvider is our custom class-based wrapper
-            if (RGL.WidthProvider && RGL.Responsive) {
-                console.log('✅ Using Responsive + WidthProvider');
-                return RGL.WidthProvider(RGL.Responsive);
-            }
-            // Fallback: try basic GridLayout (RGL.default)
-            if (RGL.WidthProvider && RGL.default) {
-                console.log('⚠️ Fallback to GridLayout + WidthProvider');
-                return RGL.WidthProvider(RGL.default);
-            }
-            console.error('❌ No valid GridLayout component found');
-            return null;
-        }, [RGL]);
+        // Exact same pattern as RglDashboard (which works)
+        const ResponsiveGridLayout = useMemo(() =>
+            RGL && RGL.WidthProvider && RGL.Responsive
+                ? RGL.WidthProvider(RGL.Responsive)
+                : null
+        , [RGL]);
 
         // Sauvegarder le layout courant
         const handleLayoutChange = useCallback((newLayout) => {
@@ -780,6 +755,15 @@ const DashboardGridWrapper = ({
         return existing;
     }, [layout, mainTab]);
 
+    // Memoize the responsive layouts object to prevent unnecessary re-renders
+    const responsiveLayouts = useMemo(() => ({
+        lg: filteredLayout,
+        md: filteredLayout,
+        sm: filteredLayout,
+        xs: filteredLayout,
+        xxs: filteredLayout
+    }), [filteredLayout]);
+
         // ⚠️ IMPORTANT: All hooks must be called before any early returns (React Rules of Hooks)
         // Log only on initial mount for performance
         useEffect(() => {
@@ -941,7 +925,7 @@ const DashboardGridWrapper = ({
                     ) : (
                         <ResponsiveGridLayout
                             className="layout"
-                            layouts={{ lg: filteredLayout, md: filteredLayout, sm: filteredLayout, xs: filteredLayout, xxs: filteredLayout }}
+                            layouts={responsiveLayouts}
                             breakpoints={BREAKPOINTS}
                             cols={COLS}
                             rowHeight={ROW_HEIGHT}
@@ -953,7 +937,7 @@ const DashboardGridWrapper = ({
                             margin={[16, 16]}
                             resizeHandles={['se']}
                         >
-                            {filteredLayout.map(item => (
+                            {responsiveLayouts.lg.map(item => (
                                 <div key={item.i} style={{background: isDarkMode ? '#333' : '#eee', height: '100%'}}>
                                     <span>Widget: {item.i}</span>
                                 </div>
