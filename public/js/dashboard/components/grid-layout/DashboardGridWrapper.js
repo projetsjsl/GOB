@@ -917,6 +917,18 @@ const DashboardGridWrapper = ({
                         // "React.Children.only expected to receive a single React element child" error
                         const validLayout = filteredLayout.filter(item => TAB_TO_WIDGET_MAP[item.i]);
 
+                        // GUARD: If no valid items, show placeholder instead of empty grid
+                        if (validLayout.length === 0) {
+                            return (
+                                <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
+                                    <div className={`p-4 rounded-lg text-center ${isDarkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>
+                                        <p className="font-medium mb-2">📭 Aucun widget configuré pour cet onglet</p>
+                                        <p className="text-sm">Cliquez sur "Modifier" pour ajouter des widgets.</p>
+                                    </div>
+                                </div>
+                            );
+                        }
+
                         return (
                         <ResponsiveGridLayout
                             className="layout"
