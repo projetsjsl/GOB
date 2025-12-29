@@ -373,11 +373,20 @@ const DashboardGridWrapper = ({
         const [currentBreakpoint, setCurrentBreakpoint] = useState('lg');
 
         const RGL = window.ReactGridLayout;
-        const ResponsiveGridLayout = useMemo(() => 
-            RGL && RGL.WidthProvider && RGL.Responsive 
-                ? RGL.WidthProvider(RGL.Responsive) 
-                : null
-        , [RGL]);
+
+        // Try basic ReactGridLayout first, with WidthProvider for auto-width
+        const ResponsiveGridLayout = useMemo(() => {
+            if (!RGL) return null;
+            // Use Responsive with WidthProvider if available
+            if (RGL.WidthProvider && RGL.Responsive) {
+                return RGL.WidthProvider(RGL.Responsive);
+            }
+            // Fallback to basic GridLayout with WidthProvider
+            if (RGL.WidthProvider && RGL.default) {
+                return RGL.WidthProvider(RGL.default);
+            }
+            return null;
+        }, [RGL]);
 
         // Sauvegarder le layout courant
         const handleLayoutChange = useCallback((newLayout) => {
@@ -911,71 +920,10 @@ const DashboardGridWrapper = ({
                                 </button>
                             </div>
                         </div>
-                    ) : (() => {
-                        // CRITICAL FIX: Multiple safeguards to prevent "React.Children.only" error
-                        // 1. Filter to only valid items with existing config
-                        // 2. Remove duplicates (React keys must be unique)
-                        // 3. Ensure each item has valid string key
-
-                        const seenKeys = new Set();
-                        const validLayout = filteredLayout.filter(item => {
-                            // Must have valid item.i string
-                            if (!item || typeof item.i !== 'string') return false;
-                            // Must have config in TAB_TO_WIDGET_MAP
-                            if (!TAB_TO_WIDGET_MAP[item.i]) return false;
-                            // Must be unique (no duplicate keys)
-                            if (seenKeys.has(item.i)) return false;
-                            seenKeys.add(item.i);
-                            return true;
-                        });
-
-                        // GUARD: If no valid items, show placeholder instead of empty grid
-                        if (validLayout.length === 0) {
-                            return (
-                                <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
-                                    <div className={`p-4 rounded-lg text-center ${isDarkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>
-                                        <p className="font-medium mb-2">📭 Aucun widget configuré pour cet onglet</p>
-                                        <p className="text-sm">Cliquez sur "Modifier" pour ajouter des widgets.</p>
-                                    </div>
-                                </div>
-                            );
-                        }
-
-                        // PRE-BUILD children array to ensure each is a valid single element
-                        const gridChildren = validLayout.map(item => {
-                            const config = TAB_TO_WIDGET_MAP[item.i];
-                            // Double-check config exists (should always be true due to filter above)
-                            if (!config) return null;
-
-                            return (
-                                <div
-                                    key={item.i}
-                                    className={`h-full ${isEditing ? 'cursor-move ring-2 ring-emerald-500/50' : ''}`}
-                                    data-widget-id={item.i}
-                                    data-widget-label={config.label || item.i}
-                                >
-                                    {renderWidget(item)}
-                                </div>
-                            );
-                        }).filter(Boolean); // Remove any null entries
-
-                        // Final safety check - must have children
-                        if (gridChildren.length === 0) {
-                            console.warn('⚠️ All grid children filtered out, showing fallback');
-                            return (
-                                <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
-                                    <div className={`p-4 rounded-lg text-center ${isDarkMode ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-700'}`}>
-                                        <p className="font-medium mb-2">⚠️ Erreur de rendu des widgets</p>
-                                        <p className="text-sm">Rechargez la page ou réinitialisez le layout.</p>
-                                    </div>
-                                </div>
-                            );
-                        }
-
-                        return (
+                    ) : (
                         <ResponsiveGridLayout
                             className="layout"
-                            layouts={generateResponsiveLayouts(validLayout)}
+                            layouts={generateResponsiveLayouts(filteredLayout)}
                             breakpoints={BREAKPOINTS}
                             cols={COLS}
                             rowHeight={ROW_HEIGHT}
@@ -984,17 +932,16 @@ const DashboardGridWrapper = ({
                             isDraggable={isEditing}
                             isResizable={isEditing}
                             compactType="vertical"
-                            margin={[12, 12]}
-                            containerPadding={[8, 8]}
-                            useCSSTransforms={true}
-                            preventCollision={false}
-                            transformScale={1}
+                            margin={[16, 16]}
                             resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
                         >
-                            {gridChildren}
+                            {filteredLayout.map(item => (
+                                <div key={item.i} className={isEditing ? 'cursor-move ring-2 ring-emerald-500/50' : ''}>
+                                    {renderWidget(item)}
+                                </div>
+                            ))}
                         </ResponsiveGridLayout>
-                        );
-                    })()}
+                    )}
                 </div>
 
                 {/* Dock pour ajouter des widgets (en mode édition) */}
