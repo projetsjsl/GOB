@@ -176,9 +176,21 @@ const SpreadChart = ({ usRates, caRates, darkMode }) => {
 
 
 const TradingViewCurve = ({ darkMode }) => {
-    const [isWidgetActive, setIsWidgetActive] = useState(false);
+    // Persist widget activation state in localStorage
+    const [isWidgetActive, setIsWidgetActive] = useState(() => {
+        try {
+            return localStorage.getItem('yieldCurve_tradingViewActive') === 'true';
+        } catch { return false; }
+    });
     const container = useRef();
     const LazyWidgetWrapper = window.LazyWidgetWrapper || (({ children }) => <>{children}</>);
+
+    // Save activation state to localStorage
+    useEffect(() => {
+        try {
+            localStorage.setItem('yieldCurve_tradingViewActive', isWidgetActive ? 'true' : 'false');
+        } catch {}
+    }, [isWidgetActive]);
 
     useEffect(() => {
         if (!isWidgetActive || !container.current) return;
@@ -284,7 +296,7 @@ const YieldCurveTab = () => {
 
     // Graphique Chart.js (Comparaison Actuel/M-1)
     useEffect(() => {
-        if (!yieldData || !chartRef.current) return;
+        if (!yieldData || !yieldData.data || !chartRef.current) return;
         if (chartInstance.current) chartInstance.current.destroy();
 
         const maturityOrder = ['1M', '2M', '3M', '6M', '1Y', '2Y', '3Y', '5Y', '7Y', '10Y', '20Y', '30Y'];
@@ -292,7 +304,7 @@ const YieldCurveTab = () => {
         const getPrevRate = (dataset, maturity) => dataset?.rates?.find(item => item.maturity === maturity)?.prevValue || null;
 
         const datasets = [];
-        if (yieldData.data.us) {
+        if (yieldData.data?.us) {
             datasets.push({
                 label: '🇺🇸 US Treasury (Actuel)',
                 data: maturityOrder.map(m => getRate(yieldData.data.us, m)),
@@ -313,7 +325,7 @@ const YieldCurveTab = () => {
                 hidden: true
             });
         }
-        if (yieldData.data.canada) {
+        if (yieldData.data?.canada) {
             datasets.push({
                 label: '🇨🇦 Canada Bonds (Actuel)',
                 data: maturityOrder.map(m => getRate(yieldData.data.canada, m)),

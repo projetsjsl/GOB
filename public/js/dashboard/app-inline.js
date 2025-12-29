@@ -923,13 +923,10 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         const [tabMountKeys, setTabMountKeys] = useState({});
         
         // État pour le mode de vue (onglets ou grille) - GOD MODE
-        // TEMPORARILY defaulting to 'tabs' while grid mode is being fixed
         const [dashboardViewMode, setDashboardViewMode] = useState(() => {
             try {
                 const saved = localStorage.getItem('gob-dashboard-view-mode');
-                // Force tabs mode until grid is fixed
-                if (saved === 'grid') return 'tabs';
-                return saved || 'tabs'; // Par défaut: tabs (safe mode)
+                return saved || 'tabs'; // Par défaut: tabs
             } catch {
                 return 'tabs';
             }
@@ -941,6 +938,35 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 localStorage.setItem('gob-dashboard-view-mode', dashboardViewMode);
             }
         }, [dashboardViewMode]);
+
+        // Track if DashboardGridWrapper component is available (for async Babel loading)
+        const [gridWrapperReady, setGridWrapperReady] = useState(!!window.DashboardGridWrapper);
+
+        // Check periodically for DashboardGridWrapper until it's available
+        useEffect(() => {
+            if (gridWrapperReady) return;
+
+            const checkInterval = setInterval(() => {
+                if (window.DashboardGridWrapper) {
+                    setGridWrapperReady(true);
+                    clearInterval(checkInterval);
+                    console.log('✅ DashboardGridWrapper now available');
+                }
+            }, 100); // Check every 100ms
+
+            // Cleanup after 10 seconds (stop checking)
+            const timeout = setTimeout(() => {
+                clearInterval(checkInterval);
+                if (!window.DashboardGridWrapper) {
+                    console.error('❌ DashboardGridWrapper failed to load after 10s');
+                }
+            }, 10000);
+
+            return () => {
+                clearInterval(checkInterval);
+                clearTimeout(timeout);
+            };
+        }, [gridWrapperReady]);
 
         const [activeTab, setActiveTab] = useState(() => {
             if (typeof window !== 'undefined') {
@@ -27568,8 +27594,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {/* Rendu conditionnel: Vue Grille ou Vue Onglets */}
                     {dashboardViewMode === 'grid' ? (
                         // VUE GRILLE (GOD MODE)
-                        // ⚠️ CORRECTION PERFORMANCE: Console.log supprimé (causait logs excessifs)
-                        window.DashboardGridWrapper ? (
+                        // gridWrapperReady triggers re-render when component becomes available
+                        gridWrapperReady && window.DashboardGridWrapper ? (
                             <window.DashboardGridWrapper
                                 mainTab={mainTab}
                                 isDarkMode={isDarkMode}

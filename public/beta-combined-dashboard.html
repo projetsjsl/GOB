@@ -431,9 +431,10 @@
         })();
     </script>
 
-    <!-- React Grid Layout v2.1.1 - Local bundle (migrated from CDN v1.4.4) -->
-    <link rel="stylesheet" href="/js/react-grid-layout-bundle.css">
-    <script src="/js/react-grid-layout-bundle.js"></script>
+    <!-- React Grid Layout v1.4.4 - CDN (reverted from broken npm bundle) -->
+    <link rel="stylesheet" href="https://unpkg.com/react-grid-layout@1.4.4/css/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/react-resizable@3.0.5/css/styles.css">
+    <script src="https://unpkg.com/react-grid-layout@1.4.4/dist/react-grid-layout.min.js"></script>
 
     <!-- Verify and expose React Grid Layout -->
     <script>
@@ -497,30 +498,25 @@
     <script type="text/babel" src="js/dashboard/components/tabs/FinVoxTab.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/EmmAIATab.js"></script>
     <!-- Terminal Emma IA Tab -->
-    <!-- <script type="text/babel" src="js/dashboard/components/tabs/TerminalEmmaIATab.js"></script> -->
-    <!-- <script type="text/babel" src="js/dashboard/components/tabs/FastGraphsTab.js"></script> -->
+    <script type="text/babel" src="js/dashboard/components/tabs/TerminalEmmaIATab.js"></script>
+    <script type="text/babel" src="js/dashboard/components/tabs/FastGraphsTab.js"></script>
     <!-- GroupChat Tab (JSLAI RobotWeb Ultimate v5.0) -->
-    <!-- <script type="text/babel" src="js/dashboard/components/tabs/GroupChatTab.js"></script> -->
+    <script type="text/babel" src="js/dashboard/components/tabs/GroupChatTab.js"></script>
     <!-- ChatGPT Group Tab (ChatGPT Group Chat Integration) -->
     <!-- <script type="text/babel" src="js/dashboard/components/tabs/ChatGPTGroupTab.js"></script> -->
     <!-- AdminJSLai Tab -->
-    <!-- <script type="text/babel" src="js/dashboard/components/tabs/AdminJSLaiTab.js"></script> -->
+    <script type="text/babel" src="js/dashboard/components/tabs/AdminJSLaiTab.js"></script>
     <!-- PlusTab Component -->
-    <!-- <script type="text/babel" src="js/dashboard/components/tabs/PlusTab.js"></script> -->
-    <!-- JLab Unified Tab -->
-    <!-- <script type="text/babel" src="js/dashboard/components/tabs/JLabUnifiedTab.js"></script> -->
+    <script type="text/babel" src="js/dashboard/components/tabs/PlusTab.js"></script>
+    <!-- JLab Tabs -->
+    <script type="text/babel" src="js/dashboard/components/tabs/JLabTab.js"></script>
+    <script type="text/babel" src="js/dashboard/components/tabs/JLabUnifiedTab.js"></script>
 
-    <!-- Grid Layout Components (library loaded earlier in <head>) -->
-    <script type="text/babel" src="js/dashboard/components/grid-layout/RglDashboard.js"></script>
-    <script type="text/babel" src="js/dashboard/components/grid-layout/DashboardGridWrapper.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/MarketsEconomyTabRGL.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/TitresTabRGL.js"></script>
-
-    <!-- Components needed by Grid Layout -->
+    <!-- Components needed by Grid Layout (load these first) -->
     <script type="text/babel" src="js/dashboard/components/tabs/StocksNewsTab.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/MarketsEconomyTab.js"></script>
-    <!-- <script type="text/babel" src="js/dashboard/components/tabs/AskEmmaTab.js"></script> -->
-    <!-- <script type="text/babel" src="js/dashboard/components/tabs/VoiceAssistantTab.js"></script> -->
+    <script type="text/babel" src="js/dashboard/components/tabs/AskEmmaTab.js"></script>
+    <script type="text/babel" src="js/dashboard/components/tabs/VoiceAssistantTab.js"></script>
     
     <!-- Script de test GOD MODE (disponible en console) -->
     <!-- <script src="/js/dashboard/test-god-mode-console.js"></script> -->
@@ -564,13 +560,13 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
     
     <!-- Scripts Tab Seeking Alpha & Scraping -->
-    <!-- <script type="text/babel" src="js/dashboard/components/tabs/YieldCurveTab.js"></script> -->
-    <!-- <script type="text/babel" src="js/dashboard/components/tabs/EconomicCalendarTab.js"></script> -->
-    <!-- <script type="text/babel" src="js/dashboard/components/tabs/DansWatchlistTab.js"></script> -->
-    <!-- <script type="text/babel" src="js/dashboard/components/tabs/EmailBriefingsTab.js"></script> -->
+    <script type="text/babel" src="js/dashboard/components/tabs/YieldCurveTab.js"></script>
+    <script type="text/babel" src="js/dashboard/components/tabs/EconomicCalendarTab.js"></script>
+    <script type="text/babel" src="js/dashboard/components/tabs/DansWatchlistTab.js"></script>
+    <script type="text/babel" src="js/dashboard/components/tabs/EmailBriefingsTab.js"></script>
 
-    <!-- <script type="text/babel" src="js/dashboard/components/tabs/SeekingAlphaTab.js"></script> -->
-    <!-- <script type="text/babel" src="js/dashboard/components/tabs/ScrappingSATab.js"></script> -->
+    <script type="text/babel" src="js/dashboard/components/tabs/SeekingAlphaTab.js"></script>
+    <script type="text/babel" src="js/dashboard/components/tabs/ScrappingSATab.js"></script>
     
     <!-- Styles des thèmes -->
     <link rel="stylesheet" href="/css/themes.css">
@@ -1821,8 +1817,14 @@
     <!-- DUPLICATE REMOVED: EconomicCalendarTab.js & FastGraphsTab.js already loaded above -->
     <!-- <script type="text/babel" src="/js/dashboard/components/tabs/EconomicCalendarTab.js"></script> -->
     <!-- <script type="text/babel" src="/js/dashboard/components/tabs/FastGraphsTab.js"></script> -->
-    <!-- <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisModals.js"></script> -->
-    <!-- <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisTab.js"></script> -->
+    <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisModals.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisTab.js"></script>
+
+    <!-- Grid Layout Components (MUST load AFTER all tab components) -->
+    <script type="text/babel" src="js/dashboard/components/tabs/MarketsEconomyTabRGL.js"></script>
+    <script type="text/babel" src="js/dashboard/components/tabs/TitresTabRGL.js"></script>
+    <script type="text/babel" src="js/dashboard/components/grid-layout/RglDashboard.js"></script>
+    <script type="text/babel" src="js/dashboard/components/grid-layout/DashboardGridWrapper.js"></script>
 
     <!-- Announcement Bars System (Gemini-powered) -->
     <!-- <script type="text/babel" src="/js/dashboard/components/AnnouncementBar.js"></script> -->

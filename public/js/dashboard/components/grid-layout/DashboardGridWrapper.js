@@ -15,8 +15,9 @@
     // ===================================
     const STORAGE_KEY_DEFAULT = 'gob_dashboard_layout_default_v1';
     const STORAGE_KEY_DEV = 'gob_dashboard_layout_dev_v1';
-    // Fallback key for auto-save if needed, though we primarily use the above two now
-    const STORAGE_KEY_CURRENT = 'gob_dashboard_grid_layout_v1'; 
+    const STORAGE_KEY_CURRENT = 'gob_dashboard_grid_layout_v1';
+    const STORAGE_KEY_HIDDEN = 'gob_dashboard_hidden_widgets_v1';
+    const STORAGE_KEY_WIDGET_SECTIONS = 'gob_dashboard_widget_sections_v1';
     const ROW_HEIGHT = 50;
 
     // Cache to prevent log spam for missing components
@@ -277,29 +278,29 @@ const DashboardGridWrapper = ({
             return loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout();
         });
 
-        // S'assurer que le layout n'est jamais vide et sans doublons
+        // S'assurer que le layout n'est jamais vide - ONLY RUN ONCE on mount
+        // WARNING: Do NOT add layout to dependencies - causes infinite loop!
         useEffect(() => {
-            if (!layout || layout.length === 0) {
-                console.warn('⚠️ Layout vide détecté, recréation du layout par défaut');
-                const defaultLayout = loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout();
-                setLayout(defaultLayout);
-            } else {
-                // Vérification post-render des doublons
+            setLayout(currentLayout => {
+                if (!currentLayout || currentLayout.length === 0) {
+                    console.warn('⚠️ Layout vide détecté, recréation du layout par défaut');
+                    return loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout();
+                }
+                // Check for duplicates
                 const seen = new Set();
-                const uniqueLayout = layout.filter(item => {
+                const uniqueLayout = currentLayout.filter(item => {
                     if (seen.has(item.i)) return false;
                     seen.add(item.i);
                     return true;
                 });
-                
-                if (uniqueLayout.length !== layout.length) {
-                    console.warn(`⚠️ Doublons détectés et supprimés (${layout.length} -> ${uniqueLayout.length})`);
-                    setLayout(uniqueLayout);
-                    // Update storage immediately
+                if (uniqueLayout.length !== currentLayout.length) {
+                    console.warn(`⚠️ Doublons supprimés (${currentLayout.length} -> ${uniqueLayout.length})`);
                     localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(uniqueLayout));
+                    return uniqueLayout;
                 }
-            }
-        }, [layout]);
+                return currentLayout;
+            });
+        }, []); // Empty deps - run once on mount only
 
         // Synchroniser le layout avec mainTab : ajouter les widgets par défaut si nécessaire
         useEffect(() => {
@@ -382,10 +383,15 @@ const DashboardGridWrapper = ({
         , [RGL]);
 
         // Sauvegarder le layout courant
-        const handleLayoutChange = useCallback((newLayout) => {
-            if (isEditing) {
-                setLayout(newLayout);
-                localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(newLayout));
+        // FIX: onLayoutChange receives (currentLayout, allLayouts) from ResponsiveGridLayout
+        const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
+            if (isEditing && currentLayout) {
+                console.log('[DashboardGridWrapper] Layout changed:', {
+                    currentLayoutLength: currentLayout?.length,
+                    allLayoutsKeys: allLayouts ? Object.keys(allLayouts) : null
+                });
+                setLayout(currentLayout);
+                localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(currentLayout));
             }
         }, [isEditing]);
         
@@ -450,7 +456,7 @@ const DashboardGridWrapper = ({
             }
         }, []);
 
-        // Rendre un widget
+        // Rendre un widget - FULL VERSION with actual components
         const renderWidget = useCallback((item) => {
             const config = TAB_TO_WIDGET_MAP[item.i];
             if (!config) {
@@ -461,7 +467,7 @@ const DashboardGridWrapper = ({
                 );
             }
 
-            // Gérer les redirects
+            // Handle redirect widgets
             if (config.component === 'redirect') {
                 return (
                     <div className={`h-full flex flex-col items-center justify-center ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
@@ -470,8 +476,8 @@ const DashboardGridWrapper = ({
                         <button
                             onClick={() => window.location.href = config.url}
                             className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-                                isDarkMode 
-                                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
+                                isDarkMode
+                                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
                                     : 'bg-emerald-500 hover:bg-emerald-600 text-white'
                             }`}
                         >
@@ -481,199 +487,65 @@ const DashboardGridWrapper = ({
                 );
             }
 
-            // Récupérer le composant (plusieurs tentatives)
+            // Get component (try multiple fallbacks)
             let Component = window[config.component];
+            if (!Component) Component = window[config.component + 'Tab'];
+            if (!Component && config.component === 'JLabUnifiedTab') Component = window.JLabTab;
 
-            // Fallback: essayer avec 'Tab' suffix
-            if (!Component) {
-                Component = window[config.component + 'Tab'];
-            }
-
-            // Fallback spécifique pour JLab
-            if (!Component && config.component === 'JLabUnifiedTab') {
-                Component = window.JLabTab;
-            }
-
-            // Fallback registry pour composants renommés ou fusionnés
+            // Fallback registry for components that don't exist as separate files
             if (!Component) {
                 const FALLBACK_REGISTRY = {
+                    // Components that don't have their own files
                     'EmmaConfigTab': window.AdminJSLaiTab,
-                    'EmailBriefingsTab': window.AdminJSLaiTab,
-                    'YieldCurveTab': window.MarketsEconomyTab,
                     'NouvellesTab': window.StocksNewsTab,
-                    'DansWatchlistTab': window.StocksNewsTab,
-                    'InvestingCalendarTab': window.MarketsEconomyTab,
-                    'EconomicCalendarTab': window.EconomicCalendarTab,
-                    'AdvancedAnalysisTab': window.JLabTab,
-                    'VoiceAssistantTab': window.AskEmmaTab
+                    'InvestingCalendarTab': window.EconomicCalendarTab
                 };
                 Component = FALLBACK_REGISTRY[config.component];
             }
 
             if (!Component) {
-                // Only log once per component to avoid spam
                 if (!_loggedMissingComponents[config.component]) {
                     _loggedMissingComponents[config.component] = true;
-                    console.warn('[MissingComponent]', { 
-                        key: item.i, 
-                        component: config.component,
-                        availableComponents: Object.keys(window).filter(k => 
-                            k.endsWith('Tab') || k.includes('Dashboard') || k.includes('Widget')
-                        ).slice(0, 20)
-                    });
+                    console.warn('[MissingComponent]', { key: item.i, component: config.component });
                 }
                 return <MissingComponentCard componentName={config.component} isDarkMode={isDarkMode} />;
             }
 
-            // Props communes pour tous les composants
-            const commonProps = {
-                isDarkMode,
-                activeTab: item.i,
-                setActiveTab
-            };
+            // Common props for all components
+            const commonProps = { isDarkMode, activeTab: item.i, setActiveTab };
 
-            // Props spécifiques selon le composant
+            // Component-specific props
             const componentProps = {};
-            
-            if (config.component === 'AskEmmaTab') {
+            if (config.component === 'StocksNewsTab' || config.component === 'SeekingAlphaTab') {
                 Object.assign(componentProps, {
-                    apiStatus,
-                    prefillMessage: emmaPrefillMessage,
-                    setPrefillMessage: setEmmaPrefillMessage,
-                    autoSend: emmaAutoSend,
-                    setAutoSend: setEmmaAutoSend,
-                    emmaConnected,
-                    setEmmaConnected,
-                    showPromptEditor,
-                    setShowPromptEditor,
-                    showTemperatureEditor,
-                    setShowTemperatureEditor,
-                    showLengthEditor,
-                    setShowLengthEditor,
-                    showCommandsHelp,
-                    setShowCommandsHelp,
-                    showSlashSuggestions,
-                    setShowSlashSuggestions,
-                    slashSuggestions,
-                    setSlashSuggestions,
-                    selectedSuggestionIndex,
-                    setSelectedSuggestionIndex
-                });
-            } else if (config.component === 'StocksNewsTab' || config.component === 'SeekingAlphaTab') {
-                Object.assign(componentProps, {
-                    tickers,
-                    stockData,
-                    newsData,
-                    loading,
-                    lastUpdate,
-                    selectedStock,
-                    setSelectedStock,
-                    loadTickersFromSupabase,
-                    fetchNews,
-                    refreshAllStocks,
-                    fetchLatestNewsForTickers,
-                    getCompanyLogo
-                });
-            } else if (config.component === 'ScrappingSATab' || config.component === 'SeekingAlphaTab') {
-                Object.assign(componentProps, {
-                    isDarkMode,
-                    runSeekingAlphaScraper,
-                    scrapingStatus,
-                    scrapingLogs,
-                    clearScrapingLogs,
-                    generateScrapingScript,
-                    addScrapingLog,
-                    tickers,
-                    Icon,
-                    seekingAlphaData,
-                    seekingAlphaStockData: config.component === 'SeekingAlphaTab' ? seekingAlphaStockData : undefined,
-                    analyzeWithClaude: config.component === 'SeekingAlphaTab' ? analyzeWithClaude : undefined,
-                    openPeersComparison: config.component === 'SeekingAlphaTab' ? openPeersComparison : undefined,
-                    cleanText: config.component === 'SeekingAlphaTab' ? cleanText : undefined,
-                    getGradeColor: config.component === 'SeekingAlphaTab' ? getGradeColor : undefined,
-                    openSeekingAlpha: config.component === 'SeekingAlphaTab' ? openSeekingAlpha : undefined,
-                    seekingAlphaViewMode: config.component === 'SeekingAlphaTab' ? seekingAlphaViewMode : undefined,
-                    setSeekingAlphaViewMode: config.component === 'SeekingAlphaTab' ? setSeekingAlphaViewMode : undefined
-                });
-            } else if (config.component === 'AdminJSLaiTab') {
-                Object.assign(componentProps, {
-                    emmaConnected,
-                    setEmmaConnected,
-                    showPromptEditor,
-                    setShowPromptEditor,
-                    showTemperatureEditor,
-                    setShowTemperatureEditor,
-                    showLengthEditor,
-                    setShowLengthEditor,
-                    isDarkMode,
-                    setActiveTab,
-                    activeTab: item.i,
-                    secondaryNavConfig,
-                    setSecondaryNavConfig,
-                    availableNavLinks: MASTER_NAV_LINKS,
-                    primaryNavConfig,
-                    setPrimaryNavConfig,
-                    allTabsList: allTabs.map(t => ({ id: t.id, label: t.label, icon: t.icon }))
-                });
-            } else if (config.component === 'PlusTab') {
-                Object.assign(componentProps, {
-                    setActiveTab,
-                    activeTab: item.i,
-                    isDarkMode,
-                    isProfessionalMode
-                });
-            } else if (config.component === 'MarketsEconomyTabRGL' || config.component === 'TitresTabRGL') {
-                Object.assign(componentProps, {
-                    isDarkMode,
-                    isAdmin: isEditing
-                });
-            } else if (config.component === 'RglDashboard') {
-                Object.assign(componentProps, {
-                    isDarkMode,
-                    isAdmin: isEditing
-                });
-            } else if (config.component === 'JLabUnifiedTab' || config.component === 'JLabTab') {
-                Object.assign(componentProps, {
-                    isDarkMode,
-                    Icon
+                    tickers, stockData, newsData, loading, lastUpdate, selectedStock, setSelectedStock,
+                    loadTickersFromSupabase, fetchNews, refreshAllStocks, fetchLatestNewsForTickers, getCompanyLogo
                 });
             } else if (config.component === 'MarketsEconomyTab') {
                 Object.assign(componentProps, {
-                    isDarkMode,
-                    newsData,
-                    loading,
-                    lastUpdate,
-                    fetchNews,
-                    summarizeWithEmma,
-                    isFrenchArticle,
-                    getNewsIcon,
-                    getSourceCredibility,
-                    cleanText
+                    newsData, loading, lastUpdate, fetchNews, summarizeWithEmma,
+                    isFrenchArticle, getNewsIcon, getSourceCredibility, cleanText
                 });
+            } else if (config.component === 'MarketsEconomyTabRGL' || config.component === 'TitresTabRGL' || config.component === 'RglDashboard') {
+                Object.assign(componentProps, { isAdmin: isEditing });
+            } else if (config.component === 'JLabUnifiedTab' || config.component === 'JLabTab') {
+                Object.assign(componentProps, { Icon });
             }
 
-            // Wrap component in a widget container with header
+            // Wrap component in widget container with header
             return (
                 <div className={`h-full flex flex-col rounded-xl overflow-hidden ${isDarkMode ? 'bg-neutral-900 border border-neutral-800' : 'bg-white border border-gray-200'} shadow-lg`}>
-                    {/* Widget Header */}
                     <div className={`flex items-center justify-between px-4 py-2 border-b ${isDarkMode ? 'border-neutral-800 bg-neutral-800/50' : 'border-gray-200 bg-gray-50'}`}>
                         <div className="flex items-center gap-2">
                             <window.LucideIcon name={config.icon} className={`w-4 h-4 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
-                            <span className={`font-semibold text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                {config.label}
-                            </span>
+                            <span className={`font-semibold text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{config.label}</span>
                         </div>
                         {isEditing && (
-                            <button
-                                onClick={() => removeWidget(item.i)}
-                                className={`p-1 rounded hover:bg-red-500/20 transition-colors`}
-                                title="Retirer ce widget"
-                            >
+                            <button onClick={() => removeWidget(item.i)} className="p-1 rounded hover:bg-red-500/20 transition-colors" title="Retirer ce widget">
                                 <window.LucideIcon name="X" className="w-4 h-4 text-red-500" />
                             </button>
                         )}
                     </div>
-                    {/* Widget Content */}
                     <div className="flex-1 overflow-auto">
                         <WidgetErrorBoundary>
                             {React.createElement(Component, { ...commonProps, ...componentProps })}
@@ -729,40 +601,76 @@ const DashboardGridWrapper = ({
         return layouts;
     };
 
-    // Filter layout to only show widgets for current main tab
+    // Filter layout to show ALL widgets for current main tab
     const filteredLayout = useMemo(() => {
         const validIds = getWidgetIdsForMainTab(mainTab);
-        const existing = layout.filter(item => validIds.includes(item.i));
-        
-        // If no widgets match, generate default grid for this tab
-        if (existing.length === 0) {
-            const widgets = validIds;
-            return widgets.map((id, idx) => {
-                const config = TAB_TO_WIDGET_MAP[id] || {};
-                const defaultSize = config.defaultSize || { w: 6, h: 8 };
-                const minSize = config.minSize || { w: 4, h: 6 };
-                return {
-                    i: id,
-                    x: (idx % 2) * 6,
-                    y: Math.floor(idx / 2) * 8,
-                    w: defaultSize.w,
-                    h: defaultSize.h,
-                    minW: minSize.w,
-                    minH: minSize.h
-                };
-            });
-        }
-        return existing;
+        const existingMap = {};
+        layout.filter(item => validIds.includes(item.i)).forEach(item => {
+            existingMap[item.i] = item;
+        });
+
+        // Generate layout for ALL widgets in this tab, using existing positions or defaults
+        return validIds.map((id, idx) => {
+            // Use existing position if available
+            if (existingMap[id]) return existingMap[id];
+
+            // Generate default position for new widgets
+            const config = TAB_TO_WIDGET_MAP[id] || {};
+            const defaultSize = config.defaultSize || { w: 6, h: 8 };
+            const minSize = config.minSize || { w: 4, h: 6 };
+            return {
+                i: id,
+                x: (idx % 2) * 6,
+                y: Math.floor(idx / 2) * 10,
+                w: defaultSize.w,
+                h: defaultSize.h,
+                minW: minSize.w,
+                minH: minSize.h
+            };
+        });
     }, [layout, mainTab]);
 
-    // Memoize the responsive layouts object to prevent unnecessary re-renders
-    const responsiveLayouts = useMemo(() => ({
-        lg: filteredLayout,
-        md: filteredLayout,
-        sm: filteredLayout,
-        xs: filteredLayout,
-        xxs: filteredLayout
-    }), [filteredLayout]);
+    // Memoize the responsive layouts object with optimized layouts per breakpoint
+    const responsiveLayouts = useMemo(() => {
+        // Desktop large: use original layout
+        const lgLayout = filteredLayout;
+
+        // Desktop medium: cap width at 10 columns
+        const mdLayout = filteredLayout.map(item => ({
+            ...item,
+            w: Math.min(item.w, 10),
+            x: Math.min(item.x, 10 - Math.min(item.w, 10))
+        }));
+
+        // Tablet: 2 columns max, stack more
+        const smLayout = filteredLayout.map((item, idx) => ({
+            ...item,
+            x: (idx % 2) * 3,
+            y: Math.floor(idx / 2) * 8,
+            w: 6,
+            h: Math.max(item.h, 8)
+        }));
+
+        // Mobile: single column, full width
+        const xsLayout = filteredLayout.map((item, idx) => ({
+            ...item,
+            x: 0,
+            y: idx * 8,
+            w: 4,
+            h: Math.max(item.h, 8)
+        }));
+
+        // Mobile small: single column, full width
+        const xxsLayout = filteredLayout.map((item, idx) => ({
+            ...item,
+            x: 0,
+            y: idx * 10,
+            w: 2,
+            h: Math.max(item.h, 10)
+        }));
+
+        return { lg: lgLayout, md: mdLayout, sm: smLayout, xs: xsLayout, xxs: xxsLayout };
+    }, [filteredLayout]);
 
         // ⚠️ IMPORTANT: All hooks must be called before any early returns (React Rules of Hooks)
         // Log only on initial mount for performance
@@ -922,7 +830,7 @@ const DashboardGridWrapper = ({
                                 </button>
                             </div>
                         </div>
-                    ) : !responsiveLayouts?.lg?.length ? (
+                    ) : !filteredLayout?.length ? (
                         <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
                             <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Aucun widget à afficher</p>
                         </div>
@@ -939,11 +847,10 @@ const DashboardGridWrapper = ({
                             isResizable={isEditing}
                             compactType="vertical"
                             margin={[16, 16]}
-                            resizeHandles={['se']}
                         >
-                            {responsiveLayouts.lg.map(item => (
-                                <div key={item.i} style={{background: isDarkMode ? '#333' : '#eee', height: '100%'}}>
-                                    <span>Widget: {item.i}</span>
+                            {filteredLayout.map(item => (
+                                <div key={item.i} className={`h-full ${isEditing ? 'cursor-move ring-2 ring-emerald-500/50' : ''}`}>
+                                    {renderWidget(item)}
                                 </div>
                             ))}
                         </ResponsiveGridLayout>
