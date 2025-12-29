@@ -923,12 +923,15 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         const [tabMountKeys, setTabMountKeys] = useState({});
         
         // État pour le mode de vue (onglets ou grille) - GOD MODE
+        // TEMPORARILY defaulting to 'tabs' while grid mode is being fixed
         const [dashboardViewMode, setDashboardViewMode] = useState(() => {
             try {
                 const saved = localStorage.getItem('gob-dashboard-view-mode');
-                return saved || 'grid'; // Par défaut: grid (GOD MODE)
+                // Force tabs mode until grid is fixed
+                if (saved === 'grid') return 'tabs';
+                return saved || 'tabs'; // Par défaut: tabs (safe mode)
             } catch {
-                return 'grid';
+                return 'tabs';
             }
         });
 
