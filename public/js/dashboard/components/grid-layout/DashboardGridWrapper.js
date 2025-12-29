@@ -374,19 +374,21 @@ const DashboardGridWrapper = ({
 
         const RGL = window.ReactGridLayout;
 
-        // Try basic ReactGridLayout first, with WidthProvider for auto-width
-        const ResponsiveGridLayout = useMemo(() => {
+        // Use basic GridLayout with WidthProvider (NOT Responsive) to isolate the issue
+        const GridLayoutWithWidth = useMemo(() => {
             if (!RGL) return null;
-            // Use Responsive with WidthProvider if available
-            if (RGL.WidthProvider && RGL.Responsive) {
-                return RGL.WidthProvider(RGL.Responsive);
+            // Get the base GridLayout component (default export)
+            const BaseGridLayout = RGL.default || RGL;
+            if (!BaseGridLayout) return null;
+            // Wrap with WidthProvider for auto-width
+            if (RGL.WidthProvider) {
+                return RGL.WidthProvider(BaseGridLayout);
             }
-            // Fallback to basic GridLayout with WidthProvider
-            if (RGL.WidthProvider && RGL.default) {
-                return RGL.WidthProvider(RGL.default);
-            }
-            return null;
+            return BaseGridLayout;
         }, [RGL]);
+
+        // Keep ResponsiveGridLayout as alias for compatibility
+        const ResponsiveGridLayout = GridLayoutWithWidth;
 
         // Sauvegarder le layout courant
         const handleLayoutChange = useCallback((newLayout) => {
@@ -923,17 +925,15 @@ const DashboardGridWrapper = ({
                     ) : (
                         <ResponsiveGridLayout
                             className="layout"
-                            layouts={generateResponsiveLayouts(filteredLayout)}
-                            breakpoints={BREAKPOINTS}
-                            cols={COLS}
+                            layout={filteredLayout}
+                            cols={12}
                             rowHeight={ROW_HEIGHT}
                             onLayoutChange={handleLayoutChange}
-                            onBreakpointChange={setCurrentBreakpoint}
                             isDraggable={isEditing}
                             isResizable={isEditing}
                             compactType="vertical"
                             margin={[16, 16]}
-                            resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
+                            resizeHandles={['se']}
                         >
                             {filteredLayout.map(item => (
                                 <div key={item.i} className={isEditing ? 'cursor-move ring-2 ring-emerald-500/50' : ''}>
