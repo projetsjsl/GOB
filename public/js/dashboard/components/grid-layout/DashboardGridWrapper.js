@@ -911,10 +911,16 @@ const DashboardGridWrapper = ({
                                 </button>
                             </div>
                         </div>
-                    ) : (
+                    ) : (() => {
+                        // CRITICAL: Filter layout ONCE and use same array for both layouts prop AND children
+                        // This prevents mismatch between layout items and rendered children which causes
+                        // "React.Children.only expected to receive a single React element child" error
+                        const validLayout = filteredLayout.filter(item => TAB_TO_WIDGET_MAP[item.i]);
+
+                        return (
                         <ResponsiveGridLayout
                             className="layout"
-                            layouts={generateResponsiveLayouts(filteredLayout)}
+                            layouts={generateResponsiveLayouts(validLayout)}
                             breakpoints={BREAKPOINTS}
                             cols={COLS}
                             rowHeight={ROW_HEIGHT}
@@ -930,9 +936,7 @@ const DashboardGridWrapper = ({
                             transformScale={1}
                             resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
                         >
-                            {filteredLayout
-                                .filter(item => TAB_TO_WIDGET_MAP[item.i]) // Filter out items without config BEFORE mapping
-                                .map(item => {
+                            {validLayout.map(item => {
                                 const config = TAB_TO_WIDGET_MAP[item.i];
                                 return (
                                     <div
@@ -946,7 +950,8 @@ const DashboardGridWrapper = ({
                                 );
                             })}
                         </ResponsiveGridLayout>
-                    )}
+                        );
+                    })()}
                 </div>
 
                 {/* Dock pour ajouter des widgets (en mode édition) */}
