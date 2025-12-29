@@ -764,19 +764,6 @@ const DashboardGridWrapper = ({
             }
         }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-        // TEMPORARY DEBUG: Always return placeholder to isolate error
-        // Remove this block after debugging
-        if (true) {
-            return (
-                <div className={`p-6 ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
-                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-700'}`}>
-                        <p className="font-medium">🔍 DEBUG: DashboardGridWrapper placeholder</p>
-                        <p className="text-sm mt-1">Si ce message s'affiche, le problème n'est pas dans DashboardGridWrapper</p>
-                    </div>
-                </div>
-            );
-        }
-
         // Early return for loading state (after all hooks)
         if (!ResponsiveGridLayout) {
             // Only log once to prevent console spam
@@ -925,10 +912,22 @@ const DashboardGridWrapper = ({
                             </div>
                         </div>
                     ) : (() => {
-                        // CRITICAL: Filter layout ONCE and use same array for both layouts prop AND children
-                        // This prevents mismatch between layout items and rendered children which causes
-                        // "React.Children.only expected to receive a single React element child" error
-                        const validLayout = filteredLayout.filter(item => TAB_TO_WIDGET_MAP[item.i]);
+                        // CRITICAL FIX: Multiple safeguards to prevent "React.Children.only" error
+                        // 1. Filter to only valid items with existing config
+                        // 2. Remove duplicates (React keys must be unique)
+                        // 3. Ensure each item has valid string key
+
+                        const seenKeys = new Set();
+                        const validLayout = filteredLayout.filter(item => {
+                            // Must have valid item.i string
+                            if (!item || typeof item.i !== 'string') return false;
+                            // Must have config in TAB_TO_WIDGET_MAP
+                            if (!TAB_TO_WIDGET_MAP[item.i]) return false;
+                            // Must be unique (no duplicate keys)
+                            if (seenKeys.has(item.i)) return false;
+                            seenKeys.add(item.i);
+                            return true;
+                        });
 
                         // GUARD: If no valid items, show placeholder instead of empty grid
                         if (validLayout.length === 0) {
@@ -937,6 +936,37 @@ const DashboardGridWrapper = ({
                                     <div className={`p-4 rounded-lg text-center ${isDarkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>
                                         <p className="font-medium mb-2">📭 Aucun widget configuré pour cet onglet</p>
                                         <p className="text-sm">Cliquez sur "Modifier" pour ajouter des widgets.</p>
+                                    </div>
+                                </div>
+                            );
+                        }
+
+                        // PRE-BUILD children array to ensure each is a valid single element
+                        const gridChildren = validLayout.map(item => {
+                            const config = TAB_TO_WIDGET_MAP[item.i];
+                            // Double-check config exists (should always be true due to filter above)
+                            if (!config) return null;
+
+                            return (
+                                <div
+                                    key={item.i}
+                                    className={`h-full ${isEditing ? 'cursor-move ring-2 ring-emerald-500/50' : ''}`}
+                                    data-widget-id={item.i}
+                                    data-widget-label={config.label || item.i}
+                                >
+                                    {renderWidget(item)}
+                                </div>
+                            );
+                        }).filter(Boolean); // Remove any null entries
+
+                        // Final safety check - must have children
+                        if (gridChildren.length === 0) {
+                            console.warn('⚠️ All grid children filtered out, showing fallback');
+                            return (
+                                <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
+                                    <div className={`p-4 rounded-lg text-center ${isDarkMode ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-700'}`}>
+                                        <p className="font-medium mb-2">⚠️ Erreur de rendu des widgets</p>
+                                        <p className="text-sm">Rechargez la page ou réinitialisez le layout.</p>
                                     </div>
                                 </div>
                             );
@@ -961,19 +991,7 @@ const DashboardGridWrapper = ({
                             transformScale={1}
                             resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
                         >
-                            {validLayout.map(item => {
-                                const config = TAB_TO_WIDGET_MAP[item.i];
-                                return (
-                                    <div
-                                        key={item.i}
-                                        className={`h-full ${isEditing ? 'cursor-move ring-2 ring-emerald-500/50' : ''}`}
-                                        data-widget-id={item.i}
-                                        data-widget-label={config.label}
-                                    >
-                                        {renderWidget(item)}
-                                    </div>
-                                );
-                            })}
+                            {gridChildren}
                         </ResponsiveGridLayout>
                         );
                     })()}
