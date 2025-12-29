@@ -930,15 +930,13 @@ const DashboardGridWrapper = ({
                             transformScale={1}
                             resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
                         >
-                            {filteredLayout.map(item => {
+                            {filteredLayout
+                                .filter(item => TAB_TO_WIDGET_MAP[item.i]) // Filter out items without config BEFORE mapping
+                                .map(item => {
                                 const config = TAB_TO_WIDGET_MAP[item.i];
-                                if (!config) {
-                                    console.warn(`⚠️ Widget ${item.i} non trouvé dans TAB_TO_WIDGET_MAP`);
-                                    return null;
-                                }
                                 return (
-                                    <div 
-                                        key={item.i} 
+                                    <div
+                                        key={item.i}
                                         className={`h-full ${isEditing ? 'cursor-move ring-2 ring-emerald-500/50' : ''}`}
                                         data-widget-id={item.i}
                                         data-widget-label={config.label}
