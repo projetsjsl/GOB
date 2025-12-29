@@ -448,6 +448,17 @@
                     console.log('✅ ReactGridLayout recovered from module.exports');
                 }
             } else {
+                // Check if exports are nested under .default (ES module bundle)
+                if (window.ReactGridLayout.default && !window.ReactGridLayout.Responsive) {
+                    console.log('🔄 ReactGridLayout: Flattening .default exports...');
+                    const defaultExports = window.ReactGridLayout.default;
+                    // Spread all default exports onto the main object
+                    Object.keys(defaultExports).forEach(key => {
+                        if (key !== 'default') {
+                            window.ReactGridLayout[key] = defaultExports[key];
+                        }
+                    });
+                }
                 console.log('✅ ReactGridLayout loaded successfully:', {
                     hasResponsive: !!window.ReactGridLayout.Responsive,
                     hasWidthProvider: !!window.ReactGridLayout.WidthProvider
