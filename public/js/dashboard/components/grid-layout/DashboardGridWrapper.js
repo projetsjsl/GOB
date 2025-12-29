@@ -922,6 +922,10 @@ const DashboardGridWrapper = ({
                                 </button>
                             </div>
                         </div>
+                    ) : !responsiveLayouts?.lg?.length ? (
+                        <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
+                            <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Aucun widget à afficher</p>
+                        </div>
                     ) : (
                         <ResponsiveGridLayout
                             className="layout"
