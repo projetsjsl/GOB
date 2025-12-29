@@ -374,21 +374,37 @@ const DashboardGridWrapper = ({
 
         const RGL = window.ReactGridLayout;
 
-        // Use basic GridLayout with WidthProvider (NOT Responsive) to isolate the issue
-        const GridLayoutWithWidth = useMemo(() => {
-            if (!RGL) return null;
-            // Get the base GridLayout component (default export)
-            const BaseGridLayout = RGL.default || RGL;
-            if (!BaseGridLayout) return null;
-            // Wrap with WidthProvider for auto-width
-            if (RGL.WidthProvider) {
-                return RGL.WidthProvider(BaseGridLayout);
+        // Debug: log what's available in RGL
+        useEffect(() => {
+            if (RGL) {
+                console.log('🔍 RGL exports:', {
+                    hasDefault: !!RGL.default,
+                    hasResponsive: !!RGL.Responsive,
+                    hasWidthProvider: !!RGL.WidthProvider,
+                    defaultType: typeof RGL.default,
+                    responsiveType: typeof RGL.Responsive,
+                    keys: Object.keys(RGL).slice(0, 10)
+                });
             }
-            return BaseGridLayout;
         }, [RGL]);
 
-        // Keep ResponsiveGridLayout as alias for compatibility
-        const ResponsiveGridLayout = GridLayoutWithWidth;
+        // Use ResponsiveGridLayout with our custom WidthProvider
+        const ResponsiveGridLayout = useMemo(() => {
+            if (!RGL) return null;
+            // RGL.Responsive should be the ResponsiveGridLayout component
+            // RGL.WidthProvider is our custom class-based wrapper
+            if (RGL.WidthProvider && RGL.Responsive) {
+                console.log('✅ Using Responsive + WidthProvider');
+                return RGL.WidthProvider(RGL.Responsive);
+            }
+            // Fallback: try basic GridLayout (RGL.default)
+            if (RGL.WidthProvider && RGL.default) {
+                console.log('⚠️ Fallback to GridLayout + WidthProvider');
+                return RGL.WidthProvider(RGL.default);
+            }
+            console.error('❌ No valid GridLayout component found');
+            return null;
+        }, [RGL]);
 
         // Sauvegarder le layout courant
         const handleLayoutChange = useCallback((newLayout) => {
@@ -925,10 +941,12 @@ const DashboardGridWrapper = ({
                     ) : (
                         <ResponsiveGridLayout
                             className="layout"
-                            layout={filteredLayout}
-                            cols={12}
+                            layouts={{ lg: filteredLayout, md: filteredLayout, sm: filteredLayout, xs: filteredLayout, xxs: filteredLayout }}
+                            breakpoints={BREAKPOINTS}
+                            cols={COLS}
                             rowHeight={ROW_HEIGHT}
                             onLayoutChange={handleLayoutChange}
+                            onBreakpointChange={setCurrentBreakpoint}
                             isDraggable={isEditing}
                             isResizable={isEditing}
                             compactType="vertical"
@@ -936,8 +954,8 @@ const DashboardGridWrapper = ({
                             resizeHandles={['se']}
                         >
                             {filteredLayout.map(item => (
-                                <div key={item.i} className={isEditing ? 'cursor-move ring-2 ring-emerald-500/50' : ''}>
-                                    {renderWidget(item)}
+                                <div key={item.i} style={{background: isDarkMode ? '#333' : '#eee', height: '100%'}}>
+                                    <span>Widget: {item.i}</span>
                                 </div>
                             ))}
                         </ResponsiveGridLayout>
