@@ -1,19 +1,20 @@
 // Auto-converted from monolithic dashboard file
 // Component: ScrappingSATab
 
-const ScrappingSATab = (props) => {
-    const {
-        isDarkMode,
-        runSeekingAlphaScraper,
-        scrapingStatus,
-        scrapingLogs,
-        clearScrapingLogs,
-        generateScrapingScript,
-        addScrapingLog,
-        tickers,
-        Icon,
-        seekingAlphaData
-    } = props;
+const ScrappingSATab = (props = {}) => {
+    const dashboard = typeof window !== 'undefined' ? window.BetaCombinedDashboard || {} : {};
+    const isDarkMode = props.isDarkMode ?? dashboard.isDarkMode ?? true;
+    const runSeekingAlphaScraper = props.runSeekingAlphaScraper || dashboard.runSeekingAlphaScraper || (() => {});
+    const scrapingStatus = props.scrapingStatus ?? dashboard.scrapingStatus ?? 'idle';
+    const scrapingLogs = Array.isArray(props.scrapingLogs) ? props.scrapingLogs : (dashboard.scrapingLogs || []);
+    const clearScrapingLogs = props.clearScrapingLogs || dashboard.clearScrapingLogs || (() => {});
+    const generateScrapingScript = props.generateScrapingScript || dashboard.generateScrapingScript || ((ticker) => `// Scrape ${ticker}`);
+    const addScrapingLog = props.addScrapingLog || dashboard.addScrapingLog || ((message) => console.log(message));
+    const tickers = Array.isArray(props.tickers) ? props.tickers : (dashboard.tickers || []);
+    const Icon = props.Icon || window.Icon || (({ emoji, size = 16, className = '' }) => (
+        <span className={className} style={{ fontSize: `${size}px` }}>{emoji}</span>
+    ));
+    const seekingAlphaData = props.seekingAlphaData || dashboard.seekingAlphaData || { stocks: [] };
 
     // Local state
     const [manualTicker, setManualTicker] = React.useState('');

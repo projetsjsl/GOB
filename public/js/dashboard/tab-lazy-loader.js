@@ -41,6 +41,8 @@
         'marches-calendar': '/js/dashboard/components/tabs/EconomicCalendarTab.js',
         'yield-curve': '/js/dashboard/components/tabs/YieldCurveTab.js',
         'marches-yield': '/js/dashboard/components/tabs/YieldCurveTab.js',
+        'marches-nouvelles': '/js/dashboard/components/tabs/StocksNewsTab.js',
+        'nouvelles': '/js/dashboard/components/tabs/StocksNewsTab.js',
         
         // Titres tabs
         'stocks-news': '/js/dashboard/components/tabs/StocksNewsTab.js',

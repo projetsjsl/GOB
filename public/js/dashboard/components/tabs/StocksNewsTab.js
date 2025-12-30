@@ -129,6 +129,17 @@ const StocksNewsTab = (props) => {
             return 'low';
         };
 
+        const sortNewsByCredibility = (articles) => {
+            if (!Array.isArray(articles)) return [];
+            return [...articles].sort((a, b) => {
+                const aSource = a?.source?.name || a?.source || a?.site || '';
+                const bSource = b?.source?.name || b?.source || b?.site || '';
+                const aScore = getNewsCredibilityScore(aSource);
+                const bScore = getNewsCredibilityScore(bSource);
+                return bScore - aScore;
+            });
+        };
+
         // Fonction pour formater les nombres
         const formatNumber = (num) => {
             if (!num && num !== 0) return 'N/A';
@@ -1664,4 +1675,3 @@ const StocksNewsTab = (props) => {
 if (typeof window !== 'undefined') {
     window.StocksNewsTab = StocksNewsTab;
 }
-

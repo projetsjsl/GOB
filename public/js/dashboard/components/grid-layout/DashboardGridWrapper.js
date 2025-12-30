@@ -560,15 +560,17 @@ const DashboardGridWrapper = ({
 
         // Supprimer un widget
         const removeWidget = useCallback((tabId) => {
-            setLayout(layout.filter(item => item.i !== tabId));
-        }, [layout]);
+            const updatedLayout = layout.filter(item => item.i !== tabId);
+            setLayout(updatedLayout);
+            localStorage.setItem(layoutStorageKey, JSON.stringify(updatedLayout));
+        }, [layout, layoutStorageKey]);
 
         // Reset layout to Default Preset (Production)
         const resetLayout = useCallback(() => {
             const defaultLayout = loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout();
             setLayout(defaultLayout);
-            localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(defaultLayout));
-        }, []);
+            localStorage.setItem(layoutStorageKey, JSON.stringify(defaultLayout));
+        }, [layoutStorageKey]);
 
         // Load preset layout
         const loadPreset = useCallback((presetName) => {
@@ -580,9 +582,9 @@ const DashboardGridWrapper = ({
 
             if (preset) {
                 setLayout(preset);
-                localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(preset));
+                localStorage.setItem(layoutStorageKey, JSON.stringify(preset));
             }
-        }, []);
+        }, [layoutStorageKey]);
 
         // Rendre un widget - FULL VERSION with actual components
         const renderWidget = useCallback((item) => {
@@ -965,7 +967,7 @@ const DashboardGridWrapper = ({
                                     onClick={() => {
                                         const defaultLayout = getDefaultLayout();
                                         setLayout(defaultLayout);
-                                        localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(defaultLayout));
+                                        localStorage.setItem(layoutStorageKey, JSON.stringify(defaultLayout));
                                     }}
                                     className={`px-4 py-2 rounded-lg font-medium text-sm ${
                                         isDarkMode 
@@ -1008,7 +1010,7 @@ const DashboardGridWrapper = ({
                 {isEditing && (
                     <div className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-2xl flex gap-4 shadow-2xl z-50 max-w-4xl overflow-x-auto ${isDarkMode ? 'bg-neutral-800/90 backdrop-blur border border-neutral-700' : 'bg-white/90 backdrop-blur border border-gray-200'}`}>
                         {Object.entries(TAB_TO_WIDGET_MAP)
-                            .filter(([tabId]) => !filteredLayout.some(item => item.i === tabId) && getWidgetIdsForMainTab(mainTab).includes(tabId))
+                            .filter(([tabId]) => !filteredLayout.some(item => item.i === tabId))
                             .map(([tabId, config]) => (
                                 <button
                                     key={tabId}
