@@ -682,8 +682,8 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         { id: 'marches', label: 'Marchés', icon: 'TrendingUp', color: 'blue' },
         { id: 'titres', label: 'Titres', icon: 'Briefcase', color: 'green' },
         { id: 'jlab', label: 'JLab', icon: 'Flask', color: 'teal' },
-        { id: 'emma', label: 'Emma IA', icon: 'Brain', color: 'purple' },
-        { id: 'tests', label: 'Tests', icon: 'TestTube', color: 'orange' }
+        { id: 'emma', label: 'Emma IA', icon: 'Brain', color: 'purple' }
+        // Tests tab removed - was causing freezes
     ];
 
     // Sub-tabs for each main tab
@@ -711,9 +711,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         ],
         'jlab': [
             { id: 'jlab-terminal', label: 'Terminal', icon: 'Terminal', component: 'JLabTab' },
-            { id: 'jlab-advanced', label: 'Analyse Pro', icon: 'Activity', component: 'AdvancedAnalysisTab' },
-            { id: 'jlab-screener', label: 'Screener', icon: 'Search', component: 'FinanceProPanel:screener' },
-            { id: 'jlab-ratios', label: 'Ratios', icon: 'TrendingUp', component: 'FinanceProPanel:ratios' }
+            { id: 'jlab-advanced', label: 'Analyse Pro', icon: 'Activity', component: 'AdvancedAnalysisTab' }
         ],
         'emma': [
             { id: 'emma-chat', label: 'Chat Emma', icon: 'MessageSquare', component: 'AskEmmaTab' },
@@ -722,14 +720,8 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             { id: 'emma-terminal', label: 'Terminal', icon: 'Monitor', component: 'TerminalEmmaIATab' },
             { id: 'emma-live', label: 'EmmAIA Live', icon: 'Radio', component: 'EmmAIATab' },
             { id: 'emma-finvox', label: 'FinVox', icon: 'Headphones', component: 'FinVoxTab' }
-        ],
-        'tests': [
-            { id: 'tests-rgl', label: 'Layout RGL', icon: 'LayoutDashboard', component: 'RglDashboard' },
-            { id: 'tests-calendar', label: 'Calendrier', icon: 'Calendar', component: 'MarketsEconomyTab' },
-            { id: 'tests-roboweb', label: 'RobotWeb', icon: 'Bot', component: 'GroupChatTab' },
-            { id: 'tests-sandbox', label: 'Sandbox', icon: 'Box', component: 'TestSandboxTab' },
-            { id: 'tests-debug', label: 'Debug', icon: 'Bug', component: 'DebugTab' }
         ]
+        // Tests sub-tabs removed - was causing freezes
     };
 
     // Mapping old tab IDs to new structure (for backwards compatibility)
@@ -755,9 +747,8 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         'groupchat': { main: 'emma', sub: 'emma-group' },
         'terminal-emmaia': { main: 'emma', sub: 'emma-terminal' },
         'emmaia': { main: 'emma', sub: 'emma-live' },
-        'finvox': { main: 'emma', sub: 'emma-finvox' },
-        'investing-calendar': { main: 'tests', sub: 'tests-calendar' },
-        'tests-tab': { main: 'tests', sub: 'tests-sandbox' }
+        'finvox': { main: 'emma', sub: 'emma-finvox' }
+        // Tests mappings removed
     };
 
     // Default sub-tab for each main tab
@@ -766,8 +757,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         'marches': 'marches-global',
         'titres': 'titres-portfolio',
         'jlab': 'jlab-terminal',
-        'emma': 'emma-chat',
-        'tests': 'tests-rgl'
+        'emma': 'emma-chat'
     };
 
     // Legacy: Keep MASTER_NAV_LINKS for backwards compatibility
@@ -1002,18 +992,18 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 const tab = params.get('tab');
                 if (tab) return tab;
             }
-            return 'jlab';
-        }); // Onglet par défaut: JLAB (contient Titres & Nouvelles et Finance Pro)
-        
+            return 'marches-global';
+        }); // Onglet par défaut: Marchés Globaux
+
         // New navigation state for 6-tab structure
         const [mainTab, setMainTab] = useState(() => {
             // Determine main tab from activeTab using mapping
             const mapping = TAB_ID_MAPPING[activeTab];
-            return mapping ? mapping.main : 'jlab';
+            return mapping ? mapping.main : 'marches';
         });
         const [activeSubTab, setActiveSubTab] = useState(() => {
             const mapping = TAB_ID_MAPPING[activeTab];
-            return mapping ? mapping.sub : 'jlab-terminal';
+            return mapping ? mapping.sub : 'marches-global';
         });
         
         // Helper function to get main tab from any tab ID
@@ -26085,8 +26075,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             { id: 'advanced-analysis', label: 'Titres', icon: 'iconoir-candlestick-chart', component: (props) => window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab isDarkMode={isDarkMode} {...props} /> : <div>Chargement...</div> },
             { id: 'jlab', label: 'JLab™', icon: 'iconoir-flask', component: JLabUnifiedTab },
             { id: 'ask-emma', label: 'Emma IA', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
-            { id: 'tests-tab', label: 'Tests', icon: 'iconoir-test-tube', component: InvestingCalendarTabInternal },
-            
+
             // Secondary / Optional Tabs
             { id: 'nouvelles', label: 'Nouvelles', icon: 'iconoir-newspaper', component: NouvellesTab },
             { id: 'emma-config', label: 'Config', icon: 'iconoir-tools', component: EmmaConfigTab },
@@ -26113,8 +26102,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             { id: 'jlab-terminal', label: 'Terminal', icon: 'iconoir-terminal', component: JLabUnifiedTab },
             { id: 'jlab-advanced', label: 'Analyse Pro', icon: 'iconoir-activity', component: (props) => window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab isDarkMode={isDarkMode} {...props} /> : <div>Chargement...</div> },
-            { id: 'jlab-screener', label: 'Screener', icon: 'iconoir-filter', component: () => <div className="p-10 text-center">Screener Pro (Coming Soon)</div> },
-            { id: 'jlab-ratios', label: 'Ratios', icon: 'iconoir-calculator', component: () => <div className="p-10 text-center">Analyse Ratios (Coming Soon)</div> },
 
             { id: 'emma-chat', label: 'Chat Emma', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
             { id: 'emma-vocal', label: 'Assistant Vocal', icon: 'iconoir-microphone', component: VoiceAssistantTab },
@@ -26123,9 +26110,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             { id: 'emma-live', label: 'EmmAIA Live', icon: 'iconoir-radio', component: EmmAIATab },
             { id: 'emma-finvox', label: 'FinVox', icon: 'iconoir-headset', component: FinVoxTab },
 
-            { id: 'tests-calendar', label: 'Calendrier', icon: 'iconoir-calendar', component: InvestingCalendarTabInternal },
-            { id: 'tests-rgl', label: 'Layout RGL', icon: 'iconoir-layout', component: () => <div className="p-10 text-center">Layout RGL (Coming Soon)</div> },
-            
             // Fixes for specific error reports
             { id: 'admin-config', label: 'Configuration', icon: 'iconoir-settings', component: EmmaConfigTab },
             { id: 'admin-briefings', label: 'Briefings', icon: 'iconoir-mail', component: EmailBriefingsTab },
@@ -26211,14 +26195,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             const availableWidth = navWidth - padding * 2 - plusButtonWidth - gap;
 
             // LISTE DE PRIORITÉ STRICTE demandée par l'utilisateur
-            // Admin, Marchés, Titres, JLab, Emma IA, Tests.
+            // Admin, Marchés, Titres, JLab, Emma IA
             const PRIORITY_IDS = [
-                'admin-jsla', 
-                'markets-economy', 
-                'advanced-analysis', 
-                'jlab', 
-                'ask-emma', 
-                'tests-tab'
+                'admin-jsla',
+                'markets-economy',
+                'advanced-analysis',
+                'jlab',
+                'ask-emma'
             ];
 
             let currentWidth = 0;
@@ -27922,7 +27905,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                     {/* TITRES Sub-tabs */}
                     {activeTab === 'titres-portfolio' && <StocksNewsTab tickerSource="portfolio" />}
-                    {activeTab === 'titres-flex' && (window.TitresTabRGL ? <window.TitresTabRGL isDarkMode={isDarkMode} /> : <div>Chargement...</div>)}
                     {activeTab === 'titres-watchlist' && <StocksNewsTab tickerSource="watchlist" />}
                     {activeTab === 'titres-seeking' && <SeekingAlphaTab
                         isDarkMode={isDarkMode}
@@ -27957,8 +27939,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         window.JLabTab ? <window.JLabTab /> : <JLabUnifiedTab key={`jlab-terminal-${tabMountKeys['jlab'] || 0}`} />
                     )}
                     {activeTab === 'jlab-advanced' && window.AdvancedAnalysisTab && <window.AdvancedAnalysisTab key={`jlab-advanced-${tabMountKeys['advanced-analysis'] || 0}`} isDarkMode={isDarkMode} />}
-                    {activeTab === 'jlab-screener' && <FinanceProPanel isDarkMode={isDarkMode} initialView="screener" />}
-                    {activeTab === 'jlab-ratios' && <FinanceProPanel isDarkMode={isDarkMode} initialView="ratios" />}
 
                     {/* EMMA IA Sub-tabs */}
                     {activeTab === 'emma-chat' && <AskEmmaTab

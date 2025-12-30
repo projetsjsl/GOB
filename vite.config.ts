@@ -10,6 +10,14 @@ export default defineConfig({
     port: 5173,
     strictPort: false,
     open: true,
+    // Proxy API requests to Vercel serverless functions
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
   },
 
   // Configuration du build

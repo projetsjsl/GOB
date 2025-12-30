@@ -175,89 +175,23 @@ const SpreadChart = ({ usRates, caRates, darkMode }) => {
 };
 
 
+// TradingView replaced with custom CurveWatch component
 const TradingViewCurve = ({ darkMode }) => {
-    // Persist widget activation state in localStorage
-    const [isWidgetActive, setIsWidgetActive] = useState(() => {
-        try {
-            return localStorage.getItem('yieldCurve_tradingViewActive') === 'true';
-        } catch { return false; }
-    });
-    const container = useRef();
-    const LazyWidgetWrapper = window.LazyWidgetWrapper || (({ children }) => <>{children}</>);
-
-    // Save activation state to localStorage
-    useEffect(() => {
-        try {
-            localStorage.setItem('yieldCurve_tradingViewActive', isWidgetActive ? 'true' : 'false');
-        } catch {}
-    }, [isWidgetActive]);
-
-    useEffect(() => {
-        if (!isWidgetActive || !container.current) return;
-        
-        // Cleanup content to prevent duplicates/memory leaks
-        container.current.innerHTML = '';
-
-        const script = document.createElement("script");
-        script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
-        script.type = "text/javascript";
-        script.async = true;
-        script.innerHTML = JSON.stringify({
-            "autosize": true,
-            "symbol": "TVC:US10Y",
-            "interval": "D",
-            "theme": darkMode ? "dark" : "light",
-            "style": "2",
-            "locale": "fr",
-            "hide_top_toolbar": true,
-            "allow_symbol_change": true,
-            "support_host": "https://www.tradingview.com"
-        });
-        container.current.appendChild(script);
-
-        return () => {
-            if (container.current) container.current.innerHTML = '';
-        };
-    }, [isWidgetActive, darkMode]);
-
-    if (!isWidgetActive) {
+    // Check if CurveWatchContainer is available
+    if (window.CurveWatchContainer) {
         return (
-            <div style={{ height: "400px", width: "100%" }} className="flex items-center justify-center bg-neutral-900/10 border border-neutral-800 rounded-xl relative overflow-hidden group hover:border-blue-500/50 transition-colors">
-                <div className="absolute inset-0 bg-gradient-to-br from-neutral-900/50 to-neutral-950/50 z-0"></div>
-                
-                {/* Visual Placeholder Pattern */}
-                <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-
-                <div className="text-center z-10 p-6">
-                   <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-500/20 group-hover:scale-110 transition-transform duration-300">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-blue-400 w-8 h-8">
-                            <path d="M12 20V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M18 20V4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M6 20V16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                   </div>
-                   <h3 className="text-lg font-bold text-neutral-300 mb-2">Graphique Avancé</h3>
-                   <p className="text-sm text-neutral-500 max-w-xs mb-6">Charger le terminal complet pour l'analyse technique (Consomme plus de ressources)</p>
-                   
-                   <button 
-                        onClick={() => setIsWidgetActive(true)}
-                        className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold shadow-lg shadow-blue-500/20 transition-all active:scale-95 flex items-center gap-2 mx-auto"
-                   >
-                        <LucideIcon name="Activity" className="w-4 h-4" />
-                        Charger le Graphique
-                   </button>
-                </div>
+            <div style={{ height: "500px", width: "100%" }}>
+                <window.CurveWatchContainer embedded={true} />
             </div>
         );
     }
 
+    // Fallback if CurveWatch not loaded
     return (
-        <div style={{ height: "400px", width: "100%" }}>
-            <LazyWidgetWrapper threshold={0.25} height={400} className="w-full h-full">
-                <div className="tradingview-widget-container" ref={container} style={{ height: "100%", width: "100%" }}>
-                    <div className="tradingview-widget-container__widget"></div>
-                </div>
-            </LazyWidgetWrapper>
+        <div style={{ height: "300px", width: "100%" }} className="flex items-center justify-center bg-neutral-900/10 border border-neutral-800 rounded-xl">
+            <div className="text-center p-6">
+               <div className="text-neutral-400">Chargement CurveWatch...</div>
+            </div>
         </div>
     );
 };

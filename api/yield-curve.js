@@ -820,6 +820,48 @@ async function saveToSupabase(country, yieldData) {
 }
 
 /**
+ * Get historical yield curve data from Supabase
+ * @param {string} country - 'us' or 'canada'
+ * @param {string} period - '1m', '3m', '6m', '1y', '2y'
+ */
+async function getHistoricalData(country, period = '1m') {
+  try {
+    const supabase = createSupabaseClient(true);
+
+    // Calculate start date based on period
+    const now = new Date();
+    let startDate = new Date(now);
+
+    switch (period) {
+      case '3m': startDate.setMonth(startDate.getMonth() - 3); break;
+      case '6m': startDate.setMonth(startDate.getMonth() - 6); break;
+      case '1y': startDate.setFullYear(startDate.getFullYear() - 1); break;
+      case '2y': startDate.setFullYear(startDate.getFullYear() - 2); break;
+      default: startDate.setMonth(startDate.getMonth() - 1); // 1m default
+    }
+
+    const startDateStr = startDate.toISOString().split('T')[0];
+
+    const { data, error } = await supabase
+      .from('yield_curve_data')
+      .select('data_date, rates, spread_10y_2y, inverted, source')
+      .eq('country', country.toLowerCase())
+      .gte('data_date', startDateStr)
+      .order('data_date', { ascending: true });
+
+    if (error) {
+      console.warn(`⚠️ Erreur Supabase history pour ${country}:`, error.message);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.warn(`⚠️ Erreur Supabase history:`, error.message);
+    return [];
+  }
+}
+
+/**
  * Handler principal Vercel
  */
 export default async function handler(req, res) {
@@ -843,7 +885,29 @@ export default async function handler(req, res) {
       return res.status(429).json({ error: 'Rate limited' });
     }
 
-    const { country = 'both', date = null } = req.query;
+    const { country = 'both', date = null, history = null, period = '1m' } = req.query;
+
+    // Handle history request
+    if (history === 'true') {
+      console.log(`📊 Requête historique: country=${country}, period=${period}`);
+
+      const result = {
+        timestamp: new Date().toISOString(),
+        period,
+        history: {}
+      };
+
+      if (country === 'us' || country === 'both') {
+        result.history.us = await getHistoricalData('us', period);
+      }
+
+      if (country === 'canada' || country === 'both') {
+        result.history.canada = await getHistoricalData('canada', period);
+      }
+
+      res.setHeader('Cache-Control', CACHE_CONTROL);
+      return res.status(200).json(result);
+    }
 
     console.log(`🔍 Requête yield curve: country=${country}, date=${date || 'actuelle'}`);
 

@@ -514,6 +514,7 @@
 
     <!-- Components needed by Grid Layout (load these first) -->
     <script type="text/babel" src="js/dashboard/components/tabs/StocksNewsTab.js"></script>
+    <script type="text/babel" src="js/dashboard/components/TradingViewWidgets.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/MarketsEconomyTab.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/AskEmmaTab.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/VoiceAssistantTab.js"></script>
@@ -559,6 +560,14 @@
     <!-- Iconoir - Beautiful open source icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
     
+    <!-- CurveWatch Components (custom yield curve visualization) -->
+    <script type="text/babel" src="js/dashboard/components/CurveWatch/RateCards.js"></script>
+    <script type="text/babel" src="js/dashboard/components/CurveWatch/YieldCurveChart.js"></script>
+    <script type="text/babel" src="js/dashboard/components/CurveWatch/SpreadChart.js"></script>
+    <script type="text/babel" src="js/dashboard/components/CurveWatch/HistoricalCompare.js"></script>
+    <script type="text/babel" src="js/dashboard/components/CurveWatch/CurveWatchContainer.js"></script>
+    <script type="text/babel" src="js/dashboard/components/CurveWatch/index.js"></script>
+
     <!-- Scripts Tab Seeking Alpha & Scraping -->
     <script type="text/babel" src="js/dashboard/components/tabs/YieldCurveTab.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/EconomicCalendarTab.js"></script>
@@ -1822,7 +1831,6 @@
 
     <!-- Grid Layout Components (MUST load AFTER all tab components) -->
     <script type="text/babel" src="js/dashboard/components/tabs/MarketsEconomyTabRGL.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/TitresTabRGL.js"></script>
     <script type="text/babel" src="js/dashboard/components/grid-layout/RglDashboard.js"></script>
     <script type="text/babel" src="js/dashboard/components/grid-layout/DashboardGridWrapper.js"></script>
 
