@@ -30,6 +30,13 @@
     const COLS = { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 };
     const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
 
+    // ===================================
+    // LAZY LOADING CONFIGURATION
+    // ===================================
+    // Widgets marked as 'heavy' will be lazy loaded to prevent Chrome crash
+    // Max concurrent heavy widgets to prevent memory overload
+    const MAX_CONCURRENT_HEAVY_WIDGETS = 2;
+
     // Mapping complet des tabs vers widgets avec tailles par défaut
     const TAB_TO_WIDGET_MAP = {
         // ADMIN
@@ -39,12 +46,12 @@
         'admin-scraping': { component: 'ScrappingSATab', label: 'Scraping SA', icon: 'Scissors', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
         'admin-fastgraphs': { component: 'FastGraphsTab', label: 'FastGraphs', icon: 'TrendingUp', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
         'admin-jsla': { component: 'AdminJSLaiTab', label: 'Admin JSLAI', icon: 'Shield', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
-        
-        // MARCHÉS
-        'marches-global': { component: 'MarketsEconomyTab', label: 'Marchés Globaux', icon: 'Globe', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
-        'marches-flex': { component: 'MarketsEconomyTabRGL', label: 'Marchés Flex', icon: 'Layout', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
+
+        // MARCHÉS - NOTE: marches-flex REMOVED (duplicate of marches-global, caused Chrome crash)
+        'marches-global': { component: 'MarketsEconomyTab', label: 'Marchés Globaux', icon: 'Globe', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 }, heavy: true },
+        // 'marches-flex' REMOVED - was duplicating MarketsEconomyTab causing ~15 TradingView widgets to load simultaneously
         'marches-calendar': { component: 'EconomicCalendarTab', label: 'Calendrier Éco', icon: 'Calendar', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
-        'marches-yield': { component: 'YieldCurveTab', label: 'Courbe Taux', icon: 'TrendingUp', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
+        'marches-yield': { component: 'YieldCurveTab', label: 'Courbe Taux', icon: 'TrendingUp', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 }, heavy: true },
         'marches-nouvelles': { component: 'NouvellesTab', label: 'Nouvelles', icon: 'Newspaper', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
         
         // TITRES
@@ -78,7 +85,7 @@
             'marches-global',      // Top left below - Markets widget
             'emma-chat',           // Top right - Emma chat
             'jlab-terminal',       // Top right below - JLab Terminal
-            'marches-flex',        // Bottom - Markets flexible layout
+            'marches-calendar',    // Bottom - Economic calendar (lighter than marches-flex)
             'jlab-advanced'        // Bottom - Advanced analysis
         ];
 
@@ -88,12 +95,66 @@
             // Row 2: Markets Global (left) + Emma Chat (right)
             { i: 'marches-global', x: 0, y: 12, w: 6, h: 10, minW: 6, minH: 6 },
             { i: 'emma-chat', x: 6, y: 12, w: 6, h: 10, minW: 4, minH: 8 },
-            // Row 3: JLab Terminal (left) + Markets Flex (right)
+            // Row 3: JLab Terminal (left) + Calendar (right) - Replaced marches-flex with lighter widget
             { i: 'jlab-terminal', x: 0, y: 22, w: 6, h: 14, minW: 8, minH: 10 },
-            { i: 'marches-flex', x: 6, y: 22, w: 6, h: 10, minW: 6, minH: 6 },
+            { i: 'marches-calendar', x: 6, y: 22, w: 6, h: 10, minW: 6, minH: 6 },
             // Row 4: Advanced Analysis (full width bottom)
             { i: 'jlab-advanced', x: 0, y: 36, w: 12, h: 12, minW: 8, minH: 8 }
         ].filter(item => defaultTabs.includes(item.i));
+    };
+
+    // ===================================
+    // LAZY HEAVY WIDGET WRAPPER
+    // ===================================
+    // Delays rendering of heavy widgets (TradingView) to prevent Chrome crash
+    const LazyHeavyWidget = ({ children, widgetId, delay = 500, isDarkMode }) => {
+        const [shouldRender, setShouldRender] = React.useState(false);
+        const [isVisible, setIsVisible] = React.useState(false);
+        const containerRef = React.useRef(null);
+
+        // Use IntersectionObserver to only load when visible
+        React.useEffect(() => {
+            const observer = new IntersectionObserver(
+                ([entry]) => {
+                    if (entry.isIntersecting && !isVisible) {
+                        setIsVisible(true);
+                    }
+                },
+                { rootMargin: '100px', threshold: 0.1 }
+            );
+
+            if (containerRef.current) {
+                observer.observe(containerRef.current);
+            }
+
+            return () => observer.disconnect();
+        }, [isVisible]);
+
+        // Delay actual rendering to stagger heavy widget loads
+        React.useEffect(() => {
+            if (isVisible && !shouldRender) {
+                const timer = setTimeout(() => {
+                    setShouldRender(true);
+                    console.log(`🔄 LazyHeavyWidget: Loading ${widgetId} after ${delay}ms delay`);
+                }, delay);
+                return () => clearTimeout(timer);
+            }
+        }, [isVisible, shouldRender, delay, widgetId]);
+
+        return (
+            <div ref={containerRef} className="h-full w-full">
+                {shouldRender ? children : (
+                    <div className={`h-full w-full flex items-center justify-center rounded-xl ${isDarkMode ? 'bg-neutral-800' : 'bg-gray-100'}`}>
+                        <div className="text-center p-4">
+                            <div className="animate-spin w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Chargement du widget...
+                            </p>
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
     };
 
     // Helper to load specialized presets
@@ -532,6 +593,21 @@ const DashboardGridWrapper = ({
                 Object.assign(componentProps, { Icon });
             }
 
+            // Calculate staggered delay for heavy widgets to prevent all loading at once
+            const heavyWidgetIndex = config.heavy ?
+                Object.keys(TAB_TO_WIDGET_MAP).filter(k => TAB_TO_WIDGET_MAP[k].heavy).indexOf(item.i) : -1;
+            const staggerDelay = heavyWidgetIndex >= 0 ? 500 + (heavyWidgetIndex * 1000) : 0;
+
+            // Create the actual component element
+            const componentElement = React.createElement(Component, { ...commonProps, ...componentProps });
+
+            // Wrap heavy widgets (TradingView) in lazy loader to prevent Chrome crash
+            const wrappedComponent = config.heavy ? (
+                <LazyHeavyWidget widgetId={item.i} delay={staggerDelay} isDarkMode={isDarkMode}>
+                    {componentElement}
+                </LazyHeavyWidget>
+            ) : componentElement;
+
             // Wrap component in widget container with header
             return (
                 <div className={`h-full flex flex-col rounded-xl overflow-hidden ${isDarkMode ? 'bg-neutral-900 border border-neutral-800' : 'bg-white border border-gray-200'} shadow-lg`}>
@@ -539,6 +615,11 @@ const DashboardGridWrapper = ({
                         <div className="flex items-center gap-2">
                             <window.LucideIcon name={config.icon} className={`w-4 h-4 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
                             <span className={`font-semibold text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{config.label}</span>
+                            {config.heavy && (
+                                <span className={`text-xs px-1.5 py-0.5 rounded ${isDarkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>
+                                    ⚡ Heavy
+                                </span>
+                            )}
                         </div>
                         {isEditing && (
                             <button onClick={() => removeWidget(item.i)} className="p-1 rounded hover:bg-red-500/20 transition-colors" title="Retirer ce widget">
@@ -548,7 +629,7 @@ const DashboardGridWrapper = ({
                     </div>
                     <div className="flex-1 overflow-auto">
                         <WidgetErrorBoundary>
-                            {React.createElement(Component, { ...commonProps, ...componentProps })}
+                            {wrappedComponent}
                         </WidgetErrorBoundary>
                     </div>
                 </div>

@@ -7,6 +7,32 @@ if (typeof window.setShowSlashSuggestions === "undefined") {
     window.setShowSlashSuggestions = function() {};
 }
 
+// MIGRATION: Force grid mode to prevent Chrome crashes from TradingView widget overload
+// This migration runs once to clear old 'tabs' preference
+(function migrateTGridMode() {
+    try {
+        const savedMode = localStorage.getItem('gob-dashboard-view-mode');
+        const migrationKey = 'gob-dashboard-grid-migration-v2';
+        const migrated = localStorage.getItem(migrationKey);
+
+        // Force migration if not done or if stuck in 'tabs' mode
+        if (!migrated || savedMode === 'tabs') {
+            console.log('🔄 Migrating dashboard to GOD MODE (grid) to prevent Chrome crashes...');
+            localStorage.setItem('gob-dashboard-view-mode', 'grid');
+            localStorage.setItem(migrationKey, Date.now().toString());
+            // Also clear any corrupted layout state that might include marches-flex
+            const layoutKey = 'gob_dashboard_grid_layout_v1';
+            const savedLayout = localStorage.getItem(layoutKey);
+            if (savedLayout && savedLayout.includes('marches-flex')) {
+                console.log('🧹 Clearing layout with deprecated marches-flex widget...');
+                localStorage.removeItem(layoutKey);
+            }
+        }
+    } catch (e) {
+        console.error('Migration error:', e);
+    }
+})();
+
 // EXPOSE Icon globally for other components (like JLabTab)
 window.Icon = ({ emoji, size = 20, className = '' }) => {
     const isPro = window.isProfessionalMode ?? false;
@@ -923,12 +949,14 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         const [tabMountKeys, setTabMountKeys] = useState({});
         
         // État pour le mode de vue (onglets ou grille) - GOD MODE
+        // IMPORTANT: Grid mode is now default to prevent TradingView widget overload crashes
         const [dashboardViewMode, setDashboardViewMode] = useState(() => {
             try {
                 const saved = localStorage.getItem('gob-dashboard-view-mode');
-                return saved || 'tabs'; // Par défaut: tabs
+                // Force 'grid' as default - tabs mode caused Chrome crashes with heavy TradingView widgets
+                return saved || 'grid'; // Par défaut: grid (GOD MODE)
             } catch {
-                return 'tabs';
+                return 'grid';
             }
         });
 
@@ -27488,7 +27516,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             <LucideIcon name="Settings" className="w-4 h-4" />
                                         </button>
 
-                                        {/* Toggle Vue Onglets/Grille */}
+                                        {/* Toggle Vue Onglets/Grille - HIDDEN: Grid mode is now permanent to prevent Chrome crashes */}
+                                        {/* Button hidden but kept for potential future rollback */}
+                                        {false && (
                                         <button
                                             onClick={() => {
                                                 const newMode = dashboardViewMode === 'tabs' ? 'grid' : 'tabs';
@@ -27497,7 +27527,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             className={`flex items-center gap-2 px-3 py-2 rounded-lg font-semibold text-xs whitespace-nowrap transition-all duration-300 mr-2 ${
                                                 dashboardViewMode === 'grid'
                                                     ? `bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg`
-                                                    : isDarkMode 
+                                                    : isDarkMode
                                                         ? 'text-gray-400 hover:text-white hover:bg-neutral-800'
                                                         : 'text-gray-600 hover:text-gray-900 hover:bg-white'
                                             }`}
@@ -27506,6 +27536,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             <LucideIcon name={dashboardViewMode === 'tabs' ? 'Layout' : 'List'} className="w-4 h-4" />
                                             <span>{dashboardViewMode === 'tabs' ? '📐 Grille' : '📑 Onglets'}</span>
                                         </button>
+                                        )}
+
+                                        {/* GOD MODE indicator - always visible */}
+                                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg font-semibold text-xs whitespace-nowrap mr-2">
+                                            <LucideIcon name="Layout" className="w-4 h-4" />
+                                            <span>🚀 GOD MODE</span>
+                                        </div>
                                         
                                         {MAIN_TABS.map(tab => {
                                             const isActive = mainTab === tab.id;
