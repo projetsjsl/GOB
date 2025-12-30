@@ -30,6 +30,9 @@ export default async function handler(req, res) {
             case 'mistral':
                 result = await testMistral(model_id, prompt, max_tokens, temperature);
                 break;
+            case 'alibaba':
+                result = await testQwen(model_id, prompt, max_tokens, temperature);
+                break;
             default:
                 throw new Error(`Provider ${provider} not supported`);
         }
@@ -157,6 +160,30 @@ async function testMistral(model, prompt, max_tokens = 4096, temperature = 0.7) 
     if (!response.ok) {
         const err = await response.text();
         throw new Error(`Mistral API Error: ${err}`);
+    }
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content || 'No content';
+}
+
+async function testQwen(model, prompt, max_tokens = 4096, temperature = 0.7) {
+    const response = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${process.env.ALIBABA_API_KEY || process.env.QWEN_API_KEY}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model: model,
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: max_tokens,
+            temperature: temperature
+        })
+    });
+
+    if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`Qwen API Error: ${err}`);
     }
 
     const data = await response.json();

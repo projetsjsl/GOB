@@ -32,6 +32,7 @@ export default async function handler(req, res) {
                 const available = [];
                 const envKeys = [
                     'PERPLEXITY_API_KEY', 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'GOOGLE_API_KEY', 'GEMINI_API_KEY',
+                    'ALIBABA_API_KEY', 'QWEN_API_KEY',
                     'FMP_API_KEY', 'FINNHUB_API_KEY', 'RESEND_API_KEY',
                     'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN',
                     'SUPABASE_URL', 'SUPABASE_KEY', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_KEY', 'SUPABASE_SERVICE_ROLE_KEY',
@@ -116,12 +117,14 @@ export default async function handler(req, res) {
                 } else if (key.includes('ANTHROPIC')) {
                     testHeaders['x-api-key'] = value;
                     testHeaders['anthropic-version'] = '2023-06-01';
+                } else if (key.includes('ALIBABA') || key.includes('QWEN')) {
+                    testHeaders['Authorization'] = `Bearer ${value}`;
                 } else if (key.includes('FMP')) {
                     // FMP uses query param
-                    const testUrl = testEndpoint.includes('?') 
+                    const testUrl = testEndpoint.includes('?')
                         ? `${testEndpoint}&apikey=${value}`
                         : `${testEndpoint}?apikey=${value}`;
-                    
+
                     const response = await fetch(testUrl);
                     const isValid = response.ok;
                     return res.status(200).json({
@@ -133,7 +136,7 @@ export default async function handler(req, res) {
                     const testUrl = testEndpoint.includes('?')
                         ? `${testEndpoint}&token=${value}`
                         : `${testEndpoint}?token=${value}`;
-                    
+
                     const response = await fetch(testUrl);
                     const isValid = response.ok;
                     return res.status(200).json({
@@ -149,11 +152,11 @@ export default async function handler(req, res) {
                 const response = await fetch(testEndpoint, {
                     method: 'POST',
                     headers: testHeaders,
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         // Minimal payload for testing
-                        model: 'sonar',
+                        model: key.includes('ALIBABA') || key.includes('QWEN') ? 'qwen-turbo' : 'sonar',
                         messages: [{ role: 'user', content: 'test' }],
-                        max_tokens: 1
+                        max_tokens: key.includes('ALIBABA') || key.includes('QWEN') ? 10 : 1
                     })
                 });
 

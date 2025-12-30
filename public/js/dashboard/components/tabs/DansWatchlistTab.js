@@ -1,11 +1,29 @@
 // Auto-converted from monolithic dashboard file
 // Component: DansWatchlistTab
 
+const { useState, useEffect } = React;
 
-
-
-const DansWatchlistTab = () => {
-    const [watchlistTickers, setWatchlistTickers] = useState([]);
+const DansWatchlistTab = (props = {}) => {
+    const dashboard = typeof window !== 'undefined' ? window.BetaCombinedDashboard || {} : {};
+    const isDarkMode = props.isDarkMode ?? dashboard.isDarkMode ?? true;
+    const initialTickers = Array.isArray(props.watchlistTickers) && props.watchlistTickers.length > 0
+        ? props.watchlistTickers
+        : (dashboard.watchlistTickers || []);
+    const fetchStockData = typeof props.fetchStockData === 'function'
+        ? props.fetchStockData
+        : (dashboard.fetchStockData || (async () => null));
+    const showMessage = typeof props.showMessage === 'function'
+        ? props.showMessage
+        : (dashboard.showMessage || ((msg) => console.log(msg)));
+    const emmaPopulateWatchlist = typeof props.emmaPopulateWatchlist === 'function'
+        ? props.emmaPopulateWatchlist
+        : (dashboard.emmaPopulateWatchlist || (async () => {}));
+    const getCompanyLogo = props.getCompanyLogo
+        || (typeof window !== 'undefined' ? window.BetaCombinedDashboardData?.getCompanyLogo : undefined)
+        || dashboard.getCompanyLogo
+        || ((ticker) => `https://financialmodelingprep.com/image-stock/${ticker}.png`);
+    const API_BASE_URL = props.API_BASE_URL || dashboard.API_BASE_URL || '';
+    const [watchlistTickers, setWatchlistTickers] = useState(initialTickers);
     const [newTicker, setNewTicker] = useState('');
     const [watchlistStockData, setWatchlistStockData] = useState({});
     const [watchlistLoading, setWatchlistLoading] = useState(false);
@@ -36,9 +54,9 @@ const DansWatchlistTab = () => {
             for (const stock of watchlistStocks) {
                 try {
                     const [quoteRes, profileRes, ratiosRes] = await Promise.allSettled([
-                        fetch(`/api/marketdata?endpoint=quote&symbol=${stock.symbol}&source=auto`),
-                        fetch(`/api/fmp?endpoint=profile&symbol=${stock.symbol}`),
-                        fetch(`/api/fmp?endpoint=ratios&symbol=${stock.symbol}`)
+                        fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=${stock.symbol}&source=auto`),
+                        fetch(`${API_BASE_URL}/api/fmp?endpoint=profile&symbol=${stock.symbol}`),
+                        fetch(`${API_BASE_URL}/api/fmp?endpoint=ratios&symbol=${stock.symbol}`)
                     ]);
                     
                     const quote = quoteRes.status === 'fulfilled' && quoteRes.value.ok 

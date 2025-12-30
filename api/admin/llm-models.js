@@ -41,6 +41,61 @@ export default function handler(req, res) {
             maxTokens: 8192,
             temperature: 0.7,
             priority: 3
+        },
+        {
+            id: 'qwen-turbo',
+            name: 'Qwen Turbo',
+            provider: 'alibaba',
+            enabled: true,
+            maxTokens: 1000000,
+            temperature: 0.7,
+            priority: 4,
+            description: 'Fast and economical model ideal for simple tasks',
+            costPerMillionTokens: 0.05
+        },
+        {
+            id: 'qwen-plus',
+            name: 'Qwen Plus',
+            provider: 'alibaba',
+            enabled: true,
+            maxTokens: 131000,
+            temperature: 0.7,
+            priority: 5,
+            description: 'Balanced performance for complex reasoning tasks',
+            costPerMillionTokens: 0.40
+        },
+        {
+            id: 'qwen-max',
+            name: 'Qwen Max',
+            provider: 'alibaba',
+            enabled: true,
+            maxTokens: 33000,
+            temperature: 0.7,
+            priority: 6,
+            description: 'Powerful model for complex, multi-step tasks',
+            costPerMillionTokens: 1.60
+        },
+        {
+            id: 'qwen3-coder-flash',
+            name: 'Qwen3 Coder Flash',
+            provider: 'alibaba',
+            enabled: true,
+            maxTokens: 1000000,
+            temperature: 0.7,
+            priority: 7,
+            description: 'Optimized for code generation and programming tasks',
+            costPerMillionTokens: 0.30
+        },
+        {
+            id: 'qwen3-max',
+            name: 'Qwen3 Max',
+            provider: 'alibaba',
+            enabled: true,
+            maxTokens: 262000,
+            temperature: 0.7,
+            priority: 8,
+            description: 'Latest generation with advanced reasoning capabilities',
+            costPerMillionTokens: 0.86
         }
     ];
 

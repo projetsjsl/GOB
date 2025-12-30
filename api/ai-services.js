@@ -141,6 +141,8 @@ export default async function handler(req, res) {
         return await handlePerplexity(req, res, params);
       case 'openai':
         return await handleOpenAI(req, res, params);
+      case 'qwen':
+        return await handleQwen(req, res, params);
       case 'resend':
         return await handleResend(req, res, params);
       case 'briefing-data':
@@ -161,7 +163,7 @@ export default async function handler(req, res) {
       case 'tickers-news':
         return await handleTickersNews(req, res, params);
       default:
-        return res.status(400).json({ error: 'Service non reconnu. Utilisez: perplexity, openai, resend, briefing-data, supabase-briefings, yield-curves, forex-detailed, volatility-advanced, commodities, tickers-news' });
+        return res.status(400).json({ error: 'Service non reconnu. Utilisez: perplexity, openai, qwen, resend, briefing-data, supabase-briefings, yield-curves, forex-detailed, volatility-advanced, commodities, tickers-news' });
     }
   } catch (error) {
     console.error('Erreur AI Services:', error);
@@ -571,6 +573,119 @@ Rédige maintenant le briefing selon la structure demandée.
     return res.status(500).json({
       success: false,
       error: `Erreur API OpenAI: ${error.message}. Vérifiez votre clé API OPENAI_API_KEY.`,
+      model: 'error',
+      fallback: false
+    });
+  }
+}
+
+// ============================================================================
+// QWEN (ALIBABA CLOUD) AI SERVICE HANDLER
+// ============================================================================
+async function handleQwen(req, res, { prompt, marketData, news }) {
+  try {
+    if (!prompt) {
+      return res.status(400).json({ error: 'Le prompt est requis' });
+    }
+
+    // Vérifier la clé API Alibaba Cloud (DashScope)
+    const qwenKey = process.env.ALIBABA_API_KEY || process.env.QWEN_API_KEY;
+
+    // ✅ DEBUG CRITIQUE - Garder pour diagnostic
+    console.log('🔑 Debug Qwen API Key:', {
+      qwenKey: qwenKey ? `sk-...${qwenKey.slice(-4)}` : 'NOT_FOUND'
+    });
+
+    // ERREUR : Pas de clé API configurée
+    if (!qwenKey) {
+      return res.status(400).json({
+        success: false,
+        error: 'Aucune clé API Qwen configurée. Configurez ALIBABA_API_KEY ou QWEN_API_KEY dans Vercel.',
+        model: 'error',
+        fallback: false
+      });
+    }
+
+    const contextualPrompt = `
+${prompt}
+
+DONNÉES FOURNIES :
+━━━━━━━━━━━━━━━━
+${JSON.stringify(marketData || {}, null, 2) || 'Aucune donnée de marché'}
+
+ACTUALITÉS RÉCENTES :
+━━━━━━━━━━━━━━━━
+${news || 'Aucune actualité disponible'}
+
+Rédige maintenant le briefing selon la structure demandée.
+`;
+
+    // Récupérer la config dynamique pour Qwen (Rôle Writer)
+    let modelId = 'qwen-turbo';
+    let maxTokens = 2000;
+    let temperature = 0.7;
+
+    try {
+        const writerConfig = await configManager.get('ai_roles', 'writer');
+        if (writerConfig) {
+            console.log('📡 Config Writer chargée:', writerConfig);
+            modelId = writerConfig.modelId || 'qwen-turbo';
+            maxTokens = writerConfig.max_tokens || 2000;
+            temperature = writerConfig.temperature || 0.7;
+        }
+    } catch (e) {
+        console.warn('⚠️ Erreur charge config writer, usage défauts');
+    }
+
+    // Vérifier si le modèle sélectionné est un modèle Qwen
+    const allModels = await getAllModels();
+    const selectedModel = allModels.find(m => m.model_id === modelId && m.provider === 'alibaba');
+
+    if (!selectedModel) {
+      console.log(`⚠️ Modèle ${modelId} non trouvé ou n'appartient pas au provider Alibaba, utilisation de qwen-turbo par défaut`);
+      modelId = 'qwen-turbo';
+    }
+
+    const response = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${qwenKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: modelId,
+        messages: [{ role: 'user', content: contextualPrompt }],
+        max_tokens: maxTokens,
+        temperature: temperature,
+      }),
+      signal: AbortSignal.timeout(120000) // 120 secondes timeout
+    });
+
+    console.log('✅ Réponse Qwen reçue, status:', response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Erreur Qwen:', response.status, response.statusText, errorText);
+      throw new Error(`Qwen API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0]?.message?.content || '';
+    const tokens = data.usage?.total_tokens || 0;
+    const model = data.model || modelId;
+
+    return res.status(200).json({
+      success: true,
+      content,
+      model,
+      tokens
+    });
+
+  } catch (error) {
+    console.error('Erreur Qwen:', error);
+    return res.status(500).json({
+      success: false,
+      error: `Erreur API Qwen: ${error.message}. Vérifiez votre clé API ALIBABA_API_KEY.`,
       model: 'error',
       fallback: false
     });

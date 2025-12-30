@@ -1,37 +1,55 @@
 // Auto-converted from monolithic dashboard file
 // Component: SeekingAlphaTab
 
-const SeekingAlphaTab = (props) => {
-    // Safety check for data
-    const seekingAlphaData = props.seekingAlphaData || { stocks: [] };
-    const seekingAlphaStockData = props.seekingAlphaStockData || { stocks: {} };
-    
-    const {
-        isDarkMode,
-        loading,
-        refreshAllStocks,
-        fetchNews,
-        runSeekingAlphaScraper,
-        scrapingStatus,
-        openSeekingAlpha,
-        generateScrapingScript,
-        addScrapingLog,
-        tickers,
-        
-        analyzeWithClaude,
-        selectedStock,
-        setSelectedStock,
-        
-        cleanText,
-        getGradeColor,
-        openPeersComparison,
-        stockData,
-        setActiveTab,
-        Icon,
-        getCompanyLogo,
-        seekingAlphaViewMode,
-        setSeekingAlphaViewMode
-    } = props;
+const SeekingAlphaTab = (props = {}) => {
+    const dashboard = typeof window !== 'undefined' ? window.BetaCombinedDashboard || {} : {};
+    const isDarkMode = props.isDarkMode ?? dashboard.isDarkMode ?? true;
+    const tickers = Array.isArray(props.tickers) ? props.tickers : (dashboard.tickers || []);
+    const stockData = props.stockData && Object.keys(props.stockData).length > 0 ? props.stockData : (dashboard.stockData || {});
+    const seekingAlphaData = props.seekingAlphaData && Object.keys(props.seekingAlphaData).length > 0
+        ? props.seekingAlphaData
+        : (dashboard.seekingAlphaData || { stocks: [] });
+    const seekingAlphaStockData = props.seekingAlphaStockData && Object.keys(props.seekingAlphaStockData).length > 0
+        ? props.seekingAlphaStockData
+        : (dashboard.seekingAlphaStockData || { stocks: {} });
+    const loading = props.loading ?? dashboard.loading ?? false;
+    const refreshAllStocks = typeof props.refreshAllStocks === 'function' ? props.refreshAllStocks : (dashboard.refreshAllStocks || (async () => {}));
+    const fetchNews = typeof props.fetchNews === 'function' ? props.fetchNews : (dashboard.fetchNews || (async () => {}));
+    const runSeekingAlphaScraper = typeof props.runSeekingAlphaScraper === 'function' ? props.runSeekingAlphaScraper : (dashboard.runSeekingAlphaScraper || (async () => {}));
+    const scrapingStatus = props.scrapingStatus ?? dashboard.scrapingStatus ?? 'idle';
+    const openSeekingAlpha = typeof props.openSeekingAlpha === 'function' ? props.openSeekingAlpha : ((ticker) => {
+        if (typeof window !== 'undefined') {
+            window.open(`https://seekingalpha.com/symbol/${ticker}`, '_blank', 'noopener,noreferrer');
+        }
+    });
+    const generateScrapingScript = typeof props.generateScrapingScript === 'function' ? props.generateScrapingScript : ((ticker) => `// Scrape ${ticker}`);
+    const addScrapingLog = typeof props.addScrapingLog === 'function'
+        ? props.addScrapingLog
+        : ((message, level = 'info') => console.log(`[${level}] ${message}`));
+    const analyzeWithClaude = typeof props.analyzeWithClaude === 'function' ? props.analyzeWithClaude : (async () => {});
+    const selectedStock = props.selectedStock ?? null;
+    const setSelectedStock = typeof props.setSelectedStock === 'function' ? props.setSelectedStock : (() => {});
+    const cleanText = props.cleanText
+        || (typeof window !== 'undefined' ? window.DASHBOARD_UTILS?.cleanText : undefined)
+        || ((text) => text || '');
+    const getGradeColor = props.getGradeColor
+        || (typeof window !== 'undefined' ? window.DASHBOARD_UTILS?.getGradeColor : undefined)
+        || ((grade) => {
+            if (!grade) return 'bg-gray-100 text-gray-600';
+            const value = String(grade).toUpperCase();
+            if (value.startsWith('A')) return 'bg-green-100 text-green-700';
+            if (value.startsWith('B')) return 'bg-blue-100 text-blue-700';
+            if (value.startsWith('C')) return 'bg-yellow-100 text-yellow-700';
+            if (value.startsWith('D')) return 'bg-orange-100 text-orange-700';
+            return 'bg-red-100 text-red-700';
+        });
+    const openPeersComparison = typeof props.openPeersComparison === 'function' ? props.openPeersComparison : (dashboard.openPeersComparison || (() => {}));
+    const setActiveTab = typeof props.setActiveTab === 'function' ? props.setActiveTab : (dashboard.setActiveTab || (() => {}));
+    const Icon = props.Icon
+        || (typeof window !== 'undefined' ? window.Icon : undefined)
+        || (({ emoji, size = 16, className = '' }) => (
+            <span className={className} style={{ fontSize: `${size}px` }}>{emoji}</span>
+        ));
 
     return (
         <div className="space-y-6">

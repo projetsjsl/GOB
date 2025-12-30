@@ -68,6 +68,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   const [activeView, setActiveView] = useState('curves'); // 'curves', 'spread', 'compare'
   const [showCanada, setShowCanada] = useState(true);
   const [showUS, setShowUS] = useState(true);
+  const rechartsReady = !!(window.Recharts && window.Recharts.LineChart && window.Recharts.ResponsiveContainer);
 
   // Safe fetch that bypasses any overrides
   const safeFetch = useCallback((url) => {
@@ -306,6 +307,16 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     color: colors.textMuted,
     cursor: 'pointer'
   };
+
+  if (!rechartsReady) {
+    return (
+      <div style={{ ...containerStyle, justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ color: colors.textMuted }}>
+          Recharts library not loaded. Please verify the CDN script is included.
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

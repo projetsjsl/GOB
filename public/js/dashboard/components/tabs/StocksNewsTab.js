@@ -13,6 +13,7 @@ const StocksNewsTab = (props) => {
         const tickers = (props.tickers && props.tickers.length > 0 ? props.tickers : dashboard.tickers) ?? [];
         const teamTickers = (props.teamTickers && props.teamTickers.length > 0 ? props.teamTickers : dashboard.teamTickers) ?? [];
         const stockData = (props.stockData && Object.keys(props.stockData).length > 0 ? props.stockData : dashboard.stockData) ?? {};
+        const stockDataCount = Object.keys(stockData || {}).length;
         const newsData = (props.newsData && props.newsData.length > 0 ? props.newsData : dashboard.newsData) ?? [];
         const tickerLatestNews = props.tickerLatestNews ?? dashboard.tickerLatestNews ?? {};
         const tickerMoveReasons = props.tickerMoveReasons ?? dashboard.tickerMoveReasons ?? {};
@@ -1663,5 +1664,4 @@ const StocksNewsTab = (props) => {
 if (typeof window !== 'undefined') {
     window.StocksNewsTab = StocksNewsTab;
 }
-
 
