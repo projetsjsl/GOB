@@ -19,6 +19,35 @@
     const STORAGE_KEY_HIDDEN = 'gob_dashboard_hidden_widgets_v1';
     const STORAGE_KEY_WIDGET_SECTIONS = 'gob_dashboard_widget_sections_v1';
     const ROW_HEIGHT = 50;
+    const MAIN_TAB_PREFIX = {
+        admin: 'admin-',
+        marches: 'marches-',
+        titres: 'titres-',
+        jlab: 'jlab-',
+        emma: 'emma-'
+    };
+
+    const getMainTabFromWidgetId = (tabId) => {
+        if (!tabId || typeof tabId !== 'string') return null;
+        const parts = tabId.split('-');
+        return parts.length > 1 ? parts[0] : null;
+    };
+
+    const getLayoutStorageKey = (scopeId) => `${STORAGE_KEY_CURRENT}:${scopeId || 'default'}`;
+
+    const getLayoutScopeId = (mainTab, activeTab) => {
+        const prefix = MAIN_TAB_PREFIX[mainTab];
+        if (prefix && activeTab && activeTab.startsWith(prefix)) return activeTab;
+        return mainTab || 'default';
+    };
+
+    const getLayoutFallbackKeys = (layoutScopeId, mainTabId) => {
+        const keys = [];
+        if (layoutScopeId) keys.push(getLayoutStorageKey(layoutScopeId));
+        if (mainTabId && layoutScopeId !== mainTabId) keys.push(getLayoutStorageKey(mainTabId));
+        keys.push(STORAGE_KEY_CURRENT);
+        return keys;
+    };
 
     // Cache to prevent log spam for missing components
     const _loggedMissingComponents = {};
@@ -73,6 +102,34 @@
         'emma-finvox': { component: 'FinVoxTab', label: 'FinVox', icon: 'Headphones', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
         
         // TESTS - REMOVED (was causing freezes)
+    };
+
+    const sanitizeLayout = (layout) => {
+        if (!Array.isArray(layout)) return [];
+        let validLayout = layout.filter(item => TAB_TO_WIDGET_MAP[item.i]);
+        const seen = new Set();
+        validLayout = validLayout.filter(item => {
+            if (seen.has(item.i)) return false;
+            seen.add(item.i);
+            return true;
+        });
+        return validLayout;
+    };
+
+    const loadLayoutFromStorage = (keys = []) => {
+        for (const key of keys) {
+            if (!key) continue;
+            try {
+                const saved = localStorage.getItem(key);
+                if (!saved) continue;
+                const parsed = JSON.parse(saved);
+                const validLayout = sanitizeLayout(parsed);
+                if (validLayout.length > 0) return validLayout;
+            } catch (e) {
+                console.error('❌ Erreur chargement layout:', e);
+            }
+        }
+        return null;
     };
 
     // Layout par défaut basé sur les tabs les plus utilisés
@@ -316,27 +373,21 @@ const DashboardGridWrapper = ({
         MASTER_NAV_LINKS = [],
         allTabs = []
     }) => {
+        const layoutScopeId = getLayoutScopeId(mainTab, activeTab);
+        const layoutStorageKey = getLayoutStorageKey(layoutScopeId);
+        const layoutFallbackKeys = getLayoutFallbackKeys(layoutScopeId, mainTab);
+
         const [layout, setLayout] = useState(() => {
-            // Load current working layout or default
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY_CURRENT);
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    let validLayout = parsed.filter(item => TAB_TO_WIDGET_MAP[item.i]);
-                    // Clean duplicates
-                    const seen = new Set();
-                    validLayout = validLayout.filter(item => {
-                        if (seen.has(item.i)) return false;
-                        seen.add(item.i);
-                        return true;
-                    });
-                     if (validLayout.length > 0) return validLayout;
-                }
-            } catch (e) { console.error('❌ Erreur chargement layout:', e); }
-            
-            // Fallback to Saved Default or Hardcoded Default
+            const saved = loadLayoutFromStorage(layoutFallbackKeys);
+            if (saved) return saved;
             return loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout();
         });
+
+        useEffect(() => {
+            const keys = getLayoutFallbackKeys(layoutScopeId, mainTab);
+            const saved = loadLayoutFromStorage(keys);
+            setLayout(saved || loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout());
+        }, [layoutScopeId, mainTab]);
 
         // S'assurer que le layout n'est jamais vide - ONLY RUN ONCE on mount
         // WARNING: Do NOT add layout to dependencies - causes infinite loop!
@@ -355,7 +406,7 @@ const DashboardGridWrapper = ({
                 });
                 if (uniqueLayout.length !== currentLayout.length) {
                     console.warn(`⚠️ Doublons supprimés (${currentLayout.length} -> ${uniqueLayout.length})`);
-                    localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(uniqueLayout));
+                    localStorage.setItem(layoutStorageKey, JSON.stringify(uniqueLayout));
                     return uniqueLayout;
                 }
                 return currentLayout;
@@ -420,7 +471,7 @@ const DashboardGridWrapper = ({
                     
                     // Ajouter les nouveaux widgets au layout existant (garder les autres widgets)
                     const updatedLayout = [...currentLayout, ...newItems];
-                    localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(updatedLayout));
+                    localStorage.setItem(layoutStorageKey, JSON.stringify(updatedLayout));
                     console.log('[DashboardGridWrapper] ✅ Layout mis à jour avec', newItems.length, 'nouveaux widgets');
                     return updatedLayout;
                 }
@@ -450,9 +501,9 @@ const DashboardGridWrapper = ({
                     allLayoutsKeys: allLayouts ? Object.keys(allLayouts) : null
                 });
                 setLayout(currentLayout);
-                localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(currentLayout));
+                localStorage.setItem(layoutStorageKey, JSON.stringify(currentLayout));
             }
-        }, [isEditing]);
+        }, [isEditing, layoutStorageKey]);
         
         // Save current layout as a specific preset
         const saveAsPreset = useCallback((presetName) => {
@@ -471,23 +522,41 @@ const DashboardGridWrapper = ({
             const config = TAB_TO_WIDGET_MAP[tabId];
             if (!config) return;
 
+            const widgetMainTab = getMainTabFromWidgetId(tabId);
+            const targetScopeId = widgetMainTab && widgetMainTab !== mainTab ? widgetMainTab : layoutScopeId;
+            const targetStorageKey = getLayoutStorageKey(targetScopeId);
+            const targetLayout = targetScopeId === layoutScopeId
+                ? layout
+                : (loadLayoutFromStorage([targetStorageKey]) || []);
+
             // Vérifier si le widget existe déjà
-            if (layout.some(item => item.i === tabId)) {
-                return; // Widget already exists
+            if (targetLayout.some(item => item.i === tabId)) {
+                return;
             }
 
+            const maxY = targetLayout.reduce((max, item) => Math.max(max, item.y + item.h), 0);
             const newItem = {
                 i: tabId,
                 x: 0,
-                y: Math.max(...layout.map(item => item.y + item.h), 0),
+                y: maxY,
                 w: config.defaultSize.w,
                 h: config.defaultSize.h,
                 minW: config.minSize.w,
                 minH: config.minSize.h
             };
 
-            setLayout([...layout, newItem]);
-        }, [layout]);
+            const updatedLayout = [...targetLayout, newItem];
+            if (targetScopeId === layoutScopeId) {
+                setLayout(updatedLayout);
+            }
+            localStorage.setItem(targetStorageKey, JSON.stringify(updatedLayout));
+
+            if (targetScopeId !== layoutScopeId) {
+                const targetLabel = widgetMainTab ? widgetMainTab.toUpperCase() : 'AUTRE';
+                if (window.showToast) window.showToast(`Widget ajouté dans "${targetLabel}"`, 'success');
+                else console.log(`[DashboardGridWrapper] Widget ajouté dans "${targetLabel}"`);
+            }
+        }, [layout, layoutScopeId, mainTab]);
 
         // Supprimer un widget
         const removeWidget = useCallback((tabId) => {

@@ -10,10 +10,10 @@ This document provides information about the Qwen models available in the GOB Da
 - **Temperature**: 0.7
 - **Cost**: $0.05 per million tokens (input)
 - **Best For**:
-  - Simple tasks and quick responses
-  - High-volume applications where cost efficiency is critical
+  - Simple tasks requiring fast responses
+  - High-volume applications where cost efficiency is important
   - Basic text generation and summarization
-  - Applications requiring fast turnaround times
+  - Applications requiring quick turnaround times
 
 ### Qwen Plus (`qwen-plus`)
 - **Provider**: Alibaba Cloud
@@ -23,8 +23,8 @@ This document provides information about the Qwen models available in the GOB Da
 - **Best For**:
   - Complex reasoning tasks
   - Balanced performance between cost and capability
-  - Moderate complexity text generation
-  - Applications requiring good reasoning but not the highest performance
+  - Moderate complexity applications
+  - Tasks requiring good reasoning but not the highest level of intelligence
 
 ### Qwen Max (`qwen-max`)
 - **Provider**: Alibaba Cloud
@@ -33,9 +33,9 @@ This document provides information about the Qwen models available in the GOB Da
 - **Cost**: $1.60 per million tokens (input)
 - **Best For**:
   - Complex, multi-step tasks
-  - Tasks requiring high accuracy and reasoning
-  - Critical business applications where performance is more important than cost
-  - Complex problem solving and analysis
+  - Highly complex reasoning and analysis
+  - Tasks requiring the highest level of intelligence
+  - Critical applications where accuracy is paramount
 
 ### Qwen3 Coder Flash (`qwen3-coder-flash`)
 - **Provider**: Alibaba Cloud
@@ -45,9 +45,8 @@ This document provides information about the Qwen models available in the GOB Da
 - **Best For**:
   - Code generation and programming tasks
   - Software development assistance
-  - Technical documentation
-  - Debugging and code optimization
-  - Programming-related queries and tasks
+  - Technical documentation generation
+  - Programming problem solving
 
 ### Qwen3 Max (`qwen3-max`)
 - **Provider**: Alibaba Cloud
@@ -55,20 +54,35 @@ This document provides information about the Qwen models available in the GOB Da
 - **Temperature**: 0.7
 - **Cost**: $0.86 per million tokens (input)
 - **Best For**:
-  - Latest generation with advanced reasoning capabilities
-  - Complex multi-step tasks requiring the most advanced model
-  - Tasks where the latest model improvements are beneficial
+  - Latest generation model with advanced reasoning
+  - Complex tasks requiring state-of-the-art capabilities
+  - Applications needing the most recent model improvements
   - Advanced analysis and reasoning tasks
+
+## API Configuration
+
+To use Qwen models, you need to configure your Alibaba Cloud API key:
+
+1. Set the `ALIBABA_API_KEY` or `QWEN_API_KEY` environment variable
+2. The API endpoint used is: `https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions`
+3. The models are accessed via the `qwen` service in the AI services API
 
 ## Cost Comparison
 
 | Model | Cost per Million Tokens | Context Window | Best Use Case |
 |-------|------------------------|----------------|---------------|
-| Qwen Turbo | $0.05 | 1M tokens | Cost-effective simple tasks |
-| Qwen3 Coder Flash | $0.30 | 1M tokens | Coding and programming tasks |
-| Qwen Plus | $0.40 | 131K tokens | Balanced performance |
-| Qwen3 Max | $0.86 | 262K tokens | Advanced reasoning (latest gen) |
-| Qwen Max | $1.60 | 33K tokens | Highest accuracy for complex tasks |
+| Qwen Turbo | $0.05 | 1,000,000 | Fast, economical tasks |
+| Qwen Plus | $0.40 | 131,000 | Balanced performance |
+| Qwen Max | $1.60 | 33,000 | Complex, high-intelligence tasks |
+| Qwen3 Coder Flash | $0.30 | 1,000,000 | Code generation |
+| Qwen3 Max | $0.86 | 262,000 | Advanced reasoning |
+
+## Integration Notes
+
+- The Qwen models are integrated into the existing LLM registry system
+- They can be selected dynamically based on task requirements
+- The system will automatically use the configured model based on the selected provider
+- All standard parameters (temperature, max_tokens) are supported
 
 ## Configuration in GOB Dashboard
 
