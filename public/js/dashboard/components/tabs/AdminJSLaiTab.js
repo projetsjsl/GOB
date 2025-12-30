@@ -2970,7 +2970,7 @@ const AdminJSLaiTab = ({
                         {typeof Icon !== 'undefined' ? <Icon emoji="⚙️" size={20} className="mr-2 inline-block" /> : '⚙️'}
                         Configuration
                     </h3>
-                        <div className="space-y-4">
+                        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
                             <div>
                                 <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
                                     darkMode ? 'text-gray-300' : 'text-gray-700'
@@ -2997,7 +2997,7 @@ const AdminJSLaiTab = ({
                                     {showSettings ? 'Masquer' : 'Afficher'} les paramètres
                                 </button>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             );

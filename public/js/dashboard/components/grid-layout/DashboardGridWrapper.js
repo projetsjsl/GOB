@@ -382,6 +382,22 @@ const DashboardGridWrapper = ({
             if (saved) return saved;
             return loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout();
         });
+        const [showAllWidgetsInDock, setShowAllWidgetsInDock] = useState(() => {
+            try {
+                const saved = localStorage.getItem('gob_dashboard_show_all_widgets_v1');
+                return saved ? saved === 'true' : true;
+            } catch (e) {
+                return true;
+            }
+        });
+
+        useEffect(() => {
+            try {
+                localStorage.setItem('gob_dashboard_show_all_widgets_v1', String(showAllWidgetsInDock));
+            } catch (e) {
+                // ignore storage errors
+            }
+        }, [showAllWidgetsInDock]);
 
         useEffect(() => {
             const keys = getLayoutFallbackKeys(layoutScopeId, mainTab);
@@ -779,6 +795,14 @@ const DashboardGridWrapper = ({
         });
     }, [layout, mainTab]);
 
+    const dockWidgetEntries = useMemo(() => {
+        const allowedIds = showAllWidgetsInDock ? null : getWidgetIdsForMainTab(mainTab);
+        return Object.entries(TAB_TO_WIDGET_MAP).filter(([tabId]) => {
+            if (filteredLayout.some(item => item.i === tabId)) return false;
+            return !allowedIds || allowedIds.includes(tabId);
+        });
+    }, [filteredLayout, mainTab, showAllWidgetsInDock]);
+
     // Memoize the responsive layouts object with optimized layouts per breakpoint
     const responsiveLayouts = useMemo(() => {
         // Desktop large: use original layout
@@ -941,6 +965,27 @@ const DashboardGridWrapper = ({
 
                         {isAdmin && isEditing && (
                             <button
+                                onClick={() => setShowAllWidgetsInDock(prev => !prev)}
+                                className={`px-3 py-2 rounded-lg font-medium text-xs transition-all flex items-center gap-2 shadow-sm ${
+                                    showAllWidgetsInDock
+                                        ? (isDarkMode
+                                            ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30'
+                                            : 'bg-amber-100 text-amber-700 hover:bg-amber-200')
+                                        : (isDarkMode
+                                            ? 'bg-neutral-700 text-gray-300 hover:bg-neutral-600'
+                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                }`}
+                                title={showAllWidgetsInDock
+                                    ? 'Afficher uniquement les widgets de l\'onglet principal'
+                                    : 'Afficher tous les widgets disponibles'}
+                            >
+                                <window.LucideIcon name={showAllWidgetsInDock ? "List" : "Filter"} className="w-4 h-4" />
+                                {showAllWidgetsInDock ? 'Tous widgets' : 'Onglet'}
+                            </button>
+                        )}
+
+                        {isAdmin && isEditing && (
+                            <button
                                 onClick={resetLayout}
                                 className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm ${
                                     isDarkMode
@@ -1009,9 +1054,12 @@ const DashboardGridWrapper = ({
                 {/* Dock pour ajouter des widgets (en mode édition) */}
                 {isEditing && (
                     <div className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-2xl flex gap-4 shadow-2xl z-50 max-w-4xl overflow-x-auto ${isDarkMode ? 'bg-neutral-800/90 backdrop-blur border border-neutral-700' : 'bg-white/90 backdrop-blur border border-gray-200'}`}>
-                        {Object.entries(TAB_TO_WIDGET_MAP)
-                            .filter(([tabId]) => !filteredLayout.some(item => item.i === tabId))
-                            .map(([tabId, config]) => (
+                        {dockWidgetEntries.length === 0 ? (
+                            <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Tous les widgets disponibles sont déjà dans la grille.
+                            </span>
+                        ) : (
+                            dockWidgetEntries.map(([tabId, config]) => (
                                 <button
                                     key={tabId}
                                     onClick={() => addWidget(tabId)}
@@ -1021,7 +1069,8 @@ const DashboardGridWrapper = ({
                                     <window.LucideIcon name={config.icon} className="w-5 h-5" />
                                     <span className="text-xs">{config.label}</span>
                                 </button>
-                            ))}
+                            ))
+                        )}
                     </div>
                 )}
 

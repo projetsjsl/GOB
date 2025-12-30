@@ -439,32 +439,35 @@
     <!-- Verify and expose React Grid Layout -->
     <script>
         (function() {
-            // The UMD build should have exposed ReactGridLayout globally
-            if (typeof window.ReactGridLayout === 'undefined') {
-                console.error('❌ ReactGridLayout failed to load from CDN');
+            const moduleExports = (typeof window.module !== 'undefined' && window.module.exports)
+                ? window.module.exports
+                : null;
 
-                // Try alternative access methods
-                if (typeof window.module !== 'undefined' && window.module.exports) {
-                    window.ReactGridLayout = window.module.exports;
-                    console.log('✅ ReactGridLayout recovered from module.exports');
-                }
-            } else {
-                // Check if exports are nested under .default (ES module bundle)
-                if (window.ReactGridLayout.default && !window.ReactGridLayout.Responsive) {
-                    console.log('🔄 ReactGridLayout: Flattening .default exports...');
-                    const defaultExports = window.ReactGridLayout.default;
-                    // Spread all default exports onto the main object
-                    Object.keys(defaultExports).forEach(key => {
-                        if (key !== 'default') {
-                            window.ReactGridLayout[key] = defaultExports[key];
-                        }
-                    });
-                }
-                console.log('✅ ReactGridLayout loaded successfully:', {
-                    hasResponsive: !!window.ReactGridLayout.Responsive,
-                    hasWidthProvider: !!window.ReactGridLayout.WidthProvider
+            if (typeof window.ReactGridLayout === 'undefined' && moduleExports) {
+                window.ReactGridLayout = moduleExports;
+                console.log('✅ ReactGridLayout recovered from module.exports');
+            }
+
+            if (typeof window.ReactGridLayout === 'undefined') {
+                console.warn('⚠️ ReactGridLayout not available');
+                return;
+            }
+
+            // Check if exports are nested under .default (ES module bundle)
+            if (window.ReactGridLayout.default && !window.ReactGridLayout.Responsive) {
+                console.log('🔄 ReactGridLayout: Flattening .default exports...');
+                const defaultExports = window.ReactGridLayout.default;
+                // Spread all default exports onto the main object
+                Object.keys(defaultExports).forEach(key => {
+                    if (key !== 'default') {
+                        window.ReactGridLayout[key] = defaultExports[key];
+                    }
                 });
             }
+            console.log('✅ ReactGridLayout loaded successfully:', {
+                hasResponsive: !!window.ReactGridLayout.Responsive,
+                hasWidthProvider: !!window.ReactGridLayout.WidthProvider
+            });
         })();
     </script>
 
@@ -640,6 +643,11 @@
             // Filtre pour éviter les erreurs TradingView répétitives
             const errorMsg = event.message || event.error?.message || 'Unknown error';
             const source = event.filename || 'unknown';
+
+            // Ignore generic cross-origin script errors
+            if (!event.filename && (errorMsg === 'Unknown error' || errorMsg === 'Script error.')) {
+                return;
+            }
             
             // Filtrer les erreurs TradingView répétitives (contentWindow, invalid environment)
             if (source.includes('tradingview.com') || source.includes('embed-widget')) {

@@ -178,17 +178,23 @@ async function getMarketIndices() {
   const today = new Date().toISOString().split('T')[0];
   
   // Optimisation egress : sélectionner seulement les colonnes nécessaires
-  const { data, error } = await supabase
-    .from('market_indices')
-    .select('symbol, name, value, change, change_percent, as_of')
-    .eq('as_of', today)
-    .order('symbol', { ascending: true });
+  try {
+    const { data, error } = await supabase
+      .from('market_indices')
+      .select('symbol, name, value, change, change_percent, as_of')
+      .eq('as_of', today)
+      .order('symbol', { ascending: true });
 
-  if (error) {
-    throw new Error(`Erreur récupération indices: ${error.message}`);
+    if (error) {
+      console.warn(`⚠️ market-indices query failed: ${error.message}`);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.warn('⚠️ market-indices fetch failed:', error?.message || String(error));
+    return [];
   }
-
-  return data || [];
 }
 
 /**
@@ -307,6 +313,9 @@ export default async function handler(req, res) {
     
     // Check if Supabase is configured
     if (!supabase) {
+      if (action === 'market-indices') {
+        return res.status(200).json([]);
+      }
       return res.status(503).json({ 
         success: false, 
         error: 'Database not configured',
@@ -391,4 +400,3 @@ export default async function handler(req, res) {
     });
   }
 }
-

@@ -6,6 +6,7 @@
     console.log('📡 Real-time Sync: Initializing...');
 
     let isConnected = false;
+    let sawClient = false;
 
     function startRealtime(supabaseClient) {
         if (!supabaseClient || isConnected) return;
@@ -49,6 +50,7 @@
         
         const client = window.__SUPABASE__;
         if (client) {
+            sawClient = true;
             console.log('📡 Real-time Sync: Found global Supabase client');
             startRealtime(client);
         }
@@ -74,7 +76,11 @@
     setTimeout(() => {
         clearInterval(checkInterval);
         if (!isConnected) {
-            console.warn('⚠️ Real-time Sync: Could not connect after 30s');
+            if (sawClient) {
+                console.warn('⚠️ Real-time Sync: Could not connect after 30s');
+            } else {
+                console.log('ℹ️ Real-time Sync disabled (no Supabase client)');
+            }
         }
     }, 30000);
 
