@@ -106,7 +106,6 @@
         },
         'Composants RGL chargés': () => {
             return typeof window.MarketsEconomyTabRGL !== 'undefined' ||
-                   typeof window.TitresTabRGL !== 'undefined' ||
                    typeof window.RglDashboard !== 'undefined';
         },
         'Composants tabs chargés': () => {

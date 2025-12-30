@@ -45,7 +45,7 @@
         // Titres tabs
         'stocks-news': '/js/dashboard/components/tabs/StocksNewsTab.js',
         'titres-portfolio': '/js/dashboard/components/tabs/StocksNewsTab.js',
-        'titres-flex': '/js/dashboard/components/tabs/TitresTabRGL.js',
+        'titres-watchlist': '/js/dashboard/components/tabs/StocksNewsTab.js',  // Uses StocksNewsTab with watchlist view
         'seeking-alpha': '/js/dashboard/components/tabs/SeekingAlphaTab.js',
         'titres-seeking': '/js/dashboard/components/tabs/SeekingAlphaTab.js',
         'dans-watchlist': '/js/dashboard/components/tabs/DansWatchlistTab.js',
@@ -74,7 +74,7 @@
     };
 
     // Scripts that should be pre-loaded (essential for initial experience)
-    const PRELOAD_TABS = ['jlab', 'markets-economy', 'ask-emma'];
+    const PRELOAD_TABS = ['markets-economy', 'marches-global', 'ask-emma'];
 
     /**
      * Load a tab's script dynamically

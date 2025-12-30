@@ -8,6 +8,8 @@ interface Model {
     provider: string;
     capabilities: string[];
     description: string;
+    cost?: 'free' | 'low' | 'medium' | 'high';
+    isDefault?: boolean;
 }
 
 interface ModelSelectorProps {
@@ -44,6 +46,24 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
             case 'gemini': return <Cpu className="w-3 h-3" />;
             case 'perplexity': return <Search className="w-3 h-3" />;
             default: return <Zap className="w-3 h-3" />;
+        }
+    };
+
+    const getCostBadge = (cost?: string, isDefault?: boolean) => {
+        if (isDefault) {
+            return <span className="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded font-medium">⭐ Défaut</span>;
+        }
+        switch (cost) {
+            case 'free':
+                return <span className="text-[9px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded">Gratuit</span>;
+            case 'low':
+                return <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded">$</span>;
+            case 'medium':
+                return <span className="text-[9px] bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 rounded">$$</span>;
+            case 'high':
+                return <span className="text-[9px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded">$$$</span>;
+            default:
+                return null;
         }
     };
 
@@ -85,9 +105,12 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                                         <span className={`font-medium text-sm ${model.id === currentModelId ? colors.text : 'text-white'}`}>
                                             {model.name}
                                         </span>
-                                        {model.id === currentModelId && (
-                                            <span className={`ml-auto text-[10px] ${colors.text} bg-white/10 px-1.5 py-0.5 rounded`}>Actif</span>
-                                        )}
+                                        <div className="ml-auto flex items-center gap-1">
+                                            {getCostBadge(model.cost, model.isDefault)}
+                                            {model.id === currentModelId && (
+                                                <span className={`text-[10px] ${colors.text} bg-white/10 px-1.5 py-0.5 rounded`}>Actif</span>
+                                            )}
+                                        </div>
                                     </div>
                                     <p className="text-[10px] text-gray-400 line-clamp-2">{model.description}</p>
                                     <div className="flex gap-1 mt-1.5">

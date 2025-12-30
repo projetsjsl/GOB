@@ -48,7 +48,6 @@
     console.log('\n🧩 Composants disponibles:');
     const components = [
         'MarketsEconomyTabRGL',
-        'TitresTabRGL',
         'RglDashboard',
         'JLabTab',
         'AskEmmaTab',

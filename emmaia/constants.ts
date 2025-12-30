@@ -5,30 +5,34 @@ import { BrainCircuit, TrendingUp, Globe, Building2, Scale, FileText, Activity, 
 // ... (Previous Model Definitions remain unchanged) ...
 
 export const AVAILABLE_MODELS = [
-    // Gemini Models
+    // Gemini Models - FREE Flash models first (recommended defaults)
     {
-        id: 'gemini-3-flash-preview',
-        name: 'Gemini 3 Flash',
+        id: 'gemini-2.5-flash',
+        name: 'Gemini 2.5 Flash ⭐',
         type: 'directional',
         provider: 'gemini',
-        capabilities: ['Text', 'Image', 'Fast'],
-        description: 'Le tout nouveau modèle default de Google. Ultra-rapide et multimodal.'
+        capabilities: ['Text', 'Image', 'Fast', 'Google Search'],
+        description: '⭐ RECOMMANDÉ - Gratuit avec Google Search intégré. Excellent rapport qualité/coût.',
+        cost: 'free',
+        isDefault: true
     },
     {
-        id: 'gemini-3-pro-preview',
-        name: 'Gemini 3 Pro',
+        id: 'gemini-2.0-flash-exp',
+        name: 'Gemini 2.0 Flash',
         type: 'directional',
         provider: 'gemini',
-        capabilities: ['Reasoning', 'Complex Context', 'Code'],
-        description: 'Modèle de raisonnement de pointe. Parfait pour l\'analyse financière profonde.'
+        capabilities: ['Text', 'Image', 'Fast', 'Google Search'],
+        description: 'Gratuit - Modèle stable avec Google Search.',
+        cost: 'free'
     },
     {
-        id: 'gemini-3-flash-preview', // Gemini 3 doesn't have native audio live yet, so we use it for text-based directional logic
-        name: 'Gemini 3 Logic',
+        id: 'gemini-1.5-flash-latest',
+        name: 'Gemini 1.5 Flash',
         type: 'directional',
         provider: 'gemini',
-        capabilities: ['Reasoning', 'Chain of Thought'],
-        description: 'Modèle de raisonnement expérimental ultra rapide.'
+        capabilities: ['Text', 'Fast'],
+        description: 'Gratuit - Fallback stable.',
+        cost: 'free'
     },
     {
         id: 'gemini-2.5-flash-native-audio-preview-12-2025',
@@ -100,16 +104,17 @@ export const AVAILABLE_MODELS = [
 ];
 
 // Default model configs per mode (can be overridden via emma-config)
+// NOTE: Avoid Gemini Pro models (expensive) - prefer gemini-2.5-flash (free/low-cost)
 export const DEFAULT_MODE_CONFIGS = {
     researcher: { modelId: 'sonar-pro', googleSearch: true },
-    writer: { modelId: 'gemini-3-pro-preview', googleSearch: false },
+    writer: { modelId: 'gemini-2.5-flash', googleSearch: true },  // Changed from Pro to Flash + Google Search
     critic: { modelId: 'claude-3-5-sonnet-20241022', googleSearch: true },
-    technical: { modelId: 'gemini-3-flash-preview', googleSearch: false }
+    technical: { modelId: 'gemini-2.5-flash', googleSearch: true }  // Flash with Google Search
 };
 
-export const MODEL_FLASH = 'gemini-2.5-flash-native-audio-preview-12-2025'; 
-export const MODEL_TEXT_DEFAULT = 'gemini-3-flash-preview'; 
-export const MODEL_PRO = 'gemini-3-pro-preview';
+export const MODEL_FLASH = 'gemini-2.5-flash-native-audio-preview-12-2025';
+export const MODEL_TEXT_DEFAULT = 'gemini-2.5-flash';  // Use Flash instead of Pro
+export const MODEL_PRO = 'gemini-2.5-flash';  // Redirect Pro to Flash to save costs
 
 
 export const DEFAULT_INTEGRATION_CONFIG = {

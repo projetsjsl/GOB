@@ -284,27 +284,28 @@ const performDeepAnalysis = async (symbol: string, question: string, lang: 'fr-C
   const prompt = lang === 'fr-CA' ? promptFr : promptEn;
 
   try {
-    // Attempt 1: Gemini 3 Pro (Thinking Mode)
+    // Use Gemini 2.5 Flash (free/low-cost) with Google Search grounding
+    // NOTE: Avoid Pro models due to high API costs
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
-        thinkingConfig: { thinkingBudget: 65536 }, // Enhanced thinking budget for G3
+        // Enable Google Search grounding for better results without Pro costs
+        tools: [{ googleSearch: {} }]
       }
     });
     return response.text || (lang === 'fr-CA' ? "Analyse terminée." : "Analysis complete.");
   } catch (error) {
-    console.warn("Deep analysis (Pro) failed, falling back to Flash...", error);
+    console.warn("Deep analysis (Flash) failed, falling back to 2.0...", error);
     try {
-      // Attempt 2: Gemini 3 Flash (Fallback - Standard)
+      // Fallback: Gemini 2.0 Flash Exp (stable, free)
       const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
+        model: 'gemini-2.0-flash-exp',
         contents: prompt,
-        // No thinking config for Flash standard unless specified
       });
       const note = lang === 'fr-CA'
-        ? "\n\n*(Note: Généré avec le modèle de secours Gemini 3 Flash)*"
-        : "\n\n*(Note: Generated with fallback model Gemini 3 Flash)*";
+        ? "\n\n*(Note: Généré avec le modèle de secours Gemini 2.0 Flash)*"
+        : "\n\n*(Note: Generated with fallback model Gemini 2.0 Flash)*";
       return (response.text || (lang === 'fr-CA' ? "Analyse terminée." : "Analysis complete.")) + note;
     } catch (fallbackError) {
       console.error("Deep analysis fallback failed", fallbackError);

@@ -675,6 +675,26 @@ function initTheme() {
     return applyTheme(themeId);
 }
 
+// Light themes list - themes that should use 'light' colorTheme for TradingView
+const LIGHT_THEMES = ['light', 'lightglass'];
+
+// Helper: Check if current theme is a "light" theme
+function isLightTheme(themeId = null) {
+    const id = themeId || getCurrentTheme();
+    return LIGHT_THEMES.includes(id);
+}
+
+// Helper: Get TradingView colorTheme ('dark' or 'light')
+function getTradingViewTheme(themeId = null) {
+    return isLightTheme(themeId) ? 'light' : 'dark';
+}
+
+// Helper: Get current theme object with all properties
+function getTheme(themeId = null) {
+    const id = themeId || getCurrentTheme();
+    return allThemes[id] || allThemes.darkmode;
+}
+
 // Exposer globalement AVANT l'initialisation
 window.GOBThemes = {
     themes: allThemes,
@@ -682,7 +702,12 @@ window.GOBThemes = {
     customThemes,
     applyTheme,
     getCurrentTheme,
-    initTheme
+    getTheme,
+    initTheme,
+    // New helpers to replace isDarkMode
+    isLightTheme,
+    getTradingViewTheme,
+    LIGHT_THEMES
 };
 
 // Initialiser le thème au chargement

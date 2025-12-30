@@ -56,13 +56,12 @@
         
         // TITRES
         'titres-portfolio': { component: 'StocksNewsTab', label: 'Portfolio', icon: 'Briefcase', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
-        'titres-flex': { component: 'TitresTabRGL', label: 'Titres Flex', icon: 'LayoutDashboard', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
         'titres-watchlist': { component: 'DansWatchlistTab', label: 'Watchlist', icon: 'Star', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
         'titres-seeking': { component: 'SeekingAlphaTab', label: 'Seeking Alpha', icon: 'Search', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
         'titres-3p1': { component: 'redirect', label: 'Finance Pro', icon: 'ChartBar', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 }, url: '/3p1' },
         
         // JLAB
-        'jlab-terminal': { component: 'JLabUnifiedTab', label: 'Terminal JLab', icon: 'Terminal', defaultSize: { w: 12, h: 14 }, minSize: { w: 8, h: 10 } },
+        // 'jlab-terminal' REMOVED - was placeholder "Module en cours de construction"
         'jlab-advanced': { component: 'AdvancedAnalysisTab', label: 'Analyse Avancée', icon: 'Flask', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
         
         // EMMA IA
@@ -73,9 +72,7 @@
         'emma-live': { component: 'EmmAIATab', label: 'EmmAIA Live', icon: 'Radio', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
         'emma-finvox': { component: 'FinVoxTab', label: 'FinVox', icon: 'Headphones', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
         
-        // TESTS
-        'tests-rgl': { component: 'RglDashboard', label: 'Layout RGL', icon: 'LayoutDashboard', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
-        'tests-calendar': { component: 'MarketsEconomyTab', label: 'Calendrier', icon: 'Calendar', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
+        // TESTS - REMOVED (was causing freezes)
     };
 
     // Layout par défaut basé sur les tabs les plus utilisés
@@ -84,8 +81,7 @@
             'titres-portfolio',    // Top left - Portfolio widget
             'marches-global',      // Top left below - Markets widget
             'emma-chat',           // Top right - Emma chat
-            'jlab-terminal',       // Top right below - JLab Terminal
-            'marches-calendar',    // Bottom - Economic calendar (lighter than marches-flex)
+            'marches-calendar',    // Bottom - Economic calendar
             'jlab-advanced'        // Bottom - Advanced analysis
         ];
 
@@ -95,9 +91,8 @@
             // Row 2: Markets Global (left) + Emma Chat (right)
             { i: 'marches-global', x: 0, y: 12, w: 6, h: 10, minW: 6, minH: 6 },
             { i: 'emma-chat', x: 6, y: 12, w: 6, h: 10, minW: 4, minH: 8 },
-            // Row 3: JLab Terminal (left) + Calendar (right) - Replaced marches-flex with lighter widget
-            { i: 'jlab-terminal', x: 0, y: 22, w: 6, h: 14, minW: 8, minH: 10 },
-            { i: 'marches-calendar', x: 6, y: 22, w: 6, h: 10, minW: 6, minH: 6 },
+            // Row 3: Calendar (centered)
+            { i: 'marches-calendar', x: 0, y: 22, w: 12, h: 10, minW: 6, minH: 6 },
             // Row 4: Advanced Analysis (full width bottom)
             { i: 'jlab-advanced', x: 0, y: 36, w: 12, h: 12, minW: 8, minH: 8 }
         ].filter(item => defaultTabs.includes(item.i));
@@ -106,50 +101,54 @@
     // ===================================
     // LAZY HEAVY WIDGET WRAPPER
     // ===================================
-    // Delays rendering of heavy widgets (TradingView) to prevent Chrome crash
+    // Heavy widgets require click to load - prevents Chrome crash from TradingView overload
     const LazyHeavyWidget = ({ children, widgetId, delay = 500, isDarkMode }) => {
         const [shouldRender, setShouldRender] = React.useState(false);
-        const [isVisible, setIsVisible] = React.useState(false);
+        const [isLoading, setIsLoading] = React.useState(false);
         const containerRef = React.useRef(null);
 
-        // Use IntersectionObserver to only load when visible
-        React.useEffect(() => {
-            const observer = new IntersectionObserver(
-                ([entry]) => {
-                    if (entry.isIntersecting && !isVisible) {
-                        setIsVisible(true);
-                    }
-                },
-                { rootMargin: '100px', threshold: 0.1 }
-            );
-
-            if (containerRef.current) {
-                observer.observe(containerRef.current);
-            }
-
-            return () => observer.disconnect();
-        }, [isVisible]);
-
-        // Delay actual rendering to stagger heavy widget loads
-        React.useEffect(() => {
-            if (isVisible && !shouldRender) {
-                const timer = setTimeout(() => {
-                    setShouldRender(true);
-                    console.log(`🔄 LazyHeavyWidget: Loading ${widgetId} after ${delay}ms delay`);
-                }, delay);
-                return () => clearTimeout(timer);
-            }
-        }, [isVisible, shouldRender, delay, widgetId]);
+        const handleLoadClick = () => {
+            setIsLoading(true);
+            // Small delay to show loading state before heavy render
+            setTimeout(() => {
+                setShouldRender(true);
+                console.log(`🔄 LazyHeavyWidget: User loaded ${widgetId}`);
+            }, 300);
+        };
 
         return (
             <div ref={containerRef} className="h-full w-full">
                 {shouldRender ? children : (
                     <div className={`h-full w-full flex items-center justify-center rounded-xl ${isDarkMode ? 'bg-neutral-800' : 'bg-gray-100'}`}>
-                        <div className="text-center p-4">
-                            <div className="animate-spin w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                Chargement du widget...
-                            </p>
+                        <div className="text-center p-6">
+                            {isLoading ? (
+                                <>
+                                    <div className="animate-spin w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto mb-3"></div>
+                                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        Chargement en cours...
+                                    </p>
+                                </>
+                            ) : (
+                                <>
+                                    <div className={`w-16 h-16 mx-auto mb-4 rounded-xl flex items-center justify-center ${isDarkMode ? 'bg-neutral-700' : 'bg-gray-200'}`}>
+                                        <svg className={`w-8 h-8 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                    </div>
+                                    <p className={`text-base font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        Widget interactif
+                                    </p>
+                                    <p className={`text-xs mb-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                                        Cliquez pour charger (consomme des ressources)
+                                    </p>
+                                    <button
+                                        onClick={handleLoadClick}
+                                        className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-emerald-500/20"
+                                    >
+                                        Charger le widget
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </div>
                 )}
@@ -170,9 +169,9 @@
     const LAYOUT_PRESETS = {
         default: loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout(),
         developer: loadSavedPreset(STORAGE_KEY_DEV) || [
-            // Developer preset: admin tools and testing
+            // Developer preset: admin tools and emma
             { i: 'admin-jsla', x: 0, y: 0, w: 12, h: 12, minW: 8, minH: 8 },
-            { i: 'tests-rgl', x: 0, y: 12, w: 6, h: 10, minW: 6, minH: 6 },
+            { i: 'emma-chat', x: 0, y: 12, w: 6, h: 10, minW: 6, minH: 6 },
             { i: 'emma-terminal', x: 6, y: 12, w: 6, h: 10, minW: 6, minH: 6 },
         ],
         trading: [
@@ -383,8 +382,7 @@ const DashboardGridWrapper = ({
                     'marches': 'marches-',
                     'titres': 'titres-',
                     'jlab': 'jlab-',
-                    'emma': 'emma-',
-                    'tests': 'tests-'
+                    'emma': 'emma-'
                 };
                 const prefix = prefixMap[mainTab];
                 const validIds = prefix 
@@ -587,7 +585,7 @@ const DashboardGridWrapper = ({
                     newsData, loading, lastUpdate, fetchNews, summarizeWithEmma,
                     isFrenchArticle, getNewsIcon, getSourceCredibility, cleanText
                 });
-            } else if (config.component === 'MarketsEconomyTabRGL' || config.component === 'TitresTabRGL' || config.component === 'RglDashboard') {
+            } else if (config.component === 'MarketsEconomyTabRGL' || config.component === 'RglDashboard') {
                 Object.assign(componentProps, { isAdmin: isEditing });
             } else if (config.component === 'JLabUnifiedTab' || config.component === 'JLabTab') {
                 Object.assign(componentProps, { Icon });
@@ -661,8 +659,7 @@ const DashboardGridWrapper = ({
             'marches': 'marches-',
             'titres': 'titres-',
             'jlab': 'jlab-',
-            'emma': 'emma-',
-            'tests': 'tests-'
+            'emma': 'emma-'
         };
         const prefix = prefixMap[tab];
         if (!prefix) return Object.keys(TAB_TO_WIDGET_MAP);

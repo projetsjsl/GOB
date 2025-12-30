@@ -145,16 +145,6 @@ const ComponentManager = (() => {
             riskLevel: 'medium',
             techDetails: "CRUD sur Supabase/LocalStorage."
         },
-        { 
-            id: 'TitresTabRGL', 
-            name: 'Titres RGL', 
-            category: 'Portfolio',
-            description: "Version modulaire (Grid Layout) du portfolio.",
-            implications: "Si désactivé : La vue flexible du portfolio sera cassée.",
-            riskLevel: 'medium',
-            techDetails: "Utilise ReactGridLayout."
-        },
-
         // --- CORE (DANGER ZONE) ---
         { 
             id: 'DashboardGridWrapper', 

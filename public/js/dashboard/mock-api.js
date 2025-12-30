@@ -51,7 +51,51 @@
         } else if (urlStr.includes('/api/supabase-watchlist')) {
             responseBody = { tickers: ['AAPL', 'MSFT'] };
         } else if (urlStr.includes('/api/yield-curve')) {
-            responseBody = [];
+            responseBody = {
+                timestamp: new Date().toISOString(),
+                data: {
+                    us: {
+                        country: "US",
+                        currency: "USD",
+                        date: new Date().toISOString().split('T')[0],
+                        source: "Treasury.gov (Mock)",
+                        rates: [
+                            { maturity: "1M", rate: 5.35, months: 1, change1M: 0.05 },
+                            { maturity: "2M", rate: 5.30, months: 2, change1M: 0.03 },
+                            { maturity: "3M", rate: 5.28, months: 3, change1M: 0.02 },
+                            { maturity: "6M", rate: 5.15, months: 6, change1M: -0.02 },
+                            { maturity: "1Y", rate: 4.95, months: 12, change1M: -0.05 },
+                            { maturity: "2Y", rate: 4.65, months: 24, change1M: -0.10 },
+                            { maturity: "3Y", rate: 4.45, months: 36, change1M: -0.12 },
+                            { maturity: "5Y", rate: 4.25, months: 60, change1M: -0.15 },
+                            { maturity: "7Y", rate: 4.30, months: 84, change1M: -0.12 },
+                            { maturity: "10Y", rate: 4.35, months: 120, change1M: -0.10 },
+                            { maturity: "20Y", rate: 4.45, months: 240, change1M: -0.08 },
+                            { maturity: "30Y", rate: 4.40, months: 360, change1M: -0.07 }
+                        ]
+                    },
+                    canada: {
+                        country: "Canada",
+                        currency: "CAD",
+                        date: new Date().toISOString().split('T')[0],
+                        source: "Bank of Canada (Mock)",
+                        rates: [
+                            { maturity: "1M", rate: 4.85, months: 1, change1M: 0.02 },
+                            { maturity: "2M", rate: 4.80, months: 2, change1M: 0.01 },
+                            { maturity: "3M", rate: 4.78, months: 3, change1M: 0.00 },
+                            { maturity: "6M", rate: 4.65, months: 6, change1M: -0.03 },
+                            { maturity: "1Y", rate: 4.45, months: 12, change1M: -0.06 },
+                            { maturity: "2Y", rate: 4.15, months: 24, change1M: -0.11 },
+                            { maturity: "3Y", rate: 3.95, months: 36, change1M: -0.13 },
+                            { maturity: "5Y", rate: 3.75, months: 60, change1M: -0.16 },
+                            { maturity: "7Y", rate: 3.80, months: 84, change1M: -0.13 },
+                            { maturity: "10Y", rate: 3.85, months: 120, change1M: -0.11 },
+                            { maturity: "20Y", rate: 3.95, months: 240, change1M: -0.09 },
+                            { maturity: "30Y", rate: 3.90, months: 360, change1M: -0.08 }
+                        ]
+                    }
+                }
+            };
         } else if (urlStr.includes('/api/news') || urlStr.includes('/api/fmp?endpoint=news')) {
             responseBody = [
                 {

@@ -69,10 +69,40 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   const [showCanada, setShowCanada] = useState(true);
   const [showUS, setShowUS] = useState(true);
 
+  // Safe fetch that bypasses any overrides
+  const safeFetch = useCallback((url) => {
+    // Check if we have the original fetch from before overrides
+    const nativeFetch = window.nativeFetch || window.originalFetch || fetch;
+
+    // If native fetch is not available, use XMLHttpRequest
+    if (typeof window.XMLHttpRequest !== 'undefined') {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve({
+              ok: true,
+              json: () => Promise.resolve(JSON.parse(xhr.responseText)),
+              text: () => Promise.resolve(xhr.responseText)
+            });
+          } else {
+            reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
+          }
+        };
+        xhr.onerror = () => reject(new Error('Network error'));
+        xhr.send();
+      });
+    } else {
+      // Fallback to native fetch if XMLHttpRequest is not available
+      return nativeFetch(url);
+    }
+  }, []);
+
   // Fetch current yield curve data
   const fetchCurrentData = useCallback(async () => {
     try {
-      const response = await fetch('/api/yield-curve?country=both');
+      const response = await safeFetch('/api/yield-curve?country=both');
       if (!response.ok) throw new Error('Failed to fetch yield curve data');
       const result = await response.json();
 
@@ -85,12 +115,12 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       console.error('CurveWatch: Error fetching current data:', err);
       setError(err.message);
     }
-  }, []);
+  }, [safeFetch]);
 
   // Fetch historical data
   const fetchHistoricalData = useCallback(async (period) => {
     try {
-      const response = await fetch(`/api/yield-curve?history=true&country=both&period=${period}`);
+      const response = await safeFetch(`/api/yield-curve?history=true&country=both&period=${period}`);
       if (!response.ok) throw new Error('Failed to fetch historical data');
       const result = await response.json();
 
@@ -101,7 +131,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     } catch (err) {
       console.error('CurveWatch: Error fetching historical data:', err);
     }
-  }, []);
+  }, [safeFetch]);
 
   // Fetch compare date data
   const fetchCompareData = useCallback(async (date) => {
@@ -111,7 +141,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     }
 
     try {
-      const response = await fetch(`/api/yield-curve?country=both&date=${date}`);
+      const response = await safeFetch(`/api/yield-curve?country=both&date=${date}`);
       if (!response.ok) throw new Error('Failed to fetch compare data');
       const result = await response.json();
 
@@ -124,7 +154,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       console.error('CurveWatch: Error fetching compare data:', err);
       setCompareData(null);
     }
-  }, []);
+  }, [safeFetch]);
 
   // Initial load
   useEffect(() => {
