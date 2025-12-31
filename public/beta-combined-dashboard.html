@@ -351,25 +351,38 @@
             // Safe JSON fetch utility - handles non-JSON responses gracefully
             window.fetchJsonSafe = async function(url, opts = {}) {
                 try {
-                    const res = await fetch(url, opts);
+                    const timeoutMs = typeof opts.timeoutMs === 'number' ? opts.timeoutMs : 15000;
+                    const fetchOpts = { ...opts };
+                    delete fetchOpts.timeoutMs;
+
+                    let controller = null;
+                    let timeoutId = null;
+                    if (!fetchOpts.signal && typeof AbortController !== 'undefined') {
+                        controller = new AbortController();
+                        fetchOpts.signal = controller.signal;
+                        timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+                    }
+
+                    const res = await fetch(url, fetchOpts);
                     const text = await res.text();
+                    if (timeoutId) clearTimeout(timeoutId);
                     
                     if (!res.ok) {
                         console.error('[API] Error', res.status, url, text.slice(0, 200));
-                        return { success: false, error: 'HTTP ' + res.status, data: null };
+                        return { success: false, error: 'HTTP ' + res.status, data: null, status: res.status };
                     }
                     
                     const ct = res.headers.get('content-type') || '';
                     if (!ct.includes('application/json')) {
                         console.error('[API] Not JSON', url, ct, text.slice(0, 200));
-                        return { success: false, error: 'Not JSON', data: null };
+                        return { success: false, error: 'Not JSON', data: null, status: res.status };
                     }
                     
                     try {
                         return JSON.parse(text);
                     } catch(e) {
                         console.error('[API] Invalid JSON', url, text.slice(0, 200));
-                        return { success: false, error: 'Invalid JSON', data: null };
+                        return { success: false, error: 'Invalid JSON', data: null, status: res.status };
                     }
                 } catch(e) {
                     console.error('[API] Fetch failed', url, e.message);

@@ -536,6 +536,12 @@ const DashboardGridWrapper = ({
             }
         }, [isAdmin, updateLayoutConfig]);
 
+        const persistLayoutForScopeRef = useRef(persistLayoutForScope);
+
+        useEffect(() => {
+            persistLayoutForScopeRef.current = persistLayoutForScope;
+        }, [persistLayoutForScope]);
+
         useEffect(() => {
             if (!layoutConfigLoaded) return;
             const fromConfig = getLayoutFromConfig(layoutConfig, layoutScopeId, mainTab);
@@ -622,15 +628,6 @@ const DashboardGridWrapper = ({
                 
                 const existingIds = currentLayout.filter(item => validIds.includes(item.i)).map(item => item.i);
                 
-                console.log('[DashboardGridWrapper] 🔍 Synchronisation layout/mainTab:', { 
-                    mainTab, 
-                    validIdsCount: validIds.length, 
-                    validIds: validIds.slice(0, 3),
-                    existingIdsCount: existingIds.length,
-                    existingIds: existingIds.slice(0, 3),
-                    currentLayoutLength: currentLayout.length
-                });
-                
                 // Si aucun widget du mainTab n'existe dans le layout, ajouter les widgets par défaut
                 if (existingIds.length === 0 && validIds.length > 0) {
                     console.log('[DashboardGridWrapper] ➕ Ajout des widgets par défaut pour mainTab:', mainTab);
@@ -651,14 +648,14 @@ const DashboardGridWrapper = ({
                     
                     // Ajouter les nouveaux widgets au layout existant (garder les autres widgets)
                     const updatedLayout = [...currentLayout, ...newItems];
-                    persistLayoutForScope(layoutScopeId, updatedLayout);
+                    persistLayoutForScopeRef.current(layoutScopeId, updatedLayout);
                     console.log('[DashboardGridWrapper] ✅ Layout mis à jour avec', newItems.length, 'nouveaux widgets');
                     return updatedLayout;
                 }
                 
                 return currentLayout;
             });
-        }, [layoutScopeId, layoutScopeMode, mainTab, persistLayoutForScope]); // Ne dépendre que de mainTab pour éviter les boucles infinies
+        }, [layoutScopeId, layoutScopeMode, mainTab]);
 
         const [isEditing, setIsEditing] = useState(false);
         const [currentBreakpoint, setCurrentBreakpoint] = useState('lg');

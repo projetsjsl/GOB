@@ -3,6 +3,11 @@
  * Uses event-based + polling hybrid approach
  */
 (function() {
+    if (window.__realtimeSyncInitialized) {
+        return;
+    }
+    window.__realtimeSyncInitialized = true;
+
     console.log('📡 Real-time Sync: Initializing...');
 
     let isConnected = false;

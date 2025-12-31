@@ -23,6 +23,7 @@ export interface StockData {
 export interface NewsArticle {
   title: string;
   text?: string;
+  description?: string;
   url: string;
   publishedDate: string;
   source: { name: string };
@@ -67,6 +68,7 @@ export type TabName =
   | 'economic-calendar'
   | 'investing-calendar'
   | 'yield-curve'
+  | 'advanced-analysis'
   | 'markets-economy'
   | 'nouvelles'
   | 'ask-emma'
@@ -93,8 +95,6 @@ export interface TabProps {
   economicCalendarData?: EconomicEvent[];
   apiStatus?: Record<string, any>;
   processLog?: any[];
-  watchlistTickers?: string[];
-  teamTickers?: string[];
 
   // Setters
   setTickers?: (tickers: string[]) => void;

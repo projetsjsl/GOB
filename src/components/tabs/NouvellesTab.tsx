@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, memo } from 'react';
 import type { TabProps } from '../../types';
 

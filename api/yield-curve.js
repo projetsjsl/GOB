@@ -13,6 +13,7 @@
 import { createSupabaseClient } from '../lib/supabase-config.js';
 
 const CACHE_CONTROL = 'max-age=0, s-maxage=3600, stale-while-revalidate=86400';
+const DEFAULT_FETCH_TIMEOUT_MS = 12_000;
 
 const buckets = new Map();
 const WINDOW_MS = 10_000;
@@ -42,6 +43,20 @@ function rateLimit(req) {
   }
 
   return { ok: true };
+}
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = DEFAULT_FETCH_TIMEOUT_MS) {
+  if (typeof AbortController === 'undefined') {
+    return fetch(url, options);
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 // Configuration des taux par maturité
@@ -132,7 +147,7 @@ async function fetchFromFRED(seriesId, targetDate = null) {
       url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json&sort_order=desc&limit=30`;
     }
 
-    const response = await fetch(url);
+    const response = await fetchWithTimeout(url);
 
     if (!response.ok) {
       console.warn(`⚠️ FRED API erreur pour ${seriesId}: ${response.status}`);
@@ -196,7 +211,7 @@ async function fetchFromTreasuryGov() {
 
     console.log('📊 Tentative Treasury.gov (source officielle, sans API key)...');
 
-    const response = await fetch(url, {
+    const response = await fetchWithTimeout(url, {
       headers: {
         'Accept': 'text/csv',
         'User-Agent': 'GOB-Financial-Dashboard/1.0'
@@ -290,9 +305,7 @@ async function fetchFromFMP() {
   try {
     const url = `https://financialmodelingprep.com/api/v4/treasury?apikey=${FMP_API_KEY}`;
 
-    const response = await fetch(url, {
-      signal: AbortSignal.timeout(10000)
-    });
+    const response = await fetchWithTimeout(url, {}, 10000);
 
     if (!response.ok) {
       console.warn(`⚠️ FMP API erreur: ${response.status}`);
@@ -471,9 +484,7 @@ async function fetchFromBoC(seriesId, targetDate = null, retryCount = 0) {
       url = `https://www.bankofcanada.ca/valet/observations/${seriesId}/json?recent=30`;
     }
 
-    const response = await fetch(url, {
-      signal: AbortSignal.timeout(10000) // 10 second timeout
-    });
+    const response = await fetchWithTimeout(url, {}, 10000);
 
     // Handle rate limiting or server errors with retry
     if (response.status === 429 || response.status >= 500) {
@@ -552,12 +563,8 @@ async function fetchCanadaFromGroups() {
   try {
     // Fetch bond yields and treasury bills in parallel (2 calls instead of 10+)
     const [bondsResponse, tbillsResponse] = await Promise.all([
-      fetch('https://www.bankofcanada.ca/valet/observations/group/bond_yields_all/json?recent=30', {
-        signal: AbortSignal.timeout(15000)
-      }),
-      fetch('https://www.bankofcanada.ca/valet/observations/group/tbill_all/json?recent=30', {
-        signal: AbortSignal.timeout(15000)
-      })
+      fetchWithTimeout('https://www.bankofcanada.ca/valet/observations/group/bond_yields_all/json?recent=30', {}, 15000),
+      fetchWithTimeout('https://www.bankofcanada.ca/valet/observations/group/tbill_all/json?recent=30', {}, 15000)
     ]);
 
     // Process bond yields

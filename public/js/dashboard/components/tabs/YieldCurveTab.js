@@ -78,12 +78,17 @@ const fetchYieldCurveData = async (country, { forceRefresh = false } = {}) => {
 
     console.log(`🌐 YieldCurveTab.js GLOBAL Cache MISS (${cacheKey})`);
 
-    const request = fetch(`/api/yield-curve?country=${encodeURIComponent(country)}`)
-        .then((response) => {
+    const url = `/api/yield-curve?country=${encodeURIComponent(country)}`;
+    const request = (window.fetchJsonSafe
+        ? window.fetchJsonSafe(url, { timeoutMs: 15000 })
+        : fetch(url).then((response) => {
             if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
             return response.json();
-        })
+        }))
         .then((data) => {
+            if (!data || data.success === false) {
+                throw new Error(data?.error || 'Réponse API invalide');
+            }
             global.cache.set(cacheKey, { data, cachedAt: Date.now() });
             return data;
         })

@@ -10,6 +10,11 @@
 (function() {
     'use strict';
 
+    if (window.__tabLazyLoaderInitialized) {
+        return;
+    }
+    window.__tabLazyLoaderInitialized = true;
+
     console.log('⚡ Tab Lazy Loader: Initialisation...');
 
     // Track which tabs have been loaded

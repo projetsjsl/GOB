@@ -12,6 +12,11 @@
 (function() {
     'use strict';
 
+    if (window.__performanceOptimizerInitialized) {
+        return;
+    }
+    window.__performanceOptimizerInitialized = true;
+
     console.log('🚀 Performance Optimizer V2: Initialisation...');
 
     // ============================================

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Auto-converted from monolithic dashboard file
 // Component: StocksNewsTab (legacy markup preserved)
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';

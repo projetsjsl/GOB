@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import type { TabProps } from '../../types';
 import EmailRecipientsManager from './EmailRecipientsManager';

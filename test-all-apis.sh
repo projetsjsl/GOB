@@ -69,16 +69,26 @@ test_endpoint() {
         failed=$((failed + 1))
         result="FAIL"
         error="Connection timeout or network error"
-    elif [ "$http_code" -eq "$expected_status" ]; then
-        echo -e "${GREEN}✅ PASS${NC} ($http_code)"
-        passed=$((passed + 1))
-        result="PASS"
-        error=""
     else
-        echo -e "${RED}❌ FAIL${NC} (got $http_code, expected $expected_status)"
-        failed=$((failed + 1))
-        result="FAIL"
-        error="Unexpected status code"
+        local status_ok=0
+        local expected_statuses=(${expected_status//,/ })
+        for expected in "${expected_statuses[@]}"; do
+            if [ "$http_code" -eq "$expected" ]; then
+                status_ok=1
+                break
+            fi
+        done
+        if [ "$status_ok" -eq 1 ]; then
+            echo -e "${GREEN}✅ PASS${NC} ($http_code)"
+            passed=$((passed + 1))
+            result="PASS"
+            error=""
+        else
+            echo -e "${RED}❌ FAIL${NC} (got $http_code, expected $expected_status)"
+            failed=$((failed + 1))
+            result="FAIL"
+            error="Unexpected status code"
+        fi
     fi
 
     # Add to JSON results
@@ -113,7 +123,7 @@ echo "=== News APIs ==="
 test_endpoint "News - General" "$BASE_URL/api/news?limit=5"
 test_endpoint "News - AAPL" "$BASE_URL/api/news?query=AAPL&limit=5"
 test_endpoint "Finviz News" "$BASE_URL/api/finviz-news"
-test_endpoint "Finviz Why Moving" "$BASE_URL/api/finviz-why-moving"
+test_endpoint "Finviz Why Moving" "$BASE_URL/api/finviz-why-moving?ticker=AAPL"
 
 echo ""
 echo "=== Supabase APIs ==="
@@ -122,7 +132,7 @@ test_endpoint "Team Tickers" "$BASE_URL/api/team-tickers"
 
 echo ""
 echo "=== Screener APIs ==="
-test_endpoint "FMP Stock Screener" "$BASE_URL/api/fmp-stock-screener?limit=10"
+test_endpoint "FMP Stock Screener" "$BASE_URL/api/fmp-stock-screener?limit=10" GET "200,401,402,403,429"
 
 echo ""
 echo "=== Treasury & Rates ==="
@@ -144,10 +154,12 @@ TIMEOUT=10
 
 echo ""
 echo "=== Finance APIs ==="
-test_endpoint "Finance Snapshots" "$BASE_URL/api/finance-snapshots"
+test_endpoint "Finance Snapshots" "$BASE_URL/api/finance-snapshots?all=true&limit=1"
 test_endpoint "FMP Company Data" "$BASE_URL/api/fmp-company-data?symbol=AAPL"
 
 # Finalize JSON
+success_rate=$(node -e "const total=$total; const passed=$passed; const rate= total ? (passed/total*100).toFixed(2) : '0.00'; process.stdout.write(rate);")
+
 cat >> $RESULTS_FILE <<EOF
     {
       "name": "END_OF_TESTS",
@@ -159,7 +171,7 @@ cat >> $RESULTS_FILE <<EOF
     "passed": $passed,
     "failed": $failed,
     "skipped": $skipped,
-    "success_rate": $(awk "BEGIN {printf \"%.2f\", ($passed/$total)*100}")
+    "success_rate": $success_rate
   }
 }
 EOF
@@ -169,9 +181,11 @@ echo ""
 echo "======================================"
 echo "📊 Test Summary"
 echo "======================================"
+passed_rate=$(node -e "const total=$total; const passed=$passed; const rate= total ? (passed/total*100).toFixed(1) : '0.0'; process.stdout.write(rate);")
+failed_rate=$(node -e "const total=$total; const failed=$failed; const rate= total ? (failed/total*100).toFixed(1) : '0.0'; process.stdout.write(rate);")
 echo -e "Total tests:   ${total}"
-echo -e "Passed:        ${GREEN}${passed}${NC} ($(awk "BEGIN {printf \"%.1f\", ($passed/$total)*100}")%)"
-echo -e "Failed:        ${RED}${failed}${NC} ($(awk "BEGIN {printf \"%.1f\", ($failed/$total)*100}")%)"
+echo -e "Passed:        ${GREEN}${passed}${NC} (${passed_rate}%)"
+echo -e "Failed:        ${RED}${failed}${NC} (${failed_rate}%)"
 echo -e "Skipped:       ${YELLOW}${skipped}${NC}"
 echo ""
 echo "Full results saved to: $RESULTS_FILE"

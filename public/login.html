@@ -338,16 +338,20 @@
                 errorMessage.classList.add('hidden');
 
                 try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 15000);
                     const response = await fetch('/api/auth', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'login', username, password })
+                        body: JSON.stringify({ action: 'login', username, password }),
+                        signal: controller.signal
                     });
+                    clearTimeout(timeoutId);
 
                     // Check for JSON response
-                    const contentType = response.headers.get('content-type');
-                    if (!contentType || !contentType.includes('application/json')) {
-                        throw new Error("Réponse serveur invalide (non-JSON)");
+                    const contentType = response.headers.get('content-type') || '';
+                    if (!contentType.includes('application/json')) {
+                        throw new Error(`Réponse serveur invalide (status ${response.status})`);
                     }
 
                     const data = await response.json();
@@ -390,7 +394,9 @@
                     console.error('Login error:', error);
                     loginBtn.disabled = false;
                     loginBtn.innerHTML = '<span>Accéder au Portail</span><i class="iconoir-arrow-right"></i>';
-                    errorText.textContent = error.message;
+                    errorText.textContent = error.name === 'AbortError'
+                        ? 'Délai d\'attente dépassé, réessayez.'
+                        : error.message;
                     errorMessage.classList.remove('hidden');
                     
                     // Shake animation for error

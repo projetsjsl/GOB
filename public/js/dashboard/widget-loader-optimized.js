@@ -261,14 +261,16 @@ class OptimizedWidgetLoader {
 }
 
 // Instance globale
-window.optimizedWidgetLoader = new OptimizedWidgetLoader();
+if (!window.__optimizedWidgetLoaderInitialized) {
+    window.optimizedWidgetLoader = new OptimizedWidgetLoader();
+    window.__optimizedWidgetLoaderInitialized = true;
 
-// Désactiver les widgets cachés au scroll
-let scrollTimeout;
-window.addEventListener('scroll', () => {
-    clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(() => {
-        window.optimizedWidgetLoader.disableHiddenWidgets();
-    }, 500);
-}, { passive: true });
-
+    // Désactiver les widgets cachés au scroll
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            window.optimizedWidgetLoader.disableHiddenWidgets();
+        }, 500);
+    }, { passive: true });
+}

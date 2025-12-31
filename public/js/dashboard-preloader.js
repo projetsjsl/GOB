@@ -6,6 +6,11 @@
 (function() {
     'use strict';
 
+    if (window.__dashboardPreloaderInitialized) {
+        return;
+    }
+    window.__dashboardPreloaderInitialized = true;
+
     const PRELOAD_STORAGE_KEY = 'gob-dashboard-preload';
     const PRELOAD_EXPIRY = 5 * 60 * 1000; // 5 minutes
 
@@ -316,4 +321,3 @@
 
     console.log('[Preloader] 📦 Système de préchargement initialisé');
 })();
-

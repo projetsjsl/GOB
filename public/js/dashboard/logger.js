@@ -2,6 +2,11 @@
 // Usage: Logger.info('message'), Logger.debug('message'), Logger.warn('message'), Logger.error('message')
 
 (function() {
+    if (window.__gobLoggerInitialized) {
+        return;
+    }
+    window.__gobLoggerInitialized = true;
+
     const LOG_LEVELS = {
         DEBUG: 0,
         INFO: 1,

@@ -8,7 +8,7 @@
  * - Spread analysis
  */
 
-const { useState, useEffect, useCallback, useMemo } = React;
+const { useState, useEffect, useCallback, useMemo, useRef } = React;
 
 // Hook to get theme from GOBThemes
 const useDarkMode = () => {
@@ -73,6 +73,9 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   const [debugMode, setDebugMode] = useState(false);
   const [manualData, setManualData] = useState(null);
   const [apiCallLog, setApiCallLog] = useState([]);
+  const inflightRef = useRef({ current: false, historical: 0, compare: 0 });
+  const historyRequestIdRef = useRef(0);
+  const compareRequestIdRef = useRef(0);
 
   useEffect(() => {
     if (rechartsReady) {
@@ -121,7 +124,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   }, [rechartsReady, debugMode]);
 
   // Safe fetch that bypasses any overrides
-  const safeFetch = useCallback((url) => {
+  const safeFetch = useCallback((url, { timeoutMs = 15000 } = {}) => {
     // Check if we have the original fetch from before overrides
     const nativeFetch = window.nativeFetch || window.originalFetch || fetch;
 
@@ -139,6 +142,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('GET', url);
+        xhr.timeout = timeoutMs;
         xhr.onload = () => {
           if (debugMode) {
             setApiCallLog(prev => prev.map(log =>
@@ -151,12 +155,23 @@ window.CurveWatchContainer = ({ embedded = false }) => {
           if (xhr.status >= 200 && xhr.status < 300) {
             resolve({
               ok: true,
+              status: xhr.status,
               json: () => Promise.resolve(JSON.parse(xhr.responseText)),
               text: () => Promise.resolve(xhr.responseText)
             });
           } else {
             reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
           }
+        };
+        xhr.ontimeout = () => {
+          if (debugMode) {
+            setApiCallLog(prev => prev.map(log =>
+              log.url === url && log.status === 'pending'
+                ? { ...log, status: 'timeout', error: 'Request timeout' }
+                : log
+            ));
+          }
+          reject(new Error('Request timeout'));
         };
         xhr.onerror = () => {
           if (debugMode) {
@@ -172,7 +187,13 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       });
     } else {
       // Fallback to native fetch if XMLHttpRequest is not available
-      return nativeFetch(url)
+      let controller = null;
+      let timeoutId = null;
+      if (typeof AbortController !== 'undefined') {
+        controller = new AbortController();
+        timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      }
+      return nativeFetch(url, controller ? { signal: controller.signal } : undefined)
         .then(response => {
           if (debugMode) {
             setApiCallLog(prev => prev.map(log =>
@@ -181,6 +202,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
                 : log
             ));
           }
+          if (timeoutId) clearTimeout(timeoutId);
           return response;
         })
         .catch(error => {
@@ -191,10 +213,27 @@ window.CurveWatchContainer = ({ embedded = false }) => {
                 : log
             ));
           }
+          if (timeoutId) clearTimeout(timeoutId);
           throw error;
         });
     }
   }, [debugMode]);
+
+  const parseJsonResponse = useCallback(async (response, contextLabel) => {
+    if (!response) {
+      throw new Error(`No response (${contextLabel})`);
+    }
+    const text = await response.text();
+    const ct = response.headers?.get?.('content-type') || '';
+    if (!ct.includes('application/json')) {
+      throw new Error(`Invalid JSON response (${contextLabel})`);
+    }
+    try {
+      return JSON.parse(text);
+    } catch (err) {
+      throw new Error(`Invalid JSON payload (${contextLabel})`);
+    }
+  }, []);
 
   // Fetch current yield curve data
   const fetchCurrentData = useCallback(async () => {
@@ -202,10 +241,13 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       console.log('🔍 CurveWatch: Starting fetchCurrentData');
     }
 
+    if (inflightRef.current.current) return;
+    inflightRef.current.current = true;
+
     try {
       const response = await safeFetch('/api/yield-curve?country=both');
       if (!response.ok) throw new Error('Failed to fetch yield curve data');
-      const result = await response.json();
+      const result = await parseJsonResponse(response, 'current');
 
       if (debugMode) {
         console.log('📊 CurveWatch: API Response:', result);
@@ -225,8 +267,10 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     } catch (err) {
       console.error('❌ CurveWatch: Error fetching current data:', err);
       setError(err.message);
+    } finally {
+      inflightRef.current.current = false;
     }
-  }, [safeFetch, debugMode]);
+  }, [safeFetch, parseJsonResponse, debugMode]);
 
   // Fetch historical data
   const fetchHistoricalData = useCallback(async (period) => {
@@ -234,10 +278,15 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       console.log('🔍 CurveWatch: Starting fetchHistoricalData for period:', period);
     }
 
+    const requestId = historyRequestIdRef.current + 1;
+    historyRequestIdRef.current = requestId;
+    inflightRef.current.historical += 1;
+
     try {
       const response = await safeFetch(`/api/yield-curve?history=true&country=both&period=${period}`);
       if (!response.ok) throw new Error('Failed to fetch historical data');
-      const result = await response.json();
+      const result = await parseJsonResponse(response, 'historical');
+      if (requestId !== historyRequestIdRef.current) return;
 
       if (debugMode) {
         console.log('📊 CurveWatch: Historical API Response:', result);
@@ -251,8 +300,10 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       });
     } catch (err) {
       console.error('❌ CurveWatch: Error fetching historical data:', err);
+    } finally {
+      inflightRef.current.historical = Math.max(0, inflightRef.current.historical - 1);
     }
-  }, [safeFetch, debugMode]);
+  }, [safeFetch, parseJsonResponse, debugMode]);
 
   // Fetch compare date data
   const fetchCompareData = useCallback(async (date) => {
@@ -268,10 +319,15 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       console.log('🔍 CurveWatch: Starting fetchCompareData for date:', date);
     }
 
+    const requestId = compareRequestIdRef.current + 1;
+    compareRequestIdRef.current = requestId;
+    inflightRef.current.compare += 1;
+
     try {
       const response = await safeFetch(`/api/yield-curve?country=both&date=${date}`);
       if (!response.ok) throw new Error('Failed to fetch compare data');
-      const result = await response.json();
+      const result = await parseJsonResponse(response, 'compare');
+      if (requestId !== compareRequestIdRef.current) return;
 
       if (debugMode) {
         console.log('📊 CurveWatch: Compare API Response:', result);
@@ -287,8 +343,10 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     } catch (err) {
       console.error('❌ CurveWatch: Error fetching compare data:', err);
       setCompareData(null);
+    } finally {
+      inflightRef.current.compare = Math.max(0, inflightRef.current.compare - 1);
     }
-  }, [safeFetch, debugMode]);
+  }, [safeFetch, parseJsonResponse, debugMode]);
 
   // Initial load
   useEffect(() => {

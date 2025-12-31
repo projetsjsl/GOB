@@ -8,6 +8,11 @@
 (function initAutoExpand() {
     'use strict';
 
+    if (window.__autoExpandInit) {
+        return;
+    }
+    window.__autoExpandInit = true;
+
     // Configuration étendue des sélecteurs pour TOUS les types d'éléments
     const EXPANDABLE_SELECTORS = [
         // Sections avec bordures
@@ -472,7 +477,9 @@
         }
 
         // Réappliquer régulièrement pour les contenus dynamiques
-        setInterval(applyExpandButtons, 8000);
+        if (!window.__autoExpandIntervalId) {
+            window.__autoExpandIntervalId = setInterval(applyExpandButtons, 8000);
+        }
     }
 
     // Exposer méthode de refresh manuel

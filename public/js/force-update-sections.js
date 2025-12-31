@@ -5,7 +5,12 @@
 
 (function() {
     'use strict';
-    
+
+    if (window.__forceUpdateSectionsInitialized) {
+        return;
+    }
+    window.__forceUpdateSectionsInitialized = true;
+
     console.log('🔄 Forçage de la mise à jour des sections...');
     
     // 1. FORCER LE RE-RENDER REACT
@@ -100,6 +105,7 @@
     
     // 4. OBSERVER ET RECALCULER AUTOMATIQUEMENT
     function setupAutoRecalculation() {
+        let recalculationScheduled = false;
         // Observer les changements d'inputs
         const observer = new MutationObserver(function(mutations) {
             let shouldRecalculate = false;
@@ -124,10 +130,12 @@
                 }
             });
             
-            if (shouldRecalculate) {
+            if (shouldRecalculate && !recalculationScheduled) {
+                recalculationScheduled = true;
                 setTimeout(() => {
                     triggerRecalculations();
                     updateSpecificSections();
+                    recalculationScheduled = false;
                 }, 100);
             }
         });
@@ -251,8 +259,6 @@
         recalculateValues
     };
 })();
-
-
 
 
 
