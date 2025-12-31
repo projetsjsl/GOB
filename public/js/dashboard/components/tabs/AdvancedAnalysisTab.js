@@ -261,17 +261,62 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
     const profileContainerRef = React.useRef(null);
 
     const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'chart', 'financials', 'analysis', 'timeline'
+    const [widgetErrors, setWidgetErrors] = useState({});
+    const widgetAttemptsRef = React.useRef({});
+    const widgetTimeoutsRef = React.useRef({});
+    const MAX_WIDGET_ATTEMPTS = 2;
+    const WIDGET_CHECK_DELAY_MS = 3500;
 
-    // 1. Advanced Chart Widget
-    useEffect(() => {
-        if (activeTab !== 'chart' || !chartContainerRef.current) return;
-        const container = chartContainerRef.current;
+    const clearWidgetTimeout = (key) => {
+        if (widgetTimeoutsRef.current[key]) {
+            clearTimeout(widgetTimeoutsRef.current[key]);
+            delete widgetTimeoutsRef.current[key];
+        }
+    };
+
+    const loadTradingViewWidget = (key, containerRef, scriptSrc, config, attempt = 1) => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        clearWidgetTimeout(key);
+        widgetAttemptsRef.current[key] = attempt;
+        setWidgetErrors(prev => ({ ...prev, [key]: null }));
+
         container.innerHTML = '';
         const script = document.createElement('script');
-        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+        script.src = scriptSrc;
         script.type = 'text/javascript';
         script.async = true;
-        script.innerHTML = JSON.stringify({
+        script.innerHTML = JSON.stringify(config);
+
+        const handleFailure = (message) => {
+            if (attempt < MAX_WIDGET_ATTEMPTS) {
+                loadTradingViewWidget(key, containerRef, scriptSrc, config, attempt + 1);
+                return;
+            }
+            setWidgetErrors(prev => ({ ...prev, [key]: message }));
+        };
+
+        script.onload = () => {
+            widgetTimeoutsRef.current[key] = setTimeout(() => {
+                const hasIframe = !!container.querySelector('iframe');
+                if (!hasIframe) {
+                    handleFailure('Widget bloqué ou non chargé.');
+                }
+            }, WIDGET_CHECK_DELAY_MS);
+        };
+        script.onerror = () => handleFailure('Erreur de chargement du widget.');
+
+        container.appendChild(script);
+    };
+
+    useEffect(() => () => {
+        Object.keys(widgetTimeoutsRef.current).forEach((key) => clearWidgetTimeout(key));
+    }, []);
+
+    // 1. Advanced Chart Widget
+    const reloadChartWidget = () => {
+        loadTradingViewWidget('chart', chartContainerRef, 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js', {
             allow_symbol_change: true,
             calendar: false,
             details: true,
@@ -319,54 +364,42 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             width: '100%',
             height: 800
         });
-        container.appendChild(script);
-        return () => { if (container) container.innerHTML = ''; };
+    };
+
+    useEffect(() => {
+        if (activeTab !== 'chart') return;
+        reloadChartWidget();
+        return () => { if (chartContainerRef.current) chartContainerRef.current.innerHTML = ''; };
     }, [activeTab, selectedStock, isDarkMode]);
 
     // 2. Financials & Profile Widgets
+    const reloadFinancialsWidget = () => {
+        loadTradingViewWidget('financials', financialsContainerRef, 'https://s3.tradingview.com/external-embedding/embed-widget-financials.js', {
+            symbol: selectedStock,
+            colorTheme: isDarkMode ? 'dark' : 'light',
+            isTransparent: false,
+            displayMode: 'regular',
+            locale: 'fr',
+            width: '100%',
+            height: 500
+        });
+    };
+
+    const reloadProfileWidget = () => {
+        loadTradingViewWidget('profile', profileContainerRef, 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js', {
+            symbol: selectedStock,
+            colorTheme: isDarkMode ? 'dark' : 'light',
+            isTransparent: false,
+            locale: 'fr',
+            width: '100%',
+            height: 400
+        });
+    };
+
     useEffect(() => {
         if (activeTab !== 'financials') return;
-        
-        // Financials
-        if (financialsContainerRef.current) {
-            const container = financialsContainerRef.current;
-            container.innerHTML = '';
-            const script = document.createElement('script');
-            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-financials.js';
-            script.type = 'text/javascript';
-            script.async = true;
-            script.innerHTML = JSON.stringify({
-                symbol: selectedStock,
-                colorTheme: isDarkMode ? 'dark' : 'light',
-                isTransparent: false,
-                displayMode: 'regular',
-                locale: 'fr',
-                width: '100%',
-                height: 500
-            });
-            container.appendChild(script);
-        }
-
-        // Profile
-        if (profileContainerRef.current) {
-            const container = profileContainerRef.current;
-            container.innerHTML = '';
-            const script = document.createElement('script');
-            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js';
-            script.type = 'text/javascript';
-            script.async = true;
-            script.innerHTML = JSON.stringify({
-                symbol: selectedStock,
-                colorTheme: isDarkMode ? 'dark' : 'light',
-                isTransparent: false,
-                locale: 'fr',
-                width: '100%',
-                height: 400
-            });
-            container.appendChild(script);
-        }
-
-        
+        reloadFinancialsWidget();
+        reloadProfileWidget();
         return () => {
             if (financialsContainerRef.current) financialsContainerRef.current.innerHTML = '';
             if (profileContainerRef.current) profileContainerRef.current.innerHTML = '';
@@ -374,15 +407,8 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
     }, [activeTab, selectedStock, isDarkMode]);
 
     // 3. Technical Analysis Widget
-    useEffect(() => {
-        if (activeTab !== 'analysis' || !techAnalysisContainerRef.current) return;
-        const container = techAnalysisContainerRef.current;
-        container.innerHTML = '';
-        const script = document.createElement('script');
-        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
-        script.type = 'text/javascript';
-        script.async = true;
-        script.innerHTML = JSON.stringify({
+    const reloadTechWidget = () => {
+        loadTradingViewWidget('analysis', techAnalysisContainerRef, 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js', {
             symbol: selectedStock,
             colorTheme: isDarkMode ? 'dark' : 'light',
             isTransparent: false,
@@ -391,17 +417,16 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             width: '100%',
             height: 500
         });
-        container.appendChild(script);
-        return () => { if (container) container.innerHTML = ''; };
+    };
+
+    useEffect(() => {
+        if (activeTab !== 'analysis') return;
+        reloadTechWidget();
+        return () => { if (techAnalysisContainerRef.current) techAnalysisContainerRef.current.innerHTML = ''; };
     }, [activeTab, selectedStock, isDarkMode]);
 
     // 4. Timeline Widget
-    useEffect(() => {
-        if (activeTab !== 'timeline' || !timelineContainerRef.current) return;
-        
-        const container = timelineContainerRef.current;
-        container.innerHTML = '';
-        
+    const reloadTimelineWidget = () => {
         // Construct fully qualified symbol if possible to resolve "No data here yet"
         let widgetSymbol = selectedStock;
         if (stockData && stockData.profile && stockData.profile.exchangeShortName) {
@@ -416,11 +441,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
              widgetSymbol = `NASDAQ:${selectedStock}`;
         }
 
-        const script = document.createElement('script');
-        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js';
-        script.type = 'text/javascript';
-        script.async = true;
-        script.innerHTML = JSON.stringify({
+        loadTradingViewWidget('timeline', timelineContainerRef, 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js', {
             feedMode: 'symbol',
             symbol: widgetSymbol,
             colorTheme: isDarkMode ? 'dark' : 'light',
@@ -430,9 +451,26 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             width: '100%',
             height: 600
         });
-        container.appendChild(script);
-        return () => { if (container) container.innerHTML = ''; };
+    };
+
+    useEffect(() => {
+        if (activeTab !== 'timeline') return;
+        reloadTimelineWidget();
+        return () => { if (timelineContainerRef.current) timelineContainerRef.current.innerHTML = ''; };
     }, [activeTab, selectedStock, isDarkMode, stockData?.profile?.exchangeShortName]);
+
+    const renderWidgetError = (message, onRetry) => (
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center gap-3 bg-gray-900/80 text-gray-200">
+            <div className="text-sm font-semibold">Widget bloqué</div>
+            <div className="text-xs text-gray-400 max-w-xs">{message}</div>
+            <button
+                onClick={onRetry}
+                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium"
+            >
+                Réessayer
+            </button>
+        </div>
+    );
 
     return (
         <div className={`min-h-screen p-6 ${isDarkMode ? 'bg-neutral-950 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
@@ -687,7 +725,10 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             {activeTab === 'chart' && (
                 <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 animate-fade-in">
                     <LazyWidgetWrapper threshold={0.5} height={700} forceLoad={true}>
-                        <div className="tradingview-widget-container h-[700px]" ref={chartContainerRef}></div>
+                        <div className="relative h-[700px]">
+                            <div className="tradingview-widget-container h-full" ref={chartContainerRef}></div>
+                            {widgetErrors.chart && renderWidgetError(widgetErrors.chart, reloadChartWidget)}
+                        </div>
                     </LazyWidgetWrapper>
                 </div>
             )}
@@ -699,13 +740,19 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                         <div className="lg:col-span-2 bg-gray-800 rounded-xl overflow-hidden border border-gray-700 h-[500px]">
                             <div className="p-4 border-b border-gray-700 font-bold">États Financiers</div>
                             <LazyWidgetWrapper threshold={0.5} height={440} forceLoad={true}>
-                                <div className="tradingview-widget-container h-full" ref={financialsContainerRef}></div>
+                                <div className="relative h-full">
+                                    <div className="tradingview-widget-container h-full" ref={financialsContainerRef}></div>
+                                    {widgetErrors.financials && renderWidgetError(widgetErrors.financials, reloadFinancialsWidget)}
+                                </div>
                             </LazyWidgetWrapper>
                         </div>
                         <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 h-[500px]">
                             <div className="p-4 border-b border-gray-700 font-bold">Profil Société</div>
                             <LazyWidgetWrapper threshold={0.5} height={440} forceLoad={true}>
-                                <div className="tradingview-widget-container h-full" ref={profileContainerRef}></div>
+                                <div className="relative h-full">
+                                    <div className="tradingview-widget-container h-full" ref={profileContainerRef}></div>
+                                    {widgetErrors.profile && renderWidgetError(widgetErrors.profile, reloadProfileWidget)}
+                                </div>
                             </LazyWidgetWrapper>
                         </div>
                     </div>
@@ -716,7 +763,10 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             {activeTab === 'analysis' && (
                 <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 animate-fade-in h-[600px]">
                      <LazyWidgetWrapper threshold={0.5} height={600} forceLoad={true}>
-                        <div className="tradingview-widget-container h-full" ref={techAnalysisContainerRef}></div>
+                        <div className="relative h-full">
+                            <div className="tradingview-widget-container h-full" ref={techAnalysisContainerRef}></div>
+                            {widgetErrors.analysis && renderWidgetError(widgetErrors.analysis, reloadTechWidget)}
+                        </div>
                      </LazyWidgetWrapper>
                 </div>
             )}
@@ -725,7 +775,10 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             {activeTab === 'timeline' && (
                 <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 animate-fade-in h-[700px]">
                      <LazyWidgetWrapper threshold={0.5} height={700} forceLoad={true}>
-                        <div className="tradingview-widget-container h-full" ref={timelineContainerRef}></div>
+                        <div className="relative h-full">
+                            <div className="tradingview-widget-container h-full" ref={timelineContainerRef}></div>
+                            {widgetErrors.timeline && renderWidgetError(widgetErrors.timeline, reloadTimelineWidget)}
+                        </div>
                      </LazyWidgetWrapper>
                 </div>
             )}
