@@ -136,6 +136,7 @@ class OptimizedWidgetLoader {
 
             // Nettoyer le container
             container.innerHTML = '';
+            container.classList.add('tradingview-widget-container');
 
             // Créer le div du widget avec attributs pour améliorer la compatibilité iframe
             const widgetDiv = document.createElement('div');
@@ -188,7 +189,7 @@ class OptimizedWidgetLoader {
                     resolve(); // Resolve pour ne pas bloquer les autres widgets
                 };
                 
-                widgetDiv.appendChild(script);
+                container.appendChild(script);
             });
 
             // Vérifier que l'iframe est créée et gérer les erreurs de communication

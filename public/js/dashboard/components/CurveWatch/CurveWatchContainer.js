@@ -855,13 +855,12 @@ window.CurveWatchContainer = ({ embedded = false }) => {
                       }
                     }
                   };
-                    setCurrentData({
-                      us: mockData.data.us,
-                      canada: mockData.data.canada
-                    });
-                    setError(null);
-                    console.log('✅ Sample mock data loaded');
-                  }
+                  setCurrentData({
+                    us: mockData.data.us,
+                    canada: mockData.data.canada
+                  });
+                  setError(null);
+                  console.log('✅ Sample mock data loaded');
                 }}
                 style={{
                   padding: '4px 8px',

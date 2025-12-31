@@ -468,6 +468,12 @@
             if (!container) return;
 
             container.innerHTML = '';
+            container.classList.add('tradingview-widget-container');
+            const widgetDiv = document.createElement('div');
+            widgetDiv.className = 'tradingview-widget-container__widget';
+            widgetDiv.style.width = '100%';
+            widgetDiv.style.height = '100%';
+            container.appendChild(widgetDiv);
             const script = document.createElement('script');
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
             script.async = true;
@@ -481,9 +487,7 @@
                 locale: 'fr',
                 allow_symbol_change: true,
                 calendar: false,
-                support_host: 'https://www.tradingview.com',
-                width: '100%',
-                height: height
+                support_host: 'https://www.tradingview.com'
             });
             container.appendChild(script);
 

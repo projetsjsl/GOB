@@ -12,6 +12,7 @@
     "lint": "eslint src/ api/ --ext .js,.ts,.tsx",
     "lint:fix": "eslint src/ api/ --ext .js,.ts,.tsx --fix",
     "lint:strict": "eslint src/ api/ --ext .js,.ts,.tsx --max-warnings 0",
+    "lint:dashboard": "node scripts/check-dashboard-jsx.js",
     "typecheck": "tsc --noEmit --skipLibCheck",
     "qa": "npm run lint && npm run build",
     "verify-3p1": "node scripts/verify-3p1-build.js",

@@ -283,6 +283,12 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
         setWidgetErrors(prev => ({ ...prev, [key]: null }));
 
         container.innerHTML = '';
+        container.classList.add('tradingview-widget-container');
+        const widgetDiv = document.createElement('div');
+        widgetDiv.className = 'tradingview-widget-container__widget';
+        widgetDiv.style.width = '100%';
+        widgetDiv.style.height = '100%';
+        container.appendChild(widgetDiv);
         const script = document.createElement('script');
         script.src = scriptSrc;
         script.type = 'text/javascript';
@@ -342,6 +348,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             timezone: 'America/Toronto',
             backgroundColor: isDarkMode ? '#0F0F0F' : '#FFFFFF',
             gridColor: 'rgba(242, 242, 242, 0.06)',
+            support_host: 'https://www.tradingview.com',
             watchlist: [
                 'FOREXCOM:SPXUSD',
                 'FOREXCOM:NSXUSD',
