@@ -297,13 +297,21 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             setWidgetErrors(prev => ({ ...prev, [key]: message }));
         };
 
+        widgetTimeoutsRef.current[key] = setTimeout(() => {
+            const hasIframe = !!container.querySelector('iframe');
+            if (!hasIframe) {
+                handleFailure('Widget bloqué ou non chargé.');
+            }
+        }, WIDGET_CHECK_DELAY_MS);
+
         script.onload = () => {
-            widgetTimeoutsRef.current[key] = setTimeout(() => {
+            // Allow a small grace period before the iframe appears
+            setTimeout(() => {
                 const hasIframe = !!container.querySelector('iframe');
-                if (!hasIframe) {
-                    handleFailure('Widget bloqué ou non chargé.');
+                if (hasIframe) {
+                    clearWidgetTimeout(key);
                 }
-            }, WIDGET_CHECK_DELAY_MS);
+            }, 500);
         };
         script.onerror = () => handleFailure('Erreur de chargement du widget.');
 
