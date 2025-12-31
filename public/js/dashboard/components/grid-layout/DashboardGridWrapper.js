@@ -8,7 +8,7 @@
 (function() {
     'use strict';
 
-    const { useState, useEffect, useMemo, useCallback } = React;
+    const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
     // ===================================
     // CONSTANTES & CONFIGURATION
@@ -18,6 +18,11 @@
     const STORAGE_KEY_CURRENT = 'gob_dashboard_grid_layout_v1';
     const STORAGE_KEY_HIDDEN = 'gob_dashboard_hidden_widgets_v1';
     const STORAGE_KEY_WIDGET_SECTIONS = 'gob_dashboard_widget_sections_v1';
+    const DASHBOARD_CONFIG_SECTION = 'ui';
+    const DASHBOARD_CONFIG_KEY = 'dashboard_layouts_v1';
+    const DEFAULT_LAYOUT_SCOPE_MODE = 'primary';
+    const DEFAULT_SHOW_ALL_WIDGETS_IN_DOCK = true;
+    const CONFIG_SAVE_DEBOUNCE_MS = 900;
     const ROW_HEIGHT = 50;
     const MAIN_TAB_PREFIX = {
         admin: 'admin-',
@@ -35,9 +40,12 @@
 
     const getLayoutStorageKey = (scopeId) => `${STORAGE_KEY_CURRENT}:${scopeId || 'default'}`;
 
-    const getLayoutScopeId = (mainTab, activeTab) => {
-        const prefix = MAIN_TAB_PREFIX[mainTab];
-        if (prefix && activeTab && activeTab.startsWith(prefix)) return activeTab;
+    const getLayoutScopeId = (mainTab, activeTab, scopeMode = DEFAULT_LAYOUT_SCOPE_MODE) => {
+        if (scopeMode === 'global') return 'global';
+        if (scopeMode === 'secondary') {
+            const prefix = MAIN_TAB_PREFIX[mainTab];
+            if (prefix && activeTab && activeTab.startsWith(prefix)) return activeTab;
+        }
         return mainTab || 'default';
     };
 
@@ -128,6 +136,40 @@
             } catch (e) {
                 console.error('❌ Erreur chargement layout:', e);
             }
+        }
+        return null;
+    };
+
+    const normalizeDashboardLayoutConfig = (raw) => {
+        const base = {
+            version: 1,
+            scopeMode: DEFAULT_LAYOUT_SCOPE_MODE,
+            showAllWidgetsInDock: DEFAULT_SHOW_ALL_WIDGETS_IN_DOCK,
+            layouts: {},
+            presets: {}
+        };
+        if (!raw || typeof raw !== 'object') return base;
+        const normalized = { ...base, ...raw };
+        normalized.layouts = raw.layouts && typeof raw.layouts === 'object' ? raw.layouts : {};
+        normalized.presets = raw.presets && typeof raw.presets === 'object' ? raw.presets : {};
+        if (!['primary', 'secondary', 'global'].includes(normalized.scopeMode)) {
+            normalized.scopeMode = DEFAULT_LAYOUT_SCOPE_MODE;
+        }
+        if (typeof normalized.showAllWidgetsInDock !== 'boolean') {
+            normalized.showAllWidgetsInDock = DEFAULT_SHOW_ALL_WIDGETS_IN_DOCK;
+        }
+        return normalized;
+    };
+
+    const getLayoutFromConfig = (config, scopeId, mainTabId) => {
+        if (!config || !config.layouts) return null;
+        const candidates = [];
+        if (scopeId && config.layouts[scopeId]) candidates.push(config.layouts[scopeId]);
+        if (mainTabId && scopeId !== mainTabId && config.layouts[mainTabId]) candidates.push(config.layouts[mainTabId]);
+        if (config.layouts.default) candidates.push(config.layouts.default);
+        for (const candidate of candidates) {
+            const sanitized = sanitizeLayout(candidate);
+            if (sanitized.length > 0) return sanitized;
         }
         return null;
     };
@@ -373,7 +415,21 @@ const DashboardGridWrapper = ({
         MASTER_NAV_LINKS = [],
         allTabs = []
     }) => {
-        const layoutScopeId = getLayoutScopeId(mainTab, activeTab);
+        const [layoutConfig, setLayoutConfig] = useState(null);
+        const [layoutConfigLoaded, setLayoutConfigLoaded] = useState(false);
+        const saveConfigTimerRef = useRef(null);
+        const pendingConfigRef = useRef(null);
+        const [layoutScopeMode, setLayoutScopeMode] = useState(DEFAULT_LAYOUT_SCOPE_MODE);
+        const [showAllWidgetsInDock, setShowAllWidgetsInDock] = useState(() => {
+            try {
+                const saved = localStorage.getItem('gob_dashboard_show_all_widgets_v1');
+                return saved ? saved === 'true' : DEFAULT_SHOW_ALL_WIDGETS_IN_DOCK;
+            } catch (e) {
+                return DEFAULT_SHOW_ALL_WIDGETS_IN_DOCK;
+            }
+        });
+
+        const layoutScopeId = getLayoutScopeId(mainTab, activeTab, layoutScopeMode);
         const layoutStorageKey = getLayoutStorageKey(layoutScopeId);
         const layoutFallbackKeys = getLayoutFallbackKeys(layoutScopeId, mainTab);
 
@@ -382,28 +438,123 @@ const DashboardGridWrapper = ({
             if (saved) return saved;
             return loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout();
         });
-        const [showAllWidgetsInDock, setShowAllWidgetsInDock] = useState(() => {
-            try {
-                const saved = localStorage.getItem('gob_dashboard_show_all_widgets_v1');
-                return saved ? saved === 'true' : true;
-            } catch (e) {
-                return true;
-            }
-        });
 
         useEffect(() => {
-            try {
-                localStorage.setItem('gob_dashboard_show_all_widgets_v1', String(showAllWidgetsInDock));
-            } catch (e) {
-                // ignore storage errors
+            let isActive = true;
+            const loadRemoteConfig = async () => {
+                try {
+                    const response = await fetch(`/api/admin/emma-config?section=${DASHBOARD_CONFIG_SECTION}&key=${DASHBOARD_CONFIG_KEY}`);
+                    if (!response.ok) throw new Error(`Config fetch failed (${response.status})`);
+                    const data = await response.json();
+                    let rawConfig = data?.config?.value ?? data?.config ?? null;
+                    if (typeof rawConfig === 'string') {
+                        try {
+                            rawConfig = JSON.parse(rawConfig);
+                        } catch (e) {
+                            // ignore JSON parse errors
+                        }
+                    }
+                    const normalized = normalizeDashboardLayoutConfig(rawConfig);
+                    if (!isActive) return;
+                    setLayoutConfig(normalized);
+                    setLayoutScopeMode(normalized.scopeMode);
+                    setShowAllWidgetsInDock(normalized.showAllWidgetsInDock);
+                    try {
+                        localStorage.setItem('gob_dashboard_show_all_widgets_v1', String(normalized.showAllWidgetsInDock));
+                    } catch (e) {
+                        // ignore storage errors
+                    }
+                    setLayoutConfigLoaded(true);
+                } catch (e) {
+                    if (!isActive) return;
+                    console.warn('⚠️ Layout config not available, using local defaults');
+                    setLayoutConfigLoaded(true);
+                }
+            };
+            loadRemoteConfig();
+            return () => { isActive = false; };
+        }, []);
+
+        const scheduleConfigSave = useCallback((nextConfig) => {
+            pendingConfigRef.current = nextConfig;
+            setLayoutConfig(nextConfig);
+            if (saveConfigTimerRef.current) {
+                clearTimeout(saveConfigTimerRef.current);
             }
-        }, [showAllWidgetsInDock]);
+            saveConfigTimerRef.current = setTimeout(async () => {
+                const payload = pendingConfigRef.current;
+                if (!payload) return;
+                try {
+                    await fetch('/api/admin/emma-config', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'set',
+                            category: DASHBOARD_CONFIG_SECTION,
+                            section: DASHBOARD_CONFIG_SECTION,
+                            key: DASHBOARD_CONFIG_KEY,
+                            value: payload
+                        })
+                    });
+                } catch (e) {
+                    console.error('❌ Error saving dashboard layout config:', e);
+                }
+            }, CONFIG_SAVE_DEBOUNCE_MS);
+        }, []);
 
         useEffect(() => {
+            return () => {
+                if (saveConfigTimerRef.current) {
+                    clearTimeout(saveConfigTimerRef.current);
+                }
+            };
+        }, []);
+
+        const updateLayoutConfig = useCallback((updater) => {
+            const baseConfig = normalizeDashboardLayoutConfig(layoutConfig || {});
+            baseConfig.scopeMode = layoutScopeMode || baseConfig.scopeMode;
+            baseConfig.showAllWidgetsInDock = typeof showAllWidgetsInDock === 'boolean'
+                ? showAllWidgetsInDock
+                : baseConfig.showAllWidgetsInDock;
+            const nextConfig = typeof updater === 'function'
+                ? updater(baseConfig)
+                : { ...baseConfig, ...updater };
+            scheduleConfigSave(nextConfig);
+        }, [layoutConfig, layoutScopeMode, scheduleConfigSave, showAllWidgetsInDock]);
+
+        const persistLayoutForScope = useCallback((scopeId, nextLayout) => {
+            if (!scopeId) return;
+            if (isAdmin) {
+                updateLayoutConfig((config) => ({
+                    ...config,
+                    layouts: {
+                        ...config.layouts,
+                        [scopeId]: sanitizeLayout(nextLayout)
+                    }
+                }));
+            }
+            try {
+                localStorage.setItem(getLayoutStorageKey(scopeId), JSON.stringify(nextLayout));
+            } catch (e) {
+                // ignore local storage errors
+            }
+        }, [isAdmin, updateLayoutConfig]);
+
+        useEffect(() => {
+            if (!layoutConfigLoaded) return;
+            const fromConfig = getLayoutFromConfig(layoutConfig, layoutScopeId, mainTab);
+            if (fromConfig) {
+                setLayout(fromConfig);
+                return;
+            }
             const keys = getLayoutFallbackKeys(layoutScopeId, mainTab);
             const saved = loadLayoutFromStorage(keys);
-            setLayout(saved || loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout());
-        }, [layoutScopeId, mainTab]);
+            if (saved) {
+                setLayout(saved);
+                return;
+            }
+            setLayout(loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout());
+        }, [layoutConfig, layoutConfigLoaded, layoutScopeId, mainTab]);
 
         // S'assurer que le layout n'est jamais vide - ONLY RUN ONCE on mount
         // WARNING: Do NOT add layout to dependencies - causes infinite loop!
@@ -431,6 +582,9 @@ const DashboardGridWrapper = ({
 
         // Synchroniser le layout avec mainTab : ajouter les widgets par défaut si nécessaire
         useEffect(() => {
+            if (layoutScopeMode === 'global') {
+                return;
+            }
             if (!mainTab) {
                 console.log('[DashboardGridWrapper] ⏸️ Synchronisation layout/mainTab ignorée: mainTab vide');
                 return;
@@ -487,14 +641,14 @@ const DashboardGridWrapper = ({
                     
                     // Ajouter les nouveaux widgets au layout existant (garder les autres widgets)
                     const updatedLayout = [...currentLayout, ...newItems];
-                    localStorage.setItem(layoutStorageKey, JSON.stringify(updatedLayout));
+                    persistLayoutForScope(layoutScopeId, updatedLayout);
                     console.log('[DashboardGridWrapper] ✅ Layout mis à jour avec', newItems.length, 'nouveaux widgets');
                     return updatedLayout;
                 }
                 
                 return currentLayout;
             });
-        }, [mainTab]); // Ne dépendre que de mainTab pour éviter les boucles infinies
+        }, [layoutScopeId, layoutScopeMode, mainTab, persistLayoutForScope]); // Ne dépendre que de mainTab pour éviter les boucles infinies
 
         const [isEditing, setIsEditing] = useState(false);
         const [currentBreakpoint, setCurrentBreakpoint] = useState('lg');
@@ -517,9 +671,9 @@ const DashboardGridWrapper = ({
                     allLayoutsKeys: allLayouts ? Object.keys(allLayouts) : null
                 });
                 setLayout(currentLayout);
-                localStorage.setItem(layoutStorageKey, JSON.stringify(currentLayout));
+                persistLayoutForScope(layoutScopeId, currentLayout);
             }
-        }, [isEditing, layoutStorageKey]);
+        }, [isEditing, layoutScopeId, persistLayoutForScope]);
         
         // Save current layout as a specific preset
         const saveAsPreset = useCallback((presetName) => {
@@ -527,11 +681,19 @@ const DashboardGridWrapper = ({
                         presetName === 'developer' ? STORAGE_KEY_DEV : null;
                         
              if (key) {
-                 localStorage.setItem(key, JSON.stringify(layout));
+                 const sanitized = sanitizeLayout(layout);
+                 updateLayoutConfig((config) => ({
+                     ...config,
+                     presets: {
+                         ...config.presets,
+                         [presetName]: sanitized
+                     }
+                 }));
+                 localStorage.setItem(key, JSON.stringify(sanitized));
                  if (window.showToast) window.showToast(`Layout sauvegardé comme "${presetName === 'default' ? 'Production' : 'Développeur'}"`, 'success');
                  else alert(`Layout sauvegardé comme "${presetName === 'default' ? 'Production' : 'Développeur'}"`);
              }
-        }, [layout]);
+        }, [layout, updateLayoutConfig]);
 
         // Ajouter un widget
         const addWidget = useCallback((tabId) => {
@@ -539,11 +701,13 @@ const DashboardGridWrapper = ({
             if (!config) return;
 
             const widgetMainTab = getMainTabFromWidgetId(tabId);
-            const targetScopeId = widgetMainTab && widgetMainTab !== mainTab ? widgetMainTab : layoutScopeId;
+            const targetScopeId = layoutScopeMode === 'global'
+                ? layoutScopeId
+                : (widgetMainTab && widgetMainTab !== mainTab ? widgetMainTab : layoutScopeId);
             const targetStorageKey = getLayoutStorageKey(targetScopeId);
             const targetLayout = targetScopeId === layoutScopeId
                 ? layout
-                : (loadLayoutFromStorage([targetStorageKey]) || []);
+                : (getLayoutFromConfig(layoutConfig, targetScopeId, widgetMainTab) || loadLayoutFromStorage([targetStorageKey]) || []);
 
             // Vérifier si le widget existe déjà
             if (targetLayout.some(item => item.i === tabId)) {
@@ -565,42 +729,50 @@ const DashboardGridWrapper = ({
             if (targetScopeId === layoutScopeId) {
                 setLayout(updatedLayout);
             }
-            localStorage.setItem(targetStorageKey, JSON.stringify(updatedLayout));
+            persistLayoutForScope(targetScopeId, updatedLayout);
 
             if (targetScopeId !== layoutScopeId) {
                 const targetLabel = widgetMainTab ? widgetMainTab.toUpperCase() : 'AUTRE';
                 if (window.showToast) window.showToast(`Widget ajouté dans "${targetLabel}"`, 'success');
                 else console.log(`[DashboardGridWrapper] Widget ajouté dans "${targetLabel}"`);
             }
-        }, [layout, layoutScopeId, mainTab]);
+        }, [layout, layoutConfig, layoutScopeId, layoutScopeMode, mainTab, persistLayoutForScope]);
 
         // Supprimer un widget
         const removeWidget = useCallback((tabId) => {
             const updatedLayout = layout.filter(item => item.i !== tabId);
             setLayout(updatedLayout);
-            localStorage.setItem(layoutStorageKey, JSON.stringify(updatedLayout));
-        }, [layout, layoutStorageKey]);
+            persistLayoutForScope(layoutScopeId, updatedLayout);
+        }, [layout, layoutScopeId, persistLayoutForScope]);
 
         // Reset layout to Default Preset (Production)
         const resetLayout = useCallback(() => {
-            const defaultLayout = loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout();
+            const presetFromConfig = sanitizeLayout(layoutConfig?.presets?.default);
+            const defaultLayout = presetFromConfig.length > 0
+                ? presetFromConfig
+                : (loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout());
             setLayout(defaultLayout);
-            localStorage.setItem(layoutStorageKey, JSON.stringify(defaultLayout));
-        }, [layoutStorageKey]);
+            persistLayoutForScope(layoutScopeId, defaultLayout);
+        }, [layoutConfig, layoutScopeId, persistLayoutForScope]);
 
         // Load preset layout
         const loadPreset = useCallback((presetName) => {
              // Reload from storage to get latest
              let preset = null;
-             if (presetName === 'default') preset = loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout();
-             else if (presetName === 'developer') preset = loadSavedPreset(STORAGE_KEY_DEV) || LAYOUT_PRESETS.developer;
+             if (presetName === 'default') {
+                 const presetFromConfig = sanitizeLayout(layoutConfig?.presets?.default);
+                 preset = presetFromConfig.length > 0 ? presetFromConfig : (loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout());
+             } else if (presetName === 'developer') {
+                 const presetFromConfig = sanitizeLayout(layoutConfig?.presets?.developer);
+                 preset = presetFromConfig.length > 0 ? presetFromConfig : (loadSavedPreset(STORAGE_KEY_DEV) || LAYOUT_PRESETS.developer);
+             }
              else preset = LAYOUT_PRESETS[presetName];
 
             if (preset) {
                 setLayout(preset);
-                localStorage.setItem(layoutStorageKey, JSON.stringify(preset));
+                persistLayoutForScope(layoutScopeId, preset);
             }
-        }, [layoutStorageKey]);
+        }, [layoutConfig, layoutScopeId, persistLayoutForScope]);
 
         // Rendre un widget - FULL VERSION with actual components
         const renderWidget = useCallback((item) => {
@@ -768,7 +940,9 @@ const DashboardGridWrapper = ({
 
     // Filter layout to show ALL widgets for current main tab
     const filteredLayout = useMemo(() => {
-        const validIds = getWidgetIdsForMainTab(mainTab);
+        const validIds = layoutScopeMode === 'global'
+            ? Object.keys(TAB_TO_WIDGET_MAP)
+            : getWidgetIdsForMainTab(mainTab);
         const existingMap = {};
         layout.filter(item => validIds.includes(item.i)).forEach(item => {
             existingMap[item.i] = item;
@@ -793,7 +967,7 @@ const DashboardGridWrapper = ({
                 minH: minSize.h
             };
         });
-    }, [layout, mainTab]);
+    }, [layout, mainTab, layoutScopeMode]);
 
     const dockWidgetEntries = useMemo(() => {
         const allowedIds = showAllWidgetsInDock ? null : getWidgetIdsForMainTab(mainTab);
@@ -964,8 +1138,44 @@ const DashboardGridWrapper = ({
                         )}
 
                         {isAdmin && isEditing && (
+                            <select
+                                value={layoutScopeMode}
+                                onChange={(e) => {
+                                    const nextValue = e.target.value;
+                                    setLayoutScopeMode(nextValue);
+                                    updateLayoutConfig((config) => ({
+                                        ...config,
+                                        scopeMode: nextValue
+                                    }));
+                                }}
+                                className={`px-3 py-2 rounded-lg font-medium text-xs shadow-sm ${
+                                    isDarkMode
+                                        ? 'bg-neutral-700 text-gray-300 border border-neutral-600'
+                                        : 'bg-white text-gray-700 border border-gray-300'
+                                }`}
+                                title="Portée du layout (global pour tous)"
+                            >
+                                <option value="primary">Scope: Principal</option>
+                                <option value="secondary">Scope: Secondaire</option>
+                                <option value="global">Scope: Global</option>
+                            </select>
+                        )}
+
+                        {isAdmin && isEditing && (
                             <button
-                                onClick={() => setShowAllWidgetsInDock(prev => !prev)}
+                                onClick={() => {
+                                    const nextValue = !showAllWidgetsInDock;
+                                    setShowAllWidgetsInDock(nextValue);
+                                    updateLayoutConfig((config) => ({
+                                        ...config,
+                                        showAllWidgetsInDock: nextValue
+                                    }));
+                                    try {
+                                        localStorage.setItem('gob_dashboard_show_all_widgets_v1', String(nextValue));
+                                    } catch (e) {
+                                        // ignore storage errors
+                                    }
+                                }}
                                 className={`px-3 py-2 rounded-lg font-medium text-xs transition-all flex items-center gap-2 shadow-sm ${
                                     showAllWidgetsInDock
                                         ? (isDarkMode
@@ -1012,7 +1222,7 @@ const DashboardGridWrapper = ({
                                     onClick={() => {
                                         const defaultLayout = getDefaultLayout();
                                         setLayout(defaultLayout);
-                                        localStorage.setItem(layoutStorageKey, JSON.stringify(defaultLayout));
+                                        persistLayoutForScope(layoutScopeId, defaultLayout);
                                     }}
                                     className={`px-4 py-2 rounded-lg font-medium text-sm ${
                                         isDarkMode 
