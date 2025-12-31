@@ -838,6 +838,26 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             }
         }, [primaryNavConfig]);
 
+        // Auto-unfreeze safety net if pointer-events get stuck
+        useEffect(() => {
+            const checkFrozen = () => {
+                const root = document.querySelector('#root');
+                const bodyPE = document.body?.style?.pointerEvents;
+                const htmlPE = document.documentElement?.style?.pointerEvents;
+                const rootPE = root?.style?.pointerEvents;
+                return bodyPE === 'none' || htmlPE === 'none' || rootPE === 'none';
+            };
+
+            const timer = setTimeout(() => {
+                if (checkFrozen() && typeof window.forceUnfreeze === 'function') {
+                    console.warn('⚠️ UI frozen detected, running forceUnfreeze()');
+                    window.forceUnfreeze();
+                }
+            }, 2500);
+
+            return () => clearTimeout(timer);
+        }, []);
+
         // ☁️ Load Nav Configuration from Supabase (Sync)
         useEffect(() => {
             const loadSupabaseConfig = async () => {
@@ -3067,17 +3087,23 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         };
 
         // Données Seeking Alpha (RAW DATA from Supabase)
-        const fetchSeekingAlphaData = async () => {
+        const fetchSeekingAlphaData = async ({ forceFresh = false } = {}) => {
             try {
                 // Vérifier d'abord les données préchargées depuis la page de login
                 const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
-                if (preloadedDataStr) {
+                if (!forceFresh && preloadedDataStr) {
                     try {
                         const preloadedData = JSON.parse(preloadedDataStr);
                         const dataAge = Date.now() - (preloadedData.timestamp || 0);
                         const MAX_AGE = 5 * 60 * 1000; // 5 minutes
 
                         if (preloadedData.seekingAlphaData && dataAge < MAX_AGE) {
+                            const preloadedStocks = Array.isArray(preloadedData.seekingAlphaData.stocks)
+                                ? preloadedData.seekingAlphaData.stocks
+                                : [];
+                            if (preloadedStocks.length === 0) {
+                                console.warn('⚠️ Données Seeking Alpha préchargées vides, chargement depuis Supabase');
+                            } else {
                             console.log('⚡ Utilisation des données Seeking Alpha préchargées');
                             // Convertir au format attendu par le dashboard
                             const formattedData = {
@@ -3097,6 +3123,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                             setSeekingAlphaData(formattedData);
                             console.log(`✅ Seeking Alpha raw data chargée depuis préchargement: ${formattedData.stocks.length} stocks`);
                             return;
+                            }
                         }
                     } catch (e) {
                         console.warn('⚠️ Erreur lecture données Seeking Alpha préchargées:', e);
@@ -3155,11 +3182,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         };
 
         // Données Seeking Alpha ANALYZED (Gemini AI results from Supabase)
-        const fetchSeekingAlphaStockData = async () => {
+        const fetchSeekingAlphaStockData = async ({ forceFresh = false } = {}) => {
             try {
                 // Vérifier d'abord les données préchargées depuis la page de login
                 const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
-                if (preloadedDataStr) {
+                if (!forceFresh && preloadedDataStr) {
                     try {
                         const preloadedData = JSON.parse(preloadedDataStr);
                         const dataAge = Date.now() - (preloadedData.timestamp || 0);
@@ -3176,9 +3203,13 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                             } else {
                                 stocksObject = preloadedData.seekingAlphaStockData;
                             }
-                            setSeekingAlphaStockData(stocksObject);
+                            if (Object.keys(stocksObject).length === 0) {
+                                console.warn('⚠️ Données Seeking Alpha Stock préchargées vides, chargement depuis Supabase');
+                            } else {
+                            setSeekingAlphaStockData({ stocks: stocksObject, source: 'preloaded' });
                             console.log(`✅ Seeking Alpha stock data chargée depuis préchargement: ${Object.keys(stocksObject).length} stocks`);
                             return;
+                            }
                         }
                     } catch (e) {
                         console.warn('⚠️ Erreur lecture données Seeking Alpha Stock préchargées:', e);
@@ -3925,8 +3956,40 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 window.BetaCombinedDashboard.lastUpdate = lastUpdate;
                 window.BetaCombinedDashboard.tickerLatestNews = tickerLatestNews;
                 window.BetaCombinedDashboard.tickerMoveReasons = tickerMoveReasons;
+                window.BetaCombinedDashboard.seekingAlphaData = seekingAlphaData;
+                window.BetaCombinedDashboard.seekingAlphaStockData = seekingAlphaStockData;
+                window.BetaCombinedDashboard.scrapingStatus = scrapingStatus;
+                window.BetaCombinedDashboard.scrapingProgress = scrapingProgress;
+                window.BetaCombinedDashboard.scrapingLogs = scrapingLogs;
+                window.BetaCombinedDashboard.runSeekingAlphaScraper = runSeekingAlphaScraper;
+                window.BetaCombinedDashboard.clearScrapingLogs = clearScrapingLogs;
+                window.BetaCombinedDashboard.generateScrapingScript = generateScrapingScript;
+                window.BetaCombinedDashboard.addScrapingLog = addScrapingLog;
+                window.BetaCombinedDashboard.openSeekingAlpha = openSeekingAlpha;
+                window.BetaCombinedDashboard.seekingAlphaViewMode = seekingAlphaViewMode;
+                window.BetaCombinedDashboard.setSeekingAlphaViewMode = setSeekingAlphaViewMode;
+                window.BetaCombinedDashboard.analyzeWithClaude = analyzeWithClaude;
+                window.BetaCombinedDashboard.openPeersComparison = openPeersComparison;
+                window.BetaCombinedDashboard.cleanText = cleanText;
+                window.BetaCombinedDashboard.getGradeColor = getGradeColor;
             }
-        }, [teamTickers, tickers, stockData, newsData, isDarkMode, loading, lastUpdate, tickerLatestNews, tickerMoveReasons]);
+        }, [
+            teamTickers,
+            tickers,
+            stockData,
+            newsData,
+            isDarkMode,
+            loading,
+            lastUpdate,
+            tickerLatestNews,
+            tickerMoveReasons,
+            seekingAlphaData,
+            seekingAlphaStockData,
+            scrapingStatus,
+            scrapingProgress,
+            scrapingLogs,
+            seekingAlphaViewMode
+        ]);
 
         // Charger les news par ticker quand les tickers changent ET que les news générales sont disponibles
         useEffect(() => {
@@ -4377,7 +4440,10 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         const addScrapingLog = (message, type = 'info') => {
             const timestamp = new Date().toLocaleTimeString('fr-FR');
             const logEntry = { message, type, timestamp };
-            setScrapingLogs(prev => [...prev, logEntry]);
+            setScrapingLogs(prev => {
+                const next = [...prev, logEntry];
+                return next.length > 300 ? next.slice(-300) : next;
+            });
             console.log(`[${timestamp}] ${message}`);
         };
 
@@ -4475,6 +4541,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 if (successCount > 0) {
                     setScrapingStatus('completed');
                     addScrapingLog(`🎉 Scraping terminé! ${successCount} succès, ${errorCount} erreurs`, 'success');
+                    addScrapingLog('🔄 Rechargement des données Seeking Alpha...', 'info');
+                    setTimeout(() => {
+                        fetchSeekingAlphaData({ forceFresh: true });
+                        fetchSeekingAlphaStockData({ forceFresh: true });
+                    }, 4000);
                 } else {
                     setScrapingStatus('error');
                     addScrapingLog(`💥 Aucun ticker n'a pu être traité (${errorCount} erreurs)`, 'error');
@@ -4972,8 +5043,8 @@ STRUCTURE JSON OBLIGATOIRE:
                 addScrapingLog(`🔄 Rechargement des données...`, 'info');
 
                 // Recharger les données
-                await fetchSeekingAlphaData();
-                await fetchSeekingAlphaStockData();
+                await fetchSeekingAlphaData({ forceFresh: true });
+                await fetchSeekingAlphaStockData({ forceFresh: true });
 
             } catch (error) {
                 addScrapingLog(`❌ Erreur mise à jour fichiers pour ${ticker}: ${error.message}`, 'error');
@@ -27102,24 +27173,32 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         </div>
                     </div>
 
+                    {/* TradingView TickerBanner Widget - Bandeau de cotations */}
+                    <div
+                        className="border-t"
+                        style={{
+                            borderColor: 'var(--theme-border, rgba(16, 185, 129, 0.2))',
+                            background: 'var(--theme-header-bg, linear-gradient(135deg, #111827 0%, #1f2937 100%))'
+                        }}
+                    >
+                        {window.TradingViewTicker ? (
+                            <window.TradingViewTicker 
+                                isDarkMode={isDarkMode}
+                                selectedIndices={selectedIndices}
+                                setTickerExpandableUrl={setTickerExpandableUrl}
+                                setTickerExpandableTitle={setTickerExpandableTitle}
+                                setTickerExpandableOpen={setTickerExpandableOpen}
+                            />
+                        ) : (
+                            <div className="tradingview-widget-container" ref={tickerBannerRef}>
+                                <div className="tradingview-widget-container__widget"></div>
+                            </div>
+                        )}
+                    </div>
+
                     {/* Bloomberg-style bottom accent line */}
                     <div className="h-0.5 bg-gradient-to-r from-transparent via-green-500 to-transparent"></div>
                 </header>
-
-                {/* TradingView TickerBanner Widget - Bandeau de cotations */}
-                {window.TradingViewTicker ? (
-                    <window.TradingViewTicker 
-                        isDarkMode={isDarkMode}
-                        selectedIndices={selectedIndices}
-                        setTickerExpandableUrl={setTickerExpandableUrl}
-                        setTickerExpandableTitle={setTickerExpandableTitle}
-                        setTickerExpandableOpen={setTickerExpandableOpen}
-                    />
-                ) : (
-                    <div className="tradingview-widget-container" ref={tickerBannerRef}>
-                        <div className="tradingview-widget-container__widget"></div>
-                    </div>
-                )}
 
                 {/* News Banner - Bandeau d'actualités défilant */}
                 {/* News Banner - Bandeau d'actualités défilant */}
@@ -28396,5 +28475,3 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         mountApp();
     }
 }
-
-

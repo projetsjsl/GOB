@@ -124,7 +124,43 @@ export default async function handler(req, res) {
           const { data, error } = await query;
 
           if (error) {
-            throw new Error(`Supabase error: ${error.message}`);
+            console.warn('⚠️ latest_seeking_alpha_analysis indisponible, fallback table:', error.message);
+            let fallbackQuery = supabase
+              .from('seeking_alpha_analysis')
+              .select('*')
+              .order('analyzed_at', { ascending: false });
+
+            const { data: allData, error: fallbackError } = await fallbackQuery;
+
+            if (fallbackError) {
+              throw new Error(`Supabase error: ${fallbackError.message}`);
+            }
+
+            const latestByTicker = {};
+            allData.forEach(item => {
+              if (!latestByTicker[item.ticker] ||
+                  new Date(item.analyzed_at) > new Date(latestByTicker[item.ticker].analyzed_at)) {
+                latestByTicker[item.ticker] = item;
+              }
+            });
+
+            let deduped = Object.values(latestByTicker);
+
+            if (ticker) {
+              deduped = deduped.filter(item => item.ticker === ticker.toUpperCase());
+            }
+
+            deduped = deduped.slice(0, parseInt(limit));
+
+            return res.status(200).json({
+              success: true,
+              type: 'analysis',
+              filter: 'latest',
+              data: deduped,
+              count: deduped.length,
+              fallback: 'seeking_alpha_analysis',
+              timestamp: new Date().toISOString()
+            });
           }
 
           return res.status(200).json({

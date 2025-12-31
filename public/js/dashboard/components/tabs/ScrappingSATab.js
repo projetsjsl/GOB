@@ -7,6 +7,8 @@ const ScrappingSATab = (props = {}) => {
     const runSeekingAlphaScraper = props.runSeekingAlphaScraper || dashboard.runSeekingAlphaScraper || (() => {});
     const scrapingStatus = props.scrapingStatus ?? dashboard.scrapingStatus ?? 'idle';
     const scrapingLogs = Array.isArray(props.scrapingLogs) ? props.scrapingLogs : (dashboard.scrapingLogs || []);
+    const displayedLogs = scrapingLogs.slice(-200);
+    const hiddenLogsCount = Math.max(scrapingLogs.length - displayedLogs.length, 0);
     const clearScrapingLogs = props.clearScrapingLogs || dashboard.clearScrapingLogs || (() => {});
     const generateScrapingScript = props.generateScrapingScript || dashboard.generateScrapingScript || ((ticker) => `// Scrape ${ticker}`);
     const addScrapingLog = props.addScrapingLog || dashboard.addScrapingLog || ((message) => console.log(message));
@@ -146,13 +148,18 @@ const ScrappingSATab = (props = {}) => {
             <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden border border-gray-700">
                 <div className="bg-gray-800 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
                     <h3 className="text-gray-200 font-mono text-sm">Console Logs</h3>
-                    <span className="text-xs text-gray-500">{scrapingLogs.length} événements</span>
+                    <span className="text-xs text-gray-500">
+                        {hiddenLogsCount > 0 ? `${displayedLogs.length} affichés / ${scrapingLogs.length}` : `${scrapingLogs.length} événements`}
+                    </span>
                 </div>
                 <div className="p-4 h-96 overflow-y-auto font-mono text-sm space-y-1" id="scraping-console">
                     {scrapingLogs.length === 0 && (
                         <div className="text-gray-500 italic">En attente de logs...</div>
                     )}
-                    {scrapingLogs.map((log, index) => (
+                    {hiddenLogsCount > 0 && (
+                        <div className="text-xs text-gray-500 italic">Les anciens logs sont masqués pour éviter le freeze.</div>
+                    )}
+                    {displayedLogs.map((log, index) => (
                         <div key={index} className={`border-l-2 pl-2 ${
                             log.type === 'error' ? 'border-red-500 text-red-400' :
                             log.type === 'success' ? 'border-green-500 text-green-400' :
@@ -185,7 +192,11 @@ const ScrappingSATab = (props = {}) => {
                                 {seekingAlphaData.stocks.map((item, idx) => (
                                     <tr key={idx} className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                                         <td className="p-2 font-bold">{item.ticker}</td>
-                                        <td className="p-2 opacity-75">{new Date(item.lastUpdated).toLocaleString()}</td>
+                                        <td className="p-2 opacity-75">
+                                            {item.scraped_at || item.date || item.lastUpdated
+                                                ? new Date(item.scraped_at || item.date || item.lastUpdated).toLocaleString()
+                                                : 'N/A'}
+                                        </td>
                                         <td className="p-2 font-mono text-xs text-blue-500 truncate max-w-md">
                                             {JSON.stringify(item.parsedData).substring(0, 100)}...
                                         </td>

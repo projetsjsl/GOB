@@ -346,7 +346,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
 );
 
 
-const DashboardGridWrapper = ({
+    const DashboardGridWrapper = ({
         mainTab = "titres",
         isDarkMode = true,
         isAdmin = false,
@@ -420,6 +420,15 @@ const DashboardGridWrapper = ({
         const saveConfigTimerRef = useRef(null);
         const pendingConfigRef = useRef(null);
         const [layoutScopeMode, setLayoutScopeMode] = useState(DEFAULT_LAYOUT_SCOPE_MODE);
+        const [hiddenWidgets, setHiddenWidgets] = useState(() => {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY_HIDDEN);
+                const parsed = saved ? JSON.parse(saved) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                return [];
+            }
+        });
         const [showAllWidgetsInDock, setShowAllWidgetsInDock] = useState(() => {
             try {
                 const saved = localStorage.getItem('gob_dashboard_show_all_widgets_v1');
@@ -430,6 +439,7 @@ const DashboardGridWrapper = ({
         });
 
         const layoutScopeId = getLayoutScopeId(mainTab, activeTab, layoutScopeMode);
+        const hiddenWidgetSet = useMemo(() => new Set(hiddenWidgets), [hiddenWidgets]);
 
         const [layout, setLayout] = useState(() => {
             return getDefaultLayout();
@@ -504,6 +514,15 @@ const DashboardGridWrapper = ({
                     clearTimeout(saveConfigTimerRef.current);
                 }
             };
+        }, []);
+        
+        const persistHiddenWidgets = useCallback((nextHidden) => {
+            setHiddenWidgets(nextHidden);
+            try {
+                localStorage.setItem(STORAGE_KEY_HIDDEN, JSON.stringify(nextHidden));
+            } catch (e) {
+                // ignore storage errors
+            }
         }, []);
 
         const updateLayoutConfig = useCallback((updater) => {
@@ -707,17 +726,17 @@ const DashboardGridWrapper = ({
             const config = TAB_TO_WIDGET_MAP[tabId];
             if (!config) return;
 
-            const widgetMainTab = getMainTabFromWidgetId(tabId);
-            const targetScopeId = layoutScopeMode === 'global'
-                ? layoutScopeId
-                : (widgetMainTab && widgetMainTab !== mainTab ? widgetMainTab : layoutScopeId);
+            const targetScopeId = layoutScopeId;
             const targetStorageKey = getLayoutStorageKey(targetScopeId);
             const targetLayout = targetScopeId === layoutScopeId
                 ? layout
-                : (getLayoutFromConfig(layoutConfig, targetScopeId, widgetMainTab) || loadLayoutFromStorage([targetStorageKey]) || []);
+                : (getLayoutFromConfig(layoutConfig, targetScopeId, mainTab) || loadLayoutFromStorage([targetStorageKey]) || []);
 
             // Vérifier si le widget existe déjà
             if (targetLayout.some(item => item.i === tabId)) {
+                if (hiddenWidgetSet.has(tabId)) {
+                    persistHiddenWidgets(hiddenWidgets.filter(id => id !== tabId));
+                }
                 return;
             }
 
@@ -738,19 +757,23 @@ const DashboardGridWrapper = ({
             }
             persistLayoutForScope(targetScopeId, updatedLayout);
 
-            if (targetScopeId !== layoutScopeId) {
-                const targetLabel = widgetMainTab ? widgetMainTab.toUpperCase() : 'AUTRE';
-                if (window.showToast) window.showToast(`Widget ajouté dans "${targetLabel}"`, 'success');
-                else console.log(`[DashboardGridWrapper] Widget ajouté dans "${targetLabel}"`);
+            if (hiddenWidgetSet.has(tabId)) {
+                persistHiddenWidgets(hiddenWidgets.filter(id => id !== tabId));
             }
-        }, [layout, layoutConfig, layoutScopeId, layoutScopeMode, mainTab, persistLayoutForScope]);
+
+            if (window.showToast) window.showToast('Widget ajouté dans la section courante', 'success');
+            else console.log('[DashboardGridWrapper] Widget ajouté dans la section courante');
+        }, [layout, layoutConfig, layoutScopeId, mainTab, persistLayoutForScope, hiddenWidgetSet, hiddenWidgets, persistHiddenWidgets]);
 
         // Supprimer un widget
         const removeWidget = useCallback((tabId) => {
             const updatedLayout = layout.filter(item => item.i !== tabId);
             setLayout(updatedLayout);
             persistLayoutForScope(layoutScopeId, updatedLayout);
-        }, [layout, layoutScopeId, persistLayoutForScope]);
+            if (!hiddenWidgetSet.has(tabId)) {
+                persistHiddenWidgets([...hiddenWidgets, tabId]);
+            }
+        }, [layout, layoutScopeId, persistLayoutForScope, hiddenWidgetSet, hiddenWidgets, persistHiddenWidgets]);
 
         // Reset layout to Default Preset (Production)
         const resetLayout = useCallback(() => {
@@ -846,6 +869,19 @@ const DashboardGridWrapper = ({
                     tickers, stockData, newsData, loading, lastUpdate, selectedStock, setSelectedStock,
                     loadTickersFromSupabase, fetchNews, refreshAllStocks, fetchLatestNewsForTickers, getCompanyLogo
                 });
+                if (config.component === 'SeekingAlphaTab') {
+                    Object.assign(componentProps, {
+                        seekingAlphaData, seekingAlphaStockData, runSeekingAlphaScraper, scrapingStatus,
+                        scrapingLogs, clearScrapingLogs, generateScrapingScript, addScrapingLog,
+                        analyzeWithClaude, seekingAlphaViewMode, setSeekingAlphaViewMode,
+                        openPeersComparison, openSeekingAlpha, cleanText, getGradeColor
+                    });
+                }
+            } else if (config.component === 'ScrappingSATab') {
+                Object.assign(componentProps, {
+                    tickers, seekingAlphaData, runSeekingAlphaScraper, scrapingStatus,
+                    scrapingLogs, clearScrapingLogs, generateScrapingScript, addScrapingLog, Icon
+                });
             } else if (config.component === 'MarketsEconomyTab') {
                 Object.assign(componentProps, {
                     newsData, loading, lastUpdate, fetchNews, summarizeWithEmma,
@@ -886,8 +922,16 @@ const DashboardGridWrapper = ({
                             )}
                         </div>
                         {isEditing && (
-                            <button onClick={() => removeWidget(item.i)} className="p-1 rounded hover:bg-red-500/20 transition-colors" title="Retirer ce widget">
-                                <window.LucideIcon name="X" className="w-4 h-4 text-red-500" />
+                            <button
+                                onClick={() => removeWidget(item.i)}
+                                className={`p-1.5 rounded-full transition-colors border ${
+                                    isDarkMode
+                                        ? 'border-red-500/60 text-red-400 hover:bg-red-500/20'
+                                        : 'border-red-300 text-red-600 hover:bg-red-100'
+                                }`}
+                                title="Retirer ce widget"
+                            >
+                                <window.LucideIcon name="X" className="w-4 h-4" />
                             </button>
                         )}
                     </div>
@@ -956,7 +1000,9 @@ const DashboardGridWrapper = ({
         });
 
         // Generate layout for ALL widgets in this tab, using existing positions or defaults
-        return validIds.map((id, idx) => {
+        return validIds
+            .filter(id => !hiddenWidgetSet.has(id))
+            .map((id, idx) => {
             // Use existing position if available
             if (existingMap[id]) return existingMap[id];
 
@@ -974,7 +1020,7 @@ const DashboardGridWrapper = ({
                 minH: minSize.h
             };
         });
-    }, [layout, mainTab, layoutScopeMode]);
+    }, [layout, mainTab, layoutScopeMode, hiddenWidgetSet]);
 
     const dockWidgetEntries = useMemo(() => {
         const allowedIds = showAllWidgetsInDock ? null : getWidgetIdsForMainTab(mainTab);
@@ -1276,17 +1322,35 @@ const DashboardGridWrapper = ({
                                 Tous les widgets disponibles sont déjà dans la grille.
                             </span>
                         ) : (
-                            dockWidgetEntries.map(([tabId, config]) => (
-                                <button
-                                    key={tabId}
-                                    onClick={() => addWidget(tabId)}
-                                    className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all ${isDarkMode ? 'bg-neutral-700 hover:bg-neutral-600 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
-                                    title={config.label}
-                                >
-                                    <window.LucideIcon name={config.icon} className="w-5 h-5" />
-                                    <span className="text-xs">{config.label}</span>
-                                </button>
-                            ))
+                            dockWidgetEntries.map(([tabId, config]) => {
+                                const widgetMainTab = getMainTabFromWidgetId(tabId);
+                                const showScopeHint = showAllWidgetsInDock && widgetMainTab && widgetMainTab !== mainTab;
+                                return (
+                                    <button
+                                        key={tabId}
+                                        onClick={() => addWidget(tabId)}
+                                        className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all border ${
+                                            isDarkMode
+                                                ? 'bg-neutral-800 hover:bg-neutral-700 text-white border-neutral-700'
+                                                : 'bg-white hover:bg-gray-100 text-gray-800 border-gray-200'
+                                        }`}
+                                        title={`Ajouter ${config.label}`}
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            <window.LucideIcon name="Plus" className="w-4 h-4 text-emerald-400" />
+                                            <window.LucideIcon name={config.icon} className="w-5 h-5" />
+                                        </div>
+                                        <span className="text-xs font-medium">{config.label}</span>
+                                        {showScopeHint && (
+                                            <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                                                isDarkMode ? 'bg-neutral-700 text-gray-300' : 'bg-gray-200 text-gray-600'
+                                            }`}>
+                                                {widgetMainTab.toUpperCase()}
+                                            </span>
+                                        )}
+                                    </button>
+                                );
+                            })
                         )}
                     </div>
                 )}

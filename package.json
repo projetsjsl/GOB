@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vercel dev --listen 127.0.0.1:3001",
+    "dev": "vite",
+    "dev:vercel": "vercel dev --listen 127.0.0.1:3001",
     "dev:vite": "vite",
     "build": "npm run build:rgl && vite build",
     "build:vite": "vite build",

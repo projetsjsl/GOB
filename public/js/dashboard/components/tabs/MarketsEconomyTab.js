@@ -344,13 +344,14 @@ const MarketsEconomyTab = ({
                                 className={`absolute top-0 left-0 z-10 ${isLightTheme() ? 'bg-white' : 'bg-gray-800'}`}
                                 style={{ width: '100%', height: '40px' }}
                             />
+                            {/* Investing.com embed requires full origin for its scripts; avoid sandbox here. */}
                             <iframe
                                 src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&importance=1,2,3&features=datepicker,timezone,timeselector,filters&countries=6,5&calType=day&timeZone=8&lang=5&transparentBackground=1"
                                 width="100%"
                                 height="100%"
                                 frameBorder="0"
                                 allowTransparency="true"
-                                sandbox="allow-scripts allow-forms"
+                                
                                 style={{ minWidth: '100%', background: 'transparent' }}
                             />
                         </div>
