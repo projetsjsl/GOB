@@ -6,6 +6,50 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
+// CurveWatch components - loaded from global window object
+declare global {
+    interface Window {
+        CurveWatchContainer: any;
+        YieldCurveChart: any;
+        SpreadChart: any;
+        RateCards: any;
+        HistoricalCompare: any;
+    }
+}
+
+// Load CurveWatch components if not already loaded
+const loadCurveWatchComponents = async (): Promise<void> => {
+    if (window.CurveWatchContainer) {
+        return; // Already loaded
+    }
+
+    // Define the scripts to load
+    const scripts = [
+        '/js/dashboard/components/CurveWatch/CurveWatchContainer.js',
+        '/js/dashboard/components/CurveWatch/YieldCurveChart.js',
+        '/js/dashboard/components/CurveWatch/RateCards.js',
+        '/js/dashboard/components/CurveWatch/SpreadChart.js',
+        '/js/dashboard/components/CurveWatch/HistoricalCompare.js',
+        '/js/dashboard/components/CurveWatch/index.js'
+    ];
+
+    // Load each script sequentially
+    for (const src of scripts) {
+        if (Array.from(document.head.querySelectorAll('script')).some(script => script.src.includes(src))) {
+            continue; // Already loaded
+        }
+
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = false; // Ensure scripts load in order
+        await new Promise<void>((resolve, reject) => {
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+            document.head.appendChild(script);
+        });
+    }
+};
+
 export const YieldCurveTab: React.FC<TabProps> = (props) => {
     const {
         isDarkMode = true,
@@ -17,8 +61,24 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                 const [loading, setLoading] = useState(true);
                 const [error, setError] = useState(null);
                 const [selectedCountry, setSelectedCountry] = useState('both');
+                const [componentsLoaded, setComponentsLoaded] = useState(false);
                 const chartRef = useRef(null);
                 const chartInstance = useRef(null);
+
+                // Load CurveWatch components when component mounts
+                useEffect(() => {
+                    const loadComponents = async () => {
+                        try {
+                            await loadCurveWatchComponents();
+                            setComponentsLoaded(true);
+                        } catch (err) {
+                            console.error('❌ Error loading CurveWatch components:', err);
+                            setError('Failed to load CurveWatch components');
+                        }
+                    };
+
+                    loadComponents();
+                }, []);
 
                 const darkMode = isDarkMode;
 
@@ -299,7 +359,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                             )}
                         </div>
 
-                        {/* Graphique de la courbe */}
+                        {/* CurveWatch Container - Advanced yield curve visualization */}
                         {loading && (
                             <div className={`p-12 rounded-lg text-center transition-colors duration-300 ${
                                 darkMode ? 'bg-gray-800' : 'bg-white'
@@ -326,15 +386,15 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                             </div>
                         )}
 
-                        {!loading && !error && yieldData && (
+                        {!loading && !error && (
                             <>
-                                {/* Graphique */}
-                                {(yieldData.data?.us?.rates?.length > 0 || yieldData.data?.canada?.rates?.length > 0) ? (
+                                {/* CurveWatch Interactive Chart */}
+                                {componentsLoaded && window.CurveWatchContainer ? (
                                     <div className={`p-6 rounded-lg transition-colors duration-300 ${
                                         darkMode ? 'bg-gray-800' : 'bg-white'
                                     }`}>
-                                        <div style={{ height: '400px', position: 'relative' }}>
-                                            <canvas ref={chartRef} style={{ width: '100%', height: '100%' }}></canvas>
+                                        <div style={{ height: '500px', width: '100%' }}>
+                                            <window.CurveWatchContainer embedded={true} />
                                         </div>
                                     </div>
                                 ) : (
@@ -344,10 +404,12 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                                         <h3 className={`font-bold mb-2 ${
                                             darkMode ? 'text-yellow-300' : 'text-yellow-800'
                                         }`}>
-                                            ⚠️ Aucune donnée disponible
+                                            {componentsLoaded ? '⚠️ Composant CurveWatch non chargé' : '🔄 Chargement des composants CurveWatch...'}
                                         </h3>
                                         <p className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
-                                            Les données de yield curve ne sont pas disponibles. Vérifiez que la clé API FRED_API_KEY est configurée dans les variables d'environnement Vercel.
+                                            {componentsLoaded
+                                                ? 'Le composant CurveWatch est en cours de chargement. Veuillez patienter ou actualiser la page.'
+                                                : 'Initialisation des composants avancés de visualisation de courbe des taux...'}
                                         </p>
                                     </div>
                                 )}

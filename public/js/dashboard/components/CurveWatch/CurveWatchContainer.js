@@ -69,10 +69,30 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   const [rechartsReady, setRechartsReady] = useState(() => (
     !!(window.Recharts && window.Recharts.LineChart && window.Recharts.ResponsiveContainer)
   ));
+  // Debug state
+  const [debugMode, setDebugMode] = useState(false);
+  const [manualData, setManualData] = useState(null);
+  const [apiCallLog, setApiCallLog] = useState([]);
 
   useEffect(() => {
-    if (rechartsReady) return;
-    if (window.__rechartsLoading) return;
+    if (rechartsReady) {
+      if (debugMode) {
+        console.log('✅ Recharts already loaded and ready');
+      }
+      return;
+    }
+
+    if (window.__rechartsLoading) {
+      if (debugMode) {
+        console.log('🔄 Recharts already loading...');
+      }
+      return;
+    }
+
+    if (debugMode) {
+      console.log('🔄 Loading Recharts from CDN...');
+    }
+
     window.__rechartsLoading = true;
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/recharts@2.10.3/dist/Recharts.js';
@@ -80,18 +100,39 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     script.dataset.rechartsFallback = 'true';
     script.onload = () => {
       window.__rechartsLoading = false;
-      setRechartsReady(!!(window.Recharts && window.Recharts.LineChart && window.Recharts.ResponsiveContainer));
+      const isReady = !!(window.Recharts && window.Recharts.LineChart && window.Recharts.ResponsiveContainer);
+      if (debugMode) {
+        console.log('✅ Recharts loaded:', {
+          hasRecharts: !!window.Recharts,
+          hasLineChart: !!(window.Recharts && window.Recharts.LineChart),
+          hasResponsiveContainer: !!(window.Recharts && window.Recharts.ResponsiveContainer),
+          isReady
+        });
+      }
+      setRechartsReady(isReady);
     };
     script.onerror = () => {
       window.__rechartsLoading = false;
+      if (debugMode) {
+        console.error('❌ Failed to load Recharts from CDN');
+      }
     };
     document.head.appendChild(script);
-  }, [rechartsReady]);
+  }, [rechartsReady, debugMode]);
 
   // Safe fetch that bypasses any overrides
   const safeFetch = useCallback((url) => {
     // Check if we have the original fetch from before overrides
     const nativeFetch = window.nativeFetch || window.originalFetch || fetch;
+
+    // Log API call
+    if (debugMode) {
+      setApiCallLog(prev => [...prev, {
+        url,
+        timestamp: new Date().toISOString(),
+        status: 'pending'
+      }]);
+    }
 
     // If native fetch is not available, use XMLHttpRequest
     if (typeof window.XMLHttpRequest !== 'undefined') {
@@ -99,6 +140,14 @@ window.CurveWatchContainer = ({ embedded = false }) => {
         const xhr = new XMLHttpRequest();
         xhr.open('GET', url);
         xhr.onload = () => {
+          if (debugMode) {
+            setApiCallLog(prev => prev.map(log =>
+              log.url === url && log.status === 'pending'
+                ? { ...log, status: xhr.status, response: xhr.responseText.substring(0, 100) + '...' }
+                : log
+            ));
+          }
+
           if (xhr.status >= 200 && xhr.status < 300) {
             resolve({
               ok: true,
@@ -109,54 +158,114 @@ window.CurveWatchContainer = ({ embedded = false }) => {
             reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
           }
         };
-        xhr.onerror = () => reject(new Error('Network error'));
+        xhr.onerror = () => {
+          if (debugMode) {
+            setApiCallLog(prev => prev.map(log =>
+              log.url === url && log.status === 'pending'
+                ? { ...log, status: 'error', error: 'Network error' }
+                : log
+            ));
+          }
+          reject(new Error('Network error'));
+        };
         xhr.send();
       });
     } else {
       // Fallback to native fetch if XMLHttpRequest is not available
-      return nativeFetch(url);
+      return nativeFetch(url)
+        .then(response => {
+          if (debugMode) {
+            setApiCallLog(prev => prev.map(log =>
+              log.url === url && log.status === 'pending'
+                ? { ...log, status: response.status, response: 'Response received' }
+                : log
+            ));
+          }
+          return response;
+        })
+        .catch(error => {
+          if (debugMode) {
+            setApiCallLog(prev => prev.map(log =>
+              log.url === url && log.status === 'pending'
+                ? { ...log, status: 'error', error: error.message }
+                : log
+            ));
+          }
+          throw error;
+        });
     }
-  }, []);
+  }, [debugMode]);
 
   // Fetch current yield curve data
   const fetchCurrentData = useCallback(async () => {
+    if (debugMode) {
+      console.log('🔍 CurveWatch: Starting fetchCurrentData');
+    }
+
     try {
       const response = await safeFetch('/api/yield-curve?country=both');
       if (!response.ok) throw new Error('Failed to fetch yield curve data');
       const result = await response.json();
+
+      if (debugMode) {
+        console.log('📊 CurveWatch: API Response:', result);
+        console.log('📊 CurveWatch: US Data:', result.data?.us);
+        console.log('📊 CurveWatch: Canada Data:', result.data?.canada);
+      }
 
       setCurrentData({
         us: result.data?.us || null,
         canada: result.data?.canada || null
       });
       setError(null);
+
+      if (debugMode) {
+        console.log('✅ CurveWatch: Current data updated successfully');
+      }
     } catch (err) {
-      console.error('CurveWatch: Error fetching current data:', err);
+      console.error('❌ CurveWatch: Error fetching current data:', err);
       setError(err.message);
     }
-  }, [safeFetch]);
+  }, [safeFetch, debugMode]);
 
   // Fetch historical data
   const fetchHistoricalData = useCallback(async (period) => {
+    if (debugMode) {
+      console.log('🔍 CurveWatch: Starting fetchHistoricalData for period:', period);
+    }
+
     try {
       const response = await safeFetch(`/api/yield-curve?history=true&country=both&period=${period}`);
       if (!response.ok) throw new Error('Failed to fetch historical data');
       const result = await response.json();
+
+      if (debugMode) {
+        console.log('📊 CurveWatch: Historical API Response:', result);
+        console.log('📊 CurveWatch: Historical US Data:', result.history?.us?.length, 'items');
+        console.log('📊 CurveWatch: Historical Canada Data:', result.history?.canada?.length, 'items');
+      }
 
       setHistoricalData({
         us: result.history?.us || [],
         canada: result.history?.canada || []
       });
     } catch (err) {
-      console.error('CurveWatch: Error fetching historical data:', err);
+      console.error('❌ CurveWatch: Error fetching historical data:', err);
     }
-  }, [safeFetch]);
+  }, [safeFetch, debugMode]);
 
   // Fetch compare date data
   const fetchCompareData = useCallback(async (date) => {
     if (!date) {
+      if (debugMode) {
+        console.log('🔍 CurveWatch: Clearing compare data (no date provided)');
+      }
       setCompareData(null);
       return;
+    }
+
+    if (debugMode) {
+      console.log('🔍 CurveWatch: Starting fetchCompareData for date:', date);
     }
 
     try {
@@ -164,52 +273,98 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       if (!response.ok) throw new Error('Failed to fetch compare data');
       const result = await response.json();
 
+      if (debugMode) {
+        console.log('📊 CurveWatch: Compare API Response:', result);
+        console.log('📊 CurveWatch: Compare US Data:', result.data?.us);
+        console.log('📊 CurveWatch: Compare Canada Data:', result.data?.canada);
+      }
+
       setCompareData({
         us: result.data?.us || null,
         canada: result.data?.canada || null,
         date
       });
     } catch (err) {
-      console.error('CurveWatch: Error fetching compare data:', err);
+      console.error('❌ CurveWatch: Error fetching compare data:', err);
       setCompareData(null);
     }
-  }, [safeFetch]);
+  }, [safeFetch, debugMode]);
 
   // Initial load
   useEffect(() => {
     const loadData = async () => {
+      if (debugMode) {
+        console.log('🔍 CurveWatch: Starting initial data load');
+      }
+
       setLoading(true);
       await Promise.all([
         fetchCurrentData(),
         fetchHistoricalData(selectedPeriod)
       ]);
       setLoading(false);
+
+      if (debugMode) {
+        console.log('✅ CurveWatch: Initial data load completed');
+      }
     };
     loadData();
-  }, [fetchCurrentData, fetchHistoricalData, selectedPeriod]);
+  }, [fetchCurrentData, fetchHistoricalData, selectedPeriod, debugMode]);
 
   // Fetch compare data when date changes
   useEffect(() => {
+    if (debugMode) {
+      console.log('🔍 CurveWatch: Compare date changed to:', compareDate);
+    }
     fetchCompareData(compareDate);
-  }, [compareDate, fetchCompareData]);
+  }, [compareDate, fetchCompareData, debugMode]);
 
   // Refresh data periodically (every 5 minutes)
   useEffect(() => {
-    const interval = setInterval(fetchCurrentData, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, [fetchCurrentData]);
+    if (debugMode) {
+      console.log('🔄 CurveWatch: Setting up auto-refresh interval');
+    }
+
+    const interval = setInterval(() => {
+      if (debugMode) {
+        console.log('🔄 CurveWatch: Auto-refresh triggered');
+      }
+      fetchCurrentData();
+    }, 5 * 60 * 1000);
+
+    return () => {
+      if (debugMode) {
+        console.log('🔄 CurveWatch: Cleaning up auto-refresh interval');
+      }
+      clearInterval(interval);
+    };
+  }, [fetchCurrentData, debugMode]);
 
   // Transform rates array to chart data
   const getChartData = useCallback(() => {
-    if (!currentData.us && !currentData.canada) return [];
+    if (debugMode) {
+      console.log('📊 CurveWatch: getChartData called with currentData:', currentData);
+      console.log('📊 CurveWatch: compareData:', compareData);
+    }
+
+    if (!currentData.us && !currentData.canada) {
+      if (debugMode) {
+        console.log('📊 CurveWatch: No current data available, returning empty array');
+      }
+      return [];
+    }
 
     const maturities = ['1M', '2M', '3M', '6M', '1Y', '2Y', '3Y', '5Y', '7Y', '10Y', '20Y', '30Y'];
 
-    return maturities.map(maturity => {
+    const chartData = maturities.map(maturity => {
       const usRate = currentData.us?.rates?.find(r => r.maturity === maturity);
       const canadaRate = currentData.canada?.rates?.find(r => r.maturity === maturity);
       const usCompare = compareData?.us?.rates?.find(r => r.maturity === maturity);
       const canadaCompare = compareData?.canada?.rates?.find(r => r.maturity === maturity);
+
+      if (debugMode && (usRate || canadaRate)) {
+        console.log(`📊 CurveWatch: Maturity ${maturity} - US: ${usRate?.rate || 'null'}, CA: ${canadaRate?.rate || 'null'}`);
+      }
 
       return {
         maturity,
@@ -222,18 +377,39 @@ window.CurveWatchContainer = ({ embedded = false }) => {
         canadaCompare: canadaCompare?.rate || null,
       };
     }).filter(d => d.us !== null || d.canada !== null);
-  }, [currentData, compareData]);
+
+    if (debugMode) {
+      console.log('📊 CurveWatch: Final chart data:', chartData);
+    }
+
+    return chartData;
+  }, [currentData, compareData, debugMode]);
 
   // Get spread history data
   const getSpreadHistoryData = useCallback(() => {
-    if (!historicalData.us.length) return [];
+    if (debugMode) {
+      console.log('📊 CurveWatch: getSpreadHistoryData called with historicalData:', historicalData);
+    }
 
-    return historicalData.us.map(item => ({
+    if (!historicalData.us.length) {
+      if (debugMode) {
+        console.log('📊 CurveWatch: No historical data available, returning empty array');
+      }
+      return [];
+    }
+
+    const spreadData = historicalData.us.map(item => ({
       date: item.data_date,
       spread: item.spread_10y_2y,
       inverted: item.inverted
     })).filter(d => d.spread !== null);
-  }, [historicalData]);
+
+    if (debugMode) {
+      console.log('📊 CurveWatch: Final spread history data:', spreadData);
+    }
+
+    return spreadData;
+  }, [historicalData, debugMode]);
 
   // Helper function
   const maturityToMonths = (maturity) => {
@@ -242,6 +418,44 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     if (maturity.includes('Y')) return value * 12;
     return 0;
   };
+
+  // Function to test API calls directly
+  const testApiCall = useCallback(async () => {
+    if (debugMode) {
+      console.log('🔍 Testing API call directly...');
+    }
+
+    try {
+      const response = await fetch('/api/yield-curve?country=both');
+      const data = await response.json();
+
+      if (debugMode) {
+        console.log('✅ API Test Response:', data);
+        console.log('✅ API Test - US Data Structure:', data.data?.us);
+        console.log('✅ API Test - Canada Data Structure:', data.data?.canada);
+
+        // Validate data structure
+        if (data.data?.us?.rates) {
+          console.log('✅ US rates structure OK:', data.data.us.rates.length, 'items');
+          console.log('✅ Sample US rate:', data.data.us.rates[0]);
+        } else {
+          console.warn('⚠️ US rates structure invalid:', data.data?.us);
+        }
+
+        if (data.data?.canada?.rates) {
+          console.log('✅ Canada rates structure OK:', data.data.canada.rates.length, 'items');
+          console.log('✅ Sample Canada rate:', data.data.canada.rates[0]);
+        } else {
+          console.warn('⚠️ Canada rates structure invalid:', data.data?.canada);
+        }
+      }
+
+      return data;
+    } catch (error) {
+      console.error('❌ API Test Error:', error);
+      return null;
+    }
+  }, [debugMode]);
 
   // Period selector
   const periods = [
@@ -332,6 +546,23 @@ window.CurveWatchContainer = ({ embedded = false }) => {
         <div style={{ color: colors.textMuted }}>
           Chargement de Recharts en cours...
         </div>
+        {/* Debug controls */}
+        <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
+          <button
+            onClick={() => setDebugMode(!debugMode)}
+            style={{
+              padding: '6px 12px',
+              backgroundColor: debugMode ? '#ef4444' : '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+          >
+            {debugMode ? 'Debug ON' : 'Debug OFF'}
+          </button>
+        </div>
       </div>
     );
   }
@@ -340,6 +571,23 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     return (
       <div style={{ ...containerStyle, justifyContent: 'center', alignItems: 'center' }}>
         <div style={{ color: colors.textMuted }}>Chargement des courbes de taux...</div>
+        {/* Debug controls */}
+        <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
+          <button
+            onClick={() => setDebugMode(!debugMode)}
+            style={{
+              padding: '6px 12px',
+              backgroundColor: debugMode ? '#ef4444' : '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+          >
+            {debugMode ? 'Debug ON' : 'Debug OFF'}
+          </button>
+        </div>
       </div>
     );
   }
@@ -354,12 +602,34 @@ window.CurveWatchContainer = ({ embedded = false }) => {
         >
           Réessayer
         </button>
+        {/* Debug controls */}
+        <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
+          <button
+            onClick={() => setDebugMode(!debugMode)}
+            style={{
+              padding: '6px 12px',
+              backgroundColor: debugMode ? '#ef4444' : '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+          >
+            {debugMode ? 'Debug ON' : 'Debug OFF'}
+          </button>
+        </div>
       </div>
     );
   }
 
   const chartData = getChartData();
   const spreadData = getSpreadHistoryData();
+
+  if (debugMode) {
+    console.log('📊 Final chart data passed to YieldCurveChart:', chartData);
+    console.log('📊 Final spread data passed to SpreadChart:', spreadData);
+  }
 
   return (
     <div style={containerStyle}>
@@ -381,7 +651,205 @@ window.CurveWatchContainer = ({ embedded = false }) => {
             </button>
           ))}
         </div>
+
+        {/* Debug controls */}
+        <div style={{ display: 'flex', gap: '6px' }}>
+          <button
+            onClick={() => setDebugMode(!debugMode)}
+            style={{
+              padding: '4px 8px',
+              backgroundColor: debugMode ? '#ef4444' : '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '10px'
+            }}
+          >
+            {debugMode ? 'Debug ON' : 'Debug OFF'}
+          </button>
+        </div>
       </div>
+
+      {/* Debug Panel - Only shown when debug mode is on */}
+      {debugMode && (
+        <div style={{
+          backgroundColor: colors.tooltip,
+          border: `1px solid ${colors.border}`,
+          borderRadius: '8px',
+          padding: '12px',
+          marginBottom: '12px'
+        }}>
+          <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '8px', color: colors.text }}>
+            🐞 Debug Panel
+          </div>
+
+          {/* API Call Log */}
+          <div style={{ marginBottom: '12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '4px', color: colors.text }}>
+              API Calls ({apiCallLog.length}):
+            </div>
+            <div style={{ maxHeight: '100px', overflowY: 'auto', fontSize: '10px', color: colors.textMuted }}>
+              {apiCallLog.slice(-5).map((log, i) => (
+                <div key={i} style={{ marginBottom: '2px' }}>
+                  {log.status === 'pending' ? '⏳' : log.status === 'error' ? '❌' : '✅'}
+                  {log.url} - {log.status} {log.response && `(${log.response})`}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Manual Data Input */}
+          <div style={{ marginBottom: '12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '4px', color: colors.text }}>
+              Manual Data Input:
+            </div>
+            <textarea
+              value={manualData || ''}
+              onChange={(e) => setManualData(e.target.value)}
+              placeholder="Paste JSON data here to manually load it"
+              style={{
+                width: '100%',
+                height: '80px',
+                padding: '6px',
+                borderRadius: '4px',
+                border: `1px solid ${colors.border}`,
+                backgroundColor: colors.cardBg,
+                color: colors.text,
+                fontSize: '10px',
+                fontFamily: 'monospace'
+              }}
+            />
+            <div style={{ display: 'flex', gap: '4px', marginTop: '4px' }}>
+              <button
+                onClick={() => {
+                  try {
+                    if (manualData) {
+                      const parsed = JSON.parse(manualData);
+                      setCurrentData({
+                        us: parsed.data?.us || null,
+                        canada: parsed.data?.canada || null
+                      });
+                      setError(null);
+                      console.log('✅ Manual data loaded:', parsed);
+                    }
+                  } catch (err) {
+                    console.error('❌ Error parsing manual data:', err);
+                    setError('Invalid JSON format');
+                  }
+                }}
+                style={{
+                  padding: '4px 8px',
+                  backgroundColor: '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '10px'
+                }}
+              >
+                Load Manual Data
+              </button>
+              <button
+                onClick={() => {
+                  // Load sample mock data
+                  const mockData = {
+                    data: {
+                      us: {
+                        country: "US",
+                        currency: "USD",
+                        date: new Date().toISOString().split('T')[0],
+                        source: "Mock Data",
+                        rates: [
+                          { maturity: "1M", rate: 5.35, months: 1, change1M: 0.05 },
+                          { maturity: "2M", rate: 5.30, months: 2, change1M: 0.03 },
+                          { maturity: "3M", rate: 5.28, months: 3, change1M: 0.02 },
+                          { maturity: "6M", rate: 5.15, months: 6, change1M: -0.02 },
+                          { maturity: "1Y", rate: 4.95, months: 12, change1M: -0.05 },
+                          { maturity: "2Y", rate: 4.65, months: 24, change1M: -0.10 },
+                          { maturity: "3Y", rate: 4.45, months: 36, change1M: -0.12 },
+                          { maturity: "5Y", rate: 4.25, months: 60, change1M: -0.15 },
+                          { maturity: "7Y", rate: 4.30, months: 84, change1M: -0.12 },
+                          { maturity: "10Y", rate: 4.35, months: 120, change1M: -0.10 },
+                          { maturity: "20Y", rate: 4.45, months: 240, change1M: -0.08 },
+                          { maturity: "30Y", rate: 4.40, months: 360, change1M: -0.07 }
+                        ]
+                      },
+                      canada: {
+                        country: "Canada",
+                        currency: "CAD",
+                        date: new Date().toISOString().split('T')[0],
+                        source: "Mock Data",
+                        rates: [
+                          { maturity: "1M", rate: 4.85, months: 1, change1M: 0.02 },
+                          { maturity: "2M", rate: 4.80, months: 2, change1M: 0.01 },
+                          { maturity: "3M", rate: 4.78, months: 3, change1M: 0.00 },
+                          { maturity: "6M", rate: 4.65, months: 6, change1M: -0.03 },
+                          { maturity: "1Y", rate: 4.45, months: 12, change1M: -0.06 },
+                          { maturity: "2Y", rate: 4.15, months: 24, change1M: -0.11 },
+                          { maturity: "3Y", rate: 3.95, months: 36, change1M: -0.13 },
+                          { maturity: "5Y", rate: 3.75, months: 60, change1M: -0.16 },
+                          { maturity: "7Y", rate: 3.80, months: 84, change1M: -0.13 },
+                          { maturity: "10Y", rate: 3.85, months: 120, change1M: -0.11 },
+                          { maturity: "20Y", rate: 3.95, months: 240, change1M: -0.09 },
+                          { maturity: "30Y", rate: 3.90, months: 360, change1M: -0.08 }
+                        ]
+                      }
+                    };
+                    setCurrentData({
+                      us: mockData.data.us,
+                      canada: mockData.data.canada
+                    });
+                    setError(null);
+                    console.log('✅ Sample mock data loaded');
+                  }
+                }}
+                style={{
+                  padding: '4px 8px',
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '10px'
+                }}
+              >
+                Load Sample Data
+              </button>
+            </div>
+          </div>
+
+          {/* Data Status */}
+          <div style={{ marginBottom: '12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '4px', color: colors.text }}>
+              Data Status:
+            </div>
+            <div style={{ fontSize: '10px', color: colors.textMuted }}>
+              US Rates: {currentData.us?.rates?.length || 0},
+              CA Rates: {currentData.canada?.rates?.length || 0},
+              Chart Points: {chartData.length}
+            </div>
+          </div>
+
+          {/* API Test Button */}
+          <div>
+            <button
+              onClick={testApiCall}
+              style={{
+                padding: '4px 8px',
+                backgroundColor: '#8b5cf6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '10px'
+              }}
+            >
+              Test API Call
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Controls */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
@@ -458,13 +926,19 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       </div>
 
       {/* Rate Cards */}
-      <RateCards
-        usData={currentData.us}
-        canadaData={currentData.canada}
-        colors={colors}
-        showUS={showUS}
-        showCanada={showCanada}
-      />
+      {window.RateCards ? (
+        <RateCards
+          usData={currentData.us}
+          canadaData={currentData.canada}
+          colors={colors}
+          showUS={showUS}
+          showCanada={showCanada}
+        />
+      ) : (
+        <div style={{ padding: '12px', color: colors.textMuted, fontSize: '12px' }}>
+          RateCards component not loaded
+        </div>
+      )}
 
       {/* Charts */}
       <div style={{ flex: 1, minHeight: '300px' }}>
@@ -479,22 +953,34 @@ window.CurveWatchContainer = ({ embedded = false }) => {
         )}
 
         {activeView === 'spread' && (
-          <SpreadChart
-            data={spreadData}
-            colors={colors}
-            isDark={isDark}
-          />
+          window.SpreadChart ? (
+            <SpreadChart
+              data={spreadData}
+              colors={colors}
+              isDark={isDark}
+            />
+          ) : (
+            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: colors.textMuted }}>
+              SpreadChart component not loaded
+            </div>
+          )
         )}
 
         {activeView === 'compare' && (
-          <HistoricalCompare
-            currentData={chartData}
-            compareData={compareData}
-            colors={colors}
-            showUS={showUS}
-            showCanada={showCanada}
-            isDark={isDark}
-          />
+          window.HistoricalCompare ? (
+            <HistoricalCompare
+              currentData={chartData}
+              compareData={compareData}
+              colors={colors}
+              showUS={showUS}
+              showCanada={showCanada}
+              isDark={isDark}
+            />
+          ) : (
+            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: colors.textMuted }}>
+              HistoricalCompare component not loaded
+            </div>
+          )
         )}
       </div>
 

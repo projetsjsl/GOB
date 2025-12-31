@@ -14,6 +14,8 @@ const EmailBriefingsTab = lazy(() => import('./tabs/EmailBriefingsTab'));
 const TestOnlyTab = lazy(() => import('./tabs/TestOnlyTab'));
 const NouvellesTab = lazy(() => import('./tabs/NouvellesTab'));
 const FinanceProTab = lazy(() => import('./tabs/FinanceProTab'));
+const YieldCurveTab = lazy(() => import('./tabs/YieldCurveTab'));
+const AdvancedAnalysisTab = lazy(() => import('./tabs/AdvancedAnalysisTab'));
 
 // Loading fallback component
 const TabLoadingFallback = () => (
@@ -470,6 +472,8 @@ export const BetaCombinedDashboard: React.FC = () => {
                 case 'plus': return PlusTab;
                 case 'watchlist': return DansWatchlistTab;
                 case 'economic-calendar': return EconomicCalendarTab;
+                case 'yield-curve': return YieldCurveTab;
+                case 'advanced-analysis': return AdvancedAnalysisTab;
                 case 'finance-pro': return FinanceProTab;
                 default: return StocksNewsTab;
             }
@@ -503,6 +507,8 @@ export const BetaCombinedDashboard: React.FC = () => {
                         { id: 'email-briefings' as TabName, label: '📧 Briefings' },
                         { id: 'watchlist' as TabName, label: '⭐ Watchlist' },
                         { id: 'economic-calendar' as TabName, label: '📅 Calendar' },
+                        { id: 'yield-curve' as TabName, label: '📈 Yield Curve' },
+                        { id: 'advanced-analysis' as TabName, label: '🔬 Analyse Pro' },
                         { id: 'ask-emma' as TabName, label: '🤖 Emma IA™' },
                         { id: 'emma-config' as TabName, label: '🛠️ Emma Config' },
                         { id: 'testonly' as TabName, label: '🧪 Test Only' },

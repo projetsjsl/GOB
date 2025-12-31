@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vercel dev --listen 127.0.0.1:3001",
+    "dev:vite": "vite",
     "build": "npm run build:rgl && vite build",
     "build:vite": "vite build",
     "build:rgl": "esbuild src/react-grid-layout-bridge.js --bundle --outfile=public/js/react-grid-layout-bundle.js --format=iife --global-name=ReactGridLayout --external:react --external:react-dom --minify",

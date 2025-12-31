@@ -91,10 +91,9 @@ const CustomLegend = ({ payload, colors }) => {
 };
 
 window.YieldCurveChart = ({ data, colors, showUS, showCanada, isDark }) => {
-  const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-    ResponsiveContainer, ReferenceLine, Brush } = window.Recharts || {};
-
-  if (!LineChart || !ResponsiveContainer) {
+  // Verify Recharts is available
+  if (!window.Recharts) {
+    console.error('❌ Recharts not available in window.Recharts');
     return (
       <div style={{
         height: '100%',
@@ -103,12 +102,36 @@ window.YieldCurveChart = ({ data, colors, showUS, showCanada, isDark }) => {
         justifyContent: 'center',
         color: colors?.textMuted || '#888888'
       }}>
-        Chargement du graphique...
+        Recharts non disponible
+      </div>
+    );
+  }
+
+  const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+    ResponsiveContainer, ReferenceLine, Brush } = window.Recharts;
+
+  if (!LineChart || !ResponsiveContainer) {
+    console.error('❌ Recharts components not available:', {
+      hasLineChart: !!LineChart,
+      hasResponsiveContainer: !!ResponsiveContainer,
+      availableKeys: window.Recharts ? Object.keys(window.Recharts) : 'Recharts not found'
+    });
+
+    return (
+      <div style={{
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: colors?.textMuted || '#888888'
+      }}>
+        Composants Recharts manquants
       </div>
     );
   }
 
   if (!data || data.length === 0) {
+    console.log('📊 YieldCurveChart: No data to display');
     return (
       <div style={{
         height: '100%',
@@ -118,6 +141,27 @@ window.YieldCurveChart = ({ data, colors, showUS, showCanada, isDark }) => {
         color: colors.textMuted
       }}>
         Aucune donnée disponible
+      </div>
+    );
+  }
+
+  // Validate data structure before chart rendering
+  const validData = data.filter(item =>
+    (showUS && item.us !== null) ||
+    (showCanada && item.canada !== null)
+  );
+
+  if (validData.length === 0) {
+    console.log('📊 YieldCurveChart: No valid data points to display after filtering');
+    return (
+      <div style={{
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: colors.textMuted
+      }}>
+        Aucune donnée valide à afficher
       </div>
     );
   }
