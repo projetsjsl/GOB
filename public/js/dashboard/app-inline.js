@@ -1609,6 +1609,15 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             }
         };
 
+        const scheduleNonCritical = (fn) => {
+            const runner = () => fn().catch(() => {});
+            if (typeof window !== 'undefined' && window._scheduleNonCritical) {
+                window._scheduleNonCritical(runner);
+            } else {
+                setTimeout(runner, 0);
+            }
+        };
+
         // Fonction pour gérer le changement d'onglet avec animations d'intro
         const handleTabChange = (tabId) => {
             // Ajouter l'onglet actuel à l'historique (sauf si on va au même onglet)
@@ -1643,15 +1652,19 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             }
 
             // Afficher intro Seeking Alpha si c'est la première visite de cette page load
-            if (tabId === 'scrapping-sa' || tabId === 'seeking-alpha') {
+            if (tabId === 'scrapping-sa' || tabId === 'admin-scraping' || tabId === 'seeking-alpha' || tabId === 'titres-seeking') {
                 if (!tabsVisitedThisSession['seekingalpha']) {
                     setShowSeekingAlphaIntro(true);
                     setTimeout(() => setShowSeekingAlphaIntro(false), 3000);
                     setTabsVisitedThisSession(prev => ({ ...prev, 'seekingalpha': true }));
                 }
-                // Charger les données Seeking Alpha
-                fetchSeekingAlphaData();
-                fetchSeekingAlphaStockData();
+                // Charger les données Seeking Alpha (éviter le blocage UI)
+                if (tabId === 'scrapping-sa' || tabId === 'admin-scraping') {
+                    scheduleNonCritical(() => fetchSeekingAlphaData({ parseRaw: false, limit: 30 }));
+                } else {
+                    scheduleNonCritical(() => fetchSeekingAlphaData({ parseRaw: true, limit: 100 }));
+                    scheduleNonCritical(() => fetchSeekingAlphaStockData());
+                }
             }
         };
 
@@ -1663,6 +1676,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 // 1) Déterminer s'il s'agit d'un onglet principal ou secondaire AVANT de vérifier les redirects
                 const isMainTab = MAIN_TABS.find(t => t.id === tabId);
                 let targetTabId = tabId;
+                const nextMainTab = isMainTab ? tabId : getMainTabFromId(tabId);
 
                 if (isMainTab) {
                     setMainTab(tabId);
@@ -1670,10 +1684,13 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                     setActiveSubTab(defaultSub);
                     targetTabId = defaultSub;
                 } else {
-                    const mainTabId = getMainTabFromId(tabId);
-                    setMainTab(mainTabId);
+                    setMainTab(nextMainTab);
                     setActiveSubTab(tabId);
                     targetTabId = tabId;
+                }
+                
+                if (nextMainTab === 'emma' && typeof window !== 'undefined') {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
 
                 // 2) Gestion des redirects définis dans SUB_TABS (uniquement pour les sous-onglets)
@@ -3087,7 +3104,12 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         };
 
         // Données Seeking Alpha (RAW DATA from Supabase)
-        const fetchSeekingAlphaData = async ({ forceFresh = false } = {}) => {
+        const fetchSeekingAlphaData = async ({
+            forceFresh = false,
+            parseRaw = true,
+            limit = 100,
+            trimRawLength = 20000
+        } = {}) => {
             try {
                 // Vérifier d'abord les données préchargées depuis la page de login
                 const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
@@ -3132,7 +3154,8 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
                 // Sinon, charger normalement depuis l'API
                 console.log('📊 Chargement des données brutes Seeking Alpha depuis Supabase...');
-                const response = await fetch(`${API_BASE_URL}/api/seeking-alpha-scraping?type=raw&latest=true&limit=100`);
+                const safeLimit = Number.isFinite(limit) ? limit : 100;
+                const response = await fetch(`${API_BASE_URL}/api/seeking-alpha-scraping?type=raw&latest=true&limit=${safeLimit}`);
                 if (response.ok) {
                     const result = await response.json();
 
@@ -3141,11 +3164,20 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                         const formattedData = {
                             stocks: result.data.map(item => ({
                                 ticker: item.ticker,
-                                raw_text: item.raw_text,
+                                raw_text: parseRaw
+                                    ? item.raw_text
+                                    : (typeof item.raw_text === 'string' ? item.raw_text.slice(0, trimRawLength) : item.raw_text),
+                                raw_text_preview: typeof item.raw_text === 'string'
+                                    ? item.raw_text.slice(0, trimRawLength)
+                                    : item.raw_text,
                                 url: item.url,
                                 scraped_at: item.scraped_at,
                                 status: item.status,
-                                parsedData: parseSeekingAlphaRawText(item.raw_text)
+                                parsedData: parseRaw
+                                    ? parseSeekingAlphaRawText(typeof item.raw_text === 'string'
+                                        ? item.raw_text.slice(0, trimRawLength)
+                                        : item.raw_text)
+                                    : null
                             })),
                             timestamp: result.timestamp,
                             source: 'supabase'
@@ -3168,7 +3200,17 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                         if (data.stocks && Array.isArray(data.stocks)) {
                             data.stocks = data.stocks.map(stock => ({
                                 ...stock,
-                                parsedData: parseSeekingAlphaRawText(stock.raw_text)
+                                raw_text: parseRaw
+                                    ? stock.raw_text
+                                    : (typeof stock.raw_text === 'string' ? stock.raw_text.slice(0, trimRawLength) : stock.raw_text),
+                                raw_text_preview: typeof stock.raw_text === 'string'
+                                    ? stock.raw_text.slice(0, trimRawLength)
+                                    : stock.raw_text,
+                                parsedData: parseRaw
+                                    ? parseSeekingAlphaRawText(typeof stock.raw_text === 'string'
+                                        ? stock.raw_text.slice(0, trimRawLength)
+                                        : stock.raw_text)
+                                    : null
                             }));
                         }
                         setSeekingAlphaData({ ...data, source: 'json_fallback' });

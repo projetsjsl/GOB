@@ -81,7 +81,7 @@
     };
 
     // Scripts that should be pre-loaded (essential for initial experience)
-    const PRELOAD_TABS = ['markets-economy', 'marches-global', 'ask-emma'];
+    const PRELOAD_TABS = ['markets-economy', 'marches-global', 'ask-emma', 'admin-scraping'];
 
     /**
      * Load a tab's script dynamically
