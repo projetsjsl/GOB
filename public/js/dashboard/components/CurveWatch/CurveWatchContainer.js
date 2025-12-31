@@ -9,8 +9,6 @@
  */
 
 const { useState, useEffect, useCallback, useMemo } = React;
-const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-        ReferenceLine, Area, AreaChart, ComposedChart, Brush } = window.Recharts || {};
 
 // Hook to get theme from GOBThemes
 const useDarkMode = () => {
@@ -68,7 +66,27 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   const [activeView, setActiveView] = useState('curves'); // 'curves', 'spread', 'compare'
   const [showCanada, setShowCanada] = useState(true);
   const [showUS, setShowUS] = useState(true);
-  const rechartsReady = !!(window.Recharts && window.Recharts.LineChart && window.Recharts.ResponsiveContainer);
+  const [rechartsReady, setRechartsReady] = useState(() => (
+    !!(window.Recharts && window.Recharts.LineChart && window.Recharts.ResponsiveContainer)
+  ));
+
+  useEffect(() => {
+    if (rechartsReady) return;
+    if (window.__rechartsLoading) return;
+    window.__rechartsLoading = true;
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/recharts@2.10.3/dist/Recharts.js';
+    script.async = true;
+    script.dataset.rechartsFallback = 'true';
+    script.onload = () => {
+      window.__rechartsLoading = false;
+      setRechartsReady(!!(window.Recharts && window.Recharts.LineChart && window.Recharts.ResponsiveContainer));
+    };
+    script.onerror = () => {
+      window.__rechartsLoading = false;
+    };
+    document.head.appendChild(script);
+  }, [rechartsReady]);
 
   // Safe fetch that bypasses any overrides
   const safeFetch = useCallback((url) => {
@@ -312,7 +330,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     return (
       <div style={{ ...containerStyle, justifyContent: 'center', alignItems: 'center' }}>
         <div style={{ color: colors.textMuted }}>
-          Recharts library not loaded. Please verify the CDN script is included.
+          Chargement de Recharts en cours...
         </div>
       </div>
     );

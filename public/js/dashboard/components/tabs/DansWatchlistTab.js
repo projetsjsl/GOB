@@ -143,38 +143,43 @@ const DansWatchlistTab = (props = {}) => {
 
     // État pour éviter le rechargement de la watchlist
     const [watchlistLoaded, setWatchlistLoaded] = useState(false);
+    const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
     // Charger la watchlist UNE SEULE FOIS au démarrage
     useEffect(() => {
         if (watchlistLoaded) return; // Éviter les rechargements
         
         const loadInitialWatchlist = async () => {
+            let tickers = [];
             try {
                 // Essayer de charger depuis Supabase d'abord
                 const res = await fetch('/api/supabase-watchlist');
                 if (res.ok) {
                     const json = await res.json();
-                    const tickers = Array.isArray(json.tickers) ? json.tickers : [];
+                    tickers = Array.isArray(json.tickers) ? json.tickers : [];
                     void('✅ Watchlist chargée depuis Supabase:', tickers);
-                    setWatchlistTickers(tickers);
-                    localStorage.setItem('dans-watchlist', JSON.stringify(tickers));
-                    loadWatchlistData(tickers);
-                    setWatchlistLoaded(true);
-                    return;
                 }
             } catch (e) {
                 void('⚠️ Supabase non disponible, utilisation du localStorage');
             }
             
-            // Fallback: charger depuis localStorage
-            const savedWatchlist = localStorage.getItem('dans-watchlist');
-            if (savedWatchlist) {
-                const tickers = JSON.parse(savedWatchlist);
-                void('📦 Watchlist chargée depuis localStorage:', tickers);
-                setWatchlistTickers(tickers);
-                loadWatchlistData(tickers);
+            if (!tickers.length) {
+                // Fallback: charger depuis localStorage
+                const savedWatchlist = localStorage.getItem('dans-watchlist');
+                if (savedWatchlist) {
+                    tickers = JSON.parse(savedWatchlist);
+                    void('📦 Watchlist chargée depuis localStorage:', tickers);
+                }
             }
+
+            if (tickers.length) {
+                setWatchlistTickers(tickers);
+                localStorage.setItem('dans-watchlist', JSON.stringify(tickers));
+                await loadWatchlistData(tickers);
+            }
+
             setWatchlistLoaded(true);
+            setInitialLoadComplete(true);
         };
         
         loadInitialWatchlist();

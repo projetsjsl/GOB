@@ -8,9 +8,6 @@
  * - Responsive design
  */
 
-const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-        ResponsiveContainer, ReferenceLine, Brush } = window.Recharts || {};
-
 // Custom Tooltip Component
 const CustomTooltip = ({ active, payload, label, colors }) => {
   if (!active || !payload || !payload.length) return null;
@@ -94,6 +91,23 @@ const CustomLegend = ({ payload, colors }) => {
 };
 
 window.YieldCurveChart = ({ data, colors, showUS, showCanada, isDark }) => {
+  const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+    ResponsiveContainer, ReferenceLine, Brush } = window.Recharts || {};
+
+  if (!LineChart || !ResponsiveContainer) {
+    return (
+      <div style={{
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: colors?.textMuted || '#888888'
+      }}>
+        Chargement du graphique...
+      </div>
+    );
+  }
+
   if (!data || data.length === 0) {
     return (
       <div style={{

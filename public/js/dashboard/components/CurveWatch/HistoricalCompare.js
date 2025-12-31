@@ -7,9 +7,6 @@
  * - Multiple lines for current vs historical
  */
 
-const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-        ResponsiveContainer, ReferenceLine } = window.Recharts || {};
-
 // Custom Tooltip for Compare
 const CompareTooltip = ({ active, payload, label, colors, compareDate }) => {
   if (!active || !payload || !payload.length) return null;
@@ -127,6 +124,23 @@ const CompareTooltip = ({ active, payload, label, colors, compareDate }) => {
 };
 
 window.HistoricalCompare = ({ currentData, compareData, colors, showUS, showCanada, isDark }) => {
+  const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+    ResponsiveContainer, ReferenceLine } = window.Recharts || {};
+
+  if (!LineChart || !ResponsiveContainer) {
+    return (
+      <div style={{
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: colors?.textMuted || '#888888'
+      }}>
+        Chargement du graphique...
+      </div>
+    );
+  }
+
   // Check if we have compare data
   const hasCompare = compareData && (compareData.us || compareData.canada);
 

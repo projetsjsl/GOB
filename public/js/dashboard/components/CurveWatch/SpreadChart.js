@@ -8,9 +8,6 @@
  * - Zoom/pan capabilities
  */
 
-const { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-        ResponsiveContainer, ReferenceLine, Brush } = window.Recharts || {};
-
 // Custom Tooltip for Spread
 const SpreadTooltip = ({ active, payload, label, colors }) => {
   if (!active || !payload || !payload.length) return null;
@@ -68,6 +65,23 @@ const SpreadTooltip = ({ active, payload, label, colors }) => {
 };
 
 window.SpreadChart = ({ data, colors, isDark }) => {
+  const { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+    ResponsiveContainer, ReferenceLine, Brush } = window.Recharts || {};
+
+  if (!AreaChart || !ResponsiveContainer) {
+    return (
+      <div style={{
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: colors?.textMuted || '#888888'
+      }}>
+        Chargement du graphique...
+      </div>
+    );
+  }
+
   if (!data || data.length === 0) {
     return (
       <div style={{
