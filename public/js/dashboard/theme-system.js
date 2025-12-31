@@ -634,6 +634,27 @@ function applyTheme(themeId) {
         const iframes = document.querySelectorAll('iframe');
         iframes.forEach(iframe => {
             try {
+                const src = iframe.getAttribute('src') || '';
+                const allowSync = iframe.dataset?.themeSync === 'true';
+                let shouldSync = allowSync;
+
+                if (!shouldSync) {
+                    if (!src || src.startsWith('about:') || src.startsWith('blob:')) {
+                        shouldSync = true;
+                    } else {
+                        try {
+                            const iframeUrl = new URL(src, window.location.href);
+                            shouldSync = iframeUrl.origin === window.location.origin;
+                        } catch (e) {
+                            shouldSync = false;
+                        }
+                    }
+                }
+
+                if (!shouldSync) {
+                    return;
+                }
+
                 iframe.contentWindow.postMessage({
                     type: 'THEME_CHANGE',
                     theme: {

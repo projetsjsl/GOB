@@ -680,7 +680,7 @@ const InvestingCalendarTab = ({ isDarkMode }) => {
                         allowTransparency="true"
                         marginWidth="0"
                         marginHeight="0"
-                        sandbox="allow-scripts allow-same-origin allow-forms"
+                        sandbox="allow-scripts allow-forms"
                         className="relative z-0"
                         style={{ minWidth: '100%', background: 'transparent' }}
                     />
@@ -990,7 +990,7 @@ const InvestingCalendarTab = ({ isDarkMode }) => {
                             allowTransparency="true"
                             marginWidth="0"
                             marginHeight="0"
-                            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+                            sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
                             className="relative z-0"
                             style={{ minWidth: '100%', background: 'transparent' }}
                             title="FastGraphs - Analyse Fondamentale"

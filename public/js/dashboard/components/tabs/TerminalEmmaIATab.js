@@ -105,11 +105,10 @@ const TerminalEmmaIATab = ({ isDarkMode, activeTab, setActiveTab }) => {
                 onError={handleIframeError}
                 title="Terminal Emma IA - Dashboard Marché & KPIs"
                 allow="fullscreen"
-                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
+                sandbox="allow-scripts allow-forms allow-popups allow-modals"
             />
         </div>
     );
 };
 
 window.TerminalEmmaIATab = TerminalEmmaIATab;
-

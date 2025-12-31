@@ -58,6 +58,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   // State
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [nonBlockingError, setNonBlockingError] = useState(null);
   const [currentData, setCurrentData] = useState({ us: null, canada: null });
   const [historicalData, setHistoricalData] = useState({ us: [], canada: [] });
   const [selectedPeriod, setSelectedPeriod] = useState('1m');
@@ -76,6 +77,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   const inflightRef = useRef({ current: false, historical: 0, compare: 0 });
   const historyRequestIdRef = useRef(0);
   const compareRequestIdRef = useRef(0);
+  const hasCurrentDataRef = useRef(false);
 
   useEffect(() => {
     if (rechartsReady) {
@@ -123,21 +125,81 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     document.head.appendChild(script);
   }, [rechartsReady, debugMode]);
 
+  const createRequestId = () => `cw_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+  const formatCurveWatchError = useCallback((err, contextLabel) => {
+    const details = err?.details || {};
+    const parts = [];
+    if (details.status) {
+      parts.push(`HTTP ${details.status}`);
+    }
+    if (details.contentType) {
+      parts.push(`ct ${details.contentType}`);
+    }
+    if (details.requestId) {
+      parts.push(`req ${details.requestId}`);
+    }
+    const base = err?.message || `Erreur ${contextLabel}`;
+    return parts.length ? `${base} (${parts.join(' | ')})` : base;
+  }, []);
+
   // Safe fetch that bypasses any overrides
   const safeFetch = useCallback((url, { timeoutMs = 15000 } = {}) => {
-    // Check if we have the original fetch from before overrides
-    const nativeFetch = window.nativeFetch || window.originalFetch || fetch;
+    const requestId = createRequestId();
+    const nativeFetch = window.nativeFetch || window.originalFetch || window.fetch;
 
-    // Log API call
     if (debugMode) {
       setApiCallLog(prev => [...prev, {
         url,
+        requestId,
         timestamp: new Date().toISOString(),
         status: 'pending'
       }]);
     }
 
-    // If native fetch is not available, use XMLHttpRequest
+    if (typeof nativeFetch === 'function') {
+      let controller = null;
+      let timeoutId = null;
+      if (typeof AbortController !== 'undefined') {
+        controller = new AbortController();
+        timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      }
+
+      return nativeFetch(url, controller ? { signal: controller.signal } : undefined)
+        .then(response => {
+          if (debugMode) {
+            setApiCallLog(prev => prev.map(log =>
+              log.requestId === requestId
+                ? { ...log, status: response.status, response: 'Response received' }
+                : log
+            ));
+          }
+          if (timeoutId) clearTimeout(timeoutId);
+          return {
+            ok: response.ok,
+            status: response.status,
+            statusText: response.statusText,
+            headers: response.headers,
+            text: () => response.text(),
+            url: response.url,
+            __requestId: requestId,
+            __requestUrl: url
+          };
+        })
+        .catch(error => {
+          if (debugMode) {
+            setApiCallLog(prev => prev.map(log =>
+              log.requestId === requestId
+                ? { ...log, status: 'error', error: error.message }
+                : log
+            ));
+          }
+          if (timeoutId) clearTimeout(timeoutId);
+          error.requestId = requestId;
+          throw error;
+        });
+    }
+
     if (typeof window.XMLHttpRequest !== 'undefined') {
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -146,92 +208,153 @@ window.CurveWatchContainer = ({ embedded = false }) => {
         xhr.onload = () => {
           if (debugMode) {
             setApiCallLog(prev => prev.map(log =>
-              log.url === url && log.status === 'pending'
+              log.requestId === requestId
                 ? { ...log, status: xhr.status, response: xhr.responseText.substring(0, 100) + '...' }
                 : log
             ));
           }
 
-          if (xhr.status >= 200 && xhr.status < 300) {
-            resolve({
-              ok: true,
-              status: xhr.status,
-              json: () => Promise.resolve(JSON.parse(xhr.responseText)),
-              text: () => Promise.resolve(xhr.responseText)
-            });
-          } else {
-            reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
-          }
+          const headers = {
+            get: (name) => xhr.getResponseHeader(name)
+          };
+
+          resolve({
+            ok: xhr.status >= 200 && xhr.status < 300,
+            status: xhr.status,
+            statusText: xhr.statusText,
+            headers,
+            text: () => Promise.resolve(xhr.responseText),
+            url,
+            __requestId: requestId,
+            __requestUrl: url
+          });
         };
         xhr.ontimeout = () => {
           if (debugMode) {
             setApiCallLog(prev => prev.map(log =>
-              log.url === url && log.status === 'pending'
+              log.requestId === requestId
                 ? { ...log, status: 'timeout', error: 'Request timeout' }
                 : log
             ));
           }
-          reject(new Error('Request timeout'));
+          const error = new Error('Request timeout');
+          error.requestId = requestId;
+          reject(error);
         };
         xhr.onerror = () => {
           if (debugMode) {
             setApiCallLog(prev => prev.map(log =>
-              log.url === url && log.status === 'pending'
+              log.requestId === requestId
                 ? { ...log, status: 'error', error: 'Network error' }
                 : log
             ));
           }
-          reject(new Error('Network error'));
+          const error = new Error('Network error');
+          error.requestId = requestId;
+          reject(error);
         };
         xhr.send();
       });
-    } else {
-      // Fallback to native fetch if XMLHttpRequest is not available
-      let controller = null;
-      let timeoutId = null;
-      if (typeof AbortController !== 'undefined') {
-        controller = new AbortController();
-        timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-      }
-      return nativeFetch(url, controller ? { signal: controller.signal } : undefined)
-        .then(response => {
-          if (debugMode) {
-            setApiCallLog(prev => prev.map(log =>
-              log.url === url && log.status === 'pending'
-                ? { ...log, status: response.status, response: 'Response received' }
-                : log
-            ));
-          }
-          if (timeoutId) clearTimeout(timeoutId);
-          return response;
-        })
-        .catch(error => {
-          if (debugMode) {
-            setApiCallLog(prev => prev.map(log =>
-              log.url === url && log.status === 'pending'
-                ? { ...log, status: 'error', error: error.message }
-                : log
-            ));
-          }
-          if (timeoutId) clearTimeout(timeoutId);
-          throw error;
-        });
     }
+
+    return Promise.reject(new Error('Fetch is not available in this environment'));
   }, [debugMode]);
 
   const parseJsonResponse = useCallback(async (response, contextLabel) => {
     if (!response) {
       throw new Error(`No response (${contextLabel})`);
     }
+
+    const requestId = response.__requestId || createRequestId();
+    const url = response.url || response.__requestUrl || 'unknown';
+    const status = response.status ?? 'unknown';
+    const statusText = response.statusText || '';
+    const contentType = response.headers?.get?.('content-type') || '';
     const text = await response.text();
-    const ct = response.headers?.get?.('content-type') || '';
-    if (!ct.includes('application/json')) {
-      throw new Error(`Invalid JSON response (${contextLabel})`);
+    const snippet = text.trim().slice(0, 200);
+    const details = {
+      requestId,
+      url,
+      status,
+      statusText,
+      contentType,
+      snippet
+    };
+
+    const fail = (message) => {
+      const error = new Error(message);
+      error.details = details;
+      console.error('❌ CurveWatch: Invalid response', { contextLabel, ...details });
+      throw error;
+    };
+
+    if (!response.ok) {
+      return fail(`HTTP ${status}${statusText ? ` ${statusText}` : ''} (${contextLabel})`);
     }
+
+    if (!text || text.trim().length === 0) {
+      return fail(`Empty response body (${contextLabel})`);
+    }
+
+    if (!contentType.includes('application/json')) {
+      return fail(`Expected JSON, got ${contentType || 'unknown'} (${contextLabel})`);
+    }
+
     try {
       return JSON.parse(text);
     } catch (err) {
-      throw new Error(`Invalid JSON payload (${contextLabel})`);
+      return fail(`Invalid JSON payload (${contextLabel})`);
+    }
+  }, []);
+
+  const fetchWithRetry = useCallback(async (url, contextLabel, { retries = 2 } = {}) => {
+    let attempt = 0;
+    let lastError = null;
+
+    while (attempt <= retries) {
+      try {
+        const response = await safeFetch(url, { timeoutMs: 15000 });
+        return await parseJsonResponse(response, contextLabel);
+      } catch (err) {
+        lastError = err;
+        const status = err?.details?.status;
+        const shouldRetry = status === 429 || status === 503 || err?.message?.includes('timeout');
+        if (!shouldRetry || attempt === retries) {
+          throw err;
+        }
+        const delay = 250 * Math.pow(2, attempt);
+        if (debugMode) {
+          console.warn(`🔁 CurveWatch retry (${contextLabel}) in ${delay}ms`);
+        }
+        await new Promise(resolve => setTimeout(resolve, delay));
+        attempt += 1;
+      }
+    }
+
+    throw lastError;
+  }, [safeFetch, parseJsonResponse, debugMode]);
+
+  const assertPayloadShape = useCallback((payload, contextLabel) => {
+    if (!payload || typeof payload !== 'object') {
+      const error = new Error(`Unexpected payload shape (${contextLabel})`);
+      error.details = { payloadType: typeof payload };
+      throw error;
+    }
+
+    if (contextLabel === 'current' || contextLabel === 'compare') {
+      if (!payload.data || typeof payload.data !== 'object') {
+        const error = new Error(`Unexpected payload shape (${contextLabel})`);
+        error.details = { keys: Object.keys(payload || {}) };
+        throw error;
+      }
+    }
+
+    if (contextLabel === 'historical') {
+      if (!payload.history || typeof payload.history !== 'object') {
+        const error = new Error(`Unexpected payload shape (${contextLabel})`);
+        error.details = { keys: Object.keys(payload || {}) };
+        throw error;
+      }
     }
   }, []);
 
@@ -245,9 +368,8 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     inflightRef.current.current = true;
 
     try {
-      const response = await safeFetch('/api/yield-curve?country=both');
-      if (!response.ok) throw new Error('Failed to fetch yield curve data');
-      const result = await parseJsonResponse(response, 'current');
+      const result = await fetchWithRetry('/api/yield-curve?country=both', 'current');
+      assertPayloadShape(result, 'current');
 
       if (debugMode) {
         console.log('📊 CurveWatch: API Response:', result);
@@ -260,17 +382,24 @@ window.CurveWatchContainer = ({ embedded = false }) => {
         canada: result.data?.canada || null
       });
       setError(null);
+      setNonBlockingError(null);
+      hasCurrentDataRef.current = !!(result.data?.us || result.data?.canada);
 
       if (debugMode) {
         console.log('✅ CurveWatch: Current data updated successfully');
       }
     } catch (err) {
       console.error('❌ CurveWatch: Error fetching current data:', err);
-      setError(err.message);
+      const message = formatCurveWatchError(err, 'current');
+      if (hasCurrentDataRef.current) {
+        setNonBlockingError(message);
+      } else {
+        setError(message);
+      }
     } finally {
       inflightRef.current.current = false;
     }
-  }, [safeFetch, parseJsonResponse, debugMode]);
+  }, [fetchWithRetry, assertPayloadShape, debugMode, formatCurveWatchError]);
 
   // Fetch historical data
   const fetchHistoricalData = useCallback(async (period) => {
@@ -283,9 +412,8 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     inflightRef.current.historical += 1;
 
     try {
-      const response = await safeFetch(`/api/yield-curve?history=true&country=both&period=${period}`);
-      if (!response.ok) throw new Error('Failed to fetch historical data');
-      const result = await parseJsonResponse(response, 'historical');
+      const result = await fetchWithRetry(`/api/yield-curve?history=true&country=both&period=${period}`, 'historical');
+      assertPayloadShape(result, 'historical');
       if (requestId !== historyRequestIdRef.current) return;
 
       if (debugMode) {
@@ -300,10 +428,12 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       });
     } catch (err) {
       console.error('❌ CurveWatch: Error fetching historical data:', err);
+      const message = formatCurveWatchError(err, 'historical');
+      setNonBlockingError(prev => prev || message);
     } finally {
       inflightRef.current.historical = Math.max(0, inflightRef.current.historical - 1);
     }
-  }, [safeFetch, parseJsonResponse, debugMode]);
+  }, [fetchWithRetry, assertPayloadShape, debugMode, formatCurveWatchError]);
 
   // Fetch compare date data
   const fetchCompareData = useCallback(async (date) => {
@@ -324,9 +454,8 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     inflightRef.current.compare += 1;
 
     try {
-      const response = await safeFetch(`/api/yield-curve?country=both&date=${date}`);
-      if (!response.ok) throw new Error('Failed to fetch compare data');
-      const result = await parseJsonResponse(response, 'compare');
+      const result = await fetchWithRetry(`/api/yield-curve?country=both&date=${date}`, 'compare');
+      assertPayloadShape(result, 'compare');
       if (requestId !== compareRequestIdRef.current) return;
 
       if (debugMode) {
@@ -343,10 +472,12 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     } catch (err) {
       console.error('❌ CurveWatch: Error fetching compare data:', err);
       setCompareData(null);
+      const message = formatCurveWatchError(err, 'compare');
+      setNonBlockingError(prev => prev || message);
     } finally {
       inflightRef.current.compare = Math.max(0, inflightRef.current.compare - 1);
     }
-  }, [safeFetch, parseJsonResponse, debugMode]);
+  }, [fetchWithRetry, assertPayloadShape, debugMode, formatCurveWatchError]);
 
   // Initial load
   useEffect(() => {
@@ -650,7 +781,9 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     );
   }
 
-  if (error) {
+  const hasData = !!(currentData.us || currentData.canada);
+
+  if (error && !hasData) {
     return (
       <div style={{ ...containerStyle, justifyContent: 'center', alignItems: 'center' }}>
         <div style={{ color: colors.spreadNegative }}>Erreur: {error}</div>
@@ -691,6 +824,33 @@ window.CurveWatchContainer = ({ embedded = false }) => {
 
   return (
     <div style={containerStyle}>
+      {nonBlockingError && hasData && (
+        <div
+          style={{
+            marginBottom: '10px',
+            padding: '8px 12px',
+            borderRadius: '6px',
+            backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2',
+            border: `1px solid ${colors.spreadNegative}`,
+            color: colors.spreadNegative,
+            fontSize: '12px'
+          }}
+        >
+          {nonBlockingError}
+          <button
+            onClick={fetchCurrentData}
+            style={{
+              marginLeft: '10px',
+              padding: '4px 8px',
+              cursor: 'pointer',
+              border: 'none',
+              borderRadius: '4px'
+            }}
+          >
+            Réessayer
+          </button>
+        </div>
+      )}
       {/* Header */}
       <div style={headerStyle}>
         <h3 style={titleStyle}>

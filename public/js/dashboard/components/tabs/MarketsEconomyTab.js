@@ -350,7 +350,7 @@ const MarketsEconomyTab = ({
                                 height="100%"
                                 frameBorder="0"
                                 allowTransparency="true"
-                                sandbox="allow-scripts allow-same-origin allow-forms"
+                                sandbox="allow-scripts allow-forms"
                                 style={{ minWidth: '100%', background: 'transparent' }}
                             />
                         </div>

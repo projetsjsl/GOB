@@ -382,7 +382,20 @@
 
     <script>
         // Configuration
-        const API_BASE = window.location.origin;
+        const getApiBase = () => {
+            if (window.location.origin && window.location.origin !== 'null') {
+                return window.location.origin;
+            }
+            if (document.referrer) {
+                try {
+                    return new URL(document.referrer).origin;
+                } catch (e) {
+                    return '';
+                }
+            }
+            return '';
+        };
+        const API_BASE = getApiBase();
         let currentUniverse = 'sp500';
         let currentKPI = null;
         let instrumentsData = [];
