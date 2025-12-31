@@ -853,7 +853,8 @@ window.CurveWatchContainer = ({ embedded = false }) => {
                           { maturity: "30Y", rate: 3.90, months: 360, change1M: -0.08 }
                         ]
                       }
-                    };
+                    }
+                  };
                     setCurrentData({
                       us: mockData.data.us,
                       canada: mockData.data.canada
