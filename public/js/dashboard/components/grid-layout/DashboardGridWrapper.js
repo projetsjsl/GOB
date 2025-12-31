@@ -430,13 +430,9 @@ const DashboardGridWrapper = ({
         });
 
         const layoutScopeId = getLayoutScopeId(mainTab, activeTab, layoutScopeMode);
-        const layoutStorageKey = getLayoutStorageKey(layoutScopeId);
-        const layoutFallbackKeys = getLayoutFallbackKeys(layoutScopeId, mainTab);
 
         const [layout, setLayout] = useState(() => {
-            const saved = loadLayoutFromStorage(layoutFallbackKeys);
-            if (saved) return saved;
-            return loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout();
+            return getDefaultLayout();
         });
 
         useEffect(() => {
@@ -547,14 +543,28 @@ const DashboardGridWrapper = ({
                 setLayout(fromConfig);
                 return;
             }
-            const keys = getLayoutFallbackKeys(layoutScopeId, mainTab);
-            const saved = loadLayoutFromStorage(keys);
-            if (saved) {
-                setLayout(saved);
-                return;
+
+            const fallbackKeys = getLayoutFallbackKeys(layoutScopeId, mainTab);
+            const seedLayout = isAdmin
+                ? (loadLayoutFromStorage(fallbackKeys) || loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout())
+                : getDefaultLayout();
+
+            setLayout(seedLayout);
+
+            if (isAdmin) {
+                updateLayoutConfig((config) => {
+                    const hasLayouts = config.layouts && Object.keys(config.layouts).length > 0;
+                    if (hasLayouts) return config;
+                    return {
+                        ...config,
+                        layouts: {
+                            ...config.layouts,
+                            [layoutScopeId]: sanitizeLayout(seedLayout)
+                        }
+                    };
+                });
             }
-            setLayout(loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout());
-        }, [layoutConfig, layoutConfigLoaded, layoutScopeId, mainTab]);
+        }, [layoutConfig, layoutConfigLoaded, layoutScopeId, mainTab, isAdmin, updateLayoutConfig]);
 
         // S'assurer que le layout n'est jamais vide - ONLY RUN ONCE on mount
         // WARNING: Do NOT add layout to dependencies - causes infinite loop!
@@ -573,7 +583,7 @@ const DashboardGridWrapper = ({
                 });
                 if (uniqueLayout.length !== currentLayout.length) {
                     console.warn(`⚠️ Doublons supprimés (${currentLayout.length} -> ${uniqueLayout.length})`);
-                    localStorage.setItem(layoutStorageKey, JSON.stringify(uniqueLayout));
+                    persistLayoutForScope(layoutScopeId, uniqueLayout);
                     return uniqueLayout;
                 }
                 return currentLayout;
