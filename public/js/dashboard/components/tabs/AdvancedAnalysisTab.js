@@ -686,7 +686,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             {/* Chart View */}
             {activeTab === 'chart' && (
                 <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 animate-fade-in">
-                    <LazyWidgetWrapper threshold={0.5} height={700}>
+                    <LazyWidgetWrapper threshold={0.5} height={700} forceLoad={true}>
                         <div className="tradingview-widget-container h-[700px]" ref={chartContainerRef}></div>
                     </LazyWidgetWrapper>
                 </div>
@@ -698,13 +698,13 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-2 bg-gray-800 rounded-xl overflow-hidden border border-gray-700 h-[500px]">
                             <div className="p-4 border-b border-gray-700 font-bold">États Financiers</div>
-                            <LazyWidgetWrapper threshold={0.5} height={440}>
+                            <LazyWidgetWrapper threshold={0.5} height={440} forceLoad={true}>
                                 <div className="tradingview-widget-container h-full" ref={financialsContainerRef}></div>
                             </LazyWidgetWrapper>
                         </div>
                         <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 h-[500px]">
                             <div className="p-4 border-b border-gray-700 font-bold">Profil Société</div>
-                            <LazyWidgetWrapper threshold={0.5} height={440}>
+                            <LazyWidgetWrapper threshold={0.5} height={440} forceLoad={true}>
                                 <div className="tradingview-widget-container h-full" ref={profileContainerRef}></div>
                             </LazyWidgetWrapper>
                         </div>
@@ -715,7 +715,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             {/* Technical Analysis View */}
             {activeTab === 'analysis' && (
                 <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 animate-fade-in h-[600px]">
-                     <LazyWidgetWrapper threshold={0.5} height={600}>
+                     <LazyWidgetWrapper threshold={0.5} height={600} forceLoad={true}>
                         <div className="tradingview-widget-container h-full" ref={techAnalysisContainerRef}></div>
                      </LazyWidgetWrapper>
                 </div>
@@ -724,7 +724,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             {/* Timeline View */}
             {activeTab === 'timeline' && (
                 <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 animate-fade-in h-[700px]">
-                     <LazyWidgetWrapper threshold={0.5} height={700}>
+                     <LazyWidgetWrapper threshold={0.5} height={700} forceLoad={true}>
                         <div className="tradingview-widget-container h-full" ref={timelineContainerRef}></div>
                      </LazyWidgetWrapper>
                 </div>
