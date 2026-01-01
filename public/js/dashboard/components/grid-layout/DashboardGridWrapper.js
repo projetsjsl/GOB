@@ -21,6 +21,7 @@
     const DASHBOARD_CONFIG_SECTION = 'ui';
     const DASHBOARD_CONFIG_KEY = 'dashboard_layouts_v1';
     const DEFAULT_LAYOUT_SCOPE_MODE = 'primary';
+    const ENABLE_LOCAL_LAYOUT_CACHE = false;
     const DEFAULT_SHOW_ALL_WIDGETS_IN_DOCK = true;
     const CONFIG_SAVE_DEBOUNCE_MS = 900;
     const ROW_HEIGHT = 50;
@@ -125,6 +126,7 @@
     };
 
     const loadLayoutFromStorage = (keys = []) => {
+        if (!ENABLE_LOCAL_LAYOUT_CACHE) return null;
         for (const key of keys) {
             if (!key) continue;
             try {
@@ -145,6 +147,7 @@
             version: 1,
             scopeMode: DEFAULT_LAYOUT_SCOPE_MODE,
             showAllWidgetsInDock: DEFAULT_SHOW_ALL_WIDGETS_IN_DOCK,
+            hiddenWidgets: [],
             layouts: {},
             presets: {}
         };
@@ -152,6 +155,7 @@
         const normalized = { ...base, ...raw };
         normalized.layouts = raw.layouts && typeof raw.layouts === 'object' ? raw.layouts : {};
         normalized.presets = raw.presets && typeof raw.presets === 'object' ? raw.presets : {};
+        normalized.hiddenWidgets = Array.isArray(raw.hiddenWidgets) ? raw.hiddenWidgets : base.hiddenWidgets;
         if (!['primary', 'secondary', 'global'].includes(normalized.scopeMode)) {
             normalized.scopeMode = DEFAULT_LAYOUT_SCOPE_MODE;
         }
@@ -257,6 +261,7 @@
 
     // Helper to load specialized presets
     const loadSavedPreset = (key) => {
+        if (!ENABLE_LOCAL_LAYOUT_CACHE) return null;
         try {
             const saved = localStorage.getItem(key);
             if (saved) return JSON.parse(saved);
@@ -421,6 +426,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
         const pendingConfigRef = useRef(null);
         const [layoutScopeMode, setLayoutScopeMode] = useState(DEFAULT_LAYOUT_SCOPE_MODE);
         const [hiddenWidgets, setHiddenWidgets] = useState(() => {
+            if (!ENABLE_LOCAL_LAYOUT_CACHE) return [];
             try {
                 const saved = localStorage.getItem(STORAGE_KEY_HIDDEN);
                 const parsed = saved ? JSON.parse(saved) : [];
@@ -430,6 +436,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
             }
         });
         const [showAllWidgetsInDock, setShowAllWidgetsInDock] = useState(() => {
+            if (!ENABLE_LOCAL_LAYOUT_CACHE) return DEFAULT_SHOW_ALL_WIDGETS_IN_DOCK;
             try {
                 const saved = localStorage.getItem('gob_dashboard_show_all_widgets_v1');
                 return saved ? saved === 'true' : DEFAULT_SHOW_ALL_WIDGETS_IN_DOCK;
@@ -465,10 +472,14 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
                     setLayoutConfig(normalized);
                     setLayoutScopeMode(normalized.scopeMode);
                     setShowAllWidgetsInDock(normalized.showAllWidgetsInDock);
-                    try {
-                        localStorage.setItem('gob_dashboard_show_all_widgets_v1', String(normalized.showAllWidgetsInDock));
-                    } catch (e) {
-                        // ignore storage errors
+                    setHiddenWidgets(Array.isArray(normalized.hiddenWidgets) ? normalized.hiddenWidgets : []);
+                    if (ENABLE_LOCAL_LAYOUT_CACHE) {
+                        try {
+                            localStorage.setItem('gob_dashboard_show_all_widgets_v1', String(normalized.showAllWidgetsInDock));
+                            localStorage.setItem(STORAGE_KEY_HIDDEN, JSON.stringify(normalized.hiddenWidgets || []));
+                        } catch (e) {
+                            // ignore storage errors
+                        }
                     }
                     setLayoutConfigLoaded(true);
                 } catch (e) {
@@ -518,12 +529,20 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
         
         const persistHiddenWidgets = useCallback((nextHidden) => {
             setHiddenWidgets(nextHidden);
-            try {
-                localStorage.setItem(STORAGE_KEY_HIDDEN, JSON.stringify(nextHidden));
-            } catch (e) {
-                // ignore storage errors
+            if (isAdmin) {
+                updateLayoutConfig((config) => ({
+                    ...config,
+                    hiddenWidgets: Array.isArray(nextHidden) ? nextHidden : []
+                }));
             }
-        }, []);
+            if (ENABLE_LOCAL_LAYOUT_CACHE) {
+                try {
+                    localStorage.setItem(STORAGE_KEY_HIDDEN, JSON.stringify(nextHidden));
+                } catch (e) {
+                    // ignore storage errors
+                }
+            }
+        }, [isAdmin, updateLayoutConfig]);
 
         const updateLayoutConfig = useCallback((updater) => {
             const baseConfig = normalizeDashboardLayoutConfig(layoutConfig || {});
@@ -548,10 +567,12 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
                     }
                 }));
             }
-            try {
-                localStorage.setItem(getLayoutStorageKey(scopeId), JSON.stringify(nextLayout));
-            } catch (e) {
-                // ignore local storage errors
+            if (ENABLE_LOCAL_LAYOUT_CACHE) {
+                try {
+                    localStorage.setItem(getLayoutStorageKey(scopeId), JSON.stringify(nextLayout));
+                } catch (e) {
+                    // ignore local storage errors
+                }
             }
         }, [isAdmin, updateLayoutConfig]);
 
@@ -1223,10 +1244,12 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
                                         ...config,
                                         showAllWidgetsInDock: nextValue
                                     }));
-                                    try {
-                                        localStorage.setItem('gob_dashboard_show_all_widgets_v1', String(nextValue));
-                                    } catch (e) {
-                                        // ignore storage errors
+                                    if (ENABLE_LOCAL_LAYOUT_CACHE) {
+                                        try {
+                                            localStorage.setItem('gob_dashboard_show_all_widgets_v1', String(nextValue));
+                                        } catch (e) {
+                                            // ignore storage errors
+                                        }
                                     }
                                 }}
                                 className={`px-3 py-2 rounded-lg font-medium text-xs transition-all flex items-center gap-2 shadow-sm ${

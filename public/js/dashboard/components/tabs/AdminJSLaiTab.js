@@ -665,6 +665,63 @@ const AdminJSLaiTab = ({
                         }`}>⚙️ Admin-JSLAI</h2>
                     </div>
 
+                    {/* Acces rapides admin */}
+                    <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+                        darkMode ? 'bg-gradient-to-br from-blue-900/20 to-gray-900 border-blue-700' : 'bg-gradient-to-br from-blue-50 to-gray-50 border-blue-200'
+                    }`}>
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-blue-300' : 'text-blue-900'}`}>
+                                {typeof Icon !== 'undefined' ? <Icon emoji="🧭" size={20} /> : '🧭'}
+                                Acces admin directs
+                            </h3>
+                            <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Ouvre dans un nouvel onglet
+                            </span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                            <a
+                                href="/emma-config.html"
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${darkMode ? 'bg-blue-800/60 hover:bg-blue-700 text-white' : 'bg-blue-100 hover:bg-blue-200 text-blue-900'}`}
+                            >
+                                ⚙️ Emma Config
+                            </a>
+                            <a
+                                href="/jlab-dashboard.html"
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${darkMode ? 'bg-indigo-800/60 hover:bg-indigo-700 text-white' : 'bg-indigo-100 hover:bg-indigo-200 text-indigo-900'}`}
+                            >
+                                🧠 Orchestrator Dashboard
+                            </a>
+                            <a
+                                href="/jlab-settings.html"
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${darkMode ? 'bg-purple-800/60 hover:bg-purple-700 text-white' : 'bg-purple-100 hover:bg-purple-200 text-purple-900'}`}
+                            >
+                                🛠️ JLab Settings
+                            </a>
+                            <a
+                                href="/workflow-builder.html"
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${darkMode ? 'bg-emerald-800/60 hover:bg-emerald-700 text-white' : 'bg-emerald-100 hover:bg-emerald-200 text-emerald-900'}`}
+                            >
+                                🧩 Workflow Builder
+                            </a>
+                            <a
+                                href="/jlab.html"
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${darkMode ? 'bg-slate-800/60 hover:bg-slate-700 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-900'}`}
+                            >
+                                📚 Hub JLab
+                            </a>
+                        </div>
+                    </div>
+
                     {typeof EmmaSmsPanel !== 'undefined' && <EmmaSmsPanel />}
 
                     {/* 🏠 Gestion de la Navigation Principale (Affichage des onglets) */}

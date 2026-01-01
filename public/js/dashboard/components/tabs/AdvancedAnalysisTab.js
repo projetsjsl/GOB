@@ -265,7 +265,51 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
     const widgetAttemptsRef = React.useRef({});
     const widgetTimeoutsRef = React.useRef({});
     const MAX_WIDGET_ATTEMPTS = 2;
-    const WIDGET_CHECK_DELAY_MS = 3500;
+    const WIDGET_CHECK_DELAY_MS = 8000;
+
+    const normalizeTradingViewExchange = (exchange) => {
+        if (!exchange) return null;
+        const normalized = exchange.toUpperCase();
+        if (normalized === 'NAS' || normalized === 'NASDAQ') return 'NASDAQ';
+        if (normalized === 'NYS' || normalized === 'NYSE') return 'NYSE';
+        if (normalized === 'TSE' || normalized === 'TSX') return 'TSX';
+        if (normalized === 'TSXV') return 'TSXV';
+        return normalized;
+    };
+
+    const resolveTradingViewSymbol = () => {
+        if (!selectedStock) return 'NASDAQ:AAPL';
+        const raw = selectedStock.toString().trim().toUpperCase();
+        if (raw.includes(':')) return raw;
+        if (raw.endsWith('.TO')) {
+            return `TSX:${raw.replace('.TO', '')}`;
+        }
+        const exchange = normalizeTradingViewExchange(stockData?.profile?.exchangeShortName);
+        if (exchange) {
+            return `${exchange}:${raw}`;
+        }
+        const fallbackNasdaq = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'NFLX'];
+        if (fallbackNasdaq.includes(raw)) {
+            return `NASDAQ:${raw}`;
+        }
+        return raw;
+    };
+
+    const applyWidgetSizing = (container, widgetDiv, config) => {
+        if (!container || !widgetDiv) return;
+        const heightValue = config?.height;
+        let heightNumber = null;
+        if (typeof heightValue === 'number' && Number.isFinite(heightValue)) {
+            heightNumber = heightValue;
+        } else if (typeof heightValue === 'string') {
+            const match = heightValue.match(/^\d+/);
+            if (match) heightNumber = Number(match[0]);
+        }
+        if (heightNumber && heightNumber > 0) {
+            container.style.minHeight = `${heightNumber}px`;
+            widgetDiv.style.minHeight = `${heightNumber}px`;
+        }
+    };
 
     const clearWidgetTimeout = (key) => {
         if (widgetTimeoutsRef.current[key]) {
@@ -282,6 +326,11 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
         widgetAttemptsRef.current[key] = attempt;
         setWidgetErrors(prev => ({ ...prev, [key]: null }));
 
+        if (!document.body.contains(container)) {
+            setTimeout(() => loadTradingViewWidget(key, containerRef, scriptSrc, config, attempt), 150);
+            return;
+        }
+
         container.innerHTML = '';
         container.classList.add('tradingview-widget-container');
         const widgetDiv = document.createElement('div');
@@ -293,7 +342,9 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
         script.src = scriptSrc;
         script.type = 'text/javascript';
         script.async = true;
-        script.innerHTML = JSON.stringify(config);
+        script.defer = true;
+        script.text = JSON.stringify(config);
+        applyWidgetSizing(container, widgetDiv, config);
 
         const handleFailure = (message) => {
             if (attempt < MAX_WIDGET_ATTEMPTS) {
@@ -303,20 +354,23 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             setWidgetErrors(prev => ({ ...prev, [key]: message }));
         };
 
-        widgetTimeoutsRef.current[key] = setTimeout(() => {
-            const hasIframe = !!container.querySelector('iframe');
-            if (!hasIframe) {
+        const verifyWidget = () => {
+            const iframe = container.querySelector('iframe');
+            if (!iframe) {
                 handleFailure('Widget bloqué ou non chargé.');
+                return;
             }
-        }, WIDGET_CHECK_DELAY_MS);
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            clearWidgetTimeout(key);
+        };
+
+        widgetTimeoutsRef.current[key] = setTimeout(verifyWidget, WIDGET_CHECK_DELAY_MS);
 
         script.onload = () => {
             // Allow a small grace period before the iframe appears
             setTimeout(() => {
-                const hasIframe = !!container.querySelector('iframe');
-                if (hasIframe) {
-                    clearWidgetTimeout(key);
-                }
+                verifyWidget();
             }, 500);
         };
         script.onerror = () => handleFailure('Erreur de chargement du widget.');
@@ -330,6 +384,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
 
     // 1. Advanced Chart Widget
     const reloadChartWidget = () => {
+        const widgetSymbol = resolveTradingViewSymbol();
         loadTradingViewWidget('chart', chartContainerRef, 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js', {
             allow_symbol_change: true,
             calendar: false,
@@ -343,7 +398,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             locale: 'fr',
             save_image: true,
             style: '3',
-            symbol: selectedStock,
+            symbol: widgetSymbol,
             theme: isDarkMode ? 'dark' : 'light',
             timezone: 'America/Toronto',
             backgroundColor: isDarkMode ? '#0F0F0F' : '#FFFFFF',
@@ -389,8 +444,9 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
 
     // 2. Financials & Profile Widgets
     const reloadFinancialsWidget = () => {
+        const widgetSymbol = resolveTradingViewSymbol();
         loadTradingViewWidget('financials', financialsContainerRef, 'https://s3.tradingview.com/external-embedding/embed-widget-financials.js', {
-            symbol: selectedStock,
+            symbol: widgetSymbol,
             colorTheme: isDarkMode ? 'dark' : 'light',
             isTransparent: false,
             displayMode: 'regular',
@@ -401,8 +457,9 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
     };
 
     const reloadProfileWidget = () => {
+        const widgetSymbol = resolveTradingViewSymbol();
         loadTradingViewWidget('profile', profileContainerRef, 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js', {
-            symbol: selectedStock,
+            symbol: widgetSymbol,
             colorTheme: isDarkMode ? 'dark' : 'light',
             isTransparent: false,
             locale: 'fr',
@@ -423,8 +480,9 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
 
     // 3. Technical Analysis Widget
     const reloadTechWidget = () => {
+        const widgetSymbol = resolveTradingViewSymbol();
         loadTradingViewWidget('analysis', techAnalysisContainerRef, 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js', {
-            symbol: selectedStock,
+            symbol: widgetSymbol,
             colorTheme: isDarkMode ? 'dark' : 'light',
             isTransparent: false,
             locale: 'fr',
@@ -442,19 +500,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
 
     // 4. Timeline Widget
     const reloadTimelineWidget = () => {
-        // Construct fully qualified symbol if possible to resolve "No data here yet"
-        let widgetSymbol = selectedStock;
-        if (stockData && stockData.profile && stockData.profile.exchangeShortName) {
-            // Map FMP exchange names to TradingView if necessary
-            let exchange = stockData.profile.exchangeShortName;
-            if (exchange === 'NAS') exchange = 'NASDAQ';
-            if (exchange === 'NYS') exchange = 'NYSE';
-            
-            widgetSymbol = `${exchange}:${selectedStock}`;
-        } else if (['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'NFLX'].includes(selectedStock)) {
-            // Fallback for common tech stocks if profile not yet loaded
-             widgetSymbol = `NASDAQ:${selectedStock}`;
-        }
+        const widgetSymbol = resolveTradingViewSymbol();
 
         loadTradingViewWidget('timeline', timelineContainerRef, 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js', {
             feedMode: 'symbol',

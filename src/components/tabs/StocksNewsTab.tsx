@@ -3,6 +3,15 @@
 // Component: StocksNewsTab (legacy markup preserved)
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import type { TabProps } from '../../types';
+import {
+    StockListSkeleton,
+    StockCardSkeleton,
+    TableSkeleton,
+    NewsListSkeleton,
+    NewsArticleSkeleton,
+    ChartSkeleton,
+    CompactCardGridSkeleton
+} from '../shared/LoadingSkeletons';
 
 const StocksNewsTab: React.FC<TabProps> = memo((props) => {
         // Récupère les données/handlers depuis la surface globale du dashboard avec fallback props
@@ -859,15 +868,9 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                         }`}>📊 Titres - Vue Liste</h2>
 
                         {tickers.length === 0 ? (
-                            <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                <p className="text-lg font-semibold mb-2">Aucun titre disponible</p>
-                                <p className="text-sm">Les données sont en cours de chargement...</p>
-                            </div>
-                        ) : Object.keys(stockData).length === 0 ? (
-                            <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                <p className="text-lg font-semibold mb-2">Chargement des données de marché...</p>
-                                <p className="text-sm">Veuillez patienter quelques instants</p>
-                            </div>
+                            <StockListSkeleton count={8} />
+                        ) : Object.keys(stockData).length === 0 || loading ? (
+                            <StockListSkeleton count={8} />
                         ) : (
                         <div className="space-y-3">
                             {tickers.map((ticker) => {
@@ -968,14 +971,16 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                         }`}>🎴 Titres - Vue Cartes</h2>
 
                         {tickers.length === 0 ? (
-                            <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                <p className="text-lg font-semibold mb-2">Aucun titre disponible</p>
-                                <p className="text-sm">Les données sont en cours de chargement...</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {[...Array(6)].map((_, i) => (
+                                    <StockCardSkeleton key={i} />
+                                ))}
                             </div>
-                        ) : Object.keys(stockData).length === 0 ? (
-                            <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                <p className="text-lg font-semibold mb-2">Chargement des données de marché...</p>
-                                <p className="text-sm">Veuillez patienter quelques instants</p>
+                        ) : Object.keys(stockData).length === 0 || loading ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {[...Array(6)].map((_, i) => (
+                                    <StockCardSkeleton key={i} />
+                                ))}
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1470,7 +1475,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
             )}
 
             {/* ===== SECTION ACTUALITÉS SÉPARÉE ===== */}
-            {newsData.length > 0 && (
+            {(newsData.length > 0 || loading) && (
                 <div className="mt-12">
                     <div className={`backdrop-blur-md rounded-3xl p-8 md:p-10 border-2 shadow-2xl transition-all duration-300 relative overflow-hidden ${
                         isDarkMode
@@ -1531,7 +1536,14 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {newsData.slice(0, 12).map((article, index) => {
+                                {loading || newsData.length === 0 ? (
+                                    <>
+                                        {[...Array(9)].map((_, i) => (
+                                            <NewsArticleSkeleton key={i} />
+                                        ))}
+                                    </>
+                                ) : (
+                                    newsData.slice(0, 12).map((article, index) => {
                                     const credibilityScore = getNewsCredibilityScore(article.source?.name || '');
                                     const credibilityTier = getCredibilityTier(credibilityScore);
 
@@ -1663,7 +1675,8 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                             </div>
                                         </div>
                                     );
-                                })}
+                                })
+                                )}
                             </div>
 
                             {newsData.length > 12 && (
