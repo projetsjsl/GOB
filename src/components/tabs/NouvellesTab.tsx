@@ -2,6 +2,113 @@
 import React, { useState, useEffect, memo } from 'react';
 import type { TabProps } from '../../types';
 
+// Ground News Expandable Section Component
+const GroundNewsSection: React.FC<{ isDarkMode: boolean; LucideIcon: any }> = ({ isDarkMode, LucideIcon }) => {
+    const [isExpanded, setIsExpanded] = useState(() => {
+        return localStorage.getItem('groundnews_expanded') === 'true';
+    });
+    const [iframeLoaded, setIframeLoaded] = useState(false);
+
+    // Save expand state
+    useEffect(() => {
+        localStorage.setItem('groundnews_expanded', String(isExpanded));
+    }, [isExpanded]);
+
+    // Get credentials from environment (if available)
+    const hasCredentials = typeof window !== 'undefined' &&
+        (window as any).GROUND_NEWS_EMAIL &&
+        (window as any).GROUND_NEWS_PASSWORD;
+
+    const groundNewsUrl = 'https://ground.news/';
+
+    return (
+        <div className={`rounded-xl transition-all duration-300 ${
+            isDarkMode
+                ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
+                : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
+        }`}>
+            {/* Header - Always Visible */}
+            <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="w-full p-6 flex items-center justify-between hover:bg-gray-700/20 transition-colors duration-200 rounded-t-xl"
+            >
+                <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-full ${isDarkMode ? 'bg-green-600/20' : 'bg-green-100'}`}>
+                        <LucideIcon name="Globe" className="w-6 h-6 text-green-500" />
+                    </div>
+                    <div className="text-left">
+                        <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                            🌍 Ground News
+                        </h3>
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Actualités avec analyse de biais médiatiques
+                            {hasCredentials && <span className="ml-2 text-green-500">● Connecté</span>}
+                        </p>
+                    </div>
+                </div>
+                <LucideIcon
+                    name={isExpanded ? "ChevronUp" : "ChevronDown"}
+                    className={`w-6 h-6 transition-transform duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                />
+            </button>
+
+            {/* Expandable Content */}
+            {isExpanded && (
+                <div className="p-6 pt-0 space-y-4">
+                    {/* Info Banner */}
+                    <div className={`p-4 rounded-lg ${
+                        isDarkMode ? 'bg-blue-900/20 border border-blue-600/30' : 'bg-blue-50 border border-blue-200'
+                    }`}>
+                        <p className={`text-sm ${isDarkMode ? 'text-blue-200' : 'text-blue-800'}`}>
+                            <strong>Ground News</strong> compare les sources médiatiques et révèle les biais politiques dans la couverture d'actualité.
+                        </p>
+                    </div>
+
+                    {/* Loading Indicator */}
+                    {!iframeLoaded && (
+                        <div className="flex items-center justify-center py-12">
+                            <div className="text-center">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+                                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    Chargement de Ground News...
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Iframe */}
+                    <div className={`relative rounded-lg overflow-hidden ${iframeLoaded ? 'block' : 'hidden'}`}>
+                        <iframe
+                            src={groundNewsUrl}
+                            className="w-full h-[800px] rounded-lg"
+                            sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
+                            onLoad={() => setIframeLoaded(true)}
+                            title="Ground News"
+                        />
+                    </div>
+
+                    {/* Open in New Tab Button */}
+                    <div className="flex justify-end">
+                        <a
+                            href={groundNewsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 ${
+                                isDarkMode
+                                    ? 'bg-green-600 hover:bg-green-500 text-white'
+                                    : 'bg-green-500 hover:bg-green-600 text-white'
+                            }`}
+                        >
+                            <LucideIcon name="ExternalLink" className="w-4 h-4" />
+                            Ouvrir dans un nouvel onglet
+                        </a>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
 export const NouvellesTab: React.FC<TabProps> = memo((props) => {
     const {
         isDarkMode = true,
@@ -400,6 +507,9 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                     </div>
                 )}
             </div>
+
+            {/* Ground News Section - Expandable */}
+            <GroundNewsSection isDarkMode={isDarkMode} LucideIcon={LucideIcon} />
 
             {/* Liste des nouvelles */}
             <div className="space-y-4">

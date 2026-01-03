@@ -1,3 +1,8 @@
+/* Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Styles de base pour le dashboard */
 * {
   margin: 0;

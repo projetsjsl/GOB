@@ -6,6 +6,183 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
+// FastGraph Expandable Section Component
+const FastGraphSection: React.FC<{ isDarkMode: boolean; LucideIcon: any }> = ({ isDarkMode, LucideIcon }) => {
+    const [isExpanded, setIsExpanded] = useState(() => {
+        return localStorage.getItem('fastgraph_expanded') === 'true';
+    });
+    const [iframeLoaded, setIframeLoaded] = useState(false);
+    const [sessionUrl, setSessionUrl] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    // Save expand state
+    useEffect(() => {
+        localStorage.setItem('fastgraph_expanded', String(isExpanded));
+    }, [isExpanded]);
+
+    // Auto-login when expanded
+    useEffect(() => {
+        if (isExpanded && !sessionUrl && !isLoading) {
+            handleAutoLogin();
+        }
+    }, [isExpanded]);
+
+    const handleAutoLogin = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch('/api/fastgraphs-login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            });
+
+            if (!response.ok) {
+                throw new Error('Échec de la connexion FastGraphs');
+            }
+
+            const data = await response.json();
+
+            if (data.success && data.session) {
+                setSessionUrl(data.session.url);
+            } else {
+                throw new Error('Session non disponible');
+            }
+        } catch (err: any) {
+            console.error('FastGraph login error:', err);
+            setError(err.message || 'Erreur de connexion');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const fastgraphUrl = sessionUrl || 'https://www.fastgraphs.com/';
+
+    return (
+        <div className={`mb-2 rounded-xl transition-all duration-300 ${
+            isDarkMode
+                ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
+                : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
+        }`}>
+            {/* Header - Always Visible */}
+            <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="w-full p-4 flex items-center justify-between hover:bg-gray-700/20 transition-colors duration-200 rounded-t-xl"
+            >
+                <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-full ${isDarkMode ? 'bg-blue-600/20' : 'bg-blue-100'}`}>
+                        <LucideIcon name="TrendingUp" className="w-5 h-5 text-blue-500" />
+                    </div>
+                    <div className="text-left">
+                        <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                            📊 FastGraphs
+                        </h3>
+                        <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Analyse fondamentale et graphiques de titres
+                            {sessionUrl && <span className="ml-2 text-green-500">● Session active</span>}
+                        </p>
+                    </div>
+                </div>
+                <LucideIcon
+                    name={isExpanded ? "ChevronUp" : "ChevronDown"}
+                    className={`w-5 h-5 transition-transform duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                />
+            </button>
+
+            {/* Expandable Content */}
+            {isExpanded && (
+                <div className="p-4 pt-0 space-y-3">
+                    {/* Info Banner */}
+                    <div className={`p-3 rounded-lg ${
+                        isDarkMode ? 'bg-blue-900/20 border border-blue-600/30' : 'bg-blue-50 border border-blue-200'
+                    }`}>
+                        <p className={`text-xs ${isDarkMode ? 'text-blue-200' : 'text-blue-800'}`}>
+                            <strong>FastGraphs</strong> fournit des analyses fondamentales détaillées et des graphiques de valorisation pour les titres.
+                        </p>
+                    </div>
+
+                    {/* Loading Indicator */}
+                    {isLoading && (
+                        <div className="flex items-center justify-center py-8">
+                            <div className="text-center">
+                                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto mb-3"></div>
+                                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    Connexion à FastGraphs...
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Error Message */}
+                    {error && !isLoading && (
+                        <div className={`p-3 rounded-lg ${
+                            isDarkMode ? 'bg-red-900/20 border border-red-600/30' : 'bg-red-50 border border-red-200'
+                        }`}>
+                            <p className={`text-xs ${isDarkMode ? 'text-red-200' : 'text-red-800'}`}>
+                                ⚠️ {error}
+                            </p>
+                            <button
+                                onClick={handleAutoLogin}
+                                className={`mt-2 px-3 py-1 rounded text-xs font-semibold ${
+                                    isDarkMode ? 'bg-red-600 hover:bg-red-500' : 'bg-red-500 hover:bg-red-600'
+                                } text-white`}
+                            >
+                                Réessayer
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Iframe */}
+                    {!isLoading && !error && (
+                        <>
+                            {!iframeLoaded && (
+                                <div className="flex items-center justify-center py-8">
+                                    <div className="text-center">
+                                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto mb-3"></div>
+                                        <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            Chargement de FastGraphs...
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                            <div className={`relative rounded-lg overflow-hidden ${iframeLoaded ? 'block' : 'hidden'}`}>
+                                <iframe
+                                    src={fastgraphUrl}
+                                    className="w-full h-[700px] rounded-lg"
+                                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
+                                    onLoad={() => setIframeLoaded(true)}
+                                    title="FastGraphs"
+                                />
+                            </div>
+                        </>
+                    )}
+
+                    {/* Open in New Tab Button */}
+                    <div className="flex justify-end">
+                        <a
+                            href={fastgraphUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-2 ${
+                                isDarkMode
+                                    ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                            }`}
+                        >
+                            <LucideIcon name="ExternalLink" className="w-3 h-3" />
+                            Ouvrir dans un nouvel onglet
+                        </a>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
 export const IntelliStocksTab: React.FC<TabProps> = memo((props) => {
     const {
         isDarkMode = true,
@@ -1412,6 +1589,9 @@ console.log('✅ Données hybrides récupérées:', {
                     <div className={`min-h-screen p-2 transition-colors duration-300 ${
                         isDarkMode ? 'bg-neutral-950 text-gray-100' : 'bg-gray-50 text-gray-900'
                     }`}>
+                        {/* FastGraph Section - Expandable */}
+                        <FastGraphSection isDarkMode={isDarkMode} LucideIcon={LucideIcon} />
+
                         {/* Screener */}
                         {showScreener && (
                             <div className={`mb-2 border rounded-lg p-3 transition-colors duration-300 ${
