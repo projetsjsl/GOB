@@ -2,39 +2,30 @@
 
 ## Résumé
 
+**Dernier déploiement en production:** 31 décembre 2025 à 19:59:38 (commit `0025bd0a`)
+
 **Total de branches Claude analysées:** 81 branches
-- **Branches récentes (à conserver):** 8 branches (décembre 2025 - janvier 2026)
-- **Branches obsolètes (à supprimer):** 73 branches (avant décembre 2025)
+- **Branches depuis la production (à conserver):** 2 branches (après 31 déc 2025)
+- **Branches obsolètes (avant production):** 79 branches (avant le déploiement)
 
-## Branches récentes à conserver
+## Branches depuis le déploiement en production (31 déc 2025)
 
-Ces 8 branches contiennent du travail récent et doivent être conservées:
+**Seulement 2 branches créées après le dernier déploiement en production :**
 
-1. **claude/audit-gob-stack-eZBGE** (2026-01-01) ⭐ **BRANCHE PRINCIPALE**
+1. **claude/audit-gob-stack-eZBGE** (3 janvier 2026) ⭐ **BRANCHE PRINCIPALE**
    - Audit complet du stack GOB
    - Migration Tailwind CDN → compilé (3500 KB → 93 KB)
    - Configuration Vercel/Supabase
    - Documentation complète
+   - **Cette branche contient TOUT le travail post-production**
 
-2. **claude/tailwind-poc-eZBGE** (2026-01-01)
+2. **claude/tailwind-poc-eZBGE** (1er janvier 2026)
    - POC Tailwind (déjà mergé dans audit-gob-stack)
-   - Peut être supprimé si souhaité
+   - Peut être supprimée car contenu fusionné dans la branche audit
 
-3. **claude/push-commits-new-branch-UWFTL** (2025-12-27) ✓ Mergé dans main
+## Branches obsolètes (79 branches)
 
-4. **claude/yield-curve-final-fix-BGrrA** (2025-12-27) ✓ Mergé dans main
-
-5. **claude/validate-vercel-deployment-BGrrA** (2025-12-27) ✓ Mergé dans main
-
-6. **claude/fix-gobapps-nlTje** (2025-12-26)
-
-7. **claude/fix-production-urgent-nlTje** (2025-12-26) ✓ Mergé dans main
-
-8. **claude/fix-exports-error-RD7IV** (2025-12-21)
-
-## Branches obsolètes (73 branches)
-
-Ces branches datent d'avant décembre 2025 et n'ont **jamais été mergées dans main**. Elles contiennent probablement du travail expérimental ou abandonné.
+Ces branches datent d'**avant le dernier déploiement en production** (31 décembre 2025) et n'ont **jamais été mergées dans main**. Elles contiennent du travail qui était en cours avant la production actuelle.
 
 ### Par date (les plus récentes aux plus anciennes):
 

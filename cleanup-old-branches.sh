@@ -10,93 +10,73 @@ NC='\033[0m' # No Color
 echo -e "${BLUE}"
 echo "╔═══════════════════════════════════════════════════════════╗"
 echo "║   Nettoyage des branches Claude obsolètes - GOB          ║"
-echo "║   73 branches obsolètes (avant décembre 2025)            ║"
+echo "║   Branches avant le déploiement en production            ║"
 echo "╚═══════════════════════════════════════════════════════════╝"
 echo -e "${NC}\n"
 
-# Branches à supprimer (avant décembre 2025)
-OLD_BRANCHES=(
-  "claude/add-fastgraph-variations-012BmdXLTksmzPM6gcHgHWff"
-  "claude/emma-config-ui-admin-01SXqtt3Rs1aJzMxTq8xT2fQ"
-  "claude/fix-emma-sms-data-01Hntxr6UpDTQ7dyVbJ9X4Dx"
-  "claude/fix-admin-api-get-01SXqtt3Rs1aJzMxTq8xT2fQ"
-  "claude/fix-babel-transpilation-timeout-01WrfUtGMtGeiR6zgyXowrpB"
-  "claude/fix-storage-library-loading-019PFnsDDLGzWSgbcbnd9PyE"
-  "claude/fix-production-warnings-01Buo1mUqh5H8aFpDPH6KbFN"
-  "claude/optimize-emma-prompts-01VUPd99qRjR5xYJAFDYypo1"
-  "claude/refactor-sms-chatbot-architecture-014vcK1Dk6zPtaQsDLcn9WGQ"
-  "claude/fix-emma-product-type-analysis-01B8HydDLbWhtM76j6Y5KPhV"
-  "claude/improve-emma-response-quality-01ToYsx9kEugfkGZhNs8D4GP"
-  "claude/fix-emma-json-serialization-01Rf2oCeexbbvnssYszswLf2"
-  "claude/fix-emma-analysis-response-01PtG2fB2fjxDtTQneTfQrWL"
-  "claude/process-emma-analysis-properly-01Eo9E3kkKeBBhRAe9N2KPWt"
-  "claude/fix-emma-analysis-parsing-01P6HuJvMDkChcWMEaUbQdBR"
-  "claude/maintain-emma-context-015HvC6J2z33LFm4gg3cHcb9"
-  "claude/fix-emma-context-syntax-014x5pjmLtgzuWBP1vCFWvvv"
-  "claude/remove-duplicate-emma-variables-015xUEjPHoRmGGFf3aVc9QJE"
-  "claude/improve-emma-formatting-01LQRR8yMkrHFoB84v9Vr6m2"
-  "claude/fix-emma-analysis-formatting-01ToJzZxQHqSdXxWjDMXQAkB"
-  "claude/fix-missing-curly-brace-011CUshHdXnuNH7gp5CJiLcW"
-  "claude/fix-conversation-memory-011CUoyL2KYfuoaxH8bRqjPK"
-  "claude/fix-emma-agent-errors-011CUsWzr3PQk2CstJoPxh6t"
-  "claude/add-tradingview-chart-011CUshT8RmEMYg9QFbGDiyA"
-  "claude/emma-rsi-skill-011CUsfTbVhQppVRnVWAibpe"
-  "claude/fix-emma-agent-syntax-error-011CUpfMSwaM9vj3Ho2yghLo"
-  "claude/configure-twilio-sms-url-011CUk86CKxUQVuEmok4zwKn"
-  "claude/add-multichannel-support-011CUjyrjfnSAW4RzDgsEKjT"
-  "claude/audit-site-functionality-011CUfP5eBAq1QLRKYUV8WXA"
-  "claude/add-emma-prompt-context-011CUfKM6Ph5ffVJt5DqfTDK"
-  "claude/branch-cleanup-guide-011CUfJuY54cTkxYDrqhqq2t"
-  "claude/chatbot-image-display-011CUeWgT2j8kkepj8s917ER"
-  "claude/chatbot-image-display-011CUf9uNmfa5SYfwTaPWA8v"
-  "claude/fix-admin-gob-role-access-011CUeWL3CCsah3TAHZ2rr5k"
-  "claude/fix-pattern-validation-011CUYephHrKWV5RjK4zrrWj"
-  "claude/analyze-finance-chatbots-011CUYYtjF67gKbXj9qQjnvU"
-  "claude/chat-response-type-011CUWo5VASfhAoSN5Qt1vyU"
-  "claude/test-gob-api-endpoints-011CUWmsxQ6fH6Bxph3MZn7f"
-  "claude/improve-plus-icon-overlay-011CUWmHCpXcGgEfyiVZHLXo"
-  "claude/fix-api-errors-011CUWmBMwJdtYAzLsE8Rpzy"
-  "claude/optimize-theme-icons-011CUWkL2QBhbkjw4a2rGCtU"
-  "claude/update-theme-icons-011CUWhmotVg9iMZiGEQp8t1"
-  "claude/update-site-icons-011CUWgPNjvArBjstxXiKfwJ"
-  "claude/add-footer-tab-icons-011CUWf9N1WwnM6Yd9DXEPUk"
-  "claude/improve-chat-animation-011CUWeyN9RLdJQVZaUHVW9C"
-  "claude/dark-mode-styling-011CUWeszM7FUTv5Kv4sxxhP"
-  "claude/prevent-mobile-scroll-011CUWejYfYuq6VS4icih83W"
-  "claude/mobile-desktop-navigation-update-011CUWdbYqdU8AQwrxBHnoT2"
-  "claude/fix-typescript-indexing-011CUUi2xcGA4bNHKgabLC3S"
-  "claude/fix-deployment-error-011CUUhZnQqjyYoABbDE4ruE"
-  "claude/update-site-icons-011CUUg7zEuMHp9SFEteXphR"
-  "claude/implement-dark-theme-011CUUcecBVhJBnvSB8TtqaN"
-  "claude/remove-deprecated-tabs-011CUUc3x3My3mgEQqzzq8a3"
-  "claude/improve-tab-navigation-011CUUYe7UshrC6HmznC8u5C"
-  "claude/fix-js-widget-overlap-011CUUMswmLETKiPshCDZz55"
-  "claude/validate-api-endpoints-011CUUFBW9QqtETPehqGCv5Z"
-  "claude/mobile-quote-graph-layout-011CUUCHM4HYRHgJNpLhwXtw"
-  "claude/optimize-mobile-tests-011CUU72Gyy1v8t2TuaRt3bv"
-  "claude/deploy-github-commons-011CUUDy3aoCQcqcHdSp3fBQ"
-  "claude/add-birthday-email-form-011CUPNdyjNYsoZyXJK1jEm7"
-  "claude/fetch-all-tickers-011CULjSpvf6sYZoqTvAjsGs"
-  "claude/ai-initiative-research-011CULepYkMWRn5eXDMZeZeY"
-  "claude/explain-dashboard-tab-011CULSbSkw13Q1L6AVYq1FT"
-  "claude/fix-login-validation-011CUZVMv9DtXpgodih8heQN"
-  "claude/research-market-visualization-011CUajWqxQwq7f9M12CxNLT"
-  "claude/fix-tradingview-ticker-011CUby1Y1ABFP1CQAaCzqXF"
-  "claude/research-market-visualization-011CUbp6f8FMvKzRiDzShN9J"
-  "claude/research-financial-charts-011CUch3Y1VY2xvJJAi8hNMd"
-  "claude/add-ai-analyst-tab-structure-011CUfK5YqPyP1cPQxvUZDqG"
-  "claude/update-portfolio-tab-011CUfNz8rNMTHdYbx8JeNjq"
-  "claude/optimize-tab-navigation-011CUfPq9qKK7LNiMtW4fqvL"
-  "claude/analyze-codebase-structure-011CUfS62dY8sCbBiUKDaSx8"
-  "claude/integrate-sms-service-011CUfT3YveW27dETggpbYKe"
-)
+# Date du dernier déploiement en production
+PRODUCTION_DATE="2025-12-31 19:59:38"
+PRODUCTION_COMMIT="0025bd0a"
 
+echo -e "${YELLOW}Dernier déploiement en production:${NC}"
+echo "  Date: $PRODUCTION_DATE"
+echo "  Commit: $PRODUCTION_COMMIT"
+echo ""
+
+# Collecter toutes les branches avant la production
+echo -e "${BLUE}Analyse des branches Claude...${NC}"
+
+OLD_BRANCHES=()
+while IFS= read -r branch; do
+    commit_date=$(git log -1 --format='%ci' "$branch" 2>/dev/null)
+    if [[ "$commit_date" < "$PRODUCTION_DATE" ]]; then
+        # Retirer le préfixe origin/
+        branch_name="${branch#origin/}"
+        OLD_BRANCHES+=("$branch_name")
+    fi
+done < <(git for-each-ref --format='%(refname:short)' refs/remotes/origin/claude/)
+
+echo ""
 echo -e "${YELLOW}Total de branches à supprimer: ${#OLD_BRANCHES[@]}${NC}"
 echo ""
-echo "Ces branches datent d'avant décembre 2025 et n'ont jamais été mergées dans main."
-echo "Elles contiennent probablement du travail expérimental ou abandonné."
+
+if [ ${#OLD_BRANCHES[@]} -eq 0 ]; then
+    echo -e "${GREEN}Aucune branche obsolète trouvée!${NC}"
+    exit 0
+fi
+
+# Identifier les branches déjà mergées
+echo -e "${BLUE}Identification des branches déjà mergées dans main...${NC}"
+MERGED_BRANCHES=()
+while IFS= read -r branch; do
+    branch_name="${branch#origin/}"
+    branch_name="${branch_name#  }"  # Retirer les espaces
+    MERGED_BRANCHES+=("$branch_name")
+done < <(git branch -r --merged origin/main | grep "origin/claude/")
+
+echo -e "${GREEN}Branches déjà mergées: ${#MERGED_BRANCHES[@]}${NC}"
+echo ""
+
+# Afficher un échantillon
+echo "Échantillon de branches à supprimer (10 premières):"
+for i in {0..9}; do
+    if [ $i -lt ${#OLD_BRANCHES[@]} ]; then
+        branch="${OLD_BRANCHES[$i]}"
+        # Vérifier si mergée
+        if [[ " ${MERGED_BRANCHES[@]} " =~ " ${branch} " ]]; then
+            echo "  - $branch ${GREEN}(déjà mergée dans main)${NC}"
+        else
+            echo "  - $branch"
+        fi
+    fi
+done
+if [ ${#OLD_BRANCHES[@]} -gt 10 ]; then
+    echo "  ... et $((${#OLD_BRANCHES[@]} - 10)) autres"
+fi
+
 echo ""
 echo -e "${YELLOW}⚠️  ATTENTION: Cette action est irréversible!${NC}"
+echo -e "${YELLOW}Toutes ces branches datent d'avant le déploiement en production.${NC}"
 echo ""
 read -p "Voulez-vous continuer? (y/N) " -n 1 -r
 echo ""
@@ -149,17 +129,9 @@ echo ""
 if [ $DELETED -gt 0 ]; then
     echo -e "${GREEN}Nettoyage terminé avec succès!${NC}"
     echo ""
-    echo "Branches restantes (recommandées à garder):"
-    echo "  - claude/audit-gob-stack-eZBGE (⭐ branche principale avec tout le travail récent)"
-    echo "  - claude/tailwind-poc-eZBGE (peut être supprimée si déjà mergée dans audit)"
-    echo "  - claude/fix-exports-error-RD7IV"
-    echo "  - claude/fix-gobapps-nlTje"
-    echo ""
-    echo "Branches déjà mergées dans main (peuvent être supprimées):"
-    echo "  - claude/fix-production-urgent-nlTje ✓"
-    echo "  - claude/push-commits-new-branch-UWFTL ✓"
-    echo "  - claude/validate-vercel-deployment-BGrrA ✓"
-    echo "  - claude/yield-curve-final-fix-BGrrA ✓"
+    echo "Branches post-production conservées:"
+    echo "  - claude/audit-gob-stack-eZBGE (⭐ contient tout le travail depuis la production)"
+    echo "  - claude/tailwind-poc-eZBGE (POC Tailwind, déjà mergé dans audit)"
 else
     echo -e "${RED}Aucune branche n'a été supprimée.${NC}"
 fi
