@@ -16,6 +16,12 @@ const NouvellesTab = lazy(() => import('./tabs/NouvellesTab'));
 const FinanceProTab = lazy(() => import('./tabs/FinanceProTab'));
 const YieldCurveTab = lazy(() => import('./tabs/YieldCurveTab'));
 const AdvancedAnalysisTab = lazy(() => import('./tabs/AdvancedAnalysisTab'));
+const SeekingAlphaTab = lazy(() => import('./tabs/SeekingAlphaTab'));
+
+// New tabs
+const GroundNewsTab = lazy(() => import('./tabs/GroundNewsTab'));
+const ScreenerTab = lazy(() => import('./tabs/ScreenerTab'));
+const OrchestratorTab = lazy(() => import('./tabs/OrchestratorTab'));
 
 // Loading fallback component
 const TabLoadingFallback = () => (
@@ -476,6 +482,16 @@ export const BetaCombinedDashboard: React.FC = () => {
                 case 'yield-curve': return YieldCurveTab;
                 case 'advanced-analysis': return AdvancedAnalysisTab;
                 case 'finance-pro': return FinanceProTab;
+
+                // New tabs
+                case 'nouvelles-toutes': return NouvellesTab;
+                case 'nouvelles-ground': return GroundNewsTab;
+                case 'admin-orchestrator': return OrchestratorTab;
+                case 'jlab-screener': return ScreenerTab;
+                case 'jlab-fastgraphs': return IntelliStocksTab;
+                case 'jlab-3p1': return FinanceProTab;
+                case 'jlab-seeking': return SeekingAlphaTab;
+
                 default: return StocksNewsTab;
             }
         })();

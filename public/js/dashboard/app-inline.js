@@ -679,11 +679,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     // 6 Main tabs (onglets principaux)
     const MAIN_TABS = [
         { id: 'admin', label: 'Admin', icon: 'Shield', color: 'red' },
+        { id: 'nouvelles', label: 'Nouvelles', icon: 'Newspaper', color: 'orange' },
         { id: 'marches', label: 'Marchés', icon: 'TrendingUp', color: 'blue' },
         { id: 'titres', label: 'Titres', icon: 'Briefcase', color: 'green' },
         { id: 'jlab', label: 'JLab', icon: 'Flask', color: 'teal' },
         { id: 'emma', label: 'Emma IA', icon: 'Brain', color: 'purple' }
-        // Tests tab removed - was causing freezes
     ];
 
     // Sub-tabs for each main tab
@@ -692,26 +692,30 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             { id: 'admin-config', label: 'Configuration', icon: 'Settings', component: 'EmmaConfigTab' },
             { id: 'admin-briefings', label: 'Briefings', icon: 'Mail', component: 'EmailBriefingsTab' },
             { id: 'admin-scraping', label: 'Scraping', icon: 'Database', component: 'ScrappingSATab' },
-            { id: 'admin-fastgraphs', label: 'FastGraphs', icon: 'BarChart3', component: 'FastGraphsTab' },
+            { id: 'admin-orchestrator', label: 'Orchestrateur', icon: 'GitBranch', component: 'OrchestratorTab' },
             { id: 'admin-settings', label: 'Paramètres', icon: 'Cog', component: 'PlusTab' },
             { id: 'admin-jsla', label: 'Admin JSL', icon: 'Shield', component: 'AdminJSLaiTab' }
         ],
+        'nouvelles': [
+            { id: 'nouvelles-toutes', label: '📊 Toutes Sources', icon: 'Newspaper', component: 'NouvellesTab' },
+            { id: 'nouvelles-ground', label: '🌍 Ground News', icon: 'Globe', component: 'GroundNewsTab' }
+        ],
         'marches': [
             { id: 'marches-global', label: 'Vue Globale', icon: 'Globe', component: 'MarketsEconomyTab' },
-            { id: 'marches-calendar', label: 'Calendrier Éco', icon: 'Calendar', component: 'EconomicCalendarTab' },
-            { id: 'marches-yield', label: 'Courbe Taux', icon: 'LineChart', component: 'YieldCurveTab' },
-            { id: 'marches-nouvelles', label: 'Nouvelles', icon: 'Newspaper', component: 'NouvellesTab' }
+            { id: 'marches-yield', label: 'Courbe de Taux', icon: 'LineChart', component: 'YieldCurveTab' },
+            { id: 'marches-calendar', label: 'Calendrier Éco', icon: 'Calendar', component: 'EconomicCalendarTab' }
         ],
         'titres': [
             { id: 'titres-portfolio', label: 'Mon Portfolio', icon: 'Wallet', component: 'StocksNewsTab:portfolio' },
             { id: 'titres-watchlist', label: 'Watchlist', icon: 'Star', component: 'StocksNewsTab:watchlist' },
-            { id: 'titres-fastgraphs', label: '📊 FastGraphs', icon: 'TrendingUp', component: 'IntelliStocksTab' },
-            { id: 'titres-3p1', label: 'Finance Pro', icon: 'PieChart', component: 'redirect:/3p1' },
-            { id: 'titres-seeking', label: 'Seeking Alpha', icon: 'Newspaper', component: 'SeekingAlphaTab' },
             { id: 'titres-compare', label: 'Comparer', icon: 'GitCompare', component: 'FinanceProPanel' }
         ],
         'jlab': [
             { id: 'jlab-terminal', label: 'Terminal', icon: 'Terminal', component: 'JLabTab' },
+            { id: 'jlab-screener', label: '🔍 Screener', icon: 'Filter', component: 'ScreenerTab' },
+            { id: 'jlab-fastgraphs', label: '📊 FastGraphs', icon: 'TrendingUp', component: 'IntelliStocksTab' },
+            { id: 'jlab-3p1', label: '💼 Finance Pro', icon: 'PieChart', component: 'redirect:/3p1' },
+            { id: 'jlab-seeking', label: '📈 Seeking Alpha', icon: 'Newspaper', component: 'SeekingAlphaTab' },
             { id: 'jlab-advanced', label: 'Analyse Pro', icon: 'Activity', component: 'AdvancedAnalysisTab' }
         ],
         'emma': [
@@ -722,39 +726,44 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             { id: 'emma-live', label: 'EmmAIA Live', icon: 'Radio', component: 'EmmAIATab' },
             { id: 'emma-finvox', label: 'FinVox', icon: 'Headphones', component: 'FinVoxTab' }
         ]
-        // Tests sub-tabs removed - was causing freezes
     };
 
     // Mapping old tab IDs to new structure (for backwards compatibility)
     const TAB_ID_MAPPING = {
+        // Admin
         'admin-jsla': { main: 'admin', sub: 'admin-jsla' },
         'email-briefings': { main: 'admin', sub: 'admin-briefings' },
         'scrapping-sa': { main: 'admin', sub: 'admin-scraping' },
-        'fastgraphs': { main: 'admin', sub: 'admin-fastgraphs' },
         'plus': { main: 'admin', sub: 'admin-settings' },
         'emma-config': { main: 'admin', sub: 'admin-config' },
+        // Nouvelles (new)
+        'nouvelles': { main: 'nouvelles', sub: 'nouvelles-toutes' },
+        // Marchés
         'markets-economy': { main: 'marches', sub: 'marches-global' },
         'economic-calendar': { main: 'marches', sub: 'marches-calendar' },
         'yield-curve': { main: 'marches', sub: 'marches-yield' },
-        'nouvelles': { main: 'marches', sub: 'marches-nouvelles' },
+        // Titres
         'stocks-news': { main: 'titres', sub: 'titres-portfolio' },
         'dans-watchlist': { main: 'titres', sub: 'titres-watchlist' },
-        'finance-pro': { main: 'titres', sub: 'titres-3p1' },
-        'seeking-alpha': { main: 'titres', sub: 'titres-seeking' },
+        // JLab (moved from Titres)
+        'fastgraphs': { main: 'jlab', sub: 'jlab-fastgraphs' },
+        'finance-pro': { main: 'jlab', sub: 'jlab-3p1' },
+        'seeking-alpha': { main: 'jlab', sub: 'jlab-seeking' },
         'advanced-analysis': { main: 'jlab', sub: 'jlab-advanced' },
         'jlab': { main: 'jlab', sub: 'jlab-terminal' },
+        // Emma
         'ask-emma': { main: 'emma', sub: 'emma-chat' },
         'assistant-vocal': { main: 'emma', sub: 'emma-vocal' },
         'groupchat': { main: 'emma', sub: 'emma-group' },
         'terminal-emmaia': { main: 'emma', sub: 'emma-terminal' },
         'emmaia': { main: 'emma', sub: 'emma-live' },
         'finvox': { main: 'emma', sub: 'emma-finvox' }
-        // Tests mappings removed
     };
 
     // Default sub-tab for each main tab
     const DEFAULT_SUB_TABS = {
-        'admin': 'admin-settings',
+        'admin': 'admin-config',
+        'nouvelles': 'nouvelles-toutes',
         'marches': 'marches-global',
         'titres': 'titres-portfolio',
         'jlab': 'jlab-terminal',
