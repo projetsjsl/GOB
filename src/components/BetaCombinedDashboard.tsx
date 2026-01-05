@@ -464,6 +464,7 @@ export const BetaCombinedDashboard: React.FC = () => {
                 case 'stocks-news': return StocksNewsTab;
                 case 'nouvelles': return NouvellesTab;
                 case 'intellistocks': return IntelliStocksTab;
+                case 'titres-fastgraphs': return IntelliStocksTab;
                 case 'admin-jslai': return AdminJSLaiTab;
                 case 'ask-emma': return AskEmmaTab;
                 case 'emma-config': return EmmaConfigTab;

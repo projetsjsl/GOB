@@ -705,6 +705,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         'titres': [
             { id: 'titres-portfolio', label: 'Mon Portfolio', icon: 'Wallet', component: 'StocksNewsTab:portfolio' },
             { id: 'titres-watchlist', label: 'Watchlist', icon: 'Star', component: 'StocksNewsTab:watchlist' },
+            { id: 'titres-fastgraphs', label: '📊 FastGraphs', icon: 'TrendingUp', component: 'IntelliStocksTab' },
             { id: 'titres-3p1', label: 'Finance Pro', icon: 'PieChart', component: 'redirect:/3p1' },
             { id: 'titres-seeking', label: 'Seeking Alpha', icon: 'Newspaper', component: 'SeekingAlphaTab' },
             { id: 'titres-compare', label: 'Comparer', icon: 'GitCompare', component: 'FinanceProPanel' }
@@ -26210,6 +26211,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             { id: 'titres-portfolio', label: 'Mon Portfolio', icon: 'iconoir-wallet', component: StocksNewsTab }, // Default view
             { id: 'titres-watchlist', label: 'Watchlist', icon: 'iconoir-star', component: (props) => <StocksNewsTab {...props} defaultView="watchlist" /> },
+            { id: 'titres-fastgraphs', label: '📊 FastGraphs', icon: 'iconoir-graph-up', component: IntelliStocksTab },
             { id: 'titres-seeking', label: 'Seeking Alpha', icon: 'iconoir-search', component: SeekingAlphaTab },
             { id: 'titres-3p1', label: 'Finance Pro', icon: 'iconoir-pie-chart', component: FinanceProTab },
 
