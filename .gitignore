@@ -76,3 +76,4 @@ screenshot_*.png
 .env.vercel
 .env*.local
 .env.temp_migration
+.start-context.json

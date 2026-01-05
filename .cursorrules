@@ -1,5 +1,66 @@
 # Cursor Rules - GOB Dashboard
 
+## 🚀 Commandes Slash Personnalisées
+
+Quand l'utilisateur tape une de ces commandes, exécutez l'action correspondante :
+
+### `/start`
+Initialiser l'environnement de développement :
+```bash
+cd /Users/projetsjsl/Documents/GitHub/GOB && node scripts/start-dev-setup.js --verbose
+```
+Puis lire et résumer le fichier `.start-context.json` généré.
+
+### `/pull` ou `/p`
+Pull le repo et afficher les changements :
+```bash
+cd /Users/projetsjsl/Documents/GitHub/GOB && git pull origin main && git log --oneline -5
+```
+
+### `/status` ou `/st`
+Afficher l'état du projet :
+```bash
+cd /Users/projetsjsl/Documents/GitHub/GOB && git status && cat .start-context.json 2>/dev/null | head -30
+```
+
+### `/build` ou `/b`
+Lancer le build :
+```bash
+cd /Users/projetsjsl/Documents/GitHub/GOB && npm run build
+```
+
+### `/lint` ou `/l`
+Vérifier le linting :
+```bash
+cd /Users/projetsjsl/Documents/GitHub/GOB && npm run lint
+```
+
+### `/commit "message"` ou `/c "message"`
+Commiter les changements :
+```bash
+cd /Users/projetsjsl/Documents/GitHub/GOB && git add -A && git commit -m "message"
+```
+
+### `/push`
+Pousser vers origin :
+```bash
+cd /Users/projetsjsl/Documents/GitHub/GOB && git push origin HEAD
+```
+
+### `/dev`
+Démarrer le serveur de développement :
+```bash
+cd /Users/projetsjsl/Documents/GitHub/GOB && npm run dev
+```
+
+### `/kill`
+Tuer le serveur de développement :
+```bash
+kill $(cat /Users/projetsjsl/Documents/GitHub/GOB/.vite.pid 2>/dev/null) 2>/dev/null || kill $(lsof -ti:5173) 2>/dev/null
+```
+
+---
+
 ## ⚠️ CRITICAL: Error Prevention
 
 **BEFORE CODING, ALWAYS CONSULT**: `docs/REPERTOIRE_COMPLET_ERREURS.md`

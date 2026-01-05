@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "start": "node scripts/start-dev-setup.js",
     "dev": "vite",
     "dev:vercel": "vercel dev --listen 127.0.0.1:3001",
     "dev:vite": "vite",
