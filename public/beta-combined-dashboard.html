@@ -560,13 +560,9 @@
     <!-- Note: CDN Tailwind utilisé intentionnellement pour ce fichier standalone -->
     <script>
         // Suppress Tailwind CDN warnings in production
-        const originalWarn = console.warn;
-        console.warn = function(...args) {
-            if (args[0] && typeof args[0] === 'string' && (args[0].includes('cdn.tailwindcss.com') || args[0].includes('production'))) return;
-            originalWarn.apply(console, args);
-        };
     </script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS compilé (remplace le CDN pour production) -->
+    <link rel="stylesheet" href="/css/tailwind.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/recharts@2.10.3/dist/Recharts.js"></script>
     <!-- PDF Export Dependencies -->
