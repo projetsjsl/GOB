@@ -711,7 +711,10 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         ],
         'jlab': [
             { id: 'jlab-terminal', label: 'Terminal', icon: 'Terminal', component: 'JLabTab' },
-            { id: 'jlab-advanced', label: 'Analyse Pro', icon: 'Activity', component: 'AdvancedAnalysisTab' }
+            { id: 'jlab-advanced', label: 'Analyse Pro', icon: 'Activity', component: 'AdvancedAnalysisTab' },
+            { id: 'jlab-compare', label: 'Comparaison', icon: 'GitCompare', component: 'FinanceProPanel:compare' },
+            { id: 'jlab-screener', label: 'Screener', icon: 'Search', component: 'FinanceProPanel:screener' },
+            { id: 'jlab-fastgraphs', label: 'FastGraphs', icon: 'BarChart3', component: 'FastGraphsTab' }
         ],
         'emma': [
             { id: 'emma-chat', label: 'Chat Emma', icon: 'MessageSquare', component: 'AskEmmaTab' },
@@ -742,6 +745,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         'seeking-alpha': { main: 'titres', sub: 'titres-seeking' },
         'advanced-analysis': { main: 'jlab', sub: 'jlab-advanced' },
         'jlab': { main: 'jlab', sub: 'jlab-terminal' },
+        'jlab-compare': { main: 'jlab', sub: 'jlab-compare' },
+        'jlab-screener': { main: 'jlab', sub: 'jlab-screener' },
+        'jlab-fastgraphs': { main: 'jlab', sub: 'jlab-fastgraphs' },
         'ask-emma': { main: 'emma', sub: 'emma-chat' },
         'assistant-vocal': { main: 'emma', sub: 'emma-vocal' },
         'groupchat': { main: 'emma', sub: 'emma-group' },
@@ -18358,7 +18364,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // ============================================
         // COMPOSANT FINANCE PRO PANEL
         // ============================================
-        const FinanceProPanel = ({ isDarkMode }) => {
+        const FinanceProPanel = ({ isDarkMode, initialViewMode = 'overview' }) => {
             // State for screener
             const [loadingScreener, setLoadingScreener] = useState(false);
             const [screenerResults, setScreenerResults] = useState([]);
@@ -18377,7 +18383,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 return num.toLocaleString();
             };
 
-            const [viewMode, setViewMode] = useState('overview'); // 'overview', 'screener', 'compare', 'ratios'
+            const [viewMode, setViewMode] = useState(initialViewMode); // 'overview', 'screener', 'compare', 'ratios'
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState(null);
             const [allSnapshots, setAllSnapshots] = useState([]);
@@ -26267,14 +26273,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             const defaultItems = SUB_TABS[mainTabId] || [];
             const savedIds = savedSubTabIds[mainTabId];
             
-            if (!savedIds) return defaultItems;
+            if (!savedIds || savedIds.length === 0) return defaultItems;
             
-            // Return items in the order of savedIds
-            const items = savedIds.map(id => defaultItems.find(item => item.id === id)).filter(Boolean);
+            // Return items in the order of savedIds, but also include any new items from defaultItems
+            // that weren't in the saved config (to handle newly added sub-tabs)
+            const savedItems = savedIds.map(id => defaultItems.find(item => item.id === id)).filter(Boolean);
+            const newItems = defaultItems.filter(item => !savedIds.includes(item.id));
             
-            // If some new items were added to default but not in saved, we might want to append them?
-            // For now, strict adherence to savedIds allows hiding items (which is a feature).
-            return items;
+            // Combine saved items (in order) + new items (at the end)
+            return [...savedItems, ...newItems];
         }, [savedSubTabIds]);
 
         const navRef = useRef(null);
@@ -27743,6 +27750,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 isAdmin={true}
                                 activeTab={activeTab}
                                 setActiveTab={setActiveTab}
+                                activeSubTab={activeSubTab}
                                 tickers={tickers}
                                 stockData={stockData}
                                 newsData={newsData}
@@ -28060,6 +28068,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         window.JLabTab ? <window.JLabTab /> : <JLabUnifiedTab key={`jlab-terminal-${tabMountKeys['jlab'] || 0}`} />
                     )}
                     {activeTab === 'jlab-advanced' && window.AdvancedAnalysisTab && <window.AdvancedAnalysisTab key={`jlab-advanced-${tabMountKeys['advanced-analysis'] || 0}`} isDarkMode={isDarkMode} />}
+                    {activeTab === 'jlab-compare' && <FinanceProPanel key={`jlab-compare-${tabMountKeys['jlab-compare'] || 0}`} isDarkMode={isDarkMode} initialViewMode="compare" />}
+                    {activeTab === 'jlab-screener' && <FinanceProPanel key={`jlab-screener-${tabMountKeys['jlab-screener'] || 0}`} isDarkMode={isDarkMode} initialViewMode="screener" />}
+                    {activeTab === 'jlab-fastgraphs' && window.FastGraphsTab && <window.FastGraphsTab key={`jlab-fastgraphs-${tabMountKeys['jlab-fastgraphs'] || 0}`} isDarkMode={isDarkMode} />}
 
                     {/* EMMA IA Sub-tabs */}
                     {activeTab === 'emma-chat' && <AskEmmaTab
@@ -28434,7 +28445,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             </div>
         );
     };
-
+    
+    // Exposer FinanceProPanel globalement pour la grille
+    if (typeof FinanceProPanel !== 'undefined') {
+        window.FinanceProPanel = FinanceProPanel;
+    }
 
     // Fonction fallback SUPPRIMÉE - Plus de contenu demo
 
@@ -28508,6 +28523,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             `;
         }
     };
+
+    // FinanceProPanel est maintenant exposé depuis BetaCombinedDashboard ci-dessus
 
     // Attendre que le DOM soit complètement chargé
     if (document.readyState === 'loading') {

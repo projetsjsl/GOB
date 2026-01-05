@@ -99,8 +99,11 @@
         'titres-3p1': { component: 'redirect', label: 'Finance Pro', icon: 'ChartBar', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 }, url: '/3p1' },
         
         // JLAB
-        // 'jlab-terminal' REMOVED - was placeholder "Module en cours de construction"
+        'jlab-terminal': { component: 'JLabTab', label: 'JLab Terminal', icon: 'Terminal', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
         'jlab-advanced': { component: 'AdvancedAnalysisTab', label: 'Analyse Avancée', icon: 'Flask', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
+        'jlab-compare': { component: 'FinanceProPanel', label: 'Comparaison', icon: 'GitCompare', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 }, mode: 'compare' },
+        'jlab-screener': { component: 'FinanceProPanel', label: 'Screener', icon: 'Search', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 }, mode: 'screener' },
+        'jlab-fastgraphs': { component: 'FastGraphsTab', label: 'FastGraphs', icon: 'BarChart3', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
         
         // EMMA IA
         'emma-chat': { component: 'AskEmmaTab', label: 'Chat Emma', icon: 'Brain', defaultSize: { w: 6, h: 10 }, minSize: { w: 4, h: 8 } },
@@ -357,6 +360,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
         isAdmin = false,
         activeTab,
         setActiveTab,
+        activeSubTab,
         // Tous les props nécessaires pour les composants
         tickers = [],
         stockData = {},
@@ -912,6 +916,11 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
                 Object.assign(componentProps, { isAdmin: isEditing });
             } else if (config.component === 'JLabUnifiedTab' || config.component === 'JLabTab') {
                 Object.assign(componentProps, { Icon });
+            } else if (config.component === 'FinanceProPanel') {
+                // Pass initialViewMode from config.mode if available
+                if (config.mode) {
+                    Object.assign(componentProps, { initialViewMode: config.mode });
+                }
             }
 
             // Calculate staggered delay for heavy widgets to prevent all loading at once
@@ -1010,8 +1019,30 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
         return layouts;
     };
 
-    // Filter layout to show ALL widgets for current main tab
+    // Filter layout to show ALL widgets for current main tab, or single widget if activeSubTab is set
     const filteredLayout = useMemo(() => {
+        // Si activeSubTab est défini, afficher uniquement ce widget
+        if (activeSubTab && TAB_TO_WIDGET_MAP[activeSubTab]) {
+            const existingItem = layout.find(item => item.i === activeSubTab);
+            if (existingItem) {
+                return [existingItem];
+            }
+            // Si le widget n'existe pas dans le layout, le créer avec des dimensions par défaut
+            const config = TAB_TO_WIDGET_MAP[activeSubTab] || {};
+            const defaultSize = config.defaultSize || { w: 12, h: 10 };
+            const minSize = config.minSize || { w: 6, h: 6 };
+            return [{
+                i: activeSubTab,
+                x: 0,
+                y: 0,
+                w: defaultSize.w,
+                h: defaultSize.h,
+                minW: minSize.w,
+                minH: minSize.h
+            }];
+        }
+        
+        // Sinon, afficher tous les widgets du mainTab (comportement par défaut)
         const validIds = layoutScopeMode === 'global'
             ? Object.keys(TAB_TO_WIDGET_MAP)
             : getWidgetIdsForMainTab(mainTab);
@@ -1041,7 +1072,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
                 minH: minSize.h
             };
         });
-    }, [layout, mainTab, layoutScopeMode, hiddenWidgetSet]);
+    }, [layout, mainTab, layoutScopeMode, hiddenWidgetSet, activeSubTab]);
 
     const dockWidgetEntries = useMemo(() => {
         const allowedIds = showAllWidgetsInDock ? null : getWidgetIdsForMainTab(mainTab);
