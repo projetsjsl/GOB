@@ -160,8 +160,20 @@ git push
 
 **Critère** : Push réussi (code de sortie 0)
 
+## 9. TESTS VISUELS OBLIGATOIRES 📸
+
+**⚠️ AVANT le push, toujours faire les tests visuels**
+
+Utiliser le MCP browser pour :
+1. **Naviguer** vers http://localhost:5173
+2. **Vérifier** les pages/onglets modifiés
+3. **Prendre screenshots** comme preuve
+4. **Vérifier console** browser (pas d'erreurs rouges)
+
+Voir `/st` section 8 pour les détails complets.
+
 **Bonnes pratiques consolidées**:
-- Ordre strict : Code → Console → UI → Push
+- Ordre strict : Code → Console → UI → **VISUEL** → Push
 - Ne push que si TOUS les tests passent (0 erreurs)
 - Messages de commit descriptifs mais concis
 - Analyser le contexte AVANT de choisir les tests

@@ -1,6 +1,8 @@
 # Commande `/st` - Script Test jusqu'à réussite
 
-Quand l'utilisateur écrit `/st`, exécuter les tests pertinents (Code, Console, UI) intelligemment jusqu'à réussite.
+Quand l'utilisateur écrit `/st`, exécuter les tests pertinents (Code, Console, UI, **VISUEL**) intelligemment jusqu'à réussite.
+
+**⚠️ OBLIGATOIRE : Tests visuels avec navigation browser et screenshots**
 
 **Processus optimisé - Tests multi-dimensionnels**:
 
