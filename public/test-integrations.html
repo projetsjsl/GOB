@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Intégrations GOB - FastGraph & Ground News</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #10b981;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+        .test-section {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-section h2 {
+            color: #3b82f6;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        .test-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background: #111;
+            border-radius: 4px;
+        }
+        .status {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .status.ok { background: #10b981; }
+        .status.error { background: #ef4444; }
+        .status.warning { background: #f59e0b; }
+        .console-section {
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .console-log { color: #9ca3af; margin: 2px 0; }
+        .console-error { color: #ef4444; margin: 2px 0; }
+        .console-warn { color: #f59e0b; margin: 2px 0; }
+        .screenshot-area {
+            margin-top: 20px;
+            padding: 15px;
+            background: #111;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .screenshot-area img {
+            max-width: 100%;
+            border: 1px solid #333;
+            border-radius: 4px;
+        }
+        .summary {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .summary h2 {
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #10b981;
+        }
+        .stat-label {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Intégrations GOB Dashboard</h1>
+        
+        <div class="summary">
+            <h2>📊 Résumé des Tests</h2>
+            <div class="summary-stats">
+                <div class="stat">
+                    <div class="stat-value" id="totalTests">0</div>
+                    <div class="stat-label">Tests Totaux</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="passedTests">0</div>
+                    <div class="stat-label">Réussis</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="failedTests">0</div>
+                    <div class="stat-label">Échoués</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="consoleErrors">0</div>
+                    <div class="stat-label">Erreurs Console</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎨 Test Tailwind CSS</h2>
+            <div id="tailwindTests"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Test FastGraph Integration</h2>
+            <div id="fastgraphTests"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🌍 Test Ground News Integration</h2>
+            <div id="groundnewsTests"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📝 Console Logs</h2>
+            <div class="console-section" id="consoleLogs"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Détails Techniques</h2>
+            <div id="technicalDetails"></div>
+        </div>
+    </div>
+
+    <script>
+        const results = {
+            tailwind: { tests: [], passed: 0, failed: 0 },
+            fastgraph: { tests: [], passed: 0, failed: 0 },
+            groundnews: { tests: [], passed: 0, failed: 0 },
+            console: { logs: [], errors: [], warnings: [] }
+        };
+
+        // Intercepter les logs de console
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        console.log = function(...args) {
+            results.console.logs.push({ type: 'log', message: args.join(' ') });
+            originalLog.apply(console, args);
+        };
+
+        console.error = function(...args) {
+            results.console.errors.push({ type: 'error', message: args.join(' ') });
+            originalError.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+            results.console.warnings.push({ type: 'warn', message: args.join(' ') });
+            originalWarn.apply(console, args);
+        };
+
+        function addTest(section, name, passed, details = '') {
+            const test = { name, passed, details };
+            results[section].tests.push(test);
+            if (passed) {
+                results[section].passed++;
+            } else {
+                results[section].failed++;
+            }
+        }
+
+        function renderTests() {
+            // Tailwind Tests
+            const tailwindDiv = document.getElementById('tailwindTests');
+            results.tailwind.tests.forEach(test => {
+                const div = document.createElement('div');
+                div.className = 'test-item';
+                div.innerHTML = `
+                    <div class="status ${test.passed ? 'ok' : 'error'}"></div>
+                    <div>
+                        <strong>${test.name}</strong>
+                        ${test.details ? `<div style="color: #9ca3af; font-size: 0.9rem; margin-top: 5px;">${test.details}</div>` : ''}
+                    </div>
+                `;
+                tailwindDiv.appendChild(div);
+            });
+
+            // FastGraph Tests
+            const fastgraphDiv = document.getElementById('fastgraphTests');
+            results.fastgraph.tests.forEach(test => {
+                const div = document.createElement('div');
+                div.className = 'test-item';
+                div.innerHTML = `
+                    <div class="status ${test.passed ? 'ok' : 'error'}"></div>
+                    <div>
+                        <strong>${test.name}</strong>
+                        ${test.details ? `<div style="color: #9ca3af; font-size: 0.9rem; margin-top: 5px;">${test.details}</div>` : ''}
+                    </div>
+                `;
+                fastgraphDiv.appendChild(div);
+            });
+
+            // Ground News Tests
+            const groundnewsDiv = document.getElementById('groundnewsTests');
+            results.groundnews.tests.forEach(test => {
+                const div = document.createElement('div');
+                div.className = 'test-item';
+                div.innerHTML = `
+                    <div class="status ${test.passed ? 'ok' : 'error'}"></div>
+                    <div>
+                        <strong>${test.name}</strong>
+                        ${test.details ? `<div style="color: #9ca3af; font-size: 0.9rem; margin-top: 5px;">${test.details}</div>` : ''}
+                    </div>
+                `;
+                groundnewsDiv.appendChild(div);
+            });
+
+            // Console Logs
+            const consoleDiv = document.getElementById('consoleLogs');
+            [...results.console.errors, ...results.console.warnings, ...results.console.logs.slice(-20)].forEach(log => {
+                const div = document.createElement('div');
+                div.className = `console-${log.type}`;
+                div.textContent = `[${log.type.toUpperCase()}] ${log.message}`;
+                consoleDiv.appendChild(div);
+            });
+
+            // Update Summary
+            const total = results.tailwind.tests.length + results.fastgraph.tests.length + results.groundnews.tests.length;
+            const passed = results.tailwind.passed + results.fastgraph.passed + results.groundnews.passed;
+            const failed = results.tailwind.failed + results.fastgraph.failed + results.groundnews.failed;
+
+            document.getElementById('totalTests').textContent = total;
+            document.getElementById('passedTests').textContent = passed;
+            document.getElementById('failedTests').textContent = failed;
+            document.getElementById('consoleErrors').textContent = results.console.errors.length;
+        }
+
+        // Tests Tailwind
+        function testTailwind() {
+            // Test 1: CSS Tailwind chargé
+            const tailwindLink = document.querySelector('link[href="/css/tailwind.css"]');
+            addTest('tailwind', 'CSS Tailwind compilé chargé', !!tailwindLink, 
+                tailwindLink ? 'Fichier /css/tailwind.css trouvé' : 'Fichier /css/tailwind.css non trouvé');
+
+            // Test 2: Pas de CDN Tailwind
+            const cdnScripts = Array.from(document.querySelectorAll('script')).filter(s => 
+                s.src && s.src.includes('cdn.tailwindcss.com')
+            );
+            addTest('tailwind', 'Pas de CDN Tailwind', cdnScripts.length === 0,
+                cdnScripts.length === 0 ? 'Aucun CDN Tailwind détecté ✅' : `${cdnScripts.length} CDN Tailwind détecté(s) ❌`);
+
+            // Test 3: Classes Tailwind fonctionnelles
+            const testDiv = document.createElement('div');
+            testDiv.className = 'bg-blue-500 text-white p-4 rounded-lg';
+            testDiv.style.display = 'none';
+            document.body.appendChild(testDiv);
+            const computedStyle = window.getComputedStyle(testDiv);
+            const hasTailwind = computedStyle.backgroundColor !== '' || computedStyle.padding !== '';
+            addTest('tailwind', 'Classes Tailwind fonctionnelles', hasTailwind,
+                hasTailwind ? 'Les classes Tailwind sont appliquées' : 'Les classes Tailwind ne sont pas appliquées');
+            document.body.removeChild(testDiv);
+        }
+
+        // Tests FastGraph
+        function testFastGraph() {
+            // Vérifier si le composant FastGraph est présent dans le DOM
+            const bodyText = document.body.textContent || '';
+            const hasFastGraph = bodyText.includes('FastGraphs') || bodyText.includes('FastGraph');
+            
+            addTest('fastgraph', 'Section FastGraph présente', hasFastGraph,
+                hasFastGraph ? 'Section FastGraph trouvée dans le DOM' : 'Section FastGraph non trouvée');
+
+            // Vérifier localStorage
+            try {
+                const fastgraphExpanded = localStorage.getItem('fastgraph_expanded');
+                addTest('fastgraph', 'localStorage fastgraph_expanded disponible', true,
+                    `Valeur: ${fastgraphExpanded || 'null'}`);
+            } catch (e) {
+                addTest('fastgraph', 'localStorage fastgraph_expanded disponible', false, e.message);
+            }
+
+            // Vérifier l'API endpoint
+            fetch('/api/fastgraphs-login', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+                .then(res => res.json())
+                .then(data => {
+                    addTest('fastgraph', 'API /api/fastgraphs-login accessible', true,
+                        `Réponse: ${JSON.stringify(data).substring(0, 100)}`);
+                    renderTests();
+                })
+                .catch(err => {
+                    addTest('fastgraph', 'API /api/fastgraphs-login accessible', false, err.message);
+                    renderTests();
+                });
+        }
+
+        // Tests Ground News
+        function testGroundNews() {
+            const bodyText = document.body.textContent || '';
+            const hasGroundNews = bodyText.includes('Ground News') || bodyText.includes('ground.news');
+            
+            addTest('groundnews', 'Section Ground News présente', hasGroundNews,
+                hasGroundNews ? 'Section Ground News trouvée dans le DOM' : 'Section Ground News non trouvée');
+
+            // Vérifier localStorage
+            try {
+                const groundnewsExpanded = localStorage.getItem('groundnews_expanded');
+                addTest('groundnews', 'localStorage groundnews_expanded disponible', true,
+                    `Valeur: ${groundnewsExpanded || 'null'}`);
+            } catch (e) {
+                addTest('groundnews', 'localStorage groundnews_expanded disponible', false, e.message);
+            }
+        }
+
+        // Détails techniques
+        function addTechnicalDetails() {
+            const detailsDiv = document.getElementById('technicalDetails');
+            const details = {
+                'User Agent': navigator.userAgent,
+                'URL': window.location.href,
+                'Timestamp': new Date().toISOString(),
+                'Screen Size': `${window.screen.width}x${window.screen.height}`,
+                'Viewport': `${window.innerWidth}x${window.innerHeight}`,
+                'localStorage disponible': typeof Storage !== 'undefined' ? 'Oui' : 'Non'
+            };
+
+            Object.entries(details).forEach(([key, value]) => {
+                const div = document.createElement('div');
+                div.className = 'test-item';
+                div.innerHTML = `
+                    <strong style="color: #3b82f6;">${key}:</strong>
+                    <span style="color: #9ca3af; margin-left: 10px;">${value}</span>
+                `;
+                detailsDiv.appendChild(div);
+            });
+        }
+
+        // Exécuter les tests
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('🧪 Démarrage des tests d\'intégration...');
+            
+            setTimeout(() => {
+                testTailwind();
+                testFastGraph();
+                testGroundNews();
+                addTechnicalDetails();
+                renderTests();
+                
+                console.log('✅ Tests terminés');
+                console.log('📊 Résultats:', results);
+            }, 2000);
+        });
+
+        // Exporter les résultats pour inspection
+        window.testResults = results;
+    </script>
+
+    <!-- Charger le dashboard dans un iframe pour les tests visuels -->
+    <iframe 
+        src="/beta-combined-dashboard.html" 
+        style="width: 100%; height: 800px; border: 1px solid #333; border-radius: 8px; margin-top: 20px;"
+        id="dashboardFrame">
+    </iframe>
+</body>
+</html>
