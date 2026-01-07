@@ -23,7 +23,8 @@ esbuild.build({
   globalName: 'Recharts',
   outfile: path.resolve(__dirname, '../public/js/recharts-bundle.js'),
   // Don't bundle React/ReactDOM - they're loaded separately via CDN
-  external: ['react', 'react-dom', 'prop-types'],
+  // DO bundle prop-types (it's a small utility)
+  external: ['react', 'react-dom'],
   // Platform: browser to avoid Node.js APIs
   platform: 'browser',
   target: 'es2020',
