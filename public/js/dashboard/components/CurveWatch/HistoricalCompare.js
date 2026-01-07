@@ -124,8 +124,10 @@ const CompareTooltip = ({ active, payload, label, colors, compareDate }) => {
 };
 
 window.HistoricalCompare = ({ currentData, compareData, colors, showUS, showCanada, isDark }) => {
+  // Safe access to Recharts with UMD format support
+  const RechartsLib = (window.Recharts && (window.Recharts.default || window.Recharts)) || {};
   const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-    ResponsiveContainer, ReferenceLine } = window.Recharts || {};
+    ResponsiveContainer, ReferenceLine } = RechartsLib;
 
   if (!LineChart || !ResponsiveContainer) {
     return (

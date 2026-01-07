@@ -65,8 +65,10 @@ const SpreadTooltip = ({ active, payload, label, colors }) => {
 };
 
 window.SpreadChart = ({ data, colors, isDark }) => {
+  // Safe access to Recharts with UMD format support
+  const RechartsLib = (window.Recharts && (window.Recharts.default || window.Recharts)) || {};
   const { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-    ResponsiveContainer, ReferenceLine, Brush } = window.Recharts || {};
+    ResponsiveContainer, ReferenceLine, Brush } = RechartsLib;
 
   if (!AreaChart || !ResponsiveContainer) {
     return (

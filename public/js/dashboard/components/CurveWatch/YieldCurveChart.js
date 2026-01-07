@@ -91,8 +91,8 @@ const CustomLegend = ({ payload, colors }) => {
 };
 
 window.YieldCurveChart = ({ data, colors, showUS, showCanada, isDark }) => {
-  // Verify Recharts is available
-  if (!window.Recharts) {
+  // Verify Recharts is available with safe destructuring
+  if (!window.Recharts || typeof window.Recharts !== 'object') {
     console.error('❌ Recharts not available in window.Recharts');
     return (
       <div style={{
@@ -107,8 +107,20 @@ window.YieldCurveChart = ({ data, colors, showUS, showCanada, isDark }) => {
     );
   }
 
-  const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-    ResponsiveContainer, ReferenceLine, Brush } = window.Recharts;
+  // Safe destructuring with fallbacks
+  const RechartsLib = window.Recharts.default || window.Recharts;
+  const { 
+    LineChart = null, 
+    Line = null, 
+    XAxis = null, 
+    YAxis = null, 
+    CartesianGrid = null, 
+    Tooltip = null, 
+    Legend = null,
+    ResponsiveContainer = null, 
+    ReferenceLine = null, 
+    Brush = null 
+  } = RechartsLib || {};
 
   if (!LineChart || !ResponsiveContainer) {
     console.error('❌ Recharts components not available:', {
