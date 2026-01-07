@@ -727,6 +727,7 @@ async function getCanadaRates(targetDate = null) {
 async function getFromSupabase(country, date = null) {
   try {
     const supabase = createSupabaseClient(true); // Service role pour lecture
+    if (!supabase) return null;
     
     let query = supabase
       .from('yield_curve_data')
@@ -773,7 +774,7 @@ async function getFromSupabase(country, date = null) {
     
     return null;
   } catch (error) {
-    console.warn(`⚠️ Erreur Supabase pour ${country}:`, error.message);
+    console.warn(`⚠️ Supabase non disponible pour ${country}:`, error.message);
     return null;
   }
 }
@@ -786,6 +787,7 @@ async function getFromSupabase(country, date = null) {
 async function saveToSupabase(country, yieldData) {
   try {
     const supabase = createSupabaseClient(true); // Service role pour écriture
+    if (!supabase) return;
     
     // Calculer spread_10y_2y si disponible
     let spread_10y_2y = null;
@@ -822,7 +824,7 @@ async function saveToSupabase(country, yieldData) {
       console.log(`✅ Données ${country} sauvegardées dans Supabase pour ${yieldData.date}`);
     }
   } catch (error) {
-    console.warn(`⚠️ Erreur sauvegarde Supabase pour ${country}:`, error.message);
+    console.warn(`⚠️ Supabase non disponible pour sauvegarde:`, error.message);
   }
 }
 
@@ -834,6 +836,7 @@ async function saveToSupabase(country, yieldData) {
 async function getHistoricalData(country, period = '1m') {
   try {
     const supabase = createSupabaseClient(true);
+    if (!supabase) return [];
 
     // Calculate start date based on period
     const now = new Date();
@@ -863,7 +866,7 @@ async function getHistoricalData(country, period = '1m') {
 
     return data || [];
   } catch (error) {
-    console.warn(`⚠️ Erreur Supabase history:`, error.message);
+    console.warn(`⚠️ Supabase non disponible pour historique:`, error.message);
     return [];
   }
 }
@@ -893,27 +896,33 @@ export default async function handler(req, res) {
     }
 
     const { country = 'both', date = null, history = null, period = '1m' } = req.query;
+    console.log(`📡 [API yield-curve] country=${country}, date=${date}, history=${history}`);
 
     // Handle history request
     if (history === 'true') {
-      console.log(`📊 Requête historique: country=${country}, period=${period}`);
+      try {
+        console.log(`📊 Requête historique: country=${country}, period=${period}`);
 
-      const result = {
-        timestamp: new Date().toISOString(),
-        period,
-        history: {}
-      };
+        const result = {
+          timestamp: new Date().toISOString(),
+          period,
+          history: {}
+        };
 
-      if (country === 'us' || country === 'both') {
-        result.history.us = await getHistoricalData('us', period);
+        if (country === 'us' || country === 'both') {
+          result.history.us = await getHistoricalData('us', period);
+        }
+
+        if (country === 'canada' || country === 'both') {
+          result.history.canada = await getHistoricalData('canada', period);
+        }
+
+        res.setHeader('Cache-Control', CACHE_CONTROL);
+        return res.status(200).json(result);
+      } catch (histError) {
+        console.error('❌ Erreur historique:', histError);
+        throw histError;
       }
-
-      if (country === 'canada' || country === 'both') {
-        result.history.canada = await getHistoricalData('canada', period);
-      }
-
-      res.setHeader('Cache-Control', CACHE_CONTROL);
-      return res.status(200).json(result);
     }
 
     console.log(`🔍 Requête yield curve: country=${country}, date=${date || 'actuelle'}`);
@@ -925,78 +934,67 @@ export default async function handler(req, res) {
     };
 
     // Récupérer les données selon le pays demandé
-    // Pour les données historiques, vérifier Supabase en premier
-    // Pour les données actuelles, vérifier Supabase (cache du jour) puis API si nécessaire
-    
     if (country === 'us' || country === 'both') {
-      // Essayer Supabase d'abord
-      let usData = await getFromSupabase('us', date);
-      
-      // Si pas dans Supabase ou si données actuelles et plus vieilles que 1 jour, récupérer via API
-      const today = new Date().toISOString().split('T')[0];
-      const shouldFetchFromAPI = !usData || (!date && usData.date !== today);
-      
-      if (shouldFetchFromAPI) {
-        console.log('📡 Récupération US depuis API...');
-        usData = await getUSTreasury(date);
+      try {
+        console.log('🔍 US Data - Checking Supabase...');
+        let usData = await getFromSupabase('us', date);
+        const today = new Date().toISOString().split('T')[0];
+        const shouldFetchFromAPI = !usData || (!date && usData.date !== today);
         
-        // Sauvegarder dans Supabase si récupération réussie
-        if (usData && usData.rates && usData.rates.length > 0) {
-          await saveToSupabase('us', usData);
+        if (shouldFetchFromAPI) {
+          console.log('📡 US Data - Fetching from API...');
+          usData = await getUSTreasury(date);
+          if (usData && usData.rates && usData.rates.length > 0) {
+            await saveToSupabase('us', usData);
+          }
         }
-      }
-      
-      if (usData) {
-        result.data.us = usData;
+        if (usData) result.data.us = usData;
+      } catch (usError) {
+        console.error('❌ Erreur US Data:', usError);
       }
     }
 
     if (country === 'canada' || country === 'both') {
-      // Essayer Supabase d'abord
-      let canadaData = await getFromSupabase('canada', date);
-      
-      // Si pas dans Supabase ou si données actuelles et plus vieilles que 1 jour, récupérer via API
-      const today = new Date().toISOString().split('T')[0];
-      const shouldFetchFromAPI = !canadaData || (!date && canadaData.date !== today);
-      
-      if (shouldFetchFromAPI) {
-        console.log('📡 Récupération Canada depuis API...');
-        canadaData = await getCanadaRates(date);
+      try {
+        console.log('🔍 Canada Data - Checking Supabase...');
+        let canadaData = await getFromSupabase('canada', date);
+        const today = new Date().toISOString().split('T')[0];
+        const shouldFetchFromAPI = !canadaData || (!date && canadaData.date !== today);
         
-        // Sauvegarder dans Supabase si récupération réussie
-        if (canadaData && canadaData.rates && canadaData.rates.length > 0) {
-          await saveToSupabase('canada', canadaData);
+        if (shouldFetchFromAPI) {
+          console.log('📡 Canada Data - Fetching from API...');
+          canadaData = await getCanadaRates(date);
+          if (canadaData && canadaData.rates && canadaData.rates.length > 0) {
+            await saveToSupabase('canada', canadaData);
+          }
         }
-      }
-      
-      if (canadaData) {
-        result.data.canada = canadaData;
+        if (canadaData) result.data.canada = canadaData;
+      } catch (caError) {
+        console.error('❌ Erreur Canada Data:', caError);
       }
     }
 
-    // Le spread est déjà calculé dans saveToSupabase et getFromSupabase
-    // Mais on peut le recalculer si nécessaire pour cohérence
+    // Recalculer le spread si nécessaire
     if (result.data.us && result.data.us.rates && !result.data.us.spread_10y_2y) {
       const rate10Y = result.data.us.rates.find(r => r.maturity === '10Y');
       const rate2Y = result.data.us.rates.find(r => r.maturity === '2Y');
-
       if (rate10Y && rate2Y) {
         result.data.us.spread_10y_2y = rate10Y.rate - rate2Y.rate;
         result.data.us.inverted = result.data.us.spread_10y_2y < 0;
       }
     }
 
-    console.log(`✅ Yield curve récupérée: US=${result.data.us?.count || 0} points, Canada=${result.data.canada?.count || 0} points`);
-
+    console.log(`✅ Yield curve OK: US=${result.data.us?.count || 0}, CA=${result.data.canada?.count || 0}`);
     res.setHeader('Cache-Control', CACHE_CONTROL);
     return res.status(200).json(result);
 
   } catch (error) {
-    console.error('❌ Erreur yield-curve:', error);
+    console.error('❌ Erreur Fatale yield-curve:', error);
     res.setHeader('Cache-Control', 'no-store');
     return res.status(500).json({
-      error: 'Erreur lors de la récupération de la yield curve',
-      message: error.message
+      error: 'Internal Server Error',
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 }

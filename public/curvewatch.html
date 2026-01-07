@@ -1,183 +1,381 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="dark">
+<html lang="fr" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CurveWatch - Courbes de Taux US & Canada | GOB Dashboard</title>
-    <meta name="description" content="Visualisation en temps réel des courbes de taux d'intérêt américaines et canadiennes">
+    <meta name="description" content="CurveWatch - Terminal d'analyse des courbes de rendement obligataire US et Canada">
+    <meta name="theme-color" content="#09090b">
+    <title>CurveWatch - JLab Terminal | Intelligence Obligataire</title>
+    
+    <!-- Preconnect pour performances -->
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- React & ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
-    <!-- PropTypes (required for Recharts) -->
-    <script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
-    
-    <!-- Babel Standalone for JSX -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Recharts for charts (bundled locally - no CDN dependency) -->
-    <script src="/js/recharts-bundle.js"></script>
-    
-    <!-- V0 Integration Wrapper - Permet d'intégrer directement les composants v0 -->
-    <script src="/js/dashboard/components/v0-integration-wrapper.js"></script>
-    
-    <!-- Iconoir Icons -->
-    <script src="https://unpkg.com/iconoir@latest/html"></script>
-    
-    <!-- Polyfills for require/module (needed for some components) -->
     <script>
-        if (typeof window.require === 'undefined') {
-            window.require = function(moduleName) {
-                if (moduleName === 'react') return window.React;
-                if (moduleName === 'react-dom') return window.ReactDOM;
-                if (moduleName === 'prop-types') return window.PropTypes || {};
-                if (moduleName === 'react/jsx-runtime' || moduleName === 'react/jsx-dev-runtime') {
-                    return {
-                        jsx: React.createElement,
-                        jsxs: React.createElement,
-                        Fragment: React.Fragment
-                    };
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#09090b',
+                        foreground: '#fafafa',
+                        muted: { DEFAULT: '#27272a', foreground: '#a1a1aa' },
+                        accent: { DEFAULT: '#3b82f6', foreground: '#ffffff' },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    },
+                    animation: {
+                        'spin-slow': 'spin 3s linear infinite',
+                        'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
+                    }
                 }
-                return {};
-            };
+            }
         }
-        window.exports = {};
-        window.module = { exports: window.exports };
     </script>
-    
+
+    <!-- Premium Design System -->
     <style>
-        body {
+        /* Import Inter font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        * {
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #09090b;
+            color: #fafafa;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        
-        /* Dark theme by default */
-        [data-theme="dark"] {
-            background-color: #0a0a0a;
-            color: #e0e0e0;
+
+        /* Premium Loader */
+        .loader-container {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #09090b;
+            z-index: 9999;
         }
-        
-        [data-theme="light"] {
-            background-color: #ffffff;
-            color: #333333;
+
+        .loader-ring {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .loader-ring::before,
+        .loader-ring::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        .loader-ring::before {
+            inset: 0;
+            border: 4px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .loader-ring::after {
+            inset: 0;
+            border: 4px solid transparent;
+            border-top-color: #3b82f6;
+            animation: loader-spin 1s linear infinite;
+        }
+
+        .loader-inner {
+            position: absolute;
+            inset: 16px;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top-color: #6366f1;
+            animation: loader-spin 0.8s linear infinite reverse;
+        }
+
+        @keyframes loader-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+                opacity: 1;
+            }
+            50% { 
+                box-shadow: 0 0 40px rgba(59, 130, 246, 0.4);
+                opacity: 0.8;
+            }
+        }
+
+        .loader-text {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .loader-brand {
+            font-size: 1.5rem;
+            font-weight: 900;
+            font-style: italic;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #60a5fa 0%, #818cf8 50%, #c084fc 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 200% 200%;
+            animation: gradient-shift 3s ease infinite;
+        }
+
+        .loader-subtitle {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: #52525b;
+            margin-top: 0.5rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Error State */
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .error-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fafafa;
+            margin-bottom: 0.5rem;
+        }
+
+        .error-message {
+            font-size: 0.875rem;
+            color: #71717a;
+            max-width: 400px;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .error-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .error-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #09090b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+
+        /* Selection */
+        ::selection {
+            background: rgba(59, 130, 246, 0.3);
         }
     </style>
-</head>
-<body class="min-h-screen" data-theme="dark">
-    <div id="root" class="min-h-screen w-full"></div>
 
-    <!-- CurveWatch Container (prérequis - doit être traité par Babel car contient du JSX) -->
-    <script type="text/babel" src="/js/dashboard/components/CurveWatch/CurveWatchContainer.js"></script>
+    <!-- React 18 Stack -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- CurveWatch Tab Component -->
-    <script type="text/babel" src="/js/dashboard/components/tabs/CurveWatchTab.js"></script>
+    <!-- PropTypes (Required for Recharts) -->
+    <script src="https://unpkg.com/prop-types@15.8.1/prop-types.js"></script>
+    <script>
+        window.PropTypes = window.PropTypes || PropTypes;
+    </script>
+    
+    <!-- Recharts -->
+    <script src="https://unpkg.com/recharts@2.10.3/umd/Recharts.js"></script>
+    
+    <!-- Babel Standalone -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div id="root">
+        <!-- Premium Initial Loader -->
+        <div class="loader-container" id="initial-loader">
+            <div class="loader-ring">
+                <div class="loader-inner"></div>
+            </div>
+            <div class="loader-text">
+                <div class="loader-brand">JLab Terminal</div>
+                <div class="loader-subtitle">Initialisation CurveWatch...</div>
+            </div>
+        </div>
+    </div>
 
-    <!-- Main App Script -->
+    <!-- GOB Dashboard Integration Scripts -->
+    <script src="/js/dashboard/v0-bootstrap.js"></script>
+    <script src="/js/dashboard/components/v0-integration-wrapper.js"></script>
+
+    <!-- Application Bootstrap -->
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const App = () => {
+            const [ready, setReady] = React.useState(false);
+            const [error, setError] = React.useState(null);
+            const [theme, setTheme] = React.useState('dark');
 
-        // Simple wrapper app for standalone page
-        const CurveWatchStandalone = () => {
-            const [isDark, setIsDark] = useState(() => {
-                return document.documentElement.getAttribute("data-theme") === "dark";
-            });
-
-            useEffect(() => {
-                const handleThemeChange = () => {
-                    setIsDark(document.documentElement.getAttribute("data-theme") === "dark");
+            React.useEffect(() => {
+                const init = async () => {
+                    try {
+                        console.log("🚀 CurveWatch: Starting initialization...");
+                        
+                        // Load main component
+                        await window.V0Integration.loadV0Component(
+                            '/yieldcurveanalytics/components/curve-watch-compatible.tsx', 
+                            'CurveWatchV0'
+                        );
+                        
+                        // Hide loader with fade
+                        const loader = document.getElementById('initial-loader');
+                        if (loader) {
+                            loader.style.transition = 'opacity 0.3s ease';
+                            loader.style.opacity = '0';
+                            setTimeout(() => loader.remove(), 300);
+                        }
+                        
+                        setReady(true);
+                        console.log("✅ CurveWatch: Ready");
+                        
+                    } catch (err) {
+                        console.error("❌ CurveWatch: Init failed", err);
+                        setError(err.message);
+                        
+                        const loader = document.getElementById('initial-loader');
+                        if (loader) loader.remove();
+                    }
                 };
                 
-                // Listen for theme changes
-                window.addEventListener("themeChanged", handleThemeChange);
-                return () => window.removeEventListener("themeChanged", handleThemeChange);
+                init();
             }, []);
 
-            // Wait for CurveWatchTab to be available
-            const [componentReady, setComponentReady] = useState(!!window.CurveWatchTab);
-
-            useEffect(() => {
-                if (window.CurveWatchTab) {
-                    setComponentReady(true);
-                    return;
-                }
-
-                // Check periodically
-                const checkInterval = setInterval(() => {
-                    if (window.CurveWatchTab) {
-                        setComponentReady(true);
-                        clearInterval(checkInterval);
-                    }
-                }, 100);
-
-                return () => clearInterval(checkInterval);
-            }, []);
-
-            if (!componentReady) {
+            if (error) {
                 return (
-                    <div className={`flex items-center justify-center min-h-screen ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
-                        <div className="text-center">
-                            <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${isDark ? 'border-blue-500' : 'border-blue-600'} mx-auto mb-4`}></div>
-                            <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
-                                Chargement de CurveWatch...
-                            </p>
-                        </div>
+                    <div className="error-container">
+                        <div className="error-icon">⚠️</div>
+                        <h2 className="error-title">Échec de l'initialisation</h2>
+                        <p className="error-message">{error}</p>
+                        <button 
+                            className="error-button"
+                            onClick={() => window.location.reload()}
+                        >
+                            Réessayer
+                        </button>
                     </div>
                 );
             }
 
-            return (
-                <div className={`min-h-screen w-full ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
-                    {/* Header */}
-                    <header className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4`}>
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                                    CurveWatch
-                                </h1>
-                                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-                                    Courbes de Taux US & Canada en Temps Réel
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <button
-                                    onClick={() => {
-                                        const newTheme = isDark ? 'light' : 'dark';
-                                        document.documentElement.setAttribute("data-theme", newTheme);
-                                        setIsDark(!isDark);
-                                        window.dispatchEvent(new CustomEvent('themeChanged'));
-                                    }}
-                                    className={`px-4 py-2 rounded-lg ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-900'}`}
-                                >
-                                    {isDark ? '☀️' : '🌙'} {isDark ? 'Light' : 'Dark'}
-                                </button>
-                                <a
-                                    href="/beta-combined-dashboard.html?tab=jlab-curvewatch"
-                                    className={`px-4 py-2 rounded-lg ${isDark ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
-                                >
-                                    ← Retour Dashboard
-                                </a>
-                            </div>
-                        </div>
-                    </header>
+            if (!ready) return null;
 
-                    {/* Main Content */}
-                    <main className="h-[calc(100vh-80px)]">
-                        <window.CurveWatchTab isDarkMode={isDark} />
-                    </main>
+            return (
+                <div className={theme}>
+                    {/* Theme Toggle + Back Button */}
+                    <div className="fixed top-4 right-4 z-[100] flex gap-2">
+                        <button 
+                            onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+                            className="px-3 py-1.5 text-[11px] font-semibold rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                            aria-label="Changer le thème"
+                        >
+                            {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+                        </button>
+                        <a 
+                            href="/" 
+                            className="px-3 py-1.5 text-[11px] font-semibold rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 transition-all"
+                        >
+                            ← Retour Dashboard
+                        </a>
+                    </div>
+                    
+                    {window.CurveWatchV0 && <window.CurveWatchV0 />}
                 </div>
             );
         };
 
-        // Render app
+        // API Fetch Helper
+        window.fetchYieldCurveWithCache = async (country) => {
+            try {
+                const res = await fetch(`/api/yield-curve?country=${country}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return await res.json();
+            } catch (err) {
+                console.error("API Error:", err);
+                throw err;
+            }
+        };
+
+        // Render
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<CurveWatchStandalone />);
+        root.render(<App />);
     </script>
 </body>
 </html>

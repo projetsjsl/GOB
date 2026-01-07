@@ -305,7 +305,7 @@ const YieldCurveTab = () => {
                 <div>
                     <h2 className="text-2xl font-bold flex items-center gap-2">
                         <LucideIcon name="TrendingUp" className="w-6 h-6 text-blue-500" />
-                        JLab CurveWatch™ <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded ml-2">PRO TERMINAL</span>
+                        Courbe des Taux <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded ml-2">MARCHÉS</span>
                     </h2>
                 </div>
                 <div className="flex gap-2">

@@ -27,34 +27,52 @@ export function MaturitySelector({ selectedMaturities, onMaturitiesChange }: Mat
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-foreground">Maturités</CardTitle>
-            <CardDescription className="text-muted-foreground">Sélectionnez les maturités à afficher</CardDescription>
+            <CardTitle className="text-foreground text-sm font-bold">Maturités</CardTitle>
+            <CardDescription className="text-muted-foreground text-xs">Points de la courbe à afficher</CardDescription>
           </div>
-          <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full">
+          <span className="text-[10px] font-bold bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-full border border-blue-500/30">
             {selectedMaturities.length}/{MATURITIES.length}
           </span>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="flex flex-wrap gap-2">
-          {MATURITIES.map((maturity) => (
-            <Button
-              key={maturity}
-              variant={selectedMaturities.includes(maturity) ? "default" : "outline"}
-              size="sm"
-              onClick={() => toggleMaturity(maturity)}
-              className="text-xs font-medium transition-all"
-            >
-              {maturity}
-            </Button>
-          ))}
+      <CardContent className="space-y-4">
+        <div className="flex flex-wrap gap-1.5">
+          {MATURITIES.map((maturity) => {
+            const isSelected = selectedMaturities.includes(maturity)
+            return (
+              <Button
+                key={maturity}
+                variant={isSelected ? "default" : "outline"}
+                size="sm"
+                onClick={() => toggleMaturity(maturity)}
+                aria-pressed={isSelected}
+                className={`h-8 px-3 text-xs font-semibold transition-all ${
+                  isSelected 
+                    ? 'shadow-md shadow-blue-500/20' 
+                    : 'hover:border-zinc-500 hover:text-white'
+                }`}
+              >
+                {maturity}
+              </Button>
+            )
+          })}
         </div>
 
-        <div className="flex gap-2 pt-2 border-t border-border">
-          <Button variant="ghost" size="sm" onClick={selectAll} className="text-xs flex-1">
+        <div className="flex gap-2 pt-3 border-t border-zinc-800">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={selectAll} 
+            className="text-xs flex-1 font-medium hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"
+          >
             Tout Sélectionner
           </Button>
-          <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs flex-1">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={clearAll} 
+            className="text-xs flex-1 font-medium hover:bg-red-500/10 hover:text-red-400 transition-colors"
+          >
             Effacer
           </Button>
         </div>

@@ -1,8 +1,8 @@
 /**
- * CurveWatchTab - Wrapper pour intégrer directement le composant v0
+ * CurveWatchTab - Intégration de YieldCurveAnalytics
  * 
- * Utilise le code existant dans yieldcurveanalytics sans conversion manuelle
- * Le wrapper V0Integration gère automatiquement la conversion
+ * Ce composant charge le nouveau dashboard de courbe des taux depuis /yieldcurveanalytics
+ * en utilisant le cache global du dashboard pour éviter les blocages.
  */
 
 const { useState, useEffect } = React;
@@ -40,58 +40,86 @@ const CurveWatchTab = ({ isDarkMode: isDarkModeProp }) => {
     const isDark = isDarkModeProp !== undefined ? isDarkModeProp : isDarkDetected;
     
     const [componentReady, setComponentReady] = useState(false);
-    const [useV0Component, setUseV0Component] = useState(false);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Option 1: Utiliser CurveWatchContainer existant (déjà chargé)
-        if (window.CurveWatchContainer) {
-            setComponentReady(true);
-            setUseV0Component(false);
-            console.log('✅ CurveWatchTab: Utilise CurveWatchContainer existant');
-            return;
-        }
+        let mounted = true;
+        
+        const init = async () => {
+            console.log('🔄 CurveWatchTab: Initialisation du nouveau moteur...');
+            
+            // On vérifie d'abord si le composant est déjà chargé en mémoire
+            if (window.CurveWatchV0) {
+                if (mounted) setComponentReady(true);
+                return;
+            }
 
-        // Option 2: Charger le composant v0 directement
-        if (window.V0Integration) {
-            console.log('🔄 CurveWatchTab: Tentative de chargement du composant v0...');
-            window.V0Integration.loadV0Component(
-                '/yieldcurveanalytics/components/curve-watch-compatible.tsx',
-                'CurveWatchV0'
-            ).then(() => {
-                setComponentReady(true);
-                setUseV0Component(true);
-                console.log('✅ CurveWatchTab: Composant v0 chargé');
-            }).catch((error) => {
-                console.error('❌ CurveWatchTab: Erreur lors du chargement du composant v0', error);
-                // Fallback vers CurveWatchContainer si disponible
-                if (window.CurveWatchContainer) {
-                    setComponentReady(true);
-                    setUseV0Component(false);
-                }
-            });
-        } else {
-            // Attendre que V0Integration soit disponible
-            const checkInterval = setInterval(() => {
-                if (window.V0Integration) {
-                    clearInterval(checkInterval);
-                    window.V0Integration.loadV0Component(
+            // Tentative de chargement via V0Integration
+            if (window.V0Integration) {
+                try {
+                    console.log('📡 CurveWatchTab: Appel V0Integration.loadV0Component...');
+                    const component = await window.V0Integration.loadV0Component(
                         '/yieldcurveanalytics/components/curve-watch-compatible.tsx',
                         'CurveWatchV0'
-                    ).then(() => {
+                    );
+                    console.log('📡 CurveWatchTab: Résultat chargement:', !!component);
+                    if (mounted) {
                         setComponentReady(true);
-                        setUseV0Component(true);
-                    }).catch(() => {
-                        if (window.CurveWatchContainer) {
-                            setComponentReady(true);
-                            setUseV0Component(false);
-                        }
-                    });
+                        console.log('✅ CurveWatchTab: Composant v0 chargé avec succès');
+                    }
+                } catch (err) {
+                    console.error('❌ CurveWatchTab: Échec du chargement v0:', err);
+                    if (mounted) setError(`Erreur de chargement du moteur v0: ${err.message}`);
                 }
-            }, 100);
+            } else {
+                // Attente active courte pour V0Integration
+                let attempts = 0;
+                const checkV0 = setInterval(async () => {
+                    attempts++;
+                    if (window.V0Integration) {
+                        clearInterval(checkV0);
+                        try {
+                            await window.V0Integration.loadV0Component(
+                                '/yieldcurveanalytics/components/curve-watch-compatible.tsx',
+                                'CurveWatchV0'
+                            );
+                            if (mounted) setComponentReady(true);
+                        } catch (err) {
+                            if (window.CurveWatchContainer) {
+                                if (mounted) setComponentReady(true);
+                            } else {
+                                if (mounted) setError("V0 fail");
+                            }
+                        }
+                    } else if (attempts > 30) {
+                        clearInterval(checkV0);
+                        if (window.CurveWatchContainer) {
+                            if (mounted) setComponentReady(true);
+                        } else {
+                            if (mounted) setError("Timeout chargement");
+                        }
+                    }
+                }, 100);
+            }
+        };
 
-            return () => clearInterval(checkInterval);
-        }
+        init();
+        return () => { mounted = false; };
     }, []);
+
+    if (error) {
+        return (
+            <div className={`flex items-center justify-center h-full ${isDark ? 'bg-gray-900 text-red-400' : 'bg-white text-red-600'}`}>
+                <div className="text-center p-6 border-2 border-red-500 rounded-xl bg-red-500/5">
+                    <p className="font-bold text-lg mb-2">Erreur CurveWatch</p>
+                    <p className="text-sm opacity-80">{error}</p>
+                    <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg text-xs">
+                        Actualiser la page
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     if (!componentReady) {
         return (
@@ -99,15 +127,15 @@ const CurveWatchTab = ({ isDarkMode: isDarkModeProp }) => {
                 <div className="text-center">
                     <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${isDark ? 'border-blue-500' : 'border-blue-600'} mx-auto mb-4`}></div>
                     <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
-                        Chargement de CurveWatch...
+                        Initialisation de YieldCurve Analytics...
                     </p>
                 </div>
             </div>
         );
     }
 
-    // Utiliser le composant approprié
-    if (useV0Component && window.CurveWatchV0) {
+    // Priorité au composant moderne
+    if (window.CurveWatchV0) {
         return (
             <div className={`h-full w-full ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
                 <window.CurveWatchV0 isDarkMode={isDark} />
@@ -115,7 +143,7 @@ const CurveWatchTab = ({ isDarkMode: isDarkModeProp }) => {
         );
     }
 
-    // Fallback vers CurveWatchContainer
+    // Fallback Legacy
     if (window.CurveWatchContainer) {
         return (
             <div className={`h-full w-full ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
@@ -126,14 +154,10 @@ const CurveWatchTab = ({ isDarkMode: isDarkModeProp }) => {
 
     return (
         <div className={`flex items-center justify-center h-full ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
-            <div className="text-center">
-                <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
-                    CurveWatch non disponible. Vérifiez le chargement des scripts.
-                </p>
-            </div>
+            <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>Composant indisponible.</p>
         </div>
     );
 };
 
 window.CurveWatchTab = CurveWatchTab;
-console.log('✅ CurveWatchTab loaded - Support v0 + fallback CurveWatchContainer');
+console.log('✅ CurveWatchTab: Moteur YieldCurveAnalytics activé');

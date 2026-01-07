@@ -134,45 +134,45 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
   return (
     <div className="space-y-4">
       {/* Policy Rates + Key Spreads Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {/* US Policy Rate */}
-        <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/30">
-          <CardContent className="p-3">
-            <div className="flex items-center gap-1 mb-1">
-              <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-              <span className="text-[10px] font-medium text-muted-foreground uppercase">Fed Rate</span>
+        <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/30 border-l-4 border-l-blue-500">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="h-2.5 w-2.5 rounded-full bg-blue-500"></div>
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Fed Rate</span>
             </div>
-            <div className="text-xl font-bold text-blue-400">
+            <div className="text-2xl font-bold text-blue-400">
               {isValidYield(usPolicyRate) ? `${usPolicyRate!.toFixed(2)}%` : "—"}
             </div>
             {isValidYield(usPolicyRate) && (
-              <div className="text-[10px] text-muted-foreground mt-0.5">{(usPolicyRate! * 100).toFixed(0)} pb</div>
+              <div className="text-xs text-muted-foreground mt-1">{(usPolicyRate! * 100).toFixed(0)} pb</div>
             )}
           </CardContent>
         </Card>
 
         {/* CA Policy Rate */}
-        <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5 border-red-500/30">
-          <CardContent className="p-3">
-            <div className="flex items-center gap-1 mb-1">
-              <div className="h-2 w-2 rounded-full bg-red-500"></div>
-              <span className="text-[10px] font-medium text-muted-foreground uppercase">BOC Rate</span>
+        <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5 border-red-500/30 border-l-4 border-l-red-500">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="h-2.5 w-2.5 rounded-full bg-red-500"></div>
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">BOC Rate</span>
             </div>
-            <div className="text-xl font-bold text-red-400">{caPolicyRate.toFixed(2)}%</div>
-            <div className="text-[10px] text-muted-foreground mt-0.5">{(caPolicyRate * 100).toFixed(0)} pb</div>
+            <div className="text-2xl font-bold text-red-400">{caPolicyRate.toFixed(2)}%</div>
+            <div className="text-xs text-muted-foreground mt-1">{(caPolicyRate * 100).toFixed(0)} pb</div>
           </CardContent>
         </Card>
 
         {/* US 2Y-10Y Slope */}
         {us2Y10YSpread !== null && (
           <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/30">
-            <CardContent className="p-3">
-              <div className="text-[10px] font-medium text-muted-foreground uppercase mb-1">Pente 2Y-10Y (US)</div>
-              <div className={`text-xl font-bold ${us2Y10YSpread >= 0 ? "text-emerald-400" : "text-amber-400"}`}>
+            <CardContent className="p-4">
+              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Pente 2Y-10Y (US)</div>
+              <div className={`text-2xl font-bold ${us2Y10YSpread >= 0 ? "text-emerald-400" : "text-amber-400"}`}>
                 {us2Y10YSpread >= 0 ? "+" : ""}
                 {(us2Y10YSpread * 100).toFixed(0)} pb
               </div>
-              <div className="text-[10px] text-muted-foreground mt-0.5">
+              <div className="text-xs text-muted-foreground mt-1">
                 {us2Y10YSpread >= 0 ? "Normale" : "Inversée"}
               </div>
             </CardContent>
@@ -182,13 +182,13 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
         {/* CA 2Y-10Y Slope */}
         {ca2Y10YSpread !== null && (
           <Card className="bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-orange-500/30">
-            <CardContent className="p-3">
-              <div className="text-[10px] font-medium text-muted-foreground uppercase mb-1">Pente 2Y-10Y (CA)</div>
-              <div className={`text-xl font-bold ${ca2Y10YSpread >= 0 ? "text-emerald-400" : "text-amber-400"}`}>
+            <CardContent className="p-4">
+              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Pente 2Y-10Y (CA)</div>
+              <div className={`text-2xl font-bold ${ca2Y10YSpread >= 0 ? "text-emerald-400" : "text-amber-400"}`}>
                 {ca2Y10YSpread >= 0 ? "+" : ""}
                 {(ca2Y10YSpread * 100).toFixed(0)} pb
               </div>
-              <div className="text-[10px] text-muted-foreground mt-0.5">
+              <div className="text-xs text-muted-foreground mt-1">
                 {ca2Y10YSpread >= 0 ? "Normale" : "Inversée"}
               </div>
             </CardContent>
@@ -198,24 +198,24 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
         {/* US-CA 10Y Spread */}
         {usCA10YSpread !== null && (
           <Card className="bg-gradient-to-br from-cyan-500/10 to-cyan-500/5 border-cyan-500/30">
-            <CardContent className="p-3">
-              <div className="text-[10px] font-medium text-muted-foreground uppercase mb-1">Écart 10Y US-CA</div>
-              <div className={`text-xl font-bold ${usCA10YSpread >= 0 ? "text-cyan-400" : "text-pink-400"}`}>
+            <CardContent className="p-4">
+              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Écart 10Y US-CA</div>
+              <div className={`text-2xl font-bold ${usCA10YSpread >= 0 ? "text-cyan-400" : "text-pink-400"}`}>
                 {usCA10YSpread >= 0 ? "+" : ""}
                 {(usCA10YSpread * 100).toFixed(0)} pb
               </div>
-              <div className="text-[10px] text-muted-foreground mt-0.5">US {usCA10YSpread >= 0 ? ">" : "<"} CA</div>
+              <div className="text-xs text-muted-foreground mt-1">US {usCA10YSpread >= 0 ? ">" : "<"} CA</div>
             </CardContent>
           </Card>
         )}
       </div>
 
       {/* All Maturities Grid - showing both countries and daily performance */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* US Maturities */}
-        <div className="space-y-2">
-          <h3 className="text-xs font-bold text-blue-400 uppercase">États-Unis (FRED)</h3>
-          <div className="grid grid-cols-5 gap-1.5">
+        <div className="space-y-3">
+          <h3 className="text-sm font-bold text-blue-400 uppercase tracking-wider">États-Unis (FRED)</h3>
+          <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-6 gap-2">
             {KEY_MATURITIES.map((maturity) => {
               const usYield = getYield(usData, maturity)
               const change = usPerformance[maturity] || 0
@@ -226,18 +226,18 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
               }
 
               return (
-                <Card key={`us-${maturity}`} className="bg-card border-border hover:border-primary/50">
-                  <CardContent className="p-1.5">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[9px] font-bold text-muted-foreground">{maturity}</span>
+                <Card key={`us-${maturity}`} className="bg-card border-border hover:border-primary/50 min-w-[70px]">
+                  <CardContent className="p-2.5">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[11px] font-bold text-muted-foreground">{maturity}</span>
                       {getChangeIcon()}
                     </div>
-                    <div className="text-sm font-bold text-blue-400">
+                    <div className="text-base font-bold text-blue-400 whitespace-nowrap">
                       {isValidYield(usYield) ? `${usYield!.toFixed(2)}%` : "—"}
                     </div>
                     {Object.keys(usPerformance).includes(maturity) && (
                       <div
-                        className={`text-[8px] ${change > 0 ? "text-emerald-400" : change < 0 ? "text-red-400" : "text-gray-500"}`}
+                        className={`text-[10px] mt-0.5 ${change > 0 ? "text-emerald-400" : change < 0 ? "text-red-400" : "text-gray-500"}`}
                       >
                         {change > 0 ? "+" : ""}
                         {change.toFixed(1)} pb
@@ -252,9 +252,9 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
 
         {/* CA Maturities */}
         {caData && caData.length > 0 && (
-          <div className="space-y-2">
-            <h3 className="text-xs font-bold text-red-400 uppercase">Canada (BOC)</h3>
-            <div className="grid grid-cols-5 gap-1.5">
+          <div className="space-y-3">
+            <h3 className="text-sm font-bold text-red-400 uppercase tracking-wider">Canada (BOC)</h3>
+            <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-6 gap-2">
               {KEY_MATURITIES.map((maturity) => {
                 const caYield = getYield(caData, maturity)
                 const change = caPerformance[maturity] || 0
@@ -265,18 +265,18 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
                 }
 
                 return (
-                  <Card key={`ca-${maturity}`} className="bg-card border-border hover:border-primary/50">
-                    <CardContent className="p-1.5">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-[9px] font-bold text-muted-foreground">{maturity}</span>
+                  <Card key={`ca-${maturity}`} className="bg-card border-border hover:border-primary/50 min-w-[70px]">
+                    <CardContent className="p-2.5">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[11px] font-bold text-muted-foreground">{maturity}</span>
                         {getChangeIcon()}
                       </div>
-                      <div className="text-sm font-bold text-red-400">
+                      <div className="text-base font-bold text-red-400 whitespace-nowrap">
                         {isValidYield(caYield) ? `${caYield!.toFixed(2)}%` : "—"}
                       </div>
                       {Object.keys(caPerformance).includes(maturity) && (
                         <div
-                          className={`text-[8px] ${change > 0 ? "text-emerald-400" : change < 0 ? "text-red-400" : "text-gray-500"}`}
+                          className={`text-[10px] mt-0.5 ${change > 0 ? "text-emerald-400" : change < 0 ? "text-red-400" : "text-gray-500"}`}
                         >
                           {change > 0 ? "+" : ""}
                           {change.toFixed(1)} pb
@@ -292,24 +292,24 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
       </div>
 
       {/* Legend & Info */}
-      <div className="bg-muted/20 rounded-lg p-2.5 text-[10px] text-muted-foreground border border-border/20">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5">
-              <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-              <span>États-Unis (FRED)</span>
+      <div className="bg-muted/20 rounded-xl p-4 text-xs text-muted-foreground border border-border/30">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <div className="h-2.5 w-2.5 rounded-full bg-blue-500"></div>
+              <span className="font-medium">États-Unis (FRED)</span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <div className="h-2 w-2 rounded-full bg-red-500"></div>
-              <span>Canada (BOC)</span>
+            <div className="flex items-center gap-2">
+              <div className="h-2.5 w-2.5 rounded-full bg-red-500"></div>
+              <span className="font-medium">Canada (BOC)</span>
             </div>
           </div>
-          <div className="flex items-center gap-1 text-gray-500">
-            <RefreshCw className="h-3 w-3" />
+          <div className="flex items-center gap-2 text-gray-500">
+            <RefreshCw className="h-3.5 w-3.5" />
             <span>{lastUpdated}</span>
           </div>
         </div>
-        <p className="text-[9px] mt-2 text-muted-foreground">
+        <p className="text-[11px] mt-3 text-muted-foreground leading-relaxed">
           Les données avec "—" indiquent une absence de données réelles. La performance du jour montre le changement en
           points de base depuis la veille.
         </p>
