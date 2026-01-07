@@ -178,54 +178,13 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       }
     }, 100);
 
-    // Also try loading if not available after 500ms (faster)
+    // Recharts is now bundled locally - no CDN loading needed
+    // If not available, it means the bundle failed to load
     const timeout = setTimeout(() => {
-      if (rechartsReady || window.__rechartsLoading) {
-        return;
+      if (!rechartsReady && debugMode) {
+        console.error('❌ Recharts bundle not loaded - check /js/recharts-bundle.js');
       }
-
-      if (debugMode) {
-        console.log('🔄 Recharts not detected, loading from CDN...');
-      }
-
-      window.__rechartsLoading = true;
-      const script = document.createElement('script');
-      // Try jsdelivr first (same as dashboard), then fallback to unpkg
-      script.src = 'https://cdn.jsdelivr.net/npm/recharts@2.10.3/dist/Recharts.js';
-      script.async = true;
-      script.dataset.rechartsFallback = 'true';
-      script.onload = () => {
-        window.__rechartsLoading = false;
-        // Wait a bit for Recharts to initialize
-        setTimeout(() => {
-          checkRecharts();
-        }, 200);
-      };
-      script.onerror = () => {
-        window.__rechartsLoading = false;
-        if (debugMode) {
-          console.error('❌ Failed to load Recharts from jsdelivr, trying unpkg...');
-        }
-        // Fallback to unpkg
-        const fallback = document.createElement('script');
-        fallback.src = 'https://unpkg.com/recharts@2.10.3/dist/Recharts.js';
-        fallback.async = true;
-        fallback.onload = () => {
-          window.__rechartsLoading = false;
-          setTimeout(() => {
-            checkRecharts();
-          }, 200);
-        };
-        fallback.onerror = () => {
-          window.__rechartsLoading = false;
-          if (debugMode) {
-            console.error('❌ Failed to load Recharts from both CDNs');
-          }
-        };
-        document.head.appendChild(fallback);
-      };
-      document.head.appendChild(script);
-    }, 500);
+    }, 3000);
 
     return () => {
       clearInterval(interval);
