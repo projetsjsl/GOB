@@ -611,8 +611,50 @@
 
     <!-- Script pour exposer les bibliothèques globalement -->
     <script>
-        // Exposer Recharts globalement
-        window.Recharts = window.Recharts || {};
+        // Exposer Recharts globalement (CRITIQUE pour CurveWatch)
+        // Recharts est chargé via CDN, mais doit être exposé correctement
+        (function() {
+            // Attendre que Recharts soit chargé
+            function exposeRecharts() {
+                // Si Recharts est disponible globalement (via CDN)
+                if (typeof Recharts !== 'undefined') {
+                    window.Recharts = Recharts;
+                    // Gérer le format UMD
+                    if (Recharts.default) {
+                        const recharts = Recharts.default;
+                        window.Recharts = recharts;
+                        // Copier aussi les exports au niveau supérieur
+                        Object.keys(recharts).forEach(key => {
+                            if (!window.Recharts[key]) {
+                                window.Recharts[key] = recharts[key];
+                            }
+                        });
+                    }
+                    console.log('✅ Recharts exposé globalement:', {
+                        hasLineChart: !!(window.Recharts && window.Recharts.LineChart),
+                        hasResponsiveContainer: !!(window.Recharts && window.Recharts.ResponsiveContainer)
+                    });
+                    return true;
+                }
+                return false;
+            }
+            
+            // Essayer immédiatement
+            if (!exposeRecharts()) {
+                // Attendre le chargement de la page
+                window.addEventListener('load', function() {
+                    setTimeout(exposeRecharts, 100);
+                });
+                // Vérifier périodiquement
+                const checkInterval = setInterval(() => {
+                    if (exposeRecharts()) {
+                        clearInterval(checkInterval);
+                    }
+                }, 100);
+                // Arrêter après 5 secondes
+                setTimeout(() => clearInterval(checkInterval), 5000);
+            }
+        })();
 
         // ============================================
         // INJECTION VARIABLE D'ENVIRONNEMENT VITE_GROUP_CHAT_URL
@@ -1846,6 +1888,9 @@
     <!-- <script type="text/babel" src="/js/dashboard/components/tabs/FastGraphsTab.js"></script> -->
     <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisModals.js"></script>
     <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisTab.js"></script>
+    <!-- V0 Integration Wrapper - Permet d'intégrer directement les composants v0 -->
+    <script src="/js/dashboard/components/v0-integration-wrapper.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/tabs/CurveWatchTab.js"></script>
 
     <!-- Grid Layout Components (MUST load AFTER all tab components) -->
     <script type="text/babel" src="js/dashboard/components/tabs/MarketsEconomyTabRGL.js"></script>

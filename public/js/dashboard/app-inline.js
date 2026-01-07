@@ -714,7 +714,8 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             { id: 'jlab-advanced', label: 'Analyse Pro', icon: 'Activity', component: 'AdvancedAnalysisTab' },
             { id: 'jlab-compare', label: 'Comparaison', icon: 'GitCompare', component: 'FinanceProPanel:compare' },
             { id: 'jlab-screener', label: 'Screener', icon: 'Search', component: 'FinanceProPanel:screener' },
-            { id: 'jlab-fastgraphs', label: 'FastGraphs', icon: 'BarChart3', component: 'FastGraphsTab' }
+            { id: 'jlab-fastgraphs', label: 'FastGraphs', icon: 'BarChart3', component: 'FastGraphsTab' },
+            { id: 'jlab-curvewatch', label: 'CurveWatch', icon: 'TrendingUp', component: 'CurveWatchTab' }
         ],
         'emma': [
             { id: 'emma-chat', label: 'Chat Emma', icon: 'MessageSquare', component: 'AskEmmaTab' },
@@ -748,6 +749,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         'jlab-compare': { main: 'jlab', sub: 'jlab-compare' },
         'jlab-screener': { main: 'jlab', sub: 'jlab-screener' },
         'jlab-fastgraphs': { main: 'jlab', sub: 'jlab-fastgraphs' },
+        'jlab-curvewatch': { main: 'jlab', sub: 'jlab-curvewatch' },
         'ask-emma': { main: 'emma', sub: 'emma-chat' },
         'assistant-vocal': { main: 'emma', sub: 'emma-vocal' },
         'groupchat': { main: 'emma', sub: 'emma-group' },
@@ -1553,6 +1555,16 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch (_) { }
         };
 
+        // Charger CurveWatchTab automatiquement quand l'onglet est activé
+        useEffect(() => {
+            if (activeTab === 'jlab-curvewatch' && !window.CurveWatchTab && window.TabLazyLoader?.load) {
+                console.log('[CurveWatch] Chargement automatique du script...');
+                window.TabLazyLoader.load('jlab-curvewatch').catch((err) => {
+                    console.error('[CurveWatch] Erreur lors du chargement:', err);
+                });
+            }
+        }, [activeTab]);
+
         // Footer Context Updater
         useEffect(() => {
             const footerContext = document.getElementById('footer-context');
@@ -1579,7 +1591,8 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                     'finvox': 'FinVox',
                     'investing-calendar': 'Calendrier Investing',
                     'dans-watchlist': 'Watchlist Dan',
-                    'markets-economy': 'Marchés & Économie'
+                    'markets-economy': 'Marchés & Économie',
+                    'jlab-curvewatch': 'CurveWatch - Courbes de Taux'
                 };
                 
                 const tabName = tabNames[activeTab] || activeTab;
@@ -1721,6 +1734,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 // 3) Précharger le composant si TabLazyLoader est disponible
                 if (window.TabLazyLoader?.load) {
                     window.TabLazyLoader.load(targetTabId).catch(() => {});
+                }
+                
+                // 4) Charger CurveWatchTab si nécessaire
+                if (targetTabId === 'jlab-curvewatch' && !window.CurveWatchTab && window.TabLazyLoader?.load) {
+                    window.TabLazyLoader.load('jlab-curvewatch').catch(() => {});
                 }
 
                 // 4) Appliquer la navigation legacy (historique, intros, etc.)
@@ -28071,6 +28089,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {activeTab === 'jlab-compare' && <FinanceProPanel key={`jlab-compare-${tabMountKeys['jlab-compare'] || 0}`} isDarkMode={isDarkMode} initialViewMode="compare" />}
                     {activeTab === 'jlab-screener' && <FinanceProPanel key={`jlab-screener-${tabMountKeys['jlab-screener'] || 0}`} isDarkMode={isDarkMode} initialViewMode="screener" />}
                     {activeTab === 'jlab-fastgraphs' && window.FastGraphsTab && <window.FastGraphsTab key={`jlab-fastgraphs-${tabMountKeys['jlab-fastgraphs'] || 0}`} isDarkMode={isDarkMode} />}
+                    {activeTab === 'jlab-curvewatch' && window.CurveWatchTab && <window.CurveWatchTab key={`jlab-curvewatch-${tabMountKeys['jlab-curvewatch'] || 0}`} isDarkMode={isDarkMode} />}
 
                     {/* EMMA IA Sub-tabs */}
                     {activeTab === 'emma-chat' && <AskEmmaTab

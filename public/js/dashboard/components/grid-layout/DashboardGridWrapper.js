@@ -104,6 +104,7 @@
         'jlab-compare': { component: 'FinanceProPanel', label: 'Comparaison', icon: 'GitCompare', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 }, mode: 'compare' },
         'jlab-screener': { component: 'FinanceProPanel', label: 'Screener', icon: 'Search', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 }, mode: 'screener' },
         'jlab-fastgraphs': { component: 'FastGraphsTab', label: 'FastGraphs', icon: 'BarChart3', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
+        'jlab-curvewatch': { component: 'CurveWatchTab', label: 'CurveWatch', icon: 'TrendingUp', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
         
         // EMMA IA
         'emma-chat': { component: 'AskEmmaTab', label: 'Chat Emma', icon: 'Brain', defaultSize: { w: 6, h: 10 }, minSize: { w: 4, h: 8 } },

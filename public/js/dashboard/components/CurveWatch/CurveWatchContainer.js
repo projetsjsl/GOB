@@ -79,50 +79,158 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   const compareRequestIdRef = useRef(0);
   const hasCurrentDataRef = useRef(false);
 
+  // Check periodically if Recharts becomes available (in case it's loaded by page)
   useEffect(() => {
-    if (rechartsReady) {
-      if (debugMode) {
-        console.log('✅ Recharts already loaded and ready');
+    const checkRecharts = () => {
+      // Method 1: Try global Recharts (like JLabTab does)
+      let RechartsGlobal = null;
+      try {
+        // Check if Recharts is available globally (not just window.Recharts)
+        if (typeof Recharts !== 'undefined') {
+          RechartsGlobal = Recharts;
+        } else if (typeof window !== 'undefined' && typeof window.Recharts !== 'undefined') {
+          RechartsGlobal = window.Recharts;
+        }
+      } catch (e) {
+        // Recharts might not be defined yet
       }
-      return;
-    }
 
-    if (window.__rechartsLoading) {
-      if (debugMode) {
-        console.log('🔄 Recharts already loading...');
+      // Method 2: Force expose to window.Recharts if found globally
+      if (RechartsGlobal && !window.Recharts) {
+        window.Recharts = RechartsGlobal;
       }
-      return;
-    }
 
-    if (debugMode) {
-      console.log('🔄 Loading Recharts from CDN...');
-    }
-
-    window.__rechartsLoading = true;
-    const script = document.createElement('script');
-    script.src = 'https://unpkg.com/recharts@2.10.3/dist/Recharts.js';
-    script.async = true;
-    script.dataset.rechartsFallback = 'true';
-    script.onload = () => {
-      window.__rechartsLoading = false;
-      const isReady = !!(window.Recharts && window.Recharts.LineChart && window.Recharts.ResponsiveContainer);
-      if (debugMode) {
-        console.log('✅ Recharts loaded:', {
-          hasRecharts: !!window.Recharts,
-          hasLineChart: !!(window.Recharts && window.Recharts.LineChart),
-          hasResponsiveContainer: !!(window.Recharts && window.Recharts.ResponsiveContainer),
-          isReady
+      // Method 3: Handle UMD format - check if Recharts is in default export
+      if (window.Recharts && window.Recharts.default) {
+        const recharts = window.Recharts.default;
+        // Copy all exports to main object
+        Object.keys(recharts).forEach(key => {
+          if (!window.Recharts[key] && typeof recharts[key] !== 'undefined') {
+            window.Recharts[key] = recharts[key];
+          }
         });
       }
-      setRechartsReady(isReady);
-    };
-    script.onerror = () => {
-      window.__rechartsLoading = false;
-      if (debugMode) {
-        console.error('❌ Failed to load Recharts from CDN');
+
+      // Method 4: Try to extract components directly like JLabTab
+      let LineChart, ResponsiveContainer;
+      try {
+        // Try direct access first (like JLabTab: const { LineChart } = Recharts)
+        if (typeof Recharts !== 'undefined') {
+          LineChart = Recharts.LineChart;
+          ResponsiveContainer = Recharts.ResponsiveContainer;
+          // If found, ensure window.Recharts has them
+          if (LineChart && ResponsiveContainer) {
+            window.Recharts = window.Recharts || {};
+            window.Recharts.LineChart = LineChart;
+            window.Recharts.ResponsiveContainer = ResponsiveContainer;
+          }
+        }
+        
+        // Fallback to window.Recharts
+        if (!LineChart && window.Recharts) {
+          LineChart = window.Recharts.LineChart;
+          ResponsiveContainer = window.Recharts.ResponsiveContainer;
+        }
+      } catch (e) {
+        if (debugMode) {
+          console.warn('Error accessing Recharts components:', e);
+        }
       }
+      
+      const isReady = !!(LineChart && ResponsiveContainer);
+      if (isReady && !rechartsReady) {
+        if (debugMode) {
+          console.log('✅ Recharts detected and ready:', {
+            hasRecharts: !!window.Recharts,
+            hasGlobalRecharts: typeof Recharts !== 'undefined',
+            hasLineChart: !!LineChart,
+            hasResponsiveContainer: !!ResponsiveContainer,
+            keys: window.Recharts ? Object.keys(window.Recharts).slice(0, 15) : []
+          });
+        }
+        setRechartsReady(true);
+        return true;
+      }
+      
+      // Debug info if not ready
+      if (debugMode) {
+        console.log('🔍 Recharts check:', {
+          hasRecharts: !!window.Recharts,
+          hasGlobalRecharts: typeof Recharts !== 'undefined',
+          hasLineChart: !!LineChart,
+          hasResponsiveContainer: !!ResponsiveContainer,
+          rechartsType: typeof window.Recharts,
+          keys: window.Recharts ? Object.keys(window.Recharts).slice(0, 15) : [],
+          hasDefault: !!(window.Recharts && window.Recharts.default)
+        });
+      }
+      
+      return false;
     };
-    document.head.appendChild(script);
+
+    // Check immediately
+    if (checkRecharts()) return;
+
+    // If not ready, check periodically (more frequently)
+    const interval = setInterval(() => {
+      if (checkRecharts()) {
+        clearInterval(interval);
+      }
+    }, 100);
+
+    // Also try loading if not available after 500ms (faster)
+    const timeout = setTimeout(() => {
+      if (rechartsReady || window.__rechartsLoading) {
+        return;
+      }
+
+      if (debugMode) {
+        console.log('🔄 Recharts not detected, loading from CDN...');
+      }
+
+      window.__rechartsLoading = true;
+      const script = document.createElement('script');
+      // Try jsdelivr first (same as dashboard), then fallback to unpkg
+      script.src = 'https://cdn.jsdelivr.net/npm/recharts@2.10.3/dist/Recharts.js';
+      script.async = true;
+      script.dataset.rechartsFallback = 'true';
+      script.onload = () => {
+        window.__rechartsLoading = false;
+        // Wait a bit for Recharts to initialize
+        setTimeout(() => {
+          checkRecharts();
+        }, 200);
+      };
+      script.onerror = () => {
+        window.__rechartsLoading = false;
+        if (debugMode) {
+          console.error('❌ Failed to load Recharts from jsdelivr, trying unpkg...');
+        }
+        // Fallback to unpkg
+        const fallback = document.createElement('script');
+        fallback.src = 'https://unpkg.com/recharts@2.10.3/dist/Recharts.js';
+        fallback.async = true;
+        fallback.onload = () => {
+          window.__rechartsLoading = false;
+          setTimeout(() => {
+            checkRecharts();
+          }, 200);
+        };
+        fallback.onerror = () => {
+          window.__rechartsLoading = false;
+          if (debugMode) {
+            console.error('❌ Failed to load Recharts from both CDNs');
+          }
+        };
+        document.head.appendChild(fallback);
+      };
+      document.head.appendChild(script);
+    }, 500);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
   }, [rechartsReady, debugMode]);
 
   const createRequestId = () => `cw_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;

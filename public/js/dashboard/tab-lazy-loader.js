@@ -62,6 +62,7 @@
         'jlab-terminal': '/js/dashboard/components/tabs/JLabTab.js',
         'advanced-analysis': '/js/dashboard/components/tabs/AdvancedAnalysisTab.js',
         'jlab-advanced': '/js/dashboard/components/tabs/AdvancedAnalysisTab.js',
+        'jlab-curvewatch': '/js/dashboard/components/tabs/CurveWatchTab.js',
         
         // Admin tabs
         'fastgraphs': '/js/dashboard/components/tabs/FastGraphsTab.js',
@@ -117,13 +118,17 @@
             script.async = true;
             
             script.onload = () => {
-                // Wait a bit for Babel to transpile
+                // Wait for Babel to transpile (increased delay for complex scripts)
                 setTimeout(() => {
+                    // Force Babel to process if needed
+                    if (window.Babel && window.Babel.transformScriptTags) {
+                        window.Babel.transformScriptTags();
+                    }
                     loadedTabs.add(scriptPath);
                     loadingTabs.delete(scriptPath);
                     console.log(`[LazyLoader] ✅ Loaded: ${scriptPath}`);
                     resolve();
-                }, 100);
+                }, 500); // Increased from 100ms to 500ms for better Babel processing
             };
             
             script.onerror = (error) => {
