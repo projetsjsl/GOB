@@ -564,7 +564,57 @@
     <!-- Tailwind CSS compilé (remplace le CDN pour production) -->
     <link rel="stylesheet" href="/css/tailwind.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Recharts - CRITICAL: Must load synchronously before CurveWatch components -->
     <script src="https://cdn.jsdelivr.net/npm/recharts@2.10.3/dist/Recharts.js"></script>
+    <!-- Expose Recharts immediately after loading (before Babel scripts) -->
+    <script>
+        // CRITICAL: Expose Recharts synchronously before any Babel scripts run
+        (function() {
+            function exposeRecharts() {
+                // Check if Recharts is loaded
+                if (typeof Recharts !== 'undefined') {
+                    window.Recharts = Recharts;
+                    // Handle UMD format
+                    if (Recharts.default) {
+                        const recharts = Recharts.default;
+                        window.Recharts = recharts;
+                        // Copy all exports
+                        Object.keys(recharts).forEach(key => {
+                            if (!window.Recharts[key]) {
+                                window.Recharts[key] = recharts[key];
+                            }
+                        });
+                    }
+                    // Also check for direct exports
+                    if (!window.Recharts.LineChart && Recharts.LineChart) {
+                        window.Recharts.LineChart = Recharts.LineChart;
+                    }
+                    if (!window.Recharts.ResponsiveContainer && Recharts.ResponsiveContainer) {
+                        window.Recharts.ResponsiveContainer = Recharts.ResponsiveContainer;
+                    }
+                    console.log('✅ Recharts exposé synchronement:', {
+                        hasRecharts: !!window.Recharts,
+                        hasLineChart: !!(window.Recharts && window.Recharts.LineChart),
+                        hasResponsiveContainer: !!(window.Recharts && window.Recharts.ResponsiveContainer)
+                    });
+                    return true;
+                }
+                return false;
+            }
+            
+            // Try immediately (script is synchronous)
+            if (!exposeRecharts()) {
+                // If not available, wait for script to load
+                const checkInterval = setInterval(() => {
+                    if (exposeRecharts()) {
+                        clearInterval(checkInterval);
+                    }
+                }, 10);
+                // Stop after 2 seconds
+                setTimeout(() => clearInterval(checkInterval), 2000);
+            }
+        })();
+    </script>
     <!-- PDF Export Dependencies -->
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> -->
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> -->
