@@ -590,6 +590,8 @@
                 
                 if (window.Recharts && window.Recharts.LineChart && window.Recharts.ResponsiveContainer) {
                     console.log('✅ Recharts exposé et prêt');
+                    // Dispatch event for components waiting for Recharts
+                    window.dispatchEvent(new CustomEvent('recharts-ready'));
                     return true;
                 }
                 return false;
