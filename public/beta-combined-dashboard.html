@@ -564,32 +564,23 @@
     <!-- Tailwind CSS compilé (remplace le CDN pour production) -->
     <link rel="stylesheet" href="/css/tailwind.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Recharts - CRITICAL: Load synchronously BEFORE any Babel scripts -->
+    <!-- Recharts - CRITICAL: Load BEFORE any Babel scripts that use it -->
     <script src="https://cdn.jsdelivr.net/npm/recharts@2.10.3/dist/Recharts.js"></script>
-    <!-- Expose Recharts immediately after loading (synchronous) -->
     <script>
-        // CRITICAL: Expose Recharts synchronously before any Babel scripts run
-        (function() {
-            function exposeRecharts() {
-                if (typeof Recharts === 'undefined') {
-                    return false;
-                }
+        // CRITICAL: Expose Recharts immediately after script loads
+        // This must run BEFORE Babel processes any scripts that use Recharts
+        (function exposeRechartsNow() {
+            function expose() {
+                if (typeof Recharts === 'undefined') return false;
                 
                 window.Recharts = Recharts;
-                
-                // Handle UMD format
                 if (Recharts.default) {
-                    const recharts = Recharts.default;
-                    window.Recharts = recharts;
-                    // Copy all exports
-                    Object.keys(recharts).forEach(key => {
-                        if (!window.Recharts[key]) {
-                            window.Recharts[key] = recharts[key];
-                        }
+                    const r = Recharts.default;
+                    window.Recharts = r;
+                    Object.keys(r).forEach(k => {
+                        if (!window.Recharts[k]) window.Recharts[k] = r[k];
                     });
                 }
-                
-                // Also check for direct exports
                 if (!window.Recharts.LineChart && Recharts.LineChart) {
                     window.Recharts.LineChart = Recharts.LineChart;
                 }
@@ -597,33 +588,20 @@
                     window.Recharts.ResponsiveContainer = Recharts.ResponsiveContainer;
                 }
                 
-                // Verify critical components are available
                 if (window.Recharts && window.Recharts.LineChart && window.Recharts.ResponsiveContainer) {
-                    console.log('✅ Recharts exposé et prêt:', {
-                        hasRecharts: !!window.Recharts,
-                        hasLineChart: !!(window.Recharts && window.Recharts.LineChart),
-                        hasResponsiveContainer: !!(window.Recharts && window.Recharts.ResponsiveContainer)
-                    });
+                    console.log('✅ Recharts exposé et prêt');
                     return true;
                 }
-                
                 return false;
             }
             
-            // Try immediately (script loads synchronously)
-            if (!exposeRecharts()) {
-                // If not available yet, wait a bit and try again
-                setTimeout(() => {
-                    if (!exposeRecharts()) {
-                        // Last resort: check periodically
-                        const checkInterval = setInterval(() => {
-                            if (exposeRecharts()) {
-                                clearInterval(checkInterval);
-                            }
-                        }, 50);
-                        setTimeout(() => clearInterval(checkInterval), 2000);
-                    }
-                }, 100);
+            // Try immediately
+            if (!expose()) {
+                // Wait for script to fully load
+                const check = setInterval(() => {
+                    if (expose()) clearInterval(check);
+                }, 10);
+                setTimeout(() => clearInterval(check), 3000);
             }
         })();
     </script>
