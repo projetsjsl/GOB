@@ -2,7 +2,8 @@
 // Component: JLabTab
 
 const { useState, useEffect } = React;
-const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, AreaChart, Area } = Recharts;
+// Safe Recharts destructuring - will be done inside component when Recharts is available
+let LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, AreaChart, Area;
 
 
 
@@ -28,6 +29,47 @@ const JLabTab = () => {
     
     // Icon components
     const IconoirIcon = window.IconoirIcon;
+
+    // Safe Recharts loading - wait for it to be available
+    useEffect(() => {
+        const loadRecharts = () => {
+            const RechartsLib = (window.Recharts && (window.Recharts.default || window.Recharts)) || (typeof Recharts !== 'undefined' ? Recharts : null);
+            if (RechartsLib) {
+                LineChart = RechartsLib.LineChart;
+                Line = RechartsLib.Line;
+                XAxis = RechartsLib.XAxis;
+                YAxis = RechartsLib.YAxis;
+                CartesianGrid = RechartsLib.CartesianGrid;
+                Tooltip = RechartsLib.Tooltip;
+                ResponsiveContainer = RechartsLib.ResponsiveContainer;
+                BarChart = RechartsLib.BarChart;
+                Bar = RechartsLib.Bar;
+                Legend = RechartsLib.Legend;
+                AreaChart = RechartsLib.AreaChart;
+                Area = RechartsLib.Area;
+            }
+        };
+        
+        // Try immediately
+        loadRecharts();
+        
+        // Also listen for recharts-ready event
+        window.addEventListener('recharts-ready', loadRecharts);
+        
+        // Check periodically if not loaded
+        const interval = setInterval(() => {
+            if (!LineChart) {
+                loadRecharts();
+            } else {
+                clearInterval(interval);
+            }
+        }, 100);
+        
+        return () => {
+            window.removeEventListener('recharts-ready', loadRecharts);
+            clearInterval(interval);
+        };
+    }, []);
 
     const [time, setTime] = useState(new Date());
     const [selectedStock, setSelectedStock] = useState('AAPL');
