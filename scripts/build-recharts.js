@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 /**
- * Build Recharts as standalone IIFE bundle
+ * Build Recharts as standalone UMD bundle
  * Usage: node scripts/build-recharts.js
  * Output: public/js/recharts-bundle.js
- * 
- * This ensures Recharts is available as window.Recharts without CDN dependency
  */
 
 import esbuild from 'esbuild';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -29,7 +28,18 @@ esbuild.build({
   platform: 'browser',
   target: 'es2020',
 }).then(() => {
+  // Read the built file and add explicit window exposure
+  const bundlePath = path.resolve(__dirname, '../public/js/recharts-bundle.js');
+  let bundleCode = fs.readFileSync(bundlePath, 'utf8');
+  
+  // Add explicit window exposure at the end
+  const windowExposure = `\nif(typeof window !== 'undefined') window.Recharts = Recharts;\n`;
+  bundleCode += windowExposure;
+  
+  fs.writeFileSync(bundlePath, bundleCode, 'utf8');
+  
   console.log('✅ Recharts bundle created: public/js/recharts-bundle.js');
+  console.log('✅ Exposed to window.Recharts');
   process.exit(0);
 }).catch((err) => {
   console.error('❌ Build failed:', err);
