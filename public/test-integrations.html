@@ -311,14 +311,29 @@
 
             // Vérifier l'API endpoint
             fetch('/api/fastgraphs-login', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
-                .then(res => res.json())
-                .then(data => {
-                    addTest('fastgraph', 'API /api/fastgraphs-login accessible', true,
-                        `Réponse: ${JSON.stringify(data).substring(0, 100)}`);
-                    renderTests();
+                .then(async res => {
+                    // Vérifier si la réponse est vide
+                    const text = await res.text();
+                    if (!text || text.trim() === '') {
+                        addTest('fastgraph', 'API /api/fastgraphs-login accessible', res.ok,
+                            `Réponse vide (status: ${res.status}) - API peut nécessiter des credentials`);
+                        renderTests();
+                        return;
+                    }
+                    try {
+                        const data = JSON.parse(text);
+                        addTest('fastgraph', 'API /api/fastgraphs-login accessible', res.ok,
+                            `Status: ${res.status}, Réponse: ${JSON.stringify(data).substring(0, 100)}`);
+                        renderTests();
+                    } catch (parseErr) {
+                        addTest('fastgraph', 'API /api/fastgraphs-login accessible', false,
+                            `Réponse invalide (status: ${res.status}): ${text.substring(0, 100)}`);
+                        renderTests();
+                    }
                 })
                 .catch(err => {
-                    addTest('fastgraph', 'API /api/fastgraphs-login accessible', false, err.message);
+                    addTest('fastgraph', 'API /api/fastgraphs-login accessible', false, 
+                        `Erreur réseau: ${err.message}`);
                     renderTests();
                 });
         }
