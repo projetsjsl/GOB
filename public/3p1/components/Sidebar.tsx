@@ -15,7 +15,8 @@ import {
   XMarkIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  TableCellsIcon
+  TableCellsIcon,
+  CheckIcon
 } from '@heroicons/react/24/outline';
 import { AnalysisProfile, Recommendation } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
@@ -34,6 +35,7 @@ interface SidebarProps {
   onSyncFromSupabase?: () => void;
   isLoadingTickers?: boolean;
   onBulkSyncAll?: () => void;
+  onSyncSelected?: (tickerIds: string[]) => void;
   isBulkSyncing?: boolean;
   bulkSyncProgress?: { current: number; total: number };
   onOpenAdmin?: () => void;
@@ -45,7 +47,7 @@ interface SidebarProps {
 type SortOption = 'alphabetical' | 'alphabetical-desc' | 'lastModified' | 'lastModified-desc' | 'recommendation' | 'sector';
 type FilterOption = 'all' | 'portfolio' | 'watchlist';
 
-export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, onOpenDataExplorer, isAdmin = false, onToggleAdmin }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, onSyncSelected, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, onOpenDataExplorer, isAdmin = false, onToggleAdmin }) => {
   // ✅ DEBUG: Log pour vérifier que les profils sont bien reçus
   React.useEffect(() => {
     console.log(`📋 Sidebar: ${profiles.length} profil(s) reçu(s)`, profiles.map(p => p.id).slice(0, 10));
@@ -60,6 +62,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
   const [filterMarketCap, setFilterMarketCap] = useState<string>('all');
   // ✅ État pour collapse/expand des filtres
   const [isFiltersExpanded, setIsFiltersExpanded] = useState(true);
+  // ✅ État pour la sélection de tickers pour synchronisation
+  const [selectedTickers, setSelectedTickers] = useState<Set<string>>(new Set());
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
   
   // ✅ Gestionnaire double-clic pour toggle admin (fonction cachée)
   const [logoClickCount, setLogoClickCount] = useState(0);
@@ -309,19 +314,57 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
         )}
         {isAdmin && onBulkSyncAll && (
           <div className="flex flex-col gap-1">
-             <button
-              onClick={onBulkSyncAll}
-              disabled={isBulkSyncing || isLoadingTickers}
-              className="w-full bg-green-700 hover:bg-green-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors"
-              title="🔄 Options de Synchronisation Avancées\n\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options:\n\n📊 Options principales:\n• Sauvegarder avant sync\n• Remplacer données oranges\n• Forcer remplacement\n\n⚙️ Options détaillées:\n• Synchroniser données historiques\n• Synchroniser uniquement nouvelles années\n• Synchroniser uniquement métriques manquantes\n• Synchroniser assumptions\n• Préserver exclusions\n• Recalculer outliers\n• Mettre à jour prix actuel\n• Synchroniser métriques ValueLine\n\n💡 Chaque option inclut des explications détaillées, exemples concrets et informations sur les outils utilisés."
-            >
-              <ArrowPathIcon className={`w-4 h-4 ${isBulkSyncing ? 'animate-spin' : ''}`} />
-              <span className="flex-1 text-left" style={{ wordBreak: 'normal', overflowWrap: 'normal', whiteSpace: 'normal' }}>
-                {isBulkSyncing && bulkSyncProgress
-                  ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}`
-                  : '⚙️ Options Sync Avancées'}
-              </span>
-            </button>
+            {/* Mode sélection pour synchronisation sélective */}
+            <div className="flex gap-1">
+              <button
+                onClick={() => {
+                  setIsSelectionMode(!isSelectionMode);
+                  if (isSelectionMode) {
+                    setSelectedTickers(new Set()); // Réinitialiser la sélection
+                  }
+                }}
+                className={`flex-1 px-2 py-1.5 rounded text-xs font-medium transition-colors ${
+                  isSelectionMode 
+                    ? 'bg-blue-700 hover:bg-blue-600 text-white' 
+                    : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
+                }`}
+                title={isSelectionMode 
+                  ? "Désactiver le mode sélection\n\nCliquez pour quitter le mode sélection et revenir au mode normal."
+                  : "Activer le mode sélection\n\nPermet de sélectionner des tickers spécifiques pour synchronisation.\n\nAprès activation:\n• Des checkboxes apparaîtront à côté de chaque ticker\n• Sélectionnez les tickers à synchroniser\n• Cliquez sur 'Sync Sélection' pour synchroniser uniquement ceux sélectionnés"}
+              >
+                {isSelectionMode ? '✓ Sélection' : '☐ Sélectionner'}
+              </button>
+              {isSelectionMode && selectedTickers.size > 0 && onSyncSelected && (
+                <button
+                  onClick={() => {
+                    onSyncSelected(Array.from(selectedTickers));
+                    setIsSelectionMode(false);
+                    setSelectedTickers(new Set());
+                  }}
+                  disabled={isBulkSyncing || isLoadingTickers}
+                  className="flex-1 bg-green-700 hover:bg-green-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 py-1.5 rounded text-xs font-medium transition-colors"
+                  title={`Synchroniser ${selectedTickers.size} ticker(s) sélectionné(s)\n\nSynchronise uniquement les tickers que vous avez sélectionnés avec les options de synchronisation avancées.`}
+                >
+                  <ArrowPathIcon className={`w-3 h-3 inline mr-1 ${isBulkSyncing ? 'animate-spin' : ''}`} />
+                  Sync ({selectedTickers.size})
+                </button>
+              )}
+            </div>
+            {!isSelectionMode && (
+              <button
+                onClick={onBulkSyncAll}
+                disabled={isBulkSyncing || isLoadingTickers}
+                className="w-full bg-green-700 hover:bg-green-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors"
+                title="🔄 Options de Synchronisation Avancées\n\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options:\n\n📊 Options principales:\n• Sauvegarder avant sync\n• Remplacer données oranges\n• Forcer remplacement\n\n⚙️ Options détaillées:\n• Synchroniser données historiques\n• Synchroniser uniquement nouvelles années\n• Synchroniser uniquement métriques manquantes\n• Synchroniser assumptions\n• Préserver exclusions\n• Recalculer outliers\n• Mettre à jour prix actuel\n• Synchroniser métriques ValueLine\n\n💡 Chaque option inclut des explications détaillées, exemples concrets et informations sur les outils utilisés."
+              >
+                <ArrowPathIcon className={`w-4 h-4 ${isBulkSyncing ? 'animate-spin' : ''}`} />
+                <span className="flex-1 text-left" style={{ wordBreak: 'normal', overflowWrap: 'normal', whiteSpace: 'normal' }}>
+                  {isBulkSyncing && bulkSyncProgress
+                    ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}`
+                    : '⚙️ Options Sync Avancées'}
+                </span>
+              </button>
+            )}
             
             <div className="flex gap-1">
                  <button
@@ -386,15 +429,62 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
             // Calculate status on the fly
             const { recommendation } = calculateRecommendation(profile.data, profile.assumptions);
 
+            const isSelected = selectedTickers.has(profile.id);
+            
             return (
               <div
                 key={profile.id}
-                onClick={() => onSelect(profile.id)}
-                className={`group flex items-center justify-between p-2 rounded cursor-pointer transition-all ${currentId === profile.id
+                onClick={(e) => {
+                  // Si mode sélection, toggle la sélection au lieu de sélectionner le ticker
+                  if (isSelectionMode) {
+                    e.stopPropagation();
+                    const newSelected = new Set(selectedTickers);
+                    if (isSelected) {
+                      newSelected.delete(profile.id);
+                    } else {
+                      newSelected.add(profile.id);
+                    }
+                    setSelectedTickers(newSelected);
+                  } else {
+                    onSelect(profile.id);
+                  }
+                }}
+                className={`group flex items-center justify-between p-2 rounded cursor-pointer transition-all ${currentId === profile.id && !isSelectionMode
                   ? 'bg-blue-900/30 border border-blue-800 text-blue-100'
+                  : isSelected
+                  ? 'bg-green-900/20 border border-green-700 text-green-200'
                   : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-transparent'
                   }`}
               >
+                {/* Checkbox pour mode sélection */}
+                {isSelectionMode && (
+                  <div 
+                    className="flex items-center justify-center w-5 h-5 mr-2 flex-shrink-0"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div 
+                      className={`w-4 h-4 border-2 rounded flex items-center justify-center transition-colors ${
+                        isSelected 
+                          ? 'bg-green-600 border-green-500' 
+                          : 'border-slate-500 hover:border-slate-400'
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const newSelected = new Set(selectedTickers);
+                        if (isSelected) {
+                          newSelected.delete(profile.id);
+                        } else {
+                          newSelected.add(profile.id);
+                        }
+                        setSelectedTickers(newSelected);
+                      }}
+                    >
+                      {isSelected && (
+                        <CheckIcon className="w-3 h-3 text-white" />
+                      )}
+                    </div>
+                  </div>
+                )}
                 <div className="flex items-center gap-2 min-w-0">
                   {/* Recommendation Dot (PAS une étoile - c'est la recommandation) */}
                   <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getRecommendationColor(recommendation)} cursor-help`} title={`📊 Recommandation: ${recommendation}\n\nBasé sur:\n• Prix actuel vs Limite d'achat/vente\n• Calculé automatiquement selon vos hypothèses\n\n🟢 Vert = ACHAT\n🟡 Jaune = CONSERVER\n🔴 Rouge = VENTE\n\n⚠️ Note: Ce point coloré = Recommandation\n⭐ L'étoile jaune = Portefeuille (titres détenus)`}></div>

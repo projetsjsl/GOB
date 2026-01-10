@@ -1,28 +1,4 @@
-import { r as reactExports, j as jsxRuntimeExports, s as ForwardRef$1, t as ForwardRef$2, g as ForwardRef$3, F as ForwardRef$4, u as ForwardRef$5, v as ForwardRef$6, w as ForwardRef$7, a as ForwardRef$8, l as ForwardRef$9, m as ForwardRef$a, x as ForwardRef$b } from "./index.js";
-function CheckIcon({
-  title,
-  titleId,
-  ...props
-}, svgRef) {
-  return /* @__PURE__ */ reactExports.createElement("svg", Object.assign({
-    xmlns: "http://www.w3.org/2000/svg",
-    fill: "none",
-    viewBox: "0 0 24 24",
-    strokeWidth: 1.5,
-    stroke: "currentColor",
-    "aria-hidden": "true",
-    "data-slot": "icon",
-    ref: svgRef,
-    "aria-labelledby": titleId
-  }, props), title ? /* @__PURE__ */ reactExports.createElement("title", {
-    id: titleId
-  }, title) : null, /* @__PURE__ */ reactExports.createElement("path", {
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-    d: "m4.5 12.75 6 6 9-13.5"
-  }));
-}
-const ForwardRef = /* @__PURE__ */ reactExports.forwardRef(CheckIcon);
+import { r as reactExports, j as jsxRuntimeExports, s as ForwardRef, t as ForwardRef$1, u as ForwardRef$2, g as ForwardRef$3, F as ForwardRef$4, v as ForwardRef$5, w as ForwardRef$6, x as ForwardRef$7, a as ForwardRef$8, l as ForwardRef$9, m as ForwardRef$a, y as ForwardRef$b } from "./index.js";
 const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
   const [tables, setTables] = reactExports.useState([]);
   const [selectedTable, setSelectedTable] = reactExports.useState(null);
@@ -296,7 +272,7 @@ ID: ${id}`)) return;
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-7xl h-[90vh] flex flex-col shadow-2xl", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-4 border-b border-slate-700", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-6 h-6 text-blue-400" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-6 h-6 text-blue-400" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-bold text-white", children: "Data Explorer" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-400", children: "Supabase 3P1 Tables" })
@@ -313,7 +289,7 @@ ID: ${id}`)) return;
               },
               className: "flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm text-white transition-colors",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-4 h-4" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4" }),
                 "Ajouter"
               ]
             }
@@ -364,7 +340,7 @@ ID: ${id}`)) return;
             },
             className: `w-full text-left p-3 rounded-xl mb-4 transition-all ${showSummary && !selectedTable ? "bg-emerald-600/20 border border-emerald-500/50" : "hover:bg-slate-800 border border-transparent"}`,
             children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-5 h-5 text-emerald-400" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-5 h-5 text-emerald-400" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold text-white", children: "Rapport Global" })
             ] })
           }
@@ -631,7 +607,7 @@ ID: ${id}`)) return;
           ) })
         ] }, t.name)) })
       ] }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 flex items-center justify-center text-slate-500", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-16 h-16 mx-auto mb-4 opacity-50" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-16 h-16 mx-auto mb-4 opacity-50" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg", children: "Sélectionnez une table" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm mt-2", children: "pour visualiser les données" })
       ] }) }) })
@@ -676,7 +652,7 @@ ID: ${id}`)) return;
       {
         className: `p-4 rounded-xl shadow-2xl flex items-center gap-3 animate-in slide-in-from-right duration-300 ${n.type === "success" ? "bg-emerald-600 text-white" : "bg-red-600 text-white"}`,
         children: [
-          n.type === "success" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-5 h-5" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-5 h-5" }),
+          n.type === "success" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-5 h-5" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-5 h-5" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: n.message }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "button",

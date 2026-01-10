@@ -2779,6 +2779,17 @@ export default function App() {
         setShowAdvancedSyncDialog(true);
     };
 
+    const handleSyncSelectedTickers = async (tickerIds: string[]) => {
+        if (tickerIds.length === 0) {
+            showNotification('Aucun ticker sélectionné', 'warning');
+            return;
+        }
+        // Stocker les tickers sélectionnés pour le dialogue de synchronisation
+        (window as any)._pendingSyncTickers = tickerIds;
+        setIsAdvancedSyncForBulk(true);
+        setShowAdvancedSyncDialog(true);
+    };
+
     // État pour le rapport de synchronisation
     const [syncReportData, setSyncReportData] = useState<any>(null);
     const [showSyncReport, setShowSyncReport] = useState(false);
@@ -4541,6 +4552,7 @@ export default function App() {
                         onSyncFromSupabase={handleSyncFromSupabase}
                         isLoadingTickers={isLoadingTickers}
                         onBulkSyncAll={handleBulkSyncAllTickers}
+                        onSyncSelected={handleSyncSelectedTickers}
                         isBulkSyncing={isBulkSyncing}
                         bulkSyncProgress={bulkSyncProgress}
                         onOpenAdmin={() => setShowAdmin(true)}
