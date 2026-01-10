@@ -72,6 +72,7 @@ html, body {
 @media (max-width: 640px) {
   body {
     -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%; /* Support moderne */
     -webkit-tap-highlight-color: transparent;
   }
   /* Améliorer la lisibilité sur mobile */
