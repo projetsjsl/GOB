@@ -205,7 +205,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                         </div>
                         <div className="text-xs text-gray-500">
                             {jpegy !== null ? (
-                                <>Growth: {(assumptions.growthRateEPS || 0).toFixed(1)}% + Yield: {currentYield.toFixed(2)}% = {growthPlusYield.toFixed(2)}%</>
+                                <>Growth: {(assumptions.growthRateEPS || 0).toFixed(1)}% + Yield: {isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(2) : '0.00'}% = {isFinite(growthPlusYield) ? growthPlusYield.toFixed(2) : '0.00'}%</>
                             ) : (
                                 <span className="text-orange-600">⚠️ JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%</span>
                             )}
@@ -213,7 +213,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                         <div className="mt-2 pt-2 border-t border-gray-200">
                             <div className="text-[10px] text-gray-400 space-y-1">
                                 <div><strong>Source de calcul:</strong> P/E Actuel ÷ (Taux de croissance EPS % + Rendement dividende %)</div>
-                                <div><strong>Formule:</strong> JPEGY = {currentPE > 0 ? currentPE.toFixed(2) : 'P/E'} ÷ ({(assumptions.growthRateEPS || 0).toFixed(1)}% + {currentYield.toFixed(2)}%) = {jpegy !== null ? jpegy.toFixed(2) : 'N/A'}</div>
+                                <div><strong>Formule:</strong> JPEGY = {currentPE > 0 ? currentPE.toFixed(2) : 'P/E'} ÷ ({(assumptions.growthRateEPS || 0).toFixed(1)}% + {isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(2) : '0.00'}%) = {jpegy !== null ? jpegy.toFixed(2) : 'N/A'}</div>
                                 <div><strong>Fournisseur:</strong> Métrique propriétaire développée par Jean-Sébastien (JSLAI™). Le fournisseur établit cette métrique en ajustant le ratio P/E traditionnel par la somme du taux de croissance des bénéfices et du rendement du dividende, permettant une évaluation plus nuancée de la valorisation d'une action en tenant compte de sa capacité de croissance et de sa distribution de dividendes.</div>
                             </div>
                         </div>
@@ -259,7 +259,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                         </div>
                         <div className="text-xs text-gray-500">
                             {forwardJpegy !== null ? (
-                                <>Growth: {(assumptions.growthRateEPS || 0).toFixed(1)}% + Yield: {currentYield.toFixed(2)}% = {growthPlusYield.toFixed(2)}%</>
+                                <>Growth: {(assumptions.growthRateEPS || 0).toFixed(1)}% + Yield: {isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(2) : '0.00'}% = {isFinite(growthPlusYield) ? growthPlusYield.toFixed(2) : '0.00'}%</>
                             ) : (
                                 <span className="text-orange-600">⚠️ Forward JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%</span>
                             )}
@@ -267,7 +267,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                         <div className="mt-2 pt-2 border-t border-gray-200">
                             <div className="text-[10px] text-gray-400 space-y-1">
                                 <div><strong>Source de calcul:</strong> Forward P/E ÷ (Taux de croissance EPS % + Rendement dividende %)</div>
-                                <div><strong>Formule:</strong> Forward JPEGY = {forwardPE > 0 ? forwardPE.toFixed(2) : 'Forward P/E'} ÷ ({(assumptions.growthRateEPS || 0).toFixed(1)}% + {currentYield.toFixed(2)}%) = {forwardJpegy !== null ? forwardJpegy.toFixed(2) : 'N/A'}</div>
+                                <div><strong>Formule:</strong> Forward JPEGY = {forwardPE > 0 ? forwardPE.toFixed(2) : 'Forward P/E'} ÷ ({(assumptions.growthRateEPS || 0).toFixed(1)}% + {isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(2) : '0.00'}%) = {forwardJpegy !== null ? forwardJpegy.toFixed(2) : 'N/A'}</div>
                                 <div><strong>Fournisseur:</strong> Métrique propriétaire développée par Jean-Sébastien (JSLAI™). Le fournisseur établit cette métrique en utilisant le Forward P/E (basé sur les bénéfices projetés) au lieu du P/E actuel, ajusté par la somme du taux de croissance des bénéfices et du rendement du dividende, offrant une perspective prospective de la valorisation.</div>
                             </div>
                         </div>
@@ -344,10 +344,14 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                             </tr>
                             <tr>
                                 <td className="p-2 font-semibold cursor-help" title="Rendement DIV (Dividend Yield)\n\nRendement en dividendes actuel.\nSource: FMP key-metrics">Rendement DIV</td>
-                                <td className="p-2 text-right cursor-help" title={`Yield Actuel: ${currentYield.toFixed(2)}%\n\nCalculé avec:\n(Dividende Actuel / Prix Actuel) × 100`}>{currentYield.toFixed(2)}%</td>
+                                {/* BUG #3P1-2 FIX: Validation pour éviter NaN dans l'affichage */}
+                                <td className="p-2 text-right cursor-help" title={`Yield Actuel: ${isFinite(currentYield) ? currentYield.toFixed(2) : 'N/A'}%\n\nCalculé avec:\n(Dividende Actuel / Prix Actuel) × 100`}>
+                                  {isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(2) : 'N/A'}%
+                                </td>
                                 <td className="p-2 text-right cursor-help" title={`Yield Cible: ${(assumptions.targetYield || 0).toFixed(2)}%\n\nRendement en dividendes cible utilisé pour vos projections à 5 ans.\nAuto-rempli avec la moyenne historique.`}>{(assumptions.targetYield || 0).toFixed(2)}%</td>
-                                <td className={`p-2 text-right font-semibold cursor-help ${currentYield > assumptions.targetYield ? 'text-green-600' : 'text-red-600'}`} title={`Écart: ${assumptions.targetYield > 0 ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : '0.0'}%\n\n${currentYield > assumptions.targetYield ? '✅ Rendement supérieur au rendement cible' : '⚠️ Rendement inférieur au rendement cible'}\n\nUn rendement supérieur au cible peut indiquer une opportunité.`}>
-                                    {assumptions.targetYield > 0 ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : '0.0'}%
+                                {/* BUG #3P1-2 FIX: Validation pour éviter NaN dans calcul d'écart */}
+                                <td className={`p-2 text-right font-semibold cursor-help ${isFinite(currentYield) && currentYield > assumptions.targetYield ? 'text-green-600' : 'text-red-600'}`} title={`Écart: ${assumptions.targetYield > 0 && isFinite(currentYield) && !isNaN(currentYield) ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : '0.0'}%\n\n${isFinite(currentYield) && currentYield > assumptions.targetYield ? '✅ Rendement supérieur au rendement cible' : '⚠️ Rendement inférieur au rendement cible'}\n\nUn rendement supérieur au cible peut indiquer une opportunité.`}>
+                                    {assumptions.targetYield > 0 && isFinite(currentYield) && !isNaN(currentYield) ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : '0.0'}%
                                 </td>
                             </tr>
                         </tbody>
@@ -421,12 +425,13 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                         </div>
                     </div>
                     <div>
-                        <div className="text-xs sm:text-sm text-gray-600 mb-2 cursor-help" title={`Rendement Total Espéré\n\nRendement annualisé incluant l'appréciation du prix ET les dividendes.\n\nFormule:\nAppréciation annualisée + Yield annuel\n\n= ${annualizedReturn.toFixed(1)}% + ${currentYield.toFixed(1)}%\n\n= ${expectedReturn.toFixed(1)}% / an`}>Rendement Total Espéré</div>
-                        <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 cursor-help" title={`Rendement Total: ${expectedReturn.toFixed(1)}% / an\n\nDétail:\n• Appréciation: ${annualizedReturn.toFixed(1)}% / an\n• Dividendes: ${currentYield.toFixed(1)}% / an\n• Total: ${expectedReturn.toFixed(1)}% / an\n\nInclut les dividendes perçus sur 5 ans.`}>
-                            {expectedReturn.toFixed(1)}% / an
+                        {/* BUG #3P1-2 FIX: Validation pour éviter NaN dans tooltips et affichages */}
+                        <div className="text-xs sm:text-sm text-gray-600 mb-2 cursor-help" title={`Rendement Total Espéré\n\nRendement annualisé incluant l'appréciation du prix ET les dividendes.\n\nFormule:\nAppréciation annualisée + Yield annuel\n\n= ${isFinite(annualizedReturn) ? annualizedReturn.toFixed(1) : '0.0'}% + ${isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(1) : '0.0'}%\n\n= ${isFinite(expectedReturn) ? expectedReturn.toFixed(1) : '0.0'}% / an`}>Rendement Total Espéré</div>
+                        <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 cursor-help" title={`Rendement Total: ${isFinite(expectedReturn) ? expectedReturn.toFixed(1) : '0.0'}% / an\n\nDétail:\n• Appréciation: ${isFinite(annualizedReturn) ? annualizedReturn.toFixed(1) : '0.0'}% / an\n• Dividendes: ${isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(1) : '0.0'}% / an\n• Total: ${isFinite(expectedReturn) ? expectedReturn.toFixed(1) : '0.0'}% / an\n\nInclut les dividendes perçus sur 5 ans.`}>
+                            {isFinite(expectedReturn) && !isNaN(expectedReturn) ? expectedReturn.toFixed(1) : '0.0'}% / an
                         </div>
-                        <div className="text-xs text-gray-500 mt-1 cursor-help" title={`Dividendes: ${currentYield.toFixed(1)}% / an\n\nCalculé avec:\n(Dividende Actuel / Prix Actuel) × 100\n\n= (${(assumptions.currentDividend || 0).toFixed(2)} / ${formatCurrency(assumptions.currentPrice)}) × 100\n\n= ${currentYield.toFixed(1)}% / an`}>
-                            Incluant dividendes: {currentYield.toFixed(1)}% / an
+                        <div className="text-xs text-gray-500 mt-1 cursor-help" title={`Dividendes: ${isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(1) : '0.0'}% / an\n\nCalculé avec:\n(Dividende Actuel / Prix Actuel) × 100\n\n= (${(assumptions.currentDividend || 0).toFixed(2)} / ${formatCurrency(assumptions.currentPrice)}) × 100\n\n= ${isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(1) : '0.0'}% / an`}>
+                            Incluant dividendes: {isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(1) : '0.0'}% / an
                         </div>
                     </div>
                 </div>

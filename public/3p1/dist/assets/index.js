@@ -37259,9 +37259,9 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
             "Growth: ",
             (assumptions.growthRateEPS || 0).toFixed(1),
             "% + Yield: ",
-            currentYield.toFixed(2),
+            isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(2) : "0.00",
             "% = ",
-            growthPlusYield.toFixed(2),
+            isFinite(growthPlusYield) ? growthPlusYield.toFixed(2) : "0.00",
             "%"
           ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-600", children: "⚠️ JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 pt-2 border-t border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-[10px] text-gray-400 space-y-1", children: [
@@ -37276,7 +37276,7 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
               " ÷ (",
               (assumptions.growthRateEPS || 0).toFixed(1),
               "% + ",
-              currentYield.toFixed(2),
+              isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(2) : "0.00",
               "%) = ",
               jpegy !== null ? jpegy.toFixed(2) : "N/A"
             ] }),
@@ -37318,9 +37318,9 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
             "Growth: ",
             (assumptions.growthRateEPS || 0).toFixed(1),
             "% + Yield: ",
-            currentYield.toFixed(2),
+            isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(2) : "0.00",
             "% = ",
-            growthPlusYield.toFixed(2),
+            isFinite(growthPlusYield) ? growthPlusYield.toFixed(2) : "0.00",
             "%"
           ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-600", children: "⚠️ Forward JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 pt-2 border-t border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-[10px] text-gray-400 space-y-1", children: [
@@ -37335,7 +37335,7 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
               " ÷ (",
               (assumptions.growthRateEPS || 0).toFixed(1),
               "% + ",
-              currentYield.toFixed(2),
+              isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(2) : "0.00",
               "%) = ",
               forwardJpegy !== null ? forwardJpegy.toFixed(2) : "N/A"
             ] }),
@@ -37439,11 +37439,11 @@ ${currentPBV < assumptions.targetPBV ? "✅ Sous-évalué par rapport au ratio c
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 font-semibold cursor-help", title: "Rendement DIV (Dividend Yield)\\n\\nRendement en dividendes actuel.\\nSource: FMP key-metrics", children: "Rendement DIV" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "p-2 text-right cursor-help", title: `Yield Actuel: ${currentYield.toFixed(2)}%
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "p-2 text-right cursor-help", title: `Yield Actuel: ${isFinite(currentYield) ? currentYield.toFixed(2) : "N/A"}%
 
 Calculé avec:
 (Dividende Actuel / Prix Actuel) × 100`, children: [
-              currentYield.toFixed(2),
+              isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(2) : "N/A",
               "%"
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "p-2 text-right cursor-help", title: `Yield Cible: ${(assumptions.targetYield || 0).toFixed(2)}%
@@ -37453,12 +37453,12 @@ Auto-rempli avec la moyenne historique.`, children: [
               (assumptions.targetYield || 0).toFixed(2),
               "%"
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${currentYield > assumptions.targetYield ? "text-green-600" : "text-red-600"}`, title: `Écart: ${assumptions.targetYield > 0 ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : "0.0"}%
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${isFinite(currentYield) && currentYield > assumptions.targetYield ? "text-green-600" : "text-red-600"}`, title: `Écart: ${assumptions.targetYield > 0 && isFinite(currentYield) && !isNaN(currentYield) ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : "0.0"}%
 
-${currentYield > assumptions.targetYield ? "✅ Rendement supérieur au rendement cible" : "⚠️ Rendement inférieur au rendement cible"}
+${isFinite(currentYield) && currentYield > assumptions.targetYield ? "✅ Rendement supérieur au rendement cible" : "⚠️ Rendement inférieur au rendement cible"}
 
 Un rendement supérieur au cible peut indiquer une opportunité.`, children: [
-              assumptions.targetYield > 0 ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : "0.0",
+              assumptions.targetYield > 0 && isFinite(currentYield) && !isNaN(currentYield) ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : "0.0",
               "%"
             ] })
           ] })
@@ -37588,30 +37588,30 @@ Rendement annualisé incluant l'appréciation du prix ET les dividendes.
 Formule:
 Appréciation annualisée + Yield annuel
 
-= ${annualizedReturn.toFixed(1)}% + ${currentYield.toFixed(1)}%
+= ${isFinite(annualizedReturn) ? annualizedReturn.toFixed(1) : "0.0"}% + ${isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(1) : "0.0"}%
 
-= ${expectedReturn.toFixed(1)}% / an`, children: "Rendement Total Espéré" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xl sm:text-2xl md:text-3xl font-bold text-green-600 cursor-help", title: `Rendement Total: ${expectedReturn.toFixed(1)}% / an
+= ${isFinite(expectedReturn) ? expectedReturn.toFixed(1) : "0.0"}% / an`, children: "Rendement Total Espéré" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xl sm:text-2xl md:text-3xl font-bold text-green-600 cursor-help", title: `Rendement Total: ${isFinite(expectedReturn) ? expectedReturn.toFixed(1) : "0.0"}% / an
 
 Détail:
-• Appréciation: ${annualizedReturn.toFixed(1)}% / an
-• Dividendes: ${currentYield.toFixed(1)}% / an
-• Total: ${expectedReturn.toFixed(1)}% / an
+• Appréciation: ${isFinite(annualizedReturn) ? annualizedReturn.toFixed(1) : "0.0"}% / an
+• Dividendes: ${isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(1) : "0.0"}% / an
+• Total: ${isFinite(expectedReturn) ? expectedReturn.toFixed(1) : "0.0"}% / an
 
 Inclut les dividendes perçus sur 5 ans.`, children: [
-            expectedReturn.toFixed(1),
+            isFinite(expectedReturn) && !isNaN(expectedReturn) ? expectedReturn.toFixed(1) : "0.0",
             "% / an"
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 mt-1 cursor-help", title: `Dividendes: ${currentYield.toFixed(1)}% / an
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 mt-1 cursor-help", title: `Dividendes: ${isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(1) : "0.0"}% / an
 
 Calculé avec:
 (Dividende Actuel / Prix Actuel) × 100
 
 = (${(assumptions.currentDividend || 0).toFixed(2)} / ${formatCurrency(assumptions.currentPrice)}) × 100
 
-= ${currentYield.toFixed(1)}% / an`, children: [
+= ${isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(1) : "0.0"}% / an`, children: [
             "Incluant dividendes: ",
-            currentYield.toFixed(1),
+            isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(1) : "0.0",
             "% / an"
           ] })
         ] })
@@ -40809,7 +40809,7 @@ const NotificationManager = ({
   )) });
 };
 const LandingPage = ({ onGetStarted }) => {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900", style: { wordBreak: "normal", overflowWrap: "normal" }, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-center mb-8", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "inline-flex items-center space-x-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-2xl shadow-2xl", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$8, { className: "w-8 h-8" }),

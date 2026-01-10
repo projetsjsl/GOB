@@ -3,14 +3,32 @@
 @tailwind utilities;
 
 /* BUG #3P1-1 FIX: Empêcher la troncature avec espaces au milieu des mots */
-/* Override global pour les textes de LandingPage */
-h1, h2, h3, p {
+/* Override global pour les textes de LandingPage - Règle très spécifique */
+.min-h-screen h1,
+.min-h-screen h2,
+.min-h-screen h3,
+.min-h-screen p,
+.min-h-screen span {
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  white-space: normal !important;
+}
+
+/* Override pour tous les éléments de texte dans la page */
+h1, h2, h3, h4, h5, h6, p, span, div {
   word-break: normal !important;
   overflow-wrap: normal !important;
 }
 
 /* Surtout pour les titres et textes importants */
-h1 span, h2 span, h3 span {
+h1 span, h2 span, h3 span, h4 span, h5 span, h6 span {
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  white-space: normal !important;
+}
+
+/* Override spécifique pour les classes Tailwind qui pourraient causer le problème */
+.text-5xl, .text-6xl, .text-xl, .text-2xl, .text-3xl, .text-4xl {
   word-break: normal !important;
   overflow-wrap: normal !important;
 }
