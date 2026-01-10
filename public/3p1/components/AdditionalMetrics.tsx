@@ -23,7 +23,10 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
     const currentPE = baseEPS > 0 ? assumptions.currentPrice / baseEPS : 0;
     const currentPCF = assumptions.currentPrice / (lastData?.cashFlowPerShare || 1);
     const currentPBV = assumptions.currentPrice / (lastData?.bookValuePerShare || 1);
-    const currentYield = (assumptions.currentDividend / assumptions.currentPrice) * 100;
+    // BUG #3P1-2 FIX: Validation pour éviter NaN quand currentPrice = 0
+    const currentYield = assumptions.currentPrice > 0 && assumptions.currentDividend >= 0
+      ? (assumptions.currentDividend / assumptions.currentPrice) * 100
+      : 0;
 
     // Calcul du Forward P/E (P/E basé sur les earnings projetés)
     const forwardEPS = baseEPS * (1 + assumptions.growthRateEPS / 100);

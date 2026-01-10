@@ -23,16 +23,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           </div>
 
           {/* Headline */}
-          <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 leading-tight">
+          {/* BUG #3P1-1 FIX: Ajout de whitespace-nowrap pour éviter la troncature avec espaces */}
+          <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 leading-tight" style={{ wordBreak: 'normal', overflowWrap: 'normal' }}>
             Analyse Financière
             <br />
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent" style={{ wordBreak: 'normal', overflowWrap: 'normal' }}>
               Propulsée par l'IA
             </span>
           </h1>
 
           {/* Subheadline */}
-          <p className="text-xl md:text-2xl text-slate-300 mb-12 max-w-3xl mx-auto">
+          {/* BUG #3P1-1 FIX: Ajout de wordBreak normal pour éviter la troncature */}
+          <p className="text-xl md:text-2xl text-slate-300 mb-12 max-w-3xl mx-auto" style={{ wordBreak: 'normal', overflowWrap: 'normal' }}>
             Prenez des décisions d'investissement éclairées avec notre plateforme professionnelle d'analyse de valorisation
           </p>
 
@@ -49,9 +51,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
       {/* How It Works Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12">
-          Comment ça fonctionne
-        </h2>
+          {/* BUG #3P1-1 FIX: Ajout de wordBreak normal */}
+          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12" style={{ wordBreak: 'normal', overflowWrap: 'normal' }}>
+            Comment ça fonctionne
+          </h2>
 
         <div className="grid md:grid-cols-3 gap-8">
           {/* Step 1 */}
@@ -98,10 +101,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       {/* CTA Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          {/* BUG #3P1-1 FIX: Ajout de wordBreak normal */}
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ wordBreak: 'normal', overflowWrap: 'normal' }}>
             Prêt à commencer votre analyse?
           </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto" style={{ wordBreak: 'normal', overflowWrap: 'normal' }}>
             Accédez instantanément à notre plateforme d'analyse professionnelle
           </p>
           <button

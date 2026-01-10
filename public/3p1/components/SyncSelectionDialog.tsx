@@ -62,6 +62,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
       const hasValidEPS = baseEPS > 0.01;
       const basePE = hasValidEPS && currentPrice > 0 ? currentPrice / baseEPS : 0;
       const safeBasePE = basePE > 0 && basePE <= 1000 ? basePE : 0;
+      // BUG #3P1-2 FIX: Validation pour éviter NaN quand currentPrice = 0
       const baseYield = currentPrice > 0 && profile.assumptions.currentDividend >= 0 
         ? (profile.assumptions.currentDividend / currentPrice) * 100 
         : 0;

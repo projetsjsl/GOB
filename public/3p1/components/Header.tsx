@@ -120,8 +120,13 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
           <div className="flex-1 min-w-0">
+            {/* BUG #3P1-4 FIX: Afficher message d'erreur si toujours en chargement */}
             <h1 className="text-base sm:text-xl md:text-2xl font-bold text-gray-800 uppercase truncate flex items-center gap-2 cursor-help" title={`${info.name}\n\nNom complet de l'entreprise.\n\nSource: FMP API (company-profile)\n\nSymbole: ${info.preferredSymbol || info.symbol}\nSecteur: ${info.sector || 'N/A'}\nPays: ${info.country || 'N/A'}\nBourse: ${info.exchange || 'N/A'}`}>
-              {info.name}
+              {info.name === 'Chargement...' ? (
+                <span className="text-orange-600 normal-case">Données non disponibles - Veuillez sélectionner un ticker</span>
+              ) : (
+                info.name
+              )}
             </h1>
             <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
               <p className="text-xs text-gray-500 sm:hidden">GOB</p>
@@ -257,8 +262,13 @@ export const Header: React.FC<HeaderProps> = ({
             step="0.01"
             value={assumptions.currentPrice}
             onChange={(e) => handleNumericChange(e, 'currentPrice', 0.01)}
-            className="border border-gray-300 rounded px-2 py-1 text-base sm:text-lg font-bold text-blue-700 focus:ring-2 focus:ring-blue-500 outline-none invalid:border-red-500 invalid:text-red-600"
-            title="Prix Actuel\n\nPrix du marché en temps réel de l'action.\nSource: FMP API (quote)\n\nVous pouvez modifier manuellement si nécessaire.\nUtilisé pour:\n• Calcul du rendement total\n• Calcul du JPEGY\n• Calcul du Ratio 3:1\n• Zones de prix recommandées"
+            className={`border rounded px-2 py-1 text-base sm:text-lg font-bold focus:ring-2 focus:ring-blue-500 outline-none ${
+              assumptions.currentPrice === 0 || assumptions.currentPrice === null || assumptions.currentPrice === undefined
+                ? 'border-red-300 text-red-600 focus:ring-red-500'
+                : 'border-gray-300 text-blue-700 invalid:border-red-500 invalid:text-red-600'
+            }`}
+            placeholder={assumptions.currentPrice === 0 ? "Prix requis" : ""}
+            title="Prix Actuel\n\nPrix du marché en temps réel de l'action.\nSource: FMP API (quote)\n\nVous pouvez modifier manuellement si nécessaire.\nUtilisé pour:\n• Calcul du rendement total\n• Calcul du JPEGY\n• Calcul du Ratio 3:1\n• Zones de prix recommandées\n\n⚠️ Le prix doit être > 0 pour les calculs"
           />
         </div>
         <div className="flex flex-col">
@@ -279,29 +289,36 @@ export const Header: React.FC<HeaderProps> = ({
           <label className="text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help" title="Rendement du dividende (Dividende / Prix)">
             <ArrowTrendingUpIcon className="w-3 h-3" /> Rendement (Yield)
           </label>
-          <div className="px-2 py-1 text-base sm:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help" title={`Rendement du dividende: ${formatPercent((assumptions.currentDividend / assumptions.currentPrice) * 100)}\n\nFormule: (Dividende / Prix Actuel) × 100\n\nCalculé automatiquement à partir du dividende et du prix actuel.`}>
-            {formatPercent((assumptions.currentDividend / assumptions.currentPrice) * 100)}
+          <div className="px-2 py-1 text-base sm:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help" title={`Rendement du dividende: ${assumptions.currentPrice > 0 ? formatPercent((assumptions.currentDividend / assumptions.currentPrice) * 100) : 'N/A'}\n\nFormule: (Dividende / Prix Actuel) × 100\n\nCalculé automatiquement à partir du dividende et du prix actuel.`}>
+            {/* BUG #3P1-2 FIX: Validation pour éviter NaN quand currentPrice = 0 */}
+            {assumptions.currentPrice > 0 ? formatPercent((assumptions.currentDividend / assumptions.currentPrice) * 100) : 'N/A'}
           </div>
         </div>
         <div className="flex flex-col">
           <label className="text-xs font-semibold text-gray-500 uppercase mb-1 cursor-help" title="Capitalisation boursière (Market Cap)\n\nValeur totale de l'entreprise en bourse.\nFormule: Prix Actuel × Nombre d'actions en circulation\n\nSource: FMP API">Capitalisation</label>
-          <div className="px-2 py-1 text-sm sm:text-base md:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help truncate" title={`Capitalisation: ${info.marketCap}\n\nValeur totale de l'entreprise calculée par:\nPrix Actuel × Nombre d'actions en circulation`}>
-            {info.marketCap}
+          {/* BUG #3P1-5 FIX: Afficher N/A si données manquantes */}
+          <div className="px-2 py-1 text-sm sm:text-base md:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help truncate" title={`Capitalisation: ${info.marketCap || 'Non disponible'}\n\nValeur totale de l'entreprise calculée par:\nPrix Actuel × Nombre d'actions en circulation`}>
+            {info.marketCap && info.marketCap.trim() !== '' ? info.marketCap : 'N/A'}
           </div>
         </div>
         <div className="flex flex-col">
           <label className="text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help" title="Année de départ pour les projections à 5 ans">
             <CalendarDaysIcon className="w-3 h-3" /> Année de Base
           </label>
+          {/* BUG #3P1-5 FIX: Gérer le cas où availableYears est vide */}
           <select
-            value={assumptions.baseYear}
+            value={assumptions.baseYear || ''}
             onChange={(e) => onUpdateAssumption('baseYear', parseInt(e.target.value))}
             className="border border-gray-300 rounded px-2 py-1.5 text-sm sm:text-base md:text-lg font-medium text-gray-700 focus:ring-2 focus:ring-blue-500 outline-none bg-white h-[38px]"
             title="Année de Base\n\nAnnée de référence pour toutes les projections à 5 ans.\n\nSélectionnez l'année qui servira de point de départ:\n• Généralement la dernière année complète\n• Ou l'année estimée N+1 si disponible\n\nToutes les valeurs projetées (EPS, CF, BV, DIV) partiront de cette année.\n\nModifier l'année de base recalcule automatiquement toutes les projections."
           >
-            {availableYears.map(year => (
-              <option key={year} value={year}>{year}</option>
-            ))}
+            {availableYears.length > 0 ? (
+              availableYears.map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))
+            ) : (
+              <option value="">Sélectionner une année</option>
+            )}
           </select>
         </div>
       </div>
