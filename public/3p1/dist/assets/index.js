@@ -34911,7 +34911,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
           title: "Synchroniser depuis Supabase\\n\\nCharge les tickers depuis la base de données Supabase.\\n\\nAjoute les nouveaux tickers présents dans Supabase mais absents de votre LocalStorage.\\n\\n⚠️ Ne modifie pas les tickers existants, seulement ajoute les nouveaux.",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: `w-4 h-4 ${isLoadingTickers ? "animate-spin" : ""}` }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: isLoadingTickers ? "Synchronisation..." : "Synchroniser Supabase" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { wordBreak: "normal", overflowWrap: "normal", whiteSpace: "normal" }, children: isLoadingTickers ? "Synchronisation..." : "Synchroniser Supabase" })
           ]
         }
       ),
@@ -34925,7 +34925,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
             title: "🔄 Options de Synchronisation Avancées\\n\\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options:\\n\\n📊 Options principales:\\n• Sauvegarder avant sync\\n• Remplacer données oranges\\n• Forcer remplacement\\n\\n⚙️ Options détaillées:\\n• Synchroniser données historiques\\n• Synchroniser uniquement nouvelles années\\n• Synchroniser uniquement métriques manquantes\\n• Synchroniser assumptions\\n• Préserver exclusions\\n• Recalculer outliers\\n• Mettre à jour prix actuel\\n• Synchroniser métriques ValueLine\\n\\n💡 Chaque option inclut des explications détaillées, exemples concrets et informations sur les outils utilisés.",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: `w-4 h-4 ${isBulkSyncing ? "animate-spin" : ""}` }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex-1 text-left", children: isBulkSyncing && bulkSyncProgress ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}` : "⚙️ Options Sync Avancées" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex-1 text-left", style: { wordBreak: "normal", overflowWrap: "normal", whiteSpace: "normal" }, children: isBulkSyncing && bulkSyncProgress ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}` : "⚙️ Options Sync Avancées" })
             ]
           }
         ),
@@ -34951,7 +34951,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
           title: "Ouvrir le tableau de bord d'administration (Ctrl+Shift+A)\\n\\n• État de la synchronisation\\n• Inspecteur de données brutes\\n• Réparation et diagnostic",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$9, { className: "w-4 h-4" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Admin Warehouse" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { wordBreak: "normal", overflowWrap: "normal", whiteSpace: "normal" }, children: "Admin Warehouse" })
           ]
         }
       ),

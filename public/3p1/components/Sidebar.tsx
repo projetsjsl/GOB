@@ -304,7 +304,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
             title="Synchroniser depuis Supabase\n\nCharge les tickers depuis la base de données Supabase.\n\nAjoute les nouveaux tickers présents dans Supabase mais absents de votre LocalStorage.\n\n⚠️ Ne modifie pas les tickers existants, seulement ajoute les nouveaux."
           >
             <ArrowPathIcon className={`w-4 h-4 ${isLoadingTickers ? 'animate-spin' : ''}`} />
-            <span>{isLoadingTickers ? 'Synchronisation...' : 'Synchroniser Supabase'}</span>
+            <span style={{ wordBreak: 'normal', overflowWrap: 'normal', whiteSpace: 'normal' }}>{isLoadingTickers ? 'Synchronisation...' : 'Synchroniser Supabase'}</span>
           </button>
         )}
         {isAdmin && onBulkSyncAll && (
@@ -316,7 +316,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
               title="🔄 Options de Synchronisation Avancées\n\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options:\n\n📊 Options principales:\n• Sauvegarder avant sync\n• Remplacer données oranges\n• Forcer remplacement\n\n⚙️ Options détaillées:\n• Synchroniser données historiques\n• Synchroniser uniquement nouvelles années\n• Synchroniser uniquement métriques manquantes\n• Synchroniser assumptions\n• Préserver exclusions\n• Recalculer outliers\n• Mettre à jour prix actuel\n• Synchroniser métriques ValueLine\n\n💡 Chaque option inclut des explications détaillées, exemples concrets et informations sur les outils utilisés."
             >
               <ArrowPathIcon className={`w-4 h-4 ${isBulkSyncing ? 'animate-spin' : ''}`} />
-              <span className="flex-1 text-left">
+              <span className="flex-1 text-left" style={{ wordBreak: 'normal', overflowWrap: 'normal', whiteSpace: 'normal' }}>
                 {isBulkSyncing && bulkSyncProgress
                   ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}`
                   : '⚙️ Options Sync Avancées'}
@@ -345,7 +345,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
             title="Ouvrir le tableau de bord d'administration (Ctrl+Shift+A)\n\n• État de la synchronisation\n• Inspecteur de données brutes\n• Réparation et diagnostic"
           >
             <ShieldCheckIcon className="w-4 h-4" />
-            <span>Admin Warehouse</span>
+            <span style={{ wordBreak: 'normal', overflowWrap: 'normal', whiteSpace: 'normal' }}>Admin Warehouse</span>
           </button>
         )}
         {isAdmin && onOpenDataExplorer && (
@@ -355,7 +355,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
             title="Data Explorer - Supabase Tables\n\n• Visualiser toutes les tables 3P1\n• Voir les dernières mises à jour\n• Exporter en Excel/CSV\n• Synchronisation sélective"
           >
             <TableCellsIcon className="w-4 h-4" />
-            <span>Data Explorer</span>
+            <span style={{ wordBreak: 'normal', overflowWrap: 'normal', whiteSpace: 'normal' }}>Data Explorer</span>
           </button>
         )}
       </div>

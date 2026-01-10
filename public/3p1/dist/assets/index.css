@@ -2756,6 +2756,41 @@ h1 span, h2 span, h3 span, h4 span, h5 span, h6 span {
   overflow-wrap: normal !important;
 }
 
+/* BUG #3P1-1 FIX COMPLÉMENTAIRE: Forcer word-break normal sur TOUS les boutons et leurs spans */
+/* Règle très agressive pour corriger la troncature dans les boutons */
+button,
+button *,
+button span,
+button span *,
+[role="button"],
+[role="button"] *,
+[role="button"] span {
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  white-space: normal !important;
+  hyphens: none !important;
+}
+
+/* Spécifique pour les boutons de la sidebar */
+.bg-slate-700 span,
+.bg-slate-800 span,
+.bg-green-700 span,
+.bg-emerald-800 span,
+button span {
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  white-space: normal !important;
+}
+
+/* Forcer sur tous les éléments texte dans les boutons */
+button > span,
+button > * > span,
+.flex.items-center span {
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  white-space: normal !important;
+}
+
 /* Custom scrollbar for cleaner look in complex tables */
 ::-webkit-scrollbar {
   width: 8px;
@@ -2795,6 +2830,8 @@ html, body {
 @media (max-width: 640px) {
   body {
     -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+         text-size-adjust: 100%; /* Support moderne */
     -webkit-tap-highlight-color: transparent;
   }
   /* Améliorer la lisibilité sur mobile */
