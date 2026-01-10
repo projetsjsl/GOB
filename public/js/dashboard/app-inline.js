@@ -233,6 +233,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             // Graphiques & Finance
             'PieChart': 'pie-chart',
             'BarChart3': 'stat-up',
+            'CandlestickChart': 'candlestick-chart',
             'LayoutDashboard': 'view-grid',
             'Flask': 'flask',
             'Brain': 'brain',
@@ -241,6 +242,10 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             'GraphUp': 'graph-up',
             'ChartLine': 'chart-line',
             'DollarSign': 'dollar',
+            'Wallet': 'wallet',
+            'LineChart': 'chart-line',
+            'AreaChart': 'chart-line',
+            'Terminal': 'terminal',
 
             // Documents & Communication
             'Newspaper': 'newspaper',
@@ -284,7 +289,22 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             'ChatBubble': 'chat-bubble',
             'MessageSquare': 'chat-bubble',
             'Mic': 'microphone',
-            'Monitor': 'pc-monitor'
+            'Monitor': 'pc-monitor',
+            'Cog': 'settings',
+            'Settings': 'settings',
+            'GitCompare': 'git-compare',
+            'Scissors': 'scissors',
+            'Activity': 'activity',
+            'Search': 'search',
+            'Terminal': 'terminal',
+            'List': 'list',
+            'Layout': 'view-grid',
+            'LayoutGrid': 'view-grid',
+            'Radio': 'radio',
+            'Headphones': 'headset-help',
+            'Activity': 'activity',
+            'FlaskConical': 'flask',
+            'FlaskRound': 'flask'
         };
 
         const iconClass = iconMap[name] || iconMap['Activity'];
@@ -679,8 +699,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     // 6 Main tabs (onglets principaux)
     const MAIN_TABS = [
         { id: 'admin', label: 'Admin', icon: 'Shield', color: 'red' },
-        { id: 'marches', label: 'Marchés', icon: 'TrendingUp', color: 'blue' },
-        { id: 'titres', label: 'Titres', icon: 'Briefcase', color: 'green' },
+        { id: 'marches', label: 'Marchés', icon: 'BarChart3', color: 'blue' },
+        { id: 'nouvelles', label: 'Nouvelles', icon: 'Newspaper', color: 'orange' },
+        { id: 'titres', label: 'Titres', icon: 'Wallet', color: 'green' },
         { id: 'jlab', label: 'JLab', icon: 'Flask', color: 'teal' },
         { id: 'emma', label: 'Emma IA', icon: 'Brain', color: 'purple' }
         // Tests tab removed - was causing freezes
@@ -699,8 +720,10 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         'marches': [
             { id: 'marches-global', label: 'Vue Globale', icon: 'Globe', component: 'MarketsEconomyTab' },
             { id: 'marches-calendar', label: 'Calendrier Éco', icon: 'Calendar', component: 'EconomicCalendarTab' },
-            { id: 'marches-yield', label: 'Courbe Taux', icon: 'LineChart', component: 'YieldCurveTab' },
-            { id: 'marches-nouvelles', label: 'Nouvelles', icon: 'Newspaper', component: 'NouvellesTab' }
+            { id: 'marches-yield', label: 'Courbe Taux', icon: 'TrendingUp', component: 'YieldCurveLiteTab' }
+        ],
+        'nouvelles': [
+            { id: 'nouvelles-main', label: 'Actualités', icon: 'Newspaper', component: 'NouvellesTab' }
         ],
         'titres': [
             { id: 'titres-portfolio', label: 'Mon Portfolio', icon: 'Wallet', component: 'StocksNewsTab:portfolio' },
@@ -739,7 +762,8 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         'markets-economy': { main: 'marches', sub: 'marches-global' },
         'economic-calendar': { main: 'marches', sub: 'marches-calendar' },
         'yield-curve': { main: 'marches', sub: 'marches-yield' },
-        'nouvelles': { main: 'marches', sub: 'marches-nouvelles' },
+        'marches-nouvelles': { main: 'marches', sub: 'marches-nouvelles' }, // Keep for backwards compatibility
+        'nouvelles': { main: 'nouvelles', sub: 'nouvelles-main' },
         'stocks-news': { main: 'titres', sub: 'titres-portfolio' },
         'dans-watchlist': { main: 'titres', sub: 'titres-watchlist' },
         'finance-pro': { main: 'titres', sub: 'titres-3p1' },
@@ -763,6 +787,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     const DEFAULT_SUB_TABS = {
         'admin': 'admin-settings',
         'marches': 'marches-global',
+        'nouvelles': 'nouvelles-main',
         'titres': 'titres-portfolio',
         'jlab': 'jlab-terminal',
         'emma': 'emma-chat'
@@ -965,6 +990,29 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         // Track visited tabs to force remount on return
         const [visitedTabs, setVisitedTabs] = useState(new Set());
         const [tabMountKeys, setTabMountKeys] = useState({});
+        
+        // Watch for CurveWatchTab to become available (for re-render when loaded)
+        const [curveWatchReady, setCurveWatchReady] = useState(() => typeof window.CurveWatchTab !== 'undefined');
+        
+        useEffect(() => {
+            if (typeof window.CurveWatchTab !== 'undefined') {
+                setCurveWatchReady(true);
+                return;
+            }
+            
+            const checkInterval = setInterval(() => {
+                if (typeof window.CurveWatchTab !== 'undefined') {
+                    setCurveWatchReady(true);
+                    clearInterval(checkInterval);
+                }
+            }, 100);
+            
+            const timeout = setTimeout(() => clearInterval(checkInterval), 10000);
+            return () => {
+                clearInterval(checkInterval);
+                clearTimeout(timeout);
+            };
+        }, []);
         
         // État pour le mode de vue (onglets ou grille) - GOD MODE
         // IMPORTANT: Grid mode is now default to prevent TradingView widget overload crashes
@@ -1687,6 +1735,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             }
         };
 
+        // EXPOSE setActiveTab globally for external components (like YieldCurveLiteTab)
+        // Note: handleNewTabChange will be exposed after its definition below
+        window.setActiveTab = setActiveTab;
+        window.handleTabChange = handleTabChange;
+
         // Enhanced tab change handler pour la nouvelle navigation (onglets principaux & sous-onglets)
         const handleNewTabChange = (tabId) => {
             setTabLoading(true);
@@ -1747,6 +1800,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 setTimeout(() => setTabLoading(false), 100);
             });
         };
+
+        // EXPOSE handleNewTabChange globally for external components
+        window.handleNewTabChange = handleNewTabChange;
 
         // Fonction pour charger les données du ticker (sans auto-refresh)
         const fetchTickerData = async () => {
@@ -23890,6 +23946,21 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 setLocalFilteredNews(filtered);
             }, [newsData, localFrenchOnly, selectedSource, selectedMarket, selectedTheme]);
 
+            // Ground News Component
+            const [groundNewsExpanded, setGroundNewsExpanded] = useState(() => {
+                return localStorage.getItem('groundnews_expanded') === 'true';
+            });
+            const [groundNewsIframeLoaded, setGroundNewsIframeLoaded] = useState(false);
+            const groundNewsUrl = 'https://ground.news/';
+
+            React.useEffect(() => {
+                localStorage.setItem('groundnews_expanded', String(groundNewsExpanded));
+            }, [groundNewsExpanded]);
+
+            const hasGroundNewsCredentials = typeof window !== 'undefined' &&
+                window.GROUND_NEWS_EMAIL &&
+                window.GROUND_NEWS_PASSWORD;
+
             return (
                 <div className="space-y-6">
                     {/* Header */}
@@ -23907,6 +23978,24 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         </div>
 
                         <div className="flex gap-2 relative z-10">
+                            {/* Ground News Button - Dédié */}
+                            <button
+                                onClick={() => setGroundNewsExpanded(!groundNewsExpanded)}
+                                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 flex items-center gap-2 ${groundNewsExpanded
+                                    ? 'bg-green-600 text-white shadow-lg shadow-green-500/30'
+                                    : (isDarkMode
+                                        ? 'bg-gradient-to-r from-green-600/20 to-green-500/10 hover:from-green-600/30 hover:to-green-500/20 text-green-400 border border-green-500/30'
+                                        : 'bg-gradient-to-r from-green-50 to-green-100/50 hover:from-green-100 hover:to-green-200 text-green-700 border border-green-300')
+                                    }`}
+                                title="Ground News - Analyse de biais médiatiques"
+                            >
+                                <LucideIcon name="Globe" className="w-4 h-4" />
+                                <span>🌍 Ground News</span>
+                                {hasGroundNewsCredentials && (
+                                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                                )}
+                            </button>
+                            
                             {/* Toggle Français */}
                             <button
                                 onClick={() => setLocalFrenchOnly(!localFrenchOnly)}
@@ -23931,6 +24020,88 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </button>
                         </div>
                     </div>
+
+                    {/* Ground News Section - Expandable */}
+                    {groundNewsExpanded && (
+                        <div className={`rounded-xl transition-all duration-300 overflow-hidden ${
+                            isDarkMode
+                                ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
+                                : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
+                        }`}>
+                            <div className="p-6 space-y-4">
+                                {/* Info Banner */}
+                                <div className={`p-4 rounded-lg ${
+                                    isDarkMode ? 'bg-blue-900/20 border border-blue-600/30' : 'bg-blue-50 border border-blue-200'
+                                }`}>
+                                    <div className="flex items-start gap-3">
+                                        <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-green-600/20' : 'bg-green-100'}`}>
+                                            <LucideIcon name="Globe" className="w-5 h-5 text-green-500" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className={`text-lg font-bold mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                🌍 Ground News
+                                            </h3>
+                                            <p className={`text-sm ${isDarkMode ? 'text-blue-200' : 'text-blue-800'}`}>
+                                                <strong>Ground News</strong> compare les sources médiatiques et révèle les biais politiques dans la couverture d'actualité.
+                                                {hasGroundNewsCredentials && (
+                                                    <span className="ml-2 text-green-500 font-semibold">● Connecté</span>
+                                                )}
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={() => setGroundNewsExpanded(false)}
+                                            className={`p-2 rounded-lg transition-colors ${isDarkMode 
+                                                ? 'hover:bg-gray-700 text-gray-400' 
+                                                : 'hover:bg-gray-100 text-gray-600'}`}
+                                            title="Fermer Ground News"
+                                        >
+                                            <LucideIcon name="X" className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Loading Indicator */}
+                                {!groundNewsIframeLoaded && (
+                                    <div className="flex items-center justify-center py-12">
+                                        <div className="text-center">
+                                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+                                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                Chargement de Ground News...
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Iframe */}
+                                <div className={`relative rounded-lg overflow-hidden ${groundNewsIframeLoaded ? 'block' : 'hidden'}`}>
+                                    <iframe
+                                        src={groundNewsUrl}
+                                        className="w-full h-[800px] rounded-lg border-0"
+                                        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
+                                        onLoad={() => setGroundNewsIframeLoaded(true)}
+                                        title="Ground News"
+                                    />
+                                </div>
+
+                                {/* Open in New Tab Button */}
+                                <div className="flex justify-end">
+                                    <a
+                                        href={groundNewsUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 ${
+                                            isDarkMode
+                                                ? 'bg-green-600 hover:bg-green-500 text-white'
+                                                : 'bg-green-500 hover:bg-green-600 text-white'
+                                        }`}
+                                    >
+                                        <LucideIcon name="ExternalLink" className="w-4 h-4" />
+                                        Ouvrir dans un nouvel onglet
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {lastUpdate && (
                         <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -24189,6 +24360,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 </div>
             );
         };
+
+        // Exposer NouvellesTab globalement pour DashboardGridWrapper
+        window.NouvellesTab = NouvellesTab;
 
         // ============================================================================
         // COMPOSANT MARCHÉS & ÉCONOMIE
@@ -26228,9 +26402,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             
             // Sub-tabs Mapping for direct access
             { id: 'marches-global', label: 'Vue Globale', icon: 'iconoir-globe', component: MarketsEconomyTab },
-            { id: 'marches-yield', label: 'Courbe Taux', icon: 'iconoir-graph-up', component: window.YieldCurveTab || (() => <div className="p-10 text-center">Composant YieldCurveTab non chargé</div>) },
+            { id: 'marches-yield', label: 'Courbe Taux', icon: 'iconoir-graph-up', component: window.YieldCurveLiteTab || (() => <div className="p-10 text-center">Chargement...</div>) },
             { id: 'marches-calendar', label: 'Calendrier Éco', icon: 'iconoir-calendar', component: EconomicCalendarTab },
             { id: 'marches-nouvelles', label: 'Nouvelles', icon: 'iconoir-newspaper', component: NouvellesTab },
+            
+            // Main Nouvelles Tab
+            { id: 'nouvelles-main', label: 'Actualités', icon: 'iconoir-newspaper', component: NouvellesTab },
 
             { id: 'titres-portfolio', label: 'Mon Portfolio', icon: 'iconoir-wallet', component: StocksNewsTab }, // Default view
             { id: 'titres-watchlist', label: 'Watchlist', icon: 'iconoir-star', component: (props) => <StocksNewsTab {...props} defaultView="watchlist" /> },
@@ -26239,6 +26416,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             { id: 'jlab-terminal', label: 'Terminal', icon: 'iconoir-terminal', component: JLabUnifiedTab },
             { id: 'jlab-advanced', label: 'Analyse Pro', icon: 'iconoir-activity', component: (props) => window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab isDarkMode={isDarkMode} {...props} /> : <div>Chargement...</div> },
+            { id: 'jlab-curvewatch', label: 'CurveWatch', icon: 'iconoir-graph-up', component: (props) => window.CurveWatchTab ? <window.CurveWatchTab isDarkMode={isDarkMode} {...props} /> : <div className="p-10 text-center">Chargement CurveWatch...</div> },
 
             { id: 'emma-chat', label: 'Chat Emma', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
             { id: 'emma-vocal', label: 'Assistant Vocal', icon: 'iconoir-microphone', component: VoiceAssistantTab },
@@ -26989,7 +27167,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         filter: 'brightness(1.1)'
                                                     }}
                                                 >
-                                                    Emma IA
+                                                    JLAB - Emma IA
                                                 </span>
                                                 <span 
                                                     className="ml-2 text-[10px] font-semibold px-2 py-0.5 rounded relative inline-block"
@@ -27022,7 +27200,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             ? '1px solid rgba(0, 166, 81, 0.3)'
                                                             : `1px solid rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)`,
                                                         textTransform: 'uppercase',
-                                                        letterSpacing: '0.08em'
+                                                        letterSpacing: '0.08em',
+                                                        width: '36px',
+                                                        height: '20px'
                                                     }}
                                                 >
                                                     BÊTA
@@ -27278,6 +27458,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     console.warn('⚠️ NewsBanner component not loaded') || null
                 )}
 
+                {/* News Overlay - Overlay de nouveautés en bas à gauche */}
+                {window.NewsOverlay ? (
+                    React.createElement(window.NewsOverlay, { 
+                        isDarkMode: isDarkMode
+                    })
+                ) : null}
+
                 {/* Bouton Back flottant - Visible quand il y a un historique de navigation */}
                 {navigationHistory.length > 0 && !showLoadingScreen && (
                     <button
@@ -27301,12 +27488,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 {/* Bottom Navigation Bar - Tous les écrans - AUTO-HIDE ON SCROLL */}
                 <nav 
                     ref={navRef}
-                    className={`fixed bottom-0 left-0 right-0 backdrop-blur-md transition-all duration-300 z-40 shadow-2xl hidden md:block ${isDarkMode
+                    className={`fixed bottom-0 left-0 right-0 backdrop-blur-md transition-all duration-300 z-[9999] shadow-2xl block ${isDarkMode
                     ? 'bg-black/95 border-t border-green-500/20'
                     : 'bg-white/95 border-t-2 border-gray-200'
-                        } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : ''} ${isNavHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
+                        } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'} ${isNavHidden ? 'translate-y-full' : 'translate-y-0'}`}
                 >
-                    <div className="flex items-center justify-center overflow-x-auto scrollbar-hide px-2 py-3 gap-1 bg-white" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
+                    <div className={`flex items-center justify-center overflow-x-auto scrollbar-hide px-2 py-3 gap-1 ${isDarkMode ? 'bg-black/95' : 'bg-white/95'}`} style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
                         {(window.RolesPermissions && window.userPermissions 
                             ? window.RolesPermissions.filterTabsByPermissions(tabs)
                             : tabs
@@ -27660,19 +27847,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         ? 'text-gray-400 hover:text-white hover:bg-neutral-800'
                                                         : 'text-gray-600 hover:text-gray-900 hover:bg-white'
                                             }`}
-                                            title={dashboardViewMode === 'tabs' ? 'Passer en vue grille (GOD MODE)' : 'Passer en vue onglets'}
+                                            title={dashboardViewMode === 'tabs' ? 'Passer en vue grille modulaire' : 'Passer en vue onglets'}
                                         >
                                             <LucideIcon name={dashboardViewMode === 'tabs' ? 'Layout' : 'List'} className="w-4 h-4" />
                                             <span>{dashboardViewMode === 'tabs' ? '📐 Grille' : '📑 Onglets'}</span>
                                         </button>
                                         )}
 
-                                        {/* GOD MODE indicator - always visible */}
-                                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg font-semibold text-xs whitespace-nowrap mr-2">
-                                            <LucideIcon name="Layout" className="w-4 h-4" />
-                                            <span>🚀 GOD MODE</span>
-                                        </div>
-                                        
                                         {MAIN_TABS.map(tab => {
                                             const isActive = mainTab === tab.id;
                                             const colorMap = {
@@ -27716,16 +27897,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         key={subTab.id}
                                                         onClick={() => handleNewTabChange(subTab.id)}
                                                         className={`flex items-center gap-2 px-3 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap transition-all duration-300 ${
-                                                            isActive 
-                                                                ? isDarkMode 
-                                                                    ? 'text-white bg-neutral-800 border-b-2 border-emerald-500'
-                                                                    : 'text-gray-900 bg-white border-b-2 border-emerald-500 shadow-sm'
-                                                                : isDarkMode 
+                                                            isActive
+                                                                ? isDarkMode
+                                                                    ? 'bg-gradient-to-b from-green-500/20 to-transparent text-green-400 border-b-2 border-green-500'
+                                                                    : 'bg-green-50 text-green-700 border-b-2 border-green-600'
+                                                                : isDarkMode
                                                                     ? 'text-gray-500 hover:text-gray-300 hover:bg-neutral-800/50'
-                                                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                                                         }`}
                                                     >
-                                                        <LucideIcon name={subTab.icon} className="w-3.5 h-3.5" />
+                                                        {subTab.icon && (
+                                                            <LucideIcon name={subTab.icon} className="w-4 h-4" />
+                                                        )}
                                                         <span>{subTab.label}</span>
                                                     </button>
                                                 );
@@ -28047,8 +28230,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     )}
                     {activeTab === 'marches-flex' && (window.MarketsEconomyTabRGL ? <window.MarketsEconomyTabRGL isDarkMode={isDarkMode} isAdmin={true} /> : <div>Chargement...</div>)}
                     {activeTab === 'marches-calendar' && <EconomicCalendarTab key={`marches-calendar-${tabMountKeys['economic-calendar'] || 0}`} />}
-                    {activeTab === 'marches-yield' && <YieldCurveTab />}
+                    {activeTab === 'marches-yield' && window.YieldCurveLiteTab && <window.YieldCurveLiteTab isDarkMode={isDarkMode} setActiveTab={setActiveTab} />}
                     {activeTab === 'marches-nouvelles' && <NouvellesTab key={`marches-nouvelles-${tabMountKeys['nouvelles'] || 0}`} />}
+
+                    {/* NOUVELLES Main Tab */}
+                    {activeTab === 'nouvelles-main' && <NouvellesTab key={`nouvelles-main-${tabMountKeys['nouvelles'] || 0}`} />}
 
                     {/* TITRES Sub-tabs */}
                     {activeTab === 'titres-portfolio' && <StocksNewsTab tickerSource="portfolio" />}
@@ -28089,7 +28275,22 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {activeTab === 'jlab-compare' && <FinanceProPanel key={`jlab-compare-${tabMountKeys['jlab-compare'] || 0}`} isDarkMode={isDarkMode} initialViewMode="compare" />}
                     {activeTab === 'jlab-screener' && <FinanceProPanel key={`jlab-screener-${tabMountKeys['jlab-screener'] || 0}`} isDarkMode={isDarkMode} initialViewMode="screener" />}
                     {activeTab === 'jlab-fastgraphs' && window.FastGraphsTab && <window.FastGraphsTab key={`jlab-fastgraphs-${tabMountKeys['jlab-fastgraphs'] || 0}`} isDarkMode={isDarkMode} />}
-                    {activeTab === 'jlab-curvewatch' && window.CurveWatchTab && <window.CurveWatchTab key={`jlab-curvewatch-${tabMountKeys['jlab-curvewatch'] || 0}`} isDarkMode={isDarkMode} />}
+                    {activeTab === 'jlab-curvewatch' && (
+                        (typeof window.CurveWatchTab !== 'undefined' && curveWatchReady) ? (
+                            <window.CurveWatchTab 
+                                key={`jlab-curvewatch-${tabMountKeys['jlab-curvewatch'] || 0}`} 
+                                isDarkMode={isDarkMode} 
+                            />
+                        ) : (
+                            <div key={`jlab-curvewatch-loading-${tabMountKeys['jlab-curvewatch'] || 0}`} className="h-full w-full flex items-center justify-center" style={{ minHeight: '800px' }}>
+                                <div className="text-center">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                                    <p className="text-gray-400">Chargement de CurveWatch...</p>
+                                    <p className="text-xs text-gray-500 mt-2">Initialisation du moteur YieldCurve Analytics...</p>
+                                </div>
+                            </div>
+                        )
+                    )}
 
                     {/* EMMA IA Sub-tabs */}
                     {activeTab === 'emma-chat' && <AskEmmaTab

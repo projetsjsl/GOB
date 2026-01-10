@@ -89,7 +89,7 @@
         'marches-global': { component: 'MarketsEconomyTab', label: 'Marchés Globaux', icon: 'Globe', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 }, heavy: true },
         // 'marches-flex' REMOVED - was duplicating MarketsEconomyTab causing ~15 TradingView widgets to load simultaneously
         'marches-calendar': { component: 'EconomicCalendarTab', label: 'Calendrier Éco', icon: 'Calendar', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
-        'marches-yield': { component: 'YieldCurveTab', label: 'Courbe Taux', icon: 'TrendingUp', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 }, heavy: true },
+        'marches-yield': { component: 'YieldCurveLiteTab', label: 'Courbe Taux', icon: 'TrendingUp', defaultSize: { w: 12, h: 8 }, minSize: { w: 6, h: 6 } },
         'marches-nouvelles': { component: 'NouvellesTab', label: 'Nouvelles', icon: 'Newspaper', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
         
         // TITRES
@@ -104,7 +104,7 @@
         'jlab-compare': { component: 'FinanceProPanel', label: 'Comparaison', icon: 'GitCompare', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 }, mode: 'compare' },
         'jlab-screener': { component: 'FinanceProPanel', label: 'Screener', icon: 'Search', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 }, mode: 'screener' },
         'jlab-fastgraphs': { component: 'FastGraphsTab', label: 'FastGraphs', icon: 'BarChart3', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
-        'jlab-curvewatch': { component: 'CurveWatchTab', label: 'CurveWatch', icon: 'TrendingUp', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
+        'jlab-curvewatch': { component: 'iframe', label: 'CurveWatch', icon: 'TrendingUp', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 }, url: '/curvewatch.html' },
         
         // EMMA IA
         'emma-chat': { component: 'AskEmmaTab', label: 'Chat Emma', icon: 'Brain', defaultSize: { w: 6, h: 10 }, minSize: { w: 4, h: 8 } },
@@ -129,8 +129,57 @@
         return validLayout;
     };
 
-    const loadLayoutFromStorage = (keys = []) => {
-        if (!ENABLE_LOCAL_LAYOUT_CACHE) return null;
+    // Helper to get UserPreferencesService (with fallback)
+    const getUserPreferencesService = () => {
+        return window.UserPreferencesService || {
+            loadPreferencesWithFallback: async (appName, storageKey, defaults) => {
+                // Fallback: use localStorage directly
+                try {
+                    const saved = localStorage.getItem(storageKey);
+                    if (!saved) return defaults;
+                    return { ...defaults, ...JSON.parse(saved) };
+                } catch (e) {
+                    return defaults;
+                }
+            },
+            savePreferencesWithFallback: async (appName, storageKey, data) => {
+                // Fallback: use localStorage directly
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify(data));
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+        };
+    };
+
+    const loadLayoutFromStorage = async (keys = [], scopeId = null) => {
+        const service = getUserPreferencesService();
+        
+        // Try Supabase first (if authenticated) via service
+        if (scopeId && service.loadPreferencesWithFallback) {
+            try {
+                const storageKey = getLayoutStorageKey(scopeId);
+                const prefs = await service.loadPreferencesWithFallback(
+                    'dashboard',
+                    storageKey,
+                    {}
+                );
+                
+                if (prefs && prefs.layouts && prefs.layouts[scopeId]) {
+                    const validLayout = sanitizeLayout(prefs.layouts[scopeId]);
+                    if (validLayout.length > 0) {
+                        console.log(`✅ Layout chargé depuis Supabase: ${scopeId}`, { items: validLayout.length });
+                        return validLayout;
+                    }
+                }
+            } catch (e) {
+                console.warn(`⚠️ Erreur chargement Supabase pour ${scopeId}:`, e);
+            }
+        }
+        
+        // Fallback: try localStorage directly
         for (const key of keys) {
             if (!key) continue;
             try {
@@ -138,9 +187,12 @@
                 if (!saved) continue;
                 const parsed = JSON.parse(saved);
                 const validLayout = sanitizeLayout(parsed);
-                if (validLayout.length > 0) return validLayout;
+                if (validLayout.length > 0) {
+                    console.log(`✅ Layout chargé depuis localStorage: ${key}`, { items: validLayout.length });
+                    return validLayout;
+                }
             } catch (e) {
-                console.error('❌ Erreur chargement layout:', e);
+                console.error(`❌ Erreur chargement layout depuis ${key}:`, e);
             }
         }
         return null;
@@ -286,7 +338,7 @@
             // Trading preset: focus on markets and portfolio
             { i: 'titres-portfolio', x: 0, y: 0, w: 8, h: 12, minW: 6, minH: 8 },
             { i: 'marches-global', x: 8, y: 0, w: 4, h: 12, minW: 4, minH: 6 },
-            { i: 'marches-yield', x: 0, y: 12, w: 6, h: 10, minW: 6, minH: 6 },
+            { i: 'marches-yield', x: 0, y: 12, w: 6, h: 8, minW: 6, minH: 6 },
             { i: 'marches-calendar', x: 6, y: 12, w: 6, h: 10, minW: 6, minH: 6 },
         ],
         research: [
@@ -339,20 +391,28 @@ class WidgetErrorBoundary extends React.Component {
 }
 
 // Missing Component Card - displayed when a component is not found
-const MissingComponentCard = ({ componentName, isDarkMode }) => (
-    <div className={`h-full flex flex-col items-center justify-center p-6 rounded-lg border-2 border-dashed ${
-        isDarkMode 
-            ? 'bg-neutral-900/50 border-amber-500/30 text-amber-400' 
-            : 'bg-amber-50 border-amber-300 text-amber-700'
-    }`}>
-        <span className="text-4xl mb-3">⚠️</span>
-        <h3 className="font-bold text-lg mb-2">Module non chargé</h3>
-        <p className="text-sm text-center opacity-75 mb-3">{componentName || 'Composant inconnu'}</p>
-        <p className="text-xs text-center opacity-50">
-            Vérifiez que le script est chargé dans beta-combined-dashboard.html
-        </p>
-    </div>
-);
+const MissingComponentCard = ({ componentName, isDarkMode }) => {
+    const isFinanceProPanel = componentName === 'FinanceProPanel';
+    return (
+        <div className={`h-full flex flex-col items-center justify-center p-6 rounded-lg border-2 border-dashed ${
+            isDarkMode 
+                ? 'bg-neutral-900/50 border-amber-500/30 text-amber-400' 
+                : 'bg-amber-50 border-amber-300 text-amber-700'
+        }`}>
+            <span className="text-4xl mb-3">⚠️</span>
+            <h3 className="font-bold text-lg mb-2">Module non chargé</h3>
+            <p className="text-sm text-center opacity-75 mb-3">{componentName || 'Composant inconnu'}</p>
+            <p className="text-xs text-center opacity-50">
+                {isFinanceProPanel 
+                    ? 'Chargement en cours... (app-inline.js)' 
+                    : 'Vérifiez que le script est chargé dans beta-combined-dashboard.html'}
+            </p>
+            {isFinanceProPanel && (
+                <div className="mt-4 w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            )}
+        </div>
+    );
+};
 
 
     const DashboardGridWrapper = ({
@@ -561,23 +621,58 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
             scheduleConfigSave(nextConfig);
         }, [layoutConfig, layoutScopeMode, scheduleConfigSave, showAllWidgetsInDock]);
 
-        const persistLayoutForScope = useCallback((scopeId, nextLayout) => {
+        const persistLayoutForScope = useCallback(async (scopeId, nextLayout, saveToRemote = false) => {
             if (!scopeId) return;
-            if (isAdmin) {
+            const sanitized = sanitizeLayout(nextLayout);
+            const service = getUserPreferencesService();
+            const storageKey = getLayoutStorageKey(scopeId);
+            
+            // Structure pour Supabase: { layouts: { [scopeId]: layout }, ... }
+            const preferencesData = {
+                layouts: {
+                    [scopeId]: sanitized
+                }
+            };
+            
+            // Save to Supabase (if authenticated) with localStorage fallback
+            if (service.savePreferencesWithFallback) {
+                try {
+                    await service.savePreferencesWithFallback(
+                        'dashboard',
+                        storageKey,
+                        preferencesData
+                    );
+                    console.log(`💾 Layout sauvegardé (Supabase/localStorage): ${scopeId}`, { items: sanitized.length });
+                } catch (e) {
+                    console.error('❌ Erreur sauvegarde via service:', e);
+                    // Fallback to localStorage
+                    try {
+                        localStorage.setItem(storageKey, JSON.stringify(sanitized));
+                    } catch (e2) {
+                        console.error('❌ Erreur sauvegarde localStorage:', e2);
+                    }
+                }
+            } else {
+                // Fallback: localStorage only
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify(sanitized));
+                    console.log(`💾 Layout sauvegardé dans localStorage: ${storageKey}`, { items: sanitized.length });
+                } catch (e) {
+                    console.error('❌ Erreur sauvegarde localStorage:', e);
+                }
+            }
+            
+            // ONLY save to remote config if explicitly requested (e.g., "Sauv. Prod" button)
+            // This prevents personal changes from affecting all users
+            if (saveToRemote && isAdmin) {
+                console.log(`🌐 Layout sauvegardé dans config remote (GLOBAL): ${scopeId}`);
                 updateLayoutConfig((config) => ({
                     ...config,
                     layouts: {
                         ...config.layouts,
-                        [scopeId]: sanitizeLayout(nextLayout)
+                        [scopeId]: sanitized
                     }
                 }));
-            }
-            if (ENABLE_LOCAL_LAYOUT_CACHE) {
-                try {
-                    localStorage.setItem(getLayoutStorageKey(scopeId), JSON.stringify(nextLayout));
-                } catch (e) {
-                    // ignore local storage errors
-                }
             }
         }, [isAdmin, updateLayoutConfig]);
 
@@ -587,34 +682,109 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
             persistLayoutForScopeRef.current = persistLayoutForScope;
         }, [persistLayoutForScope]);
 
+        // Watch for FinanceProPanel to become available (app-inline.js loads asynchronously)
+        const [componentsReady, setComponentsReady] = useState(() => {
+            // Initial check
+            return typeof window.FinanceProPanel !== 'undefined';
+        });
+
         useEffect(() => {
-            if (!layoutConfigLoaded) return;
-            const fromConfig = getLayoutFromConfig(layoutConfig, layoutScopeId, mainTab);
-            if (fromConfig) {
-                setLayout(fromConfig);
+            // If FinanceProPanel is already available, no need to watch
+            if (typeof window.FinanceProPanel !== 'undefined') {
+                setComponentsReady(true);
                 return;
             }
 
-            const fallbackKeys = getLayoutFallbackKeys(layoutScopeId, mainTab);
-            const seedLayout = isAdmin
-                ? (loadLayoutFromStorage(fallbackKeys) || loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout())
-                : getDefaultLayout();
+            // Poll for FinanceProPanel to become available (Babel transpilation takes time)
+            const checkInterval = setInterval(() => {
+                if (typeof window.FinanceProPanel !== 'undefined') {
+                    setComponentsReady(true);
+                    clearInterval(checkInterval);
+                }
+            }, 100); // Check every 100ms
 
-            setLayout(seedLayout);
+            // Stop checking after 10 seconds
+            const timeout = setTimeout(() => {
+                clearInterval(checkInterval);
+            }, 10000);
 
-            if (isAdmin) {
-                updateLayoutConfig((config) => {
-                    const hasLayouts = config.layouts && Object.keys(config.layouts).length > 0;
-                    if (hasLayouts) return config;
-                    return {
-                        ...config,
-                        layouts: {
-                            ...config.layouts,
-                            [layoutScopeId]: sanitizeLayout(seedLayout)
-                        }
-                    };
-                });
-            }
+            return () => {
+                clearInterval(checkInterval);
+                clearTimeout(timeout);
+            };
+        }, []);
+
+        useEffect(() => {
+            if (!layoutConfigLoaded) return;
+            
+            let isActive = true;
+            
+            const loadLayout = async () => {
+                // Priority 1: Load from Supabase/localStorage (most recent user changes)
+                const fallbackKeys = getLayoutFallbackKeys(layoutScopeId, mainTab);
+                const fromStorage = await loadLayoutFromStorage(fallbackKeys, layoutScopeId);
+                if (isActive && fromStorage && fromStorage.length > 0) {
+                    console.log(`✅ Layout restauré depuis Supabase/localStorage pour scope: ${layoutScopeId}`);
+                    setLayout(fromStorage);
+                    return;
+                }
+                
+                // Priority 2: Load from remote config (if admin and available)
+                const fromConfig = getLayoutFromConfig(layoutConfig, layoutScopeId, mainTab);
+                if (isActive && fromConfig && fromConfig.length > 0) {
+                    console.log(`✅ Layout restauré depuis config remote pour scope: ${layoutScopeId}`);
+                    setLayout(fromConfig);
+                    return;
+                }
+
+                // Priority 3: Fallback to presets or default
+                const seedLayout = isAdmin
+                    ? (loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout())
+                    : getDefaultLayout();
+
+                if (!isActive) return;
+                
+                console.log(`⚠️ Layout par défaut utilisé pour scope: ${layoutScopeId}`);
+                setLayout(seedLayout);
+
+                // Save default layout to Supabase/localStorage (personal preference)
+                // DO NOT save to remote config automatically - that would affect all users!
+                const service = getUserPreferencesService();
+                const storageKey = getLayoutStorageKey(layoutScopeId);
+                const preferencesData = {
+                    layouts: {
+                        [layoutScopeId]: sanitizeLayout(seedLayout)
+                    }
+                };
+                
+                if (service.savePreferencesWithFallback) {
+                    service.savePreferencesWithFallback('dashboard', storageKey, preferencesData)
+                        .then(() => {
+                            console.log(`💾 Layout par défaut sauvegardé (Supabase/localStorage): ${storageKey}`);
+                        })
+                        .catch((e) => {
+                            console.error('❌ Erreur sauvegarde service:', e);
+                            // Fallback localStorage
+                            try {
+                                localStorage.setItem(storageKey, JSON.stringify(sanitizeLayout(seedLayout)));
+                            } catch (e2) {
+                                console.error('❌ Erreur sauvegarde localStorage:', e2);
+                            }
+                        });
+                } else {
+                    // Fallback localStorage only
+                    try {
+                        localStorage.setItem(storageKey, JSON.stringify(sanitizeLayout(seedLayout)));
+                        console.log(`💾 Layout par défaut sauvegardé dans localStorage: ${storageKey}`);
+                    } catch (e) {
+                        console.error('❌ Erreur sauvegarde localStorage:', e);
+                    }
+                }
+            };
+            
+            loadLayout();
+            
+            return () => { isActive = false; };
         }, [layoutConfig, layoutConfigLoaded, layoutScopeId, mainTab, isAdmin, updateLayoutConfig]);
 
         // S'assurer que le layout n'est jamais vide - ONLY RUN ONCE on mount
@@ -717,23 +887,32 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
         // Sauvegarder le layout courant
         // FIX: onLayoutChange receives (currentLayout, allLayouts) from ResponsiveGridLayout
         const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
-            if (isEditing && currentLayout) {
+            // Always save layout changes (even if not in editing mode, in case user resizes)
+            if (currentLayout && currentLayout.length > 0) {
                 console.log('[DashboardGridWrapper] Layout changed:', {
                     currentLayoutLength: currentLayout?.length,
-                    allLayoutsKeys: allLayouts ? Object.keys(allLayouts) : null
+                    allLayoutsKeys: allLayouts ? Object.keys(allLayouts) : null,
+                    scopeId: layoutScopeId,
+                    isEditing: isEditing
                 });
                 setLayout(currentLayout);
-                persistLayoutForScope(layoutScopeId, currentLayout);
+                // IMPORTANT: Save to localStorage ONLY (personal preference)
+                // DO NOT save to remote config - that would affect all users!
+                // Remote config is only updated via explicit "Sauv. Prod" or "Sauv. Dev" buttons
+                persistLayoutForScope(layoutScopeId, currentLayout, false);
             }
         }, [isEditing, layoutScopeId, persistLayoutForScope]);
         
         // Save current layout as a specific preset
+        // ⚠️ IMPORTANT: This function saves to REMOTE CONFIG (affects all users)
+        // This is intentional - presets are global templates, not personal preferences
         const saveAsPreset = useCallback((presetName) => {
              const key = presetName === 'default' ? STORAGE_KEY_DEFAULT : 
                         presetName === 'developer' ? STORAGE_KEY_DEV : null;
                         
              if (key) {
                  const sanitized = sanitizeLayout(layout);
+                 // Save to remote config (GLOBAL - affects all users)
                  updateLayoutConfig((config) => ({
                      ...config,
                      presets: {
@@ -741,22 +920,36 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
                          [presetName]: sanitized
                      }
                  }));
+                 // Also save locally for quick access
                  localStorage.setItem(key, JSON.stringify(sanitized));
-                 if (window.showToast) window.showToast(`Layout sauvegardé comme "${presetName === 'default' ? 'Production' : 'Développeur'}"`, 'success');
-                 else alert(`Layout sauvegardé comme "${presetName === 'default' ? 'Production' : 'Développeur'}"`);
+                 console.log(`🌐 Preset "${presetName}" sauvegardé dans config remote (GLOBAL)`);
+                 if (window.showToast) window.showToast(`Layout sauvegardé comme "${presetName === 'default' ? 'Production' : 'Développeur'}" (GLOBAL)`, 'success');
+                 else alert(`Layout sauvegardé comme "${presetName === 'default' ? 'Production' : 'Développeur'}" (GLOBAL)`);
              }
         }, [layout, updateLayoutConfig]);
 
         // Ajouter un widget
-        const addWidget = useCallback((tabId) => {
+        const addWidget = useCallback(async (tabId) => {
             const config = TAB_TO_WIDGET_MAP[tabId];
             if (!config) return;
 
             const targetScopeId = layoutScopeId;
             const targetStorageKey = getLayoutStorageKey(targetScopeId);
-            const targetLayout = targetScopeId === layoutScopeId
-                ? layout
-                : (getLayoutFromConfig(layoutConfig, targetScopeId, mainTab) || loadLayoutFromStorage([targetStorageKey]) || []);
+            
+            // Get target layout (use current if same scope, otherwise load)
+            let targetLayout;
+            if (targetScopeId === layoutScopeId) {
+                targetLayout = layout;
+            } else {
+                const fromConfig = getLayoutFromConfig(layoutConfig, targetScopeId, mainTab);
+                if (fromConfig) {
+                    targetLayout = fromConfig;
+                } else {
+                    // Load from storage (async)
+                    const fromStorage = await loadLayoutFromStorage([targetStorageKey], targetScopeId);
+                    targetLayout = fromStorage || [];
+                }
+            }
 
             // Vérifier si le widget existe déjà
             if (targetLayout.some(item => item.i === tabId)) {
@@ -781,7 +974,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
             if (targetScopeId === layoutScopeId) {
                 setLayout(updatedLayout);
             }
-            persistLayoutForScope(targetScopeId, updatedLayout);
+            await persistLayoutForScope(targetScopeId, updatedLayout);
 
             if (hiddenWidgetSet.has(tabId)) {
                 persistHiddenWidgets(hiddenWidgets.filter(id => id !== tabId));
@@ -861,6 +1054,21 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
                 );
             }
 
+            // Handle iframe widgets (embedded pages)
+            if (config.component === 'iframe') {
+                return (
+                    <div className="h-full w-full">
+                        <iframe
+                            src={config.url}
+                            className="w-full h-full border-0"
+                            title={config.label}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            loading="lazy"
+                        />
+                    </div>
+                );
+            }
+
             // Get component (try multiple fallbacks)
             let Component = window[config.component];
             if (!Component) Component = window[config.component + 'Tab'];
@@ -871,10 +1079,27 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
                 const FALLBACK_REGISTRY = {
                     // Components that don't have their own files
                     'EmmaConfigTab': window.AdminJSLaiTab,
-                    'NouvellesTab': window.StocksNewsTab,
+                    // NouvellesTab is now exposed globally from app-inline.js
+                    'NouvellesTab': (typeof window.NouvellesTab !== 'undefined' ? window.NouvellesTab : window.StocksNewsTab),
                     'InvestingCalendarTab': window.EconomicCalendarTab
                 };
                 Component = FALLBACK_REGISTRY[config.component];
+            }
+
+            // Special handling for FinanceProPanel - wait for app-inline.js to load
+            if (!Component && config.component === 'FinanceProPanel') {
+                // Check if component is available now (may have loaded since last render)
+                if (typeof window.FinanceProPanel !== 'undefined') {
+                    Component = window.FinanceProPanel;
+                } else {
+                    // Component not loaded yet, show loading state
+                    if (!_loggedMissingComponents[config.component]) {
+                        _loggedMissingComponents[config.component] = true;
+                        console.warn('[MissingComponent] FinanceProPanel not loaded yet, waiting for app-inline.js...');
+                    }
+                    // Return a placeholder that will re-render when component loads (via componentsReady state)
+                    return <MissingComponentCard componentName={config.component} isDarkMode={isDarkMode} />;
+                }
             }
 
             if (!Component) {
@@ -946,11 +1171,6 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
                         <div className="flex items-center gap-2">
                             <window.LucideIcon name={config.icon} className={`w-4 h-4 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
                             <span className={`font-semibold text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{config.label}</span>
-                            {config.heavy && (
-                                <span className={`text-xs px-1.5 py-0.5 rounded ${isDarkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>
-                                    ⚡ Heavy
-                                </span>
-                            )}
                         </div>
                         {isEditing && (
                             <button
@@ -985,7 +1205,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
             scrapingLogs, clearScrapingLogs, generateScrapingScript, addScrapingLog,
             seekingAlphaData, seekingAlphaStockData, analyzeWithClaude, seekingAlphaViewMode,
             setSeekingAlphaViewMode, openPeersComparison, cleanText, getGradeColor,
-            openSeekingAlpha, Icon, MASTER_NAV_LINKS, allTabs, layout
+            openSeekingAlpha, Icon, MASTER_NAV_LINKS, allTabs, layout, componentsReady
         ]);
 
         
@@ -1163,13 +1383,10 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => (
                                 <window.LucideIcon name="Layout" className="w-6 h-6" />
                             </div>
                             <div>
-                                <h1 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>GOD MODE</h1>
-                                <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Dashboard Modulaire</span>
+                                <h1 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Dashboard Modulaire</h1>
+                                <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Vue personnalisable</span>
                             </div>
                         </div>
-                        <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-neutral-700 text-gray-300' : 'bg-gray-200 text-gray-600'}`}>
-                            BP: {currentBreakpoint}
-                        </span>
                         <span className={`text-xs px-3 py-1 rounded-full flex items-center gap-1 ${isDarkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-700'}`}>
                             <window.LucideIcon name="Grid3x3" className="w-3 h-3" />
                             {layout?.length || 0} widgets
