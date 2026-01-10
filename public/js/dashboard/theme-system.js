@@ -439,7 +439,20 @@ const allThemes = {
 };
 
 // Fonction pour appliquer un thème
+// BUG #8 FIX: Optimiser avec debounce et CSS variables pour éviter timeout
+let themeApplyTimeout = null;
 function applyTheme(themeId) {
+    // BUG #8 FIX: Debounce pour éviter les changements trop rapides
+    if (themeApplyTimeout) {
+        clearTimeout(themeApplyTimeout);
+    }
+    
+    themeApplyTimeout = setTimeout(() => {
+        _applyThemeInternal(themeId);
+    }, 50); // Debounce de 50ms
+}
+
+function _applyThemeInternal(themeId) {
     // Validation du themeId
     if (!themeId || typeof themeId !== 'string') {
         console.warn('Theme ID invalide, utilisation du thème par défaut');
@@ -452,10 +465,13 @@ function applyTheme(themeId) {
     // Validation du thème
     if (!theme || !theme.colors || !theme.styles || !theme.fonts) {
         console.error('Thème invalide:', themeId, 'Utilisation du thème par défaut');
-        return applyTheme('darkmode');
+        return _applyThemeInternal('darkmode');
     }
     
     const root = document.documentElement;
+    
+    // BUG #8 FIX: Utiliser requestAnimationFrame pour éviter les reflows massifs
+    requestAnimationFrame(() => {
     
     // Fonction helper pour convertir hex en RGB
     const hexToRgb = (hex) => {
@@ -615,21 +631,21 @@ function applyTheme(themeId) {
     root.style.setProperty('--theme-font-secondary', theme.fonts.secondary);
     root.style.setProperty('--theme-font-mono', theme.fonts.mono);
     
-    // Ajouter une classe au body pour le thème
-    document.body.className = document.body.className.replace(/theme-\w+/g, '');
-    document.body.classList.add(`theme-${themeId}`);
-    
-    // Sauvegarder dans localStorage
-    try {
+        // Ajouter une classe au body pour le thème
+        document.body.className = document.body.className.replace(/theme-\w+/g, '');
+        document.body.classList.add(`theme-${themeId}`);
+        
+        // Sauvegarder dans localStorage
+        try {
         localStorage.setItem('gob-dashboard-theme', themeId);
     } catch (error) {
         console.warn('Impossible de sauvegarder le thème dans localStorage:', error);
     }
     
-    // Déclencher un événement personnalisé
-    window.dispatchEvent(new CustomEvent('themeChanged', { detail: { themeId } }));
+        // Déclencher un événement personnalisé
+        window.dispatchEvent(new CustomEvent('themeChanged', { detail: { themeId } }));
 
-    // PROPAGATION AUX IFRAMES (pour Emma IA et autres sous-apps)
+        // PROPAGATION AUX IFRAMES (pour Emma IA et autres sous-apps)
     try {
         const iframes = document.querySelectorAll('iframe');
         iframes.forEach(iframe => {
@@ -668,9 +684,10 @@ function applyTheme(themeId) {
                 console.warn('Impossible de propager le thème à l\'iframe', e);
             }
         });
-    } catch (e) {
-        console.error('Erreur propagation iframe:', e);
-    }
+        } catch (e) {
+            console.error('Erreur propagation iframe:', e);
+        }
+    });
     
     return theme;
 }

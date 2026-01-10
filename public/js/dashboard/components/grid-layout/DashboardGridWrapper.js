@@ -261,17 +261,49 @@
     // LAZY HEAVY WIDGET WRAPPER
     // ===================================
     // Heavy widgets require click to load - prevents Chrome crash from TradingView overload
+    // BUG #6 FIX: Lazy load automatique au scroll au lieu de clic manuel
     const LazyHeavyWidget = ({ children, widgetId, delay = 500, isDarkMode }) => {
         const [shouldRender, setShouldRender] = React.useState(false);
         const [isLoading, setIsLoading] = React.useState(false);
         const containerRef = React.useRef(null);
 
+        // BUG #6 FIX: Auto-load avec IntersectionObserver
+        React.useEffect(() => {
+            if (shouldRender) return;
+
+            const observer = new IntersectionObserver(
+                ([entry]) => {
+                    if (entry.isIntersecting && !shouldRender) {
+                        setIsLoading(true);
+                        // Small delay to show loading state before heavy render
+                        setTimeout(() => {
+                            setShouldRender(true);
+                            console.log(`🔄 LazyHeavyWidget: Auto-loaded ${widgetId} on scroll`);
+                        }, delay);
+                    }
+                },
+                { 
+                    threshold: 0.1, 
+                    rootMargin: '100px' // Preload 100px avant que le widget soit visible
+                }
+            );
+
+            if (containerRef.current) {
+                observer.observe(containerRef.current);
+            }
+
+            return () => {
+                if (containerRef.current) {
+                    observer.unobserve(containerRef.current);
+                }
+            };
+        }, [shouldRender, widgetId, delay]);
+
         const handleLoadClick = () => {
             setIsLoading(true);
-            // Small delay to show loading state before heavy render
             setTimeout(() => {
                 setShouldRender(true);
-                console.log(`🔄 LazyHeavyWidget: User loaded ${widgetId}`);
+                console.log(`🔄 LazyHeavyWidget: User manually loaded ${widgetId}`);
             }, 300);
         };
 
@@ -297,14 +329,15 @@
                                     <p className={`text-base font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                         Widget interactif
                                     </p>
-                                    <p className={`text-xs mb-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                                        Cliquez pour charger (consomme des ressources)
+                                    {/* BUG #A5 FIX: Texte complet sans troncature */}
+                                    <p className={`text-xs mb-4 px-2 ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`} style={{ wordBreak: 'break-word', maxWidth: '100%' }}>
+                                        Chargement automatique au scroll...
                                     </p>
                                     <button
                                         onClick={handleLoadClick}
                                         className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-emerald-500/20"
                                     >
-                                        Charger le widget
+                                        Charger maintenant
                                     </button>
                                 </>
                             )}

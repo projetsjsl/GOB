@@ -27559,24 +27559,40 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     })
                 ) : null}
 
-                {/* Bouton Back flottant - Visible quand il y a un historique de navigation */}
+                {/* BUG #5 FIX: Breadcrumbs au lieu de bouton "Retour" confus */}
                 {navigationHistory.length > 0 && !showLoadingScreen && (
-                    <button
-                        onClick={goBack}
-                        className={`fixed bottom-20 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full shadow-lg transition-all duration-300 hover:scale-105 group ${
+                    <nav 
+                        className={`fixed bottom-20 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full shadow-lg transition-all duration-300 ${
                             isDarkMode 
-                                ? 'bg-gray-800/95 hover:bg-gray-700 text-gray-200 border border-gray-600/50 hover:border-green-500/50' 
-                                : 'bg-white/95 hover:bg-gray-50 text-gray-700 border border-gray-200 hover:border-green-500/50'
+                                ? 'bg-gray-800/95 text-gray-200 border border-gray-600/50' 
+                                : 'bg-white/95 text-gray-700 border border-gray-200'
                         }`}
                         style={{ backdropFilter: 'blur(8px)' }}
-                        title={`Retour (${navigationHistory.length} page${navigationHistory.length > 1 ? 's' : ''} en historique)`}
+                        aria-label="Fil d'Ariane"
                     >
-                        <i className={`iconoir-arrow-left text-lg transition-transform duration-200 group-hover:-translate-x-0.5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}></i>
-                        <span className="text-sm font-medium">Retour</span>
-                        <span className={`text-xs px-1.5 py-0.5 rounded-full ${isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-500'}`}>
-                            {navigationHistory.length}
+                        <button
+                            onClick={goBack}
+                            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                            title="Retour à la page précédente"
+                            aria-label="Retour"
+                        >
+                            <i className={`iconoir-arrow-left text-lg ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}></i>
+                        </button>
+                        <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>/</span>
+                        <span className="text-sm font-medium">
+                            {navigationHistory.slice(-2).map((tab, idx) => {
+                                const tabConfig = tabs.find(t => t.id === tab);
+                                return (
+                                    <React.Fragment key={tab}>
+                                        {idx > 0 && <span className="mx-1 text-gray-500">/</span>}
+                                        <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
+                                            {tabConfig?.label || tab}
+                                        </span>
+                                    </React.Fragment>
+                                );
+                            })}
                         </span>
-                    </button>
+                    </nav>
                 )}
 
                 {/* Bottom Navigation Bar - Tous les écrans - AUTO-HIDE ON SCROLL */}

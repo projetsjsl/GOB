@@ -20,15 +20,17 @@ class ToastManager {
         if (!document.getElementById('toast-container')) {
             this.container = document.createElement('div');
             this.container.id = 'toast-container';
+            // BUG #A3 FIX: Toast positionné pour ne pas couvrir la navigation (z-index inférieur à nav)
             this.container.style.cssText = `
                 position: fixed;
                 bottom: 24px;
                 right: 24px;
-                z-index: 9999;
+                z-index: 9998;
                 display: flex;
                 flex-direction: column;
                 gap: 12px;
                 pointer-events: none;
+                max-width: 400px;
             `;
             if (document.body) {
                 document.body.appendChild(this.container);

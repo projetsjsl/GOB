@@ -200,9 +200,62 @@ const TradingViewTickerContent = React.memo(({
 
     }, [isDarkMode, finalSymbols, setTickerExpandableUrl, setTickerExpandableTitle, setTickerExpandableOpen]);
 
+    // BUG #4 FIX: Détecter les erreurs dans le widget TradingView et afficher des tooltips
+    React.useEffect(() => {
+        if (!containerRef.current) return;
+
+        const checkForErrors = () => {
+            const iframe = containerRef.current?.querySelector('iframe');
+            if (!iframe) return;
+
+            // Écouter les messages d'erreur de TradingView
+            const messageHandler = (event) => {
+                if (event.data && typeof event.data === 'object') {
+                    // Détecter les erreurs de chargement de symboles
+                    if (event.data.type === 'error' || event.data.error) {
+                        console.warn('TradingView widget error detected:', event.data);
+                        // Afficher un tooltip d'erreur si disponible
+                        const errorSymbols = event.data.symbols || [];
+                        errorSymbols.forEach(symbol => {
+                            const element = containerRef.current?.querySelector(`[data-symbol="${symbol}"]`);
+                            if (element) {
+                                element.setAttribute('title', `Erreur de chargement pour ${symbol}. Données temporairement indisponibles.`);
+                                element.style.opacity = '0.6';
+                            }
+                        });
+                    }
+                }
+            };
+
+            window.addEventListener('message', messageHandler);
+            return () => window.removeEventListener('message', messageHandler);
+        };
+
+        // Vérifier périodiquement pour les erreurs (TradingView peut mettre du temps à charger)
+        const interval = setInterval(checkForErrors, 2000);
+        const cleanup = checkForErrors();
+
+        return () => {
+            clearInterval(interval);
+            if (cleanup) cleanup();
+        };
+    }, [finalSymbols]);
+
     return (
         <div className="tradingview-widget-container" ref={containerRef}>
             <div className="tradingview-widget-container__widget"></div>
+            {/* BUG #4 FIX: Tooltip d'aide pour les symboles en erreur */}
+            <div 
+                className="absolute bottom-0 right-0 text-xs opacity-50 hover:opacity-100 transition-opacity"
+                style={{ 
+                    pointerEvents: 'none',
+                    fontSize: '10px',
+                    color: isDarkMode ? '#9ca3af' : '#6b7280'
+                }}
+                title="Les indicateurs avec ⚠️ peuvent avoir des données temporairement indisponibles. Survolez pour plus d'infos."
+            >
+                ℹ️
+            </div>
         </div>
     );
 }, (prevProps, nextProps) => {

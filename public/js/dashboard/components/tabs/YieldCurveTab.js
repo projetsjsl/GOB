@@ -298,6 +298,50 @@ const YieldCurveTab = () => {
 
 
 
+    // BUG #3 FIX: Empty state si erreur ou pas de données
+    if (error && !yieldData) {
+        return (
+            <div className={`flex flex-col items-center justify-center min-h-[500px] p-8 rounded-xl border-2 transition-colors duration-300 ${
+                darkMode
+                    ? 'bg-gray-800/50 border-dashed border-gray-700'
+                    : 'bg-gray-50 border-dashed border-gray-300'
+            }`}>
+                <div className="text-6xl mb-4 opacity-60">📈</div>
+                <h3 className={`text-xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    Impossible de charger la courbe des taux
+                </h3>
+                <p className={`text-sm text-center max-w-md mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    {error || 'Une erreur est survenue lors du chargement des données de la courbe des taux.'}
+                </p>
+                <button
+                    onClick={() => fetchYieldCurve(true)}
+                    className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
+                        darkMode
+                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                            : 'bg-blue-500 hover:bg-blue-600 text-white'
+                    }`}
+                >
+                    Réessayer
+                </button>
+            </div>
+        );
+    }
+
+    if (loading && !yieldData) {
+        return (
+            <div className={`flex flex-col items-center justify-center min-h-[500px] p-8 rounded-xl border-2 transition-colors duration-300 ${
+                darkMode
+                    ? 'bg-gray-800/50 border-dashed border-gray-700'
+                    : 'bg-gray-50 border-dashed border-gray-300'
+            }`}>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+                <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Chargement de la courbe des taux...
+                </p>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-6 max-w-[1600px] mx-auto pb-10">
             {/* Header */}

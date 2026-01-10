@@ -84,19 +84,41 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
     }, [currentNewsIndex]);
 
     const loadNews = async () => {
+        // BUG #2 FIX: Timeout de 5 secondes avec fallback UI
+        const loadingTimeout = setTimeout(() => {
+            setIsLoading(false);
+            // Afficher un message d'erreur si timeout
+            if (news.length === 0) {
+                setNews([{
+                    time: 'Aujourd\'hui',
+                    headline: 'Les actualités sont temporairement indisponibles. Veuillez réessayer plus tard.',
+                    source: 'Système',
+                    type: 'other',
+                    url: null,
+                    isError: true
+                }]);
+            }
+        }, 5000);
+
         try {
             setIsLoading(true);
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000);
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // Réduit à 5s comme recommandé
+            
             const response = await fetch(`/api/finviz-news?type=${newsType}&limit=40`, {
                 signal: controller.signal
             });
+            
             clearTimeout(timeoutId);
+            clearTimeout(loadingTimeout);
+            
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            
             const data = await response.json();
             if (data.success && data.news && data.news.length > 0) {
                 setNews(data.news);
             } else {
+                // Fallback avec données par défaut
                 setNews([{
                     time: 'Aujourd\'hui, 11:15 AM',
                     headline: 'Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data',
@@ -106,14 +128,29 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
                 }]);
             }
         } catch (error) {
+            clearTimeout(loadingTimeout);
             console.error('Erreur chargement actualités:', error);
-            setNews([{
-                time: 'Aujourd\'hui, 11:15 AM',
-                headline: 'Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data',
-                source: 'MarketWatch',
-                type: 'market',
-                url: 'https://www.marketwatch.com'
-            }]);
+            
+            // BUG #2 FIX: Afficher message d'erreur explicite au lieu de données par défaut
+            if (error.name === 'AbortError' || error.message.includes('Timeout')) {
+                setNews([{
+                    time: 'Aujourd\'hui',
+                    headline: 'Les actualités sont temporairement indisponibles. Veuillez réessayer plus tard.',
+                    source: 'Système',
+                    type: 'other',
+                    url: null,
+                    isError: true
+                }]);
+            } else {
+                // Pour autres erreurs, utiliser données par défaut
+                setNews([{
+                    time: 'Aujourd\'hui, 11:15 AM',
+                    headline: 'Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data',
+                    source: 'MarketWatch',
+                    type: 'market',
+                    url: 'https://www.marketwatch.com'
+                }]);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -437,12 +474,38 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
                         </div>
                     ) : (
                         <div className="px-6 text-sm flex items-center gap-2" style={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }}>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="8" x2="12" y2="12"></line>
-                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
-                            <span>Aucune actualité disponible</span>
+                            {currentNews && currentNews.isError ? (
+                                <>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4" style={{ color: '#ef4444' }}>
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                    </svg>
+                                    <span style={{ color: isDarkMode ? '#fca5a5' : '#dc2626' }}>
+                                        {currentNews.headline}
+                                    </span>
+                                    <button
+                                        onClick={() => loadNews()}
+                                        className="ml-2 px-2 py-1 rounded text-xs font-semibold transition-colors"
+                                        style={{
+                                            backgroundColor: isDarkMode ? 'rgba(239, 68, 68, 0.2)' : 'rgba(239, 68, 68, 0.1)',
+                                            color: '#ef4444',
+                                            border: `1px solid ${isDarkMode ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.2)'}`
+                                        }}
+                                    >
+                                        Réessayer
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                    </svg>
+                                    <span>Aucune actualité disponible</span>
+                                </>
+                            )}
                         </div>
                     )}
                 </div>

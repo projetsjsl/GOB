@@ -1360,18 +1360,46 @@ const StocksNewsTab = (props) => {
             </div>
             )}
 
-            {/* Message si aucune donnée */}
+            {/* BUG #3 FIX: EmptyState amélioré pour Portfolio */}
             {tickers.length === 0 && (
-                <div className="bg-yellow-900/20 backdrop-blur-sm rounded-lg p-6 border border-yellow-300/20">
-                    <div className="flex items-center gap-3">
-                        <span className="text-yellow-400 text-2xl">⚠️</span>
-                        <div>
-                            <h3 className="text-yellow-200 font-semibold">Aucun ticker configuré</h3>
-                            <p className="text-yellow-300/80 text-sm mt-1">
-                                Ajoutez des tickers dans l'onglet Seeking Alpha pour voir les données ici.
-                            </p>
-                        </div>
-                    </div>
+                <div className={`flex flex-col items-center justify-center min-h-[400px] p-8 rounded-xl border-2 transition-colors duration-300 ${
+                    isDarkMode
+                        ? 'bg-gray-800/50 border-dashed border-gray-700'
+                        : 'bg-gray-50 border-dashed border-gray-300'
+                }`}>
+                    <div className="text-6xl mb-4 opacity-60">📊</div>
+                    <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {tickerSource === 'portfolio' 
+                            ? 'Aucun titre dans votre portfolio'
+                            : tickerSource === 'watchlist'
+                            ? 'Aucun titre dans votre watchlist'
+                            : 'Aucun ticker configuré'}
+                    </h3>
+                    <p className={`text-sm text-center max-w-md mb-6 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {tickerSource === 'portfolio'
+                            ? 'Ajoutez des actions à votre portfolio pour commencer le suivi de vos investissements.'
+                            : tickerSource === 'watchlist'
+                            ? 'Ajoutez des titres à votre watchlist pour suivre leurs performances.'
+                            : 'Ajoutez des tickers dans l\'onglet Seeking Alpha pour voir les données ici.'}
+                    </p>
+                    {tickerSource === 'portfolio' && (
+                        <button
+                            onClick={() => {
+                                if (typeof safeSetActiveTab === 'function') {
+                                    safeSetActiveTab('titres-seeking');
+                                } else if (typeof setActiveTab === 'function') {
+                                    setActiveTab('titres-seeking');
+                                }
+                            }}
+                            className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
+                                isDarkMode
+                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                            }`}
+                        >
+                            Ajouter un titre
+                        </button>
+                    )}
                 </div>
             )}
 

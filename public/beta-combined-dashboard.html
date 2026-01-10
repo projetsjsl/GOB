@@ -16,6 +16,8 @@
     <!-- Variable d'environnement VITE_GROUP_CHAT_URL pour ChatGPTGroupTab -->
     <meta name="vite-group-chat-url" content="" id="vite-group-chat-url-meta" />
     <!-- Cache bust: 2025-10-15 21:00 -->
+    <!-- BUG #7 FIX: Précharger logo JSLAI pour chargement immédiat -->
+    <link rel="preload" href="/logojslaidark.jpg" as="image" type="image/jpeg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -1030,10 +1032,25 @@
             if (window.Toast) window.Toast.show(msg, type);
             else console.log('Toast:', msg);
         };
-        // Welcome Toast
+        // BUG #A3 FIX: Welcome Toast - Positionné en haut pour ne pas couvrir la navigation
         window.addEventListener('load', () => {
             setTimeout(() => {
-                if(window.showToast) window.showToast('Bienvenue sur votre Dashboard Premium', 'gold', 'JSLai Wealth');
+                if(window.showToast) {
+                    // Positionner le toast en haut au lieu du bas pour ne pas couvrir la navigation
+                    const toastContainer = document.getElementById('toast-container');
+                    if (toastContainer) {
+                        toastContainer.style.bottom = 'auto';
+                        toastContainer.style.top = '24px';
+                    }
+                    window.showToast('Bienvenue sur votre Dashboard Premium', 'gold', 'JSLai Wealth');
+                    // Réinitialiser la position après 3 secondes
+                    setTimeout(() => {
+                        if (toastContainer) {
+                            toastContainer.style.top = 'auto';
+                            toastContainer.style.bottom = '24px';
+                        }
+                    }, 3000);
+                }
             }, 1000);
         });
     </script>
