@@ -134,7 +134,7 @@
 2. `public/js/dashboard/state-persistence.js` - State persistence manager
 3. `public/css/wcag-accessibility-fixes.css` - Accessibilité WCAG AA
 4. `public/css/spacing-standardization.css` - Standardisation espacements
-5. `docs/CORRECTIONS_FINALES.md` - Documentation des corrections finales
+5. `docs/CORRECTIONS_BUGS_AUDIT.md` - Documentation des corrections (consolidée)
 
 ---
 
@@ -148,9 +148,7 @@
 6. `public/js/dashboard/app-inline.js` - Multiples corrections (widgets, Forex, LIVE, UI, state)
 7. `public/beta-combined-dashboard.html` - Ajout scripts CSS/JS
 8. `docs/CORRECTIONS_BUGS_AUDIT.md` - Suivi détaillé
-9. `docs/CORRECTIONS_UI_ACCESSIBILITY.md` - Documentation UI/UX
-10. `docs/CORRECTIONS_TECHNIQUES.md` - Documentation technique
-11. `docs/RESUME_CORRECTIONS_FINAL.md` - Résumé final
+9. `docs/RESUME_COMPLET_CORRECTIONS.md` - Documentation consolidée (ce document)
 
 ---
 
@@ -241,13 +239,8 @@
 
 1. `docs/RAPPORT_AUDIT_COMPLET_DASHBOARD_BETA.md` - Rapport d'audit original
 2. `docs/CORRECTIONS_BUGS_AUDIT.md` - Suivi détaillé des corrections
-3. `docs/CORRECTIONS_UI_ACCESSIBILITY.md` - Corrections UI/UX
-4. `docs/CORRECTIONS_TECHNIQUES.md` - Corrections techniques
-5. `docs/CORRECTIONS_FINALES.md` - Corrections finales
-6. `docs/RESUME_CORRECTIONS_FINAL.md` - Résumé final
-7. `docs/RESUME_COMPLET_CORRECTIONS.md` - Ce document
-8. `docs/TESTS_VISUELS_RESULTS.md` - Résultats tests visuels
-9. `docs/RESUME_TESTS_FINAL.md` - Résumé tests
+3. `docs/RESUME_COMPLET_CORRECTIONS.md` - Ce document (résumé consolidé)
+4. `docs/TESTS_FINAUX_COMPLETS.md` - Résultats tests complets
 
 ---
 
