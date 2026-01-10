@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, memo, useRef } from 'react';
 import type { TabProps } from '../../types';
 
 // Ground News Expandable Section Component
@@ -130,6 +130,12 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
     const [selectedTheme, setSelectedTheme] = useState('all');
     const [localFilteredNews, setLocalFilteredNews] = useState<any[]>([]);
     const [isApproximateMatch, setIsApproximateMatch] = useState(false);
+    
+    // BUG #1 FIX: Pagination et lazy loading pour éviter freeze
+    const [displayedCount, setDisplayedCount] = useState(20); // Limiter à 20 articles initialement
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const loadMoreRef = useRef<HTMLDivElement>(null);
+    const ARTICLES_PER_PAGE = 20;
 
     // Listes de filtres
     const sources = ['Bloomberg', 'Reuters', 'WSJ', 'CNBC', 'MarketWatch', 'La Presse', 'Les Affaires'];
@@ -320,7 +326,40 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
 
         setIsApproximateMatch(!hasExactMatches);
         setLocalFilteredNews(filtered);
+        // BUG #1 FIX: Réinitialiser le compteur d'affichage quand les filtres changent
+        setDisplayedCount(ARTICLES_PER_PAGE);
     }, [newsData, localFrenchOnly, selectedSource, selectedMarket, selectedTheme]);
+
+    // BUG #1 FIX: Intersection Observer pour lazy loading automatique
+    useEffect(() => {
+        if (!loadMoreRef.current || displayedCount >= localFilteredNews.length) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && !isLoadingMore) {
+                    setIsLoadingMore(true);
+                    // Debounce: charger plus d'articles après un court délai
+                    setTimeout(() => {
+                        setDisplayedCount(prev => Math.min(prev + ARTICLES_PER_PAGE, localFilteredNews.length));
+                        setIsLoadingMore(false);
+                    }, 300);
+                }
+            },
+            { threshold: 0.1, rootMargin: '200px' }
+        );
+
+        observer.observe(loadMoreRef.current);
+
+        return () => {
+            if (loadMoreRef.current) {
+                observer.unobserve(loadMoreRef.current);
+            }
+        };
+    }, [displayedCount, localFilteredNews.length, isLoadingMore]);
+
+    // Articles à afficher (limités par pagination)
+    const displayedNews = localFilteredNews.slice(0, displayedCount);
+    const hasMore = displayedCount < localFilteredNews.length;
 
     return (
         <div className="space-y-6">
@@ -511,7 +550,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
             {/* Ground News Section - Expandable */}
             <GroundNewsSection isDarkMode={isDarkMode} LucideIcon={LucideIcon} />
 
-            {/* Liste des nouvelles */}
+            {/* Liste des nouvelles avec pagination lazy */}
             <div className="space-y-4">
                 {localFilteredNews.length === 0 ? (
                     <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -526,7 +565,8 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                         </p>
                     </div>
                 ) : (
-                    localFilteredNews.map((article, index) => {
+                    <>
+                        {displayedNews.map((article, index) => {
                         const newsIconData = getNewsIcon(article.title, article.description, article.sentiment);
                         const credibility = getSourceCredibility(article.source?.name);
 
@@ -627,7 +667,44 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                                 </div>
                             </div>
                         );
-                    })
+                        })}
+                        
+                        {/* BUG #1 FIX: Intersection Observer trigger et bouton "Charger plus" */}
+                        {hasMore && (
+                            <div ref={loadMoreRef} className="flex justify-center py-6">
+                                {isLoadingMore ? (
+                                    <div className="flex items-center gap-2 text-gray-400">
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                                        <span>Chargement...</span>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={() => {
+                                            setIsLoadingMore(true);
+                                            setTimeout(() => {
+                                                setDisplayedCount(prev => Math.min(prev + ARTICLES_PER_PAGE, localFilteredNews.length));
+                                                setIsLoadingMore(false);
+                                            }, 300);
+                                        }}
+                                        className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
+                                            isDarkMode
+                                                ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                                                : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                        }`}
+                                    >
+                                        Charger plus ({localFilteredNews.length - displayedCount} restants)
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                        
+                        {/* Indicateur de fin */}
+                        {!hasMore && localFilteredNews.length > 0 && (
+                            <div className={`text-center py-4 text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                Tous les articles ont été chargés ({localFilteredNews.length} articles)
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

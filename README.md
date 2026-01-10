@@ -1,4 +1,4 @@
-﻿# GOB - JLab™ Dashboard
+# GOB - JLab™ Dashboard
 
 Dashboard financier complet avec JLab™ (ex-JStocks™) pour le Groupe Ouellet Bolduc.
 
@@ -31,7 +31,7 @@ Dashboard financier complet avec JLab™ (ex-JStocks™) pour le Groupe Ouellet 
 
 ### 🔧 Pour les développeurs
 - **[Plan d'implémentation](./docs/technical/COMPLETE_IMPLEMENTATION_PLAN.md)**
-- **[Résultats des tests](./docs/technical/TEST_RESULTS.md)**
+- **[Résultats des tests](./docs/TESTS_FINAUX_COMPLETS.md)** (ou voir `docs/TEST_RESULTS_BROWSER.md`)
 - **[Configuration APIs](./docs/api/CONFIGURATION_CLES_API.md)**
 - **⚠️ [Répertoire des Erreurs](./docs/REPERTOIRE_COMPLET_ERREURS.md)** - **CRITIQUE**: 32+ erreurs documentées avec solutions. **À consulter avant de coder**
 

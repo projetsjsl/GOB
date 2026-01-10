@@ -1,5 +1,0 @@
--- Vérifier la structure de la table emma_config
-SELECT column_name, data_type, is_nullable
-FROM information_schema.columns
-WHERE table_name = 'emma_config'
-ORDER BY ordinal_position;

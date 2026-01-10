@@ -1,0 +1,206 @@
+/* 
+ * UI #13 FIX: Standardisation des espacements entre composants
+ * 
+ * Problème: Utilisation inconsistante de gap-2, gap-4, gap-6, space-y-2, space-y-4, etc.
+ * Solution: Définir un système d'espacement cohérent basé sur une échelle de 4px
+ * 
+ * Échelle standardisée:
+ * - xs: 4px (gap-1, space-y-1)
+ * - sm: 8px (gap-2, space-y-2)
+ * - md: 16px (gap-4, space-y-4)
+ * - lg: 24px (gap-6, space-y-6)
+ * - xl: 32px (gap-8, space-y-8)
+ */
+
+/* =====================================================
+ * STANDARDISATION DES GAPS (Flexbox/Grid)
+ * ===================================================== */
+
+/* Gaps pour grilles de cartes (stocks, news) */
+.dashboard-grid,
+.stocks-grid,
+.news-grid {
+    gap: 24px !important; /* gap-6 standardisé */
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid,
+    .stocks-grid,
+    .news-grid {
+        gap: 16px !important; /* gap-4 sur mobile */
+    }
+}
+
+/* Gaps pour listes verticales */
+.dashboard-list,
+.news-list,
+.stocks-list {
+    gap: 16px !important; /* gap-4 standardisé */
+}
+
+/* Gaps pour éléments inline (boutons, badges) */
+.inline-group,
+.button-group,
+.badge-group {
+    gap: 8px !important; /* gap-2 standardisé */
+}
+
+/* =====================================================
+ * STANDARDISATION DES SPACE-Y (Espacement vertical)
+ * ===================================================== */
+
+/* Sections principales */
+.dashboard-section,
+.tab-content-section {
+    --section-spacing: 24px; /* space-y-6 */
+}
+
+.dashboard-section > * + *,
+.tab-content-section > * + * {
+    margin-top: var(--section-spacing) !important;
+}
+
+/* Sous-sections */
+.dashboard-subsection {
+    --subsection-spacing: 16px; /* space-y-4 */
+}
+
+.dashboard-subsection > * + * {
+    margin-top: var(--subsection-spacing) !important;
+}
+
+/* Groupes compacts (formulaires, métadonnées) */
+.compact-group,
+.metadata-group {
+    --compact-spacing: 8px; /* space-y-2 */
+}
+
+.compact-group > * + *,
+.metadata-group > * + * {
+    margin-top: var(--compact-spacing) !important;
+}
+
+/* =====================================================
+ * STANDARDISATION DES PADDINGS
+ * ===================================================== */
+
+/* Cards principales */
+.dashboard-card,
+.stock-card,
+.news-card {
+    padding: 24px !important; /* p-6 standardisé */
+}
+
+@media (max-width: 768px) {
+    .dashboard-card,
+    .stock-card,
+    .news-card {
+        padding: 16px !important; /* p-4 sur mobile */
+    }
+}
+
+/* Cards compactes */
+.compact-card {
+    padding: 16px !important; /* p-4 standardisé */
+}
+
+/* Containers de widgets */
+.widget-container {
+    padding: 16px !important; /* p-4 standardisé */
+}
+
+/* Headers de sections */
+.section-header {
+    padding-bottom: 16px !important; /* pb-4 standardisé */
+    margin-bottom: 16px !important; /* mb-4 standardisé */
+}
+
+/* =====================================================
+ * STANDARDISATION DES MARGINS
+ * ===================================================== */
+
+/* Marges entre sections principales */
+.section-spacing {
+    margin-bottom: 32px !important; /* mb-8 standardisé */
+}
+
+/* Marges entre sous-sections */
+.subsection-spacing {
+    margin-bottom: 24px !important; /* mb-6 standardisé */
+}
+
+/* Marges entre éléments de liste */
+.list-item-spacing {
+    margin-bottom: 16px !important; /* mb-4 standardisé */
+}
+
+/* =====================================================
+ * OVERRIDES POUR CAS SPÉCIFIQUES
+ * ===================================================== */
+
+/* Grid layouts avec espacement standardisé */
+.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 {
+    gap: 24px !important; /* gap-6 */
+}
+
+.grid-cols-1.md\:grid-cols-2 {
+    gap: 16px !important; /* gap-4 */
+}
+
+/* Espacement pour TradingView widgets */
+.tradingview-widget-container {
+    margin-bottom: 24px !important; /* mb-6 standardisé */
+}
+
+/* Espacement pour modals */
+.modal-content {
+    padding: 32px !important; /* p-8 standardisé */
+}
+
+.modal-header {
+    padding-bottom: 16px !important; /* pb-4 standardisé */
+    margin-bottom: 16px !important; /* mb-4 standardisé */
+}
+
+/* =====================================================
+ * UTILITAIRES POUR MIGRATION PROGRESSIVE
+ * ===================================================== */
+
+/* Classes utilitaires pour migration */
+.spacing-standard {
+    /* Applique l'espacement standardisé */
+    gap: 24px;
+}
+
+.spacing-compact {
+    /* Pour éléments compacts */
+    gap: 16px;
+}
+
+.spacing-tight {
+    /* Pour éléments très serrés */
+    gap: 8px;
+}
+
+/* =====================================================
+ * RESPONSIVE ADJUSTMENTS
+ * ===================================================== */
+
+@media (max-width: 640px) {
+    /* Réduire espacements sur mobile */
+    .dashboard-grid,
+    .stocks-grid,
+    .news-grid {
+        gap: 16px !important;
+    }
+    
+    .dashboard-card,
+    .stock-card,
+    .news-card {
+        padding: 12px !important;
+    }
+    
+    .section-spacing {
+        margin-bottom: 24px !important;
+    }
+}

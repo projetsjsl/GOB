@@ -516,13 +516,15 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             <>
                 <div className={`relative ${className}`}>
                     {/* Bouton d'agrandissement */}
+                    {/* UI #14 FIX: Standardiser position bouton Agrandir */}
                     <button
                         onClick={() => setIsExpanded(true)}
-                        className={`absolute top-2 right-2 z-10 p-1.5 md:p-2 rounded-lg transition-all duration-200 hover:scale-110 ${isDarkMode
+                        className={`expand-button absolute top-3 right-3 z-10 p-2 rounded-lg transition-all duration-200 hover:scale-110 ${isDarkMode
                             ? 'bg-gray-800/90 hover:bg-gray-700 text-white border border-gray-600 shadow-lg'
                             : 'bg-white/90 hover:bg-gray-100 text-gray-700 border border-gray-300 shadow-lg'
                             }`}
                         title="Agrandir dans une fenêtre"
+                        aria-label="Agrandir en plein écran"
                     >
                         <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
@@ -1062,14 +1064,50 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             };
         }, [gridWrapperReady]);
 
+        // PERF #16 FIX: State persistence pour éviter rechargement complet
         const [activeTab, setActiveTab] = useState(() => {
             if (typeof window !== 'undefined') {
+                // 1. Vérifier URL params
                 const params = new URLSearchParams(window.location.search);
                 const tab = params.get('tab');
                 if (tab) return tab;
+                
+                // 2. Vérifier state persistence
+                if (window.getTabState) {
+                    const savedState = window.getTabState('activeTab');
+                    if (savedState) return savedState;
+                }
+                
+                // 3. Vérifier localStorage direct (fallback)
+                try {
+                    const saved = localStorage.getItem('gob-active-tab');
+                    if (saved) return saved;
+                } catch (e) {
+                    console.warn('[StatePersistence] Error reading activeTab from localStorage:', e);
+                }
             }
             return 'marches-global';
         }); // Onglet par défaut: Marchés Globaux
+        
+        // PERF #16 FIX: Sauvegarder activeTab quand il change
+        useEffect(() => {
+            if (typeof window !== 'undefined' && activeTab) {
+                // Sauvegarder dans state persistence
+                if (window.saveTabState) {
+                    window.saveTabState('activeTab', activeTab);
+                }
+                // Sauvegarder aussi dans localStorage (fallback)
+                try {
+                    localStorage.setItem('gob-active-tab', activeTab);
+                } catch (e) {
+                    console.warn('[StatePersistence] Error saving activeTab to localStorage:', e);
+                }
+                // Mettre à jour l'URL sans recharger la page
+                const url = new URL(window.location);
+                url.searchParams.set('tab', activeTab);
+                window.history.replaceState({}, '', url);
+            }
+        }, [activeTab]);
 
         // New navigation state for 6-tab structure
         const [mainTab, setMainTab] = useState(() => {
@@ -5682,7 +5720,8 @@ STRUCTURE JSON OBLIGATOIRE:
                                     }`}>
                                     Compte
                                 </h3>
-                                <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                {/* UI #15 FIX: Améliorer contraste WCAG AA */}
+                                <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                     }`}>
                                     Gérez votre compte et vos préférences
                                 </p>
@@ -12113,7 +12152,8 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             }`}>
                                             🌅 Briefing Matin - 7h20 ET
                                         </h4>
-                                        <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                        {/* UI #15 FIX: Améliorer contraste WCAG AA */}
+                                <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                             }`}>
                                             Asie • Futures • Préouverture
                                         </p>
@@ -12139,7 +12179,8 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             }`}>
                                             ☀️ Briefing Midi - 11h50 ET
                                         </h4>
-                                        <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                        {/* UI #15 FIX: Améliorer contraste WCAG AA */}
+                                <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                             }`}>
                                             Wall Street • Clôture Europe
                                         </p>
@@ -12165,7 +12206,8 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             }`}>
                                             🌆 Briefing Soir - 16h20 ET
                                         </h4>
-                                        <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                        {/* UI #15 FIX: Améliorer contraste WCAG AA */}
+                                <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                             }`}>
                                             Clôture US • Asie Next
                                         </p>
@@ -12788,7 +12830,8 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                     }`}>
                                                     {briefing.subject}
                                                 </h4>
-                                                <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                {/* UI #15 FIX: Améliorer contraste WCAG AA */}
+                                <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                                     }`}>
                                                     {new Date(briefing.created_at).toLocaleString('fr-FR')}
                                                 </p>
@@ -24459,8 +24502,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             }, [activeSubTab, isDarkMode]);
 
              // Charger le script TradingView Forex Heat Map + Cross Rates
+            // BUG #2 FIX: Auto-load widgets même si sous-onglet pas encore sélectionné
             useEffect(() => {
-                if (activeSubTab !== 'forex' || activeTab !== 'markets-economy') return;
+                if (activeTab !== 'markets-economy') return;
+                // Charger automatiquement si on est sur l'onglet markets-economy
+                if (activeSubTab !== 'forex' && activeSubTab !== 'overview') return;
                 
                 // Heat Map
                 if (tradingViewForexRef.current) {
@@ -24503,11 +24549,45 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             }, [activeSubTab, isDarkMode, activeTab, remountKey]);
 
             // Charger le script TradingView Stock Heatmap (USA or TSX)
+            // BUG #5 FIX: Auto-load Heatmap TSX même si pas encore sélectionné
             useEffect(() => {
-                if (activeSubTab !== 'stocks' || activeTab !== 'markets-economy') return;
+                if (activeTab !== 'markets-economy') return;
+                // Charger automatiquement si on est sur l'onglet markets-economy
+                if (activeSubTab !== 'stocks' && activeSubTab !== 'overview') return;
                 
                 const container = heatmapSource === 'USA' ? tradingViewHeatmapRef.current : tradingViewHeatmapTSXRef.current;
-                if (!container) return;
+                if (!container) {
+                    // BUG #5 FIX: Essayer de charger TSX même si container pas encore monté
+                    if (heatmapSource === 'TSX' && tradingViewHeatmapTSXRef.current) {
+                        const tsxContainer = tradingViewHeatmapTSXRef.current;
+                        if (tsxContainer && tsxContainer.children.length === 0) {
+                            // Initialiser TSX heatmap
+                            tsxContainer.innerHTML = '';
+                            const script = document.createElement('script');
+                            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+                            script.type = 'text/javascript';
+                            script.async = true;
+                            script.innerHTML = JSON.stringify({
+                                dataSource: 'TSX',
+                                blockSize: 'market_cap_basic',
+                                blockColor: 'change',
+                                grouping: 'sector',
+                                locale: 'fr',
+                                symbolUrl: '',
+                                colorTheme: isDarkMode ? 'dark' : 'light',
+                                hasTopBar: true,
+                                isDataSetEnabled: true,
+                                isZoomEnabled: true,
+                                hasSymbolTooltip: true,
+                                isMonoSize: false,
+                                width: '100%',
+                                height: 1000
+                            });
+                            tsxContainer.appendChild(script);
+                        }
+                    }
+                    return;
+                }
 
                 container.innerHTML = '';
                 const script = document.createElement('script');
@@ -25687,7 +25767,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                             📊 Calendrier Économique (Investing.com)
                                         </h3>
-                                        <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        {/* UI #15 FIX: Améliorer contraste WCAG AA */}
+                                <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                                             Événements économiques majeurs et données en temps réel
                                         </p>
                                     </div>
@@ -25726,18 +25807,25 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         </div>
                     )}
 
+                    {/* BUG #11 FIX: S'assurer que le contenu Forex s'affiche visuellement */}
                     {activeSubTab === 'forex' && (
-                         <div className="space-y-6">
+                         <div className="space-y-6 animate-fade-in">
                             <ExpandableComponent title="Heat Map Forex" icon="💱" isDarkMode={isDarkMode}>
                                 <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                    <h3 className="p-4 text-lg font-bold">Heat Map Forex</h3>
-                                    <div className="tradingview-widget-container" style={{height: '900px'}} ref={tradingViewForexRef}></div>
+                                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                        <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Heat Map Forex</h3>
+                                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Force relative des devises principales</p>
+                                    </div>
+                                    <div className="tradingview-widget-container" style={{height: '900px', minHeight: '900px'}} ref={tradingViewForexRef}></div>
                                 </div>
                             </ExpandableComponent>
                             <ExpandableComponent title="Cross Rates" icon="💱" isDarkMode={isDarkMode}>
                                 <div className={`rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                    <h3 className="p-4 text-lg font-bold">Cross Rates</h3>
-                                    <div className="tradingview-widget-container" ref={tradingViewCrossRatesRef}></div>
+                                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                        <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Cross Rates</h3>
+                                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Taux de change croisés</p>
+                                    </div>
+                                    <div className="tradingview-widget-container" style={{height: '900px', minHeight: '900px'}} ref={tradingViewCrossRatesRef}></div>
                                 </div>
                             </ExpandableComponent>
                         </div>
@@ -25789,7 +25877,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                             📊 Vue d'ensemble des Marchés (Temps Réel)
                                         </h3>
-                                        <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        {/* UI #15 FIX: Améliorer contraste WCAG AA */}
+                                <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                                             Indices majeurs, Forex, Crypto - Données en direct
                                         </p>
                                     </div>
@@ -25807,7 +25896,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                             🔥 Heatmap Boursière
                                         </h3>
-                                        <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        {/* UI #15 FIX: Améliorer contraste WCAG AA */}
+                                <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                                             Visualisation des performances par secteur
                                         </p>
                                     </div>
@@ -25825,7 +25915,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                             🚀 Screener - Top Gainers & Losers
                                         </h3>
-                                        <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        {/* UI #15 FIX: Améliorer contraste WCAG AA */}
+                                <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                                             Actions les plus performantes et en baisse
                                         </p>
                                     </div>
@@ -25843,7 +25934,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                             📈 Courbe des Taux (Yield Curve)
                                         </h2>
-                                        <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        {/* UI #15 FIX: Améliorer contraste WCAG AA */}
+                                <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                                             Visualisation des taux obligataires US Treasury et Canada par maturité
                                         </p>
                                     </div>
@@ -27355,7 +27447,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         ></div>
                                     </div>
                                     <span 
-                                        className="text-[10px] font-bold tracking-wide relative z-10 uppercase"
+                                        className="text-[10px] font-bold tracking-wide relative z-10 uppercase animate-pulse"
                                         style={{ 
                                             color: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
                                                 ? '#00ff88'
@@ -27376,7 +27468,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                 ? `0 0 4px rgba(0, 255, 0, 0.5)`
                                                 : `0 0 4px rgba(var(--theme-success-rgb, 16, 185, 129), 0.4)`,
-                                            letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0.1em' : '0.08em'
+                                            letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0.1em' : '0.08em',
+                                            // BUG #10 FIX: Animation pulse pour indiquer données temps réel
+                                            animation: 'pulse 2s ease-in-out infinite'
                                         }}
                                     >
                                         LIVE

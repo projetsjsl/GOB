@@ -45,15 +45,15 @@
 6. `deploy-to-production.sh` - Script de déploiement
 7. `open-pr.sh` - Ouverture automatique du PR
 
-**Documentation (10 fichiers):**
-- FINAL_SUMMARY.md
-- COMPREHENSIVE_CODE_AUDIT.md
-- PRODUCTION_READINESS_REPORT.md
-- API_AUDIT_REPORT.md
-- REACT_GRID_LAYOUT_FIX_REPORT.md
-- INNERHTML_SECURITY_AUDIT.md
-- CONSOLE_LOG_CLEANUP_REPORT.md
-- POST_DEPLOY_QUICK_START.md
+**Documentation (10 fichiers - certains archivés dans Git):**
+- FINAL_SUMMARY.md (archivé - récupérable: `git show HEAD:FINAL_SUMMARY.md`)
+- COMPREHENSIVE_CODE_AUDIT.md (archivé - récupérable: `git show HEAD:COMPREHENSIVE_CODE_AUDIT.md`)
+- PRODUCTION_READINESS_REPORT.md (archivé - récupérable: `git show HEAD:PRODUCTION_READINESS_REPORT.md`)
+- API_AUDIT_REPORT.md (archivé - récupérable: `git show HEAD:API_AUDIT_REPORT.md`)
+- REACT_GRID_LAYOUT_FIX_REPORT.md (archivé - récupérable: `git show HEAD:REACT_GRID_LAYOUT_FIX_REPORT.md`)
+- INNERHTML_SECURITY_AUDIT.md (archivé - récupérable: `git show HEAD:INNERHTML_SECURITY_AUDIT.md`)
+- CONSOLE_LOG_CLEANUP_REPORT.md (archivé - récupérable: `git show HEAD:CONSOLE_LOG_CLEANUP_REPORT.md`)
+- POST_DEPLOY_QUICK_START.md (archivé - récupérable: `git show HEAD:POST_DEPLOY_QUICK_START.md`)
 - PR_DESCRIPTION.md
 - DEPLOYMENT_GUIDE.md (ce fichier)
 
@@ -356,17 +356,17 @@ Vercel Build Logs montrent:
 
 ### Documentation Disponible
 
-**Rapports Techniques:**
-- `FINAL_SUMMARY.md` - Rapport complet de mission (549 lignes)
-- `COMPREHENSIVE_CODE_AUDIT.md` - Audit technique détaillé (689 lignes)
-- `PRODUCTION_READINESS_REPORT.md` - Checklist de déploiement
-- `API_AUDIT_REPORT.md` - Inventaire complet des 101 APIs
-- `REACT_GRID_LAYOUT_FIX_REPORT.md` - Détails techniques du fix RGL
+**Rapports Techniques (archivés dans Git - récupérables):**
+- `FINAL_SUMMARY.md` - Rapport complet de mission (549 lignes) - `git show HEAD:FINAL_SUMMARY.md`
+- `COMPREHENSIVE_CODE_AUDIT.md` - Audit technique détaillé (689 lignes) - `git show HEAD:COMPREHENSIVE_CODE_AUDIT.md`
+- `PRODUCTION_READINESS_REPORT.md` - Checklist de déploiement - `git show HEAD:PRODUCTION_READINESS_REPORT.md`
+- `API_AUDIT_REPORT.md` - Inventaire complet des 101 APIs - `git show HEAD:API_AUDIT_REPORT.md`
+- `REACT_GRID_LAYOUT_FIX_REPORT.md` - Détails techniques du fix RGL - `git show HEAD:REACT_GRID_LAYOUT_FIX_REPORT.md`
 - `INNERHTML_SECURITY_AUDIT.md` - Audit de sécurité (137 occurrences)
 - `CONSOLE_LOG_CLEANUP_REPORT.md` - Plan de migration logger
 
 **Guides Pratiques:**
-- `POST_DEPLOY_QUICK_START.md` - Guide de validation rapide
+- `POST_DEPLOY_QUICK_START.md` - Guide de validation rapide (archivé - `git show HEAD:POST_DEPLOY_QUICK_START.md`)
 - `PR_DESCRIPTION.md` - Template de Pull Request
 - `DEPLOYMENT_GUIDE.md` - Ce guide
 

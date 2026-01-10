@@ -385,8 +385,19 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
                             {/* Divider */}
                             <div className="w-px h-6 flex-shrink-0" style={{ backgroundColor: isDarkMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.15)' }}></div>
                             
-                            {/* Headline */}
-                            <span className="news-headline font-semibold flex-1 truncate transition-colors duration-200" style={{ fontSize: '15px', lineHeight: '1.5' }}>
+                            {/* Headline - BUG #6 FIX: Améliorer ellipsis pour texte tronqué */}
+                            <span 
+                                className="news-headline font-semibold flex-1 transition-colors duration-200" 
+                                style={{ 
+                                    fontSize: '15px', 
+                                    lineHeight: '1.5',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    maxWidth: '600px'
+                                }}
+                                title={currentNews.headline}
+                            >
                                 {currentNews.headline}
                             </span>
                             
@@ -404,9 +415,12 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
                                     ></div>
                                 </div>
                                 
-                                {/* Counter */}
-                                <div className="px-2 py-0.5 rounded text-xs font-bold tabular-nums" style={{ color: 'var(--theme-primary, #10b981)' }}>
-                                    {currentNewsIndex + 1}/{news.length}
+                                {/* Counter - BUG #7 FIX: Ajouter label explicite */}
+                                <div className="px-2 py-0.5 rounded text-xs font-bold tabular-nums" style={{ color: 'var(--theme-primary, #10b981)' }} title={`Article ${currentNewsIndex + 1} sur ${news.length}`}>
+                                    <span className="hidden sm:inline">Article </span>
+                                    <strong>{currentNewsIndex + 1}</strong>
+                                    <span className="mx-0.5">/</span>
+                                    <strong>{news.length}</strong>
                                 </div>
                             </div>
                             

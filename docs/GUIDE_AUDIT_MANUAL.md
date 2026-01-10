@@ -12,10 +12,9 @@
    - Firefox: F12 ou Cmd+Option+K (Mac) / Ctrl+Shift+K (Windows)
 
 3. **Copier-coller le script d'audit:**
-   - Ouvrir le fichier `docs/AUDIT_AUTOMATED_SCRIPT.js`
-   - Copier tout le contenu
-   - Coller dans la console
-   - Appuyer sur Entrée
+   - Ouvrir le fichier `scripts/audit-complet-automatise.js` (script actif)
+   - OU utiliser le script automatisé: `node scripts/audit-complet-automatise.js`
+   - Pour usage manuel: Copier le contenu et coller dans la console
 
 4. **Exécuter l'audit complet:**
    ```javascript

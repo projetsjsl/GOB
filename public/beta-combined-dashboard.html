@@ -531,6 +531,8 @@
     <!-- Components needed by Grid Layout (load these first) -->
     <script type="text/babel" src="js/dashboard/components/tabs/StocksNewsTab.js"></script>
     <script type="text/babel" src="js/dashboard/components/TradingViewWidgets.js"></script>
+    <!-- TECH #1 FIX: Error Boundaries pour widgets -->
+    <script type="text/babel" src="js/dashboard/components/ErrorBoundary.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/MarketsEconomyTab.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/AskEmmaTab.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/VoiceAssistantTab.js"></script>
@@ -634,6 +636,10 @@
     
     <!-- Styles des thèmes -->
     <link rel="stylesheet" href="/css/themes.css">
+    <!-- UI #15 FIX: WCAG AA Accessibility - Dark Mode Text Contrast -->
+    <link rel="stylesheet" href="/css/wcag-accessibility-fixes.css">
+    <!-- UI #13 FIX: Standardisation des espacements -->
+    <link rel="stylesheet" href="/css/spacing-standardization.css">
     <!-- Google Fonts pour les polices personnalisées des thèmes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -641,6 +647,8 @@
 
     <!-- Environment Configuration from env-config.js -->
     <script src="/js/env-config.js"></script>
+    <!-- PERF #16 FIX: State Persistence pour éviter rechargement complet -->
+    <script src="/js/dashboard/state-persistence.js"></script>
     <!-- Mock API for Local Development -->
     <script src="/js/dashboard/mock-api.js"></script>
 

@@ -73,6 +73,10 @@
     // LAZY WIDGET WRAPPER
     // =====================================================
     // NOTE: No longer accepts isDarkMode prop - uses theme system
+    // TECH #1 FIX: Wrapper avec ErrorBoundary pour protéger contre les erreurs
+    // Get ErrorBoundary from window (loaded from ErrorBoundary.js) - déclaré une seule fois
+    const WidgetErrorBoundary = window.WidgetErrorBoundary || (({ children }) => children);
+    
     const LazyTVWidget = ({ children, name, height = 400 }) => {
         const [shouldLoad, setShouldLoad] = useState(false);
         const [isVisible, setIsVisible] = useState(false);
@@ -121,38 +125,42 @@
             });
         };
 
+        // TECH #1 FIX: Wrapper avec ErrorBoundary (WidgetErrorBoundary déjà déclaré en haut du composant)
         return (
-            <div ref={containerRef} style={{ height: height, width: '100%' }}>
-                {shouldLoad ? children : (
-                    <div className={`h-full w-full flex items-center justify-center rounded-lg ${light ? 'bg-gray-100' : 'bg-neutral-800'}`}>
-                        <div className="text-center p-4">
-                            <div className="animate-pulse mb-2">
-                                <div className={`w-12 h-12 mx-auto rounded-lg ${light ? 'bg-gray-200' : 'bg-neutral-700'}`}></div>
+            <WidgetErrorBoundary widgetName={name} isDarkMode={!light}>
+                <div ref={containerRef} style={{ height: height, width: '100%' }}>
+                    {shouldLoad ? children : (
+                        <div className={`h-full w-full flex items-center justify-center rounded-lg ${light ? 'bg-gray-100' : 'bg-neutral-800'}`}>
+                            <div className="text-center p-4">
+                                <div className="animate-pulse mb-2">
+                                    <div className={`w-12 h-12 mx-auto rounded-lg ${light ? 'bg-gray-200' : 'bg-neutral-700'}`}></div>
+                                </div>
+                                <p className={`text-sm ${light ? 'text-gray-600' : 'text-gray-400'}`}>
+                                    {isQueued ? '⏳ Chargement...' : requiresClick ? '📊 Widget disponible' : '📊 Widget TradingView'}
+                                </p>
+                                <p className={`text-xs mt-1 ${light ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    {name}
+                                </p>
+                                {requiresClick && (
+                                    <button
+                                        onClick={handleManualLoad}
+                                        className="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-lg transition-colors"
+                                    >
+                                        Charger le widget
+                                    </button>
+                                )}
                             </div>
-                            <p className={`text-sm ${light ? 'text-gray-600' : 'text-gray-400'}`}>
-                                {isQueued ? '⏳ Chargement...' : requiresClick ? '📊 Widget disponible' : '📊 Widget TradingView'}
-                            </p>
-                            <p className={`text-xs mt-1 ${light ? 'text-gray-400' : 'text-gray-500'}`}>
-                                {name}
-                            </p>
-                            {requiresClick && (
-                                <button
-                                    onClick={handleManualLoad}
-                                    className="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-lg transition-colors"
-                                >
-                                    Charger le widget
-                                </button>
-                            )}
                         </div>
-                    </div>
-                )}
-            </div>
+                    )}
+                </div>
+            </WidgetErrorBoundary>
         );
     };
 
     // =====================================================
     // 1. MARKET OVERVIEW WIDGET
     // =====================================================
+    // TECH #1 FIX: Wrapper avec ErrorBoundary (WidgetErrorBoundary déjà déclaré plus haut)
     const MarketOverviewWidget = ({ height = 450 }) => {
         const containerRef = useRef(null);
 
@@ -212,7 +220,12 @@
             return () => { container.innerHTML = ''; };
         }, []);
 
-        return <div ref={containerRef} style={{ height: height, width: '100%' }} />;
+        // TECH #1 FIX: Wrapper avec ErrorBoundary
+        return (
+            <WidgetErrorBoundary widgetName="Market Overview" isDarkMode={!isLightTheme()}>
+                <div ref={containerRef} style={{ height: height, width: '100%' }} />
+            </WidgetErrorBoundary>
+        );
     };
 
     // =====================================================

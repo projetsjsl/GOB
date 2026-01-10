@@ -9,6 +9,29 @@ const TradingViewTickerContent = React.memo(({
     setTickerExpandableOpen
 }) => {
     const containerRef = React.useRef(null);
+    
+    // PERF #17 FIX: Mémoriser les symboles finaux pour éviter recalculs
+    const finalSymbols = React.useMemo(() => {
+        // Obtenir tous les indices disponibles
+        const allIndices = window.getAllAvailableIndices ? window.getAllAvailableIndices() : {};
+        const flatIndices = Object.values(allIndices).flat();
+        
+        // Filtrer les indices sélectionnés
+        const symbolsToDisplay = flatIndices.filter(idx => 
+            selectedIndices && selectedIndices.includes(idx.proName)
+        );
+
+        // Si aucun indice sélectionné, utiliser les indices par défaut
+        return symbolsToDisplay.length > 0 
+            ? symbolsToDisplay 
+            : [
+                { proName: 'FOREXCOM:SPXUSD', title: 'S&P 500' },
+                { proName: 'FOREXCOM:NSXUSD', title: 'NASDAQ 100' },
+                { proName: 'FOREXCOM:DJI', title: 'Dow Jones' },
+                { proName: 'OANDA:XAUUSD', title: 'Gold' },
+                { proName: 'BITSTAMP:BTCUSD', title: 'Bitcoin' }
+            ];
+    }, [selectedIndices]);
 
     React.useEffect(() => {
         const container = containerRef.current;
@@ -20,32 +43,13 @@ const TradingViewTickerContent = React.memo(({
         widgetContainer.className = 'tradingview-widget-container__widget';
         container.appendChild(widgetContainer);
 
-        // Obtenir tous les indices disponibles
-        // window.getAllAvailableIndices est défini dans app-inline.js
-        const allIndices = window.getAllAvailableIndices ? window.getAllAvailableIndices() : {};
-        const flatIndices = Object.values(allIndices).flat();
-        
-        // Filtrer les indices sélectionnés
-        const symbolsToDisplay = flatIndices.filter(idx => 
-            selectedIndices.includes(idx.proName)
-        );
-
-        // Si aucun indice sélectionné, utiliser les indices par défaut
-        const finalSymbols = symbolsToDisplay.length > 0 
-            ? symbolsToDisplay 
-            : [
-                { proName: 'FOREXCOM:SPXUSD', title: 'S&P 500' },
-                { proName: 'FOREXCOM:NSXUSD', title: 'NASDAQ 100' },
-                { proName: 'FOREXCOM:DJI', title: 'Dow Jones' },
-                { proName: 'OANDA:XAUUSD', title: 'Gold' },
-                { proName: 'BITSTAMP:BTCUSD', title: 'Bitcoin' }
-            ];
-
         // Créer le script
         const script = document.createElement('script');
         script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
         script.type = 'text/javascript';
         script.async = true;
+        // BUG #4 FIX: Améliorer configuration pour E-Mini futures et autres symboles
+        // PERF #17 FIX: Utiliser finalSymbols mémorisé
         script.textContent = JSON.stringify({
             symbols: finalSymbols,
             colorTheme: isDarkMode ? 'dark' : 'light',
@@ -53,7 +57,10 @@ const TradingViewTickerContent = React.memo(({
             largeChartUrl: '',
             isTransparent: false,
             showSymbolLogo: true,
-            displayMode: 'adaptive'
+            displayMode: 'adaptive',
+            // Options supplémentaires pour meilleur affichage des futures
+            hideDateRanges: false,
+            showVolume: false
         });
 
         // Ajouter le script à son conteneur
@@ -191,21 +198,30 @@ const TradingViewTickerContent = React.memo(({
             }
         };
 
-    }, [isDarkMode, selectedIndices, setTickerExpandableUrl, setTickerExpandableTitle, setTickerExpandableOpen]);
+    }, [isDarkMode, finalSymbols, setTickerExpandableUrl, setTickerExpandableTitle, setTickerExpandableOpen]);
 
     return (
         <div className="tradingview-widget-container" ref={containerRef}>
             <div className="tradingview-widget-container__widget"></div>
         </div>
     );
+}, (prevProps, nextProps) => {
+    // PERF #17 FIX: Comparaison personnalisée pour éviter re-renders inutiles
+    return (
+        prevProps.isDarkMode === nextProps.isDarkMode &&
+        JSON.stringify(prevProps.selectedIndices) === JSON.stringify(nextProps.selectedIndices) &&
+        prevProps.setTickerExpandableUrl === nextProps.setTickerExpandableUrl &&
+        prevProps.setTickerExpandableTitle === nextProps.setTickerExpandableTitle &&
+        prevProps.setTickerExpandableOpen === nextProps.setTickerExpandableOpen
+    );
 });
 
-const TradingViewTicker = (props) => {
+const TradingViewTicker = React.memo((props) => {
     return (
         <LazyWrapper height="74px" placeholderTitle="Chargement Ticker...">
             <TradingViewTickerContent {...props} />
         </LazyWrapper>
     );
-};
+});
 
 window.TradingViewTicker = TradingViewTicker;

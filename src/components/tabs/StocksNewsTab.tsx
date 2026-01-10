@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Auto-converted from monolithic dashboard file
 // Component: StocksNewsTab (legacy markup preserved)
-import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import type { TabProps } from '../../types';
 import {
     StockListSkeleton,
@@ -52,6 +52,12 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
 
         const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
         const [expandedStock, setExpandedStock] = useState(null);
+        
+        // BUG #3 FIX: Pagination et lazy loading pour améliorer performance
+        const [displayedTickersCount, setDisplayedTickersCount] = useState(12); // Limiter à 12 tickers initialement
+        const [isLoadingMoreTickers, setIsLoadingMoreTickers] = useState(false);
+        const loadMoreTickersRef = useRef<HTMLDivElement>(null);
+        const TICKERS_PER_PAGE = 12;
 
         // Refs pour les widgets TradingView
         const marketOverviewRef = useRef(null);
@@ -202,6 +208,45 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                 }
             };
         }, [isDarkMode]);
+
+        // BUG #3 FIX: Intersection Observer pour lazy loading des tickers
+        useEffect(() => {
+            // Réinitialiser le compteur quand les tickers changent
+            if (tickers.length > 0) {
+                setDisplayedTickersCount(TICKERS_PER_PAGE);
+            }
+        }, [tickers.length]);
+
+        useEffect(() => {
+            if (!loadMoreTickersRef.current || displayedTickersCount >= tickers.length || isLoadingMoreTickers) return;
+
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    if (entries[0].isIntersecting) {
+                        setIsLoadingMoreTickers(true);
+                        // Debounce pour éviter trop de chargements
+                        setTimeout(() => {
+                            setDisplayedTickersCount(prev => Math.min(prev + TICKERS_PER_PAGE, tickers.length));
+                            setIsLoadingMoreTickers(false);
+                        }, 300);
+                    }
+                },
+                { threshold: 0.1, rootMargin: '100px' }
+            );
+
+            observer.observe(loadMoreTickersRef.current);
+
+            return () => {
+                if (loadMoreTickersRef.current) {
+                    observer.unobserve(loadMoreTickersRef.current);
+                }
+            };
+        }, [displayedTickersCount, tickers.length, isLoadingMoreTickers]);
+
+        // BUG #3 FIX: Mémoriser les tickers affichés pour éviter re-renders inutiles
+        const displayedTickers = useMemo(() => {
+            return tickers.slice(0, displayedTickersCount);
+        }, [tickers, displayedTickersCount]);
 
         const renderMarketBadge = window.DASHBOARD_UTILS?.renderMarketBadge
             ? (type) => window.DASHBOARD_UTILS.renderMarketBadge(type, isDarkMode)
@@ -983,8 +1028,10 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                 ))}
                             </div>
                         ) : (
+                            <>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {tickers.map((ticker) => {
+                                {/* BUG #3 FIX: Utiliser displayedTickers au lieu de tous les tickers */}
+                                {displayedTickers.map((ticker) => {
                                 const data = stockData[ticker] || {};
                                 const price = data.c || data.price || 0;
                                 const change = data.d || data.change || 0;
@@ -1092,6 +1139,37 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                 );
                             })}
                             </div>
+                            
+                            {/* BUG #3 FIX: Bouton et Intersection Observer pour charger plus de tickers */}
+                            {displayedTickersCount < tickers.length && (
+                                <div ref={loadMoreTickersRef} className="flex justify-center py-6">
+                                    <button
+                                        onClick={() => {
+                                            setIsLoadingMoreTickers(true);
+                                            setTimeout(() => {
+                                                setDisplayedTickersCount(prev => Math.min(prev + TICKERS_PER_PAGE, tickers.length));
+                                                setIsLoadingMoreTickers(false);
+                                            }, 300);
+                                        }}
+                                        disabled={isLoadingMoreTickers}
+                                        className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
+                                            isDarkMode
+                                                ? 'bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-700 disabled:text-gray-400'
+                                                : 'bg-blue-500 hover:bg-blue-600 text-white disabled:bg-gray-300 disabled:text-gray-500'
+                                        }`}
+                                    >
+                                        {isLoadingMoreTickers ? (
+                                            <span className="flex items-center gap-2">
+                                                <span className="animate-spin">⏳</span>
+                                                Chargement...
+                                            </span>
+                                        ) : (
+                                            `Charger plus (${tickers.length - displayedTickersCount} restants)`
+                                        )}
+                                    </button>
+                                </div>
+                            )}
+                            </>
                         )}
                     </div>
                 </div>
