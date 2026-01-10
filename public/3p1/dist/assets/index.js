@@ -34721,7 +34721,7 @@ const ValuationCharts = ({
     ] })
   ] });
 };
-const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, onSyncSelected, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, onOpenDataExplorer, isAdmin = false, onToggleAdmin }) => {
+const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onSetTickerType, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, onSyncSelected, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, onOpenDataExplorer, isAdmin = false, onToggleAdmin }) => {
   React.useEffect(() => {
     console.log(`📋 Sidebar: ${profiles.length} profil(s) reçu(s)`, profiles.map((p) => p.id).slice(0, 10));
   }, [profiles.length]);
@@ -34818,6 +34818,8 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
       filtered = filtered.filter((p) => p.isWatchlist === false);
     } else if (filterBy === "watchlist") {
       filtered = filtered.filter((p) => p.isWatchlist === true);
+    } else if (filterBy === "normal") {
+      filtered = filtered.filter((p) => p.isWatchlist === null || p.isWatchlist === void 0);
     }
     if (filterCountry !== "all") {
       filtered = filtered.filter((p) => p.info.country === filterCountry);
@@ -35170,18 +35172,59 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
                 ] })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                profile.isWatchlist !== null && profile.isWatchlist !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative group/type", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                   "button",
                   {
                     onClick: (e) => {
                       e.stopPropagation();
-                      onToggleWatchlist(profile.id);
+                      if (onSetTickerType) {
+                        const menu = document.createElement("div");
+                        menu.className = "absolute right-0 bottom-full mb-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 min-w-[140px]";
+                        menu.innerHTML = `
+                            <div class="py-1">
+                              <button class="w-full text-left px-3 py-2 text-xs hover:bg-slate-700 flex items-center gap-2 ${profile.isWatchlist === false ? "bg-yellow-900/30 text-yellow-400" : "text-slate-300"}" data-type="portfolio">
+                                <span>⭐</span> Portefeuille
+                              </button>
+                              <button class="w-full text-left px-3 py-2 text-xs hover:bg-slate-700 flex items-center gap-2 ${profile.isWatchlist === true ? "bg-blue-900/30 text-blue-400" : "text-slate-300"}" data-type="watchlist">
+                                <span>👁️</span> Watchlist
+                              </button>
+                              <button class="w-full text-left px-3 py-2 text-xs hover:bg-slate-700 flex items-center gap-2 ${profile.isWatchlist === null || profile.isWatchlist === void 0 ? "bg-slate-700 text-slate-300" : "text-slate-300"}" data-type="normal">
+                                <span>📋</span> Normal
+                              </button>
+                            </div>
+                          `;
+                        const handleMenuClick = (e22) => {
+                          const target = e22.target;
+                          const button = target.closest("button[data-type]");
+                          if (button) {
+                            const type = button.getAttribute("data-type");
+                            onSetTickerType(profile.id, type);
+                            document.body.removeChild(menu);
+                            document.removeEventListener("click", handleOutsideClick);
+                          }
+                        };
+                        const handleOutsideClick = (e22) => {
+                          if (!menu.contains(e22.target)) {
+                            document.body.removeChild(menu);
+                            document.removeEventListener("click", handleOutsideClick);
+                          }
+                        };
+                        menu.addEventListener("click", handleMenuClick);
+                        document.addEventListener("click", handleOutsideClick);
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        menu.style.position = "fixed";
+                        menu.style.right = `${window.innerWidth - rect.right}px`;
+                        menu.style.bottom = `${window.innerHeight - rect.top + 4}px`;
+                        document.body.appendChild(menu);
+                      } else {
+                        onToggleWatchlist(profile.id);
+                      }
                     },
-                    title: profile.isWatchlist ? "👁️ Watchlist (Non détenu)\n\nCe titre est dans votre watchlist (surveillé mais non détenu).\n\nCliquez pour déplacer vers le Portefeuille (⭐).\n\nLa watchlist contient les titres que vous surveillez mais ne détenez pas encore." : "⭐ Portefeuille (Détenu)\n\nCe titre est dans votre portefeuille (vous le détenez actuellement).\n\nCliquez pour déplacer vers la Watchlist (👁️).\n\nLe portefeuille contient les titres que vous détenez actuellement.\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation.",
-                    className: `p-1.5 rounded transition-colors ${profile.isWatchlist ? "text-blue-400 hover:bg-slate-700" : "text-yellow-500 hover:text-yellow-400 hover:bg-slate-700"}`,
-                    children: profile.isWatchlist ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-4 h-4 fill-current", style: { fill: "#eab308" } })
+                    title: profile.isWatchlist === false ? "⭐ Portefeuille (Détenu)\n\nCliquez pour changer le type:\n• ⭐ Portefeuille (actuel)\n• 👁️ Watchlist\n• 📋 Normal" : profile.isWatchlist === true ? "👁️ Watchlist (Surveillé)\n\nCliquez pour changer le type:\n• ⭐ Portefeuille\n• 👁️ Watchlist (actuel)\n• 📋 Normal" : "📋 Normal\n\nCliquez pour changer le type:\n• ⭐ Portefeuille\n• 👁️ Watchlist\n• 📋 Normal (actuel)",
+                    className: `p-1.5 rounded transition-colors ${profile.isWatchlist === false ? "text-yellow-500 hover:text-yellow-400 hover:bg-slate-700" : profile.isWatchlist === true ? "text-blue-400 hover:bg-slate-700" : "text-slate-500 hover:text-slate-400 hover:bg-slate-700"}`,
+                    children: profile.isWatchlist === false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-4 h-4 fill-current", style: { fill: "#eab308" } }) : profile.isWatchlist === true ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs", children: "📋" })
                   }
-                ),
+                ) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hidden group-hover:flex items-center gap-1", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
                     "button",
@@ -35232,26 +35275,43 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
         }
       ),
       isFiltersExpanded && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-2 sm:px-3 md:px-4 pb-2 sm:pb-3 md:pb-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-3 gap-1.5 sm:gap-2 mb-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 mb-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
             {
               onClick: () => setFilterBy("all"),
-              className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors ${filterBy === "all" ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
-              title: "Afficher tous les tickers (Portefeuille + Watchlist)",
-              children: "Tous"
+              className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors ${filterBy === "all" ? "bg-blue-600 text-white shadow-lg" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
+              title: `Afficher tous les tickers
+
+📊 Statistiques:
+• ⭐ Portefeuille: ${tickerStats.portfolio}
+• 👁️ Watchlist: ${tickerStats.watchlist}
+• 📋 Normaux: ${tickerStats.normal}
+• Total: ${tickerStats.total}`,
+              children: [
+                "Tous (",
+                tickerStats.total,
+                ")"
+              ]
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
             {
               onClick: () => setFilterBy("portfolio"),
-              className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${filterBy === "portfolio" ? "bg-yellow-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
-              title: "Afficher uniquement les tickers du portefeuille (titres détenus)",
+              className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${filterBy === "portfolio" ? "bg-yellow-600 text-white shadow-lg" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
+              title: `Afficher uniquement les tickers du portefeuille (titres détenus)
+
+⭐ ${tickerStats.portfolio} ticker(s) dans le portefeuille`,
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-3 h-3" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Portefeuille" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sm:hidden", children: "Port." })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sm:hidden", children: "Port." }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[9px]", children: [
+                  "(",
+                  tickerStats.portfolio,
+                  ")"
+                ] })
               ]
             }
           ),
@@ -35259,12 +35319,39 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
             "button",
             {
               onClick: () => setFilterBy("watchlist"),
-              className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${filterBy === "watchlist" ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
-              title: "Afficher uniquement les tickers de la watchlist (titres surveillés)",
+              className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${filterBy === "watchlist" ? "bg-blue-600 text-white shadow-lg" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
+              title: `Afficher uniquement les tickers de la watchlist (titres surveillés)
+
+👁️ ${tickerStats.watchlist} ticker(s) dans la watchlist`,
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-3 h-3" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Watchlist" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sm:hidden", children: "Watch" })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sm:hidden", children: "Watch" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[9px]", children: [
+                  "(",
+                  tickerStats.watchlist,
+                  ")"
+                ] })
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
+              onClick: () => setFilterBy("normal"),
+              className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${filterBy === "normal" ? "bg-slate-600 text-white shadow-lg" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
+              title: `Afficher uniquement les tickers normaux (hors portefeuille/watchlist)
+
+📋 ${tickerStats.normal} ticker(s) normaux`,
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs", children: "📋" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Normaux" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sm:hidden", children: "Norm." }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[9px]", children: [
+                  "(",
+                  tickerStats.normal,
+                  ")"
+                ] })
               ]
             }
           )
@@ -58247,6 +58334,24 @@ Vérifiez les logs de la console pour plus de détails.`;
       return newLib;
     });
   };
+  const handleSetTickerType = (id, type) => {
+    setLibrary((prev) => {
+      const profile2 = prev[id];
+      if (!profile2) return prev;
+      const updated = {
+        ...profile2,
+        isWatchlist: type === "portfolio" ? false : type === "watchlist" ? true : null
+      };
+      const newLib = { ...prev, [id]: updated };
+      saveToCache(newLib).catch((e) => {
+        console.warn("Failed to save to cache:", e);
+      });
+      if (id === activeId) {
+        setIsWatchlist(updated.isWatchlist);
+      }
+      return newLib;
+    });
+  };
   const handleResetData = () => {
     if (confirm("Voulez-vous remettre à zéro toutes les données historiques de ce profil ?")) {
       setData(INITIAL_DATA.map((d) => ({ ...d, priceHigh: 0, priceLow: 0, earningsPerShare: 0, dividendPerShare: 0, cashFlowPerShare: 0, bookValuePerShare: 0 })));
@@ -59653,6 +59758,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
             onDelete: handleDeleteTicker,
             onDuplicate: handleDuplicateTicker,
             onToggleWatchlist: handleToggleWatchlist,
+            onSetTickerType: handleSetTickerType,
             onLoadVersion: handleLoadSnapshot,
             onSyncFromSupabase: handleSyncFromSupabase,
             isLoadingTickers,

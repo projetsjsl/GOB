@@ -31,6 +31,7 @@ interface SidebarProps {
   onDelete: (id: string) => void;
   onDuplicate: (id: string) => void;
   onToggleWatchlist: (id: string) => void;
+  onSetTickerType?: (id: string, type: 'portfolio' | 'watchlist' | 'normal') => void;
   onLoadVersion: (snapshotId: string) => void;
   onSyncFromSupabase?: () => void;
   isLoadingTickers?: boolean;
@@ -47,7 +48,7 @@ interface SidebarProps {
 type SortOption = 'alphabetical' | 'alphabetical-desc' | 'lastModified' | 'lastModified-desc' | 'recommendation' | 'sector';
 type FilterOption = 'all' | 'portfolio' | 'watchlist';
 
-export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, onSyncSelected, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, onOpenDataExplorer, isAdmin = false, onToggleAdmin }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onSetTickerType, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, onSyncSelected, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, onOpenDataExplorer, isAdmin = false, onToggleAdmin }) => {
   // ✅ DEBUG: Log pour vérifier que les profils sont bien reçus
   React.useEffect(() => {
     console.log(`📋 Sidebar: ${profiles.length} profil(s) reçu(s)`, profiles.map(p => p.id).slice(0, 10));
@@ -191,11 +192,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
       p.info.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Filtrage par source (portefeuille/watchlist)
+    // Filtrage par source (portefeuille/watchlist/normal)
     if (filterBy === 'portfolio') {
       filtered = filtered.filter(p => p.isWatchlist === false); // Seulement team tickers (⭐)
     } else if (filterBy === 'watchlist') {
       filtered = filtered.filter(p => p.isWatchlist === true); // Seulement watchlist (👁️)
+    } else if (filterBy === 'normal') {
+      filtered = filtered.filter(p => p.isWatchlist === null || p.isWatchlist === undefined); // Seulement tickers normaux (📋)
     }
     // Si filterBy === 'all', on affiche tous (portfolio + watchlist + normal)
 
@@ -406,18 +409,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
       {/* Ticker List */}
       <div className="flex-1 overflow-y-auto px-2 pb-4 space-y-1 custom-scrollbar pt-2">
         <h3 className="text-xs font-semibold text-slate-500 uppercase px-2 mb-2 tracking-wider flex justify-between items-center">
-          <span className="cursor-help" title={`Liste de vos tickers\n\n📊 Statistiques:\n• ⭐ Portefeuille (team tickers): ${tickerStats.portfolio} tickers\n• 👁️ Watchlist (surveillés): ${tickerStats.watchlist} tickers\n• 📋 Normaux (hors team/watchlist): ${tickerStats.normal} tickers\n• Total: ${tickerStats.total} tickers\n\n⚠️ IMPORTANT:\n• ⭐ Étoile = Portefeuille (team tickers DÉTENUS)\n• 👁️ Œil = Watchlist (titres SURVEILLÉS)\n• Pas d'icône = Tickers normaux (hors team/watchlist)\n• Point coloré = Recommandation (ACHAT/CONSERVER/VENTE)\n\nUtilisez la barre de recherche pour filtrer par symbole ou nom.`}>Portefeuille</span>
+          <span className="cursor-help" title={`Liste de vos tickers\n\n📊 Statistiques:\n• ⭐ Portefeuille (team tickers): ${tickerStats.portfolio} tickers\n• 👁️ Watchlist (surveillés): ${tickerStats.watchlist} tickers\n• 📋 Normaux (hors team/watchlist): ${tickerStats.normal} tickers\n• Total: ${tickerStats.total} tickers\n\n⚠️ IMPORTANT:\n• ⭐ Étoile = Portefeuille (team tickers DÉTENUS)\n• 👁️ Œil = Watchlist (titres SURVEILLÉS)\n• 📋 = Tickers normaux (hors team/watchlist)\n• Point coloré = Recommandation (ACHAT/CONSERVER/VENTE)\n\nUtilisez les filtres ci-dessous pour filtrer par type.`}>
+            {filterBy === 'all' ? 'Tous les tickers' : filterBy === 'portfolio' ? '⭐ Portefeuille' : filterBy === 'watchlist' ? '👁️ Watchlist' : '📋 Normaux'}
+          </span>
           <div className="flex items-center gap-1.5">
-            {filterBy === 'all' && (
-              <>
-                <span className="text-[9px] bg-yellow-900/50 px-1.5 py-0.5 rounded text-yellow-400" title={`Portefeuille (team tickers): ${tickerStats.portfolio} tickers`}>⭐ {tickerStats.portfolio}</span>
-                <span className="text-[9px] bg-blue-900/50 px-1.5 py-0.5 rounded text-blue-400" title={`Watchlist: ${tickerStats.watchlist} tickers`}>👁️ {tickerStats.watchlist}</span>
-                {tickerStats.normal > 0 && (
-                  <span className="text-[9px] bg-slate-700/50 px-1.5 py-0.5 rounded text-slate-400" title={`Tickers normaux (hors team/watchlist): ${tickerStats.normal} tickers`}>📋 {tickerStats.normal}</span>
-                )}
-              </>
-            )}
-            <span className="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded-full text-slate-400 cursor-help" title={`Nombre de tickers affichés: ${filteredAndSortedProfiles.length} / ${profiles.length}\n\n${searchTerm ? `(Filtrés sur "${searchTerm}")` : ''}\n${filterBy !== 'all' ? `(Filtre: ${filterBy === 'portfolio' ? 'Portefeuille' : 'Watchlist'})` : ''}`}>{filteredAndSortedProfiles.length}</span>
+            {/* Toujours afficher les stats, même quand filtré */}
+            <span className={`text-[9px] px-1.5 py-0.5 rounded transition-colors ${
+              filterBy === 'portfolio' 
+                ? 'bg-yellow-600 text-white' 
+                : 'bg-yellow-900/50 text-yellow-400'
+            }`} title={`Portefeuille (team tickers): ${tickerStats.portfolio} tickers`}>⭐ {tickerStats.portfolio}</span>
+            <span className={`text-[9px] px-1.5 py-0.5 rounded transition-colors ${
+              filterBy === 'watchlist' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-blue-900/50 text-blue-400'
+            }`} title={`Watchlist: ${tickerStats.watchlist} tickers`}>👁️ {tickerStats.watchlist}</span>
+            <span className={`text-[9px] px-1.5 py-0.5 rounded transition-colors ${
+              filterBy === 'normal' 
+                ? 'bg-slate-600 text-white' 
+                : 'bg-slate-700/50 text-slate-400'
+            }`} title={`Tickers normaux: ${tickerStats.normal} tickers`}>📋 {tickerStats.normal}</span>
+            <span className="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded-full text-slate-400 cursor-help" title={`Nombre de tickers affichés: ${filteredAndSortedProfiles.length} / ${profiles.length}\n\n${searchTerm ? `(Filtrés sur "${searchTerm}")` : ''}\n${filterBy !== 'all' ? `(Filtre actif: ${filterBy === 'portfolio' ? 'Portefeuille' : filterBy === 'watchlist' ? 'Watchlist' : 'Normaux'})` : ''}`}>{filteredAndSortedProfiles.length}</span>
           </div>
         </h3>
         {filteredAndSortedProfiles.length === 0 ? (
@@ -529,25 +541,85 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
                 </div>
 
                 <div className="flex items-center gap-1">
-                  {/* Watchlist/Portfolio Toggle Icon - Affiché seulement si team ou watchlist */}
-                  {profile.isWatchlist !== null && profile.isWatchlist !== undefined && (
+                  {/* Menu de changement de type de ticker - Amélioré */}
+                  <div className="relative group/type">
+                    {/* Bouton principal avec icône selon le type */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        onToggleWatchlist(profile.id);
+                        // Si onSetTickerType existe, on ouvre un menu, sinon on toggle
+                        if (onSetTickerType) {
+                          // Créer un menu contextuel simple
+                          const menu = document.createElement('div');
+                          menu.className = 'absolute right-0 bottom-full mb-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 min-w-[140px]';
+                          menu.innerHTML = `
+                            <div class="py-1">
+                              <button class="w-full text-left px-3 py-2 text-xs hover:bg-slate-700 flex items-center gap-2 ${profile.isWatchlist === false ? 'bg-yellow-900/30 text-yellow-400' : 'text-slate-300'}" data-type="portfolio">
+                                <span>⭐</span> Portefeuille
+                              </button>
+                              <button class="w-full text-left px-3 py-2 text-xs hover:bg-slate-700 flex items-center gap-2 ${profile.isWatchlist === true ? 'bg-blue-900/30 text-blue-400' : 'text-slate-300'}" data-type="watchlist">
+                                <span>👁️</span> Watchlist
+                              </button>
+                              <button class="w-full text-left px-3 py-2 text-xs hover:bg-slate-700 flex items-center gap-2 ${(profile.isWatchlist === null || profile.isWatchlist === undefined) ? 'bg-slate-700 text-slate-300' : 'text-slate-300'}" data-type="normal">
+                                <span>📋</span> Normal
+                              </button>
+                            </div>
+                          `;
+                          
+                          const handleMenuClick = (e: MouseEvent) => {
+                            const target = e.target as HTMLElement;
+                            const button = target.closest('button[data-type]');
+                            if (button) {
+                              const type = button.getAttribute('data-type') as 'portfolio' | 'watchlist' | 'normal';
+                              onSetTickerType(profile.id, type);
+                              document.body.removeChild(menu);
+                              document.removeEventListener('click', handleOutsideClick);
+                            }
+                          };
+                          
+                          const handleOutsideClick = (e: MouseEvent) => {
+                            if (!menu.contains(e.target as Node)) {
+                              document.body.removeChild(menu);
+                              document.removeEventListener('click', handleOutsideClick);
+                            }
+                          };
+                          
+                          menu.addEventListener('click', handleMenuClick);
+                          document.addEventListener('click', handleOutsideClick);
+                          
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          menu.style.position = 'fixed';
+                          menu.style.right = `${window.innerWidth - rect.right}px`;
+                          menu.style.bottom = `${window.innerHeight - rect.top + 4}px`;
+                          
+                          document.body.appendChild(menu);
+                        } else {
+                          // Fallback vers toggle si onSetTickerType n'existe pas
+                          onToggleWatchlist(profile.id);
+                        }
                       }}
-                      title={profile.isWatchlist 
-                        ? "👁️ Watchlist (Non détenu)\n\nCe titre est dans votre watchlist (surveillé mais non détenu).\n\nCliquez pour déplacer vers le Portefeuille (⭐).\n\nLa watchlist contient les titres que vous surveillez mais ne détenez pas encore."
-                        : "⭐ Portefeuille (Détenu)\n\nCe titre est dans votre portefeuille (vous le détenez actuellement).\n\nCliquez pour déplacer vers la Watchlist (👁️).\n\nLe portefeuille contient les titres que vous détenez actuellement.\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation."}
-                      className={`p-1.5 rounded transition-colors ${profile.isWatchlist ? 'text-blue-400 hover:bg-slate-700' : 'text-yellow-500 hover:text-yellow-400 hover:bg-slate-700'}`}
+                      title={profile.isWatchlist === false 
+                        ? "⭐ Portefeuille (Détenu)\n\nCliquez pour changer le type:\n• ⭐ Portefeuille (actuel)\n• 👁️ Watchlist\n• 📋 Normal"
+                        : profile.isWatchlist === true
+                        ? "👁️ Watchlist (Surveillé)\n\nCliquez pour changer le type:\n• ⭐ Portefeuille\n• 👁️ Watchlist (actuel)\n• 📋 Normal"
+                        : "📋 Normal\n\nCliquez pour changer le type:\n• ⭐ Portefeuille\n• 👁️ Watchlist\n• 📋 Normal (actuel)"}
+                      className={`p-1.5 rounded transition-colors ${
+                        profile.isWatchlist === false 
+                          ? 'text-yellow-500 hover:text-yellow-400 hover:bg-slate-700' 
+                          : profile.isWatchlist === true
+                          ? 'text-blue-400 hover:bg-slate-700'
+                          : 'text-slate-500 hover:text-slate-400 hover:bg-slate-700'
+                      }`}
                     >
-                      {profile.isWatchlist ? (
+                      {profile.isWatchlist === false ? (
+                        <StarIcon className="w-4 h-4 fill-current" style={{ fill: '#eab308' }} />
+                      ) : profile.isWatchlist === true ? (
                         <EyeIcon className="w-4 h-4" />
                       ) : (
-                        <StarIcon className="w-4 h-4 fill-current" style={{ fill: '#eab308' }} />
+                        <span className="text-xs">📋</span>
                       )}
                     </button>
-                  )}
+                  </div>
 
                   {/* Other Actions (Hidden unless hovered) */}
                   <div className="hidden group-hover:flex items-center gap-1">
@@ -605,44 +677,60 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
         {/* Contenu des filtres (collapsible) */}
         {isFiltersExpanded && (
           <div className="px-2 sm:px-3 md:px-4 pb-2 sm:pb-3 md:pb-4">
-            {/* Filter Buttons */}
-        <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mb-2">
+            {/* Filter Buttons - Amélioré avec 4 options */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 mb-2">
           <button
             onClick={() => setFilterBy('all')}
             className={`px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors ${
               filterBy === 'all'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-blue-600 text-white shadow-lg'
                 : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
             }`}
-            title="Afficher tous les tickers (Portefeuille + Watchlist)"
+            title={`Afficher tous les tickers\n\n📊 Statistiques:\n• ⭐ Portefeuille: ${tickerStats.portfolio}\n• 👁️ Watchlist: ${tickerStats.watchlist}\n• 📋 Normaux: ${tickerStats.normal}\n• Total: ${tickerStats.total}`}
           >
-            Tous
+            Tous ({tickerStats.total})
           </button>
           <button
             onClick={() => setFilterBy('portfolio')}
             className={`px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${
               filterBy === 'portfolio'
-                ? 'bg-yellow-600 text-white'
+                ? 'bg-yellow-600 text-white shadow-lg'
                 : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
             }`}
-            title="Afficher uniquement les tickers du portefeuille (titres détenus)"
+            title={`Afficher uniquement les tickers du portefeuille (titres détenus)\n\n⭐ ${tickerStats.portfolio} ticker(s) dans le portefeuille`}
           >
             <StarIcon className="w-3 h-3" />
             <span className="hidden sm:inline">Portefeuille</span>
             <span className="sm:hidden">Port.</span>
+            <span className="text-[9px]">({tickerStats.portfolio})</span>
           </button>
           <button
             onClick={() => setFilterBy('watchlist')}
             className={`px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${
               filterBy === 'watchlist'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-blue-600 text-white shadow-lg'
                 : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
             }`}
-            title="Afficher uniquement les tickers de la watchlist (titres surveillés)"
+            title={`Afficher uniquement les tickers de la watchlist (titres surveillés)\n\n👁️ ${tickerStats.watchlist} ticker(s) dans la watchlist`}
           >
             <EyeIcon className="w-3 h-3" />
             <span className="hidden sm:inline">Watchlist</span>
             <span className="sm:hidden">Watch</span>
+            <span className="text-[9px]">({tickerStats.watchlist})</span>
+          </button>
+          <button
+            onClick={() => setFilterBy('normal')}
+            className={`px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${
+              filterBy === 'normal'
+                ? 'bg-slate-600 text-white shadow-lg'
+                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+            }`}
+            title={`Afficher uniquement les tickers normaux (hors portefeuille/watchlist)\n\n📋 ${tickerStats.normal} ticker(s) normaux`}
+          >
+            <span className="text-xs">📋</span>
+            <span className="hidden sm:inline">Normaux</span>
+            <span className="sm:hidden">Norm.</span>
+            <span className="text-[9px]">({tickerStats.normal})</span>
           </button>
         </div>
 

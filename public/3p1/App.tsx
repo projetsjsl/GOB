@@ -2757,6 +2757,30 @@ export default function App() {
         });
     };
 
+    const handleSetTickerType = (id: string, type: 'portfolio' | 'watchlist' | 'normal') => {
+        setLibrary(prev => {
+            const profile = prev[id];
+            if (!profile) return prev;
+
+            const updated = {
+                ...profile,
+                isWatchlist: type === 'portfolio' ? false : type === 'watchlist' ? true : null
+            };
+
+            const newLib = { ...prev, [id]: updated };
+            saveToCache(newLib).catch(e => {
+                console.warn('Failed to save to cache:', e);
+            });
+
+            // If modifying currently active profile, sync local state
+            if (id === activeId) {
+                setIsWatchlist(updated.isWatchlist);
+            }
+
+            return newLib;
+        });
+    };
+
     const handleResetData = () => {
         if (confirm("Voulez-vous remettre à zéro toutes les données historiques de ce profil ?")) {
             setData(INITIAL_DATA.map(d => ({ ...d, priceHigh: 0, priceLow: 0, earningsPerShare: 0, dividendPerShare: 0, cashFlowPerShare: 0, bookValuePerShare: 0 })));
@@ -4548,6 +4572,7 @@ export default function App() {
                         onDelete={handleDeleteTicker}
                         onDuplicate={handleDuplicateTicker}
                         onToggleWatchlist={handleToggleWatchlist}
+                        onSetTickerType={handleSetTickerType}
                         onLoadVersion={handleLoadSnapshot}
                         onSyncFromSupabase={handleSyncFromSupabase}
                         isLoadingTickers={isLoadingTickers}
