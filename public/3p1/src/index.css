@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* BUG #3P1-1 FIX: Empêcher la troncature avec espaces au milieu des mots */
+/* Override global pour les textes de LandingPage */
+h1, h2, h3, p {
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+}
+
+/* Surtout pour les titres et textes importants */
+h1 span, h2 span, h3 span {
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+}
+
 /* Custom scrollbar for cleaner look in complex tables */
 ::-webkit-scrollbar {
   width: 8px;

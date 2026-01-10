@@ -8926,7 +8926,7 @@ Source: FMP API (company-profile)
 Symbole: ${info.preferredSymbol || info.symbol}
 Secteur: ${info.sector || "N/A"}
 Pays: ${info.country || "N/A"}
-Bourse: ${info.exchange || "N/A"}`, children: info.name }),
+Bourse: ${info.exchange || "N/A"}`, children: info.name === "Chargement..." ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-600 normal-case", children: "Données non disponibles - Veuillez sélectionner un ticker" }) : info.name }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-1 sm:gap-2 mt-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 sm:hidden", children: "GOB" }),
             info.exchange && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded cursor-help", title: `Bourse: ${info.exchange}
@@ -9066,8 +9066,9 @@ Source: FMP key-metrics`, children: [
             step: "0.01",
             value: assumptions.currentPrice,
             onChange: (e) => handleNumericChange(e, "currentPrice", 0.01),
-            className: "border border-gray-300 rounded px-2 py-1 text-base sm:text-lg font-bold text-blue-700 focus:ring-2 focus:ring-blue-500 outline-none invalid:border-red-500 invalid:text-red-600",
-            title: "Prix Actuel\\n\\nPrix du marché en temps réel de l'action.\\nSource: FMP API (quote)\\n\\nVous pouvez modifier manuellement si nécessaire.\\nUtilisé pour:\\n• Calcul du rendement total\\n• Calcul du JPEGY\\n• Calcul du Ratio 3:1\\n• Zones de prix recommandées"
+            className: `border rounded px-2 py-1 text-base sm:text-lg font-bold focus:ring-2 focus:ring-blue-500 outline-none ${assumptions.currentPrice === 0 || assumptions.currentPrice === null || assumptions.currentPrice === void 0 ? "border-red-300 text-red-600 focus:ring-red-500" : "border-gray-300 text-blue-700 invalid:border-red-500 invalid:text-red-600"}`,
+            placeholder: assumptions.currentPrice === 0 ? "Prix requis" : "",
+            title: "Prix Actuel\\n\\nPrix du marché en temps réel de l'action.\\nSource: FMP API (quote)\\n\\nVous pouvez modifier manuellement si nécessaire.\\nUtilisé pour:\\n• Calcul du rendement total\\n• Calcul du JPEGY\\n• Calcul du Ratio 3:1\\n• Zones de prix recommandées\\n\\n⚠️ Le prix doit être > 0 pour les calculs"
           }
         )
       ] }),
@@ -9094,18 +9095,18 @@ Source: FMP key-metrics`, children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$L, { className: "w-3 h-3" }),
           " Rendement (Yield)"
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-2 py-1 text-base sm:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help", title: `Rendement du dividende: ${formatPercent(assumptions.currentDividend / assumptions.currentPrice * 100)}
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-2 py-1 text-base sm:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help", title: `Rendement du dividende: ${assumptions.currentPrice > 0 ? formatPercent(assumptions.currentDividend / assumptions.currentPrice * 100) : "N/A"}
 
 Formule: (Dividende / Prix Actuel) × 100
 
-Calculé automatiquement à partir du dividende et du prix actuel.`, children: formatPercent(assumptions.currentDividend / assumptions.currentPrice * 100) })
+Calculé automatiquement à partir du dividende et du prix actuel.`, children: assumptions.currentPrice > 0 ? formatPercent(assumptions.currentDividend / assumptions.currentPrice * 100) : "N/A" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 cursor-help", title: "Capitalisation boursière (Market Cap)\\n\\nValeur totale de l'entreprise en bourse.\\nFormule: Prix Actuel × Nombre d'actions en circulation\\n\\nSource: FMP API", children: "Capitalisation" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-2 py-1 text-sm sm:text-base md:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help truncate", title: `Capitalisation: ${info.marketCap}
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-2 py-1 text-sm sm:text-base md:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help truncate", title: `Capitalisation: ${info.marketCap || "Non disponible"}
 
 Valeur totale de l'entreprise calculée par:
-Prix Actuel × Nombre d'actions en circulation`, children: info.marketCap })
+Prix Actuel × Nombre d'actions en circulation`, children: info.marketCap && info.marketCap.trim() !== "" ? info.marketCap : "N/A" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Année de départ pour les projections à 5 ans", children: [
@@ -9115,11 +9116,11 @@ Prix Actuel × Nombre d'actions en circulation`, children: info.marketCap })
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "select",
           {
-            value: assumptions.baseYear,
+            value: assumptions.baseYear || "",
             onChange: (e) => onUpdateAssumption("baseYear", parseInt(e.target.value)),
             className: "border border-gray-300 rounded px-2 py-1.5 text-sm sm:text-base md:text-lg font-medium text-gray-700 focus:ring-2 focus:ring-blue-500 outline-none bg-white h-[38px]",
             title: "Année de Base\\n\\nAnnée de référence pour toutes les projections à 5 ans.\\n\\nSélectionnez l'année qui servira de point de départ:\\n• Généralement la dernière année complète\\n• Ou l'année estimée N+1 si disponible\\n\\nToutes les valeurs projetées (EPS, CF, BV, DIV) partiront de cette année.\\n\\nModifier l'année de base recalcule automatiquement toutes les projections.",
-            children: availableYears.map((year) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: year, children: year }, year))
+            children: availableYears.length > 0 ? availableYears.map((year) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: year, children: year }, year)) : /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: "Sélectionner une année" })
           }
         )
       ] })
@@ -37154,7 +37155,7 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
   const currentPE = baseEPS > 0 ? assumptions.currentPrice / baseEPS : 0;
   const currentPCF = assumptions.currentPrice / ((lastData == null ? void 0 : lastData.cashFlowPerShare) || 1);
   const currentPBV = assumptions.currentPrice / ((lastData == null ? void 0 : lastData.bookValuePerShare) || 1);
-  const currentYield = assumptions.currentDividend / assumptions.currentPrice * 100;
+  const currentYield = assumptions.currentPrice > 0 && assumptions.currentDividend >= 0 ? assumptions.currentDividend / assumptions.currentPrice * 100 : 0;
   const forwardEPS = baseEPS * (1 + assumptions.growthRateEPS / 100);
   const forwardPE = forwardEPS > 0 ? assumptions.currentPrice / forwardEPS : 0;
   const hasValidEPS = baseEPS > 0.01 && isFinite(baseEPS);
@@ -40814,12 +40815,12 @@ const LandingPage = ({ onGetStarted }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$8, { className: "w-8 h-8" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-3xl font-bold", children: "3P1" })
       ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("h1", { className: "text-5xl md:text-6xl font-extrabold text-white mb-6 leading-tight", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("h1", { className: "text-5xl md:text-6xl font-extrabold text-white mb-6 leading-tight", style: { wordBreak: "normal", overflowWrap: "normal" }, children: [
         "Analyse Financière",
         /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent", children: "Propulsée par l'IA" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent", style: { wordBreak: "normal", overflowWrap: "normal" }, children: "Propulsée par l'IA" })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl md:text-2xl text-slate-300 mb-12 max-w-3xl mx-auto", children: "Prenez des décisions d'investissement éclairées avec notre plateforme professionnelle d'analyse de valorisation" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl md:text-2xl text-slate-300 mb-12 max-w-3xl mx-auto", style: { wordBreak: "normal", overflowWrap: "normal" }, children: "Prenez des décisions d'investissement éclairées avec notre plateforme professionnelle d'analyse de valorisation" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "button",
         {
@@ -40833,7 +40834,7 @@ const LandingPage = ({ onGetStarted }) => {
       )
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-3xl md:text-4xl font-bold text-white text-center mb-12", children: "Comment ça fonctionne" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-3xl md:text-4xl font-bold text-white text-center mb-12", style: { wordBreak: "normal", overflowWrap: "normal" }, children: "Comment ça fonctionne" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid md:grid-cols-3 gap-8", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-4 -left-4 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg", children: "1" }),
@@ -40853,8 +40854,8 @@ const LandingPage = ({ onGetStarted }) => {
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-3xl md:text-4xl font-bold text-white mb-4", children: "Prêt à commencer votre analyse?" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl text-blue-100 mb-8 max-w-2xl mx-auto", children: "Accédez instantanément à notre plateforme d'analyse professionnelle" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-3xl md:text-4xl font-bold text-white mb-4", style: { wordBreak: "normal", overflowWrap: "normal" }, children: "Prêt à commencer votre analyse?" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl text-blue-100 mb-8 max-w-2xl mx-auto", style: { wordBreak: "normal", overflowWrap: "normal" }, children: "Accédez instantanément à notre plateforme d'analyse professionnelle" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "button",
         {
