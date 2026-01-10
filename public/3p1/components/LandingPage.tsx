@@ -42,8 +42,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           <button
             onClick={onGetStarted}
             className="group inline-flex items-center space-x-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300"
+            style={{ wordBreak: 'normal', overflowWrap: 'normal' }}
           >
-            <span>Commencer l'analyse</span>
+            <span style={{ wordBreak: 'normal', overflowWrap: 'normal', whiteSpace: 'normal' }}>Commencer l'analyse</span>
             <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
@@ -111,8 +112,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           <button
             onClick={onGetStarted}
             className="group inline-flex items-center space-x-3 bg-white text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300"
+            style={{ wordBreak: 'normal', overflowWrap: 'normal' }}
           >
-            <span>Lancer l'application</span>
+            <span style={{ wordBreak: 'normal', overflowWrap: 'normal', whiteSpace: 'normal' }}>Lancer l'application</span>
             <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>

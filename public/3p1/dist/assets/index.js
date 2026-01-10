@@ -34963,7 +34963,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
           title: "Data Explorer - Supabase Tables\\n\\n• Visualiser toutes les tables 3P1\\n• Voir les dernières mises à jour\\n• Exporter en Excel/CSV\\n• Synchronisation sélective",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-4 h-4" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Data Explorer" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { wordBreak: "normal", overflowWrap: "normal", whiteSpace: "normal" }, children: "Data Explorer" })
           ]
         }
       )
@@ -40826,8 +40826,9 @@ const LandingPage = ({ onGetStarted }) => {
         {
           onClick: onGetStarted,
           className: "group inline-flex items-center space-x-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300",
+          style: { wordBreak: "normal", overflowWrap: "normal" },
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Commencer l'analyse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { wordBreak: "normal", overflowWrap: "normal", whiteSpace: "normal" }, children: "Commencer l'analyse" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-5 h-5 group-hover:translate-x-1 transition-transform" })
           ]
         }
@@ -40861,8 +40862,9 @@ const LandingPage = ({ onGetStarted }) => {
         {
           onClick: onGetStarted,
           className: "group inline-flex items-center space-x-3 bg-white text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300",
+          style: { wordBreak: "normal", overflowWrap: "normal" },
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Lancer l'application" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { wordBreak: "normal", overflowWrap: "normal", whiteSpace: "normal" }, children: "Lancer l'application" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-5 h-5 group-hover:translate-x-1 transition-transform" })
           ]
         }
