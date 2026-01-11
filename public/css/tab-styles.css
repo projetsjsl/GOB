@@ -1,0 +1,18 @@
+/**
+ * Styles pour les Tabs
+ * 
+ * Extrait depuis beta-combined-dashboard.html
+ * Styles pour la gestion des onglets et leur contenu
+ */
+
+/* =====================================================
+ * TAB CONTENT MANAGEMENT
+ * ===================================================== */
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}

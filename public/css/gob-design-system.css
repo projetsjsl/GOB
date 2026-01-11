@@ -23,6 +23,9 @@
 /* Composants Emma IA */
 @import './emma-components.css';
 
+/* Styles pour les tabs */
+@import './tab-styles.css';
+
 /* =====================================================
  * 1. DESIGN TOKENS (Variables CSS)
  * ===================================================== */
