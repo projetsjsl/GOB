@@ -60066,15 +60066,15 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
     ] });
   }
   const profile = library[activeId] || DEFAULT_PROFILE;
+  const profileInfoName = profile.info.name;
   reactExports.useEffect(() => {
-    const profileInfo = profile.info;
-    if (!showLanding && !showDemo && (!activeId || profileInfo.name === "Chargement...")) {
+    if (!showLanding && !showDemo && (!activeId || profileInfoName === "Chargement...")) {
       const timer = setTimeout(() => {
         setShowDemo(true);
       }, 1e3);
       return () => clearTimeout(timer);
     }
-  }, [showLanding, activeId, profile.info.name, showDemo, profile]);
+  }, [showLanding, activeId, profileInfoName, showDemo]);
   const handleUpdateProfile = (id, updates) => {
     setLibrary((prev) => {
       if (!prev[id]) return prev;

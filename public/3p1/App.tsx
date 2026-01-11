@@ -4528,18 +4528,18 @@ export default function App() {
     }
 
     const profile = library[activeId] || DEFAULT_PROFILE; // Ensure profile is always available
+    const profileInfoName = profile.info.name; // Extraire pour éviter les références instables
     
     // Afficher le démo si aucun ticker n'est sélectionné ou si les données ne sont pas chargées
     useEffect(() => {
-        const profileInfo = profile.info;
-        if (!showLanding && !showDemo && (!activeId || profileInfo.name === 'Chargement...')) {
+        if (!showLanding && !showDemo && (!activeId || profileInfoName === 'Chargement...')) {
             // Attendre un peu pour que l'interface se charge
             const timer = setTimeout(() => {
                 setShowDemo(true);
             }, 1000);
             return () => clearTimeout(timer);
         }
-    }, [showLanding, activeId, profile.info.name, showDemo, profile]);
+    }, [showLanding, activeId, profileInfoName, showDemo]);
 
     // Handler générique pour mettre à jour un profil complet (utilisé par KPIDashboard)
     const handleUpdateProfile = (id: string, updates: Partial<AnalysisProfile>) => {
