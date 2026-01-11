@@ -9127,10 +9127,10 @@ Calculé automatiquement à partir du dividende et du prix actuel.`, children: a
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 cursor-help", title: "Capitalisation boursière (Market Cap)\\n\\nValeur totale de l'entreprise en bourse.\\nFormule: Prix Actuel × Nombre d'actions en circulation\\n\\nSource: FMP API", children: "Capitalisation" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-2 py-1 text-sm sm:text-base md:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help truncate", title: `Capitalisation: ${info.marketCap || "Non disponible"}
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-2 py-1 text-sm sm:text-base md:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help truncate", title: `Capitalisation: ${typeof info.marketCap === "string" ? info.marketCap : info.marketCap || "Non disponible"}
 
 Valeur totale de l'entreprise calculée par:
-Prix Actuel × Nombre d'actions en circulation`, children: info.marketCap && info.marketCap.trim() !== "" ? info.marketCap : "N/A" })
+Prix Actuel × Nombre d'actions en circulation`, children: info.marketCap && typeof info.marketCap === "string" && info.marketCap.trim() !== "" ? info.marketCap : typeof info.marketCap === "number" ? info.marketCap.toLocaleString() : "N/A" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Année de départ pour les projections à 5 ans", children: [

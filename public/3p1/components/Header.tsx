@@ -297,8 +297,8 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex flex-col">
           <label className="text-xs font-semibold text-gray-500 uppercase mb-1 cursor-help" title="Capitalisation boursière (Market Cap)\n\nValeur totale de l'entreprise en bourse.\nFormule: Prix Actuel × Nombre d'actions en circulation\n\nSource: FMP API">Capitalisation</label>
           {/* BUG #3P1-5 FIX: Afficher N/A si données manquantes */}
-          <div className="px-2 py-1 text-sm sm:text-base md:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help truncate" title={`Capitalisation: ${info.marketCap || 'Non disponible'}\n\nValeur totale de l'entreprise calculée par:\nPrix Actuel × Nombre d'actions en circulation`}>
-            {info.marketCap && info.marketCap.trim() !== '' ? info.marketCap : 'N/A'}
+          <div className="px-2 py-1 text-sm sm:text-base md:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help truncate" title={`Capitalisation: ${typeof info.marketCap === 'string' ? info.marketCap : (info.marketCap || 'Non disponible')}\n\nValeur totale de l'entreprise calculée par:\nPrix Actuel × Nombre d'actions en circulation`}>
+            {info.marketCap && typeof info.marketCap === 'string' && info.marketCap.trim() !== '' ? info.marketCap : (typeof info.marketCap === 'number' ? info.marketCap.toLocaleString() : 'N/A')}
           </div>
         </div>
         <div className="flex flex-col">
