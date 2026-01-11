@@ -56,21 +56,21 @@ describe('Card Component', () => {
 
   it('should apply variant classes', () => {
     const { rerender } = render(<Card variant="default">Default</Card>);
-    let card = screen.getByText('Default').parentElement;
+    let card = screen.getByText('Default');
     expect(card).toHaveClass('bg-gob-bg-secondary');
 
     rerender(<Card variant="elevated">Elevated</Card>);
-    card = screen.getByText('Elevated').parentElement;
+    card = screen.getByText('Elevated');
     expect(card).toHaveClass('shadow-gob-lg');
   });
 
   it('should apply padding classes', () => {
     const { rerender } = render(<Card padding="sm">Small</Card>);
-    let card = screen.getByText('Small').parentElement;
+    let card = screen.getByText('Small');
     expect(card).toHaveClass('p-2');
 
     rerender(<Card padding="lg">Large</Card>);
-    card = screen.getByText('Large').parentElement;
+    card = screen.getByText('Large');
     expect(card).toHaveClass('p-6');
   });
 });
