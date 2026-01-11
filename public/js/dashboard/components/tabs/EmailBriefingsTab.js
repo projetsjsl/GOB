@@ -389,12 +389,18 @@ const EmailBriefingsTab = () => {
                             marketData: { ...prev.marketData, request: marketDataRequest }
                         }));
 
+                        // ✅ FIX BUG-017: Timeout réduit à 8s (au lieu de 120s) pour éviter les timeouts
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 8000);
+                        
                         const dataResponse = await fetch('/api/ai-services', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(marketDataRequest),
-                            signal: AbortSignal.timeout(120000) // 120 secondes timeout pour Perplexity
+                            signal: controller.signal
                         });
+                        
+                        clearTimeout(timeoutId);
                         
                         addLogEntry('MARKET_DATA', 'Réponse reçue', { 
                             status: dataResponse.status,
@@ -479,7 +485,12 @@ const EmailBriefingsTab = () => {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(newsRequest),
-                            signal: AbortSignal.timeout(120000) // 120 secondes timeout pour Perplexity
+                            // ✅ FIX BUG-017: Timeout réduit à 8s
+                            signal: (() => {
+                                const controller = new AbortController();
+                                setTimeout(() => controller.abort(), 8000);
+                                return controller.signal;
+                            })()
                         });
                         
                         addLogEntry('NEWS', 'Réponse actualités reçue', { 
@@ -764,7 +775,12 @@ RÉPONDS EN JSON UNIQUEMENT:
                                     date: new Date().toISOString()
                                 }
                             }),
-                            signal: AbortSignal.timeout(60000)
+                            // ✅ FIX BUG-017: Timeout réduit à 8s
+                            signal: (() => {
+                                const controller = new AbortController();
+                                setTimeout(() => controller.abort(), 8000);
+                                return controller.signal;
+                            })()
                         });
 
                         const result = await response.json();
@@ -820,7 +836,12 @@ RÉPONDS EN JSON UNIQUEMENT:
                                     news_limit: 10
                                 }
                             }),
-                            signal: AbortSignal.timeout(90000)
+                            // ✅ FIX BUG-017: Timeout réduit à 8s
+                            signal: (() => {
+                                const controller = new AbortController();
+                                setTimeout(() => controller.abort(), 8000);
+                                return controller.signal;
+                            })()
                         });
 
                         const result = await response.json();
@@ -1253,7 +1274,12 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                         trending_topics: intentData.trending_topics
                                     }
                                 }),
-                                signal: AbortSignal.timeout(300000) // 5 minutes pour briefing complexe
+                                // ✅ FIX BUG-017: Timeout réduit à 8s (au lieu de 5 minutes)
+                                signal: (() => {
+                                    const controller = new AbortController();
+                                    setTimeout(() => controller.abort(), 8000);
+                                    return controller.signal;
+                                })()
                             });
 
                             clearTimeout(warningTimer1);

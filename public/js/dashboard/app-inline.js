@@ -1089,6 +1089,23 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             return 'marches-global';
         }); // Onglet par défaut: Marchés Globaux
         
+        // ✅ FIX BUG-021: Synchroniser activeTab avec l'URL (bidirectionnel)
+        useEffect(() => {
+            // Lire l'URL au chargement initial
+            if (typeof window !== 'undefined') {
+                const params = new URLSearchParams(window.location.search);
+                const urlTab = params.get('tab');
+                if (urlTab && urlTab !== activeTab) {
+                    console.log(`[Routing] Tab depuis URL: ${urlTab}, activeTab actuel: ${activeTab}`);
+                    // Si l'URL a un tab différent, le synchroniser
+                    const mapping = TAB_ID_MAPPING[urlTab];
+                    if (mapping || MAIN_TABS.find(t => t.id === urlTab) || SUB_TABS[urlTab]) {
+                        handleNewTabChange(urlTab);
+                    }
+                }
+            }
+        }, []); // Seulement au montage
+        
         // PERF #16 FIX: Sauvegarder activeTab quand il change
         useEffect(() => {
             if (typeof window !== 'undefined' && activeTab) {
@@ -1102,10 +1119,14 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 } catch (e) {
                     console.warn('[StatePersistence] Error saving activeTab to localStorage:', e);
                 }
-                // Mettre à jour l'URL sans recharger la page
+                // ✅ FIX BUG-021: Mettre à jour l'URL sans recharger la page
                 const url = new URL(window.location);
-                url.searchParams.set('tab', activeTab);
-                window.history.replaceState({}, '', url);
+                const currentTab = url.searchParams.get('tab');
+                if (currentTab !== activeTab) {
+                    url.searchParams.set('tab', activeTab);
+                    window.history.replaceState({}, '', url);
+                    console.log(`[Routing] URL mise à jour: tab=${activeTab}`);
+                }
             }
         }, [activeTab]);
 
@@ -1133,8 +1154,19 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             return 'jlab'; // default
         };
         
-        // Tab loading state for visual feedback
+        // Tab loading state for visual feedback avec timeout automatique
         const [tabLoading, setTabLoading] = useState(false);
+        
+        // ✅ FIX BUG-018: Timeout automatique pour tabLoading (3 secondes max)
+        React.useEffect(() => {
+            if (tabLoading) {
+                const timeout = setTimeout(() => {
+                    console.warn('[handleNewTabChange] Timeout: tabLoading nettoyé après 3s');
+                    setTabLoading(false);
+                }, 3000);
+                return () => clearTimeout(timeout);
+            }
+        }, [tabLoading]);
         
         const [navigationHistory, setNavigationHistory] = useState([]); // Historique de navigation pour le bouton Back
         const [tickers, setTickers] = useState([]);
@@ -1332,11 +1364,13 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         // Configuration API
         const API_BASE_URL = (window.location && window.location.origin) ? window.location.origin : '';
         
-        // Helper function pour fetch avec timeout et retry
-        const fetchWithTimeoutAndRetry = async (url, options = {}, timeoutMs = 10000, maxRetries = 2) => {
+        // ✅ FIX BUG-017: Helper function pour fetch avec timeout et retry (timeout réduit à 8s)
+        const fetchWithTimeoutAndRetry = async (url, options = {}, timeoutMs = 8000, maxRetries = 1) => {
             for (let attempt = 0; attempt <= maxRetries; attempt++) {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+                const timeoutId = setTimeout(() => {
+                    controller.abort();
+                }, timeoutMs);
 
                 try {
                     const response = await fetch(url, {
@@ -1835,7 +1869,16 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 // 4) Appliquer la navigation legacy (historique, intros, etc.)
                 handleTabChange(targetTabId);
 
+                // ✅ FIX BUG-018: Nettoyer tabLoading après navigation (avec timeout de sécurité)
                 setTimeout(() => setTabLoading(false), 100);
+                
+                // ✅ FIX BUG-018: Timeout de sécurité supplémentaire (3s max)
+                setTimeout(() => {
+                    if (tabLoading) {
+                        console.warn('[handleNewTabChange] Timeout sécurité: tabLoading forcé à false');
+                        setTabLoading(false);
+                    }
+                }, 3000);
             });
         };
 
@@ -2495,10 +2538,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 // Utiliser l'endpoint unifié qui agrège toutes les sources avec déduplication et scoring
                 addLog(`🔍 Récupération depuis endpoint unifié (contexte: ${newsContext})...`, 'info');
 
+                // ✅ FIX BUG-017: Timeout réduit à 8s (au lieu de 10s) pour éviter les timeouts
                 const response = await fetchWithTimeoutAndRetry(
                     `${API_BASE_URL}/api/news?q=${encodeURIComponent(tickersQuery)}&limit=100&context=${newsContext}`,
                     {},
-                    10000, // 10 secondes pour news (peut être long)
+                    8000, // 8 secondes max (recommandation rapport externe: 5-8s)
                     1
                 );
 
@@ -10885,7 +10929,12 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(marketDataRequest),
-                        signal: AbortSignal.timeout(60000) // 60 secondes timeout pour Perplexity (réduit de 120s)
+                        // ✅ FIX BUG-017: Timeout réduit à 8s (au lieu de 60s)
+                        signal: (() => {
+                            const controller = new AbortController();
+                            setTimeout(() => controller.abort(), 8000);
+                            return controller.signal;
+                        })()
                     });
 
                     addLogEntry('MARKET_DATA', 'Réponse reçue', {
@@ -10971,7 +11020,12 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(newsRequest),
-                        signal: AbortSignal.timeout(60000) // 60 secondes timeout pour Perplexity (réduit de 120s)
+                        // ✅ FIX BUG-017: Timeout réduit à 8s (au lieu de 60s)
+                        signal: (() => {
+                            const controller = new AbortController();
+                            setTimeout(() => controller.abort(), 8000);
+                            return controller.signal;
+                        })()
                     });
 
                     addLogEntry('NEWS', 'Réponse actualités reçue', {
@@ -11312,7 +11366,12 @@ RÉPONDS EN JSON UNIQUEMENT:
                                 news_limit: 10
                             }
                         }),
-                        signal: AbortSignal.timeout(90000)
+                        // ✅ FIX BUG-017: Timeout réduit à 8s
+                        signal: (() => {
+                            const controller = new AbortController();
+                            setTimeout(() => controller.abort(), 8000);
+                            return controller.signal;
+                        })()
                     });
 
                     const result = await response.json();
@@ -11745,7 +11804,12 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     trending_topics: intentData.trending_topics
                                 }
                             }),
-                            signal: AbortSignal.timeout(300000) // 5 minutes pour briefing complexe
+                            // ✅ FIX BUG-017: Timeout réduit à 8s (au lieu de 5 minutes)
+                            signal: (() => {
+                                const controller = new AbortController();
+                                setTimeout(() => controller.abort(), 8000);
+                                return controller.signal;
+                            })()
                         });
 
                         clearTimeout(warningTimer1);

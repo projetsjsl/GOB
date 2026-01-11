@@ -235,8 +235,8 @@ export default async function handler(req, res) {
             
             if (loaded === total) resolve(true);
             
-            // Timeout après 10 secondes
-            setTimeout(() => resolve(true), 10000);
+            // ✅ FIX BUG-017: Timeout réduit à 5 secondes (au lieu de 10s)
+            setTimeout(() => resolve(true), 5000);
           });
         }
         
