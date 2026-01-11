@@ -34,6 +34,7 @@ Résoudre tous les problèmes de console (console.log en production) et les prob
 - ✅ Ajoute automatiquement les imports `logger` si nécessaire
 
 **Fichiers critiques traités:**
+
 - `public/js/dashboard/app-inline.js`
 - `public/beta-combined-dashboard.html`
 - `src/components/BetaCombinedDashboard.tsx`
@@ -44,6 +45,7 @@ Résoudre tous les problèmes de console (console.log en production) et les prob
 #### `src/types.ts`
 
 **Avant:**
+
 ```typescript
 export interface StockData {
   [key: string]: any;  // ❌ Type unsafe
@@ -77,6 +79,7 @@ export interface SeekingAlphaData {
 #### `src/App.tsx`
 
 **Avant:**
+
 ```typescript
 declare const Chart: any;  // ❌
 if ((window as any).__GOB_DASHBOARD_MOUNTED) {  // ❌
@@ -106,6 +109,7 @@ if (win.__GOB_DASHBOARD_MOUNTED) {
 #### `src/utils/fetchHybridData.ts`
 
 **Avant:**
+
 ```typescript
 data?: any;  // ❌
 news?: any[];  // ❌
@@ -127,6 +131,7 @@ news?: Array<Record<string, unknown>>;  // ✅
 ### 4. Amélioration de TabProps
 
 **Types améliorés:**
+
 - `githubUser`: Interface spécifique au lieu de `any`
 - `finvizNews`: `Record<string, NewsArticle[]>` au lieu de `Record<string, any>`
 - `seekingAlphaStockData`: `Record<string, StockData>` au lieu de `Record<string, any>`
@@ -141,12 +146,14 @@ news?: Array<Record<string, unknown>>;  // ✅
 ## 📊 Résultats
 
 ### Avant
+
 - ❌ 2076 occurrences de `console.log` dans 199 fichiers
 - ❌ 20+ utilisations de `any` dans TypeScript
 - ❌ Erreurs TypeScript non résolues
 - ❌ Console.log visible en production
 
 ### Après
+
 - ✅ Console wrapper actif en production
 - ✅ Types TypeScript améliorés (0 erreurs de compilation)
 - ✅ Script de remplacement disponible pour fichiers critiques
