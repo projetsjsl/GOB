@@ -1099,12 +1099,26 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                     console.log(`[Routing] Tab depuis URL: ${urlTab}, activeTab actuel: ${activeTab}`);
                     // Si l'URL a un tab différent, le synchroniser
                     const mapping = TAB_ID_MAPPING[urlTab];
-                    if (mapping || MAIN_TABS.find(t => t.id === urlTab) || SUB_TABS[urlTab]) {
+                    if (mapping || MAIN_TABS.find(t => t.id === urlTab) || Object.values(SUB_TABS).flat().find(s => s.id === urlTab)) {
                         handleNewTabChange(urlTab);
                     }
                 }
             }
         }, []); // Seulement au montage
+        
+        // ✅ FIX BUG-021: Écouter les changements d'URL (popstate pour bouton retour navigateur)
+        useEffect(() => {
+            const handlePopState = (event) => {
+                const params = new URLSearchParams(window.location.search);
+                const urlTab = params.get('tab');
+                if (urlTab && urlTab !== activeTab) {
+                    console.log(`[Routing] URL changée (popstate): ${urlTab}`);
+                    handleNewTabChange(urlTab);
+                }
+            };
+            window.addEventListener('popstate', handlePopState);
+            return () => window.removeEventListener('popstate', handlePopState);
+        }, [activeTab]);
         
         // PERF #16 FIX: Sauvegarder activeTab quand il change
         useEffect(() => {
