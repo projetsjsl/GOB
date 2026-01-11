@@ -1,0 +1,63 @@
+/**
+ * GOB Dashboard - Main CSS Entry Point
+ * 
+ * Point d'entrée unique pour tous les styles du dashboard
+ * Remplace les 22 fichiers CSS dispersés par une structure organisée
+ */
+
+/* 1. Design Tokens (variables CSS) */
+@import './tokens.css';
+
+/* 2. Tailwind Base */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 3. Base Styles (migré depuis src/index.css) */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--gob-bg-primary);
+  color: var(--gob-text-primary);
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html {
+  height: 100%;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+#root {
+  height: 100%;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 4. Thèmes (importé depuis public/css/themes.css mais consolidé ici) */
+/* Note: Les styles de thèmes dynamiques sont gérés par theme-system.js */
+/* Ce fichier contient les styles statiques pour les thèmes */
+
+/* 5. Standardisation des espacements */
+@import './spacing.css';
+
+/* 6. Accessibilité */
+@import './accessibility.css';
+
+/* 7. Composants globaux */
+@import './components.css';

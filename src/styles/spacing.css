@@ -1,0 +1,153 @@
+/**
+ * Standardisation des Espacements
+ * 
+ * Migré depuis public/css/spacing-standardization.css
+ * Utilise les variables CSS du design system
+ */
+
+/* =====================================================
+ * STANDARDISATION DES GAPS (Flexbox/Grid)
+ * ===================================================== */
+
+.dashboard-grid,
+.stocks-grid,
+.news-grid {
+    gap: var(--gob-spacing-lg) !important; /* 24px */
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid,
+    .stocks-grid,
+    .news-grid {
+        gap: var(--gob-spacing-md) !important; /* 16px */
+    }
+}
+
+.dashboard-list,
+.news-list,
+.stocks-list {
+    gap: var(--gob-spacing-md) !important; /* 16px */
+}
+
+.inline-group,
+.button-group,
+.badge-group {
+    gap: var(--gob-spacing-sm) !important; /* 8px */
+}
+
+/* =====================================================
+ * STANDARDISATION DES SPACE-Y (Espacement vertical)
+ * ===================================================== */
+
+.dashboard-section,
+.tab-content-section {
+    --section-spacing: var(--gob-spacing-lg);
+}
+
+.dashboard-section > * + *,
+.tab-content-section > * + * {
+    margin-top: var(--section-spacing) !important;
+}
+
+.dashboard-subsection {
+    --subsection-spacing: var(--gob-spacing-md);
+}
+
+.dashboard-subsection > * + * {
+    margin-top: var(--subsection-spacing) !important;
+}
+
+.compact-group,
+.metadata-group {
+    --compact-spacing: var(--gob-spacing-sm);
+}
+
+.compact-group > * + *,
+.metadata-group > * + * {
+    margin-top: var(--compact-spacing) !important;
+}
+
+/* =====================================================
+ * STANDARDISATION DES PADDINGS
+ * ===================================================== */
+
+.dashboard-card,
+.stock-card,
+.news-card {
+    padding: var(--gob-spacing-lg) !important; /* 24px */
+}
+
+@media (max-width: 768px) {
+    .dashboard-card,
+    .stock-card,
+    .news-card {
+        padding: var(--gob-spacing-md) !important; /* 16px */
+    }
+}
+
+.compact-card {
+    padding: var(--gob-spacing-md) !important; /* 16px */
+}
+
+.widget-container {
+    padding: var(--gob-spacing-md) !important; /* 16px */
+}
+
+.section-header {
+    padding-bottom: var(--gob-spacing-md) !important;
+    margin-bottom: var(--gob-spacing-md) !important;
+}
+
+/* =====================================================
+ * STANDARDISATION DES MARGINS
+ * ===================================================== */
+
+.section-spacing {
+    margin-bottom: var(--gob-spacing-xl) !important; /* 32px */
+}
+
+.subsection-spacing {
+    margin-bottom: var(--gob-spacing-lg) !important; /* 24px */
+}
+
+.list-item-spacing {
+    margin-bottom: var(--gob-spacing-md) !important; /* 16px */
+}
+
+/* =====================================================
+ * UTILITAIRES POUR MIGRATION PROGRESSIVE
+ * ===================================================== */
+
+.spacing-standard {
+    gap: var(--gob-spacing-lg);
+}
+
+.spacing-compact {
+    gap: var(--gob-spacing-md);
+}
+
+.spacing-tight {
+    gap: var(--gob-spacing-sm);
+}
+
+/* =====================================================
+ * RESPONSIVE ADJUSTMENTS
+ * ===================================================== */
+
+@media (max-width: 640px) {
+    .dashboard-grid,
+    .stocks-grid,
+    .news-grid {
+        gap: var(--gob-spacing-md) !important;
+    }
+    
+    .dashboard-card,
+    .stock-card,
+    .news-card {
+        padding: 12px !important;
+    }
+    
+    .section-spacing {
+        margin-bottom: var(--gob-spacing-lg) !important;
+    }
+}

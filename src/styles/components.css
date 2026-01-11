@@ -1,0 +1,52 @@
+/**
+ * Styles Globaux pour Composants
+ * 
+ * Styles partagés entre tous les composants du dashboard
+ */
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.3);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(156, 163, 175, 0.5);
+}
+
+/* Widgets dans React Grid Layout */
+.react-grid-item > div {
+    height: 100% !important;
+    overflow: hidden !important;
+}
+
+.widget-content-scroll {
+    overflow-y: auto;
+    height: 100%;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+/* Transitions douces pour changement de thème */
+* {
+    transition: background-color var(--gob-transition-normal) ease,
+                color var(--gob-transition-normal) ease,
+                border-color var(--gob-transition-normal) ease;
+}
+
+/* Glassmorphism effect */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--gob-border-subtle);
+}

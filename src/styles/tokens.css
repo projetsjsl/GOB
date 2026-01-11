@@ -1,0 +1,79 @@
+/**
+ * GOB Design System - CSS Variables
+ * 
+ * Variables CSS générées depuis src/design-system/tokens.ts
+ * Utilisées pour thèmes dynamiques et styles cohérents
+ */
+
+:root {
+  /* Couleurs principales */
+  --gob-primary: #6366f1;
+  --gob-primary-light: #8b5cf6;
+  --gob-primary-dark: #4f46e5;
+  --gob-secondary: #7c3aed;
+  
+  /* Couleurs d'état */
+  --gob-success: #10b981;
+  --gob-danger: #ef4444;
+  --gob-warning: #f59e0b;
+  --gob-info: #3b82f6;
+  
+  /* Couleurs de texte */
+  --gob-text-primary: #ffffff;
+  --gob-text-primary-light: #1a1a1a;
+  --gob-text-secondary: #9ca3af;
+  --gob-text-muted: #6b7280;
+  --gob-text-disabled: #4b5563;
+  
+  /* Couleurs de fond */
+  --gob-bg-primary: #000000;
+  --gob-bg-primary-light: #ffffff;
+  --gob-bg-secondary: #111827;
+  --gob-bg-tertiary: #1f2937;
+  --gob-bg-elevated: #18181b;
+  
+  /* Couleurs de bordure */
+  --gob-border: #374151;
+  --gob-border-light: #4b5563;
+  --gob-border-subtle: rgba(255, 255, 255, 0.1);
+  --gob-border-accent: rgba(99, 102, 241, 0.3);
+  
+  /* Espacements */
+  --gob-spacing-xs: 4px;
+  --gob-spacing-sm: 8px;
+  --gob-spacing-md: 16px;
+  --gob-spacing-lg: 24px;
+  --gob-spacing-xl: 32px;
+  --gob-spacing-2xl: 48px;
+  --gob-spacing-3xl: 64px;
+  
+  /* Typographie */
+  --gob-font-primary: Inter, sans-serif;
+  --gob-font-secondary: Roboto, sans-serif;
+  --gob-font-mono: "Courier New", "Courier", "Consolas", "Monaco", "Menlo", "SF Mono", monospace;
+  
+  /* Ombres */
+  --gob-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --gob-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --gob-shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+  --gob-shadow-primary: 0 4px 12px rgba(99, 102, 241, 0.15);
+  
+  /* Border Radius */
+  --gob-radius-sm: 0.25rem;
+  --gob-radius-md: 0.5rem;
+  --gob-radius-lg: 0.75rem;
+  --gob-radius-xl: 1rem;
+  
+  /* Transitions */
+  --gob-transition-fast: 150ms;
+  --gob-transition-normal: 300ms;
+  --gob-transition-slow: 500ms;
+}
+
+/* Light mode overrides */
+[data-theme="light"] {
+  --gob-text-primary: var(--gob-text-primary-light);
+  --gob-bg-primary: var(--gob-bg-primary-light);
+  --gob-bg-secondary: #f5f5f5;
+  --gob-border: #d0d0d0;
+}

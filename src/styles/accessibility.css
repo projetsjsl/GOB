@@ -1,0 +1,67 @@
+/**
+ * Accessibilité WCAG
+ * 
+ * Migré depuis public/css/wcag-accessibility-fixes.css
+ * Améliore l'accessibilité du dashboard
+ */
+
+/* Focus visible pour navigation clavier */
+*:focus-visible {
+    outline: 2px solid var(--gob-primary);
+    outline-offset: 2px;
+}
+
+/* Contraste amélioré pour texte */
+.text-low-contrast {
+    color: var(--gob-text-secondary);
+}
+
+/* Skip links pour navigation clavier */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--gob-primary);
+    color: white;
+    padding: var(--gob-spacing-sm);
+    z-index: 100;
+    text-decoration: none;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* ARIA labels visuels */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Amélioration du contraste pour les boutons */
+button:not(:disabled) {
+    min-height: 44px; /* Taille minimale pour touch */
+    min-width: 44px;
+}
+
+/* Indicateurs d'état pour lecteurs d'écran */
+[aria-busy="true"]::before {
+    content: "Chargement en cours...";
+    position: absolute;
+    left: -10000px;
+}
+
+[aria-live="polite"] {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
