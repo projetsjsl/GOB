@@ -41,6 +41,21 @@
 /* Styles scrollbar personnalisés */
 @import './scrollbar-styles.css';
 
+/* Utilitaires CSS (line-clamp, etc.) */
+@import './utilities.css';
+
+/* Effets UI avancés (glassmorphism, shine, glow, shimmer, ripple) */
+@import './ui-effects.css';
+
+/* Effets pour cartes (stock, news) */
+@import './card-effects.css';
+
+/* Styles responsive mobile */
+@import './mobile-responsive.css';
+
+/* Styles scrollbar personnalisés */
+@import './scrollbar-styles.css';
+
 /* =====================================================
  * 1. DESIGN TOKENS (Variables CSS)
  * ===================================================== */
