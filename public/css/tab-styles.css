@@ -16,3 +16,8 @@
 .tab-content.active {
     display: block;
 }
+
+.tab-button.active {
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+    color: white;
+}

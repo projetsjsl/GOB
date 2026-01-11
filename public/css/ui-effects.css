@@ -1,0 +1,196 @@
+/**
+ * Effets UI Avancés
+ * 
+ * Extrait depuis beta-combined-dashboard.html
+ * Glassmorphism, shine, glow, shimmer, ripple effects
+ */
+
+/* =====================================================
+ * GLASSMORPHISM EFFECTS
+ * ===================================================== */
+
+/* 🌫️ Glassmorphism Effect */
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-card-light {
+    background: rgba(255, 255, 255, 0.7);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+}
+
+/* =====================================================
+ * SHINE EFFECT (Horizontal Sweep)
+ * ===================================================== */
+
+/* ✨ Shine Effect (horizontal sweep) */
+.shine-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.shine-effect::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent);
+    transition: left 0.5s ease;
+}
+
+.shine-effect:hover::before {
+    left: 100%;
+}
+
+/* =====================================================
+ * GLOW ANIMATIONS
+ * ===================================================== */
+
+/* 🌟 Glow Animation for Important Metrics */
+.glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+    0%,
+    100% {
+        box-shadow: 0 0 5px rgba(74, 222, 128, 0.5),
+            0 0 10px rgba(74, 222, 128, 0.3),
+            0 0 15px rgba(74, 222, 128, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 10px rgba(74, 222, 128, 0.8),
+            0 0 20px rgba(74, 222, 128, 0.6),
+            0 0 30px rgba(74, 222, 128, 0.4);
+    }
+}
+
+.glow-pulse-red {
+    animation: glow-pulse-red 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse-red {
+    0%,
+    100% {
+        box-shadow: 0 0 5px rgba(239, 68, 68, 0.5),
+            0 0 10px rgba(239, 68, 68, 0.3),
+            0 0 15px rgba(239, 68, 68, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.8),
+            0 0 20px rgba(239, 68, 68, 0.6),
+            0 0 30px rgba(239, 68, 68, 0.4);
+    }
+}
+
+.glow-pulse-blue {
+    animation: glow-pulse-blue 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse-blue {
+    0%,
+    100% {
+        box-shadow: 0 0 5px rgba(59, 130, 246, 0.5),
+            0 0 10px rgba(59, 130, 246, 0.3),
+            0 0 15px rgba(59, 130, 246, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.8),
+            0 0 20px rgba(59, 130, 246, 0.6),
+            0 0 30px rgba(59, 130, 246, 0.4);
+    }
+}
+
+/* =====================================================
+ * SHIMMER EFFECT (Loading States)
+ * ===================================================== */
+
+/* 💫 Shimmer Effect for Loading States */
+.shimmer {
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.05) 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.05) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* =====================================================
+ * RIPPLE EFFECT (Buttons)
+ * ===================================================== */
+
+/* Effets visuels - ripple sur boutons */
+.btn-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple-circle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    background: rgba(59, 130, 246, 0.45);
+    transform: scale(0);
+    animation: ripple 600ms ease-out;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+/* =====================================================
+ * EMMA INTRO ANIMATIONS
+ * ===================================================== */
+
+/* Animation intro Emma */
+@keyframes emma-intro-fade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes emma-zoom-in {
+    0% {
+        transform: scale(0.85);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.emma-intro-overlay {
+    animation: emma-intro-fade 300ms ease-out;
+}
+
+.emma-intro-image {
+    animation: emma-zoom-in 800ms ease-out;
+}

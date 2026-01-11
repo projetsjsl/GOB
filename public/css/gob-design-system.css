@@ -26,6 +26,21 @@
 /* Styles pour les tabs */
 @import './tab-styles.css';
 
+/* Fixes pour icônes Iconoir */
+@import './iconoir-fixes.css';
+
+/* Effets UI avancés (glassmorphism, shine, glow, shimmer, ripple) */
+@import './ui-effects.css';
+
+/* Effets pour cartes (stock, news) */
+@import './card-effects.css';
+
+/* Styles responsive mobile */
+@import './mobile-responsive.css';
+
+/* Styles scrollbar personnalisés */
+@import './scrollbar-styles.css';
+
 /* =====================================================
  * 1. DESIGN TOKENS (Variables CSS)
  * ===================================================== */

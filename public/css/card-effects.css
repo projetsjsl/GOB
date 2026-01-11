@@ -1,0 +1,59 @@
+/**
+ * Effets pour les Cartes (Stock, News, etc.)
+ * 
+ * Extrait depuis beta-combined-dashboard.html
+ * Styles pour les cartes avec effets hover et transitions
+ */
+
+/* =====================================================
+ * CARD TRANSITIONS
+ * ===================================================== */
+
+.stock-card {
+    transition: all 0.3s ease;
+}
+
+.stock-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.news-card {
+    transition: all 0.3s ease;
+}
+
+.news-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* =====================================================
+ * CARD VARIANTS
+ * ===================================================== */
+
+.seeking-alpha-card {
+    background: linear-gradient(135deg, #1f1f1f 0%, #2d2d2d 100%);
+}
+
+.stocks-news-card {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+}
+
+/* =====================================================
+ * NAVIGATION BUTTON EFFECTS
+ * ===================================================== */
+
+/* Transition fluide pour toutes les icônes */
+nav button i {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Effet hover sur les boutons de navigation */
+nav button:hover:not(:active) i {
+    transform: translateY(-2px);
+}
+
+/* Effet de press */
+nav button:active i {
+    transform: scale(0.9);
+}
