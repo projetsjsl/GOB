@@ -236,6 +236,11 @@ export const BetaCombinedDashboard: React.FC = () => {
         const loadInitialData = async () => {
             setLoading(true);
             try {
+                // ✅ FIX: Charger les news en premier si l'onglet Nouvelles est actif
+                if (activeTab === 'nouvelles' && newsData.length === 0) {
+                    await fetchNews('general', 100);
+                }
+
                 // 1. Charger watchlist depuis Supabase
                 const watchlistRes = await fetch('/api/supabase-watchlist');
 
@@ -268,8 +273,10 @@ export const BetaCombinedDashboard: React.FC = () => {
                         setStockData(newStockData);
                         setLastUpdate(new Date());
 
-                        // 3. Charger les news générales
-                        await fetchNews('general', 20);
+                        // 3. Charger les news générales (si pas déjà fait)
+                        if (newsData.length === 0) {
+                            await fetchNews('general', 100);
+                        }
 
                         // 4. Charger les news spécifiques aux tickers (use requestIdleCallback for better perf)
                         if ('requestIdleCallback' in window) {
@@ -306,6 +313,16 @@ export const BetaCombinedDashboard: React.FC = () => {
 
         return () => { isMounted = false; };
     }, [fetchStockData, fetchNews, fetchLatestNewsForTickers, initialLoadComplete]);
+
+    // ✅ FIX: Charger les news quand l'onglet Nouvelles devient actif
+    useEffect(() => {
+        if (activeTab === 'nouvelles' && newsData.length === 0 && !loading && initialLoadComplete) {
+            console.log('📰 Onglet Nouvelles actif, chargement des news...');
+            fetchNews('general', 100).catch(err => {
+                console.error('Erreur chargement news pour onglet Nouvelles:', err);
+            });
+        }
+    }, [activeTab, newsData.length, loading, initialLoadComplete, fetchNews]);
 
     // Effet: charger les news spécifiques aux tickers quand la liste change (debounced)
     useEffect(() => {

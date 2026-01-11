@@ -133,6 +133,21 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
     const [selectedTheme, setSelectedTheme] = useState('all');
     const [localFilteredNews, setLocalFilteredNews] = useState<any[]>([]);
     const [isApproximateMatch, setIsApproximateMatch] = useState(false);
+    const [isLoadingNews, setIsLoadingNews] = useState(false);
+
+    // ✅ FIX: Charger les news automatiquement si vides au montage ou quand newsData change
+    useEffect(() => {
+        if ((!newsData || newsData.length === 0) && fetchNews && !loading && !isLoadingNews) {
+            console.log('📰 NouvellesTab: newsData vide, chargement automatique...');
+            setIsLoadingNews(true);
+            fetchNews('general', 100).then(() => {
+                setIsLoadingNews(false);
+            }).catch(err => {
+                console.error('Erreur chargement news:', err);
+                setIsLoadingNews(false);
+            });
+        }
+    }, [newsData.length, fetchNews, loading]); // Se déclenche quand newsData change ou au montage
     
     // BUG #1 FIX: Pagination et lazy loading pour éviter freeze
     const [displayedCount, setDisplayedCount] = useState(20); // Limiter à 20 articles initialement
@@ -237,6 +252,19 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
 
     // Filtrer les nouvelles
     useEffect(() => {
+        // ✅ FIX: Vérifier que newsData existe et est un tableau non vide
+        if (!newsData || !Array.isArray(newsData) || newsData.length === 0) {
+            setLocalFilteredNews([]);
+            setIsApproximateMatch(false);
+            // Si pas de données et fetchNews disponible, essayer de charger
+            if (fetchNews && newsData.length === 0) {
+                fetchNews('general', 100).catch(err => {
+                    console.error('Erreur chargement nouvelles:', err);
+                });
+            }
+            return;
+        }
+
         let filtered = newsData;
         let hasExactMatches = true;
 
@@ -635,17 +663,41 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
             {/* Liste des nouvelles avec pagination lazy - Hide when ground sub-tab is active */}
             {activeSubTab !== 'ground' && (
             <div className="space-y-4">
-                {localFilteredNews.length === 0 ? (
+                {(loading || isLoadingNews) ? (
+                    <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                        <p className="text-lg font-semibold mb-2">Chargement des actualités...</p>
+                        <p className="text-sm">Récupération des dernières nouvelles financières</p>
+                    </div>
+                ) : localFilteredNews.length === 0 ? (
                     <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         <LucideIcon name="AlertCircle" className="w-16 h-16 mx-auto mb-4 opacity-50" />
                         <p className="text-lg font-semibold mb-2">
-                            {localFrenchOnly ? 'Aucun article en français trouvé' : 'Aucune nouvelle disponible'}
+                            {newsData.length === 0 
+                                ? 'Aucune nouvelle chargée'
+                                : localFrenchOnly 
+                                    ? 'Aucun article en français trouvé' 
+                                    : 'Aucune nouvelle disponible après filtrage'}
                         </p>
-                        <p className="text-sm">
-                            {localFrenchOnly
-                                ? 'Essayez de désactiver le filtre français ou actualisez les données'
-                                : 'Cliquez sur Actualiser pour charger les dernières nouvelles'}
+                        <p className="text-sm mb-4">
+                            {newsData.length === 0
+                                ? 'Les actualités sont en cours de chargement ou indisponibles'
+                                : localFrenchOnly
+                                    ? 'Essayez de désactiver le filtre français ou actualisez les données'
+                                    : 'Essayez de modifier les filtres ou cliquez sur Actualiser'}
                         </p>
+                        {fetchNews && (
+                            <button
+                                onClick={() => fetchNews('general', 100)}
+                                className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
+                                    isDarkMode
+                                        ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                }`}
+                            >
+                                🔄 Charger les actualités
+                            </button>
+                        )}
                     </div>
                 ) : (
                     <>

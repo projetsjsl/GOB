@@ -23929,6 +23929,29 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             const [selectedMarket, setSelectedMarket] = useState('all'); // Filtre marché
             const [selectedTheme, setSelectedTheme] = useState('all'); // Filtre thème
             const [localFilteredNews, setLocalFilteredNews] = useState([]);
+            const [isLoadingNews, setIsLoadingNews] = useState(false);
+
+            // ✅ FIX: Charger les news automatiquement si vides quand l'onglet devient actif
+            React.useEffect(() => {
+                if (activeTab === 'nouvelles-main' || activeTab === 'nouvelles') {
+                    if (!newsData || newsData.length === 0) {
+                        console.log('📰 NouvellesTab: newsData vide, chargement automatique...');
+                        setIsLoadingNews(true);
+                        // Utiliser fetchNews du scope parent
+                        if (typeof fetchNews === 'function') {
+                            fetchNews().then(() => {
+                                setIsLoadingNews(false);
+                            }).catch(err => {
+                                console.error('Erreur chargement news:', err);
+                                setIsLoadingNews(false);
+                            });
+                        } else {
+                            console.warn('⚠️ fetchNews non disponible dans NouvellesTab');
+                            setIsLoadingNews(false);
+                        }
+                    }
+                }
+            }, [activeTab, newsData]);
 
             // Listes de filtres
             const sources = ['Bloomberg', 'Reuters', 'WSJ', 'CNBC', 'MarketWatch', 'La Presse', 'Les Affaires'];
@@ -24374,17 +24397,42 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                     {/* Liste des nouvelles */}
                     <div className="space-y-4">
-                        {localFilteredNews.length === 0 ? (
+                        {isLoadingNews ? (
+                            <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                                <p className="text-lg font-semibold mb-2">Chargement des actualités...</p>
+                                <p className="text-sm">Récupération des dernières nouvelles financières</p>
+                            </div>
+                        ) : localFilteredNews.length === 0 ? (
                             <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                 <LucideIcon name="AlertCircle" className="w-16 h-16 mx-auto mb-4 opacity-50" />
                                 <p className="text-lg font-semibold mb-2">
-                                    {localFrenchOnly ? 'Aucun article en français trouvé' : 'Aucune nouvelle disponible'}
+                                    {newsData.length === 0
+                                        ? 'Aucune nouvelle chargée'
+                                        : localFrenchOnly 
+                                            ? 'Aucun article en français trouvé' 
+                                            : 'Aucune nouvelle disponible après filtrage'}
                                 </p>
-                                <p className="text-sm">
-                                    {localFrenchOnly
-                                        ? 'Essayez de désactiver le filtre français ou actualisez les données'
-                                        : 'Cliquez sur Actualiser pour charger les dernières nouvelles'}
+                                <p className="text-sm mb-4">
+                                    {newsData.length === 0
+                                        ? 'Les actualités sont en cours de chargement ou indisponibles'
+                                        : localFrenchOnly
+                                            ? 'Essayez de désactiver le filtre français ou actualisez les données'
+                                            : 'Essayez de modifier les filtres ou cliquez sur Actualiser'}
                                 </p>
+                                <button
+                                    onClick={() => {
+                                        setIsLoadingNews(true);
+                                        fetchNews().then(() => setIsLoadingNews(false)).catch(() => setIsLoadingNews(false));
+                                    }}
+                                    className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
+                                        isDarkMode
+                                            ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                                            : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                    }`}
+                                >
+                                    🔄 Charger les actualités
+                                </button>
                             </div>
                         ) : (
                             localFilteredNews.map((article, index) => {
