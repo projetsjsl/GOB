@@ -79,11 +79,13 @@ body {
     /* Navigation tabs - horizontal scroll */
     nav {
         overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important;
+        /* -webkit-overflow-scrolling: touch; - Deprecated, removed in Safari iOS 13+ */
+        /* Firefox scrollbar hiding (Safari/Chrome use ::-webkit-scrollbar below) */
         scrollbar-width: none !important;
         padding: 6px !important;
     }
 
+    /* Safari/Chrome scrollbar hiding */
     nav::-webkit-scrollbar {
         display: none;
     }
@@ -99,7 +101,7 @@ body {
     table {
         display: block !important;
         overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important;
+        /* -webkit-overflow-scrolling: touch; - Deprecated, removed in Safari iOS 13+ */
         white-space: nowrap !important;
         font-size: 0.7rem !important;
     }
