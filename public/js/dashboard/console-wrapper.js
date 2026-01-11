@@ -13,11 +13,25 @@
                        !window.location.hostname.includes('localhost');
 
   // Logger disponible (si chargé)
-  // Attendre que logger.js soit chargé
+  // Attendre que logger.js soit chargé - vérifier de manière asynchrone
   const hasLogger = () => {
-    return typeof window !== 'undefined' && 
-           (typeof window.logger !== 'undefined' || 
-            (window.logger && typeof window.logger.debug === 'function'));
+    if (typeof window === 'undefined') return false;
+    
+    // Vérifier si logger est déjà chargé
+    if (typeof window.logger !== 'undefined' && 
+        window.logger && 
+        typeof window.logger.debug === 'function') {
+      return true;
+    }
+    
+    // Vérifier si le script logger.js est en cours de chargement
+    const loggerScript = document.querySelector('script[src*="logger.js"]');
+    if (loggerScript && !loggerScript.hasAttribute('data-loaded')) {
+      // Script pas encore chargé, retourner false pour l'instant
+      return false;
+    }
+    
+    return false;
   };
 
   // Sauvegarder les méthodes originales
@@ -92,6 +106,21 @@
   // Exposer une méthode pour vérifier l'état
   console._isProduction = isProduction;
   console._hasLogger = hasLogger();
+
+  // Attendre que logger.js soit chargé si nécessaire
+  if (typeof window !== 'undefined' && !hasLogger()) {
+    const checkLogger = setInterval(() => {
+      if (hasLogger()) {
+        clearInterval(checkLogger);
+        if (!isProduction) {
+          console.log('🔧 Console wrapper: Logger maintenant disponible');
+        }
+      }
+    }, 100);
+    
+    // Arrêter après 5 secondes
+    setTimeout(() => clearInterval(checkLogger), 5000);
+  }
 
   if (!isProduction) {
     console.log('🔧 Console wrapper activé (mode développement)');
