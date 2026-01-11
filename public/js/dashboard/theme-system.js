@@ -442,6 +442,12 @@ const allThemes = {
 // BUG #8 FIX: Optimiser avec debounce et CSS variables pour éviter timeout
 let themeApplyTimeout = null;
 function applyTheme(themeId) {
+    // ✅ FIX: Empêcher l'application du thème 'lightglass' dès l'entrée
+    if (themeId === 'lightglass') {
+        console.warn('Le thème "lightglass" est désactivé. Utilisation de "darkmode" à la place.');
+        themeId = 'darkmode';
+    }
+    
     // BUG #8 FIX: Debounce pour éviter les changements trop rapides
     if (themeApplyTimeout) {
         clearTimeout(themeApplyTimeout);
