@@ -1351,7 +1351,7 @@ export default function App() {
             }, 1000);
             return () => clearTimeout(timer);
         }
-    }, [isInitialized, showLanding, activeId, showDemo, library]);
+    }, [isInitialized, showLanding, activeId, showDemo]); // ⚠️ Retirer 'library' des dépendances pour éviter la boucle infinie
 
     // Save to Library when Active State Changes (optimisé avec requestIdleCallback)
     useEffect(() => {

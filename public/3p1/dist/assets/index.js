@@ -57581,7 +57581,7 @@ Vérifiez votre connexion et réessayez.`,
       }, 1e3);
       return () => clearTimeout(timer);
     }
-  }, [isInitialized, showLanding, activeId, showDemo, library]);
+  }, [isInitialized, showLanding, activeId, showDemo]);
   reactExports.useEffect(() => {
     if (!isInitialized) return;
     if (isLoadingProfileRef.current) {
