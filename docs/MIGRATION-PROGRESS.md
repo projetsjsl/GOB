@@ -8,6 +8,7 @@
 ## ✅ Phase 1: Fondation (Terminée)
 
 ### Créé
+
 - [x] `src/design-system/tokens.ts` - Source unique de vérité
 - [x] `src/styles/main.css` - Point d'entrée CSS unifié
 - [x] `src/styles/tokens.css` - Variables CSS
@@ -19,6 +20,7 @@
 - [x] `tailwind.config.ts` - Mis à jour avec tokens
 
 ### Tests
+
 - [x] `src/design-system/__tests__/tokens.test.ts` - Tests tokens
 - [x] `src/design-system/__tests__/components.test.tsx` - Tests composants
 - [x] `src/design-system/__tests__/theme-adapter.test.ts` - Tests adapter
@@ -29,22 +31,26 @@
 ## 🟡 Phase 2: Migration (En cours)
 
 ### Nettoyage CSS
+
 - [x] `public/css/spacing-standardization.css` - Supprimé (migré)
 - [x] `public/css/wcag-accessibility-fixes.css` - Supprimé (migré)
 - [x] `public/css/themes.css` - Conservé (toujours utilisé)
 - [x] `public/css/retirement-calculator-fix.css` - Conservé (spécifique)
 
 ### Migration Thèmes
+
 - [ ] Migrer `theme-system.js` pour utiliser `tokens.ts`
 - [ ] Créer `theme-adapter.ts` pour bridge (✅ créé)
 - [ ] Mettre à jour `applyTheme` pour utiliser adapter
 
 ### Migration Styles Inline
+
 - [ ] Identifier tous les styles inline (script créé)
 - [ ] Remplacer par classes Tailwind dans composants clés
 - [ ] Mettre à jour composants pour utiliser Button/Card
 
 ### Fichiers à Migrer
+
 - [ ] `config/theme-colors.json` → Utiliser `tokens.ts`
 - [ ] `lib/theme-colors.js` → Utiliser `tokens.ts`
 - [ ] `public/js/dashboard/v0-bootstrap.js` → Utiliser `tokens.ts`
@@ -54,7 +60,7 @@
 ## 📊 Métriques
 
 | Métrique | Avant | Actuel | Cible | Progression |
-|----------|-------|--------|-------|-------------|
+| -------- | ----- | ------ | ----- | ----------- |
 | Fichiers CSS | 22 | 7 | 5 | 68% |
 | Sources couleurs | 4 | 2 | 1 | 50% |
 | Styles inline | 2033 | 2033 | 0 | 0% |
