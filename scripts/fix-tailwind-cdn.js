@@ -44,19 +44,31 @@ function replaceTailwindCDN(filePath) {
   const cdnPattern = /<script[^>]*src=["']https?:\/\/cdn\.tailwindcss\.com[^"']*["'][^>]*><\/script>/gi;
   
   if (cdnPattern.test(content)) {
-    // Remplacer par une référence au CSS Tailwind compilé
-    // Note: Le chemin dépend de la structure du projet
-    const relativePath = path.relative(path.dirname(filePath), path.join(projectRoot, 'public', 'css', 'tailwind.css'));
+    // Calculer le chemin relatif vers tailwind.css
+    // Les fichiers peuvent être dans public/ ou dans des sous-dossiers
+    let relativePath;
+    if (filePath.includes('public/')) {
+      // Fichier dans public/ ou sous-dossier
+      const publicPath = filePath.substring(filePath.indexOf('public/'));
+      const depth = (publicPath.match(/\//g) || []).length - 2; // -2 pour public/ et le fichier
+      relativePath = depth > 0 ? '../'.repeat(depth) + 'css/tailwind.css' : 'css/tailwind.css';
+    } else {
+      // Fichier à la racine ou ailleurs
+      relativePath = path.relative(path.dirname(filePath), path.join(projectRoot, 'public', 'css', 'tailwind.css'));
+    }
+    
+    // Normaliser les séparateurs de chemin pour le web
+    relativePath = relativePath.replace(/\\/g, '/');
+    
     const cssLink = `<link rel="stylesheet" href="${relativePath}">`;
     
     content = content.replace(cdnPattern, cssLink);
     modified = true;
     
-    // Si tailwind.config existe, le garder mais le convertir en CSS custom properties si nécessaire
-    const configPattern = /<script[^>]*>[\s\S]*?tailwind\.config[\s\S]*?<\/script>/gi;
-    // Pour l'instant, on garde la config mais on pourrait la convertir
+    // Note: Les configurations tailwind.config dans <script> sont conservées
+    // car elles peuvent être nécessaires pour des customizations spécifiques
     
-    console.log(`✅ Modifié: ${filePath}`);
+    console.log(`✅ Modifié: ${filePath} -> ${relativePath}`);
   }
   
   return { content, modified };
@@ -72,16 +84,16 @@ async function main() {
   for (const file of htmlFiles) {
     const result = replaceTailwindCDN(file);
     if (result.modified) {
-      // ⚠️ Mode dry-run par défaut - décommenter pour appliquer
-      // fs.writeFileSync(file, result.content, 'utf8');
+      // ✅ Appliquer les changements (mode production)
+      fs.writeFileSync(file, result.content, 'utf8');
       modifiedCount++;
     }
   }
   
   console.log(`\n📊 Résumé:`);
   console.log(`   Fichiers HTML trouvés: ${htmlFiles.length}`);
-  console.log(`   Fichiers avec CDN Tailwind: ${modifiedCount}`);
-  console.log(`\n⚠️  Mode dry-run activé. Décommentez fs.writeFileSync pour appliquer les changements.`);
+  console.log(`   Fichiers modifiés: ${modifiedCount}`);
+  console.log(`\n✅ Tous les CDN Tailwind ont été remplacés par des références locales.`);
 }
 
 main().catch(console.error);
