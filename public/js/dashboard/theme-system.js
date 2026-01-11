@@ -459,6 +459,18 @@ function _applyThemeInternal(themeId) {
         themeId = 'darkmode';
     }
     
+    // ✅ FIX: Empêcher l'application du thème 'lightglass'
+    if (themeId === 'lightglass') {
+        console.warn('Le thème "lightglass" est désactivé. Utilisation de "darkmode" à la place.');
+        themeId = 'darkmode';
+        // Mettre à jour le localStorage pour éviter la récurrence
+        try {
+            localStorage.setItem('gob-dashboard-theme', 'darkmode');
+        } catch (e) {
+            // Ignorer les erreurs de localStorage
+        }
+    }
+    
     // Utiliser allThemes pour inclure les thèmes par défaut
     const theme = allThemes[themeId] || allThemes.darkmode || defaultThemes.darkmode;
     
