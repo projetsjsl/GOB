@@ -9,8 +9,8 @@ export interface HybridDataResponse {
   success: boolean;
   symbol: string;
   dataType: string;
-  data?: any;
-  news?: any[];
+  data?: Record<string, unknown>;
+  news?: Array<Record<string, unknown>>;
   source: string;
   fallback: boolean;
   metadata: {
@@ -114,10 +114,11 @@ export const fetchHybridData = async (symbol: string, dataType: DataType): Promi
       }
     };
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`❌ Erreur ${dataType} pour ${symbol}:`, error);
 
     // Propager l'erreur
-    throw new Error(`Erreur API ${dataType} pour ${symbol}: ${error.message}`);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(`Erreur API ${dataType} pour ${symbol}: ${errorMessage}`);
   }
 };

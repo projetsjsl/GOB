@@ -1,29 +1,43 @@
 import React, { useEffect } from 'react';
 import BetaCombinedDashboard from './components/BetaCombinedDashboard';
+import { logger } from '../lib/logger';
 
 // Import utils pour exposition globale
 import { IconoirIcon, ProfessionalModeSystem } from './utils/iconMapping';
 
 // Déclarations TypeScript pour bibliothèques CDN
-declare const Chart: any;
-declare const Recharts: any;
-declare const LightweightCharts: any;
+interface ChartLibrary {
+  [key: string]: unknown;
+}
+
+declare const Chart: ChartLibrary;
+declare const Recharts: ChartLibrary;
+declare const LightweightCharts: ChartLibrary;
+
+interface WindowWithDashboard extends Window {
+  __GOB_DASHBOARD_MOUNTED?: boolean;
+  IconoirIcon?: typeof IconoirIcon;
+  LucideIcon?: typeof IconoirIcon;
+  ProfessionalModeSystem?: typeof ProfessionalModeSystem;
+}
 
 const App: React.FC = () => {
     useEffect(() => {
+        const win = window as WindowWithDashboard;
+        
         // Guard pour éviter le double-montage
-        if ((window as any).__GOB_DASHBOARD_MOUNTED) {
-            console.warn('⚠️ Dashboard déjà monté');
+        if (win.__GOB_DASHBOARD_MOUNTED) {
+            logger.warn('⚠️ Dashboard déjà monté');
             return;
         }
-        (window as any).__GOB_DASHBOARD_MOUNTED = true;
+        win.__GOB_DASHBOARD_MOUNTED = true;
 
         // Exposer les utils globalement pour compatibilité
-        (window as any).IconoirIcon = IconoirIcon;
-        (window as any).LucideIcon = IconoirIcon; // Backward compatibility
-        (window as any).ProfessionalModeSystem = ProfessionalModeSystem;
+        win.IconoirIcon = IconoirIcon;
+        win.LucideIcon = IconoirIcon; // Backward compatibility
+        win.ProfessionalModeSystem = ProfessionalModeSystem;
 
-        console.log('✅ GOB Dashboard monté (Vite + React + TypeScript)');
+        logger.info('✅ GOB Dashboard monté (Vite + React + TypeScript)');
     }, []);
 
     // Rendu direct du dashboard - UI friendly, pas de loader

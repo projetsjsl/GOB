@@ -16,7 +16,7 @@ export interface StockData {
   low?: number;
   open?: number;
   previousClose?: number;
-  [key: string]: any;
+  [key: string]: string | number | boolean | undefined;
 }
 
 // Article de news
@@ -43,13 +43,21 @@ export interface EconomicEvent {
   previous?: string | number;
 }
 
+// Article Seeking Alpha
+export interface SeekingAlphaArticle {
+  title: string;
+  url: string;
+  publishedDate?: string;
+  [key: string]: string | number | boolean | undefined;
+}
+
 // Données Seeking Alpha
 export interface SeekingAlphaData {
   symbol?: string;
   rating?: string;
   targetPrice?: number;
-  articles?: any[];
-  [key: string]: any;
+  articles?: SeekingAlphaArticle[];
+  [key: string]: string | number | boolean | SeekingAlphaArticle[] | undefined;
 }
 
 // Contexte de news
@@ -106,7 +114,7 @@ export interface TabProps {
   setTickerMoveReasons?: (data: Record<string, string>) => void;
   setEconomicCalendarData?: (events: EconomicEvent[]) => void;
   setSeekingAlphaData?: (data: Record<string, SeekingAlphaData>) => void;
-  setSeekingAlphaStockData?: (data: Record<string, any>) => void;
+  setSeekingAlphaStockData?: (data: Record<string, StockData>) => void;
   setSelectedStock?: (stock: string | null) => void;
   setActiveTab?: (tab: TabName) => void;
   setLoading?: (loading: boolean) => void;
@@ -132,7 +140,12 @@ export interface TabProps {
   setCacheStatus?: (status: Record<string, any>) => void;
   loadingCacheStatus?: boolean;
   setLoadingCacheStatus?: (value: boolean) => void;
-  systemLogs?: any[];
+  systemLogs?: Array<{
+    timestamp: string;
+    level: 'info' | 'warn' | 'error' | 'debug';
+    message: string;
+    [key: string]: string | number | boolean | undefined;
+  }>;
 
   // État du système
   loading?: boolean;
@@ -149,7 +162,7 @@ export interface TabProps {
   autoSend?: boolean;
 
   // Fonctions utilitaires
-  fetchStockData?: (ticker: string) => Promise<any>;
+  fetchStockData?: (ticker: string) => Promise<StockData>;
   fetchNews?: (context?: string, limit?: number) => Promise<NewsArticle[]>;
   fetchLatestNewsForTickers?: () => Promise<void>;
   loadTickersFromSupabase?: () => Promise<string[]>;
@@ -178,10 +191,10 @@ declare global {
       renderIcon: (emoji: string, size?: number, className?: string) => string;
     };
     __GOB_DASHBOARD_MOUNTED?: boolean;
-    BetaCombinedDashboard?: Record<string, any>;
-    BetaCombinedDashboardData?: Record<string, any>;
-    DASHBOARD_UTILS?: Record<string, any>;
-    DASHBOARD_CONSTANTS?: Record<string, any>;
+    BetaCombinedDashboard?: Record<string, unknown>;
+    BetaCombinedDashboardData?: Record<string, unknown>;
+    DASHBOARD_UTILS?: Record<string, unknown>;
+    DASHBOARD_CONSTANTS?: Record<string, unknown>;
   }
 }
 
