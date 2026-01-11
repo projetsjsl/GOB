@@ -242,7 +242,8 @@ export const calculateRecommendation = (
 export const autoFillAssumptionsFromFMPData = (
   data: AnnualData[],
   currentPrice: number,
-  existingAssumptions?: Partial<Assumptions>
+  existingAssumptions?: Partial<Assumptions>,
+  currentDividendFromAPI?: number // ✅ NOUVEAU: Dividende actuel depuis l'API FMP
 ): Partial<Assumptions> => {
   // Guard clause for empty or invalid data
   if (!data || data.length === 0) {
@@ -369,12 +370,59 @@ export const autoFillAssumptionsFromFMPData = (
     return calculated; // Utiliser la valeur calculée
   };
 
+  // ✅ AMÉLIORATION: Utiliser le dividende depuis l'API FMP si disponible (priorité 1)
+  // Sinon, trouver le dividende le plus récent dans les données historiques
+  let finalCurrentDividend = 0;
+  
+  // Priorité 1: Utiliser le dividende depuis l'API FMP (calculé depuis key metrics ou yield)
+  if (currentDividendFromAPI !== undefined && currentDividendFromAPI > 0) {
+    finalCurrentDividend = currentDividendFromAPI;
+  } else {
+    // Priorité 2: Trouver le dividende le plus récent (année en cours ou dernière année avec dividende > 0)
+    const currentYear = new Date().getFullYear();
+    
+    // 1. Chercher le dividende de l'année en cours d'abord
+    const currentYearData = data.find(d => d.year === currentYear && d.dividendPerShare > 0);
+    if (currentYearData) {
+      finalCurrentDividend = currentYearData.dividendPerShare;
+    } else {
+      // 2. Chercher la dernière année avec un dividende > 0 (en ordre décroissant)
+      const sortedData = [...data].sort((a, b) => b.year - a.year);
+      const lastYearWithDividend = sortedData.find(d => d.dividendPerShare > 0);
+      if (lastYearWithDividend) {
+        finalCurrentDividend = lastYearWithDividend.dividendPerShare;
+      } else {
+        // 3. Fallback: utiliser lastData.dividendPerShare même si 0
+        finalCurrentDividend = lastData.dividendPerShare || 0;
+      }
+    }
+    
+    // Priorité 3: Si le dividende est toujours 0 mais qu'on a un prix actuel, 
+    // essayer de calculer à partir du yield moyen historique (si disponible)
+    if (finalCurrentDividend === 0 && currentPrice > 0 && data.length > 0) {
+      // Calculer le yield moyen historique pour les années avec dividende
+      const yearsWithDividend = data.filter(d => d.dividendPerShare > 0 && d.priceHigh > 0);
+      if (yearsWithDividend.length > 0) {
+        const avgYield = yearsWithDividend.reduce((sum, d) => {
+          const yield = (d.dividendPerShare / d.priceHigh) * 100;
+          return sum + yield;
+        }, 0) / yearsWithDividend.length;
+        
+        // Si le yield moyen est raisonnable (0.1% à 20%), utiliser pour estimer le dividende actuel
+        if (avgYield > 0.1 && avgYield < 20) {
+          finalCurrentDividend = (avgYield / 100) * currentPrice;
+          console.log(`ℹ️ Dividende estimé à partir du yield moyen historique (${avgYield.toFixed(2)}%): ${finalCurrentDividend.toFixed(4)}`);
+        }
+      }
+    }
+  }
+
   // Retourner les assumptions auto-remplies avec limites STRICTES
   // Ces limites sont cruciales pour éviter les prix cibles aberrants
   const rawAssumptions: Partial<Assumptions> = {
     currentPrice: round(currentPrice, 2), // ✅ Toujours mettre à jour le prix actuel
     currentDividend: preserveIfExists(
-      round(lastData.dividendPerShare || 0, 4),
+      round(finalCurrentDividend, 4),
       existingAssumptions?.currentDividend,
       true // ✅ FIX: Traiter comme un taux - ne pas préserver si existant est 0
     ),

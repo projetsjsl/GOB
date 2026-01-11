@@ -1,0 +1,800 @@
+{
+  "summary": {
+    "total": 41,
+    "suffixes": 8,
+    "generatedAt": "2026-01-11T01:58:13.431Z"
+  },
+  "bySuffix": {
+    "HK": {
+      "count": 2,
+      "countries": [
+        "CA"
+      ],
+      "exchanges": [
+        "HKSE"
+      ],
+      "tickers": [
+        {
+          "ticker": "0945.HK",
+          "company_name": "Manulife Financial Corporation",
+          "country": "CA",
+          "exchange": "HKSE",
+          "sector": "Financial Services",
+          "source": "TSX"
+        },
+        {
+          "ticker": "2099.HK",
+          "company_name": "China Gold International Resources Corp. Ltd.",
+          "country": "CA",
+          "exchange": "HKSE",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        }
+      ]
+    },
+    "L": {
+      "count": 26,
+      "countries": [
+        "CA",
+        "US"
+      ],
+      "exchanges": [
+        "LSE"
+      ],
+      "tickers": [
+        {
+          "ticker": "0A18.L",
+          "company_name": "CGI Inc.",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Technology",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0AH3.L",
+          "company_name": "Great-West Lifeco Inc.",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Financial Services",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0JVT.L",
+          "company_name": "Lululemon Athletica Inc.",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Consumer Cyclical",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0KTI.L",
+          "company_name": "Enbridge Inc.",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Energy",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0NHS.L",
+          "company_name": "Nutrien Ltd.",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0QKU.L",
+          "company_name": "Royal Bank of Canada",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Financial Services",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0QYZ.L",
+          "company_name": "Franco-Nevada Corporation",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0R07.L",
+          "company_name": "Pan American Silver Corp.",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0R2J.L",
+          "company_name": "Agnico Eagle Mines Limited",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0R35.L",
+          "company_name": "Cameco Corporation",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Energy",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0R4M.L",
+          "company_name": "Lundin Gold Inc.",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0UGS.L",
+          "company_name": "Alamos Gold Inc.",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0UKH.L",
+          "company_name": "Bank of Montreal",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Financial Services",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0UKI.L",
+          "company_name": "The Bank of Nova Scotia",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Financial Services",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0V5H.L",
+          "company_name": "Manulife Financial Corporation",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Financial Services",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0VFA.L",
+          "company_name": "Restaurant Brands International Inc.",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Consumer Cyclical",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0VHA.L",
+          "company_name": "Shopify Inc.",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Technology",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0VJA.L",
+          "company_name": "Sun Life Financial Inc.",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Financial Services",
+          "source": "TSX"
+        },
+        {
+          "ticker": "0VL8.L",
+          "company_name": "The Toronto-Dominion Bank",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Financial Services",
+          "source": "TSX"
+        },
+        {
+          "ticker": "AMRQ.L",
+          "company_name": "Amaroq Minerals Ltd.",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        },
+        {
+          "ticker": "AT1D.L",
+          "company_name": "Invesco AT1 Capital Bond ETF",
+          "country": "US",
+          "exchange": "LSE",
+          "sector": "Financial Services",
+          "source": "manual"
+        },
+        {
+          "ticker": "CGI.L",
+          "company_name": "Canadian General Investments, Limited",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Financial Services",
+          "source": "TSX"
+        },
+        {
+          "ticker": "MKA.L",
+          "company_name": "Mkango Resources Ltd.",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        },
+        {
+          "ticker": "THX.L",
+          "company_name": "Thor Explorations Ltd.",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        },
+        {
+          "ticker": "TKO.L",
+          "company_name": "Taseko Mines Limited",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        },
+        {
+          "ticker": "WPM.L",
+          "company_name": "Wheaton Precious Metals Corp.",
+          "country": "CA",
+          "exchange": "LSE",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        }
+      ]
+    },
+    "F": {
+      "count": 1,
+      "countries": [
+        "CA"
+      ],
+      "exchanges": [
+        "FSX"
+      ],
+      "tickers": [
+        {
+          "ticker": "307.F",
+          "company_name": "Shopify Inc.",
+          "country": "CA",
+          "exchange": "FSX",
+          "sector": "Technology",
+          "source": "TSX"
+        }
+      ]
+    },
+    "KQ": {
+      "count": 1,
+      "countries": [
+        "US"
+      ],
+      "exchanges": [
+        "KOE"
+      ],
+      "tickers": [
+        {
+          "ticker": "950160.KQ",
+          "company_name": "Kolon TissueGene, Inc.",
+          "country": "US",
+          "exchange": "KOE",
+          "sector": "Healthcare",
+          "source": "manual"
+        }
+      ]
+    },
+    "MX": {
+      "count": 3,
+      "countries": [
+        "US",
+        "CA"
+      ],
+      "exchanges": [
+        "MEX"
+      ],
+      "tickers": [
+        {
+          "ticker": "AAPL.MX",
+          "company_name": "Apple Inc.",
+          "country": "US",
+          "exchange": "MEX",
+          "sector": "Technology",
+          "source": "manual"
+        },
+        {
+          "ticker": "BBDBN.MX",
+          "company_name": "Bombardier Inc.",
+          "country": "CA",
+          "exchange": "MEX",
+          "sector": "Industrials",
+          "source": "TSX"
+        },
+        {
+          "ticker": "XOM.MX",
+          "company_name": "Exxon Mobil Corporation",
+          "country": "US",
+          "exchange": "MEX",
+          "sector": "Energy",
+          "source": "manual"
+        }
+      ]
+    },
+    "B": {
+      "count": 3,
+      "countries": [
+        "CA",
+        "US"
+      ],
+      "exchanges": [
+        "TSX",
+        "AMEX"
+      ],
+      "tickers": [
+        {
+          "ticker": "ATD.B",
+          "company_name": "Alimentation Couche-Tard Inc.",
+          "country": "CA",
+          "exchange": "TSX",
+          "sector": "Consumer Defensive",
+          "source": "watchlist"
+        },
+        {
+          "ticker": "BBD.B",
+          "company_name": "Bombardier Inc.",
+          "country": "CA",
+          "exchange": "TSX",
+          "sector": "Industrials",
+          "source": "watchlist"
+        },
+        {
+          "ticker": "BRK.B",
+          "company_name": "YieldMax BRK.B Option Income Strategy ETF",
+          "country": "US",
+          "exchange": "AMEX",
+          "sector": "Financial Services",
+          "source": "watchlist"
+        }
+      ]
+    },
+    "ST": {
+      "count": 3,
+      "countries": [
+        "CA"
+      ],
+      "exchanges": [
+        "STO"
+      ],
+      "tickers": [
+        {
+          "ticker": "IPCO.ST",
+          "company_name": "International Petroleum Corporation",
+          "country": "CA",
+          "exchange": "STO",
+          "sector": "Energy",
+          "source": "TSX"
+        },
+        {
+          "ticker": "LUG.ST",
+          "company_name": "Lundin Gold Inc.",
+          "country": "CA",
+          "exchange": "STO",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        },
+        {
+          "ticker": "LUMI.ST",
+          "company_name": "Lundin Mining Corporation",
+          "country": "CA",
+          "exchange": "STO",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        }
+      ]
+    },
+    "DE": {
+      "count": 2,
+      "countries": [
+        "CA"
+      ],
+      "exchanges": [
+        "XETRA"
+      ],
+      "tickers": [
+        {
+          "ticker": "KIN2.DE",
+          "company_name": "Kinross Gold Corporation",
+          "country": "CA",
+          "exchange": "XETRA",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        },
+        {
+          "ticker": "SII.DE",
+          "company_name": "Wheaton Precious Metals Corp.",
+          "country": "CA",
+          "exchange": "XETRA",
+          "sector": "Basic Materials",
+          "source": "TSX"
+        }
+      ]
+    }
+  },
+  "allTickers": [
+    {
+      "ticker": "0945.HK",
+      "company_name": "Manulife Financial Corporation",
+      "country": "CA",
+      "exchange": "HKSE",
+      "sector": "Financial Services",
+      "source": "TSX",
+      "suffix": "HK"
+    },
+    {
+      "ticker": "0A18.L",
+      "company_name": "CGI Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Technology",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0AH3.L",
+      "company_name": "Great-West Lifeco Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Financial Services",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0JVT.L",
+      "company_name": "Lululemon Athletica Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Consumer Cyclical",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0KTI.L",
+      "company_name": "Enbridge Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Energy",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0NHS.L",
+      "company_name": "Nutrien Ltd.",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0QKU.L",
+      "company_name": "Royal Bank of Canada",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Financial Services",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0QYZ.L",
+      "company_name": "Franco-Nevada Corporation",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0R07.L",
+      "company_name": "Pan American Silver Corp.",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0R2J.L",
+      "company_name": "Agnico Eagle Mines Limited",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0R35.L",
+      "company_name": "Cameco Corporation",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Energy",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0R4M.L",
+      "company_name": "Lundin Gold Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0UGS.L",
+      "company_name": "Alamos Gold Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0UKH.L",
+      "company_name": "Bank of Montreal",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Financial Services",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0UKI.L",
+      "company_name": "The Bank of Nova Scotia",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Financial Services",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0V5H.L",
+      "company_name": "Manulife Financial Corporation",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Financial Services",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0VFA.L",
+      "company_name": "Restaurant Brands International Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Consumer Cyclical",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0VHA.L",
+      "company_name": "Shopify Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Technology",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0VJA.L",
+      "company_name": "Sun Life Financial Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Financial Services",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "0VL8.L",
+      "company_name": "The Toronto-Dominion Bank",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Financial Services",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "2099.HK",
+      "company_name": "China Gold International Resources Corp. Ltd.",
+      "country": "CA",
+      "exchange": "HKSE",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "HK"
+    },
+    {
+      "ticker": "307.F",
+      "company_name": "Shopify Inc.",
+      "country": "CA",
+      "exchange": "FSX",
+      "sector": "Technology",
+      "source": "TSX",
+      "suffix": "F"
+    },
+    {
+      "ticker": "950160.KQ",
+      "company_name": "Kolon TissueGene, Inc.",
+      "country": "US",
+      "exchange": "KOE",
+      "sector": "Healthcare",
+      "source": "manual",
+      "suffix": "KQ"
+    },
+    {
+      "ticker": "AAPL.MX",
+      "company_name": "Apple Inc.",
+      "country": "US",
+      "exchange": "MEX",
+      "sector": "Technology",
+      "source": "manual",
+      "suffix": "MX"
+    },
+    {
+      "ticker": "AMRQ.L",
+      "company_name": "Amaroq Minerals Ltd.",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "AT1D.L",
+      "company_name": "Invesco AT1 Capital Bond ETF",
+      "country": "US",
+      "exchange": "LSE",
+      "sector": "Financial Services",
+      "source": "manual",
+      "suffix": "L"
+    },
+    {
+      "ticker": "ATD.B",
+      "company_name": "Alimentation Couche-Tard Inc.",
+      "country": "CA",
+      "exchange": "TSX",
+      "sector": "Consumer Defensive",
+      "source": "watchlist",
+      "suffix": "B"
+    },
+    {
+      "ticker": "BBD.B",
+      "company_name": "Bombardier Inc.",
+      "country": "CA",
+      "exchange": "TSX",
+      "sector": "Industrials",
+      "source": "watchlist",
+      "suffix": "B"
+    },
+    {
+      "ticker": "BBDBN.MX",
+      "company_name": "Bombardier Inc.",
+      "country": "CA",
+      "exchange": "MEX",
+      "sector": "Industrials",
+      "source": "TSX",
+      "suffix": "MX"
+    },
+    {
+      "ticker": "BRK.B",
+      "company_name": "YieldMax BRK.B Option Income Strategy ETF",
+      "country": "US",
+      "exchange": "AMEX",
+      "sector": "Financial Services",
+      "source": "watchlist",
+      "suffix": "B"
+    },
+    {
+      "ticker": "CGI.L",
+      "company_name": "Canadian General Investments, Limited",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Financial Services",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "IPCO.ST",
+      "company_name": "International Petroleum Corporation",
+      "country": "CA",
+      "exchange": "STO",
+      "sector": "Energy",
+      "source": "TSX",
+      "suffix": "ST"
+    },
+    {
+      "ticker": "KIN2.DE",
+      "company_name": "Kinross Gold Corporation",
+      "country": "CA",
+      "exchange": "XETRA",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "DE"
+    },
+    {
+      "ticker": "LUG.ST",
+      "company_name": "Lundin Gold Inc.",
+      "country": "CA",
+      "exchange": "STO",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "ST"
+    },
+    {
+      "ticker": "LUMI.ST",
+      "company_name": "Lundin Mining Corporation",
+      "country": "CA",
+      "exchange": "STO",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "ST"
+    },
+    {
+      "ticker": "MKA.L",
+      "company_name": "Mkango Resources Ltd.",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "SII.DE",
+      "company_name": "Wheaton Precious Metals Corp.",
+      "country": "CA",
+      "exchange": "XETRA",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "DE"
+    },
+    {
+      "ticker": "THX.L",
+      "company_name": "Thor Explorations Ltd.",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "TKO.L",
+      "company_name": "Taseko Mines Limited",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "WPM.L",
+      "company_name": "Wheaton Precious Metals Corp.",
+      "country": "CA",
+      "exchange": "LSE",
+      "sector": "Basic Materials",
+      "source": "TSX",
+      "suffix": "L"
+    },
+    {
+      "ticker": "XOM.MX",
+      "company_name": "Exxon Mobil Corporation",
+      "country": "US",
+      "exchange": "MEX",
+      "sector": "Energy",
+      "source": "manual",
+      "suffix": "MX"
+    }
+  ]
+}

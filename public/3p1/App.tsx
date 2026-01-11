@@ -19,6 +19,7 @@ import { SyncReportDialog, SyncReportData } from './components/SyncReportDialog'
 import { HistoricalVersionBanner } from './components/HistoricalVersionBanner';
 import { NotificationManager } from './components/Notification';
 import { SyncProgressBar } from './components/SyncProgressBar';
+import { SyncLockOverlay } from './components/SyncLockOverlay';
 import { LandingPage } from './components/LandingPage';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { InteractiveDemo } from './components/InteractiveDemo';
@@ -38,6 +39,7 @@ import { loadAllTickersFromSupabase, mapSourceToIsWatchlist } from './services/t
 import { loadProfilesBatchFromSupabase, loadProfileFromSupabase } from './services/supabaseDataLoader';
 import { storage } from './utils/storage';
 import { useRealtimeSync } from './hooks/useRealtimeSync';
+import { autoCleanupProfiles } from './utils/cleanupProfiles';
 
 // Lazy load heavy components for better initial load performance
 const KPIDashboard = React.lazy(() => import('./components/KPIDashboard').then(m => ({ default: m.KPIDashboard })));
@@ -98,8 +100,9 @@ const DEFAULT_PROFILE: AnalysisProfile = {
     isWatchlist: false
 };
 
-const STORAGE_KEY = 'finance_pro_profiles';
-const CACHE_MAX_AGE_MS = 5 * 60 * 1000; // 5 minutes - Cache invalidation automatique
+// ✅ Configurations chargées depuis Supabase (pas de hardcoding)
+let STORAGE_KEY = 'finance_pro_profiles'; // Valeur par défaut, sera remplacée par Supabase
+let CACHE_MAX_AGE_MS = 5 * 60 * 1000; // Valeur par défaut, sera remplacée par Supabase
 
 // ✅ Structure du cache avec timestamp pour invalidation automatique
 interface CacheEntry {
@@ -108,6 +111,26 @@ interface CacheEntry {
 }
 
 // ✅ Helper function pour sauvegarder avec timestamp (Supabase = source de vérité, localStorage = cache)
+// ✅ NOUVEAU: Sauvegarder dans Supabase ET cache local (Supabase = source de vérité)
+const saveToSupabase = async (data: Record<string, AnalysisProfile>): Promise<void> => {
+    try {
+        // Sauvegarder dans Supabase (source de vérité)
+        const { saveProfilesBatchToSupabase } = await import('./services/profileApi');
+        const result = await saveProfilesBatchToSupabase(data);
+        
+        if (result.failed > 0) {
+            console.warn(`⚠️ ${result.failed} profils n'ont pas pu être sauvegardés dans Supabase:`, result.errors.slice(0, 5));
+        }
+        
+        if (result.success > 0) {
+            console.log(`✅ ${result.success} profils sauvegardés dans Supabase`);
+        }
+    } catch (e) {
+        console.warn('Failed to save to Supabase:', e);
+    }
+};
+
+// ✅ Cache local uniquement (pour performance, Supabase = source de vérité)
 const saveToCache = async (data: Record<string, AnalysisProfile>): Promise<void> => {
     try {
         const cacheEntry: CacheEntry = {
@@ -118,6 +141,17 @@ const saveToCache = async (data: Record<string, AnalysisProfile>): Promise<void>
     } catch (e) {
         console.warn('Failed to save to cache:', e);
     }
+};
+
+// ✅ Sauvegarder dans Supabase ET cache local
+const saveProfiles = async (data: Record<string, AnalysisProfile>, saveToSupabaseFirst: boolean = true): Promise<void> => {
+    if (saveToSupabaseFirst) {
+        // Sauvegarder dans Supabase d'abord (source de vérité)
+        await saveToSupabase(data);
+    }
+    
+    // Puis sauvegarder dans le cache local (pour performance)
+    await saveToCache(data);
 };
 
 const ProgressBar = ({ current, total }: { current: number; total: number }) => {
@@ -487,37 +521,56 @@ export default function App() {
     useEffect(() => {
         const loadFromStorage = async () => {
             try {
-                const saved = await storage.getItem(STORAGE_KEY);
-                if (saved) {
-                    let parsed: Record<string, AnalysisProfile> | CacheEntry = saved;
-                    let cacheTimestamp: number | null = null;
+                // ✅ NOUVEAU: Charger depuis Supabase d'abord (source de vérité)
+                console.log('📡 Chargement des profils depuis Supabase...');
+                const { loadAllProfilesFromSupabase } = await import('./services/profileApi');
+                const supabaseResult = await loadAllProfilesFromSupabase();
+                
+                let parsed: Record<string, AnalysisProfile> = {};
+                
+                if (supabaseResult.success && Object.keys(supabaseResult.profiles).length > 0) {
+                    // ✅ Utiliser les profils depuis Supabase
+                    parsed = supabaseResult.profiles;
+                    console.log(`✅ ${Object.keys(parsed).length} profils chargés depuis Supabase`);
                     
-                    // ✅ NOUVEAU : Vérifier si c'est la nouvelle structure avec timestamp
-                    if (saved && typeof saved === 'object' && 'data' in saved && 'timestamp' in saved) {
-                        const cacheEntry = saved as CacheEntry;
-                        cacheTimestamp = cacheEntry.timestamp;
-                        parsed = cacheEntry.data;
+                    // Mettre à jour le cache local avec les données Supabase (cache uniquement, Supabase = source de vérité)
+                    await saveToCache(parsed);
+                } else {
+                    // ✅ Fallback: Charger depuis cache local si Supabase échoue
+                    console.log('⚠️ Échec chargement Supabase, fallback sur cache local...');
+                    const saved = await storage.getItem(STORAGE_KEY);
+                    if (saved) {
+                        let cacheTimestamp: number | null = null;
                         
-                        // ✅ Vérifier si le cache est obsolète (> 5 min)
-                        const now = Date.now();
-                        const cacheAge = now - cacheTimestamp;
-                        if (cacheAge > CACHE_MAX_AGE_MS) {
-                            console.log(`🔄 Cache obsolète (${Math.round(cacheAge / 1000 / 60)} min) - Rechargement depuis Supabase...`);
-                            // Invalider le cache et recharger depuis Supabase
-                            await storage.removeItem(STORAGE_KEY);
-                            parsed = {};
-                        } else {
-                            console.log(`✅ Cache valide (${Math.round(cacheAge / 1000)}s) - Utilisation cache localStorage`);
-                        }
-                    } else if (typeof saved === 'string') {
-                        // Migration depuis ancien format (string)
-                        try {
-                           parsed = JSON.parse(saved);
-                        } catch (e) {
-                           console.error('Failed to parse stringified data', e);
-                           parsed = {};
+                        // ✅ NOUVEAU : Vérifier si c'est la nouvelle structure avec timestamp
+                        if (saved && typeof saved === 'object' && 'data' in saved && 'timestamp' in saved) {
+                            const cacheEntry = saved as CacheEntry;
+                            cacheTimestamp = cacheEntry.timestamp;
+                            parsed = cacheEntry.data;
+                            
+                            // ✅ Vérifier si le cache est obsolète (> 5 min)
+                            const now = Date.now();
+                            const cacheAge = now - cacheTimestamp;
+                            if (cacheAge > CACHE_MAX_AGE_MS) {
+                                console.log(`🔄 Cache obsolète (${Math.round(cacheAge / 1000 / 60)} min) - Ignoré`);
+                                parsed = {};
+                            } else {
+                                console.log(`✅ Cache valide (${Math.round(cacheAge / 1000)}s) - Utilisation cache local`);
+                            }
+                        } else if (typeof saved === 'string') {
+                            // Migration depuis ancien format (string)
+                            try {
+                               parsed = JSON.parse(saved);
+                            } catch (e) {
+                               console.error('Failed to parse stringified data', e);
+                               parsed = {};
+                            }
+                        } else if (typeof saved === 'object') {
+                            // Format direct
+                            parsed = saved as Record<string, AnalysisProfile>;
                         }
                     }
+                }
 
                     // NETTOYER LES FONDS MUTUELS : Supprimer automatiquement les fonds mutuels existants
                     const cleaned: Record<string, AnalysisProfile> = {};
@@ -534,7 +587,8 @@ export default function App() {
                     
                     if (removedMutualFunds.length > 0) {
                         console.log(`🧹 ${removedMutualFunds.length} fonds mutuel(s) supprimé(s) automatiquement`);
-                        await saveToCache(cleaned);
+                        // ✅ Sauvegarder dans Supabase ET cache local
+                        await saveProfiles(cleaned, true);
                     }
                     
                     if (Object.keys(cleaned).length > 0) {
@@ -673,6 +727,22 @@ export default function App() {
                 }
                 
                 console.log(`✅ ${result.tickers.length} tickers chargés depuis Supabase`);
+                
+                // ✅ NETTOYAGE AUTOMATIQUE: Supprimer les profils obsolètes qui ne sont plus dans Supabase
+                try {
+                    const cleanupResult = await autoCleanupProfiles();
+                    if (cleanupResult.removed > 0) {
+                        console.log(`🧹 Nettoyage automatique: ${cleanupResult.removed} profils obsolètes supprimés de localStorage`);
+                        // Recharger depuis localStorage après nettoyage
+                        const cleaned = await storage.getItem(STORAGE_KEY);
+                        if (cleaned && typeof cleaned === 'object' && 'data' in cleaned) {
+                            setLibrary(cleaned.data || {});
+                        }
+                    }
+                } catch (cleanupError) {
+                    console.warn('⚠️ Erreur lors du nettoyage automatique:', cleanupError);
+                    // Ne pas bloquer le chargement si le nettoyage échoue
+                }
                 
                 // Mettre à jour la progression pour le chargement des données
                 const validTickers = result.tickers.filter(t => t.ticker && !isMutualFund(t.ticker, t.company_name));
@@ -892,7 +962,8 @@ export default function App() {
                     });
 
                     // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp (fire and forget)
-                    saveToCache(updated).catch(e => console.warn('Failed to save to cache:', e));
+                    // ✅ Sauvegarder dans Supabase ET cache local
+                    saveProfiles(updated, true).catch(e => console.warn('Failed to save profiles:', e));
 
                     if (newTickersCount > 0) {
                         console.log(`✅ ${newTickersCount} nouveaux profils squelettes créés depuis Supabase`);
@@ -1046,7 +1117,8 @@ export default function App() {
                         const updated = { ...prev, ...skeletonProfiles };
                         console.log(`📊 ${Object.keys(skeletonProfiles).length} profils squelettes ajoutés à library (total: ${Object.keys(updated).length})`);
                         // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp
-                        saveToCache(updated).catch(e => console.warn('Failed to save to cache:', e));
+                        // ✅ Sauvegarder dans Supabase ET cache local
+                    saveProfiles(updated, true).catch(e => console.warn('Failed to save profiles:', e));
                         return updated;
                     });
 
@@ -1179,7 +1251,8 @@ export default function App() {
                                         baseAssumptions = autoFillAssumptionsFromFMPData(
                                             result.data,
                                             result.currentPrice,
-                                            INITIAL_ASSUMPTIONS
+                                            INITIAL_ASSUMPTIONS,
+                                            result.currentDividend // ✅ NOUVEAU: Dividende actuel depuis l'API
                                         ) as Assumptions;
                                     }
                                     
@@ -1234,7 +1307,8 @@ export default function App() {
                                             }
                                         };
                                         // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp
-                                        saveToCache(updated).catch(e => console.warn('Failed to save to cache:', e));
+                                        // ✅ Sauvegarder dans Supabase ET cache local
+                    saveProfiles(updated, true).catch(e => console.warn('Failed to save profiles:', e));
                                         return updated;
                                     });
                                     
@@ -1391,7 +1465,10 @@ export default function App() {
             // ⚠️ Profil non trouvé dans la library - peut-être un nouveau ticker ou chargement initial
             // Si c'est un profil squelette ou manquant, on tente de forcer le chargement
              // Afficher un avertissement si ce n'est pas le profil initial (ACN) ou si on vient de delete
-            if (activeId !== 'ACN' && activeId !== '') {
+            // ✅ Vérifier le ticker par défaut depuis Supabase (pas de hardcoding)
+            const { getConfigValue } = await import('./services/appConfigApi');
+            const defaultTicker = await getConfigValue('default_ticker');
+            if (activeId !== defaultTicker && activeId !== '') {
                  // Ne pas afficher d'erreur tout de suite, cela peut être transitoire
             }
         }
@@ -1465,7 +1542,8 @@ export default function App() {
                 if (typeof requestIdleCallback !== 'undefined') {
                     requestIdleCallback(async () => {
                         try {
-                            await storage.setItem(STORAGE_KEY, updated);
+                            // ✅ Sauvegarder dans Supabase ET cache local
+                            await saveProfiles(updated, true);
                         } catch (e) {
                             console.warn('Failed to save to Storage:', e);
                         }
@@ -1474,7 +1552,8 @@ export default function App() {
                     // Fallback pour navigateurs sans requestIdleCallback
                     setTimeout(async () => {
                         try {
-                            await storage.setItem(STORAGE_KEY, updated);
+                            // ✅ Sauvegarder dans Supabase ET cache local
+                            await saveProfiles(updated, true);
                         } catch (e) {
                             console.warn('Failed to save to Storage:', e);
                         }
@@ -1674,6 +1753,22 @@ export default function App() {
                             (newRowTyped.priceHigh <= 0 && existingRow.priceHigh > 0) ||
                             (newRowTyped.priceLow <= 0 && existingRow.priceLow > 0);
                         
+                        // ✅ PRÉSERVER LE DATASOURCE ORIGINAL SI FMP-VERIFIED ET PAS DE PRÉSERVATION
+                        // Si les données existantes sont 'fmp-verified' et qu'on n'a pas préservé de valeurs,
+                        // on garde 'fmp-verified' pour que les données restent vertes
+                        let finalDataSource: 'fmp-verified' | 'fmp-adjusted' | 'manual' | 'calculated';
+                        if (hasPreservedValues) {
+                            // Si on a préservé des valeurs, c'est forcément ajusté
+                            finalDataSource = 'fmp-adjusted' as const;
+                        } else if (existingRow.dataSource === 'fmp-verified') {
+                            // Si les données existantes étaient déjà vérifiées et qu'on n'a rien préservé,
+                            // on garde 'fmp-verified' pour que ça reste vert
+                            finalDataSource = 'fmp-verified' as const;
+                        } else {
+                            // Sinon, on utilise les nouvelles données FMP qui sont vérifiées
+                            finalDataSource = 'fmp-verified' as const;
+                        }
+                        
                         return {
                             ...existingRow,
                             earningsPerShare: (newRowTyped.earningsPerShare > 0) ? newRowTyped.earningsPerShare : existingRow.earningsPerShare,
@@ -1683,7 +1778,7 @@ export default function App() {
                             priceHigh: (newRowTyped.priceHigh > 0) ? newRowTyped.priceHigh : existingRow.priceHigh,
                             priceLow: (newRowTyped.priceLow > 0) ? newRowTyped.priceLow : existingRow.priceLow,
                             autoFetched: true,
-                            dataSource: hasPreservedValues ? 'fmp-adjusted' as const : 'fmp-verified' as const // ✅ Si valeurs préservées = ajusté, sinon vérifié
+                            dataSource: finalDataSource // ✅ Préserve 'fmp-verified' si les données n'ont pas été modifiées
                         };
                     });
 
@@ -1805,7 +1900,8 @@ export default function App() {
             const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
                 mergedDataForCalc, // Utiliser les données mergées au lieu de result.data
                 result.currentPrice,
-                existingAssumptionsForCalc // Préserver les valeurs existantes seulement si replaceOrangeData est false
+                existingAssumptionsForCalc, // Préserver les valeurs existantes seulement si replaceOrangeData est false
+                result.currentDividend // ✅ NOUVEAU: Dividende actuel depuis l'API
             );
 
             console.log('✅ Auto-filled assumptions in performSync (AVANT setAssumptions):', {
@@ -1982,6 +2078,7 @@ export default function App() {
             showNotification(`Erreur lors de la récupération des données : ${errorMessage}`, 'error');
         } finally {
             setIsLoading(false);
+            setCurrentSyncingTicker(undefined); // ✅ Réinitialiser le ticker actuel
         }
     };
 
@@ -2190,7 +2287,8 @@ export default function App() {
             const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
                 mergedData, // Utiliser les données mergées au lieu de result.data
                 result.currentPrice,
-                assumptions // Préserver les exclusions existantes
+                assumptions, // Préserver les exclusions existantes
+                result.currentDividend // ✅ NOUVEAU: Dividende actuel depuis l'API
             );
 
             // Détecter et exclure automatiquement les métriques avec prix cibles aberrants
@@ -2617,6 +2715,22 @@ export default function App() {
                     (newRowTyped.priceHigh <= 0 && existingRow.priceHigh > 0) ||
                     (newRowTyped.priceLow <= 0 && existingRow.priceLow > 0);
                 
+                // ✅ PRÉSERVER LE DATASOURCE ORIGINAL SI FMP-VERIFIED ET PAS DE PRÉSERVATION
+                // Si les données existantes sont 'fmp-verified' et qu'on n'a pas préservé de valeurs,
+                // on garde 'fmp-verified' pour que les données restent vertes
+                let finalDataSource: 'fmp-verified' | 'fmp-adjusted' | 'manual' | 'calculated';
+                if (hasPreservedValues) {
+                    // Si on a préservé des valeurs, c'est forcément ajusté
+                    finalDataSource = 'fmp-adjusted' as const;
+                } else if (existingRow.dataSource === 'fmp-verified') {
+                    // Si les données existantes étaient déjà vérifiées et qu'on n'a rien préservé,
+                    // on garde 'fmp-verified' pour que ça reste vert
+                    finalDataSource = 'fmp-verified' as const;
+                } else {
+                    // Sinon, on utilise les nouvelles données FMP qui sont vérifiées
+                    finalDataSource = 'fmp-verified' as const;
+                }
+                
                 return {
                     ...existingRow,
                     earningsPerShare: (newRowTyped.earningsPerShare > 0) ? newRowTyped.earningsPerShare : existingRow.earningsPerShare,
@@ -2626,7 +2740,7 @@ export default function App() {
                     priceHigh: (newRowTyped.priceHigh > 0) ? newRowTyped.priceHigh : existingRow.priceHigh,
                     priceLow: (newRowTyped.priceLow > 0) ? newRowTyped.priceLow : existingRow.priceLow,
                     autoFetched: true,
-                    dataSource: hasPreservedValues ? 'fmp-adjusted' as const : 'fmp-verified' as const // ✅ Si valeurs préservées = ajusté, sinon vérifié
+                    dataSource: finalDataSource // ✅ Préserve 'fmp-verified' si les données n'ont pas été modifiées
                 };
             });
 
@@ -2651,7 +2765,8 @@ export default function App() {
             const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
                 mergedData, // ✅ Utiliser mergedData au lieu de result.data
                 result.currentPrice,
-                existingProfile?.assumptions || INITIAL_ASSUMPTIONS
+                existingProfile?.assumptions || INITIAL_ASSUMPTIONS,
+                result.currentDividend // ✅ NOUVEAU: Dividende actuel depuis l'API
             );
 
             // ✅ MERGE INTELLIGENT : Préserver les valeurs existantes (orange) AVANT d'appliquer les nouvelles
@@ -2741,7 +2856,8 @@ export default function App() {
                 };
                 
                 // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp (fire and forget)
-                saveToCache(updated).catch(e => console.warn('Failed to save to cache:', e));
+                        // ✅ Sauvegarder dans Supabase ET cache local
+                        saveProfiles(updated, true).catch(e => console.warn('Failed to save profiles:', e));
                 
                 return updated;
             });
@@ -2782,7 +2898,8 @@ export default function App() {
         const newLib = { ...library };
         delete newLib[id];
         setLibrary(newLib);
-        await saveToCache(newLib);
+        // ✅ Sauvegarder dans Supabase ET cache local
+        await saveProfiles(newLib, true);
 
         // Update active ticker if needed
         if (activeId === id) {
@@ -2852,7 +2969,8 @@ export default function App() {
             };
 
             const newLib = { ...prev, [id]: updated };
-            saveToCache(newLib).catch(e => {
+            // ✅ Sauvegarder dans Supabase ET cache local
+            saveProfiles(newLib, true).catch(e => {
                 console.warn('Failed to save to cache:', e);
             });
 
@@ -2876,7 +2994,8 @@ export default function App() {
             };
 
             const newLib = { ...prev, [id]: updated };
-            saveToCache(newLib).catch(e => {
+            // ✅ Sauvegarder dans Supabase ET cache local
+            saveProfiles(newLib, true).catch(e => {
                 console.warn('Failed to save to cache:', e);
             });
 
@@ -2899,6 +3018,7 @@ export default function App() {
     const [isBulkSyncing, setIsBulkSyncing] = useState(false);
     const [bulkSyncProgress, setBulkSyncProgress] = useState({ current: 0, total: 0 });
     const [syncStats, setSyncStats] = useState({ successCount: 0, errorCount: 0 });
+    const [currentSyncingTicker, setCurrentSyncingTicker] = useState<string | undefined>(undefined);
     
     // Sync Control Refs & State
     const abortSync = useRef(false);
@@ -2966,9 +3086,11 @@ export default function App() {
         }
         
         // ✅ OPTIMISATION: Utiliser l'endpoint batch pour récupérer plusieurs tickers en une seule requête
-        const BATCH_API_SIZE = 20; // Nombre de tickers par batch API (limite FMP)
-        const delayBetweenBatches = 2000; // Délai entre batches API (2 secondes - ultra-sécurisé pour rate limiting)
-        const MAX_SYNC_TIME_MS = 30 * 60 * 1000; // Timeout global : 30 minutes max pour toute la synchronisation
+        // ✅ Charger les configurations depuis Supabase (pas de hardcoding)
+        const { getConfigValue } = await import('./services/appConfigApi');
+        const BATCH_API_SIZE = await getConfigValue('api_batch_size');
+        const delayBetweenBatches = await getConfigValue('delay_between_batches_ms');
+        const MAX_SYNC_TIME_MS = await getConfigValue('max_sync_time_ms');
         const startSyncTime = Date.now(); // Timestamp de début pour timeout global
 
         // ✅ FONCTION HELPER: Récupérer plusieurs tickers en batch
@@ -3005,10 +3127,11 @@ export default function App() {
                         if (result.success && result.data) {
                             const dataLength = result.data.data ? result.data.data.length : 0;
                             if (dataLength > 0) {
-                                console.log(`✅ [BATCH] ${result.symbol}: ${dataLength} années de données`);
+                                console.log(`✅ [BATCH] ${result.symbol}: ${dataLength} années de données, currentDividend: ${result.data.currentDividend || 0}`);
                             } else {
                                 console.log(`⚠️ [BATCH] ${result.symbol}: Profile trouvé mais ${dataLength} années de données`);
                             }
+                            // ✅ Stocker la structure complète (result.data contient data, info, currentPrice, currentDividend)
                             results.set(result.symbol.toUpperCase(), result.data);
                         } else {
                             console.warn(`❌ [BATCH] ${result.symbol}: Échec ou données manquantes (success: ${result.success}, hasData: ${!!result.data})`);
@@ -3072,14 +3195,57 @@ export default function App() {
                 await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
             }
 
-            // ✅ OPTIMISATION: Récupérer tous les tickers du batch en une seule requête API
+            // ✅ OPTIMISATION: Filtrer les tickers qui ont vraiment besoin de données FMP
+            // Avant d'appeler l'API batch, vérifier quels tickers ont vraiment besoin de données
+            const { shouldFetchFromFMP } = await import('./utils/syncOptimization');
+            const tickersNeedingFMP: string[] = [];
+            
+            // Vérifier chaque ticker du batch en parallèle
+            await Promise.all(
+                batch.map(async (tickerSymbol) => {
+                    const profile = library[tickerSymbol];
+                    if (!profile) {
+                        // Pas de profil - besoin de FMP
+                        tickersNeedingFMP.push(tickerSymbol);
+                        return;
+                    }
+                    
+                    const needsFMP = await shouldFetchFromFMP(
+                        tickerSymbol,
+                        profile.data,
+                        profile.assumptions.currentPrice || 0,
+                        profile.info,
+                        {
+                            syncData: options.syncData,
+                            syncInfo: options.syncInfo,
+                            updateCurrentPrice: options.updateCurrentPrice,
+                            syncOnlyNewYears: options.syncOnlyNewYears,
+                            syncOnlyMissingMetrics: options.syncOnlyMissingMetrics
+                        }
+                    );
+                    
+                    if (needsFMP) {
+                        tickersNeedingFMP.push(tickerSymbol);
+                    } else {
+                        console.log(`✅ ${tickerSymbol}: Skip FMP - données déjà disponibles`);
+                    }
+                })
+            );
+            
+            // ✅ OPTIMISATION: Récupérer seulement les tickers qui en ont besoin
             // Inclure les key metrics seulement si syncData est activé
             const includeKeyMetrics = options.syncData;
-            console.log(`📦 Récupération batch ${i / BATCH_API_SIZE + 1}/${Math.ceil(allTickers.length / BATCH_API_SIZE)}: ${batch.length} tickers`);
-            console.log(`🔍 [BATCH] Options: syncData=${options.syncData}, syncAssumptions=${options.syncAssumptions}, syncInfo=${options.syncInfo}, includeKeyMetrics=${includeKeyMetrics}`);
-            const batchResults = await fetchCompanyDataBatch(batch, includeKeyMetrics);
+            let batchResults = new Map<string, any>();
+            
+            if (tickersNeedingFMP.length > 0) {
+                console.log(`📦 Récupération batch ${i / BATCH_API_SIZE + 1}/${Math.ceil(allTickers.length / BATCH_API_SIZE)}: ${tickersNeedingFMP.length}/${batch.length} tickers nécessitent FMP`);
+                console.log(`🔍 [BATCH] Options: syncData=${options.syncData}, syncAssumptions=${options.syncAssumptions}, syncInfo=${options.syncInfo}, includeKeyMetrics=${includeKeyMetrics}`);
+                batchResults = await fetchCompanyDataBatch(tickersNeedingFMP, includeKeyMetrics);
+            } else {
+                console.log(`✅ Batch ${i / BATCH_API_SIZE + 1}: Tous les tickers ont déjà leurs données, skip FMP`);
+            }
 
-            // Traiter chaque ticker du batch avec timeout individuel
+            // Traiter chaque ticker du batch (même ceux qui n'ont pas besoin de FMP pour les assumptions)
             await Promise.allSettled(
                 batch.map(async (tickerSymbol) => {
                     const tickerStartTime = Date.now();
@@ -3129,6 +3295,8 @@ export default function App() {
                     };
 
                     try {
+                        // ✅ Mettre à jour le ticker actuel pour l'overlay
+                        setCurrentSyncingTicker(tickerSymbol);
                         setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
 
                         const profile = library[tickerSymbol];
@@ -3165,9 +3333,55 @@ export default function App() {
                             }
                         }
 
-                        // 2. Charger les nouvelles données FMP avec timeout (si option activée)
+                        // 2. ✅ OPTIMISATION: Analyser les besoins avant d'appeler FMP
                         if (!options.syncData && !options.syncAssumptions && !options.syncInfo) {
                             console.log(`⏭️ ${tickerSymbol}: Aucune option de sync activée, ignoré`);
+                            return;
+                        }
+
+                        // ✅ Vérifier si on a vraiment besoin d'appeler FMP
+                        const { shouldFetchFromFMP, analyzeSyncNeeds } = await import('./utils/syncOptimization');
+                        const needsFMP = await shouldFetchFromFMP(
+                            tickerSymbol,
+                            profile.data,
+                            profile.assumptions.currentPrice || 0,
+                            profile.info,
+                            {
+                                syncData: options.syncData,
+                                syncInfo: options.syncInfo,
+                                updateCurrentPrice: options.updateCurrentPrice,
+                                syncOnlyNewYears: options.syncOnlyNewYears,
+                                syncOnlyMissingMetrics: options.syncOnlyMissingMetrics
+                            }
+                        );
+
+                        if (!needsFMP) {
+                            console.log(`✅ ${tickerSymbol}: Toutes les données nécessaires déjà disponibles, skip FMP`);
+                            // Mettre à jour seulement les assumptions si nécessaire (sans appeler FMP)
+                            if (options.syncAssumptions && profile.data.length > 0) {
+                                const { autoFillAssumptionsFromFMPData } = await import('./utils/calculations');
+                                const updatedAssumptions = autoFillAssumptionsFromFMPData(
+                                    profile.data,
+                                    profile.assumptions.currentPrice || 0,
+                                    profile.assumptions,
+                                    undefined // Pas de dividende depuis API dans ce cas (skip FMP)
+                                );
+                                
+                                setLibrary(prev => ({
+                                    ...prev,
+                                    [tickerSymbol]: {
+                                        ...profile,
+                                        assumptions: { ...profile.assumptions, ...updatedAssumptions },
+                                        lastModified: Date.now()
+                                    }
+                                }));
+                                
+                                tickerResult.other.assumptionsUpdated = true;
+                                successCount++;
+                                tickerResult.success = true;
+                                setSyncStats(prev => ({ ...prev, successCount: prev.successCount + 1 }));
+                                console.log(`✅ ${tickerSymbol}: Assumptions mises à jour sans appel FMP`);
+                            }
                             return;
                         }
 
@@ -3176,13 +3390,43 @@ export default function App() {
                         
                         // Essayer d'abord le batch result
                         if (batchResults.has(tickerSymbol)) {
-                            result = batchResults.get(tickerSymbol);
-                            console.log(`📦 ${tickerSymbol}: Données récupérées du batch (data.length: ${result?.data?.length || 0})`);
+                            const batchResult = batchResults.get(tickerSymbol);
+                            // ✅ FIX: La structure batch est { data: [...], info: {...}, currentPrice: ..., currentDividend: ... }
+                            // batchResult est déjà la structure complète depuis result.data
+                            result = {
+                                data: batchResult?.data || [],
+                                info: batchResult?.info || {},
+                                currentPrice: batchResult?.currentPrice || 0,
+                                currentDividend: batchResult?.currentDividend || 0, // ✅ NOUVEAU: Dividende actuel depuis batch
+                                financials: batchResult?.financials || [],
+                                analysisData: batchResult?.analysisData || null
+                            };
+                            console.log(`📦 ${tickerSymbol}: Données récupérées du batch (data.length: ${result?.data?.length || 0}, currentDividend: ${result.currentDividend})`);
+                            
+                            // ✅ OPTIMISATION: Filtrer les données FMP si nécessaire
+                            if (options.syncOnlyNewYears || options.syncOnlyMissingMetrics) {
+                                const { filterFMPDataForSync } = await import('./utils/syncOptimization');
+                                result.data = filterFMPDataForSync(result.data, profile.data, {
+                                    syncOnlyNewYears: options.syncOnlyNewYears,
+                                    syncOnlyMissingMetrics: options.syncOnlyMissingMetrics
+                                });
+                                console.log(`🔍 ${tickerSymbol}: Données FMP filtrées - ${result.data.length} années à traiter`);
+                            }
                         } else {
                             console.warn(`⚠️ ${tickerSymbol}: Pas dans les résultats du batch, fallback vers appel individuel`);
                             // Fallback: appel individuel si pas dans le batch
                             try {
                                 result = await fetchCompanyDataWithTimeout(tickerSymbol);
+                                
+                                // ✅ OPTIMISATION: Filtrer les données FMP si nécessaire
+                                if (result && result.data && (options.syncOnlyNewYears || options.syncOnlyMissingMetrics)) {
+                                    const { filterFMPDataForSync } = await import('./utils/syncOptimization');
+                                    result.data = filterFMPDataForSync(result.data, profile.data, {
+                                        syncOnlyNewYears: options.syncOnlyNewYears,
+                                        syncOnlyMissingMetrics: options.syncOnlyMissingMetrics
+                                    });
+                                    console.log(`🔍 ${tickerSymbol}: Données FMP filtrées - ${result.data.length} années à traiter`);
+                                }
                             } catch (fetchError: any) {
                                 // Détecter si c'est une erreur de rate limiting
                                 const isRateLimitError = fetchError.message && (
@@ -3375,11 +3619,37 @@ export default function App() {
                                             return existingRow;
                                         }
                                         
-                                        // Sinon, remplacer directement (données FMP vérifiées si pas de merge complexe)
+                                        // Sinon, merger avec préservation des valeurs existantes (données ajustées)
+                                        // ✅ CRITIQUE : Ne pas remplacer les valeurs existantes par des valeurs à 0
+                                        const typedNewRow = newRow as AnnualData;
+                                        const hasPreservedValues = 
+                                            (typedNewRow.earningsPerShare <= 0 && existingRow.earningsPerShare > 0) ||
+                                            (typedNewRow.cashFlowPerShare <= 0 && existingRow.cashFlowPerShare > 0) ||
+                                            (typedNewRow.bookValuePerShare <= 0 && existingRow.bookValuePerShare > 0) ||
+                                            (typedNewRow.dividendPerShare <= 0 && existingRow.dividendPerShare > 0) ||
+                                            (typedNewRow.priceHigh <= 0 && existingRow.priceHigh > 0) ||
+                                            (typedNewRow.priceLow <= 0 && existingRow.priceLow > 0);
+                                        
+                                        // ✅ PRÉSERVER LE DATASOURCE ORIGINAL SI FMP-VERIFIED ET PAS DE PRÉSERVATION
+                                        let finalDataSource: 'fmp-verified' | 'fmp-adjusted' | 'manual' | 'calculated';
+                                        if (hasPreservedValues) {
+                                            finalDataSource = 'fmp-adjusted' as const;
+                                        } else if (existingRow.dataSource === 'fmp-verified') {
+                                            finalDataSource = 'fmp-verified' as const;
+                                        } else {
+                                            finalDataSource = 'fmp-verified' as const;
+                                        }
+                                        
                                         return {
-                                            ...(newRow as AnnualData),
+                                            ...existingRow,
+                                            earningsPerShare: (typedNewRow.earningsPerShare > 0) ? typedNewRow.earningsPerShare : existingRow.earningsPerShare,
+                                            cashFlowPerShare: (typedNewRow.cashFlowPerShare > 0) ? typedNewRow.cashFlowPerShare : existingRow.cashFlowPerShare,
+                                            bookValuePerShare: (typedNewRow.bookValuePerShare > 0) ? typedNewRow.bookValuePerShare : existingRow.bookValuePerShare,
+                                            dividendPerShare: (typedNewRow.dividendPerShare > 0) ? typedNewRow.dividendPerShare : existingRow.dividendPerShare,
+                                            priceHigh: (typedNewRow.priceHigh > 0) ? typedNewRow.priceHigh : existingRow.priceHigh,
+                                            priceLow: (typedNewRow.priceLow > 0) ? typedNewRow.priceLow : existingRow.priceLow,
                                             autoFetched: true,
-                                            dataSource: 'fmp-verified' as const // ✅ Remplacement direct = données FMP vérifiées
+                                            dataSource: finalDataSource // ✅ Préserve 'fmp-verified' si les données n'ont pas été modifiées
                                         };
                                     });
 
@@ -3409,7 +3679,8 @@ export default function App() {
                             const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
                                 mergedData,
                                 currentPriceForCalc,
-                                existingAssumptionsForCalc
+                                existingAssumptionsForCalc,
+                                result.currentDividend // ✅ NOUVEAU: Dividende actuel depuis l'API
                             );
 
                             // Détecter les outliers (si option activée)
@@ -3534,8 +3805,9 @@ export default function App() {
                             };
 
                             // Sauvegarder avec IndexedDB (évite QuotaExceededError)
-                            saveToCache(updated).catch(e => {
-                                console.warn('Failed to save to cache:', e);
+                            // ✅ Sauvegarder dans Supabase ET cache local
+                            saveProfiles(updated, true).catch(e => {
+                                console.warn('Failed to save profiles:', e);
                             });
 
                             return updated;
@@ -3799,6 +4071,7 @@ export default function App() {
         } finally {
             setIsBulkSyncing(false);
             setBulkSyncProgress({ current: 0, total: 0 });
+            setCurrentSyncingTicker(undefined); // ✅ Réinitialiser le ticker actuel
         }
     };
 
@@ -3852,6 +4125,8 @@ export default function App() {
             await Promise.allSettled(
                 batch.map(async (tickerSymbol) => {
                     try {
+                        // ✅ Mettre à jour le ticker actuel pour l'overlay
+                        setCurrentSyncingTicker(tickerSymbol);
                         setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
 
                         const profile = library[tickerSymbol];
@@ -3923,7 +4198,8 @@ export default function App() {
                         const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
                             mergedData,
                             result.currentPrice,
-                            profile.assumptions
+                            profile.assumptions,
+                            result.currentDividend // ✅ NOUVEAU: Dividende actuel depuis l'API
                         );
 
                         // 5. Détecter les outliers
@@ -3963,8 +4239,9 @@ export default function App() {
                             };
 
                             // Sauvegarder avec IndexedDB (évite QuotaExceededError)
-                            saveToCache(updated).catch(e => {
-                                console.warn('Failed to save to cache:', e);
+                            // ✅ Sauvegarder dans Supabase ET cache local
+                            saveProfiles(updated, true).catch(e => {
+                                console.warn('Failed to save profiles:', e);
                             });
 
                             return updated;
@@ -4016,6 +4293,7 @@ export default function App() {
             // ✅ GARANTIE: Toujours réinitialiser l'état, même en cas d'erreur
             setIsBulkSyncing(false);
             setBulkSyncProgress({ current: 0, total: 0 });
+            setCurrentSyncingTicker(undefined); // ✅ Réinitialiser le ticker actuel
 
             // Afficher le résultat
             const message = `Synchronisation terminée\n\n` +
@@ -4158,7 +4436,8 @@ export default function App() {
                 });
 
                 // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp (fire and forget)
-                saveToCache(updated).catch(e => console.warn('Failed to save to cache:', e));
+                        // ✅ Sauvegarder dans Supabase ET cache local
+                        saveProfiles(updated, true).catch(e => console.warn('Failed to save profiles:', e));
 
                 // ✅ DEBUG: Compter les profils avec isWatchlist=false après migration
                 const portfolioCount = Object.values(updated).filter((p: any) => p.isWatchlist === false).length;
@@ -4277,7 +4556,9 @@ export default function App() {
             });
 
             if (newTickers.length > 0) {
-                const batchSize = 5;
+                // ✅ Taille du batch depuis Supabase (pas de hardcoding)
+                const { getConfigValue } = await import('./services/appConfigApi');
+                const batchSize = await getConfigValue('profile_batch_size');
                 const delayBetweenBatches = 500;
                 
                 // ✅ Collecter les erreurs pour afficher un résumé à la fin
@@ -4357,7 +4638,8 @@ export default function App() {
                                 const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
                                     result.data,
                                     result.currentPrice,
-                                    INITIAL_ASSUMPTIONS
+                                    INITIAL_ASSUMPTIONS,
+                                    result.currentDividend // ✅ NOUVEAU: Dividende actuel depuis l'API
                                 );
                                 
                                 // ✅ SANITISER une deuxième fois pour être absolument sûr (les paramètres peuvent avoir changé)
@@ -4408,8 +4690,9 @@ export default function App() {
                                     };
                                     
                                     // Sauvegarder avec IndexedDB (évite QuotaExceededError)
-                                    saveToCache(updated).catch(e => {
-                                        console.warn('Failed to save to cache:', e);
+                                    // ✅ Sauvegarder dans Supabase ET cache local
+                            saveProfiles(updated, true).catch(e => {
+                                        console.warn('Failed to save profiles:', e);
                                     });
                                     
                                     return updated;
@@ -4552,46 +4835,8 @@ export default function App() {
 
     const availableYears = data.map(d => d.year);
 
-    const syncOverlay = isBulkSyncing ? (
-        <div className="fixed bottom-4 right-4 bg-slate-800 p-4 rounded-lg shadow-xl border border-slate-700 z-[100] w-80 animate-in fade-in slide-in-from-bottom-5">
-            <div className="flex justify-between items-center mb-2">
-                <span className="font-bold text-white text-sm flex items-center gap-2">
-                    <ArrowPathIcon className={`w-4 h-4 ${!syncPausedState ? 'animate-spin' : ''}`} />
-                    Syncing... {bulkSyncProgress.current}/{bulkSyncProgress.total}
-                </span>
-                <span className="text-xs text-slate-400 font-mono">{Math.round((bulkSyncProgress.current / bulkSyncProgress.total) * 100)}%</span>
-            </div>
-            <ProgressBar 
-                current={bulkSyncProgress.current} 
-                total={bulkSyncProgress.total} 
-            />
-            
-            <div className="flex justify-between items-center text-xs text-slate-400 mb-3">
-                 <span>Success: <span className="text-green-400">{syncStats.successCount}</span></span>
-                 <span>Errors: <span className="text-red-400">{syncStats.errorCount}</span></span>
-            </div>
-
-            <div className="flex gap-2">
-                <button 
-                    onClick={() => { 
-                        isSyncPaused.current = !isSyncPaused.current; 
-                        setSyncPausedState(isSyncPaused.current); 
-                    }} 
-                    className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded transition-colors ${syncPausedState ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-yellow-600 hover:bg-yellow-500 text-white'}`}
-                >
-                    {syncPausedState ? <PlayIcon className="w-4 h-4" /> : <PauseIcon className="w-4 h-4" />}
-                    <span>{syncPausedState ? "Resume" : "Pause"}</span>
-                </button>
-                <button 
-                    onClick={() => abortSync.current = true} 
-                    className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded transition-colors"
-                >
-                    <StopIcon className="w-4 h-4" />
-                    <span>Stop</span>
-                </button>
-            </div>
-        </div>
-    ) : null;
+    // ✅ Overlay de verrouillage pendant la synchronisation (bulk ou single)
+    const isSyncing = isBulkSyncing || isLoading;
 
     if (!isInitialized) return <div className="flex items-center justify-center h-screen text-slate-500">Chargement...</div>;
 
@@ -4627,10 +4872,11 @@ export default function App() {
                              <AdminDashboard onRepair={handleAdminRepair} isRepairing={isRepairing} />
                          </Suspense>
                      </ErrorBoundary>
-                </div>
             </div>
-        );
-    }
+        </div>
+        </>
+    );
+}
 
 
     // Handler générique pour mettre à jour un profil complet (utilisé par KPIDashboard)
@@ -4654,10 +4900,12 @@ export default function App() {
             // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp
             if (typeof requestIdleCallback !== 'undefined') {
                 requestIdleCallback(() => {
-                    saveToCache(updatedLibrary).catch(e => console.warn('Failed to save to cache:', e));
+                    // ✅ Sauvegarder dans Supabase ET cache local
+                    saveProfiles(updatedLibrary, true).catch(e => console.warn('Failed to save profiles:', e));
                 });
             } else {
-                saveToCache(updatedLibrary).catch(e => console.warn('Failed to save to cache:', e));
+                // ✅ Sauvegarder dans Supabase ET cache local
+                saveProfiles(updatedLibrary, true).catch(e => console.warn('Failed to save profiles:', e));
             }
             
             return updatedLibrary;
@@ -4665,7 +4913,25 @@ export default function App() {
     };
 
     return (
-        <div className="flex h-screen bg-gray-100 font-sans text-slate-800 overflow-hidden">
+        <>
+            {/* ✅ Overlay de verrouillage pendant la synchronisation */}
+            {(isBulkSyncing || isLoading) && (
+                <SyncLockOverlay
+                    isActive={isBulkSyncing || isLoading}
+                    current={isBulkSyncing ? bulkSyncProgress.current : (isLoading ? 1 : 0)}
+                    total={isBulkSyncing ? bulkSyncProgress.total : (isLoading ? 1 : 0)}
+                    successCount={isBulkSyncing ? syncStats.successCount : 0}
+                    errorCount={isBulkSyncing ? syncStats.errorCount : 0}
+                    currentTicker={currentSyncingTicker || (isLoading ? activeId : undefined)}
+                    onAbort={isBulkSyncing ? () => { abortSync.current = true; } : undefined}
+                />
+            )}
+
+            {/* Désactiver toutes les interactions pendant la synchronisation */}
+            <div 
+                className={`flex h-screen bg-gray-100 font-sans text-slate-800 overflow-hidden ${isSyncing ? 'pointer-events-none opacity-50' : ''}`}
+                style={isSyncing ? { cursor: 'not-allowed', userSelect: 'none' } : {}}
+            >
 
             {/* SIDEBAR NAVIGATION */}
             {/* Overlay pour mobile */}
@@ -5169,8 +5435,8 @@ export default function App() {
                                     ...prev,
                                     [upperTicker]: skeletonProfile
                                 };
-                                // Sauvegarder dans le cache
-                                saveToCache(updated).catch(e => console.warn('Erreur sauvegarde cache:', e));
+                                // ✅ Sauvegarder dans Supabase ET cache local
+                                saveProfiles(updated, true).catch(e => console.warn('Erreur sauvegarde profils:', e));
                                 return updated;
                             });
                         }
@@ -5194,7 +5460,7 @@ export default function App() {
                                             id: upperTicker,
                                             lastModified: Date.now(),
                                             data: result.data,
-                                            assumptions: autoFillAssumptionsFromFMPData(result.data, result.currentPrice, INITIAL_ASSUMPTIONS) as Assumptions,
+                                            assumptions: autoFillAssumptionsFromFMPData(result.data, result.currentPrice, INITIAL_ASSUMPTIONS, result.currentDividend) as Assumptions,
                                             info: result.info,
                                             notes: '',
                                             isWatchlist: null
@@ -5325,11 +5591,13 @@ export default function App() {
                                 await handleBulkSyncAllTickersWithOptions(options, failedTickers);
                             } finally {
                                 setIsBulkSyncing(false);
+                                setCurrentSyncingTicker(undefined); // ✅ Réinitialiser le ticker actuel
                             }
                         }
                     }
                 }}
             />
         </div>
+        </>
     );
 }

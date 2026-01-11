@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ClockIcon, TrashIcon, DocumentDuplicateIcon, CheckCircleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { listSnapshots, deleteSnapshot } from '../services/snapshotApi';
 import { SyncDetailsDialog } from './SyncDetailsDialog';
@@ -29,11 +29,21 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [selectedSyncDetails, setSelectedSyncDetails] = useState<{ snapshot: Snapshot; details: any } | null>(null);
+    const errorTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     // Load snapshots when ticker changes
     useEffect(() => {
         loadSnapshots();
     }, [ticker]);
+
+    // ✅ FIX: Nettoyer le timer d'erreur au démontage
+    useEffect(() => {
+        return () => {
+            if (errorTimerRef.current) {
+                clearTimeout(errorTimerRef.current);
+            }
+        };
+    }, []);
 
     const loadSnapshots = async () => {
         if (!ticker) return;
@@ -67,7 +77,14 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
         } else {
             setError(`Erreur: ${result.error}`);
             // Clear error after 5 seconds
-            setTimeout(() => setError(null), 5000);
+            // ✅ FIX: Nettoyer le timer précédent s'il existe
+            if (errorTimerRef.current) {
+                clearTimeout(errorTimerRef.current);
+            }
+            errorTimerRef.current = setTimeout(() => {
+                setError(null);
+                errorTimerRef.current = null;
+            }, 5000);
         }
     };
 
@@ -103,6 +120,8 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
                         onClick={loadSnapshots}
                         disabled={loading}
                         className="text-xs text-blue-600 hover:text-blue-800 disabled:text-gray-400"
+                        aria-label="Recharger l'historique"
+                        title="Recharger l'historique des versions"
                     >
                         {loading ? '⟳' : '↻'}
                     </button>
@@ -180,6 +199,7 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
                                         onClick={(e) => handleDelete(snapshot.id, e)}
                                         className="p-1 text-gray-400 hover:text-red-600 transition-colors"
                                         title="Supprimer"
+                                        aria-label={`Supprimer la version ${snapshot.version}`}
                                     >
                                         <TrashIcon className="w-4 h-4" />
                                     </button>

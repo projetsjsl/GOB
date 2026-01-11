@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { InformationCircleIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { InformationCircleIcon, ChevronDownIcon, ChevronUpIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 export const DataColorLegend: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -49,7 +49,7 @@ export const DataColorLegend: React.FC = () => {
                 <h4 className="font-semibold text-blue-800 text-sm mb-1">Fond BLEU</h4>
                 <p className="text-xs text-blue-700">
                   <strong>Données FMP ajustées</strong><br />
-                  Données provenant de FMP mais ajustées/mergées avec des valeurs existantes. Ces données ne sont pas 100% vérifiées car elles ont été modifiées lors du merge.
+                  Données provenant de FMP mais mergées avec des valeurs existantes (Supabase ou manuelles). Apparaît quand FMP retourne des valeurs à 0 ou quand des données existantes sont préservées. <strong>Pour avoir uniquement du VERT, synchronisez depuis FMP sans données existantes à préserver.</strong>
                 </p>
               </div>
             </div>
@@ -78,6 +78,20 @@ export const DataColorLegend: React.FC = () => {
                 <p className="text-xs text-gray-700">
                   <strong>Données calculées</strong><br />
                   Valeur calculée automatiquement (ratios P/E, P/CF, P/BV, rendements, etc.). Ces données ne proviennent pas directement de FMP.
+                </p>
+              </div>
+            </div>
+
+            {/* Valeurs Aberrantes - ROUGE */}
+            <div className="flex items-start gap-3 p-3 bg-red-50 border-2 border-red-400 border-dashed rounded-lg">
+              <div className="w-8 h-8 bg-red-100 border-2 border-red-500 rounded flex-shrink-0 flex items-center justify-center">
+                <ExclamationTriangleIcon className="w-5 h-5 text-red-700" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-semibold text-red-800 text-sm mb-1">Fond ROUGE (Bordure pointillée)</h4>
+                <p className="text-xs text-red-700">
+                  <strong>Valeurs aberrantes détectées</strong><br />
+                  Valeur significativement différente de la moyenne historique (&gt; 2 écarts-types). Peut indiquer une erreur de données, un événement exceptionnel, ou des données incomplètes. Vérifiez et corrigez si nécessaire.
                 </p>
               </div>
             </div>

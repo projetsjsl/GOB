@@ -404,6 +404,8 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
             <button
               onClick={onClose}
               className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+              aria-label="Fermer le panneau"
+              title="Fermer"
             >
               <XMarkIcon className="w-5 h-5 text-slate-400" />
             </button>
@@ -567,6 +569,8 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                               checked={selectedRows.size === tableData.length && tableData.length > 0}
                               onChange={selectAllRows}
                               className="rounded bg-slate-700 border-slate-600"
+                              aria-label="Sélectionner toutes les lignes"
+                              title="Sélectionner toutes les lignes"
                             />
                           </th>
                           {columns.slice(0, 8).map(col => (
@@ -600,6 +604,8 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                                 checked={selectedRows.has(row.id || row.ticker)}
                                 onChange={() => toggleRowSelection(row.id || row.ticker)}
                                 className="rounded bg-slate-700 border-slate-600"
+                                aria-label={`Sélectionner ${row.ticker || row.id}`}
+                                title={`Sélectionner ${row.ticker || row.id}`}
                               />
                             </td>
                             {columns.slice(0, 8).map(col => (
@@ -615,6 +621,7 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                                   onClick={() => { setEditingRow(row); setIsEditModalOpen(true); }}
                                   className="p-1 hover:bg-slate-700 rounded text-blue-400 transition-colors"
                                   title="Modifier"
+                                  aria-label="Modifier cette ligne"
                                 >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                 </button>
@@ -623,6 +630,7 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                                     onClick={() => handleSyncFMP(row.ticker)}
                                     className="p-1 hover:bg-slate-700 rounded text-green-400 transition-colors"
                                     title="Synchroniser FMP"
+                                    aria-label={`Synchroniser ${row.ticker} depuis FMP`}
                                   >
                                     <ArrowPathIcon className="w-4 h-4" />
                                   </button>
@@ -631,6 +639,7 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                                   onClick={() => handleDeleteRow(row)}
                                   className="p-1 hover:bg-slate-700 rounded text-red-400 transition-colors"
                                   title="Supprimer"
+                                  aria-label="Supprimer cette ligne"
                                 >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                 </button>
@@ -780,6 +789,8 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
               <button
                 onClick={() => setNotifications(prev => prev.filter(x => x.id !== n.id))}
                 className="ml-4 p-1 hover:bg-black/10 rounded"
+                aria-label="Fermer la notification"
+                title="Fermer"
               >
                 <XMarkIcon className="w-4 h-4" />
               </button>
@@ -919,7 +930,7 @@ const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onCl
       <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col max-h-[80vh]">
         <div className="p-4 border-b border-slate-700 flex justify-between items-center">
           <h3 className="text-xl font-bold text-white">{title}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-slate-700 rounded-lg"><XMarkIcon className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-2 hover:bg-slate-700 rounded-lg" aria-label="Fermer le modal d'édition"><XMarkIcon className="w-5 h-5" /></button>
         </div>
         <div className="p-6 overflow-y-auto space-y-4">
           {columns.map(col => {
@@ -947,6 +958,7 @@ const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onCl
                         disabled={!!loadingField}
                         className={`flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded transition-colors disabled:opacity-50 ${hasFmpValue ? 'bg-green-600/20 text-green-400' : 'bg-blue-600/20 text-blue-400 hover:bg-blue-600/30'}`}
                         title="Récupérer depuis FMP"
+                        aria-label={`Récupérer ${col.name} depuis FMP`}
                       >
                         {loadingField === col.name ? (
                           <ArrowPathIcon className="w-3 h-3 animate-spin" />
@@ -1013,6 +1025,8 @@ const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onCl
                       }
                     }}
                     className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-mono text-sm h-32 focus:border-blue-500 outline-none"
+                    aria-label={col.name.replace(/_/g, ' ')}
+                    title={`Éditer ${col.name.replace(/_/g, ' ')} (format JSON)`}
                   />
                 ) : (
                   <div className="relative">
@@ -1021,6 +1035,8 @@ const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onCl
                       value={formData[col.name] === null ? '' : formData[col.name]}
                       onChange={(e) => setFormData({ ...formData, [col.name]: col.type === 'number' ? parseFloat(e.target.value) : e.target.value })}
                       className={`w-full bg-slate-900 border-slate-600 rounded-lg p-3 text-white focus:border-blue-500 outline-none border ${hasFmpValue ? 'border-green-500/50' : ''}`}
+                      aria-label={col.name.replace(/_/g, ' ')}
+                      placeholder={col.name.replace(/_/g, ' ')}
                     />
                     {hasFmpValue && (
                        <div className="absolute top-full left-0 mt-1 z-10 w-full animate-in fade-in slide-in-from-top-1 duration-200">
@@ -1038,6 +1054,8 @@ const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onCl
                                  setFmpValues(newFmpValues);
                                }}
                                className="p-1 hover:bg-slate-700/50 rounded text-slate-400 hover:text-white"
+                               aria-label="Ignorer la suggestion FMP"
+                               title="Ignorer la suggestion FMP"
                              >
                                <XMarkIcon className="w-4 h-4" />
                              </button>

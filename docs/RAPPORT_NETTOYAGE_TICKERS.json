@@ -1,0 +1,820 @@
+{
+  "summary": {
+    "totalTickers": 1118,
+    "activeTickers": 1028,
+    "inactiveTickers": 90,
+    "duplicatesFound": 4,
+    "noCompanyName": 4,
+    "invalidSource": 0,
+    "toDelete": 90
+  },
+  "inactive": [
+    {
+      "ticker": "0945.HK",
+      "company_name": "Manulife Financial Corporation",
+      "country": "CA",
+      "exchange": "HKSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0A18.L",
+      "company_name": "CGI Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0AH3.L",
+      "company_name": "Great-West Lifeco Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0JVT.L",
+      "company_name": "Lululemon Athletica Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0KTI.L",
+      "company_name": "Enbridge Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0NHS.L",
+      "company_name": "Nutrien Ltd.",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0QKU.L",
+      "company_name": "Royal Bank of Canada",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0QYZ.L",
+      "company_name": "Franco-Nevada Corporation",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0R07.L",
+      "company_name": "Pan American Silver Corp.",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0R2J.L",
+      "company_name": "Agnico Eagle Mines Limited",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0R35.L",
+      "company_name": "Cameco Corporation",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0R4M.L",
+      "company_name": "Lundin Gold Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0UGS.L",
+      "company_name": "Alamos Gold Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0UKH.L",
+      "company_name": "Bank of Montreal",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0UKI.L",
+      "company_name": "The Bank of Nova Scotia",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0V5H.L",
+      "company_name": "Manulife Financial Corporation",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0VFA.L",
+      "company_name": "Restaurant Brands International Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0VHA.L",
+      "company_name": "Shopify Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0VJA.L",
+      "company_name": "Sun Life Financial Inc.",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "0VL8.L",
+      "company_name": "The Toronto-Dominion Bank",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "2099.HK",
+      "company_name": "China Gold International Resources Corp. Ltd.",
+      "country": "CA",
+      "exchange": "HKSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "307.F",
+      "company_name": "Shopify Inc.",
+      "country": "CA",
+      "exchange": "FSX",
+      "source": "TSX"
+    },
+    {
+      "ticker": "950160.KQ",
+      "company_name": "Kolon TissueGene, Inc.",
+      "country": "US",
+      "exchange": "KOE",
+      "source": "manual"
+    },
+    {
+      "ticker": "9984.T",
+      "company_name": "SoftBank Group Corp.",
+      "country": "JP",
+      "exchange": "JPX",
+      "source": "manual"
+    },
+    {
+      "ticker": "AAPL.MX",
+      "company_name": "Apple Inc.",
+      "country": "US",
+      "exchange": "MEX",
+      "source": "manual"
+    },
+    {
+      "ticker": "AAPL.NE",
+      "company_name": "Apple Inc.",
+      "country": "US",
+      "exchange": "NEO",
+      "source": "manual"
+    },
+    {
+      "ticker": "ABBV.BA",
+      "company_name": "AbbVie Inc.",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "AMD.BA",
+      "company_name": "Advanced Micro Devices, Inc.",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "AMRQ.L",
+      "company_name": "Amaroq Minerals Ltd.",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "AT1D.L",
+      "company_name": "Invesco AT1 Capital Bond ETF",
+      "country": "US",
+      "exchange": "LSE",
+      "source": "manual"
+    },
+    {
+      "ticker": "ATD.B",
+      "company_name": "Alimentation Couche-Tard Inc.",
+      "country": "CA",
+      "exchange": "TSX",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "AXP.BA",
+      "company_name": "American Express Company",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "BBD.B",
+      "company_name": "Bombardier Inc.",
+      "country": "CA",
+      "exchange": "TSX",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "BBDBN.MX",
+      "company_name": "Bombardier Inc.",
+      "country": "CA",
+      "exchange": "MEX",
+      "source": "TSX"
+    },
+    {
+      "ticker": "BFB",
+      "company_name": "Brown Forman Corp (Class B)",
+      "country": "UNITED STATES",
+      "exchange": "NYS",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "BRK.B",
+      "company_name": "YieldMax BRK.B Option Income Strategy ETF",
+      "country": "US",
+      "exchange": "AMEX",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "CGI.L",
+      "company_name": "Canadian General Investments, Limited",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "COST.BA",
+      "company_name": "Costco Wholesale Corporation",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "CSCO.NE",
+      "company_name": "Cisco Systems Inc",
+      "country": "CA",
+      "exchange": "NEO",
+      "source": "TSX"
+    },
+    {
+      "ticker": "DOL",
+      "company_name": "WisdomTree True Developed International Fund",
+      "country": "US",
+      "exchange": "AMEX",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "EMPA.TO",
+      "company_name": "Empire Company Limited (Class A)",
+      "country": "CANADA",
+      "exchange": "TSE",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "GIBA.TO",
+      "company_name": "CGI Inc",
+      "country": "CANADA",
+      "exchange": "TSE",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "GOOG.NE",
+      "company_name": "Alphabet Inc.",
+      "country": "US",
+      "exchange": "NEO",
+      "source": "manual"
+    },
+    {
+      "ticker": "GWO",
+      "company_name": "Great-West Lifeco Inc.",
+      "country": "CA",
+      "exchange": "TSX",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "HSBA",
+      "company_name": null,
+      "country": null,
+      "exchange": null,
+      "source": "manual"
+    },
+    {
+      "ticker": "HSY.BA",
+      "company_name": "The Hershey Company",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "IFC",
+      "company_name": "Intact Financial Corporation",
+      "country": "CA",
+      "exchange": "TSX",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "IPCO.ST",
+      "company_name": "International Petroleum Corporation",
+      "country": "CA",
+      "exchange": "STO",
+      "source": "TSX"
+    },
+    {
+      "ticker": "KIN2.DE",
+      "company_name": "Kinross Gold Corporation",
+      "country": "CA",
+      "exchange": "XETRA",
+      "source": "TSX"
+    },
+    {
+      "ticker": "KO.BA",
+      "company_name": "The Coca-Cola Company",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "LMT.BA",
+      "company_name": "Lockheed Martin Corporation",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "LRCX.BA",
+      "company_name": "Lam Research Corporation",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "LUG.ST",
+      "company_name": "Lundin Gold Inc.",
+      "country": "CA",
+      "exchange": "STO",
+      "source": "TSX"
+    },
+    {
+      "ticker": "LULU.NE",
+      "company_name": "Lululemon Athletica Inc.",
+      "country": "CA",
+      "exchange": "NEO",
+      "source": "TSX"
+    },
+    {
+      "ticker": "LUMI.ST",
+      "company_name": "Lundin Mining Corporation",
+      "country": "CA",
+      "exchange": "STO",
+      "source": "TSX"
+    },
+    {
+      "ticker": "LVMH",
+      "company_name": null,
+      "country": null,
+      "exchange": null,
+      "source": "manual"
+    },
+    {
+      "ticker": "MA.BA",
+      "company_name": "Mastercard Incorporated",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "MC.PA",
+      "company_name": "LVMH Moët Hennessy - Louis Vuitton, Société Européenne",
+      "country": "FR",
+      "exchange": "PAR",
+      "source": "manual"
+    },
+    {
+      "ticker": "MCD.BA",
+      "company_name": "McDonald's Corporation",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "MCDS.NE",
+      "company_name": "McDonald's Corp",
+      "country": "CA",
+      "exchange": "NEO",
+      "source": "TSX"
+    },
+    {
+      "ticker": "MKA.L",
+      "company_name": "Mkango Resources Ltd.",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "MMM.BA",
+      "company_name": "3M Company",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "MRU",
+      "company_name": "Metro Inc.",
+      "country": "CA",
+      "exchange": "TSX",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "NESN",
+      "company_name": null,
+      "country": null,
+      "exchange": null,
+      "source": "manual"
+    },
+    {
+      "ticker": "NKE.BA",
+      "company_name": "NIKE, Inc.",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "NKE.NE",
+      "company_name": "NIKE, Inc.",
+      "country": "CA",
+      "exchange": "NEO",
+      "source": "TSX"
+    },
+    {
+      "ticker": "NVDA.NE",
+      "company_name": "NVIDIA Corporation",
+      "country": "US",
+      "exchange": "NEO",
+      "source": "manual"
+    },
+    {
+      "ticker": "OR.PA",
+      "company_name": "L'Oréal S.A.",
+      "country": "FR",
+      "exchange": "PAR",
+      "source": "manual"
+    },
+    {
+      "ticker": "PAAS.BA",
+      "company_name": "Pan American Silver Corp.",
+      "country": "CA",
+      "exchange": "BUE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "PEP.BA",
+      "company_name": "PepsiCo, Inc.",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "PFE.BA",
+      "company_name": "Pfizer Inc.",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "POW",
+      "company_name": "VistaShares Electrification Supercycle ETF",
+      "country": "US",
+      "exchange": "AMEX",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "RCIB.TO",
+      "company_name": "Rogers Communications Inc (Class B)",
+      "country": "CANADA",
+      "exchange": "TSE",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "RTX.BA",
+      "company_name": "RTX Corporation",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "SBUX.NE",
+      "company_name": "Starbucks Corporation",
+      "country": "CA",
+      "exchange": "NEO",
+      "source": "TSX"
+    },
+    {
+      "ticker": "SII.DE",
+      "company_name": "Wheaton Precious Metals Corp.",
+      "country": "CA",
+      "exchange": "XETRA",
+      "source": "TSX"
+    },
+    {
+      "ticker": "SMSN.IL",
+      "company_name": "Samsung Electronics Co., Ltd.",
+      "country": "KR",
+      "exchange": "IOB",
+      "source": "manual"
+    },
+    {
+      "ticker": "TECK.B",
+      "company_name": "Sunteck Realty Limited",
+      "country": "IN",
+      "exchange": "BSE",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "TGT.BA",
+      "company_name": "Target Corporation",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "THX.L",
+      "company_name": "Thor Explorations Ltd.",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "TKO.L",
+      "company_name": "Taseko Mines Limited",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "TXN.BA",
+      "company_name": "Texas Instruments Incorporated",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "ULVR",
+      "company_name": null,
+      "country": null,
+      "exchange": null,
+      "source": "manual"
+    },
+    {
+      "ticker": "UNH.BA",
+      "company_name": "UnitedHealth Group Incorporated",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "UNH.NE",
+      "company_name": "UnitedHealth Group Inc",
+      "country": "CA",
+      "exchange": "NEO",
+      "source": "TSX"
+    },
+    {
+      "ticker": "V.BA",
+      "company_name": "Visa Inc.",
+      "country": "US",
+      "exchange": "BUE",
+      "source": "manual"
+    },
+    {
+      "ticker": "VTSAX",
+      "company_name": "Vanguard Total Stock Market Index Fund",
+      "country": "US",
+      "exchange": "NASDAQ",
+      "source": "manual"
+    },
+    {
+      "ticker": "WJA",
+      "company_name": "WestJet Airlines Ltd. (delistée)",
+      "country": "Canada",
+      "exchange": "TSX",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "WPM.L",
+      "company_name": "Wheaton Precious Metals Corp.",
+      "country": "CA",
+      "exchange": "LSE",
+      "source": "TSX"
+    },
+    {
+      "ticker": "XOM.MX",
+      "company_name": "Exxon Mobil Corporation",
+      "country": "US",
+      "exchange": "MEX",
+      "source": "manual"
+    }
+  ],
+  "duplicates": [
+    {
+      "normalized": "BFB",
+      "toKeep": {
+        "ticker": "BF-B",
+        "company_name": "Brown-Forman Corporation",
+        "is_active": true
+      },
+      "toDelete": [
+        {
+          "ticker": "BFB",
+          "company_name": "Brown Forman Corp (Class B)",
+          "is_active": false
+        }
+      ]
+    },
+    {
+      "normalized": "BRKB",
+      "toKeep": {
+        "ticker": "BRK-B",
+        "company_name": "Berkshire Hathaway Inc.",
+        "is_active": true
+      },
+      "toDelete": [
+        {
+          "ticker": "BRK.B",
+          "company_name": "YieldMax BRK.B Option Income Strategy ETF",
+          "is_active": false
+        }
+      ]
+    },
+    {
+      "normalized": "GIBATO",
+      "toKeep": {
+        "ticker": "GIB-A.TO",
+        "company_name": "CGI Inc.",
+        "is_active": true
+      },
+      "toDelete": [
+        {
+          "ticker": "GIBA.TO",
+          "company_name": "CGI Inc",
+          "is_active": false
+        }
+      ]
+    },
+    {
+      "normalized": "RCIBTO",
+      "toKeep": {
+        "ticker": "RCI-B.TO",
+        "company_name": "Rogers Communications Inc.",
+        "is_active": true
+      },
+      "toDelete": [
+        {
+          "ticker": "RCIB.TO",
+          "company_name": "Rogers Communications Inc (Class B)",
+          "is_active": false
+        }
+      ]
+    }
+  ],
+  "noCompanyName": [
+    {
+      "ticker": "HSBA",
+      "source": "manual",
+      "is_active": false
+    },
+    {
+      "ticker": "LVMH",
+      "source": "manual",
+      "is_active": false
+    },
+    {
+      "ticker": "NESN",
+      "source": "manual",
+      "is_active": false
+    },
+    {
+      "ticker": "ULVR",
+      "source": "manual",
+      "is_active": false
+    }
+  ],
+  "invalidSource": [],
+  "toDelete": [
+    "0945.HK",
+    "0A18.L",
+    "0AH3.L",
+    "0JVT.L",
+    "0KTI.L",
+    "0NHS.L",
+    "0QKU.L",
+    "0QYZ.L",
+    "0R07.L",
+    "0R2J.L",
+    "0R35.L",
+    "0R4M.L",
+    "0UGS.L",
+    "0UKH.L",
+    "0UKI.L",
+    "0V5H.L",
+    "0VFA.L",
+    "0VHA.L",
+    "0VJA.L",
+    "0VL8.L",
+    "2099.HK",
+    "307.F",
+    "950160.KQ",
+    "9984.T",
+    "AAPL.MX",
+    "AAPL.NE",
+    "ABBV.BA",
+    "AMD.BA",
+    "AMRQ.L",
+    "AT1D.L",
+    "ATD.B",
+    "AXP.BA",
+    "BBD.B",
+    "BBDBN.MX",
+    "BFB",
+    "BRK.B",
+    "CGI.L",
+    "COST.BA",
+    "CSCO.NE",
+    "DOL",
+    "EMPA.TO",
+    "GIBA.TO",
+    "GOOG.NE",
+    "GWO",
+    "HSBA",
+    "HSY.BA",
+    "IFC",
+    "IPCO.ST",
+    "KIN2.DE",
+    "KO.BA",
+    "LMT.BA",
+    "LRCX.BA",
+    "LUG.ST",
+    "LULU.NE",
+    "LUMI.ST",
+    "LVMH",
+    "MA.BA",
+    "MC.PA",
+    "MCD.BA",
+    "MCDS.NE",
+    "MKA.L",
+    "MMM.BA",
+    "MRU",
+    "NESN",
+    "NKE.BA",
+    "NKE.NE",
+    "NVDA.NE",
+    "OR.PA",
+    "PAAS.BA",
+    "PEP.BA",
+    "PFE.BA",
+    "POW",
+    "RCIB.TO",
+    "RTX.BA",
+    "SBUX.NE",
+    "SII.DE",
+    "SMSN.IL",
+    "TECK.B",
+    "TGT.BA",
+    "THX.L",
+    "TKO.L",
+    "TXN.BA",
+    "ULVR",
+    "UNH.BA",
+    "UNH.NE",
+    "V.BA",
+    "VTSAX",
+    "WJA",
+    "WPM.L",
+    "XOM.MX"
+  ]
+}

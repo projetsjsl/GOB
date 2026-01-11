@@ -1,0 +1,84 @@
+{
+  "summary": {
+    "total": 1032,
+    "stocks": 1028,
+    "etfs": 3,
+    "mutualFunds": 1,
+    "toDelete": 4,
+    "generatedAt": "2026-01-11T02:12:57.015Z"
+  },
+  "etfs": [
+    {
+      "ticker": "BRK.B",
+      "company_name": "YieldMax BRK.B Option Income Strategy ETF",
+      "country": "US",
+      "exchange": "AMEX",
+      "sector": "Financial Services",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "DOL",
+      "company_name": "WisdomTree True Developed International Fund",
+      "country": "US",
+      "exchange": "AMEX",
+      "sector": "Financial Services",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "POW",
+      "company_name": "VistaShares Electrification Supercycle ETF",
+      "country": "US",
+      "exchange": "AMEX",
+      "sector": "Financial Services",
+      "source": "watchlist"
+    }
+  ],
+  "mutualFunds": [
+    {
+      "ticker": "VTSAX",
+      "company_name": "Vanguard Total Stock Market Index Fund",
+      "country": "US",
+      "exchange": "NASDAQ",
+      "sector": "Financial Services",
+      "source": "manual"
+    }
+  ],
+  "allToDelete": [
+    {
+      "ticker": "BRK.B",
+      "company_name": "YieldMax BRK.B Option Income Strategy ETF",
+      "country": "US",
+      "exchange": "AMEX",
+      "sector": "Financial Services",
+      "source": "watchlist",
+      "type": "ETF"
+    },
+    {
+      "ticker": "DOL",
+      "company_name": "WisdomTree True Developed International Fund",
+      "country": "US",
+      "exchange": "AMEX",
+      "sector": "Financial Services",
+      "source": "watchlist",
+      "type": "ETF"
+    },
+    {
+      "ticker": "POW",
+      "company_name": "VistaShares Electrification Supercycle ETF",
+      "country": "US",
+      "exchange": "AMEX",
+      "sector": "Financial Services",
+      "source": "watchlist",
+      "type": "ETF"
+    },
+    {
+      "ticker": "VTSAX",
+      "company_name": "Vanguard Total Stock Market Index Fund",
+      "country": "US",
+      "exchange": "NASDAQ",
+      "sector": "Financial Services",
+      "source": "manual",
+      "type": "Mutual Fund"
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "summary": {
+    "replaced": 12,
+    "deleted": 1,
+    "skipped": 0,
+    "errors": 0,
+    "generatedAt": "2026-01-11T02:11:40.403Z"
+  },
+  "replaced": [
+    {
+      "from": "ATD.B",
+      "to": "ATD.TO",
+      "action": "Désactivé (doublon existant)"
+    },
+    {
+      "from": "BBD.B",
+      "to": "BBD-B.TO",
+      "action": "Désactivé (doublon existant)"
+    },
+    {
+      "from": "BFB",
+      "to": "BF-B",
+      "action": "Désactivé (doublon existant)"
+    },
+    {
+      "from": "MOGA",
+      "to": "MOG-A",
+      "action": "Remplacé"
+    },
+    {
+      "from": "CCLB.TO",
+      "to": "CCLLF",
+      "action": "Remplacé"
+    },
+    {
+      "from": "CTCA.TO",
+      "to": "CTC.TO",
+      "action": "Remplacé"
+    },
+    {
+      "from": "GIBA.TO",
+      "to": "GIB",
+      "action": "Désactivé (doublon existant)"
+    },
+    {
+      "from": "RCIB.TO",
+      "to": "RCI",
+      "action": "Désactivé (doublon existant)"
+    },
+    {
+      "from": "CCA",
+      "to": "CCA.TO",
+      "action": "Remplacé"
+    },
+    {
+      "from": "GWO",
+      "to": "GWO.TO",
+      "action": "Désactivé (doublon existant)"
+    },
+    {
+      "from": "IFC",
+      "to": "IFC.TO",
+      "action": "Désactivé (doublon existant)"
+    },
+    {
+      "from": "MRU",
+      "to": "MRU.TO",
+      "action": "Désactivé (doublon existant)"
+    }
+  ],
+  "deleted": [
+    {
+      "ticker": "EMPA.TO"
+    }
+  ],
+  "skipped": [],
+  "errors": []
+}

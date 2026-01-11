@@ -9230,7 +9230,8 @@ const DataColorLegend = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Données FMP ajustées" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-              "Données provenant de FMP mais ajustées/mergées avec des valeurs existantes. Ces données ne sont pas 100% vérifiées car elles ont été modifiées lors du merge."
+              "Données provenant de FMP mais mergées avec des valeurs existantes (Supabase ou manuelles). Apparaît quand FMP retourne des valeurs à 0 ou quand des données existantes sont préservées. ",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Pour avoir uniquement du VERT, synchronisez depuis FMP sans données existantes à préserver." })
             ] })
           ] })
         ] }),
@@ -9255,6 +9256,17 @@ const DataColorLegend = () => {
               "Valeur calculée automatiquement (ratios P/E, P/CF, P/BV, rendements, etc.). Ces données ne proviennent pas directement de FMP."
             ] })
           ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 p-3 bg-red-50 border-2 border-red-400 border-dashed rounded-lg", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-red-100 border-2 border-red-500 rounded flex-shrink-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-5 h-5 text-red-700" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-red-800 text-sm mb-1", children: "Fond ROUGE (Bordure pointillée)" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-red-700", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Valeurs aberrantes détectées" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+              "Valeur significativement différente de la moyenne historique (> 2 écarts-types). Peut indiquer une erreur de données, un événement exceptionnel, ou des données incomplètes. Vérifiez et corrigez si nécessaire."
+            ] })
+          ] })
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 p-2 bg-blue-50 border-l-4 border-blue-400 rounded", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-800", children: [
@@ -9264,7 +9276,7 @@ const DataColorLegend = () => {
     ] })
   ] });
 };
-const EditableCell = ({ value, onCommit, min: min2 = -Infinity, id, autoFetched = false, dataSource }) => {
+const EditableCell = ({ value, onCommit, min: min2 = -Infinity, id, autoFetched = false, dataSource, isOutlier = false }) => {
   const [localValue, setLocalValue] = reactExports.useState(value.toString());
   const actualDataSource = dataSource || (autoFetched ? "fmp-adjusted" : "manual");
   const [currentDataSource, setCurrentDataSource] = reactExports.useState(actualDataSource);
@@ -9313,10 +9325,13 @@ const EditableCell = ({ value, onCommit, min: min2 = -Infinity, id, autoFetched 
       }
     }
   };
-  const baseClass = "w-full text-right focus:bg-white focus:ring-1 focus:ring-blue-400 rounded px-0.5 sm:px-1 outline-none transition-colors invalid:text-red-500 invalid:bg-red-50 text-xs sm:text-sm";
+  const baseClass = "w-full text-right focus:bg-white focus:ring-1 focus:ring-blue-400 rounded px-0.5 sm:px-1 outline-none transition-colors invalid:text-red-500 invalid:bg-red-50 text-xs sm:text-sm relative";
   let sourceClass = "bg-transparent";
   let tooltipText = "Données manuelles\n\nFond blanc = valeur modifiée manuellement.\n\nLes modifications manuelles sont préservées lors de la synchronisation.";
-  if (currentDataSource === "fmp-verified") {
+  if (isOutlier) {
+    sourceClass = "bg-red-100 text-red-800 font-bold border-2 border-red-400 border-dashed";
+    tooltipText = "⚠️ VALEUR ABERRANTE DÉTECTÉE\n\nCette valeur est significativement différente de la moyenne historique (> 2 écarts-types).\n\nCela peut indiquer:\n• Une erreur de données\n• Un événement exceptionnel (restructuration, acquisition, etc.)\n• Des données incomplètes ou corrompues\n\nVérifiez cette valeur et corrigez-la si nécessaire.";
+  } else if (currentDataSource === "fmp-verified") {
     sourceClass = "bg-green-50 text-green-700 font-medium";
     tooltipText = `✅ Données FMP vérifiées
 
@@ -9335,23 +9350,63 @@ Cliquez pour modifier manuellement. La modification marquera cette valeur comme 
     sourceClass = "bg-gray-50 text-gray-700 font-medium";
     tooltipText = "⚪ Données calculées\n\nFond GRIS = valeur calculée automatiquement.\n\nCes données ne proviennent pas directement de FMP.";
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    "input",
-    {
-      id,
-      type: "number",
-      step: "0.01",
-      min: min2 !== -Infinity ? min2 : void 0,
-      className: `${baseClass} ${sourceClass}`,
-      value: localValue,
-      onChange: handleChange,
-      onBlur: handleBlur,
-      onKeyDown: handleKeyDown,
-      title: tooltipText
-    }
-  );
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "input",
+      {
+        id,
+        type: "number",
+        step: "0.01",
+        min: min2 !== -Infinity ? min2 : void 0,
+        className: `${baseClass} ${sourceClass}`,
+        value: localValue,
+        onChange: handleChange,
+        onBlur: handleBlur,
+        onKeyDown: handleKeyDown,
+        title: tooltipText
+      }
+    ),
+    isOutlier && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ForwardRef$p,
+      {
+        className: "absolute -top-1 -right-1 w-3 h-3 text-red-600 bg-white rounded-full p-0.5",
+        title: "Valeur aberrante détectée"
+      }
+    )
+  ] });
 };
+function detectOutlierValues(values) {
+  const validValues = values.filter((v) => v > 0 && isFinite(v));
+  if (validValues.length < 3) return /* @__PURE__ */ new Set();
+  const mean = validValues.reduce((a2, b) => a2 + b, 0) / validValues.length;
+  const variance = validValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / validValues.length;
+  const stdDev = Math.sqrt(variance);
+  const threshold2 = 2 * stdDev;
+  const outliers = /* @__PURE__ */ new Set();
+  validValues.forEach((val) => {
+    if (Math.abs(val - mean) > threshold2) {
+      outliers.add(val);
+    }
+  });
+  return outliers;
+}
 const HistoricalTable = ({ data, onUpdateRow }) => {
+  const outlierDetection = reactExports.useMemo(() => {
+    const outliers = {
+      earningsPerShare: detectOutlierValues(data.map((d) => d.earningsPerShare)),
+      cashFlowPerShare: detectOutlierValues(data.map((d) => d.cashFlowPerShare)),
+      bookValuePerShare: detectOutlierValues(data.map((d) => d.bookValuePerShare)),
+      dividendPerShare: detectOutlierValues(data.map((d) => d.dividendPerShare)),
+      priceHigh: detectOutlierValues(data.map((d) => d.priceHigh)),
+      priceLow: detectOutlierValues(data.map((d) => d.priceLow))
+    };
+    return outliers;
+  }, [data]);
+  const checkIfOutlier = (field, value) => {
+    var _a2;
+    if (value <= 0 || !isFinite(value)) return false;
+    return ((_a2 = outlierDetection[field]) == null ? void 0 : _a2.has(value)) || false;
+  };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-4 sm:mb-6 print-break-inside-avoid", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(DataColorLegend, {}),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto bg-white rounded-lg shadow border border-gray-200", "data-demo": "historical-table", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "min-w-full text-xs sm:text-sm text-right", children: [
@@ -9385,11 +9440,24 @@ const HistoricalTable = ({ data, onUpdateRow }) => {
         const ratios = calculateRowRatios(row);
         const isFuture = row.year >= (/* @__PURE__ */ new Date()).getFullYear() + 1;
         const rowClass = isFuture ? "bg-slate-50 italic" : "hover:bg-gray-50";
-        return /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: rowClass, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 sm:px-3 py-1.5 sm:py-2 font-bold text-left text-gray-700 sticky left-0 bg-white border-r z-10 text-xs sm:text-sm", children: row.year }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-1.5 sm:px-2 py-1.5 sm:py-2 bg-blue-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-priceHigh-${idx}`, value: row.priceHigh, onCommit: (v) => onUpdateRow(idx, "priceHigh", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-blue-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-priceLow-${idx}`, value: row.priceLow, onCommit: (v) => onUpdateRow(idx, "priceLow", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-green-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-cashFlowPerShare-${idx}`, value: row.cashFlowPerShare, onCommit: (v) => onUpdateRow(idx, "cashFlowPerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
+        const outlierCount = [
+          checkIfOutlier("priceHigh", row.priceHigh),
+          checkIfOutlier("priceLow", row.priceLow),
+          checkIfOutlier("cashFlowPerShare", row.cashFlowPerShare),
+          checkIfOutlier("dividendPerShare", row.dividendPerShare),
+          checkIfOutlier("bookValuePerShare", row.bookValuePerShare),
+          checkIfOutlier("earningsPerShare", row.earningsPerShare)
+        ].filter(Boolean).length;
+        const hasOutliers = outlierCount > 0;
+        const rowOutlierClass = hasOutliers ? "bg-red-50/50 border-l-4 border-red-500" : "";
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: `${rowClass} ${rowOutlierClass} ${hasOutliers ? "relative" : ""}`, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `px-2 sm:px-3 py-1.5 sm:py-2 font-bold text-left text-gray-700 sticky left-0 bg-white border-r z-10 text-xs sm:text-sm ${hasOutliers ? "bg-red-50" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+            row.year,
+            hasOutliers && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-3 h-3 text-red-600 flex-shrink-0", title: `${outlierCount} valeur(s) aberrante(s) détectée(s) dans cette année` })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `px-1.5 sm:px-2 py-1.5 sm:py-2 bg-blue-50/30 border-r ${checkIfOutlier("priceHigh", row.priceHigh) ? "bg-red-100 border-red-400 border-2 border-dashed" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-priceHigh-${idx}`, value: row.priceHigh, onCommit: (v) => onUpdateRow(idx, "priceHigh", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource, isOutlier: checkIfOutlier("priceHigh", row.priceHigh) }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `px-2 py-2 bg-blue-50/30 border-r ${checkIfOutlier("priceLow", row.priceLow) ? "bg-red-100 border-red-400 border-2 border-dashed" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-priceLow-${idx}`, value: row.priceLow, onCommit: (v) => onUpdateRow(idx, "priceLow", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource, isOutlier: checkIfOutlier("priceLow", row.priceLow) }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `px-2 py-2 bg-green-50/30 border-r ${checkIfOutlier("cashFlowPerShare", row.cashFlowPerShare) ? "bg-red-100 border-red-400 border-2 border-dashed" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-cashFlowPerShare-${idx}`, value: row.cashFlowPerShare, onCommit: (v) => onUpdateRow(idx, "cashFlowPerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource, isOutlier: checkIfOutlier("cashFlowPerShare", row.cashFlowPerShare) }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/CF au Prix Haut: ${ratios.pcfHigh.toFixed(1)}x
 
 Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / Cash Flow (${row.cashFlowPerShare.toFixed(2)})
@@ -9400,7 +9468,7 @@ Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / Cash Flow (${row.cashFlowPer
 Calculé: Prix Bas (${row.priceLow.toFixed(2)}) / Cash Flow (${row.cashFlowPerShare.toFixed(2)})
 
 = ${ratios.pcfLow.toFixed(1)}x`, children: ratios.pcfLow.toFixed(1) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-yellow-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-dividendPerShare-${idx}`, value: row.dividendPerShare, onCommit: (v) => onUpdateRow(idx, "dividendPerShare", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `px-2 py-2 bg-yellow-50/30 border-r ${checkIfOutlier("dividendPerShare", row.dividendPerShare) ? "bg-red-100 border-red-400 border-2 border-dashed" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-dividendPerShare-${idx}`, value: row.dividendPerShare, onCommit: (v) => onUpdateRow(idx, "dividendPerShare", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource, isOutlier: checkIfOutlier("dividendPerShare", row.dividendPerShare) }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "px-2 py-2 text-gray-500 border-r cursor-help", title: `Rendement au Prix Bas: ${ratios.yieldHigh.toFixed(2)}%
 
 Calculé: (Dividende (${row.dividendPerShare.toFixed(2)}) / Prix Bas (${row.priceLow.toFixed(2)})) × 100
@@ -9411,7 +9479,7 @@ Le rendement est calculé au prix bas pour obtenir le rendement maximum.`, child
             ratios.yieldHigh.toFixed(2),
             "%"
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-purple-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-bookValuePerShare-${idx}`, value: row.bookValuePerShare, onCommit: (v) => onUpdateRow(idx, "bookValuePerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `px-2 py-2 bg-purple-50/30 border-r ${checkIfOutlier("bookValuePerShare", row.bookValuePerShare) ? "bg-red-100 border-red-400 border-2 border-dashed" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-bookValuePerShare-${idx}`, value: row.bookValuePerShare, onCommit: (v) => onUpdateRow(idx, "bookValuePerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource, isOutlier: checkIfOutlier("bookValuePerShare", row.bookValuePerShare) }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/BV au Prix Haut: ${ratios.pbvHigh.toFixed(1)}x
 
 Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / Book Value (${row.bookValuePerShare.toFixed(2)})
@@ -9422,7 +9490,7 @@ Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / Book Value (${row.bookValueP
 Calculé: Prix Bas (${row.priceLow.toFixed(2)}) / Book Value (${row.bookValuePerShare.toFixed(2)})
 
 = ${ratios.pbvLow.toFixed(1)}x`, children: ratios.pbvLow.toFixed(1) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-red-50/30 border-r font-medium", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-earningsPerShare-${idx}`, value: row.earningsPerShare, onCommit: (v) => onUpdateRow(idx, "earningsPerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `px-2 py-2 bg-red-50/30 border-r font-medium ${checkIfOutlier("earningsPerShare", row.earningsPerShare) ? "bg-red-100 border-red-400 border-2 border-dashed" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-earningsPerShare-${idx}`, value: row.earningsPerShare, onCommit: (v) => onUpdateRow(idx, "earningsPerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource, isOutlier: checkIfOutlier("earningsPerShare", row.earningsPerShare) }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/E au Prix Haut: ${ratios.peHigh.toFixed(1)}x
 
 Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / EPS (${row.earningsPerShare.toFixed(2)})
@@ -36655,12 +36723,15 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `BPA (EPS) Actuel: ${((_b = baseValues.eps) == null ? void 0 : _b.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-3 font-semibold ${assumptions.excludeEPS ? "bg-red-200 text-red-800 border-2 border-red-500 border-dashed" : "bg-green-50 text-green-800"} cursor-help relative`, title: `BPA (EPS) Actuel: ${((_b = baseValues.eps) == null ? void 0 : _b.toFixed(2)) ?? "0.00"} $
 
-Valeur de l'année de base ({assumptions.baseYear}).
+Valeur de l'année de base (${assumptions.baseYear}).
 Source: Données historiques FMP (vert = officiel).
 
-Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_c = baseValues.eps) == null ? void 0 : _c.toFixed(2)) ?? "0.00" }),
+${assumptions.excludeEPS ? "⚠️ EXCLUE: Cette métrique produit un prix cible aberrant et a été exclue du calcul." : "Utilisée comme point de départ pour la projection à 5 ans."}`, children: [
+            ((_c = baseValues.eps) == null ? void 0 : _c.toFixed(2)) ?? "0.00",
+            assumptions.excludeEPS && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "absolute top-1 right-1 w-4 h-4 text-red-600", title: "Métrique exclue (prix cible aberrant)" })
+          ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeEPS ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -36742,12 +36813,15 @@ ${assumptions.excludeEPS ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `CFA (Cash Flow) Actuel: ${((_h = baseValues.cf) == null ? void 0 : _h.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-3 font-semibold ${assumptions.excludeCF ? "bg-red-200 text-red-800 border-2 border-red-500 border-dashed" : "bg-green-50 text-green-800"} cursor-help relative`, title: `CFA (Cash Flow) Actuel: ${((_h = baseValues.cf) == null ? void 0 : _h.toFixed(2)) ?? "0.00"} $
 
-Valeur de l'année de base ({assumptions.baseYear}).
+Valeur de l'année de base (${assumptions.baseYear}).
 Source: Données historiques FMP (vert = officiel).
 
-Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_i = baseValues.cf) == null ? void 0 : _i.toFixed(2)) ?? "0.00" }),
+${assumptions.excludeCF ? "⚠️ EXCLUE: Cette métrique produit un prix cible aberrant et a été exclue du calcul." : "Utilisée comme point de départ pour la projection à 5 ans."}`, children: [
+            ((_i = baseValues.cf) == null ? void 0 : _i.toFixed(2)) ?? "0.00",
+            assumptions.excludeCF && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "absolute top-1 right-1 w-4 h-4 text-red-600", title: "Métrique exclue (prix cible aberrant)" })
+          ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeCF ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -36829,12 +36903,15 @@ ${assumptions.excludeCF ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `BV (Book Value) Actuel: ${((_n = baseValues.bv) == null ? void 0 : _n.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-3 font-semibold ${assumptions.excludeBV ? "bg-red-200 text-red-800 border-2 border-red-500 border-dashed" : "bg-green-50 text-green-800"} cursor-help relative`, title: `BV (Book Value) Actuel: ${((_n = baseValues.bv) == null ? void 0 : _n.toFixed(2)) ?? "0.00"} $
 
-Valeur de l'année de base ({assumptions.baseYear}).
+Valeur de l'année de base (${assumptions.baseYear}).
 Source: Données historiques FMP (vert = officiel).
 
-Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_o = baseValues.bv) == null ? void 0 : _o.toFixed(2)) ?? "0.00" }),
+${assumptions.excludeBV ? "⚠️ EXCLUE: Cette métrique produit un prix cible aberrant et a été exclue du calcul." : "Utilisée comme point de départ pour la projection à 5 ans."}`, children: [
+            ((_o = baseValues.bv) == null ? void 0 : _o.toFixed(2)) ?? "0.00",
+            assumptions.excludeBV && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "absolute top-1 right-1 w-4 h-4 text-red-600", title: "Métrique exclue (prix cible aberrant)" })
+          ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeBV ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -36916,12 +36993,15 @@ ${assumptions.excludeBV ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `DIV (Dividende) Actuel: ${((_t = baseValues.div) == null ? void 0 : _t.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-3 font-semibold ${assumptions.excludeDIV ? "bg-red-200 text-red-800 border-2 border-red-500 border-dashed" : "bg-green-50 text-green-800"} cursor-help relative`, title: `DIV (Dividende) Actuel: ${((_t = baseValues.div) == null ? void 0 : _t.toFixed(2)) ?? "0.00"} $
 
-Valeur de l'année de base ({assumptions.baseYear}).
+Valeur de l'année de base (${assumptions.baseYear}).
 Source: Données historiques FMP (vert = officiel).
 
-Utilisée comme point de départ pour la projection à 5 ans.`, children: ((_u = baseValues.div) == null ? void 0 : _u.toFixed(2)) ?? "0.00" }),
+${assumptions.excludeDIV ? "⚠️ EXCLUE: Cette métrique produit un prix cible aberrant et a été exclue du calcul." : "Utilisée comme point de départ pour la projection à 5 ans."}`, children: [
+            ((_u = baseValues.div) == null ? void 0 : _u.toFixed(2)) ?? "0.00",
+            assumptions.excludeDIV && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "absolute top-1 right-1 w-4 h-4 text-red-600", title: "Métrique exclue (prix cible aberrant)" })
+          ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeDIV ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {

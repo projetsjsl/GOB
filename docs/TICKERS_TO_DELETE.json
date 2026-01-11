@@ -1,0 +1,198 @@
+{
+  "summary": {
+    "total": 1087,
+    "toKeep": 1078,
+    "toDelete": 9,
+    "keepCountries": [
+      "United States",
+      "Canada",
+      "US",
+      "CA",
+      "UNITED STATES",
+      "CANADA"
+    ],
+    "keepExchanges": [
+      "NYSE",
+      "NASDAQ",
+      "AMEX",
+      "OTC",
+      "OTCQB",
+      "OTCQX",
+      "PINK",
+      "NYS",
+      "NAS"
+    ]
+  },
+  "toDelete": [
+    {
+      "ticker": "MC.PA",
+      "company_name": "LVMH Moët Hennessy - Louis Vuitton, Société Européenne",
+      "country": "FR",
+      "exchange": "PAR",
+      "sector": "Consumer Cyclical",
+      "source": "manual"
+    },
+    {
+      "ticker": "OR.PA",
+      "company_name": "L'Oréal S.A.",
+      "country": "FR",
+      "exchange": "PAR",
+      "sector": "Consumer Defensive",
+      "source": "manual"
+    },
+    {
+      "ticker": "TECK.B",
+      "company_name": "Sunteck Realty Limited",
+      "country": "IN",
+      "exchange": "BSE",
+      "sector": "Real Estate",
+      "source": "watchlist"
+    },
+    {
+      "ticker": "9984.T",
+      "company_name": "SoftBank Group Corp.",
+      "country": "JP",
+      "exchange": "JPX",
+      "sector": "Communication Services",
+      "source": "manual"
+    },
+    {
+      "ticker": "SMSN.IL",
+      "company_name": "Samsung Electronics Co., Ltd.",
+      "country": "KR",
+      "exchange": "IOB",
+      "sector": "Technology",
+      "source": "manual"
+    },
+    {
+      "ticker": "HSBA",
+      "company_name": null,
+      "country": null,
+      "exchange": null,
+      "sector": null,
+      "source": "manual"
+    },
+    {
+      "ticker": "LVMH",
+      "company_name": null,
+      "country": null,
+      "exchange": null,
+      "sector": null,
+      "source": "manual"
+    },
+    {
+      "ticker": "NESN",
+      "company_name": null,
+      "country": null,
+      "exchange": null,
+      "sector": null,
+      "source": "manual"
+    },
+    {
+      "ticker": "ULVR",
+      "company_name": null,
+      "country": null,
+      "exchange": null,
+      "sector": null,
+      "source": "manual"
+    }
+  ],
+  "statsByCountry": {
+    "FR": {
+      "count": 2,
+      "exchanges": [
+        "PAR"
+      ],
+      "tickers": [
+        "MC.PA",
+        "OR.PA"
+      ]
+    },
+    "IN": {
+      "count": 1,
+      "exchanges": [
+        "BSE"
+      ],
+      "tickers": [
+        "TECK.B"
+      ]
+    },
+    "JP": {
+      "count": 1,
+      "exchanges": [
+        "JPX"
+      ],
+      "tickers": [
+        "9984.T"
+      ]
+    },
+    "KR": {
+      "count": 1,
+      "exchanges": [
+        "IOB"
+      ],
+      "tickers": [
+        "SMSN.IL"
+      ]
+    },
+    "N/A": {
+      "count": 4,
+      "exchanges": [],
+      "tickers": [
+        "HSBA",
+        "LVMH",
+        "NESN",
+        "ULVR"
+      ]
+    }
+  },
+  "statsByExchange": {
+    "PAR": {
+      "count": 2,
+      "countries": [
+        "FR"
+      ],
+      "tickers": [
+        "MC.PA",
+        "OR.PA"
+      ]
+    },
+    "BSE": {
+      "count": 1,
+      "countries": [
+        "IN"
+      ],
+      "tickers": [
+        "TECK.B"
+      ]
+    },
+    "JPX": {
+      "count": 1,
+      "countries": [
+        "JP"
+      ],
+      "tickers": [
+        "9984.T"
+      ]
+    },
+    "IOB": {
+      "count": 1,
+      "countries": [
+        "KR"
+      ],
+      "tickers": [
+        "SMSN.IL"
+      ]
+    },
+    "N/A": {
+      "count": 4,
+      "countries": [],
+      "tickers": [
+        "HSBA",
+        "LVMH",
+        "NESN",
+        "ULVR"
+      ]
+    }
+  }
+}

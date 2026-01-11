@@ -1,0 +1,42 @@
+Ticker,Suffix,Company Name,Country,Exchange,Sector,Source
+0945.HK,HK,"Manulife Financial Corporation",CA,HKSE,Financial Services,TSX
+0A18.L,L,"CGI Inc.",CA,LSE,Technology,TSX
+0AH3.L,L,"Great-West Lifeco Inc.",CA,LSE,Financial Services,TSX
+0JVT.L,L,"Lululemon Athletica Inc.",CA,LSE,Consumer Cyclical,TSX
+0KTI.L,L,"Enbridge Inc.",CA,LSE,Energy,TSX
+0NHS.L,L,"Nutrien Ltd.",CA,LSE,Basic Materials,TSX
+0QKU.L,L,"Royal Bank of Canada",CA,LSE,Financial Services,TSX
+0QYZ.L,L,"Franco-Nevada Corporation",CA,LSE,Basic Materials,TSX
+0R07.L,L,"Pan American Silver Corp.",CA,LSE,Basic Materials,TSX
+0R2J.L,L,"Agnico Eagle Mines Limited",CA,LSE,Basic Materials,TSX
+0R35.L,L,"Cameco Corporation",CA,LSE,Energy,TSX
+0R4M.L,L,"Lundin Gold Inc.",CA,LSE,Basic Materials,TSX
+0UGS.L,L,"Alamos Gold Inc.",CA,LSE,Basic Materials,TSX
+0UKH.L,L,"Bank of Montreal",CA,LSE,Financial Services,TSX
+0UKI.L,L,"The Bank of Nova Scotia",CA,LSE,Financial Services,TSX
+0V5H.L,L,"Manulife Financial Corporation",CA,LSE,Financial Services,TSX
+0VFA.L,L,"Restaurant Brands International Inc.",CA,LSE,Consumer Cyclical,TSX
+0VHA.L,L,"Shopify Inc.",CA,LSE,Technology,TSX
+0VJA.L,L,"Sun Life Financial Inc.",CA,LSE,Financial Services,TSX
+0VL8.L,L,"The Toronto-Dominion Bank",CA,LSE,Financial Services,TSX
+2099.HK,HK,"China Gold International Resources Corp. Ltd.",CA,HKSE,Basic Materials,TSX
+307.F,F,"Shopify Inc.",CA,FSX,Technology,TSX
+950160.KQ,KQ,"Kolon TissueGene, Inc.",US,KOE,Healthcare,manual
+AAPL.MX,MX,"Apple Inc.",US,MEX,Technology,manual
+AMRQ.L,L,"Amaroq Minerals Ltd.",CA,LSE,Basic Materials,TSX
+AT1D.L,L,"Invesco AT1 Capital Bond ETF",US,LSE,Financial Services,manual
+ATD.B,B,"Alimentation Couche-Tard Inc.",CA,TSX,Consumer Defensive,watchlist
+BBD.B,B,"Bombardier Inc.",CA,TSX,Industrials,watchlist
+BBDBN.MX,MX,"Bombardier Inc.",CA,MEX,Industrials,TSX
+BRK.B,B,"YieldMax BRK.B Option Income Strategy ETF",US,AMEX,Financial Services,watchlist
+CGI.L,L,"Canadian General Investments, Limited",CA,LSE,Financial Services,TSX
+IPCO.ST,ST,"International Petroleum Corporation",CA,STO,Energy,TSX
+KIN2.DE,DE,"Kinross Gold Corporation",CA,XETRA,Basic Materials,TSX
+LUG.ST,ST,"Lundin Gold Inc.",CA,STO,Basic Materials,TSX
+LUMI.ST,ST,"Lundin Mining Corporation",CA,STO,Basic Materials,TSX
+MKA.L,L,"Mkango Resources Ltd.",CA,LSE,Basic Materials,TSX
+SII.DE,DE,"Wheaton Precious Metals Corp.",CA,XETRA,Basic Materials,TSX
+THX.L,L,"Thor Explorations Ltd.",CA,LSE,Basic Materials,TSX
+TKO.L,L,"Taseko Mines Limited",CA,LSE,Basic Materials,TSX
+WPM.L,L,"Wheaton Precious Metals Corp.",CA,LSE,Basic Materials,TSX
+XOM.MX,MX,"Exxon Mobil Corporation",US,MEX,Energy,manual

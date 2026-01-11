@@ -81,8 +81,9 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto">
           {/* Logo - Masqué par défaut si pas de logo, affiché seulement si chargé avec succès */}
           {/* Logo - Utilise l'URL fournie par le backend (info.logo) qui gère la logique FMP */}
-          <img 
+          <img
             src={info.logo || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}
+            alt={`Logo de ${info.name || activeId}`}
             alt={info.name}
             className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200 cursor-help"
             title={`Logo de ${info.name}\n\nSource: FMP API\n\nChargé via: ${info.logo || 'Non disponible'}`}
@@ -228,6 +229,7 @@ export const Header: React.FC<HeaderProps> = ({
                     : 'bg-purple-50 text-purple-700 hover:bg-purple-100 hover:shadow-md active:scale-95 border border-purple-200'
                 }`}
                 title="📥 Restaurer les données\n\nOuvre un dialogue pour charger un snapshot précédent ou recalculer depuis FMP."
+                aria-label="Restaurer les données"
               >
                 <ArrowUturnLeftIcon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                 <span className="hidden sm:inline whitespace-nowrap">Restaurer</span>
@@ -239,6 +241,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={handlePrint}
               className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print bg-gray-50 text-gray-700 hover:bg-gray-100 hover:shadow-md active:scale-95 border border-gray-200"
               title="🖨️ Imprimer la fiche d'analyse\n\nGénère une version imprimable de l'analyse complète (données, graphiques, matrices, notes)."
+              aria-label="Imprimer la fiche d'analyse"
             >
               <PrinterIcon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
               <span className="hidden sm:inline whitespace-nowrap">Imprimer</span>

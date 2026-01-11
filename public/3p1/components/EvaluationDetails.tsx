@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { formatCurrency, projectFutureValue, calculateCAGR, calculateHistoricalGrowth } from '../utils/calculations';
-import { CalculatorIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { CalculatorIcon, ChevronDownIcon, ChevronUpIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { GuardrailConfig, DEFAULT_CONFIG } from '../config/AppConfig';
 import { AnnualData, Assumptions, CompanyInfo } from '../types';
 
@@ -759,7 +759,12 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   </button>
                 </div>
               </td>
-              <td className={`p-3 font-semibold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`BPA (EPS) Actuel: ${baseValues.eps?.toFixed(2) ?? '0.00'} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.eps?.toFixed(2) ?? '0.00'}</td>
+              <td className={`p-3 font-semibold ${assumptions.excludeEPS ? "bg-red-200 text-red-800 border-2 border-red-500 border-dashed" : "bg-green-50 text-green-800"} cursor-help relative`} title={`BPA (EPS) Actuel: ${baseValues.eps?.toFixed(2) ?? '0.00'} $\n\nValeur de l'année de base (${assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\n${assumptions.excludeEPS ? '⚠️ EXCLUE: Cette métrique produit un prix cible aberrant et a été exclue du calcul.' : 'Utilisée comme point de départ pour la projection à 5 ans.'}`}>
+                {baseValues.eps?.toFixed(2) ?? '0.00'}
+                {assumptions.excludeEPS && (
+                  <ExclamationTriangleIcon className="absolute top-1 right-1 w-4 h-4 text-red-600" title="Métrique exclue (prix cible aberrant)" />
+                )}
+              </td>
               <td className={`p-3 ${assumptions.excludeEPS ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -816,7 +821,12 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   </button>
                 </div>
               </td>
-              <td className={`p-3 font-semibold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`CFA (Cash Flow) Actuel: ${baseValues.cf?.toFixed(2) ?? '0.00'} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.cf?.toFixed(2) ?? '0.00'}</td>
+              <td className={`p-3 font-semibold ${assumptions.excludeCF ? "bg-red-200 text-red-800 border-2 border-red-500 border-dashed" : "bg-green-50 text-green-800"} cursor-help relative`} title={`CFA (Cash Flow) Actuel: ${baseValues.cf?.toFixed(2) ?? '0.00'} $\n\nValeur de l'année de base (${assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\n${assumptions.excludeCF ? '⚠️ EXCLUE: Cette métrique produit un prix cible aberrant et a été exclue du calcul.' : 'Utilisée comme point de départ pour la projection à 5 ans.'}`}>
+                {baseValues.cf?.toFixed(2) ?? '0.00'}
+                {assumptions.excludeCF && (
+                  <ExclamationTriangleIcon className="absolute top-1 right-1 w-4 h-4 text-red-600" title="Métrique exclue (prix cible aberrant)" />
+                )}
+              </td>
               <td className={`p-3 ${assumptions.excludeCF ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -873,7 +883,12 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   </button>
                 </div>
               </td>
-              <td className={`p-3 font-semibold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`BV (Book Value) Actuel: ${baseValues.bv?.toFixed(2) ?? '0.00'} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.bv?.toFixed(2) ?? '0.00'}</td>
+              <td className={`p-3 font-semibold ${assumptions.excludeBV ? "bg-red-200 text-red-800 border-2 border-red-500 border-dashed" : "bg-green-50 text-green-800"} cursor-help relative`} title={`BV (Book Value) Actuel: ${baseValues.bv?.toFixed(2) ?? '0.00'} $\n\nValeur de l'année de base (${assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\n${assumptions.excludeBV ? '⚠️ EXCLUE: Cette métrique produit un prix cible aberrant et a été exclue du calcul.' : 'Utilisée comme point de départ pour la projection à 5 ans.'}`}>
+                {baseValues.bv?.toFixed(2) ?? '0.00'}
+                {assumptions.excludeBV && (
+                  <ExclamationTriangleIcon className="absolute top-1 right-1 w-4 h-4 text-red-600" title="Métrique exclue (prix cible aberrant)" />
+                )}
+              </td>
               <td className={`p-3 ${assumptions.excludeBV ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 
@@ -930,7 +945,12 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   </button>
                 </div>
               </td>
-              <td className={`p-3 font-semibold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`} title={`DIV (Dividende) Actuel: ${baseValues.div?.toFixed(2) ?? '0.00'} $\n\nValeur de l'année de base ({assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\nUtilisée comme point de départ pour la projection à 5 ans.`}>{baseValues.div?.toFixed(2) ?? '0.00'}</td>
+              <td className={`p-3 font-semibold ${assumptions.excludeDIV ? "bg-red-200 text-red-800 border-2 border-red-500 border-dashed" : "bg-green-50 text-green-800"} cursor-help relative`} title={`DIV (Dividende) Actuel: ${baseValues.div?.toFixed(2) ?? '0.00'} $\n\nValeur de l'année de base (${assumptions.baseYear}).\nSource: Données historiques FMP (vert = officiel).\n\n${assumptions.excludeDIV ? '⚠️ EXCLUE: Cette métrique produit un prix cible aberrant et a été exclue du calcul.' : 'Utilisée comme point de départ pour la projection à 5 ans.'}`}>
+                {baseValues.div?.toFixed(2) ?? '0.00'}
+                {assumptions.excludeDIV && (
+                  <ExclamationTriangleIcon className="absolute top-1 right-1 w-4 h-4 text-red-600" title="Métrique exclue (prix cible aberrant)" />
+                )}
+              </td>
               <td className={`p-3 ${assumptions.excludeDIV ? "bg-gray-200" : "bg-orange-50"}`}>
                 <input 
                   type="number" 

@@ -98,7 +98,10 @@ export async function loadAllCurrentSnapshotsFromSupabase(): Promise<Map<string,
     console.log('🚀 Loading ALL current snapshots from Supabase in single API call...');
     const startTime = Date.now();
     
-    const response = await fetch('/api/finance-snapshots?all=true&current=true&limit=2000');
+    // ✅ Limite depuis Supabase (pas de hardcoding)
+    const { getConfigValue } = await import('./appConfigApi');
+    const limit = await getConfigValue('snapshots_limit');
+    const response = await fetch(`/api/finance-snapshots?all=true&current=true&limit=${limit}`);
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status} ${response.statusText}`);

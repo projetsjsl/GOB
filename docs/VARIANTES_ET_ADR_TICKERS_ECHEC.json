@@ -1,0 +1,734 @@
+{
+  "summary": {
+    "total": 14,
+    "withVariants": 14,
+    "withADR": 8,
+    "generatedAt": "2026-01-11T02:10:12.486Z"
+  },
+  "results": [
+    {
+      "original": "ATD.B",
+      "company": "Alimentation Couche-Tard Inc.",
+      "country": "CA",
+      "exchange": "TSX",
+      "variants": [
+        {
+          "ticker": "ATD-B",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "ATD",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "ATD.TO",
+          "success": true,
+          "companyName": "Alimentation Couche-Tard Inc.",
+          "exchange": "TSX",
+          "currency": "CAD",
+          "marketCap": 70757128891
+        },
+        {
+          "ticker": "ANCTF",
+          "success": true,
+          "companyName": "Alimentation Couche-Tard Inc.",
+          "exchange": "OTC",
+          "currency": "USD",
+          "marketCap": 50816483476
+        }
+      ],
+      "adrFound": [
+        {
+          "ticker": "ANCTF",
+          "name": "Alimentation Couche-Tard Inc.",
+          "exchange": "OTC",
+          "currency": "USD"
+        }
+      ],
+      "bestMatch": {
+        "ticker": "ATD.TO",
+        "success": true,
+        "companyName": "Alimentation Couche-Tard Inc.",
+        "exchange": "TSX",
+        "currency": "CAD",
+        "marketCap": 70757128891
+      }
+    },
+    {
+      "original": "BBD.B",
+      "company": "Bombardier Inc.",
+      "country": "CA",
+      "exchange": "TSX",
+      "variants": [
+        {
+          "ticker": "BBD-B",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "BBD",
+          "success": true,
+          "companyName": "Banco Bradesco S.A.",
+          "exchange": "NYSE",
+          "currency": "USD",
+          "marketCap": 36417613956
+        },
+        {
+          "ticker": "BBD-A.TO",
+          "success": true,
+          "companyName": "Bombardier Inc.",
+          "exchange": "TSX",
+          "currency": "CAD",
+          "marketCap": 24403312607
+        },
+        {
+          "ticker": "BBD-B.TO",
+          "success": true,
+          "companyName": "Bombardier Inc.",
+          "exchange": "TSX",
+          "currency": "CAD",
+          "marketCap": 24474154383
+        },
+        {
+          "ticker": "BOMBF",
+          "success": true,
+          "companyName": "Bombardier Inc.",
+          "exchange": "OTC",
+          "currency": "USD",
+          "marketCap": 48610828032
+        }
+      ],
+      "adrFound": [
+        {
+          "ticker": "BOMBF",
+          "name": "Bombardier Inc.",
+          "exchange": "OTC",
+          "currency": "USD"
+        },
+        {
+          "ticker": "BDRXF",
+          "name": "Bombardier Inc.",
+          "exchange": "OTC",
+          "currency": "USD"
+        },
+        {
+          "ticker": "BDRPF",
+          "name": "Bombardier Inc.",
+          "exchange": "OTC",
+          "currency": "USD"
+        },
+        {
+          "ticker": "BDRBF",
+          "name": "Bombardier Inc.",
+          "exchange": "OTC",
+          "currency": "USD"
+        },
+        {
+          "ticker": "BDRAF",
+          "name": "Bombardier Inc.",
+          "exchange": "OTC",
+          "currency": "USD"
+        }
+      ],
+      "bestMatch": {
+        "ticker": "BBD",
+        "success": true,
+        "companyName": "Banco Bradesco S.A.",
+        "exchange": "NYSE",
+        "currency": "USD",
+        "marketCap": 36417613956
+      }
+    },
+    {
+      "original": "BRK.B",
+      "company": "YieldMax BRK.B Option Income Strategy ETF",
+      "country": "US",
+      "exchange": "AMEX",
+      "variants": [
+        {
+          "ticker": "BRK-B",
+          "success": true,
+          "companyName": "Berkshire Hathaway Inc.",
+          "exchange": "NYSE",
+          "currency": "USD",
+          "marketCap": 1076725791194
+        },
+        {
+          "ticker": "BRK",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "BRK.A",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "BRK-A",
+          "success": true,
+          "companyName": "Berkshire Hathaway Inc.",
+          "exchange": "NYSE",
+          "currency": "USD",
+          "marketCap": 1077985065920
+        }
+      ],
+      "adrFound": [],
+      "bestMatch": {
+        "ticker": "BRK-B",
+        "success": true,
+        "companyName": "Berkshire Hathaway Inc.",
+        "exchange": "NYSE",
+        "currency": "USD",
+        "marketCap": 1076725791194
+      }
+    },
+    {
+      "original": "BFB",
+      "company": "Brown Forman Corp (Class B)",
+      "country": "US",
+      "exchange": "NYS",
+      "variants": [
+        {
+          "ticker": "BF-B",
+          "success": true,
+          "companyName": "Brown-Forman Corporation",
+          "exchange": "NYSE",
+          "currency": "USD",
+          "marketCap": 12264144589
+        },
+        {
+          "ticker": "BFB",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "BF.A",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "BF-A",
+          "success": true,
+          "companyName": "Brown-Forman Corporation",
+          "exchange": "NYSE",
+          "currency": "USD",
+          "marketCap": 12344456784
+        }
+      ],
+      "adrFound": [],
+      "bestMatch": {
+        "ticker": "BF-B",
+        "success": true,
+        "companyName": "Brown-Forman Corporation",
+        "exchange": "NYSE",
+        "currency": "USD",
+        "marketCap": 12264144589
+      }
+    },
+    {
+      "original": "MOGA",
+      "company": "Moog Inc (Class A)",
+      "country": "US",
+      "exchange": "NYS",
+      "variants": [
+        {
+          "ticker": "MOG-A",
+          "success": true,
+          "companyName": "Moog Inc.",
+          "exchange": "NYSE",
+          "currency": "USD",
+          "marketCap": 8637631886
+        },
+        {
+          "ticker": "MOG.A",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "MOGA",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "MOG",
+          "success": false,
+          "error": "Aucune donnée"
+        }
+      ],
+      "adrFound": [],
+      "bestMatch": {
+        "ticker": "MOG-A",
+        "success": true,
+        "companyName": "Moog Inc.",
+        "exchange": "NYSE",
+        "currency": "USD",
+        "marketCap": 8637631886
+      }
+    },
+    {
+      "original": "CCLB.TO",
+      "company": "CCL Industries",
+      "country": "CANADA",
+      "exchange": "TSE",
+      "variants": [
+        {
+          "ticker": "CCL",
+          "success": true,
+          "companyName": "Carnival Corporation & plc",
+          "exchange": "NYSE",
+          "currency": "USD",
+          "marketCap": 42140571401
+        },
+        {
+          "ticker": "CCL.TO",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "CCL-B",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "CCLB",
+          "success": false,
+          "error": "Aucune donnée"
+        }
+      ],
+      "adrFound": [
+        {
+          "ticker": "CCLLF",
+          "name": "CCL Industries Inc.",
+          "exchange": "OTC",
+          "currency": "USD"
+        },
+        {
+          "ticker": "CCDBF",
+          "name": "CCL Industries Inc.",
+          "exchange": "OTC",
+          "currency": "USD"
+        }
+      ],
+      "bestMatch": {
+        "ticker": "CCL",
+        "success": true,
+        "companyName": "Carnival Corporation & plc",
+        "exchange": "NYSE",
+        "currency": "USD",
+        "marketCap": 42140571401
+      }
+    },
+    {
+      "original": "CTCA.TO",
+      "company": "Canadian Tire 'A'",
+      "country": "CANADA",
+      "exchange": "TSE",
+      "variants": [
+        {
+          "ticker": "CTC",
+          "success": true,
+          "companyName": "IFM Investments Ltd.",
+          "exchange": "NYSE",
+          "currency": "USD",
+          "marketCap": 0
+        },
+        {
+          "ticker": "CTC-A",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "CTC.A",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "CTCA",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "CTC.TO",
+          "success": true,
+          "companyName": "Canadian Tire Corporation, Limited",
+          "exchange": "TSX",
+          "currency": "CAD",
+          "marketCap": 8118597058
+        }
+      ],
+      "adrFound": [],
+      "bestMatch": {
+        "ticker": "CTC",
+        "success": true,
+        "companyName": "IFM Investments Ltd.",
+        "exchange": "NYSE",
+        "currency": "USD",
+        "marketCap": 0
+      }
+    },
+    {
+      "original": "EMPA.TO",
+      "company": "Empire Company Limited (Class A)",
+      "country": "CANADA",
+      "exchange": "TSE",
+      "variants": [
+        {
+          "ticker": "EMP",
+          "success": true,
+          "companyName": "Entergy Mississippi, Inc. 1M BD 66",
+          "exchange": "NYSE",
+          "currency": "USD",
+          "marketCap": 179826970
+        },
+        {
+          "ticker": "EMP-A",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "EMP.A",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "EMPA",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "EMP.TO",
+          "success": false,
+          "error": "Aucune donnée"
+        }
+      ],
+      "adrFound": [],
+      "bestMatch": {
+        "ticker": "EMP",
+        "success": true,
+        "companyName": "Entergy Mississippi, Inc. 1M BD 66",
+        "exchange": "NYSE",
+        "currency": "USD",
+        "marketCap": 179826970
+      }
+    },
+    {
+      "original": "GIBA.TO",
+      "company": "CGI Inc",
+      "country": "CANADA",
+      "exchange": "TSE",
+      "variants": [
+        {
+          "ticker": "GIB",
+          "success": true,
+          "companyName": "CGI Inc.",
+          "exchange": "NYSE",
+          "currency": "USD",
+          "marketCap": 20892955184
+        },
+        {
+          "ticker": "GIB.TO",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "CGI",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "CGI.TO",
+          "success": true,
+          "companyName": "Canadian General Investments, Limited",
+          "exchange": "TSX",
+          "currency": "CAD",
+          "marketCap": 1009679224
+        },
+        {
+          "ticker": "CGI.L",
+          "success": true,
+          "companyName": "Canadian General Investments, Limited",
+          "exchange": "LSE",
+          "currency": "GBp",
+          "marketCap": 544475728
+        }
+      ],
+      "adrFound": [
+        {
+          "ticker": "GIB",
+          "name": "CGI Inc.",
+          "exchange": "NYSE",
+          "currency": "USD"
+        }
+      ],
+      "bestMatch": {
+        "ticker": "GIB",
+        "success": true,
+        "companyName": "CGI Inc.",
+        "exchange": "NYSE",
+        "currency": "USD",
+        "marketCap": 20892955184
+      }
+    },
+    {
+      "original": "RCIB.TO",
+      "company": "Rogers Communications Inc (Class B)",
+      "country": "CANADA",
+      "exchange": "TSE",
+      "variants": [
+        {
+          "ticker": "RCI",
+          "success": true,
+          "companyName": "Rogers Communications Inc.",
+          "exchange": "NYSE",
+          "currency": "USD",
+          "marketCap": 19648699266
+        },
+        {
+          "ticker": "RCI-B",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "RCI.B",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "RCIB",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "RCI.TO",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "RCI.A",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "RCI-A",
+          "success": false,
+          "error": "Aucune donnée"
+        }
+      ],
+      "adrFound": [],
+      "bestMatch": {
+        "ticker": "RCI",
+        "success": true,
+        "companyName": "Rogers Communications Inc.",
+        "exchange": "NYSE",
+        "currency": "USD",
+        "marketCap": 19648699266
+      }
+    },
+    {
+      "original": "CCA",
+      "company": "Cogeco Communications Inc.",
+      "country": "CA",
+      "exchange": "TSX",
+      "variants": [
+        {
+          "ticker": "CCA.TO",
+          "success": true,
+          "companyName": "Cogeco Communications Inc.",
+          "exchange": "TSX",
+          "currency": "CAD",
+          "marketCap": 2861249202
+        },
+        {
+          "ticker": "CCA-A",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "CCA.A",
+          "success": false,
+          "error": "Aucune donnée"
+        }
+      ],
+      "adrFound": [
+        {
+          "ticker": "CGEAF",
+          "name": "Cogeco Communications Inc.",
+          "exchange": "OTC",
+          "currency": "USD"
+        }
+      ],
+      "bestMatch": {
+        "ticker": "CCA.TO",
+        "success": true,
+        "companyName": "Cogeco Communications Inc.",
+        "exchange": "TSX",
+        "currency": "CAD",
+        "marketCap": 2861249202
+      }
+    },
+    {
+      "original": "GWO",
+      "company": "Great-West Lifeco Inc.",
+      "country": "CA",
+      "exchange": "TSX",
+      "variants": [
+        {
+          "ticker": "GWO.TO",
+          "success": true,
+          "companyName": "Great-West Lifeco Inc.",
+          "exchange": "TSX",
+          "currency": "CAD",
+          "marketCap": 61901589307
+        },
+        {
+          "ticker": "GWO-A",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "GWO.A",
+          "success": false,
+          "error": "Aucune donnée"
+        }
+      ],
+      "adrFound": [
+        {
+          "ticker": "GWLIF",
+          "name": "Great-West Lifeco Inc.",
+          "exchange": "OTC",
+          "currency": "USD"
+        },
+        {
+          "ticker": "GRWTF",
+          "name": "Great-West Lifeco Inc.",
+          "exchange": "OTC",
+          "currency": "USD"
+        }
+      ],
+      "bestMatch": {
+        "ticker": "GWO.TO",
+        "success": true,
+        "companyName": "Great-West Lifeco Inc.",
+        "exchange": "TSX",
+        "currency": "CAD",
+        "marketCap": 61901589307
+      }
+    },
+    {
+      "original": "IFC",
+      "company": "Intact Financial Corporation",
+      "country": "CA",
+      "exchange": "TSX",
+      "variants": [
+        {
+          "ticker": "IFC.TO",
+          "success": true,
+          "companyName": "Intact Financial Corporation",
+          "exchange": "TSX",
+          "currency": "CAD",
+          "marketCap": 49706485430
+        },
+        {
+          "ticker": "IFC-A",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "IFC.A",
+          "success": false,
+          "error": "Aucune donnée"
+        }
+      ],
+      "adrFound": [
+        {
+          "ticker": "INTAF",
+          "name": "Intact Financial Corporation",
+          "exchange": "OTC",
+          "currency": "USD"
+        },
+        {
+          "ticker": "INFFF",
+          "name": "Intact Financial Corporation",
+          "exchange": "OTC",
+          "currency": "USD"
+        },
+        {
+          "ticker": "IFZZF",
+          "name": "Intact Financial Corporation",
+          "exchange": "OTC",
+          "currency": "USD"
+        },
+        {
+          "ticker": "IFTPF",
+          "name": "Intact Financial Corporation",
+          "exchange": "OTC",
+          "currency": "USD"
+        },
+        {
+          "ticker": "IFCZF",
+          "name": "Intact Financial Corporation",
+          "exchange": "OTC",
+          "currency": "USD"
+        }
+      ],
+      "bestMatch": {
+        "ticker": "IFC.TO",
+        "success": true,
+        "companyName": "Intact Financial Corporation",
+        "exchange": "TSX",
+        "currency": "CAD",
+        "marketCap": 49706485430
+      }
+    },
+    {
+      "original": "MRU",
+      "company": "Metro Inc.",
+      "country": "CA",
+      "exchange": "TSX",
+      "variants": [
+        {
+          "ticker": "MRU.TO",
+          "success": true,
+          "companyName": "Metro Inc.",
+          "exchange": "TSX",
+          "currency": "CAD",
+          "marketCap": 21533218675
+        },
+        {
+          "ticker": "MRU-A",
+          "success": false,
+          "error": "Aucune donnée"
+        },
+        {
+          "ticker": "MRU.A",
+          "success": false,
+          "error": "Aucune donnée"
+        }
+      ],
+      "adrFound": [
+        {
+          "ticker": "MTRI",
+          "name": "Metro Inc.",
+          "exchange": "OTC",
+          "currency": "USD"
+        },
+        {
+          "ticker": "MTRAF",
+          "name": "Metro Inc.",
+          "exchange": "OTC",
+          "currency": "USD"
+        }
+      ],
+      "bestMatch": {
+        "ticker": "MRU.TO",
+        "success": true,
+        "companyName": "Metro Inc.",
+        "exchange": "TSX",
+        "currency": "CAD",
+        "marketCap": 21533218675
+      }
+    }
+  ]
+}

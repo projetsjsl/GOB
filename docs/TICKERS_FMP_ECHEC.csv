@@ -1,0 +1,15 @@
+Ticker,Erreur,Temps (ms),Company Name (Supabase),Country,Exchange,Sector
+ATD.B,"Aucune donnée retournée (tableau vide)",45,"Alimentation Couche-Tard Inc.",CA,TSX,Consumer Defensive
+BBD.B,"Aucune donnée retournée (tableau vide)",44,"Bombardier Inc.",CA,TSX,Industrials
+BFB,"Aucune donnée retournée (tableau vide)",46,"Brown Forman Corp (Class B)",UNITED STATES,NYS,
+BRK.B,"Aucune donnée retournée (tableau vide)",76,"YieldMax BRK.B Option Income Strategy ETF",US,AMEX,Financial Services
+CCA,"Aucune donnée retournée (tableau vide)",44,"Cogeco Communications Inc.",CA,TSX,Communication Services
+CCLB.TO,"Aucune donnée retournée (tableau vide)",42,"CCL Industries",CANADA,TSE,
+CTCA.TO,"Aucune donnée retournée (tableau vide)",43,"Canadian Tire 'A'",CANADA,TSE,
+EMPA.TO,"Aucune donnée retournée (tableau vide)",148,"Empire Company Limited (Class A)",CANADA,TSE,
+GIBA.TO,"Aucune donnée retournée (tableau vide)",42,"CGI Inc",CANADA,TSE,
+GWO,"Aucune donnée retournée (tableau vide)",48,"Great-West Lifeco Inc.",CA,TSX,Financial Services
+IFC,"Aucune donnée retournée (tableau vide)",135,"Intact Financial Corporation",CA,TSX,Financial Services
+MOGA,"Aucune donnée retournée (tableau vide)",43,"Moog Inc (Class A)",UNITED STATES,NYS,
+MRU,"Aucune donnée retournée (tableau vide)",43,"Metro Inc.",CA,TSX,Consumer Defensive
+RCIB.TO,"Aucune donnée retournée (tableau vide)",47,"Rogers Communications Inc (Class B)",CANADA,TSE,

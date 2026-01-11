@@ -575,20 +575,23 @@ export default async function handler(req, res) {
         const institutionalHolders = await getJsonSafe(instHolderRes);
         const earningsSurprises = await getJsonSafe(surprisesRes);
 
-        // 6a. Fetch Beta, ROE, ROA from Key Metrics (most recent)
+        // 6a. Fetch Beta, ROE, ROA, and Current Dividend from Key Metrics (most recent)
         let beta = null;
         let roe = null;
         let roa = null;
+        let currentDividendFromMetrics = null; // ✅ NOUVEAU: Dividende actuel depuis key metrics
         if (metricsData && metricsData.length > 0) {
+            const mostRecentMetric = metricsData[0]; // Le plus récent (premier après tri)
+            
             // Beta est généralement dans les key-metrics les plus récents
             // Essayer aussi dans le profile
-            beta = profile.beta || (metricsData[0]?.beta) || null;
+            beta = profile.beta || mostRecentMetric?.beta || null;
             if (beta !== null) {
                 beta = parseFloat(beta);
             }
             
             // ROE (Return on Equity) - généralement en pourcentage dans FMP
-            roe = metricsData[0]?.roe || metricsData[0]?.returnOnEquity || null;
+            roe = mostRecentMetric?.roe || mostRecentMetric?.returnOnEquity || null;
             if (roe !== null && roe !== undefined) {
                 roe = parseFloat(roe);
                 // Si ROE est déjà en pourcentage (0-100), le garder tel quel
@@ -599,13 +602,30 @@ export default async function handler(req, res) {
             }
             
             // ROA (Return on Assets) - généralement en pourcentage dans FMP
-            roa = metricsData[0]?.roa || metricsData[0]?.returnOnAssets || null;
+            roa = mostRecentMetric?.roa || mostRecentMetric?.returnOnAssets || null;
             if (roa !== null && roa !== undefined) {
                 roa = parseFloat(roa);
                 // Si ROA est déjà en pourcentage (0-100), le garder tel quel
                 // Si ROA est en décimal (0-1), le convertir en pourcentage
                 if (Math.abs(roa) <= 1 && roa !== 0) {
                     roa = roa * 100;
+                }
+            }
+            
+            // ✅ NOUVEAU: Récupérer le dividende actuel depuis key metrics
+            // 1. Essayer dividendPerShare du metric le plus récent
+            if (mostRecentMetric?.dividendPerShare && mostRecentMetric.dividendPerShare > 0) {
+                currentDividendFromMetrics = parseFloat(mostRecentMetric.dividendPerShare);
+            }
+            // 2. Fallback: Calculer à partir de dividendYield et currentPrice
+            else if (mostRecentMetric?.dividendYield && mostRecentMetric.dividendYield > 0 && currentPrice > 0) {
+                // dividendYield est généralement en décimal (0.04 pour 4%)
+                const yieldDecimal = parseFloat(mostRecentMetric.dividendYield);
+                // Si yield est > 1, c'est probablement déjà en pourcentage, convertir
+                const yieldPercent = yieldDecimal > 1 ? yieldDecimal : yieldDecimal * 100;
+                if (yieldPercent > 0 && yieldPercent < 50) { // Raisonnable: 0-50%
+                    currentDividendFromMetrics = (yieldPercent / 100) * currentPrice;
+                    console.log(`✅ Calculé currentDividend depuis dividendYield (${yieldPercent.toFixed(2)}%): ${currentDividendFromMetrics.toFixed(4)}`);
                 }
             }
         }
@@ -675,6 +695,41 @@ export default async function handler(req, res) {
             roa: roa // Return on Assets (en pourcentage)
         };
 
+        // ✅ NOUVEAU: Calculer le dividende actuel pour l'inclure dans la réponse
+        // 1. Utiliser le dividende depuis key metrics si disponible
+        let finalCurrentDividend = currentDividendFromMetrics;
+        
+        // 2. Fallback: Utiliser le dividende de l'année la plus récente avec dividende > 0
+        if (!finalCurrentDividend || finalCurrentDividend === 0) {
+            const sortedAnnualData = [...annualData].sort((a, b) => b.year - a.year);
+            const mostRecentWithDividend = sortedAnnualData.find(d => d.dividendPerShare > 0);
+            if (mostRecentWithDividend) {
+                finalCurrentDividend = mostRecentWithDividend.dividendPerShare;
+            }
+        }
+        
+        // 3. Fallback final: Calculer à partir du yield moyen historique si disponible
+        if (!finalCurrentDividend || finalCurrentDividend === 0) {
+            const yearsWithDividend = annualData.filter(d => d.dividendPerShare > 0 && d.priceHigh > 0);
+            if (yearsWithDividend.length > 0 && currentPrice > 0) {
+                const avgYield = yearsWithDividend.reduce((sum, d) => {
+                    const yield = (d.dividendPerShare / d.priceHigh) * 100;
+                    return sum + yield;
+                }, 0) / yearsWithDividend.length;
+                
+                // Si le yield moyen est raisonnable (0.1% à 20%), utiliser pour estimer le dividende actuel
+                if (avgYield > 0.1 && avgYield < 20) {
+                    finalCurrentDividend = (avgYield / 100) * currentPrice;
+                    console.log(`ℹ️ ${usedSymbol}: Dividende estimé à partir du yield moyen historique (${avgYield.toFixed(2)}%): ${finalCurrentDividend.toFixed(4)}`);
+                }
+            }
+        }
+        
+        // 4. Si toujours 0, laisser 0 (pas de dividende)
+        if (!finalCurrentDividend || finalCurrentDividend < 0) {
+            finalCurrentDividend = 0;
+        }
+
         return res.status(200).json({
             data: annualData, // Strategic: Return full available history (up to 30 years) for archival
             financials: {
@@ -689,7 +744,8 @@ export default async function handler(req, res) {
                 earningsSurprises
             },
             info: mappedInfo,
-            currentPrice: parseFloat(currentPrice.toFixed(2))
+            currentPrice: parseFloat(currentPrice.toFixed(2)),
+            currentDividend: parseFloat(finalCurrentDividend.toFixed(4)) // ✅ NOUVEAU: Dividende actuel calculé
         });
 
     } catch (error) {

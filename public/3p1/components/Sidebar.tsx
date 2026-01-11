@@ -119,8 +119,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
     }
     const rec = calculateRecommendation(profile.data, profile.assumptions).recommendation;
     recommendationCacheRef.current.set(cacheKey, rec);
-    // Limiter la taille du cache à 1000 entrées pour éviter les fuites mémoire
-    if (recommendationCacheRef.current.size > 1000) {
+    // ✅ Limite du cache depuis Supabase (pas de hardcoding)
+    const { getConfigValue } = await import('../services/appConfigApi');
+    const cacheMax = await getConfigValue('recommendation_cache_max');
+    if (recommendationCacheRef.current.size > cacheMax) {
       const firstKey = recommendationCacheRef.current.keys().next().value;
       recommendationCacheRef.current.delete(firstKey);
     }
@@ -249,10 +251,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
         const marketCapNum = parseMarketCapToNumber(p.info.marketCap || '');
         switch (filterMarketCap) {
           case 'micro': return marketCapNum > 0 && marketCapNum < 300000000; // < 300M
-          case 'small': return marketCapNum >= 300000000 && marketCapNum < 2000000000; // 300M - 2B
-          case 'mid': return marketCapNum >= 2000000000 && marketCapNum < 10000000000; // 2B - 10B
-          case 'large': return marketCapNum >= 10000000000 && marketCapNum < 200000000000; // 10B - 200B
-          case 'mega': return marketCapNum >= 200000000000; // > 200B
+          // ✅ Charger les seuils depuis Supabase (pas de hardcoding)
+          const { getConfigValue } = await import('../services/appConfigApi');
+          const smallMin = await getConfigValue('market_cap_small_min');
+          const smallMax = await getConfigValue('market_cap_small_max');
+          const midMin = await getConfigValue('market_cap_mid_min');
+          const midMax = await getConfigValue('market_cap_mid_max');
+          const largeMin = await getConfigValue('market_cap_large_min');
+          const largeMax = await getConfigValue('market_cap_large_max');
+          const megaMin = await getConfigValue('market_cap_mega_min');
+          
+          case 'small': return marketCapNum >= smallMin && marketCapNum < smallMax;
+          case 'mid': return marketCapNum >= midMin && marketCapNum < midMax;
+          case 'large': return marketCapNum >= largeMin && marketCapNum < largeMax;
+          case 'mega': return marketCapNum >= megaMin;
           default: return true;
         }
       });
@@ -610,8 +622,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
                   <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getRecommendationColor(recommendation)} cursor-help`} title={`📊 Recommandation: ${recommendation}\n\nBasé sur:\n• Prix actuel vs Limite d'achat/vente\n• Calculé automatiquement selon vos hypothèses\n\n🟢 Vert = ACHAT\n🟡 Jaune = CONSERVER\n🔴 Rouge = VENTE\n\n⚠️ Note: Ce point coloré = Recommandation\n⭐ L'étoile jaune = Portefeuille (titres détenus)`}></div>
 
                   {/* Logo - Masqué immédiatement si erreur pour éviter 404 */}
-                  <img 
+                  <img
                     src={profile.info.logo || ((profile.info.logoSymbol || profile.info.actualSymbol?.replace('.TO', '').replace('-', '.') || profile.info.preferredSymbol || profile.id) ? `https://financialmodelingprep.com/image-stock/${profile.info.logoSymbol || profile.info.actualSymbol?.replace('.TO', '').replace('-', '.') || profile.info.preferredSymbol || profile.id}.png` : '')}
+                    alt={`Logo ${profile.info.name || profile.id}`}
                     alt={profile.info.name}
                     className="w-8 h-8 rounded object-cover flex-shrink-0 cursor-help"
                     title={`Logo de ${profile.info.name}\n\nSource: FMP API (image-stock)`}

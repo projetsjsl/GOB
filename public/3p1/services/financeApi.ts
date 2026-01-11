@@ -69,6 +69,7 @@ export const fetchCompanyData = async (symbol: string): Promise<any> => {
       data: dataWithFlag,
       info: result.info || {},
       currentPrice: finalCurrentPrice, // Use validated/fallback price
+      currentDividend: result.currentDividend || 0, // ✅ NOUVEAU: Dividende actuel depuis l'API
       financials: result.financials,
       analysisData: result.analysisData
     };

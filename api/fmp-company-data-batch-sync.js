@@ -277,6 +277,38 @@ export default async function handler(req, res) {
                 console.log(`✅ ${symbol}: ${data.length} années de données transformées`);
             }
 
+            // ✅ NOUVEAU: Calculer le dividende actuel depuis key metrics
+            const currentPrice = quote?.price || profile.price || 0;
+            let currentDividend = 0;
+            
+            if (metrics.length > 0) {
+                const mostRecentMetric = metrics[0]; // Le plus récent (premier après tri)
+                
+                // 1. Essayer dividendPerShare du metric le plus récent
+                if (mostRecentMetric?.dividendPerShare && mostRecentMetric.dividendPerShare > 0) {
+                    currentDividend = parseFloat(mostRecentMetric.dividendPerShare);
+                }
+                // 2. Fallback: Calculer à partir de dividendYield et currentPrice
+                else if (mostRecentMetric?.dividendYield && mostRecentMetric.dividendYield > 0 && currentPrice > 0) {
+                    // dividendYield est généralement en décimal (0.04 pour 4%)
+                    const yieldDecimal = parseFloat(mostRecentMetric.dividendYield);
+                    // Si yield est > 1, c'est probablement déjà en pourcentage, convertir
+                    const yieldPercent = yieldDecimal > 1 ? yieldDecimal : yieldDecimal * 100;
+                    if (yieldPercent > 0 && yieldPercent < 50) { // Raisonnable: 0-50%
+                        currentDividend = (yieldPercent / 100) * currentPrice;
+                    }
+                }
+            }
+            
+            // 3. Fallback final: Utiliser le dividende de l'année la plus récente avec dividende > 0
+            if (currentDividend === 0 && data.length > 0) {
+                const sortedData = [...data].sort((a, b) => b.year - a.year);
+                const mostRecentWithDividend = sortedData.find(d => d.dividendPerShare > 0);
+                if (mostRecentWithDividend) {
+                    currentDividend = mostRecentWithDividend.dividendPerShare;
+                }
+            }
+
             return {
                 symbol,
                 success: true,
@@ -297,7 +329,8 @@ export default async function handler(req, res) {
                         marketCap: profile.mktCap || 0,
                         image: profile.image || ''
                     },
-                    currentPrice: quote?.price || profile.price || 0,
+                    currentPrice: currentPrice,
+                    currentDividend: parseFloat(currentDividend.toFixed(4)), // ✅ NOUVEAU: Dividende actuel calculé
                     financials: [],
                     analysisData: null
                 }
