@@ -26628,12 +26628,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         const allTabs = useMemo(() => [
             { id: 'admin-jsla', label: 'Admin', icon: 'iconoir-settings', component: AdminJSLaiTab },
             { id: 'markets-economy', label: 'Marchés', icon: 'iconoir-globe', component: MarketsEconomyTab },
+            { id: 'nouvelles', label: 'Nouvelles', icon: 'iconoir-newspaper', component: NouvellesTab },
             { id: 'advanced-analysis', label: 'Titres', icon: 'iconoir-candlestick-chart', component: (props) => window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab isDarkMode={isDarkMode} {...props} /> : <div>Chargement...</div> },
             { id: 'jlab', label: 'JLab™', icon: 'iconoir-flask', component: JLabUnifiedTab },
             { id: 'ask-emma', label: 'Emma IA', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
 
             // Secondary / Optional Tabs
-            { id: 'nouvelles', label: 'Nouvelles', icon: 'iconoir-newspaper', component: NouvellesTab },
             { id: 'emma-config', label: 'Config', icon: 'iconoir-tools', component: EmmaConfigTab },
             { id: 'fastgraphs', label: 'FastGraphs', icon: 'iconoir-graph-up', component: FastGraphsTab },
             { id: 'scrapping-sa', label: 'Seeking', icon: 'iconoir-search', component: ScrappingSATab },
