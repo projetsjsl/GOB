@@ -85,6 +85,7 @@ declare const Chart: any;  // ❌
 if ((window as any).__GOB_DASHBOARD_MOUNTED) {  // ❌
   console.log('...');  // ❌
 }
+
 ```
 
 **Après:**
@@ -116,6 +117,7 @@ news?: any[];  // ❌
 } catch (error: any) {  // ❌
   throw new Error(`...: ${error.message}`);  // ❌
 }
+
 ```
 
 **Après:**
