@@ -1,0 +1,334 @@
+/**
+ * GOB Design System - Consolidated CSS for Standalone Files
+ * 
+ * Ce fichier consolide tous les styles du design system pour les fichiers HTML standalone
+ * comme beta-combined-dashboard.html qui n'utilisent pas Vite.
+ * 
+ * Généré depuis src/styles/ pour être accessible depuis public/css/
+ */
+
+/* =====================================================
+ * 1. DESIGN TOKENS (Variables CSS)
+ * ===================================================== */
+
+:root {
+  /* Couleurs principales */
+  --gob-primary: #6366f1;
+  --gob-primary-light: #8b5cf6;
+  --gob-primary-dark: #4f46e5;
+  --gob-secondary: #7c3aed;
+  
+  /* Couleurs d'état */
+  --gob-success: #10b981;
+  --gob-danger: #ef4444;
+  --gob-warning: #f59e0b;
+  --gob-info: #3b82f6;
+  
+  /* Couleurs de texte */
+  --gob-text-primary: #ffffff;
+  --gob-text-primary-light: #1a1a1a;
+  --gob-text-secondary: #9ca3af;
+  --gob-text-muted: #6b7280;
+  --gob-text-disabled: #4b5563;
+  
+  /* Couleurs de fond */
+  --gob-bg-primary: #000000;
+  --gob-bg-primary-light: #ffffff;
+  --gob-bg-secondary: #111827;
+  --gob-bg-tertiary: #1f2937;
+  --gob-bg-elevated: #18181b;
+  
+  /* Couleurs de bordure */
+  --gob-border: #374151;
+  --gob-border-light: #4b5563;
+  --gob-border-subtle: rgba(255, 255, 255, 0.1);
+  --gob-border-accent: rgba(99, 102, 241, 0.3);
+  
+  /* Espacements */
+  --gob-spacing-xs: 4px;
+  --gob-spacing-sm: 8px;
+  --gob-spacing-md: 16px;
+  --gob-spacing-lg: 24px;
+  --gob-spacing-xl: 32px;
+  --gob-spacing-2xl: 48px;
+  --gob-spacing-3xl: 64px;
+  
+  /* Typographie */
+  --gob-font-primary: Inter, sans-serif;
+  --gob-font-secondary: Roboto, sans-serif;
+  --gob-font-mono: "Courier New", "Courier", "Consolas", "Monaco", "Menlo", "SF Mono", monospace;
+  
+  /* Ombres */
+  --gob-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --gob-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --gob-shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+  --gob-shadow-primary: 0 4px 12px rgba(99, 102, 241, 0.15);
+  
+  /* Border Radius */
+  --gob-radius-sm: 0.25rem;
+  --gob-radius-md: 0.5rem;
+  --gob-radius-lg: 0.75rem;
+  --gob-radius-xl: 1rem;
+  
+  /* Transitions */
+  --gob-transition-fast: 150ms;
+  --gob-transition-normal: 300ms;
+  --gob-transition-slow: 500ms;
+}
+
+/* Light mode overrides */
+[data-theme="light"] {
+  --gob-text-primary: var(--gob-text-primary-light);
+  --gob-bg-primary: var(--gob-bg-primary-light);
+  --gob-bg-secondary: #f5f5f5;
+  --gob-border: #d0d0d0;
+}
+
+/* =====================================================
+ * 2. STANDARDISATION DES ESPACEMENTS
+ * ===================================================== */
+
+/* Gaps pour grilles de cartes (stocks, news) */
+.dashboard-grid,
+.stocks-grid,
+.news-grid {
+    gap: var(--gob-spacing-lg) !important; /* 24px */
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid,
+    .stocks-grid,
+    .news-grid {
+        gap: var(--gob-spacing-md) !important; /* 16px */
+    }
+}
+
+.dashboard-list,
+.news-list,
+.stocks-list {
+    gap: var(--gob-spacing-md) !important; /* 16px */
+}
+
+.inline-group,
+.button-group,
+.badge-group {
+    gap: var(--gob-spacing-sm) !important; /* 8px */
+}
+
+/* Standardisation des space-y */
+.dashboard-section,
+.tab-content-section {
+    --section-spacing: var(--gob-spacing-lg);
+}
+
+.dashboard-section > * + *,
+.tab-content-section > * + * {
+    margin-top: var(--section-spacing) !important;
+}
+
+.dashboard-subsection {
+    --subsection-spacing: var(--gob-spacing-md);
+}
+
+.dashboard-subsection > * + * {
+    margin-top: var(--subsection-spacing) !important;
+}
+
+.compact-group,
+.metadata-group {
+    --compact-spacing: var(--gob-spacing-sm);
+}
+
+.compact-group > * + *,
+.metadata-group > * + * {
+    margin-top: var(--compact-spacing) !important;
+}
+
+/* Standardisation des paddings */
+.dashboard-card,
+.stock-card,
+.news-card {
+    padding: var(--gob-spacing-lg) !important; /* 24px */
+}
+
+@media (max-width: 768px) {
+    .dashboard-card,
+    .stock-card,
+    .news-card {
+        padding: var(--gob-spacing-md) !important; /* 16px */
+    }
+}
+
+.compact-card {
+    padding: var(--gob-spacing-md) !important; /* 16px */
+}
+
+.widget-container {
+    padding: var(--gob-spacing-md) !important; /* 16px */
+}
+
+.section-header {
+    padding-bottom: var(--gob-spacing-md) !important;
+    margin-bottom: var(--gob-spacing-md) !important;
+}
+
+/* Standardisation des margins */
+.section-spacing {
+    margin-bottom: var(--gob-spacing-xl) !important; /* 32px */
+}
+
+.subsection-spacing {
+    margin-bottom: var(--gob-spacing-lg) !important; /* 24px */
+}
+
+.list-item-spacing {
+    margin-bottom: var(--gob-spacing-md) !important; /* 16px */
+}
+
+/* Utilitaires pour migration progressive */
+.spacing-standard {
+    gap: var(--gob-spacing-lg);
+}
+
+.spacing-compact {
+    gap: var(--gob-spacing-md);
+}
+
+.spacing-tight {
+    gap: var(--gob-spacing-sm);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .dashboard-grid,
+    .stocks-grid,
+    .news-grid {
+        gap: var(--gob-spacing-md) !important;
+    }
+    
+    .dashboard-card,
+    .stock-card,
+    .news-card {
+        padding: 12px !important;
+    }
+    
+    .section-spacing {
+        margin-bottom: var(--gob-spacing-lg) !important;
+    }
+}
+
+/* =====================================================
+ * 3. ACCESSIBILITÉ WCAG
+ * ===================================================== */
+
+/* Focus visible pour navigation clavier */
+*:focus-visible {
+    outline: 2px solid var(--gob-primary);
+    outline-offset: 2px;
+}
+
+/* Contraste amélioré pour texte */
+.text-low-contrast {
+    color: var(--gob-text-secondary);
+}
+
+/* Skip links pour navigation clavier */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--gob-primary);
+    color: white;
+    padding: var(--gob-spacing-sm);
+    z-index: 100;
+    text-decoration: none;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* ARIA labels visuels */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Amélioration du contraste pour les boutons */
+button:not(:disabled) {
+    min-height: 44px; /* Taille minimale pour touch */
+    min-width: 44px;
+}
+
+/* Indicateurs d'état pour lecteurs d'écran */
+[aria-busy="true"]::before {
+    content: "Chargement en cours...";
+    position: absolute;
+    left: -10000px;
+}
+
+[aria-live="polite"] {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* =====================================================
+ * 4. STYLES GLOBAUX POUR COMPOSANTS
+ * ===================================================== */
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.3);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(156, 163, 175, 0.5);
+}
+
+/* Widgets dans React Grid Layout */
+.react-grid-item > div {
+    height: 100% !important;
+    overflow: hidden !important;
+}
+
+.widget-content-scroll {
+    overflow-y: auto;
+    height: 100%;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+/* Transitions douces pour changement de thème */
+* {
+    transition: background-color var(--gob-transition-normal) ease,
+                color var(--gob-transition-normal) ease,
+                border-color var(--gob-transition-normal) ease;
+}
+
+/* Glassmorphism effect */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--gob-border-subtle);
+}
