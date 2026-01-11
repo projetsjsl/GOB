@@ -58,6 +58,7 @@ export interface SeekingAlphaData {
 ```
 
 **Après:**
+
 ```typescript
 export interface StockData {
   [key: string]: string | number | boolean | undefined;  // ✅ Type safe
@@ -89,6 +90,7 @@ if ((window as any).__GOB_DASHBOARD_MOUNTED) {  // ❌
 ```
 
 **Après:**
+
 ```typescript
 interface ChartLibrary {
   [key: string]: unknown;
@@ -121,6 +123,7 @@ news?: any[];  // ❌
 ```
 
 **Après:**
+
 ```typescript
 data?: Record<string, unknown>;  // ✅
 news?: Array<Record<string, unknown>>;  // ✅
