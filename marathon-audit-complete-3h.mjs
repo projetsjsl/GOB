@@ -137,16 +137,13 @@ async function navigateWithRetry(page, url, name, retries = MAX_RETRIES) {
       });
 
       // Navigate with timeout - utiliser domcontentloaded au lieu de networkidle pour être plus rapide
+      // Timeout augmenté à 15s pour laisser le temps aux pages lourdes de charger
       const navigationPromise = page.goto(url, { 
         waitUntil: 'domcontentloaded', 
-        timeout: TIMEOUT_MS * 2 // 10 secondes pour laisser plus de temps
+        timeout: 15000 // 15 secondes
       });
 
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout after 10s')), TIMEOUT_MS * 2)
-      );
-
-      await Promise.race([navigationPromise, timeoutPromise]);
+      await navigationPromise;
       
       // Wait for page to stabilize
       await page.waitForTimeout(3000);
