@@ -8,6 +8,22 @@
  */
 
 /* =====================================================
+ * IMPORTS - Fichiers CSS consolidés
+ * ===================================================== */
+
+/* Animations et transitions */
+@import './animations.css';
+
+/* Fonts et typographie */
+@import './fonts.css';
+
+/* React Grid Layout personnalisé */
+@import './react-grid-layout-custom.css';
+
+/* Composants Emma IA */
+@import './emma-components.css';
+
+/* =====================================================
  * 1. DESIGN TOKENS (Variables CSS)
  * ===================================================== */
 

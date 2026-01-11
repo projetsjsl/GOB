@@ -1,0 +1,161 @@
+/**
+ * Styles pour Composants Emma IA
+ * 
+ * Extrait depuis beta-combined-dashboard.html
+ * Design system pour les composants Emma IA avec glassmorphism
+ */
+
+/* =====================================================
+ * EMMA IA BUTTONS - GLASSMORPHISM
+ * ===================================================== */
+
+/* Glassmorphism Button Standard */
+.btn-emma {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-emma:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+}
+
+.btn-emma:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Blue Accent Variation */
+.btn-emma-primary {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #bfdbfe;
+}
+
+.btn-emma-primary:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.2) 100%);
+    border-color: rgba(59, 130, 246, 0.5);
+    color: white;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+/* Green/Emerald Accent */
+.btn-emma-success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.1) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #d1fae5;
+}
+
+.btn-emma-success:hover {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(5, 150, 105, 0.2) 100%);
+    border-color: rgba(16, 185, 129, 0.5);
+    color: white;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+/* =====================================================
+ * PREMIUM UI UTILITIES (JLab™)
+ * ===================================================== */
+
+.glass-card {
+    background: rgba(10, 14, 39, 0.6);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.light .glass-card {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* =====================================================
+ * FOOTER INFO BAR
+ * ===================================================== */
+
+#footer-info-bar {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.85);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #cbd5e1;
+    padding: 6px 16px;
+    font-size: 11px;
+    border-radius: 99px;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.9;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+#footer-info-bar .brand {
+    font-weight: 600;
+    color: #fff;
+}
+
+#footer-info-bar .separator {
+    opacity: 0.3;
+}
+
+/* =====================================================
+ * SECONDARY NAV SPECIFICS
+ * ===================================================== */
+
+.emma-nav-item {
+    position: relative;
+    isolation: isolate;
+}
+
+.emma-nav-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent 5%, rgba(255,255,255,0.03) 50%, transparent 95%);
+    z-index: -1;
+    transition: opacity 0.3s;
+    opacity: 0;
+}
+
+.emma-nav-item:hover::before {
+    opacity: 1;
+}
+
+/* =====================================================
+ * SCROLLBAR UTILITIES
+ * ===================================================== */
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}

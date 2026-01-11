@@ -1,0 +1,42 @@
+/**
+ * Fonts et Typographie
+ * 
+ * Extrait depuis beta-combined-dashboard.html
+ * Font-face declarations et styles de police globaux
+ */
+
+/* =====================================================
+ * FONT-FACE DECLARATIONS
+ * ===================================================== */
+
+@font-face {
+    font-family: 'Avenir Pro 85 Heavy';
+    src: local('Avenir Next Heavy'), local('Avenir-Heavy'), local('AvenirNext-Heavy');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* =====================================================
+ * FONT UTILITIES
+ * ===================================================== */
+
+.avenir-heavy {
+    font-family: 'Avenir Pro 85 Heavy', 'Avenir Next', 'Avenir', 'Montserrat', 'Inter', sans-serif;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+}
+
+/* =====================================================
+ * GLOBAL FONT STYLES
+ * ===================================================== */
+
+/* Global font family */
+* {
+    font-family: 'Plus Jakarta Sans', 'Inter', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Global font reduction for better overview */
+html {
+    font-size: 85%;
+}
