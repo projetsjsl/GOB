@@ -1,4 +1,3 @@
-var _a2, _b;
 function _mergeNamespaces(n, m) {
   for (var i = 0; i < m.length; i++) {
     const e = m[i];
@@ -7213,7 +7212,7 @@ function ArrowDownTrayIcon({
     d: "M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
   }));
 }
-const ForwardRef$P = /* @__PURE__ */ reactExports.forwardRef(ArrowDownTrayIcon);
+const ForwardRef$Q = /* @__PURE__ */ reactExports.forwardRef(ArrowDownTrayIcon);
 function ArrowPathIcon({
   title,
   titleId,
@@ -7237,7 +7236,7 @@ function ArrowPathIcon({
     d: "M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
   }));
 }
-const ForwardRef$O = /* @__PURE__ */ reactExports.forwardRef(ArrowPathIcon);
+const ForwardRef$P = /* @__PURE__ */ reactExports.forwardRef(ArrowPathIcon);
 function ArrowRightIcon({
   title,
   titleId,
@@ -7261,7 +7260,7 @@ function ArrowRightIcon({
     d: "M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
   }));
 }
-const ForwardRef$N = /* @__PURE__ */ reactExports.forwardRef(ArrowRightIcon);
+const ForwardRef$O = /* @__PURE__ */ reactExports.forwardRef(ArrowRightIcon);
 function ArrowTrendingUpIcon({
   title,
   titleId,
@@ -7285,7 +7284,7 @@ function ArrowTrendingUpIcon({
     d: "M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"
   }));
 }
-const ForwardRef$M = /* @__PURE__ */ reactExports.forwardRef(ArrowTrendingUpIcon);
+const ForwardRef$N = /* @__PURE__ */ reactExports.forwardRef(ArrowTrendingUpIcon);
 function ArrowUturnLeftIcon({
   title,
   titleId,
@@ -7309,7 +7308,7 @@ function ArrowUturnLeftIcon({
     d: "M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
   }));
 }
-const ForwardRef$L = /* @__PURE__ */ reactExports.forwardRef(ArrowUturnLeftIcon);
+const ForwardRef$M = /* @__PURE__ */ reactExports.forwardRef(ArrowUturnLeftIcon);
 function ArrowUturnRightIcon({
   title,
   titleId,
@@ -7333,7 +7332,7 @@ function ArrowUturnRightIcon({
     d: "m15 15 6-6m0 0-6-6m6 6H9a6 6 0 0 0 0 12h3"
   }));
 }
-const ForwardRef$K = /* @__PURE__ */ reactExports.forwardRef(ArrowUturnRightIcon);
+const ForwardRef$L = /* @__PURE__ */ reactExports.forwardRef(ArrowUturnRightIcon);
 function BanknotesIcon({
   title,
   titleId,
@@ -7357,7 +7356,7 @@ function BanknotesIcon({
     d: "M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"
   }));
 }
-const ForwardRef$J = /* @__PURE__ */ reactExports.forwardRef(BanknotesIcon);
+const ForwardRef$K = /* @__PURE__ */ reactExports.forwardRef(BanknotesIcon);
 function Bars3Icon({
   title,
   titleId,
@@ -7381,7 +7380,7 @@ function Bars3Icon({
     d: "M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
   }));
 }
-const ForwardRef$I = /* @__PURE__ */ reactExports.forwardRef(Bars3Icon);
+const ForwardRef$J = /* @__PURE__ */ reactExports.forwardRef(Bars3Icon);
 function BookOpenIcon({
   title,
   titleId,
@@ -7405,7 +7404,7 @@ function BookOpenIcon({
     d: "M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
   }));
 }
-const ForwardRef$H = /* @__PURE__ */ reactExports.forwardRef(BookOpenIcon);
+const ForwardRef$I = /* @__PURE__ */ reactExports.forwardRef(BookOpenIcon);
 function BookmarkIcon({
   title,
   titleId,
@@ -7429,7 +7428,7 @@ function BookmarkIcon({
     d: "M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
   }));
 }
-const ForwardRef$G = /* @__PURE__ */ reactExports.forwardRef(BookmarkIcon);
+const ForwardRef$H = /* @__PURE__ */ reactExports.forwardRef(BookmarkIcon);
 function CalculatorIcon({
   title,
   titleId,
@@ -7453,7 +7452,7 @@ function CalculatorIcon({
     d: "M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0 0 12 2.25Z"
   }));
 }
-const ForwardRef$F = /* @__PURE__ */ reactExports.forwardRef(CalculatorIcon);
+const ForwardRef$G = /* @__PURE__ */ reactExports.forwardRef(CalculatorIcon);
 function CalendarDaysIcon({
   title,
   titleId,
@@ -7477,7 +7476,7 @@ function CalendarDaysIcon({
     d: "M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
   }));
 }
-const ForwardRef$E = /* @__PURE__ */ reactExports.forwardRef(CalendarDaysIcon);
+const ForwardRef$F = /* @__PURE__ */ reactExports.forwardRef(CalendarDaysIcon);
 function ChartBarSquareIcon({
   title,
   titleId,
@@ -7501,7 +7500,7 @@ function ChartBarSquareIcon({
     d: "M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z"
   }));
 }
-const ForwardRef$D = /* @__PURE__ */ reactExports.forwardRef(ChartBarSquareIcon);
+const ForwardRef$E = /* @__PURE__ */ reactExports.forwardRef(ChartBarSquareIcon);
 function ChartBarIcon({
   title,
   titleId,
@@ -7525,7 +7524,7 @@ function ChartBarIcon({
     d: "M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"
   }));
 }
-const ForwardRef$C = /* @__PURE__ */ reactExports.forwardRef(ChartBarIcon);
+const ForwardRef$D = /* @__PURE__ */ reactExports.forwardRef(ChartBarIcon);
 function CheckCircleIcon$1({
   title,
   titleId,
@@ -7549,7 +7548,7 @@ function CheckCircleIcon$1({
     d: "M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
   }));
 }
-const ForwardRef$B = /* @__PURE__ */ reactExports.forwardRef(CheckCircleIcon$1);
+const ForwardRef$C = /* @__PURE__ */ reactExports.forwardRef(CheckCircleIcon$1);
 function CheckIcon({
   title,
   titleId,
@@ -7573,7 +7572,7 @@ function CheckIcon({
     d: "m4.5 12.75 6 6 9-13.5"
   }));
 }
-const ForwardRef$A = /* @__PURE__ */ reactExports.forwardRef(CheckIcon);
+const ForwardRef$B = /* @__PURE__ */ reactExports.forwardRef(CheckIcon);
 function ChevronDownIcon({
   title,
   titleId,
@@ -7597,7 +7596,7 @@ function ChevronDownIcon({
     d: "m19.5 8.25-7.5 7.5-7.5-7.5"
   }));
 }
-const ForwardRef$z = /* @__PURE__ */ reactExports.forwardRef(ChevronDownIcon);
+const ForwardRef$A = /* @__PURE__ */ reactExports.forwardRef(ChevronDownIcon);
 function ChevronLeftIcon({
   title,
   titleId,
@@ -7621,7 +7620,7 @@ function ChevronLeftIcon({
     d: "M15.75 19.5 8.25 12l7.5-7.5"
   }));
 }
-const ForwardRef$y = /* @__PURE__ */ reactExports.forwardRef(ChevronLeftIcon);
+const ForwardRef$z = /* @__PURE__ */ reactExports.forwardRef(ChevronLeftIcon);
 function ChevronRightIcon({
   title,
   titleId,
@@ -7645,7 +7644,7 @@ function ChevronRightIcon({
     d: "m8.25 4.5 7.5 7.5-7.5 7.5"
   }));
 }
-const ForwardRef$x = /* @__PURE__ */ reactExports.forwardRef(ChevronRightIcon);
+const ForwardRef$y = /* @__PURE__ */ reactExports.forwardRef(ChevronRightIcon);
 function ChevronUpIcon({
   title,
   titleId,
@@ -7669,7 +7668,7 @@ function ChevronUpIcon({
     d: "m4.5 15.75 7.5-7.5 7.5 7.5"
   }));
 }
-const ForwardRef$w = /* @__PURE__ */ reactExports.forwardRef(ChevronUpIcon);
+const ForwardRef$x = /* @__PURE__ */ reactExports.forwardRef(ChevronUpIcon);
 function ClockIcon({
   title,
   titleId,
@@ -7693,8 +7692,8 @@ function ClockIcon({
     d: "M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
   }));
 }
-const ForwardRef$v = /* @__PURE__ */ reactExports.forwardRef(ClockIcon);
-function CloudArrowDownIcon({
+const ForwardRef$w = /* @__PURE__ */ reactExports.forwardRef(ClockIcon);
+function CloudArrowUpIcon({
   title,
   titleId,
   ...props
@@ -7714,10 +7713,10 @@ function CloudArrowDownIcon({
   }, title) : null, /* @__PURE__ */ reactExports.createElement("path", {
     strokeLinecap: "round",
     strokeLinejoin: "round",
-    d: "M12 9.75v6.75m0 0-3-3m3 3 3-3m-8.25 6a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
+    d: "M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
   }));
 }
-const ForwardRef$u = /* @__PURE__ */ reactExports.forwardRef(CloudArrowDownIcon);
+const ForwardRef$v = /* @__PURE__ */ reactExports.forwardRef(CloudArrowUpIcon);
 function Cog6ToothIcon({
   title,
   titleId,
@@ -7745,7 +7744,7 @@ function Cog6ToothIcon({
     d: "M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
   }));
 }
-const ForwardRef$t = /* @__PURE__ */ reactExports.forwardRef(Cog6ToothIcon);
+const ForwardRef$u = /* @__PURE__ */ reactExports.forwardRef(Cog6ToothIcon);
 function DocumentArrowDownIcon({
   title,
   titleId,
@@ -7769,7 +7768,7 @@ function DocumentArrowDownIcon({
     d: "M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
   }));
 }
-const ForwardRef$s = /* @__PURE__ */ reactExports.forwardRef(DocumentArrowDownIcon);
+const ForwardRef$t = /* @__PURE__ */ reactExports.forwardRef(DocumentArrowDownIcon);
 function DocumentChartBarIcon({
   title,
   titleId,
@@ -7793,7 +7792,7 @@ function DocumentChartBarIcon({
     d: "M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25M9 16.5v.75m3-3v3M15 12v5.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
   }));
 }
-const ForwardRef$r = /* @__PURE__ */ reactExports.forwardRef(DocumentChartBarIcon);
+const ForwardRef$s = /* @__PURE__ */ reactExports.forwardRef(DocumentChartBarIcon);
 function DocumentDuplicateIcon({
   title,
   titleId,
@@ -7817,7 +7816,7 @@ function DocumentDuplicateIcon({
     d: "M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
   }));
 }
-const ForwardRef$q = /* @__PURE__ */ reactExports.forwardRef(DocumentDuplicateIcon);
+const ForwardRef$r = /* @__PURE__ */ reactExports.forwardRef(DocumentDuplicateIcon);
 function ExclamationCircleIcon({
   title,
   titleId,
@@ -7841,7 +7840,7 @@ function ExclamationCircleIcon({
     d: "M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
   }));
 }
-const ForwardRef$p = /* @__PURE__ */ reactExports.forwardRef(ExclamationCircleIcon);
+const ForwardRef$q = /* @__PURE__ */ reactExports.forwardRef(ExclamationCircleIcon);
 function ExclamationTriangleIcon({
   title,
   titleId,
@@ -7865,7 +7864,7 @@ function ExclamationTriangleIcon({
     d: "M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
   }));
 }
-const ForwardRef$o = /* @__PURE__ */ reactExports.forwardRef(ExclamationTriangleIcon);
+const ForwardRef$p = /* @__PURE__ */ reactExports.forwardRef(ExclamationTriangleIcon);
 function EyeIcon({
   title,
   titleId,
@@ -7893,7 +7892,7 @@ function EyeIcon({
     d: "M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
   }));
 }
-const ForwardRef$n = /* @__PURE__ */ reactExports.forwardRef(EyeIcon);
+const ForwardRef$o = /* @__PURE__ */ reactExports.forwardRef(EyeIcon);
 function FunnelIcon({
   title,
   titleId,
@@ -7917,7 +7916,7 @@ function FunnelIcon({
     d: "M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
   }));
 }
-const ForwardRef$m = /* @__PURE__ */ reactExports.forwardRef(FunnelIcon);
+const ForwardRef$n = /* @__PURE__ */ reactExports.forwardRef(FunnelIcon);
 function InformationCircleIcon({
   title,
   titleId,
@@ -7941,7 +7940,7 @@ function InformationCircleIcon({
     d: "m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
   }));
 }
-const ForwardRef$l = /* @__PURE__ */ reactExports.forwardRef(InformationCircleIcon);
+const ForwardRef$m = /* @__PURE__ */ reactExports.forwardRef(InformationCircleIcon);
 function LightBulbIcon({
   title,
   titleId,
@@ -7965,7 +7964,7 @@ function LightBulbIcon({
     d: "M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"
   }));
 }
-const ForwardRef$k = /* @__PURE__ */ reactExports.forwardRef(LightBulbIcon);
+const ForwardRef$l = /* @__PURE__ */ reactExports.forwardRef(LightBulbIcon);
 function LockClosedIcon({
   title,
   titleId,
@@ -7989,7 +7988,7 @@ function LockClosedIcon({
     d: "M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
   }));
 }
-const ForwardRef$j = /* @__PURE__ */ reactExports.forwardRef(LockClosedIcon);
+const ForwardRef$k = /* @__PURE__ */ reactExports.forwardRef(LockClosedIcon);
 function LockOpenIcon({
   title,
   titleId,
@@ -8013,7 +8012,7 @@ function LockOpenIcon({
     d: "M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
   }));
 }
-const ForwardRef$i = /* @__PURE__ */ reactExports.forwardRef(LockOpenIcon);
+const ForwardRef$j = /* @__PURE__ */ reactExports.forwardRef(LockOpenIcon);
 function MagnifyingGlassIcon({
   title,
   titleId,
@@ -8037,7 +8036,7 @@ function MagnifyingGlassIcon({
     d: "m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
   }));
 }
-const ForwardRef$h = /* @__PURE__ */ reactExports.forwardRef(MagnifyingGlassIcon);
+const ForwardRef$i = /* @__PURE__ */ reactExports.forwardRef(MagnifyingGlassIcon);
 function PauseIcon({
   title,
   titleId,
@@ -8061,7 +8060,7 @@ function PauseIcon({
     d: "M15.75 5.25v13.5m-7.5-13.5v13.5"
   }));
 }
-const ForwardRef$g = /* @__PURE__ */ reactExports.forwardRef(PauseIcon);
+const ForwardRef$h = /* @__PURE__ */ reactExports.forwardRef(PauseIcon);
 function PencilSquareIcon({
   title,
   titleId,
@@ -8085,7 +8084,7 @@ function PencilSquareIcon({
     d: "m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
   }));
 }
-const ForwardRef$f = /* @__PURE__ */ reactExports.forwardRef(PencilSquareIcon);
+const ForwardRef$g = /* @__PURE__ */ reactExports.forwardRef(PencilSquareIcon);
 function PlayIcon({
   title,
   titleId,
@@ -8109,7 +8108,7 @@ function PlayIcon({
     d: "M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
   }));
 }
-const ForwardRef$e = /* @__PURE__ */ reactExports.forwardRef(PlayIcon);
+const ForwardRef$f = /* @__PURE__ */ reactExports.forwardRef(PlayIcon);
 function PlusIcon({
   title,
   titleId,
@@ -8133,7 +8132,7 @@ function PlusIcon({
     d: "M12 4.5v15m7.5-7.5h-15"
   }));
 }
-const ForwardRef$d = /* @__PURE__ */ reactExports.forwardRef(PlusIcon);
+const ForwardRef$e = /* @__PURE__ */ reactExports.forwardRef(PlusIcon);
 function PresentationChartBarIcon({
   title,
   titleId,
@@ -8157,7 +8156,7 @@ function PresentationChartBarIcon({
     d: "M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"
   }));
 }
-const ForwardRef$c = /* @__PURE__ */ reactExports.forwardRef(PresentationChartBarIcon);
+const ForwardRef$d = /* @__PURE__ */ reactExports.forwardRef(PresentationChartBarIcon);
 function PrinterIcon({
   title,
   titleId,
@@ -8181,7 +8180,7 @@ function PrinterIcon({
     d: "M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z"
   }));
 }
-const ForwardRef$b = /* @__PURE__ */ reactExports.forwardRef(PrinterIcon);
+const ForwardRef$c = /* @__PURE__ */ reactExports.forwardRef(PrinterIcon);
 function QuestionMarkCircleIcon({
   title,
   titleId,
@@ -8205,7 +8204,31 @@ function QuestionMarkCircleIcon({
     d: "M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
   }));
 }
-const ForwardRef$a = /* @__PURE__ */ reactExports.forwardRef(QuestionMarkCircleIcon);
+const ForwardRef$b = /* @__PURE__ */ reactExports.forwardRef(QuestionMarkCircleIcon);
+function ServerIcon({
+  title,
+  titleId,
+  ...props
+}, svgRef) {
+  return /* @__PURE__ */ reactExports.createElement("svg", Object.assign({
+    xmlns: "http://www.w3.org/2000/svg",
+    fill: "none",
+    viewBox: "0 0 24 24",
+    strokeWidth: 1.5,
+    stroke: "currentColor",
+    "aria-hidden": "true",
+    "data-slot": "icon",
+    ref: svgRef,
+    "aria-labelledby": titleId
+  }, props), title ? /* @__PURE__ */ reactExports.createElement("title", {
+    id: titleId
+  }, title) : null, /* @__PURE__ */ reactExports.createElement("path", {
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    d: "M21.75 17.25v-.228a4.5 4.5 0 0 0-.12-1.03l-2.268-9.64a3.375 3.375 0 0 0-3.285-2.602H7.923a3.375 3.375 0 0 0-3.285 2.602l-2.268 9.64a4.5 4.5 0 0 0-.12 1.03v.228m19.5 0a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3m19.5 0a3 3 0 0 0-3-3H5.25a3 3 0 0 0-3 3m16.5 0h.008v.008h-.008v-.008Zm-3 0h.008v.008h-.008v-.008Z"
+  }));
+}
+const ForwardRef$a = /* @__PURE__ */ reactExports.forwardRef(ServerIcon);
 function ShieldCheckIcon({
   title,
   titleId,
@@ -8589,7 +8612,12 @@ const formatCurrency = (val) => {
   }
   return new Intl.NumberFormat("fr-CA", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(val);
 };
-const formatPercent = (val) => new Intl.NumberFormat("fr-CA", { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 2 }).format(val / 100);
+const formatPercent = (val) => {
+  if (val == null || !isFinite(val) || isNaN(val)) {
+    return "N/A";
+  }
+  return new Intl.NumberFormat("fr-CA", { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 2 }).format(val / 100);
+};
 const isMutualFund = (symbol, companyName) => {
   const symbolUpper = symbol.toUpperCase().trim();
   const nameUpper = (companyName || "").toUpperCase();
@@ -8853,7 +8881,8 @@ const Header = ({
   showSyncButton = true,
   // Par défaut, afficher le bouton
   onOpenSettings,
-  onOpenReports
+  onOpenReports,
+  activeSymbol
 }) => {
   const [isLoading, setIsLoading] = reactExports.useState(false);
   const handleNumericChange = (e, key, min2 = -Infinity) => {
@@ -8936,7 +8965,7 @@ VENTE: Prix actuel ≥ Limite de vente`
             {
               className: "absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow-sm border border-blue-100 z-10",
               title: isWatchlist ? "👁️ Watchlist (Non détenu)\n\nCe titre est dans votre watchlist (surveillé mais non détenu).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation." : "⭐ Portefeuille (Détenu)\n\nCe titre est dans votre portefeuille (team ticker, vous le détenez actuellement).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation.\n• Point coloré = Recommandation (ACHAT/CONSERVER/VENTE)",
-              children: isWatchlist ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-3.5 h-3.5 text-blue-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-3.5 h-3.5 text-yellow-500 fill-yellow-500", style: { fill: "#eab308" } })
+              children: isWatchlist ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-3.5 h-3.5 text-blue-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-3.5 h-3.5 text-yellow-500 fill-yellow-500", style: { fill: "#eab308" } })
             }
           )
         ] }),
@@ -8950,7 +8979,11 @@ Source: FMP API (company-profile)
 Symbole: ${info.preferredSymbol || info.symbol}
 Secteur: ${info.sector || "N/A"}
 Pays: ${info.country || "N/A"}
-Bourse: ${info.exchange || "N/A"}`, children: info.name === "Chargement..." ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-600 normal-case", children: "Données non disponibles - Veuillez sélectionner un ticker" }) : info.name }),
+Bourse: ${info.exchange || "N/A"}`, children: info.name === "Chargement..." && !activeSymbol ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-600 normal-case", children: "Données non disponibles - Veuillez sélectionner un ticker" }) : info.name === "Chargement..." && activeSymbol ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-blue-600 normal-case", children: [
+            "Chargement des données pour ",
+            activeSymbol,
+            "..."
+          ] }) : info.name }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-1 sm:gap-2 mt-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 sm:hidden", children: "GOB" }),
             info.exchange && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded cursor-help", title: `Bourse: ${info.exchange}
@@ -9007,16 +9040,16 @@ Source: FMP key-metrics`, children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold text-teal-600", children: info.priceStability }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[9px] text-gray-500 block mt-0.5", children: "ValueLine 3 déc 2025" })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1 sm:gap-2 ml-auto md:ml-0", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-1.5 sm:gap-2 ml-auto md:ml-0", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
             {
               onClick: () => window.dispatchEvent(new CustomEvent("open-save-dialog")),
-              className: "flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print bg-blue-600 text-white hover:bg-blue-700",
-              title: "💾 Sauvegarder une version (Snapshot)\\n\\nCrée un snapshot complet de l'analyse actuelle incluant:\\n\\n📊 Données:\\n• Toutes les données historiques (EPS, CF, BV, Dividendes)\\n• Prix historiques (High/Low par année)\\n• Données manuelles et auto-fetchées\\n\\n⚙️ Hypothèses:\\n• Tous les taux de croissance (EPS, CF, BV, DIV)\\n• Tous les ratios cibles (P/E, P/CF, P/BV, Yield)\\n• Prix actuel et dividende actuel\\n• Taux de rendement requis\\n• Exclusions de métriques (EPS, CF, BV, DIV)\\n\\n📈 Métriques:\\n• Toutes les métriques calculées\\n• Date et heure de sauvegarde\\n• Version du snapshot\\n\\n💡 Utilisation:\\n• Les snapshots sont accessibles dans la sidebar droite (icône horloge)\\n• Permet de comparer différentes versions de l'analyse\\n• Utile pour suivre l'évolution de vos hypothèses dans le temps",
+              className: "flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md active:scale-95",
+              title: "💾 Sauvegarder une version (Snapshot)\\n\\nCrée un snapshot complet de l'analyse actuelle incluant toutes les données historiques, hypothèses et métriques calculées.\\n\\nLes snapshots sont accessibles dans la sidebar droite (icône horloge).",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-3 h-3 sm:w-4 sm:h-4" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Sauvegarder" })
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline whitespace-nowrap", children: "Sauvegarder" })
               ]
             }
           ),
@@ -9025,11 +9058,11 @@ Source: FMP key-metrics`, children: [
             {
               onClick: handleSyncClick,
               disabled: isLoading,
-              className: `flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-blue-50 text-blue-600 hover:bg-blue-100"}`,
-              title: "🔄 Options de Synchronisation Avancées\\n\\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options configurables.\\n\\n📊 Le dialogue vous permet de:\\n• Choisir quelles données synchroniser (historiques, assumptions, infos)\\n• Décider si vous voulez remplacer les données oranges\\n• Configurer des options avancées (nouvelles années uniquement, métriques manquantes, etc.)\\n• Voir des explications détaillées avec exemples concrets pour chaque option\\n\\n💡 Chaque option inclut une section d'aide avec:\\n• Comportement attendu\\n• Exemples concrets\\n• Outils et APIs utilisés\\n• Formules et algorithmes\\n• Recommandations d'utilisation",
+              className: `flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print ${isLoading ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:shadow-md active:scale-95 border border-emerald-200"}`,
+              title: "🔄 Options de Synchronisation Avancées\\n\\nOuvre le tableau de bord de synchronisation avec toutes les options configurables pour charger/mettre à jour les données depuis FMP.",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: `w-3 h-3 sm:w-4 sm:h-4 ${isLoading ? "animate-spin" : ""}` }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: isLoading ? "Sync..." : "⚙️ Options Sync" })
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: `w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${isLoading ? "animate-pulse" : ""}` }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline whitespace-nowrap", children: isLoading ? "Synchronisation..." : "Synchroniser" })
               ]
             }
           ),
@@ -9038,39 +9071,48 @@ Source: FMP key-metrics`, children: [
             {
               onClick: onRestoreData,
               disabled: isLoading,
-              className: `flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-purple-50 text-purple-600 hover:bg-purple-100"}`,
-              title: "📥 Restaurer les données\\n\\nOuvre un dialogue de restauration avec 2 options principales:\\n\\n1️⃣ Charger le dernier snapshot:\\n   • Restaure la dernière sauvegarde complète\\n   • Inclut toutes les données historiques\\n   • Inclut toutes les hypothèses\\n   • Mode lecture seule (sécurisé)\\n   • Permet de comparer avec la version actuelle\\n\\n2️⃣ Recalculer depuis FMP:\\n   • Recharge les données FMP Premium (30 ans)\\n   • Réapplique automatiquement les hypothèses auto-fill\\n   • Préserve vos exclusions de métriques\\n   • Préserve les métriques ValueLine\\n   • Met à jour uniquement les données auto-fetchées\\n\\n💡 Utilisation:\\n• Utilisez 'Charger snapshot' pour revenir à une version précédente\\n• Utilisez 'Recalculer FMP' pour actualiser avec les dernières données\\n• Les modifications manuelles sont toujours préservées",
+              className: `flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print ${isLoading ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-purple-50 text-purple-700 hover:bg-purple-100 hover:shadow-md active:scale-95 border border-purple-200"}`,
+              title: "📥 Restaurer les données\\n\\nOuvre un dialogue pour charger un snapshot précédent ou recalculer depuis FMP.",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$P, { className: "w-3 h-3 sm:w-4 sm:h-4" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Restaurer" })
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline whitespace-nowrap", children: "Restaurer" })
               ]
             }
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
             {
               onClick: handlePrint,
-              className: "p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors no-print",
-              title: "🖨️ Imprimer la fiche d'analyse\\n\\nGénère une version imprimable de l'analyse complète incluant:\\n\\n📊 Contenu imprimé:\\n• En-tête avec informations de l'entreprise\\n• Tableau des données historiques\\n• Graphiques de valorisation\\n• Matrices de sensibilité (P/E et P/CF)\\n• Évaluation détaillée (4 métriques)\\n• Notes de l'analyste\\n• Résumé exécutif\\n\\n💡 Conseils:\\n• Utilisez Ctrl+P (Cmd+P sur Mac) pour ouvrir le dialogue d'impression\\n• Les éléments avec la classe 'no-print' sont automatiquement masqués\\n• Optimisé pour impression en format A4\\n• Les couleurs sont préservées pour une meilleure lisibilité",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: "w-4 h-4 sm:w-6 sm:h-6" })
+              className: "flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print bg-gray-50 text-gray-700 hover:bg-gray-100 hover:shadow-md active:scale-95 border border-gray-200",
+              title: "🖨️ Imprimer la fiche d'analyse\\n\\nGénère une version imprimable de l'analyse complète (données, graphiques, matrices, notes).",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$c, { className: "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline whitespace-nowrap", children: "Imprimer" })
+              ]
             }
           ),
-          onOpenReports && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          onOpenReports && /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
             {
               onClick: onOpenReports,
-              className: "p-1.5 sm:p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-full transition-colors no-print",
-              title: "📊 Rapports Visuels et Analyse de Données\\n\\nOuvre le panneau de rapports visuels complets incluant:\\n\\n📈 Qualité des Données:\\n• Visualisation des données aberrantes détectées\\n• Métriques exclues et raisons d'exclusion\\n• Analyse des outliers dans les données historiques\\n• Graphiques des prix cibles par métrique\\n• Statistiques détaillées (médiane, écart-type)\\n\\n✅ Rapport de Sanitisation:\\n• Comparaison avant/après sanitisation\\n• Détails de toutes les corrections appliquées\\n• Raisons des corrections par paramètre\\n• Statistiques par catégorie (croissance, ratios, prix)\\n\\n📊 Visualisation Complète:\\n• Graphiques de toutes les données historiques\\n• Évolution des prix (High/Low/Avg)\\n• Ratios de valorisation (P/E, P/CF, P/BV)\\n• Taux de croissance annuel\\n• Corrélations et statistiques",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$r, { className: "w-4 h-4 sm:w-6 sm:h-6" })
+              className: "flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:shadow-md active:scale-95 border border-indigo-200",
+              title: "📊 Rapports Visuels et Analyse de Données\\n\\nOuvre le panneau de rapports visuels complets avec visualisation des données, qualité des données et statistiques détaillées.",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$s, { className: "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline whitespace-nowrap", children: "Rapports" })
+              ]
             }
           ),
-          onOpenSettings && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          onOpenSettings && /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
             {
               onClick: onOpenSettings,
-              className: "p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors no-print",
-              title: "⚙️ Configuration Complète : Guardrails, Validation, Ajustements\\n\\nOuvre le panneau de configuration unifié pour gérer tous les paramètres de l'application.\\n\\n🛡️ Guardrails (Limites d'affichage):\\n• Limites de croissance (min/max)\\n• Limites de ratios (P/E, P/CF, P/BV)\\n• Multiplicateur maximum raisonnable\\n• Contrôlent l'affichage des graphiques et tableaux\\n• Stockés dans localStorage (navigateur)\\n\\n✅ Validation (Paramètres de sanitisation):\\n• Limites de croissance par métrique\\n• Limites de ratios cibles\\n• Précision des calculs\\n• Automatisation de la sanitisation\\n• Cohérence des données\\n• Stockés dans Supabase (partagés)\\n\\n📊 Ajustements:\\n• Paramètres généraux de l'application\\n• Comportement par défaut\\n• Options d'affichage\\n\\n💡 Impact:\\n• Les Guardrails affectent l'affichage uniquement\\n• La Validation affecte les calculs et la sauvegarde\\n• Les changements sont appliqués immédiatement",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-4 h-4 sm:w-6 sm:h-6" })
+              className: "flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print bg-slate-50 text-slate-700 hover:bg-slate-100 hover:shadow-md active:scale-95 border border-slate-200",
+              title: "⚙️ Configuration Complète\\n\\nOuvre le panneau de configuration pour gérer les Guardrails (affichage), Validation (sanitisation) et Ajustements.",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline whitespace-nowrap", children: "Paramètres" })
+              ]
             }
           )
         ] })
@@ -9098,7 +9140,7 @@ Source: FMP key-metrics`, children: [
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Dividende annuel versé par action", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: "w-3 h-3" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-3 h-3" }),
           " Dividende (Act.)"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -9116,7 +9158,7 @@ Source: FMP key-metrics`, children: [
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Rendement du dividende (Dividende / Prix)", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-3 h-3" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: "w-3 h-3" }),
           " Rendement (Yield)"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-2 py-1 text-base sm:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help", title: `Rendement du dividende: ${assumptions.currentPrice > 0 ? formatPercent(assumptions.currentDividend / assumptions.currentPrice * 100) : "N/A"}
@@ -9134,7 +9176,7 @@ Prix Actuel × Nombre d'actions en circulation`, children: info.marketCap && typ
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Année de départ pour les projections à 5 ans", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$E, { className: "w-3 h-3" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$F, { className: "w-3 h-3" }),
           " Année de Base"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -9161,10 +9203,10 @@ const DataColorLegend = () => {
         className: "w-full flex items-center justify-between text-left",
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-blue-600" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-blue-600" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm sm:text-base font-semibold text-gray-700", children: "Légende des couleurs des données" })
           ] }),
-          isExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-5 h-5 text-gray-500" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-5 h-5 text-gray-500" })
+          isExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-5 h-5 text-gray-500" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$A, { className: "w-5 h-5 text-gray-500" })
         ]
       }
     ),
@@ -23316,8 +23358,8 @@ var isArray = Array.isArray;
 var isTypedArray = typeof ArrayBuffer !== "undefined" && typeof ArrayBuffer.isView === "function" ? ArrayBuffer.isView : null;
 var assign = Object.assign;
 var getTag = Object.prototype.toString.call.bind(Object.prototype.toString);
-function createEqualityComparator(_a3) {
-  var areArraysEqual2 = _a3.areArraysEqual, areDatesEqual2 = _a3.areDatesEqual, areErrorsEqual2 = _a3.areErrorsEqual, areFunctionsEqual2 = _a3.areFunctionsEqual, areMapsEqual2 = _a3.areMapsEqual, areNumbersEqual2 = _a3.areNumbersEqual, areObjectsEqual2 = _a3.areObjectsEqual, arePrimitiveWrappersEqual2 = _a3.arePrimitiveWrappersEqual, areRegExpsEqual2 = _a3.areRegExpsEqual, areSetsEqual2 = _a3.areSetsEqual, areTypedArraysEqual2 = _a3.areTypedArraysEqual, areUrlsEqual2 = _a3.areUrlsEqual, unknownTagComparators = _a3.unknownTagComparators;
+function createEqualityComparator(_a2) {
+  var areArraysEqual2 = _a2.areArraysEqual, areDatesEqual2 = _a2.areDatesEqual, areErrorsEqual2 = _a2.areErrorsEqual, areFunctionsEqual2 = _a2.areFunctionsEqual, areMapsEqual2 = _a2.areMapsEqual, areNumbersEqual2 = _a2.areNumbersEqual, areObjectsEqual2 = _a2.areObjectsEqual, arePrimitiveWrappersEqual2 = _a2.arePrimitiveWrappersEqual, areRegExpsEqual2 = _a2.areRegExpsEqual, areSetsEqual2 = _a2.areSetsEqual, areTypedArraysEqual2 = _a2.areTypedArraysEqual, areUrlsEqual2 = _a2.areUrlsEqual, unknownTagComparators = _a2.unknownTagComparators;
   return function comparator(a2, b, state) {
     if (a2 === b) {
       return true;
@@ -23406,8 +23448,8 @@ function createEqualityComparator(_a3) {
     return false;
   };
 }
-function createEqualityComparatorConfig(_a3) {
-  var circular = _a3.circular, createCustomConfig = _a3.createCustomConfig, strict = _a3.strict;
+function createEqualityComparatorConfig(_a2) {
+  var circular = _a2.circular, createCustomConfig = _a2.createCustomConfig, strict = _a2.strict;
   var config2 = {
     areArraysEqual: strict ? areObjectsEqualStrict : areArraysEqual,
     areDatesEqual,
@@ -23445,11 +23487,11 @@ function createInternalEqualityComparator(compare) {
     return compare(a2, b, state);
   };
 }
-function createIsEqual(_a3) {
-  var circular = _a3.circular, comparator = _a3.comparator, createState = _a3.createState, equals = _a3.equals, strict = _a3.strict;
+function createIsEqual(_a2) {
+  var circular = _a2.circular, comparator = _a2.comparator, createState = _a2.createState, equals = _a2.equals, strict = _a2.strict;
   if (createState) {
     return function isEqual2(a2, b) {
-      var _a4 = createState(), _b2 = _a4.cache, cache = _b2 === void 0 ? circular ? /* @__PURE__ */ new WeakMap() : void 0 : _b2, meta = _a4.meta;
+      var _a3 = createState(), _b = _a3.cache, cache = _b === void 0 ? circular ? /* @__PURE__ */ new WeakMap() : void 0 : _b, meta = _a3.meta;
       return comparator(a2, b, {
         cache,
         equals,
@@ -23513,7 +23555,7 @@ function createCustomEqual(options) {
   if (options === void 0) {
     options = {};
   }
-  var _a3 = options.circular, circular = _a3 === void 0 ? false : _a3, createCustomInternalComparator = options.createInternalComparator, createState = options.createState, _b2 = options.strict, strict = _b2 === void 0 ? false : _b2;
+  var _a2 = options.circular, circular = _a2 === void 0 ? false : _a2, createCustomInternalComparator = options.createInternalComparator, createState = options.createState, _b = options.strict, strict = _b === void 0 ? false : _b;
   var config2 = createEqualityComparatorConfig(options);
   var comparator = createEqualityComparator(config2);
   var equals = createCustomInternalComparator ? createCustomInternalComparator(comparator) : createInternalEqualityComparator(comparator);
@@ -34805,9 +34847,12 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
   const [filterCountry, setFilterCountry] = reactExports.useState("all");
   const [filterExchange, setFilterExchange] = reactExports.useState("all");
   const [filterMarketCap, setFilterMarketCap] = reactExports.useState("all");
-  const [isFiltersExpanded, setIsFiltersExpanded] = reactExports.useState(true);
+  const [isFiltersExpanded, setIsFiltersExpanded] = reactExports.useState(false);
   const [selectedTickers, setSelectedTickers] = reactExports.useState(/* @__PURE__ */ new Set());
   const [isSelectionMode, setIsSelectionMode] = reactExports.useState(false);
+  const [showSuggestions, setShowSuggestions] = reactExports.useState(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = reactExports.useState(-1);
+  const searchInputRef = reactExports.useRef(null);
   const [logoClickCount, setLogoClickCount] = reactExports.useState(0);
   const logoClickTimeoutRef = reactExports.useRef(null);
   React.useEffect(() => {
@@ -34855,6 +34900,24 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
     const total = profiles.length;
     return { portfolio, watchlist, normal, total };
   }, [profiles]);
+  const suggestions = reactExports.useMemo(() => {
+    if (!searchTerm || searchTerm.trim().length < 1) {
+      return [];
+    }
+    const term = searchTerm.toLowerCase().trim();
+    const matches = profiles.filter((p) => {
+      const symbolMatch = p.id.toLowerCase().includes(term);
+      const nameMatch = p.info.name.toLowerCase().includes(term);
+      return symbolMatch || nameMatch;
+    }).slice(0, 8).map((p) => ({
+      id: p.id,
+      symbol: p.id,
+      name: p.info.name || p.id,
+      sector: p.info.sector || "",
+      isWatchlist: p.isWatchlist
+    }));
+    return matches;
+  }, [profiles, searchTerm]);
   const availableCountries = reactExports.useMemo(() => {
     const countries = /* @__PURE__ */ new Set();
     profiles.forEach((p) => {
@@ -34963,7 +35026,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-3 sm:p-4 border-b border-slate-800 bg-slate-950 cursor-help", title: "Finance Pro 3p1\\n\\nApplication d'analyse fondamentale pour la gestion de portefeuille.\\n\\nFonctionnalités:\\n• Analyse de valorisation sur 5 ans\\n• Triangulation de la valeur (4 métriques)\\n• KPI Dashboard multi-tickers\\n• Snapshots et historique\\n• Synchronisation avec FMP API", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-blue-400 font-bold text-base sm:text-lg", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(
-          ForwardRef$C,
+          ForwardRef$D,
           {
             className: `w-5 h-5 sm:w-6 sm:h-6 transition-all ${isAdmin ? "text-yellow-400" : ""} ${onToggleAdmin ? "cursor-pointer hover:scale-110" : ""}`,
             onClick: onToggleAdmin ? handleLogoClick : void 0,
@@ -34978,18 +35041,78 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-2 sm:p-3 md:p-4 border-b border-slate-800/50", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1.5 sm:gap-2 mb-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex-1 min-w-0", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$h, { className: "w-4 h-4 absolute left-2 sm:left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-slate-500 flex-shrink-0" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$i, { className: "w-4 h-4 absolute left-2 sm:left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-slate-500 flex-shrink-0 z-10" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
+              ref: searchInputRef,
               type: "text",
               placeholder: "Filtrer...",
               value: searchTerm,
-              onChange: (e) => setSearchTerm(e.target.value),
+              onChange: (e) => {
+                setSearchTerm(e.target.value);
+                setShowSuggestions(true);
+                setSelectedSuggestionIndex(-1);
+              },
+              onFocus: () => {
+                if (suggestions.length > 0) {
+                  setShowSuggestions(true);
+                }
+              },
+              onBlur: () => {
+                setTimeout(() => setShowSuggestions(false), 200);
+              },
+              onKeyDown: (e) => {
+                if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  setSelectedSuggestionIndex(
+                    (prev) => prev < suggestions.length - 1 ? prev + 1 : prev
+                  );
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  setSelectedSuggestionIndex((prev) => prev > 0 ? prev - 1 : -1);
+                } else if (e.key === "Enter" && selectedSuggestionIndex >= 0) {
+                  e.preventDefault();
+                  const suggestion = suggestions[selectedSuggestionIndex];
+                  if (suggestion) {
+                    onSelect(suggestion.id);
+                    setSearchTerm("");
+                    setShowSuggestions(false);
+                    setSelectedSuggestionIndex(-1);
+                  }
+                } else if (e.key === "Escape") {
+                  setShowSuggestions(false);
+                  setSelectedSuggestionIndex(-1);
+                }
+              },
               className: "w-full bg-slate-800 border border-slate-700 rounded pl-7 sm:pl-8 md:pl-9 pr-2 sm:pr-3 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-200 focus:ring-1 focus:ring-blue-500 outline-none placeholder-slate-500 transition-all focus:border-blue-500",
-              title: "Rechercher un ticker\\n\\nTapez le symbole ou le nom de l'entreprise pour filtrer la liste.\\nLa recherche est insensible à la casse et cherche dans:\\n• Le symbole du ticker\\n• Le nom de l'entreprise"
+              title: "Rechercher un ticker\\n\\nTapez le symbole ou le nom de l'entreprise pour filtrer la liste.\\nLa recherche est insensible à la casse et cherche dans:\\n• Le symbole du ticker\\n• Le nom de l'entreprise\\n\\n💡 Utilisez les flèches ↑↓ pour naviguer dans les suggestions et Entrée pour sélectionner."
             }
-          )
+          ),
+          showSuggestions && suggestions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto", children: suggestions.map((suggestion, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              type: "button",
+              onClick: () => {
+                onSelect(suggestion.id);
+                setSearchTerm("");
+                setShowSuggestions(false);
+                setSelectedSuggestionIndex(-1);
+              },
+              onMouseEnter: () => setSelectedSuggestionIndex(index2),
+              className: `w-full text-left px-3 py-2 text-xs sm:text-sm transition-colors flex items-center gap-2 ${index2 === selectedSuggestionIndex ? "bg-blue-600 text-white" : "text-slate-200 hover:bg-slate-700"}`,
+              children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-blue-400", children: suggestion.symbol }),
+                  suggestion.isWatchlist === false && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-3 h-3 text-yellow-500 fill-yellow-500 flex-shrink-0" }),
+                  suggestion.isWatchlist === true && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-3 h-3 text-blue-500 flex-shrink-0" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-slate-400 truncate mt-0.5", children: suggestion.name }),
+                suggestion.sector && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[10px] text-slate-500 mt-0.5", children: suggestion.sector })
+              ] })
+            },
+            suggestion.id
+          )) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "button",
@@ -34998,7 +35121,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
             className: "bg-blue-600 hover:bg-blue-500 text-white px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm font-bold transition-colors shadow-lg hover:shadow-blue-500/20 whitespace-nowrap flex-shrink-0",
             title: "Ajouter un nouveau ticker\\n\\nOuvre une boîte de recherche pour ajouter une nouvelle entreprise à analyser.\\n\\nLe système va:\\n1. Rechercher le ticker via l'API FMP\\n2. Charger les données historiques (10 dernières années)\\n3. Auto-remplir les hypothèses (CAGR, ratios moyens)\\n4. Charger les métriques ValueLine si disponibles\\n\\nLe nouveau ticker sera ajouté à votre portefeuille.",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$d, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$e, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Ajouter" })
             ]
           }
@@ -35012,7 +35135,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
           className: "w-full bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors mb-2",
           title: "Synchroniser depuis Supabase\\n\\nCharge les tickers depuis la base de données Supabase.\\n\\nAjoute les nouveaux tickers présents dans Supabase mais absents de votre LocalStorage.\\n\\n⚠️ Ne modifie pas les tickers existants, seulement ajoute les nouveaux.",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: `w-4 h-4 ${isLoadingTickers ? "animate-spin" : ""}` }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: `w-4 h-4 ${isLoadingTickers ? "animate-pulse" : ""}` }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { wordBreak: "normal", overflowWrap: "normal", whiteSpace: "normal" }, children: isLoadingTickers ? "Synchronisation..." : "Synchroniser Supabase" })
           ]
         }
@@ -35047,7 +35170,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
 
 Synchronise uniquement les tickers que vous avez sélectionnés avec les options de synchronisation avancées.`,
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: `w-3 h-3 inline mr-1 ${isBulkSyncing ? "animate-spin" : ""}` }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: `w-3 h-3 inline mr-1 ${isBulkSyncing ? "animate-pulse" : ""}` }),
                 "Sync (",
                 selectedTickers.size,
                 ")"
@@ -35063,7 +35186,7 @@ Synchronise uniquement les tickers que vous avez sélectionnés avec les options
             className: "w-full bg-green-700 hover:bg-green-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors",
             title: "🔄 Options de Synchronisation Avancées\\n\\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options:\\n\\n📊 Options principales:\\n• Sauvegarder avant sync\\n• Remplacer données oranges\\n• Forcer remplacement\\n\\n⚙️ Options détaillées:\\n• Synchroniser données historiques\\n• Synchroniser uniquement nouvelles années\\n• Synchroniser uniquement métriques manquantes\\n• Synchroniser assumptions\\n• Préserver exclusions\\n• Recalculer outliers\\n• Mettre à jour prix actuel\\n• Synchroniser métriques ValueLine\\n\\n💡 Chaque option inclut des explications détaillées, exemples concrets et informations sur les outils utilisés.",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: `w-4 h-4 ${isBulkSyncing ? "animate-spin" : ""}` }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: `w-4 h-4 ${isBulkSyncing ? "animate-pulse" : ""}` }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex-1 text-left", style: { wordBreak: "normal", overflowWrap: "normal", whiteSpace: "normal" }, children: isBulkSyncing && bulkSyncProgress ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}` : "⚙️ Options Sync Avancées" })
             ]
           }
@@ -35144,7 +35267,7 @@ ${filterBy !== "all" ? `(Filtre actif: ${filterBy === "portfolio" ? "Portefeuill
         ] })
       ] }),
       filteredAndSortedProfiles.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center text-slate-600 text-sm py-8 px-4", children: searchTerm ? "Aucun résultat" : "Commencez par ajouter un ticker" }) : filteredAndSortedProfiles.map((profile) => {
-        var _a3, _b2;
+        var _a2, _b;
         const { recommendation } = calculateRecommendation(profile.data, profile.assumptions);
         const isSelected = selectedTickers.has(profile.id);
         return /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -35185,7 +35308,7 @@ ${filterBy !== "all" ? `(Filtre actif: ${filterBy === "portfolio" ? "Portefeuill
                         }
                         setSelectedTickers(newSelected);
                       },
-                      children: isSelected && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$A, { className: "w-3 h-3 text-white" })
+                      children: isSelected && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-3 h-3 text-white" })
                     }
                   )
                 }
@@ -35206,7 +35329,7 @@ Basé sur:
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   "img",
                   {
-                    src: profile.info.logo || (profile.info.logoSymbol || ((_a3 = profile.info.actualSymbol) == null ? void 0 : _a3.replace(".TO", "").replace("-", ".")) || profile.info.preferredSymbol || profile.id ? `https://financialmodelingprep.com/image-stock/${profile.info.logoSymbol || ((_b2 = profile.info.actualSymbol) == null ? void 0 : _b2.replace(".TO", "").replace("-", ".")) || profile.info.preferredSymbol || profile.id}.png` : ""),
+                    src: profile.info.logo || (profile.info.logoSymbol || ((_a2 = profile.info.actualSymbol) == null ? void 0 : _a2.replace(".TO", "").replace("-", ".")) || profile.info.preferredSymbol || profile.id ? `https://financialmodelingprep.com/image-stock/${profile.info.logoSymbol || ((_b = profile.info.actualSymbol) == null ? void 0 : _b.replace(".TO", "").replace("-", ".")) || profile.info.preferredSymbol || profile.id}.png` : ""),
                     alt: profile.info.name,
                     className: "w-8 h-8 rounded object-cover flex-shrink-0 cursor-help",
                     title: `Logo de ${profile.info.name}
@@ -35294,7 +35417,7 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
                     },
                     title: profile.isWatchlist === false ? "⭐ Portefeuille (Détenu)\n\nCliquez pour changer le type:\n• ⭐ Portefeuille (actuel)\n• 👁️ Watchlist\n• 📋 Normal" : profile.isWatchlist === true ? "👁️ Watchlist (Surveillé)\n\nCliquez pour changer le type:\n• ⭐ Portefeuille\n• 👁️ Watchlist (actuel)\n• 📋 Normal" : "📋 Normal\n\nCliquez pour changer le type:\n• ⭐ Portefeuille\n• 👁️ Watchlist\n• 📋 Normal (actuel)",
                     className: `p-1.5 rounded transition-colors ${profile.isWatchlist === false ? "text-yellow-500 hover:text-yellow-400 hover:bg-slate-700" : profile.isWatchlist === true ? "text-blue-400 hover:bg-slate-700" : "text-slate-500 hover:text-slate-400 hover:bg-slate-700"}`,
-                    children: profile.isWatchlist === false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-4 h-4 fill-current", style: { fill: "#eab308" } }) : profile.isWatchlist === true ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs", children: "📋" })
+                    children: profile.isWatchlist === false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-4 h-4 fill-current", style: { fill: "#eab308" } }) : profile.isWatchlist === true ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs", children: "📋" })
                   }
                 ) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hidden group-hover:flex items-center gap-1", children: [
@@ -35307,7 +35430,7 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
                       },
                       title: "Dupliquer ce ticker\\n\\nCrée une copie complète de l'analyse actuelle.\\n\\nUtile pour:\\n• Comparer différents scénarios (optimiste/pessimiste)\\n• Tester différentes hypothèses\\n• Créer des variantes d'analyse\\n\\nLe ticker dupliqué aura le même nom avec un suffixe.",
                       className: "p-1.5 hover:bg-slate-700 hover:text-white rounded",
-                      children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$q, { className: "w-3.5 h-3.5" })
+                      children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$r, { className: "w-3.5 h-3.5" })
                     }
                   ),
                   isAdmin && /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -35339,10 +35462,10 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
           title: isFiltersExpanded ? "Réduire les filtres pour voir plus de titres" : "Développer les filtres",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xs font-semibold text-slate-500 uppercase flex items-center gap-1.5 sm:gap-2 cursor-help", title: "Filtres et Tri\\n\\nFiltrez et triez votre portefeuille selon différents critères.\\n\\nFiltres:\\n• Tous: Affiche tous les tickers\\n• Portefeuille: Uniquement les titres détenus\\n• Watchlist: Uniquement les titres surveillés\\n\\nTri:\\n• Alphabétique: A-Z ou Z-A\\n• Date de modification: Plus récent ou plus ancien\\n• Recommandation: Achat, Conserver, Vente\\n• Secteur: Par secteur d'activité", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-3 h-3 flex-shrink-0" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-3 h-3 flex-shrink-0" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate", children: "Filtres et Tri" })
             ] }),
-            isFiltersExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-4 h-4 text-slate-400 flex-shrink-0" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-4 h-4 text-slate-400 flex-shrink-0" })
+            isFiltersExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 text-slate-400 flex-shrink-0" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$A, { className: "w-4 h-4 text-slate-400 flex-shrink-0" })
           ]
         }
       ),
@@ -35396,7 +35519,7 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
 
 👁️ ${tickerStats.watchlist} ticker(s) dans la watchlist`,
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-3 h-3" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-3 h-3" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Watchlist" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sm:hidden", children: "Watch" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[9px]", children: [
@@ -35532,7 +35655,7 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
 };
 const API_BASE$1 = typeof window !== "undefined" ? window.location.origin : "";
 async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent = true, autoFetched = false, retryCount = 0, maxRetries = 2, syncMetadata) {
-  var _a3, _b2;
+  var _a2, _b;
   try {
     if (!ticker2 || !ticker2.trim()) {
       return { success: false, error: "Ticker is required" };
@@ -35587,7 +35710,7 @@ async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent =
     }
     return { success: true, snapshot };
   } catch (error) {
-    if (retryCount < maxRetries && (((_a3 = error.message) == null ? void 0 : _a3.includes("fetch")) || ((_b2 = error.message) == null ? void 0 : _b2.includes("timeout")))) {
+    if (retryCount < maxRetries && (((_a2 = error.message) == null ? void 0 : _a2.includes("fetch")) || ((_b = error.message) == null ? void 0 : _b.includes("timeout")))) {
       const delay = (retryCount + 1) * 1e3;
       console.warn(`⚠️ Snapshot network error for ${ticker2}, retry ${retryCount + 1}/${maxRetries} après ${delay}ms...`);
       await new Promise((resolve) => setTimeout(resolve, delay));
@@ -35758,7 +35881,7 @@ Cette action est irréversible.`)) {
         onClick: onToggle,
         className: `fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-slate-800 text-white p-2 rounded-l-lg shadow-lg hover:bg-slate-700 transition-all ${isOpen ? "translate-x-0" : "translate-x-full"}`,
         title: isOpen ? "Masquer l'historique des versions\n\nCliquez pour masquer la sidebar d'historique.\n\nL'historique contient tous les snapshots sauvegardés de cette analyse." : "Afficher l'historique des versions\n\nCliquez pour afficher la sidebar d'historique.\n\nL'historique contient tous les snapshots sauvegardés de cette analyse.\n\nVous pouvez:\n• Charger une version précédente (mode lecture seule)\n• Comparer différentes versions\n• Supprimer des snapshots",
-        children: isOpen ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-5 h-5" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-5 h-5" })
+        children: isOpen ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-5 h-5" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-5 h-5" })
       }
     ),
     isOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -35777,7 +35900,7 @@ Cette action est irréversible.`)) {
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 sm:p-4 border-b border-slate-800 bg-slate-950", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0 flex-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-base sm:text-lg font-bold text-blue-400 flex items-center gap-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate", children: "Historique" })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-500 mt-1 truncate", children: ticker2 })
@@ -35788,7 +35911,7 @@ Cette action est irréversible.`)) {
                 onClick: onToggle,
                 className: "p-1 hover:bg-slate-800 rounded flex-shrink-0 ml-2",
                 title: "Fermer l'historique",
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-5 h-5" })
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-5 h-5" })
               }
             )
           ] }) }),
@@ -35806,7 +35929,7 @@ Cette action est irréversible.`)) {
                         snapshot.version
                       ] }),
                       snapshot.isCurrent && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-green-600 px-2 py-0.5 rounded", children: "Actuel" }),
-                      snapshot.isApproved && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-4 h-4 text-green-400 cursor-help", title: "Version approuvée\\n\\nCette version a été marquée comme officielle et approuvée.\\n\\nLes versions approuvées sont utilisées comme référence pour:\\n• Comparaison avec les versions futures\\n• Indicateur dans le KPI Dashboard\\n• Historique des décisions importantes" })
+                      snapshot.isApproved && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-4 h-4 text-green-400 cursor-help", title: "Version approuvée\\n\\nCette version a été marquée comme officielle et approuvée.\\n\\nLes versions approuvées sont utilisées comme référence pour:\\n• Comparaison avec les versions futures\\n• Indicateur dans le KPI Dashboard\\n• Historique des décisions importantes" })
                     ] }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-slate-400 mt-1", children: formatDate(snapshot.date) })
                   ] }),
@@ -35925,7 +36048,7 @@ const NotesEditor = ({ initialNotes, onSave }) => {
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200 h-full flex flex-col print-break-inside-avoid", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-sm font-bold text-gray-500 uppercase mb-2 flex items-center gap-2", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-4 h-4" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-4 h-4" }),
       "Notes d'Analyste"
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -35985,7 +36108,7 @@ const saveConfig = (config2) => {
   }
 };
 const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector, config: config2 = DEFAULT_CONFIG }) => {
-  var _a3, _b2, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y;
+  var _a2, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y;
   React.useEffect(() => {
     if (data && data.length > 0) {
       const lastData = data[data.length - 1];
@@ -36019,7 +36142,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
       [metric]: !prev[metric]
     }));
   };
-  const DEBUG_MODE = typeof window !== "undefined" && (((_a3 = window.localStorage) == null ? void 0 : _a3.getItem("3p1-debug")) === "true" || window.location.search.includes("debug=true"));
+  const DEBUG_MODE = typeof window !== "undefined" && (((_a2 = window.localStorage) == null ? void 0 : _a2.getItem("3p1-debug")) === "true" || window.location.search.includes("debug=true"));
   if (!data || data.length === 0) {
     if (DEBUG_MODE) {
       console.warn("⚠️ EvaluationDetails: Aucune donnée disponible", {
@@ -36382,14 +36505,14 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     };
   }, [sectorRanges]);
   const formatRange = (range3, suffix = "") => {
-    var _a4, _b3, _c2;
+    var _a3, _b2, _c2;
     if (!range3) return "N/A";
-    return `${((_a4 = range3.min) == null ? void 0 : _a4.toFixed(1)) ?? "0.0"} - ${((_b3 = range3.max) == null ? void 0 : _b3.toFixed(1)) ?? "0.0"}${suffix} (Med: ${((_c2 = range3.median) == null ? void 0 : _c2.toFixed(1)) ?? "0.0"}${suffix})`;
+    return `${((_a3 = range3.min) == null ? void 0 : _a3.toFixed(1)) ?? "0.0"} - ${((_b2 = range3.max) == null ? void 0 : _b2.toFixed(1)) ?? "0.0"}${suffix} (Med: ${((_c2 = range3.median) == null ? void 0 : _c2.toFixed(1)) ?? "0.0"}${suffix})`;
   };
   const formatGrowthRange = (range3) => {
-    var _a4, _b3, _c2;
+    var _a3, _b2, _c2;
     if (!range3) return "N/A";
-    return `${((_a4 = range3.min) == null ? void 0 : _a4.toFixed(1)) ?? "0.0"}% - ${((_b3 = range3.max) == null ? void 0 : _b3.toFixed(1)) ?? "0.0"}% (Med: ${((_c2 = range3.median) == null ? void 0 : _c2.toFixed(1)) ?? "0.0"}%)`;
+    return `${((_a3 = range3.min) == null ? void 0 : _a3.toFixed(1)) ?? "0.0"}% - ${((_b2 = range3.max) == null ? void 0 : _b2.toFixed(1)) ?? "0.0"}% (Med: ${((_c2 = range3.median) == null ? void 0 : _c2.toFixed(1)) ?? "0.0"}%)`;
   };
   const MetricReferenceRanges = ({ metric }) => {
     if (!calculateHistoricalRanges) return null;
@@ -36495,7 +36618,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-5 rounded-lg shadow border border-gray-200 print-break-inside-avoid", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-base sm:text-lg font-bold text-gray-700 mb-3 sm:mb-4 flex items-center gap-2", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$F, { className: "w-5 h-5 text-blue-600" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$G, { className: "w-5 h-5 text-blue-600" }),
       "ÉVALUATION PERSONNELLE (Projection 5 Ans)",
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-normal text-gray-500 ml-2", children: "(☑ = Incluse, ☐ = Exclue)" })
     ] }),
@@ -36528,11 +36651,11 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
                 onClick: () => toggleMetric("eps"),
                 className: "ml-2 p-1 hover:bg-gray-200 rounded transition-colors",
                 title: expandedMetrics.eps ? "Masquer les intervalles de référence historiques\n\nCliquez pour masquer les tableaux de comparaison:\n• Ratios historiques (Titre vs Secteur)\n• Croissance historique (Titre vs Secteur)\n• Projections 5 ans (Titre vs Secteur)" : "Afficher les intervalles de référence historiques\n\nCliquez pour afficher les tableaux de comparaison:\n• Ratios historiques (Titre vs Secteur)\n• Croissance historique (Titre vs Secteur)\n• Projections 5 ans (Titre vs Secteur)\n\nUtile pour valider vos hypothèses par rapport à l'historique et au secteur.",
-                children: expandedMetrics.eps ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-4 h-4 text-gray-600" })
+                children: expandedMetrics.eps ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$A, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `BPA (EPS) Actuel: ${((_b2 = baseValues.eps) == null ? void 0 : _b2.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-semibold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-800"} cursor-help`, title: `BPA (EPS) Actuel: ${((_b = baseValues.eps) == null ? void 0 : _b.toFixed(2)) ?? "0.00"} $
 
 Valeur de l'année de base ({assumptions.baseYear}).
 Source: Données historiques FMP (vert = officiel).
@@ -36615,7 +36738,7 @@ ${assumptions.excludeEPS ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le
                 onClick: () => toggleMetric("cf"),
                 className: "ml-2 p-1 hover:bg-gray-200 rounded transition-colors",
                 title: expandedMetrics.cf ? "Masquer les intervalles de référence" : "Afficher les intervalles de référence",
-                children: expandedMetrics.cf ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-4 h-4 text-gray-600" })
+                children: expandedMetrics.cf ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$A, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] }) }),
@@ -36702,7 +36825,7 @@ ${assumptions.excludeCF ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
                 onClick: () => toggleMetric("bv"),
                 className: "ml-2 p-1 hover:bg-gray-200 rounded transition-colors",
                 title: expandedMetrics.bv ? "Masquer les intervalles de référence" : "Afficher les intervalles de référence",
-                children: expandedMetrics.bv ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-4 h-4 text-gray-600" })
+                children: expandedMetrics.bv ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$A, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] }) }),
@@ -36789,7 +36912,7 @@ ${assumptions.excludeBV ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
                 onClick: () => toggleMetric("div"),
                 className: "ml-2 p-1 hover:bg-gray-200 rounded transition-colors",
                 title: expandedMetrics.div ? "Masquer les intervalles de référence" : "Afficher les intervalles de référence",
-                children: expandedMetrics.div ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-4 h-4 text-gray-600" })
+                children: expandedMetrics.div ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$A, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] }) }),
@@ -36898,7 +37021,7 @@ Basé sur ${validTargets.length} métrique(s) incluse(s).`, children: [
   ] });
 };
 const HistoricalRangesTable = ({ data, info, sector, assumptions }) => {
-  var _a3, _b2;
+  var _a2, _b;
   const [sectorDataFromAPI, setSectorDataFromAPI] = reactExports.useState(null);
   const [isLoadingSector, setIsLoadingSector] = reactExports.useState(false);
   const [sectorError, setSectorError] = reactExports.useState(null);
@@ -37259,9 +37382,9 @@ const HistoricalRangesTable = ({ data, info, sector, assumptions }) => {
         " Calculé à partir de vos données historiques récupérées par API (",
         data.length,
         " années : ",
-        ((_a3 = data[0]) == null ? void 0 : _a3.year) || "N/A",
+        ((_a2 = data[0]) == null ? void 0 : _a2.year) || "N/A",
         " - ",
-        ((_b2 = data[data.length - 1]) == null ? void 0 : _b2.year) || "N/A",
+        ((_b = data[data.length - 1]) == null ? void 0 : _b.year) || "N/A",
         ")"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
@@ -37296,7 +37419,7 @@ const DataSourcesInfo = () => {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-lg shadow-sm border border-blue-200 mt-8", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3 mb-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800", children: "📊 Sources des Données et Méthodologie de Calcul" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -37308,7 +37431,7 @@ const DataSourcesInfo = () => {
           className: "flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold",
           title: "Ouvrir le guide complet dans GitHub",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$H, { className: "w-5 h-5" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$I, { className: "w-5 h-5" }),
             "Guide Complet"
           ]
         }
@@ -37407,7 +37530,7 @@ const DataSourcesInfo = () => {
   ] });
 };
 const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_CONFIG }) => {
-  var _a3, _b2, _c, _d, _e, _f, _g, _h, _i;
+  var _a2, _b, _c, _d, _e, _f, _g, _h, _i;
   const lastData = data[data.length - 1];
   const validHistory = data.filter((d) => d.priceHigh > 0 && d.priceLow > 0);
   const baseYearData = data.find((d) => d.year === assumptions.baseYear) || lastData;
@@ -37443,7 +37566,7 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
   const avgPCF = calculateAverage(
     validHistory.map((d) => (d.priceHigh / d.cashFlowPerShare + d.priceLow / d.cashFlowPerShare) / 2).filter((v) => isFinite(v) && v > 0)
   );
-  const opMargin = ((_c = (_b2 = (_a3 = info.financials) == null ? void 0 : _a3.incomeStatement) == null ? void 0 : _b2[0]) == null ? void 0 : _c.operatingIncomeRatio) != null ? info.financials.incomeStatement[0].operatingIncomeRatio * 100 : null;
+  const opMargin = ((_c = (_b = (_a2 = info.financials) == null ? void 0 : _a2.incomeStatement) == null ? void 0 : _b[0]) == null ? void 0 : _c.operatingIncomeRatio) != null ? info.financials.incomeStatement[0].operatingIncomeRatio * 100 : null;
   const netMargin = ((_f = (_e = (_d = info.financials) == null ? void 0 : _d.incomeStatement) == null ? void 0 : _e[0]) == null ? void 0 : _f.netIncomeRatio) != null ? info.financials.incomeStatement[0].netIncomeRatio * 100 : null;
   const debtToEquity = ((_i = (_h = (_g = info.financials) == null ? void 0 : _g.balanceSheet) == null ? void 0 : _h[0]) == null ? void 0 : _i.debtEquityRatio) != null ? info.financials.balanceSheet[0].debtEquityRatio : null;
   const payoutRatio = ((lastData == null ? void 0 : lastData.dividendPerShare) || 0) / ((lastData == null ? void 0 : lastData.earningsPerShare) || 1) * 100;
@@ -38185,7 +38308,7 @@ const InfoTab = () => {
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-4 mb-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$k, { className: "w-6 h-6 text-yellow-500" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-6 h-6 text-yellow-500" }),
             "Guide d'Utilisation & Méthodologie"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 leading-relaxed", children: "Cette application est un outil d'aide à la décision pour l'investissement fondamental. Elle permet de construire des scénarios de valorisation personnalisés pour chaque société, en projetant les fondamentaux (Bénéfices, Cash Flow, Dividendes) sur un horizon de 5 ans." })
@@ -38199,7 +38322,7 @@ const InfoTab = () => {
             className: "flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold whitespace-nowrap",
             title: "Ouvrir le guide complet dans GitHub",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$H, { className: "w-5 h-5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$I, { className: "w-5 h-5" }),
               "Guide Complet"
             ]
           }
@@ -38242,7 +38365,7 @@ const InfoTab = () => {
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-6 rounded-lg shadow border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xl font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-6 h-6 text-indigo-500" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$D, { className: "w-6 h-6 text-indigo-500" }),
         "2. Interprétation Visuelle"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3 text-gray-600 text-sm", children: [
@@ -38266,7 +38389,7 @@ const InfoTab = () => {
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-6 rounded-lg shadow border-l-4 border-blue-600", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xl font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$F, { className: "w-6 h-6 text-blue-600" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$G, { className: "w-6 h-6 text-blue-600" }),
         "3. Méthodologie de Projection (Rendement Total)"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4 text-gray-600 text-sm", children: [
@@ -38309,7 +38432,7 @@ const InfoTab = () => {
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-6 rounded-lg shadow border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xl font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-6 h-6 text-green-500" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: "w-6 h-6 text-green-500" }),
         "4. Fonctionnalités Pratiques"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc pl-5 space-y-2 text-gray-600 text-sm", children: [
@@ -38336,8 +38459,8 @@ const TickerSearch = ({ onSelect, onClose }) => {
   const [selectedIndex, setSelectedIndex] = reactExports.useState(0);
   const inputRef = reactExports.useRef(null);
   reactExports.useEffect(() => {
-    var _a3;
-    (_a3 = inputRef.current) == null ? void 0 : _a3.focus();
+    var _a2;
+    (_a2 = inputRef.current) == null ? void 0 : _a2.focus();
   }, []);
   reactExports.useEffect(() => {
     const searchTickers = async () => {
@@ -38393,7 +38516,7 @@ const TickerSearch = ({ onSelect, onClose }) => {
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black/50 flex items-start justify-center pt-20 z-50", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-2xl w-full max-w-2xl mx-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 p-4 border-b border-gray-200", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$h, { className: "w-5 h-5 text-gray-400" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$i, { className: "w-5 h-5 text-gray-400" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "input",
         {
@@ -38423,7 +38546,7 @@ const TickerSearch = ({ onSelect, onClose }) => {
         '"'
       ] }),
       results.length === 0 && query.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-8 text-center text-gray-400", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$h, { className: "w-12 h-12 mx-auto mb-3 opacity-50" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$i, { className: "w-12 h-12 mx-auto mb-3 opacity-50" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm", children: "Tapez pour rechercher des tickers" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs mt-1", children: "Ex: AAPL, Microsoft, Tesla..." })
       ] }),
@@ -38482,7 +38605,7 @@ const ConfirmSyncDialog = ({
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-xl max-w-md w-full", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between p-6 border-b border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-8 h-8 text-yellow-500" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-8 h-8 text-yellow-500" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900", children: "Synchroniser avec l'API" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-500 mt-1", children: [
@@ -38650,11 +38773,11 @@ const localStorageAdapter = {
     }
   },
   setItem: async (key, value) => {
-    var _a3;
+    var _a2;
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (e) {
-      if ((e == null ? void 0 : e.name) === "QuotaExceededError" || ((_a3 = e == null ? void 0 : e.message) == null ? void 0 : _a3.includes("quota"))) {
+      if ((e == null ? void 0 : e.name) === "QuotaExceededError" || ((_a2 = e == null ? void 0 : e.message) == null ? void 0 : _a2.includes("quota"))) {
         console.warn(`⚠️ LocalStorage quota exceeded for ${key}, attempting cleanup...`);
         try {
           const keys2 = Object.keys(localStorage);
@@ -38957,9 +39080,9 @@ const HelpSection = ({ id, title, children, showHelp, setShowHelp }) => {
         onClick: () => setShowHelp((prev) => ({ ...prev, [id]: !prev[id] })),
         className: "flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 transition-colors",
         children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-4 h-4" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: "w-4 h-4" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "En savoir plus" }),
-          isOpen ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-3 h-3" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-3 h-3" })
+          isOpen ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-3 h-3" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$A, { className: "w-3 h-3" })
         ]
       }
     ),
@@ -39114,7 +39237,7 @@ const AdvancedSyncDialog = ({
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000] p-4 overflow-y-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-xl max-w-4xl w-full my-8", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between p-6 border-b border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: "w-8 h-8 text-blue-600" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$P, { className: "w-8 h-8 text-blue-600" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900", children: "Options de Synchronisation Avancées" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 mt-1", children: isBulkSync ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
@@ -39128,7 +39251,7 @@ const AdvancedSyncDialog = ({
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-mono font-semibold", children: ticker2 })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 flex items-center gap-2 text-xs", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-4 h-4 text-blue-600" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-4 h-4 text-blue-600" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-600", children: [
               "Temps estimé: ",
               /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { className: "text-gray-900", children: estimatedTime.totalMinutes >= 1 ? `${estimatedTime.totalMinutes} min` : `${estimatedTime.totalSeconds} sec` }),
@@ -39155,7 +39278,7 @@ const AdvancedSyncDialog = ({
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-purple-900 flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$G, { className: "w-5 h-5" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$H, { className: "w-5 h-5" }),
             "Profil de Synchronisation"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -39165,7 +39288,7 @@ const AdvancedSyncDialog = ({
               className: "flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-purple-700 bg-purple-100 hover:bg-purple-200 rounded-md transition-colors",
               title: "Sauvegarder la configuration actuelle comme nouveau profil",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$d, { className: "w-4 h-4" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$e, { className: "w-4 h-4" }),
                 "Sauvegarder"
               ]
             }
@@ -39205,7 +39328,7 @@ const AdvancedSyncDialog = ({
           if (!selectedPreset) return null;
           return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 p-4 bg-white border-2 border-purple-300 rounded-lg shadow-sm", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("h5", { className: "text-sm font-bold text-purple-900 mb-3 flex items-center gap-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-purple-600" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-purple-600" }),
               "📋 Ce que ce profil implique :"
             ] }),
             selectedPreset.description && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-800 mb-4 font-medium bg-purple-50 p-3 rounded border border-purple-100", children: selectedPreset.description }),
@@ -39266,7 +39389,7 @@ const AdvancedSyncDialog = ({
         ] })
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-blue-900 mb-2", children: "🔄 Processus de Synchronisation" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-blue-800 space-y-2", children: [
@@ -39309,7 +39432,7 @@ const AdvancedSyncDialog = ({
         ] })
       ] }) }),
       hasManualData && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-50 border border-yellow-200 rounded-md p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-yellow-800 font-medium", children: "⚠️ Données manuelles détectées" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-yellow-700 mt-1", children: "Vous avez modifié des données manuellement (cases oranges). Choisissez si vous souhaitez les préserver ou les remplacer." })
@@ -39317,7 +39440,7 @@ const AdvancedSyncDialog = ({
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-gray-900 flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-5 h-5 text-blue-600" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-5 h-5 text-blue-600" }),
           "Options de Synchronisation Principales"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 bg-gray-50 rounded-md border border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 cursor-pointer", children: [
@@ -39336,7 +39459,7 @@ const AdvancedSyncDialog = ({
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "💾 Sauvegarder la version actuelle avant synchronisation" }),
               getUtilityBadge(OPTION_METADATA.saveBeforeSync.utility),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-3 h-3" }),
                 OPTION_METADATA.saveBeforeSync.timeDescription
               ] })
             ] }),
@@ -39390,7 +39513,7 @@ const AdvancedSyncDialog = ({
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-orange-900", children: "🟠 Remplacer les données oranges (assumptions manuelles)" }),
               getUtilityBadge(OPTION_METADATA.replaceOrangeData.utility),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-3 h-3" }),
                 OPTION_METADATA.replaceOrangeData.timeDescription
               ] })
             ] }),
@@ -39461,7 +39584,7 @@ const AdvancedSyncDialog = ({
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-red-900", children: "⚠️ Forcer le remplacement de TOUTES les données manuelles" }),
               getUtilityBadge(OPTION_METADATA.forceReplace.utility),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-3 h-3" }),
                 OPTION_METADATA.forceReplace.timeDescription
               ] })
             ] }),
@@ -39514,7 +39637,7 @@ const AdvancedSyncDialog = ({
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-t border-gray-200 pt-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-gray-600" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-gray-600" }),
             "Options Détaillées de Synchronisation"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
@@ -39605,7 +39728,7 @@ const AdvancedSyncDialog = ({
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🆕 Synchroniser uniquement les nouvelles années" }),
                   getUtilityBadge(OPTION_METADATA.syncOnlyNewYears.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-green-600", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-3 h-3" }),
                     OPTION_METADATA.syncOnlyNewYears.timeDescription
                   ] })
                 ] }),
@@ -39663,7 +39786,7 @@ const AdvancedSyncDialog = ({
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🔍 Synchroniser uniquement les métriques manquantes" }),
                   getUtilityBadge(OPTION_METADATA.syncOnlyMissingMetrics.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-green-600", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-3 h-3" }),
                     OPTION_METADATA.syncOnlyMissingMetrics.timeDescription
                   ] })
                 ] }),
@@ -39721,7 +39844,7 @@ const AdvancedSyncDialog = ({
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🎯 Synchroniser les assumptions (hypothèses)" }),
                   getUtilityBadge(OPTION_METADATA.syncAssumptions.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-3 h-3" }),
                     OPTION_METADATA.syncAssumptions.timeDescription
                   ] })
                 ] }),
@@ -39799,7 +39922,7 @@ const AdvancedSyncDialog = ({
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🚫 Préserver les exclusions de métriques" }),
                   getUtilityBadge(OPTION_METADATA.preserveExclusions.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-3 h-3" }),
                     OPTION_METADATA.preserveExclusions.timeDescription
                   ] })
                 ] }),
@@ -39861,7 +39984,7 @@ const AdvancedSyncDialog = ({
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "📊 Recalculer la détection d'outliers" }),
                   getUtilityBadge(OPTION_METADATA.recalculateOutliers.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-3 h-3" }),
                     OPTION_METADATA.recalculateOutliers.timeDescription
                   ] })
                 ] }),
@@ -39934,7 +40057,7 @@ const AdvancedSyncDialog = ({
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "💰 Mettre à jour le prix actuel" }),
                   getUtilityBadge(OPTION_METADATA.updateCurrentPrice.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-3 h-3" }),
                     OPTION_METADATA.updateCurrentPrice.timeDescription
                   ] })
                 ] }),
@@ -39996,7 +40119,7 @@ const AdvancedSyncDialog = ({
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "ℹ️ Synchroniser les informations de profil" }),
                   getUtilityBadge(OPTION_METADATA.syncInfo.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-3 h-3" }),
                     OPTION_METADATA.syncInfo.timeDescription
                   ] })
                 ] }),
@@ -40074,7 +40197,7 @@ const AdvancedSyncDialog = ({
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "⭐ Synchroniser les métriques ValueLine depuis Supabase" }),
                   getUtilityBadge(OPTION_METADATA.syncValueLineMetrics.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-3 h-3" }),
                     OPTION_METADATA.syncValueLineMetrics.timeDescription
                   ] })
                 ] }),
@@ -40143,7 +40266,7 @@ const AdvancedSyncDialog = ({
           ] })
         ] }),
         isBulkSync && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-50 border border-blue-200 rounded-md p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-blue-800 font-medium", children: "Synchronisation en masse" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-blue-700 mt-1", children: "Cette synchronisation traitera tous les tickers de votre portefeuille et watchlist. Le processus peut prendre plusieurs minutes selon le nombre de tickers." }),
@@ -40225,10 +40348,10 @@ const AdvancedSyncDialog = ({
             disabled: isSyncing || !options.syncData && !options.syncAssumptions && !options.syncInfo,
             className: "px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2",
             children: isSyncing ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: "w-4 h-4 animate-spin" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$P, { className: "w-4 h-4 animate-spin" }),
               "Synchronisation..."
             ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: "w-4 h-4" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$P, { className: "w-4 h-4" }),
               "Synchroniser avec Options"
             ] })
           }
@@ -40265,13 +40388,13 @@ const SyncReportDialog = ({
       filtered = filtered.filter((r2) => r2.success);
     } else if (filter === "error") {
       filtered = filtered.filter((r2) => {
-        var _a3;
-        return !r2.success && !((_a3 = r2.error) == null ? void 0 : _a3.includes("introuvable"));
+        var _a2;
+        return !r2.success && !((_a2 = r2.error) == null ? void 0 : _a2.includes("introuvable"));
       });
     } else if (filter === "skipped") {
       filtered = filtered.filter((r2) => {
-        var _a3;
-        return !r2.success && ((_a3 = r2.error) == null ? void 0 : _a3.includes("introuvable"));
+        var _a2;
+        return !r2.success && ((_a2 = r2.error) == null ? void 0 : _a2.includes("introuvable"));
       });
     }
     filtered = [...filtered].sort((a2, b) => {
@@ -40312,13 +40435,13 @@ const SyncReportDialog = ({
       "Erreur"
     ];
     const rows = reportData.tickerResults.map((result) => {
-      var _a3, _b2, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v;
+      var _a2, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v;
       return [
         result.ticker,
         result.success ? "Succès" : "Erreur",
         result.timeMs.toString(),
         result.currentPrice > 0 ? `$${result.currentPrice.toFixed(2)}` : "N/A",
-        ((_b2 = (_a3 = result.dataRetrieved) == null ? void 0 : _a3.years) == null ? void 0 : _b2.toString()) || "0",
+        ((_b = (_a2 = result.dataRetrieved) == null ? void 0 : _a2.years) == null ? void 0 : _b.toString()) || "0",
         ((_d = (_c = result.dataRetrieved) == null ? void 0 : _c.dataPoints) == null ? void 0 : _d.toString()) || "0",
         ((_f = (_e = result.outliers) == null ? void 0 : _e.detected) == null ? void 0 : _f.join("; ")) || "",
         Object.entries(((_g = result.outliers) == null ? void 0 : _g.excluded) || {}).filter(([_, excluded]) => excluded).map(([metric]) => metric).join("; ") || "",
@@ -40376,7 +40499,7 @@ const SyncReportDialog = ({
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10001] p-4 overflow-y-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow-xl max-w-7xl w-full my-8 max-h-[90vh] flex flex-col", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-8 h-8 text-blue-600" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$D, { className: "w-8 h-8 text-blue-600" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-2xl font-bold text-gray-900", children: "Rapport de Synchronisation" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 mt-1", children: new Date(reportData.startTime).toLocaleString("fr-FR") })
@@ -40390,7 +40513,7 @@ const SyncReportDialog = ({
             className: "flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium",
             title: "Exporter en CSV",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$P, { className: "w-4 h-4" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$Q, { className: "w-4 h-4" }),
               "CSV"
             ]
           }
@@ -40402,7 +40525,7 @@ const SyncReportDialog = ({
             className: "flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium",
             title: "Exporter en JSON",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$s, { className: "w-4 h-4" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-4 h-4" }),
               "JSON"
             ]
           }
@@ -40473,7 +40596,7 @@ const SyncReportDialog = ({
       ] }),
       reportData.options && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-gray-600" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-gray-600" }),
           "Options de Synchronisation Utilisées"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3", children: Object.entries(reportData.options).map(([key, value]) => {
@@ -40495,7 +40618,7 @@ const SyncReportDialog = ({
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `px-2 py-0.5 rounded-full text-xs font-medium border ${getUtilityColor(metadata.utility)}`, children: metadata.utility })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-3 h-3" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-3 h-3" }),
               metadata.timeDescription
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1 italic", children: metadata.utilityDescription })
@@ -40613,7 +40736,7 @@ const SyncReportDialog = ({
           },
           className: "px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors text-sm font-medium flex items-center gap-2",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: "w-4 h-4" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$P, { className: "w-4 h-4" }),
             "Réessayer les Échecs (",
             reportData.errorCount,
             ")"
@@ -40644,7 +40767,7 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
         onClick: onToggle,
         children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-            result.success ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-6 h-6 text-green-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-6 h-6 text-red-600" }),
+            result.success ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-6 h-6 text-green-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$q, { className: "w-6 h-6 text-red-600" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-bold text-lg", children: result.ticker }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500", children: result.success ? "Synchronisé avec succès" : result.error || "Erreur" })
@@ -40659,9 +40782,9 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-              hasOutliers && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-5 h-5 text-yellow-600", title: "Outliers détectés" }),
-              hasZeroData && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-blue-600", title: "Données à zéro" }),
-              hasNaData && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-gray-600", title: "Données N/A" })
+              hasOutliers && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-5 h-5 text-yellow-600", title: "Outliers détectés" }),
+              hasZeroData && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-blue-600", title: "Données à zéro" }),
+              hasNaData && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-gray-600", title: "Données N/A" })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-gray-400", children: isExpanded ? "▼" : "▶" })
           ] })
@@ -40697,7 +40820,7 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
       ] }),
       hasOutliers && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-yellow-50 border border-yellow-200 rounded-lg p-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-5 h-5 text-yellow-600" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-5 h-5 text-yellow-600" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-yellow-900", children: "Métriques Aberrantes Détectées" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2", children: result.outliers.detected.map((metric) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between text-sm", children: [
@@ -40777,7 +40900,7 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
       ] }),
       hasZeroData && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-blue-50 border border-blue-200 rounded-lg p-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-blue-600" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-blue-600" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-blue-900", children: "Données à Zéro" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 text-sm", children: [
@@ -40833,7 +40956,7 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
       ] }),
       hasNaData && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 border border-gray-200 rounded-lg p-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-gray-600" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-gray-600" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Données N/A" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-1 text-sm", children: result.naData.fields.map((field) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -40848,19 +40971,19 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900 mb-2", children: "Autres Informations" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-2 text-sm", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-            result.other.snapshotSaved ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-4 h-4 text-green-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-gray-400" }),
+            result.other.snapshotSaved ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-4 h-4 text-green-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-gray-400" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Snapshot sauvegardé" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-            result.other.assumptionsUpdated ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-4 h-4 text-green-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-gray-400" }),
+            result.other.assumptionsUpdated ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-4 h-4 text-green-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-gray-400" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Assumptions mises à jour" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-            result.other.infoUpdated ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-4 h-4 text-green-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-gray-400" }),
+            result.other.infoUpdated ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-4 h-4 text-green-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-gray-400" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Info mise à jour" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-            result.other.valueLineMetricsSynced ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-4 h-4 text-green-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-gray-400" }),
+            result.other.valueLineMetricsSynced ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-4 h-4 text-green-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-gray-400" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Métriques ValueLine" })
           ] })
         ] })
@@ -40879,7 +41002,7 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
             },
             className: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium flex items-center gap-2",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: "w-4 h-4" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$P, { className: "w-4 h-4" }),
               "Réessayer"
             ]
           }
@@ -40909,15 +41032,15 @@ const HistoricalVersionBanner = ({
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-50 border-b-2 border-yellow-300 p-4 print:hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-7xl mx-auto", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-6 h-6 text-yellow-600 flex-shrink-0" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-6 h-6 text-yellow-600 flex-shrink-0" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-yellow-900", children: isLocked ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-4 h-4" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$k, { className: "w-4 h-4" }),
             "Version historique (v",
             snapshotVersion,
             ") - Lecture seule"
           ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$i, { className: "w-4 h-4" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-4 h-4" }),
             "Version historique (v",
             snapshotVersion,
             ") - Déverrouillée"
@@ -40936,7 +41059,7 @@ const HistoricalVersionBanner = ({
               onClick: onUnlock,
               className: "px-3 py-1.5 text-sm font-medium text-yellow-800 bg-white border border-yellow-300 rounded-md hover:bg-yellow-50 transition-colors flex items-center gap-1.5",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$i, { className: "w-4 h-4" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-4 h-4" }),
                 "Déverrouiller"
               ]
             }
@@ -40963,7 +41086,7 @@ const HistoricalVersionBanner = ({
             onClick: onRevertToCurrent,
             className: "px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-1.5",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$L, { className: "w-4 h-4" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-4 h-4" }),
               "Revenir à la version actuelle"
             ]
           }
@@ -41007,10 +41130,10 @@ const Notification = ({
     });
   };
   const icons = {
-    success: ForwardRef$B,
+    success: ForwardRef$C,
     error: ForwardRef$2,
-    warning: ForwardRef$o,
-    info: ForwardRef$l
+    warning: ForwardRef$p,
+    info: ForwardRef$m
   };
   const colors = {
     success: "bg-green-50 border-green-200 text-green-800",
@@ -41073,7 +41196,10 @@ const LandingPage = ({ onGetStarted }) => {
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-center mb-8", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "inline-flex items-center space-x-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-2xl shadow-2xl", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$8, { className: "w-8 h-8" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-3xl font-bold", children: "JLab 3p1" })
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent tracking-tight", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-block", children: "JLab" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-block ml-2 text-blue-500", children: "3p1" })
+        ] })
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h1", { className: "text-5xl md:text-6xl font-extrabold text-white mb-6 leading-tight", style: { wordBreak: "normal", overflowWrap: "normal" }, children: [
         "Analyse Financière",
@@ -41089,7 +41215,7 @@ const LandingPage = ({ onGetStarted }) => {
           style: { wordBreak: "normal", overflowWrap: "normal" },
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { wordBreak: "normal", overflowWrap: "normal", whiteSpace: "normal" }, children: "Commencer l'analyse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: "w-5 h-5 group-hover:translate-x-1 transition-transform" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: "w-5 h-5 group-hover:translate-x-1 transition-transform" })
           ]
         }
       )
@@ -41125,12 +41251,16 @@ const LandingPage = ({ onGetStarted }) => {
           style: { wordBreak: "normal", overflowWrap: "normal" },
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { wordBreak: "normal", overflowWrap: "normal", whiteSpace: "normal" }, children: "Lancer l'application" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: "w-5 h-5 group-hover:translate-x-1 transition-transform" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: "w-5 h-5 group-hover:translate-x-1 transition-transform" })
           ]
         }
       )
     ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-slate-800", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-center text-slate-500 text-sm", children: "© 2025 JLab 3p1 - Plateforme d'analyse financière professionnelle" }) })
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-slate-800", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-center text-slate-500 text-sm", children: [
+      "© 2025 ",
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent", children: "JLab 3p1" }),
+      " - Plateforme d'analyse financière professionnelle"
+    ] }) })
   ] });
 };
 class ErrorBoundary extends reactExports.Component {
@@ -41149,13 +41279,13 @@ class ErrorBoundary extends reactExports.Component {
     return { hasError: true, error };
   }
   componentDidCatch(error, errorInfo) {
-    var _a3, _b2;
+    var _a2, _b;
     this.setState({ errorInfo });
     console.error("ErrorBoundary caught an error:", error, errorInfo);
-    (_b2 = (_a3 = this.props).onError) == null ? void 0 : _b2.call(_a3, error, errorInfo);
+    (_b = (_a2 = this.props).onError) == null ? void 0 : _b.call(_a2, error, errorInfo);
   }
   render() {
-    var _a3;
+    var _a2;
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;
@@ -41163,7 +41293,7 @@ class ErrorBoundary extends reactExports.Component {
       return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center p-8 bg-red-900/20 border border-red-500/30 rounded-lg", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-red-400 mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-12 h-12", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" }) }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-white mb-2", children: "Une erreur s'est produite" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-400 text-sm mb-4 text-center max-w-md", children: ((_a3 = this.state.error) == null ? void 0 : _a3.message) || "Une erreur inattendue est survenue." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-400 text-sm mb-4 text-center max-w-md", children: ((_a2 = this.state.error) == null ? void 0 : _a2.message) || "Une erreur inattendue est survenue." }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "button",
           {
@@ -41188,7 +41318,7 @@ const InteractiveDemo = ({ onClose, onSelectTicker, onLoadDefaultTicker }) => {
       description: "Commencez par choisir un titre dans la barre latérale gauche. Vous pouvez rechercher par symbole (ex: AAPL) ou par nom d'entreprise.",
       highlightSelector: '[data-demo="sidebar"]',
       elementDescription: "La sidebar contient tous vos tickers. Utilisez la barre de recherche pour trouver rapidement un titre.",
-      icon: ForwardRef$h,
+      icon: ForwardRef$i,
       color: "blue"
     },
     2: {
@@ -41204,7 +41334,7 @@ const InteractiveDemo = ({ onClose, onSelectTicker, onLoadDefaultTicker }) => {
       description: "Explorez les graphiques de valorisation, les métriques additionnelles, et synchronisez les données depuis l'API pour obtenir les informations les plus récentes.",
       highlightSelector: '[data-demo="features"]',
       elementDescription: "Les onglets en haut permettent d'accéder aux graphiques, métriques, et autres analyses. Le bouton de synchronisation met à jour les données depuis l'API.",
-      icon: ForwardRef$c,
+      icon: ForwardRef$d,
       color: "purple"
     }
   };
@@ -41245,6 +41375,7 @@ const InteractiveDemo = ({ onClose, onSelectTicker, onLoadDefaultTicker }) => {
       if (onLoadDefaultTicker) {
         onLoadDefaultTicker();
       }
+      localStorage.setItem("3p1-has-closed-demo", "true");
       onClose();
     }
   };
@@ -41257,6 +41388,7 @@ const InteractiveDemo = ({ onClose, onSelectTicker, onLoadDefaultTicker }) => {
     if (onLoadDefaultTicker) {
       onLoadDefaultTicker();
     }
+    localStorage.setItem("3p1-has-closed-demo", "true");
     onClose();
   };
   const handleSelectTicker = () => {
@@ -41394,7 +41526,7 @@ const InteractiveDemo = ({ onClose, onSelectTicker, onLoadDefaultTicker }) => {
                 disabled: currentStep === 1,
                 className: `flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${currentStep === 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`,
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-5 h-5" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-5 h-5" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Précédent" })
                 ]
               }
@@ -41406,7 +41538,7 @@ const InteractiveDemo = ({ onClose, onSelectTicker, onLoadDefaultTicker }) => {
                   onClick: handleSelectTicker,
                   className: "flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors",
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$h, { className: "w-5 h-5" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$i, { className: "w-5 h-5" }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Ouvrir la sidebar" })
                   ]
                 }
@@ -41427,7 +41559,7 @@ const InteractiveDemo = ({ onClose, onSelectTicker, onLoadDefaultTicker }) => {
                   },
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: currentStep === 3 ? "Commencer" : "Suivant" }),
-                    currentStep < 3 && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-5 h-5" })
+                    currentStep < 3 && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-5 h-5" })
                   ]
                 }
               )
@@ -41445,6 +41577,94 @@ const InteractiveDemo = ({ onClose, onSelectTicker, onLoadDefaultTicker }) => {
           transition: all 0.3s ease;
         }
       ` })
+  ] });
+};
+const SupabaseLoadingProgress = ({
+  isLoading,
+  current,
+  total,
+  startTime,
+  message
+}) => {
+  const [elapsedTime, setElapsedTime] = reactExports.useState(0);
+  const [estimatedTimeRemaining, setEstimatedTimeRemaining] = reactExports.useState(null);
+  reactExports.useEffect(() => {
+    if (!isLoading || !startTime) {
+      setElapsedTime(0);
+      setEstimatedTimeRemaining(null);
+      return;
+    }
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1e3);
+      setElapsedTime(elapsed);
+      if (current > 0 && total > 0) {
+        const progress = current / total;
+        if (progress > 0) {
+          const estimatedTotal = Math.floor(elapsed / progress);
+          const remaining = Math.max(0, estimatedTotal - elapsed);
+          setEstimatedTimeRemaining(remaining);
+        }
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, [isLoading, startTime, current, total]);
+  if (!isLoading && current === 0) {
+    return null;
+  }
+  const percentage = total > 0 ? Math.round(current / total * 100) : 0;
+  const formatTime = (seconds) => {
+    if (seconds < 60) {
+      return `${seconds}s`;
+    }
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}m ${secs}s`;
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "fixed top-20 right-4 z-[10000] bg-white rounded-lg shadow-2xl border-2 border-blue-500 p-4 min-w-[320px] max-w-[400px]", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-5 h-5 text-blue-600 animate-spin" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-800", children: isLoading ? "Chargement Supabase" : "Chargement terminé" })
+      ] }),
+      !isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-5 h-5 text-green-600" })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-medium text-gray-700", children: [
+          current,
+          " / ",
+          total,
+          " tickers"
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-bold text-blue-600", children: [
+          percentage,
+          "%"
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full bg-gray-200 rounded-full h-3 overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "div",
+        {
+          className: "bg-blue-600 h-3 rounded-full transition-all duration-300 ease-out",
+          style: { width: `${percentage}%` }
+        }
+      ) })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1 text-xs text-gray-600", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "⏱️ Temps écoulé:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-gray-800", children: formatTime(elapsedTime) })
+      ] }),
+      isLoading && estimatedTimeRemaining !== null && estimatedTimeRemaining > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "⏳ Temps restant (est.):" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-gray-800", children: formatTime(estimatedTimeRemaining) })
+      ] }),
+      message && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 pt-2 border-t border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 italic", children: message }) })
+    ] }),
+    isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 pt-2 border-t border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500", children: [
+      current === 0 && "Initialisation...",
+      current > 0 && current < total && `Chargement des données pour ${current} ticker(s)...`,
+      current === total && "Finalisation..."
+    ] }) })
   ] });
 };
 function calculateTargetPrices(data, assumptions) {
@@ -41649,7 +41869,7 @@ const RestoreDataDialog = ({
           disabled: isLoading,
           className: "w-full p-4 border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed",
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-blue-100 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-6 h-6 text-blue-600" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-blue-100 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-6 h-6 text-blue-600" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-900 mb-1", children: "Depuis la dernière sauvegarde" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mb-2", children: "Restaure les données et métriques de la dernière version sauvegardée (snapshot)." }),
@@ -41671,7 +41891,7 @@ const RestoreDataDialog = ({
           disabled: isLoading,
           className: "w-full p-4 border-2 border-green-200 rounded-lg hover:border-green-400 hover:bg-green-50 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed",
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-green-100 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: "w-6 h-6 text-green-600" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-green-100 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$P, { className: "w-6 h-6 text-green-600" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-900 mb-1", children: "Recalculer depuis FMP" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mb-2", children: "Récupère les données FMP et recalcule automatiquement toutes les métriques (comme lors d'un nouvel ajout de ticker)." }),
@@ -41869,7 +42089,7 @@ const UnifiedSettingsPanel = ({
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[10000] p-4 text-left", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex-shrink-0", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 min-w-0", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-600 p-2 rounded-lg shadow-lg flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-5 h-5 text-white" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-600 p-2 rounded-lg shadow-lg flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-5 h-5 text-white" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-900 truncate", children: "Configuration Complète 3p1" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-0.5 truncate", children: "Guardrails, Validation, Ajustements" })
@@ -41885,7 +42105,7 @@ const UnifiedSettingsPanel = ({
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Sauvegardé" })
         ] }),
         saveStatus === "error" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-red-600 text-sm", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-5 h-5" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-5 h-5" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Erreur" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -41945,7 +42165,7 @@ const UnifiedSettingsPanel = ({
           onClick: handleReset,
           className: "flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:text-red-600 transition-colors bg-white border border-gray-300 rounded-lg hover:bg-red-50",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: "w-4 h-4" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$P, { className: "w-4 h-4" }),
             "Réinitialiser tout"
           ]
         }
@@ -42041,7 +42261,7 @@ const OverviewTab = ({ guardrailConfig, validationSettings }) => {
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-50 border border-yellow-200 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-yellow-800", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium mb-1", children: "💡 Note importante" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
@@ -42083,7 +42303,7 @@ const GuardrailsTab = ({ config: config2, onUpdate }) => {
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-50 border border-blue-200 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-blue-800", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium mb-1", children: "Guardrails - Limites d'Affichage" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Ces limites contrôlent ce qui est affiché dans l'interface et les calculs de projections." })
@@ -42186,7 +42406,7 @@ const ValidationTab = ({ settings, onUpdate }) => {
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-green-50 border border-green-200 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-green-800", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium mb-1", children: "Validation & Sanitisation Automatique" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Ces paramètres sont sauvegardés dans Supabase et contrôlent la sanitisation automatique des données lors du chargement, de la sauvegarde et de la synchronisation." })
@@ -42679,7 +42899,7 @@ const DataQualityReport = ({ data, assumptions, ticker: ticker2 }) => {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-lg shadow-lg", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-xl font-bold flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-6 h-6" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-6 h-6" }),
         "Rapport de Qualité des Données - ",
         ticker2
       ] }),
@@ -42711,7 +42931,7 @@ const DataQualityReport = ({ data, assumptions, ticker: ticker2 }) => {
     ] }),
     outlierAnalysis.outliers.filter((o) => o.isExcluded).length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-red-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-red-800 mb-4 flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-5 h-5" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-5 h-5" }),
         "Métriques Aberrantes Détectées (",
         outlierAnalysis.outliers.filter((o) => o.isExcluded).length,
         ")"
@@ -42737,7 +42957,7 @@ const DataQualityReport = ({ data, assumptions, ticker: ticker2 }) => {
     ] }),
     outlierAnalysis.outliers.filter((o) => !o.isExcluded).length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-green-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-green-800 mb-4 flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-5 h-5" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-5 h-5" }),
         "Métriques Valides (",
         outlierAnalysis.outliers.filter((o) => !o.isExcluded).length,
         ")"
@@ -42894,14 +43114,14 @@ const SanitizationReport = ({
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-purple-600 to-purple-800 text-white p-4 rounded-lg shadow-lg", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-xl font-bold flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-6 h-6" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-6 h-6" }),
         "Rapport de Sanitisation - ",
         ticker2
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-purple-100 text-sm mt-1", children: "Visualisation des corrections automatiques appliquées aux hypothèses" })
     ] }),
     changes.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-green-50 p-6 rounded-lg border border-green-200 text-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-12 h-12 text-green-600 mx-auto mb-2" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-12 h-12 text-green-600 mx-auto mb-2" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-green-800 mb-2", children: "Aucune correction nécessaire" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-green-600", children: "Toutes les hypothèses sont dans les limites de validation acceptables." })
     ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
@@ -42922,7 +43142,7 @@ const SanitizationReport = ({
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-5 h-5" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-5 h-5" }),
           "Détails des Corrections (",
           changes.length,
           ")"
@@ -42949,7 +43169,7 @@ const SanitizationReport = ({
               change.label
             ] }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-600 font-bold", children: change.category === "growth" || change.category === "ratio" ? formatPercent(change.original) : formatCurrency(change.original) }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$N, { className: "w-5 h-5 text-gray-400 mx-auto" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: "w-5 h-5 text-gray-400 mx-auto" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-green-600 font-bold", children: change.category === "growth" || change.category === "ratio" ? formatPercent(change.sanitized) : formatCurrency(change.sanitized) }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: change.change > 0 ? "text-green-600" : "text-red-600", children: [
               change.change > 0 ? "+" : "",
@@ -42995,7 +43215,7 @@ const FullDataVisualization = ({
 }) => {
   const visualizationData = reactExports.useMemo(() => {
     return data.map((row) => {
-      var _a3, _b2, _c, _d, _e, _f;
+      var _a2, _b, _c, _d, _e, _f;
       const ratios = calculateRowRatios(row);
       return {
         year: row.year,
@@ -43020,7 +43240,7 @@ const FullDataVisualization = ({
         PBV_Avg: (ratios.pbvHigh + ratios.pbvLow) / 2,
         Yield: ratios.yield,
         // Croissance (calculée)
-        EPS_Growth: row.year > ((_a3 = data[0]) == null ? void 0 : _a3.year) ? (row.earningsPerShare - (((_b2 = data.find((d) => d.year === row.year - 1)) == null ? void 0 : _b2.earningsPerShare) || 0)) / Math.max(((_c = data.find((d) => d.year === row.year - 1)) == null ? void 0 : _c.earningsPerShare) || 1, 0.01) * 100 : 0,
+        EPS_Growth: row.year > ((_a2 = data[0]) == null ? void 0 : _a2.year) ? (row.earningsPerShare - (((_b = data.find((d) => d.year === row.year - 1)) == null ? void 0 : _b.earningsPerShare) || 0)) / Math.max(((_c = data.find((d) => d.year === row.year - 1)) == null ? void 0 : _c.earningsPerShare) || 1, 0.01) * 100 : 0,
         CF_Growth: row.year > ((_d = data[0]) == null ? void 0 : _d.year) ? (row.cashFlowPerShare - (((_e = data.find((d) => d.year === row.year - 1)) == null ? void 0 : _e.cashFlowPerShare) || 0)) / Math.max(((_f = data.find((d) => d.year === row.year - 1)) == null ? void 0 : _f.cashFlowPerShare) || 1, 0.01) * 100 : 0,
         // Flags
         isEstimate: row.isEstimate || false
@@ -43049,7 +43269,7 @@ const FullDataVisualization = ({
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-4 rounded-lg shadow-lg", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-xl font-bold flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-6 h-6" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$D, { className: "w-6 h-6" }),
         "Visualisation Complète des Données - ",
         info.symbol
       ] }),
@@ -43140,8 +43360,8 @@ const FullDataVisualization = ({
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800 mb-4", children: "Taux de Croissance Annuel" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-80", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(BarChart, { data: visualizationData.filter((d) => {
-        var _a3;
-        return d.year > ((_a3 = data[0]) == null ? void 0 : _a3.year);
+        var _a2;
+        return d.year > ((_a2 = data[0]) == null ? void 0 : _a2.year);
       }), children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(CartesianGrid, { strokeDasharray: "3 3" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(XAxis, { dataKey: "year" }),
@@ -43257,7 +43477,7 @@ const ReportsPanel = ({
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-4 rounded-t-lg flex items-center justify-between", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-2xl font-bold flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$r, { className: "w-6 h-6" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$s, { className: "w-6 h-6" }),
           "Rapports Visuels et Analyse de Données"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-indigo-100 text-sm mt-1", children: [
@@ -43291,7 +43511,7 @@ const ReportsPanel = ({
           onClick: () => setActiveTab("quality"),
           className: `px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "quality" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-gray-500 hover:text-gray-700"}`,
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-4 h-4 inline mr-1" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-4 h-4 inline mr-1" }),
             "Qualité des Données"
           ]
         }
@@ -43302,7 +43522,7 @@ const ReportsPanel = ({
           onClick: () => setActiveTab("sanitization"),
           className: `px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "sanitization" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-gray-500 hover:text-gray-700"}`,
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-4 h-4 inline mr-1" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-4 h-4 inline mr-1" }),
             "Sanitisation"
           ]
         }
@@ -43313,7 +43533,7 @@ const ReportsPanel = ({
           onClick: () => setActiveTab("full"),
           className: `px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "full" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-gray-500 hover:text-gray-700"}`,
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-4 h-4 inline mr-1" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$D, { className: "w-4 h-4 inline mr-1" }),
             "Visualisation Complète"
           ]
         }
@@ -43353,7 +43573,7 @@ const ReportsPanel = ({
                 onClick: () => setActiveTab("quality"),
                 className: "p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 text-left transition-colors",
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-8 h-8 text-blue-600 mb-2" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-8 h-8 text-blue-600 mb-2" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-blue-800 mb-1", children: "Qualité des Données" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-blue-600", children: "Visualise les données aberrantes, les exclusions et la qualité des données historiques" })
                 ]
@@ -43365,7 +43585,7 @@ const ReportsPanel = ({
                 onClick: () => setActiveTab("sanitization"),
                 className: "p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 text-left transition-colors",
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$B, { className: "w-8 h-8 text-green-600 mb-2" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-8 h-8 text-green-600 mb-2" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-green-800 mb-1", children: "Rapport de Sanitisation" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-green-600", children: "Affiche toutes les corrections automatiques appliquées aux hypothèses" })
                 ]
@@ -43377,7 +43597,7 @@ const ReportsPanel = ({
                 onClick: () => setActiveTab("full"),
                 className: "p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 text-left transition-colors",
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-8 h-8 text-purple-600 mb-2" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$D, { className: "w-8 h-8 text-purple-600 mb-2" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-purple-800 mb-1", children: "Visualisation Complète" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-purple-600", children: "Graphiques complets de toutes les données historiques, ratios et métriques" })
                 ]
@@ -43415,6 +43635,7 @@ const ReportsPanel = ({
 };
 const loadAllTickersFromSupabase = async () => {
   try {
+    const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "0.0.0.0");
     let teamTickersResponse = await fetch("/api/admin/tickers?is_active=true&source=team&limit=1000&order_by=ticker&order_direction=asc");
     let bothTickersResponse = await fetch("/api/admin/tickers?is_active=true&source=both&limit=1000&order_by=ticker&order_direction=asc");
     const allTeamTickers = [];
@@ -43536,6 +43757,40 @@ const loadAllTickersFromSupabase = async () => {
         }
       }
     }
+    if (isLocalhost) {
+      console.log("🔄 Localhost détecté - Tentative chargement direct depuis Supabase...");
+      try {
+        const { getSupabaseClient: getSupabaseClient2 } = await __vitePreload(async () => {
+          const { getSupabaseClient: getSupabaseClient3 } = await Promise.resolve().then(() => supabase$1);
+          return { getSupabaseClient: getSupabaseClient3 };
+        }, true ? void 0 : void 0, import.meta.url);
+        const supabase2 = getSupabaseClient2();
+        if (supabase2) {
+          const { data: tickers, error: supabaseError } = await supabase2.from("tickers").select("ticker, company_name, sector, source, is_active, security_rank, earnings_predictability, price_growth_persistence, price_stability, beta").eq("is_active", true).limit(1e3);
+          if (!supabaseError && tickers && tickers.length > 0) {
+            const normalizedTickers = tickers.map((t) => ({
+              ticker: t.ticker,
+              company_name: t.company_name,
+              sector: t.sector,
+              source: t.source || "manual",
+              is_active: t.is_active,
+              security_rank: t.security_rank,
+              earnings_predictability: t.earnings_predictability,
+              price_growth_persistence: t.price_growth_persistence,
+              price_stability: t.price_stability,
+              beta: t.beta
+            }));
+            console.log(`✅ ${normalizedTickers.length} tickers chargés directement depuis Supabase (localhost)`);
+            return {
+              success: true,
+              tickers: normalizedTickers
+            };
+          }
+        }
+      } catch (supabaseDirectError) {
+        console.warn("⚠️ Erreur chargement direct Supabase:", supabaseDirectError);
+      }
+    }
     throw new Error("Aucune API disponible pour charger les tickers");
   } catch (error) {
     console.error("❌ Erreur chargement tickers Supabase:", error);
@@ -43553,7 +43808,7 @@ const mapSourceToIsWatchlist = (source) => {
   return null;
 };
 async function fetchMarketDataBatch(tickers) {
-  var _a3;
+  var _a2;
   if (tickers.length === 0) {
     return {
       success: true,
@@ -43582,7 +43837,7 @@ async function fetchMarketDataBatch(tickers) {
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
     const result = await response.json();
-    if (result.success && ((_a3 = result.data) == null ? void 0 : _a3.quote)) {
+    if (result.success && ((_a2 = result.data) == null ? void 0 : _a2.quote)) {
       const transformedData = [];
       for (const ticker2 of tickers) {
         const upperTicker = ticker2.toUpperCase();
@@ -43728,15 +43983,15 @@ async function loadAllCurrentSnapshotsFromSupabase() {
   }
 }
 async function loadProfileFromSupabase(ticker2, fallbackToFMP = true) {
-  var _a3, _b2;
+  var _a2, _b;
   const upperTicker = ticker2.toUpperCase();
   const snapshot = await loadCurrentSnapshotFromSupabase(upperTicker);
   if (snapshot && snapshot.annual_data && snapshot.annual_data.length > 0) {
     const marketData = await fetchMarketData(upperTicker);
-    const currentPrice = ((marketData == null ? void 0 : marketData.currentPrice) || 0) > 0 ? marketData.currentPrice : ((_a3 = snapshot.assumptions) == null ? void 0 : _a3.currentPrice) || 0;
+    const currentPrice = ((marketData == null ? void 0 : marketData.currentPrice) || 0) > 0 ? marketData.currentPrice : ((_a2 = snapshot.assumptions) == null ? void 0 : _a2.currentPrice) || 0;
     const updatedAssumptions = sanitizeAssumptionsSync({
       ...snapshot.assumptions,
-      currentPrice: currentPrice > 0 ? currentPrice : ((_b2 = snapshot.assumptions) == null ? void 0 : _b2.currentPrice) || 0
+      currentPrice: currentPrice > 0 ? currentPrice : ((_b = snapshot.assumptions) == null ? void 0 : _b.currentPrice) || 0
     });
     console.log(`✅ ${upperTicker}: Chargé depuis Supabase (snapshot du ${snapshot.snapshot_date})`);
     return {
@@ -43791,12 +44046,12 @@ async function loadProfilesBatchFromSupabase(tickers) {
     console.warn("⚠️ fetchMarketDataBatch failed, using snapshot prices:", e);
   }
   tickers.forEach((ticker2) => {
-    var _a3;
+    var _a2;
     const upperTicker = ticker2.toUpperCase();
     const snapshot = allSnapshots.get(upperTicker);
     if (snapshot && snapshot.annual_data && snapshot.annual_data.length > 0) {
       const batchPrice = priceMap.get(upperTicker) || 0;
-      const snapshotPrice = ((_a3 = snapshot.assumptions) == null ? void 0 : _a3.currentPrice) || 0;
+      const snapshotPrice = ((_a2 = snapshot.assumptions) == null ? void 0 : _a2.currentPrice) || 0;
       const currentPrice = batchPrice > 0 ? batchPrice : snapshotPrice;
       results[upperTicker] = {
         data: snapshot.annual_data || [],
@@ -44439,7 +44694,7 @@ class FunctionsClient {
    */
   invoke(functionName_1) {
     return __awaiter(this, arguments, void 0, function* (functionName, options = {}) {
-      var _a3;
+      var _a2;
       let timeoutId;
       let timeoutController;
       try {
@@ -44501,7 +44756,7 @@ class FunctionsClient {
         if (!response.ok) {
           throw new FunctionsHttpError$1(response);
         }
-        let responseType = ((_a3 = response.headers.get("Content-Type")) !== null && _a3 !== void 0 ? _a3 : "text/plain").split(";")[0].trim();
+        let responseType = ((_a2 = response.headers.get("Content-Type")) !== null && _a2 !== void 0 ? _a2 : "text/plain").split(";")[0].trim();
         let data;
         if (responseType === "application/json") {
           data = yield response.json();
@@ -44601,16 +44856,16 @@ function requirePostgrestBuilder() {
      * ```
      */
     constructor(builder) {
-      var _a3, _b2;
+      var _a2, _b;
       this.shouldThrowOnError = false;
       this.method = builder.method;
       this.url = builder.url;
       this.headers = new Headers(builder.headers);
       this.schema = builder.schema;
       this.body = builder.body;
-      this.shouldThrowOnError = (_a3 = builder.shouldThrowOnError) !== null && _a3 !== void 0 ? _a3 : false;
+      this.shouldThrowOnError = (_a2 = builder.shouldThrowOnError) !== null && _a2 !== void 0 ? _a2 : false;
       this.signal = builder.signal;
-      this.isMaybeSingle = (_b2 = builder.isMaybeSingle) !== null && _b2 !== void 0 ? _b2 : false;
+      this.isMaybeSingle = (_b = builder.isMaybeSingle) !== null && _b !== void 0 ? _b : false;
       if (builder.fetch) {
         this.fetch = builder.fetch;
       } else {
@@ -44652,7 +44907,7 @@ function requirePostgrestBuilder() {
         body: JSON.stringify(this.body),
         signal: this.signal
       }).then(async (res2) => {
-        var _a3, _b2, _c, _d;
+        var _a2, _b, _c, _d;
         let error = null;
         let data = null;
         let count = null;
@@ -44664,13 +44919,13 @@ function requirePostgrestBuilder() {
             if (body === "") ;
             else if (this.headers.get("Accept") === "text/csv") {
               data = body;
-            } else if (this.headers.get("Accept") && ((_a3 = this.headers.get("Accept")) === null || _a3 === void 0 ? void 0 : _a3.includes("application/vnd.pgrst.plan+text"))) {
+            } else if (this.headers.get("Accept") && ((_a2 = this.headers.get("Accept")) === null || _a2 === void 0 ? void 0 : _a2.includes("application/vnd.pgrst.plan+text"))) {
               data = body;
             } else {
               data = JSON.parse(body);
             }
           }
-          const countHeader = (_b2 = this.headers.get("Prefer")) === null || _b2 === void 0 ? void 0 : _b2.match(/count=(exact|planned|estimated)/);
+          const countHeader = (_b = this.headers.get("Prefer")) === null || _b === void 0 ? void 0 : _b.match(/count=(exact|planned|estimated)/);
           const contentRange = (_c = res2.headers.get("content-range")) === null || _c === void 0 ? void 0 : _c.split("/");
           if (countHeader && contentRange && contentRange.length > 1) {
             count = parseInt(contentRange[1]);
@@ -44734,12 +44989,12 @@ function requirePostgrestBuilder() {
       });
       if (!this.shouldThrowOnError) {
         res = res.catch((fetchError) => {
-          var _a3, _b2, _c, _d, _e, _f;
+          var _a2, _b, _c, _d, _e, _f;
           let errorDetails = "";
           const cause = fetchError === null || fetchError === void 0 ? void 0 : fetchError.cause;
           if (cause) {
-            const causeMessage = (_a3 = cause === null || cause === void 0 ? void 0 : cause.message) !== null && _a3 !== void 0 ? _a3 : "";
-            const causeCode = (_b2 = cause === null || cause === void 0 ? void 0 : cause.code) !== null && _b2 !== void 0 ? _b2 : "";
+            const causeMessage = (_a2 = cause === null || cause === void 0 ? void 0 : cause.message) !== null && _a2 !== void 0 ? _a2 : "";
+            const causeCode = (_b = cause === null || cause === void 0 ? void 0 : cause.code) !== null && _b !== void 0 ? _b : "";
             errorDetails = `${(_c = fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) !== null && _c !== void 0 ? _c : "FetchError"}: ${fetchError === null || fetchError === void 0 ? void 0 : fetchError.message}`;
             errorDetails += `
 
@@ -44975,7 +45230,7 @@ function requirePostgrestTransformBuilder() {
      * or `"json"`
      */
     explain({ analyze = false, verbose = false, settings = false, buffers = false, wal = false, format: format2 = "text" } = {}) {
-      var _a3;
+      var _a2;
       const options = [
         analyze ? "analyze" : null,
         verbose ? "verbose" : null,
@@ -44983,7 +45238,7 @@ function requirePostgrestTransformBuilder() {
         buffers ? "buffers" : null,
         wal ? "wal" : null
       ].filter(Boolean).join("|");
-      const forMediatype = (_a3 = this.headers.get("Accept")) !== null && _a3 !== void 0 ? _a3 : "application/json";
+      const forMediatype = (_a2 = this.headers.get("Accept")) !== null && _a2 !== void 0 ? _a2 : "application/json";
       this.headers.set("Accept", `application/vnd.pgrst.plan+${format2}; for="${forMediatype}"; options=${options};`);
       if (format2 === "json") {
         return this;
@@ -45524,7 +45779,7 @@ function requirePostgrestQueryBuilder() {
      * inserts.
      */
     insert(values, { count, defaultToNull = true } = {}) {
-      var _a3;
+      var _a2;
       const method = "POST";
       if (count) {
         this.headers.append("Prefer", `count=${count}`);
@@ -45545,7 +45800,7 @@ function requirePostgrestQueryBuilder() {
         headers: this.headers,
         schema: this.schema,
         body: values,
-        fetch: (_a3 = this.fetch) !== null && _a3 !== void 0 ? _a3 : fetch
+        fetch: (_a2 = this.fetch) !== null && _a2 !== void 0 ? _a2 : fetch
       });
     }
     /**
@@ -45634,7 +45889,7 @@ function requirePostgrestQueryBuilder() {
     * ```
     */
     upsert(values, { onConflict, ignoreDuplicates = false, count, defaultToNull = true } = {}) {
-      var _a3;
+      var _a2;
       const method = "POST";
       this.headers.append("Prefer", `resolution=${ignoreDuplicates ? "ignore" : "merge"}-duplicates`);
       if (onConflict !== void 0)
@@ -45658,7 +45913,7 @@ function requirePostgrestQueryBuilder() {
         headers: this.headers,
         schema: this.schema,
         body: values,
-        fetch: (_a3 = this.fetch) !== null && _a3 !== void 0 ? _a3 : fetch
+        fetch: (_a2 = this.fetch) !== null && _a2 !== void 0 ? _a2 : fetch
       });
     }
     /**
@@ -45683,7 +45938,7 @@ function requirePostgrestQueryBuilder() {
      * numbers.
      */
     update(values, { count } = {}) {
-      var _a3;
+      var _a2;
       const method = "PATCH";
       if (count) {
         this.headers.append("Prefer", `count=${count}`);
@@ -45694,7 +45949,7 @@ function requirePostgrestQueryBuilder() {
         headers: this.headers,
         schema: this.schema,
         body: values,
-        fetch: (_a3 = this.fetch) !== null && _a3 !== void 0 ? _a3 : fetch
+        fetch: (_a2 = this.fetch) !== null && _a2 !== void 0 ? _a2 : fetch
       });
     }
     /**
@@ -45717,7 +45972,7 @@ function requirePostgrestQueryBuilder() {
      * numbers.
      */
     delete({ count } = {}) {
-      var _a3;
+      var _a2;
       const method = "DELETE";
       if (count) {
         this.headers.append("Prefer", `count=${count}`);
@@ -45727,7 +45982,7 @@ function requirePostgrestQueryBuilder() {
         url: this.url,
         headers: this.headers,
         schema: this.schema,
-        fetch: (_a3 = this.fetch) !== null && _a3 !== void 0 ? _a3 : fetch
+        fetch: (_a2 = this.fetch) !== null && _a2 !== void 0 ? _a2 : fetch
       });
     }
   };
@@ -45831,7 +46086,7 @@ function requirePostgrestClient() {
      * ```
      */
     rpc(fn, args = {}, { head: head2 = false, get: get2 = false, count } = {}) {
-      var _a3;
+      var _a2;
       let method;
       const url = new URL(`${this.url}/rpc/${fn}`);
       let body;
@@ -45854,7 +46109,7 @@ function requirePostgrestClient() {
         headers,
         schema: this.schemaName,
         body,
-        fetch: (_a3 = this.fetch) !== null && _a3 !== void 0 ? _a3 : fetch
+        fetch: (_a2 = this.fetch) !== null && _a2 !== void 0 ? _a2 : fetch
       });
     }
   };
@@ -45897,7 +46152,7 @@ class WebSocketFactory {
   constructor() {
   }
   static detectEnvironment() {
-    var _a3;
+    var _a2;
     if (typeof WebSocket !== "undefined") {
       return { type: "native", constructor: WebSocket };
     }
@@ -45914,7 +46169,7 @@ class WebSocketFactory {
         workaround: "Use Cloudflare Workers WebSocket API for server-side WebSocket handling, or deploy to a different runtime."
       };
     }
-    if (typeof globalThis !== "undefined" && globalThis.EdgeRuntime || typeof navigator !== "undefined" && ((_a3 = navigator.userAgent) === null || _a3 === void 0 ? void 0 : _a3.includes("Vercel-Edge"))) {
+    if (typeof globalThis !== "undefined" && globalThis.EdgeRuntime || typeof navigator !== "undefined" && ((_a2 = navigator.userAgent) === null || _a2 === void 0 ? void 0 : _a2.includes("Vercel-Edge"))) {
       return {
         type: "unsupported",
         error: "Edge runtime detected (Vercel Edge/Netlify Edge). WebSockets are not supported in edge functions.",
@@ -45997,7 +46252,7 @@ Suggested solution: ${env.workaround}`;
     try {
       const env = this.detectEnvironment();
       return env.type === "native" || env.type === "ws";
-    } catch (_a3) {
+    } catch (_a2) {
       return false;
     }
   }
@@ -46064,30 +46319,30 @@ class Serializer {
     return callback(JSON.stringify(payload));
   }
   _binaryEncodeUserBroadcastPush(message) {
-    var _a3;
-    if (this._isArrayBuffer((_a3 = message.payload) === null || _a3 === void 0 ? void 0 : _a3.payload)) {
+    var _a2;
+    if (this._isArrayBuffer((_a2 = message.payload) === null || _a2 === void 0 ? void 0 : _a2.payload)) {
       return this._encodeBinaryUserBroadcastPush(message);
     } else {
       return this._encodeJsonUserBroadcastPush(message);
     }
   }
   _encodeBinaryUserBroadcastPush(message) {
-    var _a3, _b2;
-    const userPayload = (_b2 = (_a3 = message.payload) === null || _a3 === void 0 ? void 0 : _a3.payload) !== null && _b2 !== void 0 ? _b2 : new ArrayBuffer(0);
+    var _a2, _b;
+    const userPayload = (_b = (_a2 = message.payload) === null || _a2 === void 0 ? void 0 : _a2.payload) !== null && _b !== void 0 ? _b : new ArrayBuffer(0);
     return this._encodeUserBroadcastPush(message, this.BINARY_ENCODING, userPayload);
   }
   _encodeJsonUserBroadcastPush(message) {
-    var _a3, _b2;
-    const userPayload = (_b2 = (_a3 = message.payload) === null || _a3 === void 0 ? void 0 : _a3.payload) !== null && _b2 !== void 0 ? _b2 : {};
+    var _a2, _b;
+    const userPayload = (_b = (_a2 = message.payload) === null || _a2 === void 0 ? void 0 : _a2.payload) !== null && _b !== void 0 ? _b : {};
     const encoder = new TextEncoder();
     const encodedUserPayload = encoder.encode(JSON.stringify(userPayload)).buffer;
     return this._encodeUserBroadcastPush(message, this.JSON_ENCODING, encodedUserPayload);
   }
   _encodeUserBroadcastPush(message, encodingType, encodedPayload) {
-    var _a3, _b2;
+    var _a2, _b;
     const topic = message.topic;
-    const ref = (_a3 = message.ref) !== null && _a3 !== void 0 ? _a3 : "";
-    const joinRef = (_b2 = message.join_ref) !== null && _b2 !== void 0 ? _b2 : "";
+    const ref = (_a2 = message.ref) !== null && _a2 !== void 0 ? _a2 : "";
+    const joinRef = (_b = message.join_ref) !== null && _b !== void 0 ? _b : "";
     const userEvent = message.payload.event;
     const rest = this.allowedMetadataKeys ? this._pick(message.payload, this.allowedMetadataKeys) : {};
     const metadata = Object.keys(rest).length === 0 ? "" : JSON.stringify(rest);
@@ -46173,8 +46428,8 @@ class Serializer {
     return { join_ref: null, ref: null, topic, event: this.BROADCAST_EVENT, payload: data };
   }
   _isArrayBuffer(buffer) {
-    var _a3;
-    return buffer instanceof ArrayBuffer || ((_a3 = buffer === null || buffer === void 0 ? void 0 : buffer.constructor) === null || _a3 === void 0 ? void 0 : _a3.name) === "ArrayBuffer";
+    var _a2;
+    return buffer instanceof ArrayBuffer || ((_a2 = buffer === null || buffer === void 0 ? void 0 : buffer.constructor) === null || _a2 === void 0 ? void 0 : _a2.name) === "ArrayBuffer";
   }
   _pick(obj, keys2) {
     if (!obj || typeof obj !== "object") {
@@ -46234,8 +46489,8 @@ var PostgresTypes;
   PostgresTypes2["tstzrange"] = "tstzrange";
 })(PostgresTypes || (PostgresTypes = {}));
 const convertChangeData = (columns, record, options = {}) => {
-  var _a3;
-  const skipTypes = (_a3 = options.skipTypes) !== null && _a3 !== void 0 ? _a3 : [];
+  var _a2;
+  const skipTypes = (_a2 = options.skipTypes) !== null && _a2 !== void 0 ? _a2 : [];
   if (!record) {
     return {};
   }
@@ -46416,9 +46671,9 @@ class Push {
     this.payload = Object.assign(Object.assign({}, this.payload), payload);
   }
   receive(status, callback) {
-    var _a3;
+    var _a2;
     if (this._hasReceived(status)) {
-      callback((_a3 = this.receivedResp) === null || _a3 === void 0 ? void 0 : _a3.response);
+      callback((_a2 = this.receivedResp) === null || _a2 === void 0 ? void 0 : _a2.response);
     }
     this.recHooks.push({ status, callback });
     return this;
@@ -46607,8 +46862,8 @@ let RealtimePresence$1 = class RealtimePresence {
       };
     }
     this.map(joins, (key, newPresences) => {
-      var _a3;
-      const currentPresences = (_a3 = state[key]) !== null && _a3 !== void 0 ? _a3 : [];
+      var _a2;
+      const currentPresences = (_a2 = state[key]) !== null && _a2 !== void 0 ? _a2 : [];
       state[key] = this.cloneDeep(newPresences);
       if (currentPresences.length > 0) {
         const joinedPresenceRefs = state[key].map((m) => m.presence_ref);
@@ -46735,7 +46990,7 @@ let RealtimeChannel$1 = class RealtimeChannel {
    * ```
    */
   constructor(topic, params = { config: {} }, socket) {
-    var _a3, _b2;
+    var _a2, _b;
     this.topic = topic;
     this.params = params;
     this.socket = socket;
@@ -46794,19 +47049,19 @@ let RealtimeChannel$1 = class RealtimeChannel {
     this.presence = new RealtimePresence$1(this);
     this.broadcastEndpointURL = httpEndpointURL(this.socket.endPoint);
     this.private = this.params.config.private || false;
-    if (!this.private && ((_b2 = (_a3 = this.params.config) === null || _a3 === void 0 ? void 0 : _a3.broadcast) === null || _b2 === void 0 ? void 0 : _b2.replay)) {
+    if (!this.private && ((_b = (_a2 = this.params.config) === null || _a2 === void 0 ? void 0 : _a2.broadcast) === null || _b === void 0 ? void 0 : _b.replay)) {
       throw `tried to use replay on public channel '${this.topic}'. It must be a private channel.`;
     }
   }
   /** Subscribe registers your client with the server */
   subscribe(callback, timeout = this.timeout) {
-    var _a3, _b2, _c;
+    var _a2, _b, _c;
     if (!this.socket.isConnected()) {
       this.socket.connect();
     }
     if (this.state == CHANNEL_STATES.closed) {
       const { config: { broadcast, presence, private: isPrivate } } = this.params;
-      const postgres_changes = (_b2 = (_a3 = this.bindings.postgres_changes) === null || _a3 === void 0 ? void 0 : _a3.map((r2) => r2.filter)) !== null && _b2 !== void 0 ? _b2 : [];
+      const postgres_changes = (_b = (_a2 = this.bindings.postgres_changes) === null || _a2 === void 0 ? void 0 : _a2.map((r2) => r2.filter)) !== null && _b !== void 0 ? _b : [];
       const presence_enabled = !!this.bindings[REALTIME_LISTEN_TYPES$1.PRESENCE] && this.bindings[REALTIME_LISTEN_TYPES$1.PRESENCE].length > 0 || ((_c = this.params.config.presence) === null || _c === void 0 ? void 0 : _c.enabled) === true;
       const accessTokenPayload = {};
       const config2 = {
@@ -46824,7 +47079,7 @@ let RealtimeChannel$1 = class RealtimeChannel {
       this.joinedOnce = true;
       this._rejoin(timeout);
       this.joinPush.receive("ok", async ({ postgres_changes: postgres_changes2 }) => {
-        var _a4;
+        var _a3;
         if (!this.socket._isManualToken()) {
           this.socket.setAuth();
         }
@@ -46833,7 +47088,7 @@ let RealtimeChannel$1 = class RealtimeChannel {
           return;
         } else {
           const clientPostgresBindings = this.bindings.postgres_changes;
-          const bindingsLen = (_a4 = clientPostgresBindings === null || clientPostgresBindings === void 0 ? void 0 : clientPostgresBindings.length) !== null && _a4 !== void 0 ? _a4 : 0;
+          const bindingsLen = (_a3 = clientPostgresBindings === null || clientPostgresBindings === void 0 ? void 0 : clientPostgresBindings.length) !== null && _a3 !== void 0 ? _a3 : 0;
           const newPostgresBindings = [];
           for (let i = 0; i < bindingsLen; i++) {
             const clientPostgresBinding = clientPostgresBindings[i];
@@ -46911,7 +47166,7 @@ let RealtimeChannel$1 = class RealtimeChannel {
    * @returns Promise resolving to object with success status, and error details if failed
    */
   async httpSend(event, payload, opts = {}) {
-    var _a3;
+    var _a2;
     const authorization = this.socket.accessTokenValue ? `Bearer ${this.socket.accessTokenValue}` : "";
     if (payload === void 0 || payload === null) {
       return Promise.reject("Payload is required for httpSend()");
@@ -46934,7 +47189,7 @@ let RealtimeChannel$1 = class RealtimeChannel {
         ]
       })
     };
-    const response = await this._fetchWithTimeout(this.broadcastEndpointURL, options, (_a3 = opts.timeout) !== null && _a3 !== void 0 ? _a3 : this.timeout);
+    const response = await this._fetchWithTimeout(this.broadcastEndpointURL, options, (_a2 = opts.timeout) !== null && _a2 !== void 0 ? _a2 : this.timeout);
     if (response.status === 202) {
       return { success: true };
     }
@@ -46942,7 +47197,7 @@ let RealtimeChannel$1 = class RealtimeChannel {
     try {
       const errorBody = await response.json();
       errorMessage = errorBody.error || errorBody.message || errorMessage;
-    } catch (_b2) {
+    } catch (_b) {
     }
     return Promise.reject(new Error(errorMessage));
   }
@@ -46956,7 +47211,7 @@ let RealtimeChannel$1 = class RealtimeChannel {
    * @param opts Options to be used during the send process
    */
   async send(args, opts = {}) {
-    var _a3, _b2;
+    var _a2, _b;
     if (!this._canPush() && args.type === "broadcast") {
       console.warn("Realtime send() is automatically falling back to REST API. This behavior will be deprecated in the future. Please use httpSend() explicitly for REST delivery.");
       const { event, payload: endpoint_payload } = args;
@@ -46980,8 +47235,8 @@ let RealtimeChannel$1 = class RealtimeChannel {
         })
       };
       try {
-        const response = await this._fetchWithTimeout(this.broadcastEndpointURL, options, (_a3 = opts.timeout) !== null && _a3 !== void 0 ? _a3 : this.timeout);
-        await ((_b2 = response.body) === null || _b2 === void 0 ? void 0 : _b2.cancel());
+        const response = await this._fetchWithTimeout(this.broadcastEndpointURL, options, (_a2 = opts.timeout) !== null && _a2 !== void 0 ? _a2 : this.timeout);
+        await ((_b = response.body) === null || _b === void 0 ? void 0 : _b.cancel());
         return response.ok ? "ok" : "error";
       } catch (error) {
         if (error.name === "AbortError") {
@@ -46992,9 +47247,9 @@ let RealtimeChannel$1 = class RealtimeChannel {
       }
     } else {
       return new Promise((resolve) => {
-        var _a4, _b3, _c;
+        var _a3, _b2, _c;
         const push = this._push(args.type, args, opts.timeout || this.timeout);
-        if (args.type === "broadcast" && !((_c = (_b3 = (_a4 = this.params) === null || _a4 === void 0 ? void 0 : _a4.config) === null || _b3 === void 0 ? void 0 : _b3.broadcast) === null || _c === void 0 ? void 0 : _c.ack)) {
+        if (args.type === "broadcast" && !((_c = (_b2 = (_a3 = this.params) === null || _a3 === void 0 ? void 0 : _a3.config) === null || _b2 === void 0 ? void 0 : _b2.broadcast) === null || _c === void 0 ? void 0 : _c.ack)) {
           resolve("ok");
         }
         push.receive("ok", () => resolve("ok"));
@@ -47113,7 +47368,7 @@ let RealtimeChannel$1 = class RealtimeChannel {
   }
   /** @internal */
   _trigger(type, payload, ref) {
-    var _a3, _b2;
+    var _a2, _b;
     const typeLower = type.toLocaleLowerCase();
     const { close, error, leave, join } = CHANNEL_EVENTS;
     const events = [close, error, leave, join];
@@ -47125,18 +47380,18 @@ let RealtimeChannel$1 = class RealtimeChannel {
       throw "channel onMessage callbacks must return the payload, modified or unmodified";
     }
     if (["insert", "update", "delete"].includes(typeLower)) {
-      (_a3 = this.bindings.postgres_changes) === null || _a3 === void 0 ? void 0 : _a3.filter((bind) => {
-        var _a4, _b3, _c;
-        return ((_a4 = bind.filter) === null || _a4 === void 0 ? void 0 : _a4.event) === "*" || ((_c = (_b3 = bind.filter) === null || _b3 === void 0 ? void 0 : _b3.event) === null || _c === void 0 ? void 0 : _c.toLocaleLowerCase()) === typeLower;
+      (_a2 = this.bindings.postgres_changes) === null || _a2 === void 0 ? void 0 : _a2.filter((bind) => {
+        var _a3, _b2, _c;
+        return ((_a3 = bind.filter) === null || _a3 === void 0 ? void 0 : _a3.event) === "*" || ((_c = (_b2 = bind.filter) === null || _b2 === void 0 ? void 0 : _b2.event) === null || _c === void 0 ? void 0 : _c.toLocaleLowerCase()) === typeLower;
       }).map((bind) => bind.callback(handledPayload, ref));
     } else {
-      (_b2 = this.bindings[typeLower]) === null || _b2 === void 0 ? void 0 : _b2.filter((bind) => {
-        var _a4, _b3, _c, _d, _e, _f;
+      (_b = this.bindings[typeLower]) === null || _b === void 0 ? void 0 : _b.filter((bind) => {
+        var _a3, _b2, _c, _d, _e, _f;
         if (["broadcast", "presence", "postgres_changes"].includes(typeLower)) {
           if ("id" in bind) {
             const bindId = bind.id;
-            const bindEvent = (_a4 = bind.filter) === null || _a4 === void 0 ? void 0 : _a4.event;
-            return bindId && ((_b3 = payload.ids) === null || _b3 === void 0 ? void 0 : _b3.includes(bindId)) && (bindEvent === "*" || (bindEvent === null || bindEvent === void 0 ? void 0 : bindEvent.toLocaleLowerCase()) === ((_c = payload.data) === null || _c === void 0 ? void 0 : _c.type.toLocaleLowerCase()));
+            const bindEvent = (_a3 = bind.filter) === null || _a3 === void 0 ? void 0 : _a3.event;
+            return bindId && ((_b2 = payload.ids) === null || _b2 === void 0 ? void 0 : _b2.includes(bindId)) && (bindEvent === "*" || (bindEvent === null || bindEvent === void 0 ? void 0 : bindEvent.toLocaleLowerCase()) === ((_c = payload.data) === null || _c === void 0 ? void 0 : _c.type.toLocaleLowerCase()));
           } else {
             const bindEvent = (_e = (_d = bind === null || bind === void 0 ? void 0 : bind.filter) === null || _d === void 0 ? void 0 : _d.event) === null || _e === void 0 ? void 0 : _e.toLocaleLowerCase();
             return bindEvent === "*" || bindEvent === ((_f = payload === null || payload === void 0 ? void 0 : payload.event) === null || _f === void 0 ? void 0 : _f.toLocaleLowerCase());
@@ -47203,8 +47458,8 @@ let RealtimeChannel$1 = class RealtimeChannel {
     const typeLower = type.toLocaleLowerCase();
     if (this.bindings[typeLower]) {
       this.bindings[typeLower] = this.bindings[typeLower].filter((bind) => {
-        var _a3;
-        return !(((_a3 = bind.type) === null || _a3 === void 0 ? void 0 : _a3.toLocaleLowerCase()) === typeLower && RealtimeChannel.isEqual(bind.filter, filter));
+        var _a2;
+        return !(((_a2 = bind.type) === null || _a2 === void 0 ? void 0 : _a2.toLocaleLowerCase()) === typeLower && RealtimeChannel.isEqual(bind.filter, filter));
       });
     }
     return this;
@@ -47331,7 +47586,7 @@ let RealtimeClient$1 = class RealtimeClient {
    * ```
    */
   constructor(endPoint, options) {
-    var _a3;
+    var _a2;
     this.accessTokenValue = null;
     this.apiKey = null;
     this._manuallySetToken = false;
@@ -47369,7 +47624,7 @@ let RealtimeClient$1 = class RealtimeClient {
       }
       return (...args) => fetch(...args);
     };
-    if (!((_a3 = options === null || options === void 0 ? void 0 : options.params) === null || _a3 === void 0 ? void 0 : _a3.apikey)) {
+    if (!((_a2 = options === null || options === void 0 ? void 0 : options.params) === null || _a2 === void 0 ? void 0 : _a2.apikey)) {
       throw new Error("API key is required to connect to Realtime");
     }
     this.apiKey = options.params.apikey;
@@ -47551,8 +47806,8 @@ Option 2: Install and provide the "ws" package:
     const { topic, event, payload, ref } = data;
     const callback = () => {
       this.encode(data, (result) => {
-        var _a3;
-        (_a3 = this.conn) === null || _a3 === void 0 ? void 0 : _a3.send(result);
+        var _a2;
+        (_a2 = this.conn) === null || _a2 === void 0 ? void 0 : _a2.send(result);
       });
     };
     this.log("push", `${topic} ${event} (${ref})`, payload);
@@ -47602,7 +47857,7 @@ Option 2: Install and provide the "ws" package:
    * Sends a heartbeat message if the socket is connected.
    */
   async sendHeartbeat() {
-    var _a3;
+    var _a2;
     if (!this.isConnected()) {
       try {
         this.heartbeatCallback("disconnected");
@@ -47620,11 +47875,11 @@ Option 2: Install and provide the "ws" package:
         this.log("error", "error in heartbeat callback", e);
       }
       this._wasManualDisconnect = false;
-      (_a3 = this.conn) === null || _a3 === void 0 ? void 0 : _a3.close(WS_CLOSE_NORMAL, "heartbeat timeout");
+      (_a2 = this.conn) === null || _a2 === void 0 ? void 0 : _a2.close(WS_CLOSE_NORMAL, "heartbeat timeout");
       setTimeout(() => {
-        var _a4;
+        var _a3;
         if (!this.isConnected()) {
-          (_a4 = this.reconnectTimer) === null || _a4 === void 0 ? void 0 : _a4.scheduleTimeout();
+          (_a3 = this.reconnectTimer) === null || _a3 === void 0 ? void 0 : _a3.scheduleTimeout();
         }
       }, CONNECTION_TIMEOUTS.HEARTBEAT_TIMEOUT_FALLBACK);
       return;
@@ -47721,12 +47976,12 @@ Option 2: Install and provide the "ws" package:
    * @internal
    */
   _clearTimer(timer) {
-    var _a3;
+    var _a2;
     if (timer === "heartbeat" && this.heartbeatTimer) {
       clearInterval(this.heartbeatTimer);
       this.heartbeatTimer = void 0;
     } else if (timer === "reconnect") {
-      (_a3 = this.reconnectTimer) === null || _a3 === void 0 ? void 0 : _a3.reset();
+      (_a2 = this.reconnectTimer) === null || _a2 === void 0 ? void 0 : _a2.reset();
     }
   }
   /**
@@ -47825,13 +48080,13 @@ Option 2: Install and provide the "ws" package:
   }
   /** @internal */
   _onConnClose(event) {
-    var _a3;
+    var _a2;
     this._setConnectionState("disconnected");
     this.log("transport", "close", event);
     this._triggerChanError();
     this._clearTimer("heartbeat");
     if (!this._wasManualDisconnect) {
-      (_a3 = this.reconnectTimer) === null || _a3 === void 0 ? void 0 : _a3.scheduleTimeout();
+      (_a2 = this.reconnectTimer) === null || _a2 === void 0 ? void 0 : _a2.scheduleTimeout();
     }
     this._triggerStateCallbacks("close", event);
   }
@@ -47974,9 +48229,9 @@ Option 2: Install and provide the "ws" package:
    * @internal
    */
   _initializeOptions(options) {
-    var _a3, _b2, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
-    this.transport = (_a3 = options === null || options === void 0 ? void 0 : options.transport) !== null && _a3 !== void 0 ? _a3 : null;
-    this.timeout = (_b2 = options === null || options === void 0 ? void 0 : options.timeout) !== null && _b2 !== void 0 ? _b2 : DEFAULT_TIMEOUT;
+    var _a2, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+    this.transport = (_a2 = options === null || options === void 0 ? void 0 : options.transport) !== null && _a2 !== void 0 ? _a2 : null;
+    this.timeout = (_b = options === null || options === void 0 ? void 0 : options.timeout) !== null && _b !== void 0 ? _b : DEFAULT_TIMEOUT;
     this.heartbeatIntervalMs = (_c = options === null || options === void 0 ? void 0 : options.heartbeatIntervalMs) !== null && _c !== void 0 ? _c : CONNECTION_TIMEOUTS.HEARTBEAT_INTERVAL;
     this.worker = (_d = options === null || options === void 0 ? void 0 : options.worker) !== null && _d !== void 0 ? _d : false;
     this.accessToken = (_e = options === null || options === void 0 ? void 0 : options.accessToken) !== null && _e !== void 0 ? _e : null;
@@ -48117,8 +48372,8 @@ const isValidBucketName = (bucketName) => {
   return bucketNameRegex.test(bucketName);
 };
 const _getErrorMessage$2 = (err) => {
-  var _a3;
-  return err.msg || err.message || err.error_description || (typeof err.error === "string" ? err.error : (_a3 = err.error) === null || _a3 === void 0 ? void 0 : _a3.message) || JSON.stringify(err);
+  var _a2;
+  return err.msg || err.message || err.error_description || (typeof err.error === "string" ? err.error : (_a2 = err.error) === null || _a2 === void 0 ? void 0 : _a2.message) || JSON.stringify(err);
 };
 const handleError$2 = (error, reject, options) => __awaiter(void 0, void 0, void 0, function* () {
   const Res = yield resolveResponse$1();
@@ -49579,14 +49834,14 @@ class StorageBucketApi {
 }
 var IcebergError = class extends Error {
   constructor(message, opts) {
-    var _a3;
+    var _a2;
     super(message);
     this.name = "IcebergError";
     this.status = opts.status;
     this.icebergType = opts.icebergType;
     this.icebergCode = opts.icebergCode;
     this.details = opts.details;
-    this.isCommitStateUnknown = opts.icebergType === "CommitStateUnknownException" || [500, 502, 504].includes(opts.status) && ((_a3 = opts.icebergType) == null ? void 0 : _a3.includes("CommitState")) === true;
+    this.isCommitStateUnknown = opts.icebergType === "CommitStateUnknownException" || [500, 502, 504].includes(opts.status) && ((_a2 = opts.icebergType) == null ? void 0 : _a2.includes("CommitState")) === true;
   }
   /**
    * Returns true if the error is a 404 Not Found error.
@@ -49839,7 +50094,7 @@ var IcebergRestCatalog = class {
    * @param options - Configuration options for the catalog client
    */
   constructor(options) {
-    var _a3;
+    var _a2;
     let prefix2 = "v1";
     if (options.catalogName) {
       prefix2 += `/${options.catalogName}`;
@@ -49850,7 +50105,7 @@ var IcebergRestCatalog = class {
       auth: options.auth,
       fetchImpl: options.fetch
     });
-    this.accessDelegation = (_a3 = options.accessDelegation) == null ? void 0 : _a3.join(",");
+    this.accessDelegation = (_a2 = options.accessDelegation) == null ? void 0 : _a2.join(",");
     this.namespaceOps = new NamespaceOperations(this.client, prefix2);
     this.tableOps = new TableOperations(this.client, prefix2, this.accessDelegation);
   }
@@ -51579,8 +51834,8 @@ function requireFetch() {
       const fetch2 = (0, exports$1.resolveFetch)(customFetch);
       const HeadersConstructor = (0, exports$1.resolveHeadersConstructor)();
       return async (input, init) => {
-        var _a3;
-        const accessToken = (_a3 = await getAccessToken()) !== null && _a3 !== void 0 ? _a3 : supabaseKey;
+        var _a2;
+        const accessToken = (_a2 = await getAccessToken()) !== null && _a2 !== void 0 ? _a2 : supabaseKey;
         let headers = new HeadersConstructor(init === null || init === void 0 ? void 0 : init.headers);
         if (!headers.has("apikey")) {
           headers.set("apikey", supabaseKey);
@@ -51618,7 +51873,7 @@ function requireHelpers() {
   const isBrowser2 = () => typeof window !== "undefined";
   helpers.isBrowser = isBrowser2;
   function applySettingDefaults(options, defaults2) {
-    var _a3, _b2;
+    var _a2, _b;
     const { db: dbOptions, auth: authOptions, realtime: realtimeOptions, global: globalOptions } = options;
     const { db: DEFAULT_DB_OPTIONS, auth: DEFAULT_AUTH_OPTIONS, realtime: DEFAULT_REALTIME_OPTIONS, global: DEFAULT_GLOBAL_OPTIONS } = defaults2;
     const result = {
@@ -51626,7 +51881,7 @@ function requireHelpers() {
       auth: Object.assign(Object.assign({}, DEFAULT_AUTH_OPTIONS), authOptions),
       realtime: Object.assign(Object.assign({}, DEFAULT_REALTIME_OPTIONS), realtimeOptions),
       storage: {},
-      global: Object.assign(Object.assign(Object.assign({}, DEFAULT_GLOBAL_OPTIONS), globalOptions), { headers: Object.assign(Object.assign({}, (_a3 = DEFAULT_GLOBAL_OPTIONS === null || DEFAULT_GLOBAL_OPTIONS === void 0 ? void 0 : DEFAULT_GLOBAL_OPTIONS.headers) !== null && _a3 !== void 0 ? _a3 : {}), (_b2 = globalOptions === null || globalOptions === void 0 ? void 0 : globalOptions.headers) !== null && _b2 !== void 0 ? _b2 : {}) }),
+      global: Object.assign(Object.assign(Object.assign({}, DEFAULT_GLOBAL_OPTIONS), globalOptions), { headers: Object.assign(Object.assign({}, (_a2 = DEFAULT_GLOBAL_OPTIONS === null || DEFAULT_GLOBAL_OPTIONS === void 0 ? void 0 : DEFAULT_GLOBAL_OPTIONS.headers) !== null && _a2 !== void 0 ? _a2 : {}), (_b = globalOptions === null || globalOptions === void 0 ? void 0 : globalOptions.headers) !== null && _b !== void 0 ? _b : {}) }),
       accessToken: async () => ""
     };
     if (options.accessToken) {
@@ -51646,7 +51901,7 @@ function requireHelpers() {
     }
     try {
       return new URL(ensureTrailingSlash(trimmedUrl));
-    } catch (_a3) {
+    } catch (_a2) {
       throw Error("Invalid supabaseUrl: Provided URL is malformed.");
     }
   }
@@ -52013,7 +52268,7 @@ const getItemAsync = async (storage2, key) => {
   }
   try {
     return JSON.parse(value);
-  } catch (_a3) {
+  } catch (_a2) {
     return value;
   }
 };
@@ -52219,7 +52474,7 @@ function deepClone(obj) {
 const _getErrorMessage = (err) => err.msg || err.message || err.error_description || err.error || JSON.stringify(err);
 const NETWORK_ERROR_CODES = [502, 503, 504];
 async function handleError(error) {
-  var _a3;
+  var _a2;
   if (!looksLikeFetchResponse(error)) {
     throw new AuthRetryableFetchError$1(_getErrorMessage(error), 0);
   }
@@ -52244,7 +52499,7 @@ async function handleError(error) {
       throw new AuthWeakPasswordError$1(_getErrorMessage(data), error.status, data.weak_password.reasons);
     }
   } else if (errorCode === "weak_password") {
-    throw new AuthWeakPasswordError$1(_getErrorMessage(data), error.status, ((_a3 = data.weak_password) === null || _a3 === void 0 ? void 0 : _a3.reasons) || []);
+    throw new AuthWeakPasswordError$1(_getErrorMessage(data), error.status, ((_a2 = data.weak_password) === null || _a2 === void 0 ? void 0 : _a2.reasons) || []);
   } else if (errorCode === "session_not_found") {
     throw new AuthSessionMissingError$1();
   }
@@ -52260,7 +52515,7 @@ const _getRequestParams = (method, options, parameters, body) => {
   return Object.assign(Object.assign({}, params), parameters);
 };
 async function _request(fetcher, method, url, options) {
-  var _a3;
+  var _a2;
   const headers = Object.assign({}, options === null || options === void 0 ? void 0 : options.headers);
   if (!headers[API_VERSION_HEADER_NAME]) {
     headers[API_VERSION_HEADER_NAME] = API_VERSIONS["2024-01-01"].name;
@@ -52268,7 +52523,7 @@ async function _request(fetcher, method, url, options) {
   if (options === null || options === void 0 ? void 0 : options.jwt) {
     headers["Authorization"] = `Bearer ${options.jwt}`;
   }
-  const qs = (_a3 = options === null || options === void 0 ? void 0 : options.query) !== null && _a3 !== void 0 ? _a3 : {};
+  const qs = (_a2 = options === null || options === void 0 ? void 0 : options.query) !== null && _a2 !== void 0 ? _a2 : {};
   if (options === null || options === void 0 ? void 0 : options.redirectTo) {
     qs["redirect_to"] = options.redirectTo;
   }
@@ -52301,7 +52556,7 @@ async function _handleRequest(fetcher, method, url, options, parameters, body) {
   }
 }
 function _sessionResponse(data) {
-  var _a3;
+  var _a2;
   let session = null;
   if (hasSession(data)) {
     session = Object.assign({}, data);
@@ -52309,7 +52564,7 @@ function _sessionResponse(data) {
       session.expires_at = expiresAt(data.expires_in);
     }
   }
-  const user = (_a3 = data.user) !== null && _a3 !== void 0 ? _a3 : data;
+  const user = (_a2 = data.user) !== null && _a2 !== void 0 ? _a2 : data;
   return { data: { session, user }, error: null };
 }
 function _sessionResponsePassword(data) {
@@ -52320,8 +52575,8 @@ function _sessionResponsePassword(data) {
   return response;
 }
 function _userResponse(data) {
-  var _a3;
-  const user = (_a3 = data.user) !== null && _a3 !== void 0 ? _a3 : data;
+  var _a2;
+  const user = (_a2 = data.user) !== null && _a2 !== void 0 ? _a2 : data;
   return { data: { user }, error: null };
 }
 function _ssoResponse(data) {
@@ -52486,14 +52741,14 @@ let GoTrueAdminApi$1 = class GoTrueAdminApi {
    * @param params An object which supports `page` and `perPage` as numbers, to alter the paginated results.
    */
   async listUsers(params) {
-    var _a3, _b2, _c, _d, _e, _f, _g;
+    var _a2, _b, _c, _d, _e, _f, _g;
     try {
       const pagination = { nextPage: null, lastPage: 0, total: 0 };
       const response = await _request(this.fetch, "GET", `${this.url}/admin/users`, {
         headers: this.headers,
         noResolveJson: true,
         query: {
-          page: (_b2 = (_a3 = params === null || params === void 0 ? void 0 : params.page) === null || _a3 === void 0 ? void 0 : _a3.toString()) !== null && _b2 !== void 0 ? _b2 : "",
+          page: (_b = (_a2 = params === null || params === void 0 ? void 0 : params.page) === null || _a2 === void 0 ? void 0 : _a2.toString()) !== null && _b !== void 0 ? _b : "",
           per_page: (_d = (_c = params === null || params === void 0 ? void 0 : params.perPage) === null || _c === void 0 ? void 0 : _c.toString()) !== null && _d !== void 0 ? _d : ""
         },
         xform: _noResolveJsonResponse
@@ -52627,14 +52882,14 @@ let GoTrueAdminApi$1 = class GoTrueAdminApi {
    * This function should only be called on a server. Never expose your `service_role` key in the browser.
    */
   async _listOAuthClients(params) {
-    var _a3, _b2, _c, _d, _e, _f, _g;
+    var _a2, _b, _c, _d, _e, _f, _g;
     try {
       const pagination = { nextPage: null, lastPage: 0, total: 0 };
       const response = await _request(this.fetch, "GET", `${this.url}/admin/oauth/clients`, {
         headers: this.headers,
         noResolveJson: true,
         query: {
-          page: (_b2 = (_a3 = params === null || params === void 0 ? void 0 : params.page) === null || _a3 === void 0 ? void 0 : _a3.toString()) !== null && _b2 !== void 0 ? _b2 : "",
+          page: (_b = (_a2 = params === null || params === void 0 ? void 0 : params.page) === null || _a2 === void 0 ? void 0 : _a2.toString()) !== null && _b !== void 0 ? _b : "",
           per_page: (_d = (_c = params === null || params === void 0 ? void 0 : params.perPage) === null || _c === void 0 ? void 0 : _c.toString()) !== null && _d !== void 0 ? _d : ""
         },
         xform: _noResolveJsonResponse
@@ -52850,8 +53105,8 @@ async function navigatorLock$1(name, acquireTimeout, fn) {
 }
 const PROCESS_LOCKS = {};
 async function processLock$1(name, acquireTimeout, fn) {
-  var _a3;
-  const previousOperation = (_a3 = PROCESS_LOCKS[name]) !== null && _a3 !== void 0 ? _a3 : Promise.resolve();
+  var _a2;
+  const previousOperation = (_a2 = PROCESS_LOCKS[name]) !== null && _a2 !== void 0 ? _a2 : Promise.resolve();
   const currentOperation = Promise.race([
     previousOperation.catch(() => {
       return null;
@@ -52911,7 +53166,7 @@ function toHex(value) {
   return "0x" + hex2;
 }
 function createSiweMessage(parameters) {
-  var _a3;
+  var _a2;
   const { chainId, domain, expirationTime, issuedAt = /* @__PURE__ */ new Date(), nonce, notBefore, requestId, resources, scheme, uri, version: version2 } = parameters;
   {
     if (!Number.isInteger(chainId))
@@ -52924,7 +53179,7 @@ function createSiweMessage(parameters) {
       throw new Error(`@supabase/auth-js: Invalid SIWE message field "uri". URI must be provided.`);
     if (version2 !== "1")
       throw new Error(`@supabase/auth-js: Invalid SIWE message field "version". Version must be '1'. Provided value: ${version2}`);
-    if ((_a3 = parameters.statement) === null || _a3 === void 0 ? void 0 : _a3.includes("\n"))
+    if ((_a2 = parameters.statement) === null || _a2 === void 0 ? void 0 : _a2.includes("\n"))
       throw new Error(`@supabase/auth-js: Invalid SIWE message field "statement". Statement must not include '\\n'. Provided value: ${parameters.statement}`);
   }
   const address = getAddress(parameters.address);
@@ -52964,10 +53219,10 @@ ${suffix}`;
 }
 class WebAuthnError extends Error {
   constructor({ message, code, cause, name }) {
-    var _a3;
+    var _a2;
     super(message, { cause });
     this.__isWebAuthnError = true;
-    this.name = (_a3 = name !== null && name !== void 0 ? name : cause instanceof Error ? cause.name : void 0) !== null && _a3 !== void 0 ? _a3 : "Unknown Error";
+    this.name = (_a2 = name !== null && name !== void 0 ? name : cause instanceof Error ? cause.name : void 0) !== null && _a2 !== void 0 ? _a2 : "Unknown Error";
     this.code = code;
   }
 }
@@ -52983,7 +53238,7 @@ class WebAuthnUnknownError extends WebAuthnError {
   }
 }
 function identifyRegistrationError({ error, options }) {
-  var _a3, _b2, _c;
+  var _a2, _b, _c;
   const { publicKey } = options;
   if (!publicKey) {
     throw Error("options was missing required publicKey property");
@@ -52997,7 +53252,7 @@ function identifyRegistrationError({ error, options }) {
       });
     }
   } else if (error.name === "ConstraintError") {
-    if (((_a3 = publicKey.authenticatorSelection) === null || _a3 === void 0 ? void 0 : _a3.requireResidentKey) === true) {
+    if (((_a2 = publicKey.authenticatorSelection) === null || _a2 === void 0 ? void 0 : _a2.requireResidentKey) === true) {
       return new WebAuthnError({
         message: "Discoverable credentials were required but no available authenticator supported it",
         code: "ERROR_AUTHENTICATOR_MISSING_DISCOVERABLE_CREDENTIAL_SUPPORT",
@@ -53005,7 +53260,7 @@ function identifyRegistrationError({ error, options }) {
       });
     } else if (
       // @ts-ignore: `mediation` doesn't yet exist on CredentialCreationOptions but it's possible as of Sept 2024
-      options.mediation === "conditional" && ((_b2 = publicKey.authenticatorSelection) === null || _b2 === void 0 ? void 0 : _b2.userVerification) === "required"
+      options.mediation === "conditional" && ((_b = publicKey.authenticatorSelection) === null || _b === void 0 ? void 0 : _b.userVerification) === "required"
     ) {
       return new WebAuthnError({
         message: "User verification was required during automatic registration but it could not be performed",
@@ -53224,7 +53479,7 @@ function deserializeCredentialRequestOptions(options) {
   return result;
 }
 function serializeCredentialCreationResponse(credential) {
-  var _a3;
+  var _a2;
   if ("toJSON" in credential && typeof credential.toJSON === "function") {
     return credential.toJSON();
   }
@@ -53239,11 +53494,11 @@ function serializeCredentialCreationResponse(credential) {
     type: "public-key",
     clientExtensionResults: credential.getClientExtensionResults(),
     // Convert null to undefined and cast to AuthenticatorAttachment type
-    authenticatorAttachment: (_a3 = credentialWithAttachment.authenticatorAttachment) !== null && _a3 !== void 0 ? _a3 : void 0
+    authenticatorAttachment: (_a2 = credentialWithAttachment.authenticatorAttachment) !== null && _a2 !== void 0 ? _a2 : void 0
   };
 }
 function serializeCredentialRequestResponse(credential) {
-  var _a3;
+  var _a2;
   if ("toJSON" in credential && typeof credential.toJSON === "function") {
     return credential.toJSON();
   }
@@ -53263,7 +53518,7 @@ function serializeCredentialRequestResponse(credential) {
     type: "public-key",
     clientExtensionResults,
     // Convert null to undefined and cast to AuthenticatorAttachment type
-    authenticatorAttachment: (_a3 = credentialWithAttachment.authenticatorAttachment) !== null && _a3 !== void 0 ? _a3 : void 0
+    authenticatorAttachment: (_a2 = credentialWithAttachment.authenticatorAttachment) !== null && _a2 !== void 0 ? _a2 : void 0
   };
 }
 function isValidDomain(hostname) {
@@ -53273,8 +53528,8 @@ function isValidDomain(hostname) {
   );
 }
 function browserSupportsWebAuthn() {
-  var _a3, _b2;
-  return !!(isBrowser() && "PublicKeyCredential" in window && window.PublicKeyCredential && "credentials" in navigator && typeof ((_a3 = navigator === null || navigator === void 0 ? void 0 : navigator.credentials) === null || _a3 === void 0 ? void 0 : _a3.create) === "function" && typeof ((_b2 = navigator === null || navigator === void 0 ? void 0 : navigator.credentials) === null || _b2 === void 0 ? void 0 : _b2.get) === "function");
+  var _a2, _b;
+  return !!(isBrowser() && "PublicKeyCredential" in window && window.PublicKeyCredential && "credentials" in navigator && typeof ((_a2 = navigator === null || navigator === void 0 ? void 0 : navigator.credentials) === null || _a2 === void 0 ? void 0 : _a2.create) === "function" && typeof ((_b = navigator === null || navigator === void 0 ? void 0 : navigator.credentials) === null || _b === void 0 ? void 0 : _b.get) === "function");
 }
 async function createCredential(options) {
   try {
@@ -53603,8 +53858,8 @@ class WebAuthnApi {
       });
       if (!factor) {
         await this.client.mfa.listFactors().then((factors) => {
-          var _a3;
-          return (_a3 = factors.data) === null || _a3 === void 0 ? void 0 : _a3.all.find((v) => v.factor_type === "webauthn" && v.friendly_name === friendlyName && v.status !== "unverified");
+          var _a2;
+          return (_a2 = factors.data) === null || _a2 === void 0 ? void 0 : _a2.all.find((v) => v.factor_type === "webauthn" && v.friendly_name === friendlyName && v.status !== "unverified");
         }).then((factor2) => factor2 ? this.client.mfa.unenroll({ factorId: factor2 === null || factor2 === void 0 ? void 0 : factor2.id }) : void 0);
         return { data: null, error: enrollError };
       }
@@ -53662,15 +53917,15 @@ let GoTrueClient$1 = class GoTrueClient {
    * The JWKS used for verifying asymmetric JWTs
    */
   get jwks() {
-    var _a3, _b2;
-    return (_b2 = (_a3 = GLOBAL_JWKS[this.storageKey]) === null || _a3 === void 0 ? void 0 : _a3.jwks) !== null && _b2 !== void 0 ? _b2 : { keys: [] };
+    var _a2, _b;
+    return (_b = (_a2 = GLOBAL_JWKS[this.storageKey]) === null || _a2 === void 0 ? void 0 : _a2.jwks) !== null && _b !== void 0 ? _b : { keys: [] };
   }
   set jwks(value) {
     GLOBAL_JWKS[this.storageKey] = Object.assign(Object.assign({}, GLOBAL_JWKS[this.storageKey]), { jwks: value });
   }
   get jwks_cached_at() {
-    var _a3, _b2;
-    return (_b2 = (_a3 = GLOBAL_JWKS[this.storageKey]) === null || _a3 === void 0 ? void 0 : _a3.cachedAt) !== null && _b2 !== void 0 ? _b2 : Number.MIN_SAFE_INTEGER;
+    var _a2, _b;
+    return (_b = (_a2 = GLOBAL_JWKS[this.storageKey]) === null || _a2 === void 0 ? void 0 : _a2.cachedAt) !== null && _b !== void 0 ? _b : Number.MIN_SAFE_INTEGER;
   }
   set jwks_cached_at(value) {
     GLOBAL_JWKS[this.storageKey] = Object.assign(Object.assign({}, GLOBAL_JWKS[this.storageKey]), { cachedAt: value });
@@ -53690,7 +53945,7 @@ let GoTrueClient$1 = class GoTrueClient {
    * ```
    */
   constructor(options) {
-    var _a3, _b2, _c;
+    var _a2, _b, _c;
     this.userStorage = null;
     this.memoryStorage = null;
     this.stateChangeEmitters = /* @__PURE__ */ new Map();
@@ -53707,7 +53962,7 @@ let GoTrueClient$1 = class GoTrueClient {
     this.logger = console.log;
     const settings = Object.assign(Object.assign({}, DEFAULT_OPTIONS), options);
     this.storageKey = settings.storageKey;
-    this.instanceID = (_a3 = GoTrueClient.nextInstanceID[this.storageKey]) !== null && _a3 !== void 0 ? _a3 : 0;
+    this.instanceID = (_a2 = GoTrueClient.nextInstanceID[this.storageKey]) !== null && _a2 !== void 0 ? _a2 : 0;
     GoTrueClient.nextInstanceID[this.storageKey] = this.instanceID + 1;
     this.logDebugMessages = !!settings.debug;
     if (typeof settings.debug === "function") {
@@ -53737,7 +53992,7 @@ let GoTrueClient$1 = class GoTrueClient {
     this.throwOnError = settings.throwOnError;
     if (settings.lock) {
       this.lock = settings.lock;
-    } else if (this.persistSession && isBrowser() && ((_b2 = globalThis === null || globalThis === void 0 ? void 0 : globalThis.navigator) === null || _b2 === void 0 ? void 0 : _b2.locks)) {
+    } else if (this.persistSession && isBrowser() && ((_b = globalThis === null || globalThis === void 0 ? void 0 : globalThis.navigator) === null || _b === void 0 ? void 0 : _b.locks)) {
       this.lock = navigatorLock$1;
     } else {
       this.lock = lockNoOp;
@@ -53843,7 +54098,7 @@ let GoTrueClient$1 = class GoTrueClient {
    *    the whole lifetime of the client
    */
   async _initialize() {
-    var _a3;
+    var _a2;
     try {
       let params = {};
       let callbackUrlType = "none";
@@ -53860,7 +54115,7 @@ let GoTrueClient$1 = class GoTrueClient {
         if (error) {
           this._debug("#_initialize()", "error detecting session from URL", error);
           if (isAuthImplicitGrantRedirectError$1(error)) {
-            const errorCode = (_a3 = error.details) === null || _a3 === void 0 ? void 0 : _a3.code;
+            const errorCode = (_a2 = error.details) === null || _a2 === void 0 ? void 0 : _a2.code;
             if (errorCode === "identity_already_exists" || errorCode === "identity_not_found" || errorCode === "single_identity_not_deletable") {
               return { error };
             }
@@ -53900,12 +54155,12 @@ let GoTrueClient$1 = class GoTrueClient {
    * @returns A session where the is_anonymous claim in the access token JWT set to true
    */
   async signInAnonymously(credentials) {
-    var _a3, _b2, _c;
+    var _a2, _b, _c;
     try {
       const res = await _request(this.fetch, "POST", `${this.url}/signup`, {
         headers: this.headers,
         body: {
-          data: (_b2 = (_a3 = credentials === null || credentials === void 0 ? void 0 : credentials.options) === null || _a3 === void 0 ? void 0 : _a3.data) !== null && _b2 !== void 0 ? _b2 : {},
+          data: (_b = (_a2 = credentials === null || credentials === void 0 ? void 0 : credentials.options) === null || _a2 === void 0 ? void 0 : _a2.data) !== null && _b !== void 0 ? _b : {},
           gotrue_meta_security: { captcha_token: (_c = credentials === null || credentials === void 0 ? void 0 : credentials.options) === null || _c === void 0 ? void 0 : _c.captchaToken }
         },
         xform: _sessionResponse
@@ -53939,7 +54194,7 @@ let GoTrueClient$1 = class GoTrueClient {
    * @returns A user if the server has "autoconfirm" OFF
    */
   async signUp(credentials) {
-    var _a3, _b2, _c;
+    var _a2, _b, _c;
     try {
       let res;
       if ("email" in credentials) {
@@ -53956,7 +54211,7 @@ let GoTrueClient$1 = class GoTrueClient {
           body: {
             email,
             password,
-            data: (_a3 = options === null || options === void 0 ? void 0 : options.data) !== null && _a3 !== void 0 ? _a3 : {},
+            data: (_a2 = options === null || options === void 0 ? void 0 : options.data) !== null && _a2 !== void 0 ? _a2 : {},
             gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken },
             code_challenge: codeChallenge,
             code_challenge_method: codeChallengeMethod
@@ -53970,7 +54225,7 @@ let GoTrueClient$1 = class GoTrueClient {
           body: {
             phone,
             password,
-            data: (_b2 = options === null || options === void 0 ? void 0 : options.data) !== null && _b2 !== void 0 ? _b2 : {},
+            data: (_b = options === null || options === void 0 ? void 0 : options.data) !== null && _b !== void 0 ? _b : {},
             channel: (_c = options === null || options === void 0 ? void 0 : options.channel) !== null && _c !== void 0 ? _c : "sms",
             gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken }
           },
@@ -54062,10 +54317,10 @@ let GoTrueClient$1 = class GoTrueClient {
    * This method supports the PKCE flow.
    */
   async signInWithOAuth(credentials) {
-    var _a3, _b2, _c, _d;
+    var _a2, _b, _c, _d;
     return await this._handleProviderSignIn(credentials.provider, {
-      redirectTo: (_a3 = credentials.options) === null || _a3 === void 0 ? void 0 : _a3.redirectTo,
-      scopes: (_b2 = credentials.options) === null || _b2 === void 0 ? void 0 : _b2.scopes,
+      redirectTo: (_a2 = credentials.options) === null || _a2 === void 0 ? void 0 : _a2.redirectTo,
+      scopes: (_b = credentials.options) === null || _b === void 0 ? void 0 : _b.scopes,
       queryParams: (_c = credentials.options) === null || _c === void 0 ? void 0 : _c.queryParams,
       skipBrowserRedirect: (_d = credentials.options) === null || _d === void 0 ? void 0 : _d.skipBrowserRedirect
     });
@@ -54098,7 +54353,7 @@ let GoTrueClient$1 = class GoTrueClient {
     }
   }
   async signInWithEthereum(credentials) {
-    var _a3, _b2, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+    var _a2, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
     let message;
     let signature;
     if ("message" in credentials) {
@@ -54122,7 +54377,7 @@ let GoTrueClient$1 = class GoTrueClient {
           throw new Error(`@supabase/auth-js: No compatible Ethereum wallet interface on the window object (window.ethereum) detected. Make sure the user already has a wallet installed and connected for this app. Prefer passing the wallet interface object directly to signInWithWeb3({ chain: 'ethereum', wallet: resolvedUserWallet }) instead.`);
         }
       }
-      const url = new URL((_a3 = options === null || options === void 0 ? void 0 : options.url) !== null && _a3 !== void 0 ? _a3 : window.location.href);
+      const url = new URL((_a2 = options === null || options === void 0 ? void 0 : options.url) !== null && _a2 !== void 0 ? _a2 : window.location.href);
       const accounts = await resolvedWallet.request({
         method: "eth_requestAccounts"
       }).then((accs) => accs).catch(() => {
@@ -54132,7 +54387,7 @@ let GoTrueClient$1 = class GoTrueClient {
         throw new Error(`@supabase/auth-js: No accounts available. Please ensure the wallet is connected.`);
       }
       const address = getAddress(accounts[0]);
-      let chainId = (_b2 = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _b2 === void 0 ? void 0 : _b2.chainId;
+      let chainId = (_b = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _b === void 0 ? void 0 : _b.chainId;
       if (!chainId) {
         const chainIdHex = await resolvedWallet.request({
           method: "eth_chainId"
@@ -54189,7 +54444,7 @@ let GoTrueClient$1 = class GoTrueClient {
     }
   }
   async signInWithSolana(credentials) {
-    var _a3, _b2, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+    var _a2, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
     let message;
     let signature;
     if ("message" in credentials) {
@@ -54213,7 +54468,7 @@ let GoTrueClient$1 = class GoTrueClient {
           throw new Error(`@supabase/auth-js: No compatible Solana wallet interface on the window object (window.solana) detected. Make sure the user already has a wallet installed and connected for this app. Prefer passing the wallet interface object directly to signInWithWeb3({ chain: 'solana', wallet: resolvedUserWallet }) instead.`);
         }
       }
-      const url = new URL((_a3 = options === null || options === void 0 ? void 0 : options.url) !== null && _a3 !== void 0 ? _a3 : window.location.href);
+      const url = new URL((_a2 = options === null || options === void 0 ? void 0 : options.url) !== null && _a2 !== void 0 ? _a2 : window.location.href);
       if ("signIn" in resolvedWallet && resolvedWallet.signIn) {
         const output = await resolvedWallet.signIn(Object.assign(Object.assign(Object.assign({ issuedAt: (/* @__PURE__ */ new Date()).toISOString() }, options === null || options === void 0 ? void 0 : options.signInWithSolana), {
           // non-overridable properties
@@ -54245,7 +54500,7 @@ let GoTrueClient$1 = class GoTrueClient {
           ...statement ? ["", statement, ""] : [""],
           "Version: 1",
           `URI: ${url.href}`,
-          `Issued At: ${(_c = (_b2 = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _b2 === void 0 ? void 0 : _b2.issuedAt) !== null && _c !== void 0 ? _c : (/* @__PURE__ */ new Date()).toISOString()}`,
+          `Issued At: ${(_c = (_b = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _b === void 0 ? void 0 : _b.issuedAt) !== null && _c !== void 0 ? _c : (/* @__PURE__ */ new Date()).toISOString()}`,
           ...((_d = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _d === void 0 ? void 0 : _d.notBefore) ? [`Not Before: ${options.signInWithSolana.notBefore}`] : [],
           ...((_e = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _e === void 0 ? void 0 : _e.expirationTime) ? [`Expiration Time: ${options.signInWithSolana.expirationTime}`] : [],
           ...((_f = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _f === void 0 ? void 0 : _f.chainId) ? [`Chain ID: ${options.signInWithSolana.chainId}`] : [],
@@ -54382,7 +54637,7 @@ let GoTrueClient$1 = class GoTrueClient {
    * This method supports PKCE when an email is passed.
    */
   async signInWithOtp(credentials) {
-    var _a3, _b2, _c, _d, _e;
+    var _a2, _b, _c, _d, _e;
     try {
       if ("email" in credentials) {
         const { email, options } = credentials;
@@ -54396,8 +54651,8 @@ let GoTrueClient$1 = class GoTrueClient {
           headers: this.headers,
           body: {
             email,
-            data: (_a3 = options === null || options === void 0 ? void 0 : options.data) !== null && _a3 !== void 0 ? _a3 : {},
-            create_user: (_b2 = options === null || options === void 0 ? void 0 : options.shouldCreateUser) !== null && _b2 !== void 0 ? _b2 : true,
+            data: (_a2 = options === null || options === void 0 ? void 0 : options.data) !== null && _a2 !== void 0 ? _a2 : {},
+            create_user: (_b = options === null || options === void 0 ? void 0 : options.shouldCreateUser) !== null && _b !== void 0 ? _b : true,
             gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken },
             code_challenge: codeChallenge,
             code_challenge_method: codeChallengeMethod
@@ -54436,13 +54691,13 @@ let GoTrueClient$1 = class GoTrueClient {
    * Log in a user given a User supplied OTP or TokenHash received through mobile or email.
    */
   async verifyOtp(params) {
-    var _a3, _b2;
+    var _a2, _b;
     try {
       let redirectTo = void 0;
       let captchaToken = void 0;
       if ("options" in params) {
-        redirectTo = (_a3 = params.options) === null || _a3 === void 0 ? void 0 : _a3.redirectTo;
-        captchaToken = (_b2 = params.options) === null || _b2 === void 0 ? void 0 : _b2.captchaToken;
+        redirectTo = (_a2 = params.options) === null || _a2 === void 0 ? void 0 : _a2.redirectTo;
+        captchaToken = (_b = params.options) === null || _b === void 0 ? void 0 : _b.captchaToken;
       }
       const { data, error } = await _request(this.fetch, "POST", `${this.url}/verify`, {
         headers: this.headers,
@@ -54486,7 +54741,7 @@ let GoTrueClient$1 = class GoTrueClient {
    * organization's SSO Identity Provider UUID directly instead.
    */
   async signInWithSSO(params) {
-    var _a3, _b2, _c, _d, _e;
+    var _a2, _b, _c, _d, _e;
     try {
       let codeChallenge = null;
       let codeChallengeMethod = null;
@@ -54495,7 +54750,7 @@ let GoTrueClient$1 = class GoTrueClient {
         [codeChallenge, codeChallengeMethod] = await getCodeChallengeAndMethod(this.storage, this.storageKey);
       }
       const result = await _request(this.fetch, "POST", `${this.url}/sso`, {
-        body: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, "providerId" in params ? { provider_id: params.providerId } : null), "domain" in params ? { domain: params.domain } : null), { redirect_to: (_b2 = (_a3 = params.options) === null || _a3 === void 0 ? void 0 : _a3.redirectTo) !== null && _b2 !== void 0 ? _b2 : void 0 }), ((_c = params === null || params === void 0 ? void 0 : params.options) === null || _c === void 0 ? void 0 : _c.captchaToken) ? { gotrue_meta_security: { captcha_token: params.options.captchaToken } } : null), { skip_http_redirect: true, code_challenge: codeChallenge, code_challenge_method: codeChallengeMethod }),
+        body: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, "providerId" in params ? { provider_id: params.providerId } : null), "domain" in params ? { domain: params.domain } : null), { redirect_to: (_b = (_a2 = params.options) === null || _a2 === void 0 ? void 0 : _a2.redirectTo) !== null && _b !== void 0 ? _b : void 0 }), ((_c = params === null || params === void 0 ? void 0 : params.options) === null || _c === void 0 ? void 0 : _c.captchaToken) ? { gotrue_meta_security: { captcha_token: params.options.captchaToken } } : null), { skip_http_redirect: true, code_challenge: codeChallenge, code_challenge_method: codeChallengeMethod }),
         headers: this.headers,
         xform: _ssoResponse
       });
@@ -54749,17 +55004,17 @@ let GoTrueClient$1 = class GoTrueClient {
         });
       }
       return await this._useSession(async (result) => {
-        var _a3, _b2, _c;
+        var _a2, _b, _c;
         const { data, error } = result;
         if (error) {
           throw error;
         }
-        if (!((_a3 = data.session) === null || _a3 === void 0 ? void 0 : _a3.access_token) && !this.hasCustomAuthorizationHeader) {
+        if (!((_a2 = data.session) === null || _a2 === void 0 ? void 0 : _a2.access_token) && !this.hasCustomAuthorizationHeader) {
           return { data: { user: null }, error: new AuthSessionMissingError$1() };
         }
         return await _request(this.fetch, "GET", `${this.url}/user`, {
           headers: this.headers,
-          jwt: (_c = (_b2 = data.session) === null || _b2 === void 0 ? void 0 : _b2.access_token) !== null && _c !== void 0 ? _c : void 0,
+          jwt: (_c = (_b = data.session) === null || _b === void 0 ? void 0 : _b.access_token) !== null && _c !== void 0 ? _c : void 0,
           xform: _userResponse
         });
       });
@@ -54896,13 +55151,13 @@ let GoTrueClient$1 = class GoTrueClient {
   async _refreshSession(currentSession) {
     try {
       return await this._useSession(async (result) => {
-        var _a3;
+        var _a2;
         if (!currentSession) {
           const { data, error: error2 } = result;
           if (error2) {
             throw error2;
           }
-          currentSession = (_a3 = data.session) !== null && _a3 !== void 0 ? _a3 : void 0;
+          currentSession = (_a2 = data.session) !== null && _a2 !== void 0 ? _a2 : void 0;
         }
         if (!(currentSession === null || currentSession === void 0 ? void 0 : currentSession.refresh_token)) {
           throw new AuthSessionMissingError$1();
@@ -55033,12 +55288,12 @@ let GoTrueClient$1 = class GoTrueClient {
   }
   async _signOut({ scope } = { scope: "global" }) {
     return await this._useSession(async (result) => {
-      var _a3;
+      var _a2;
       const { data, error: sessionError } = result;
       if (sessionError) {
         return this._returnResult({ error: sessionError });
       }
-      const accessToken = (_a3 = data.session) === null || _a3 === void 0 ? void 0 : _a3.access_token;
+      const accessToken = (_a2 = data.session) === null || _a2 === void 0 ? void 0 : _a2.access_token;
       if (accessToken) {
         const { error } = await this.admin.signOut(accessToken, scope);
         if (error) {
@@ -55076,15 +55331,15 @@ let GoTrueClient$1 = class GoTrueClient {
   }
   async _emitInitialSession(id) {
     return await this._useSession(async (result) => {
-      var _a3, _b2;
+      var _a2, _b;
       try {
         const { data: { session }, error } = result;
         if (error)
           throw error;
-        await ((_a3 = this.stateChangeEmitters.get(id)) === null || _a3 === void 0 ? void 0 : _a3.callback("INITIAL_SESSION", session));
+        await ((_a2 = this.stateChangeEmitters.get(id)) === null || _a2 === void 0 ? void 0 : _a2.callback("INITIAL_SESSION", session));
         this._debug("INITIAL_SESSION", "callback id", id, "session", session);
       } catch (err) {
-        await ((_b2 = this.stateChangeEmitters.get(id)) === null || _b2 === void 0 ? void 0 : _b2.callback("INITIAL_SESSION", null));
+        await ((_b = this.stateChangeEmitters.get(id)) === null || _b === void 0 ? void 0 : _b.callback("INITIAL_SESSION", null));
         this._debug("INITIAL_SESSION", "callback id", id, "error", err);
         console.error(err);
       }
@@ -55131,12 +55386,12 @@ let GoTrueClient$1 = class GoTrueClient {
    * Gets all the identities linked to a user.
    */
   async getUserIdentities() {
-    var _a3;
+    var _a2;
     try {
       const { data, error } = await this.getUser();
       if (error)
         throw error;
-      return this._returnResult({ data: { identities: (_a3 = data.user.identities) !== null && _a3 !== void 0 ? _a3 : [] }, error: null });
+      return this._returnResult({ data: { identities: (_a2 = data.user.identities) !== null && _a2 !== void 0 ? _a2 : [] }, error: null });
     } catch (error) {
       if (isAuthError$1(error)) {
         return this._returnResult({ data: null, error });
@@ -55151,16 +55406,16 @@ let GoTrueClient$1 = class GoTrueClient {
     return this.linkIdentityOAuth(credentials);
   }
   async linkIdentityOAuth(credentials) {
-    var _a3;
+    var _a2;
     try {
       const { data, error } = await this._useSession(async (result) => {
-        var _a4, _b2, _c, _d, _e;
+        var _a3, _b, _c, _d, _e;
         const { data: data2, error: error2 } = result;
         if (error2)
           throw error2;
         const url = await this._getUrlForProvider(`${this.url}/user/identities/authorize`, credentials.provider, {
-          redirectTo: (_a4 = credentials.options) === null || _a4 === void 0 ? void 0 : _a4.redirectTo,
-          scopes: (_b2 = credentials.options) === null || _b2 === void 0 ? void 0 : _b2.scopes,
+          redirectTo: (_a3 = credentials.options) === null || _a3 === void 0 ? void 0 : _a3.redirectTo,
+          scopes: (_b = credentials.options) === null || _b === void 0 ? void 0 : _b.scopes,
           queryParams: (_c = credentials.options) === null || _c === void 0 ? void 0 : _c.queryParams,
           skipBrowserRedirect: true
         });
@@ -55171,7 +55426,7 @@ let GoTrueClient$1 = class GoTrueClient {
       });
       if (error)
         throw error;
-      if (isBrowser() && !((_a3 = credentials.options) === null || _a3 === void 0 ? void 0 : _a3.skipBrowserRedirect)) {
+      if (isBrowser() && !((_a2 = credentials.options) === null || _a2 === void 0 ? void 0 : _a2.skipBrowserRedirect)) {
         window.location.assign(data === null || data === void 0 ? void 0 : data.url);
       }
       return this._returnResult({
@@ -55187,7 +55442,7 @@ let GoTrueClient$1 = class GoTrueClient {
   }
   async linkIdentityIdToken(credentials) {
     return await this._useSession(async (result) => {
-      var _a3;
+      var _a2;
       try {
         const { error: sessionError, data: { session } } = result;
         if (sessionError)
@@ -55195,7 +55450,7 @@ let GoTrueClient$1 = class GoTrueClient {
         const { options, provider, token, access_token, nonce } = credentials;
         const res = await _request(this.fetch, "POST", `${this.url}/token?grant_type=id_token`, {
           headers: this.headers,
-          jwt: (_a3 = session === null || session === void 0 ? void 0 : session.access_token) !== null && _a3 !== void 0 ? _a3 : void 0,
+          jwt: (_a2 = session === null || session === void 0 ? void 0 : session.access_token) !== null && _a2 !== void 0 ? _a2 : void 0,
           body: {
             provider,
             id_token: token,
@@ -55235,14 +55490,14 @@ let GoTrueClient$1 = class GoTrueClient {
   async unlinkIdentity(identity3) {
     try {
       return await this._useSession(async (result) => {
-        var _a3, _b2;
+        var _a2, _b;
         const { data, error } = result;
         if (error) {
           throw error;
         }
         return await _request(this.fetch, "DELETE", `${this.url}/user/identities/${identity3.identity_id}`, {
           headers: this.headers,
-          jwt: (_b2 = (_a3 = data.session) === null || _a3 === void 0 ? void 0 : _a3.access_token) !== null && _b2 !== void 0 ? _b2 : void 0
+          jwt: (_b = (_a2 = data.session) === null || _a2 === void 0 ? void 0 : _a2.access_token) !== null && _b !== void 0 ? _b : void 0
         });
       });
     } catch (error) {
@@ -55307,7 +55562,7 @@ let GoTrueClient$1 = class GoTrueClient {
    * Note: this method is async to accommodate for AsyncStorage e.g. in React native.
    */
   async _recoverAndRefresh() {
-    var _a3, _b2;
+    var _a2, _b;
     const debugName = "#_recoverAndRefresh()";
     this._debug(debugName, "begin");
     try {
@@ -55318,7 +55573,7 @@ let GoTrueClient$1 = class GoTrueClient {
           maybeUser = { user: currentSession.user };
           await setItemAsync(this.userStorage, this.storageKey + "-user", maybeUser);
         }
-        currentSession.user = (_a3 = maybeUser === null || maybeUser === void 0 ? void 0 : maybeUser.user) !== null && _a3 !== void 0 ? _a3 : userNotAvailableProxy();
+        currentSession.user = (_a2 = maybeUser === null || maybeUser === void 0 ? void 0 : maybeUser.user) !== null && _a2 !== void 0 ? _a2 : userNotAvailableProxy();
       } else if (currentSession && !currentSession.user) {
         if (!currentSession.user) {
           const separateUser = await getItemAsync(this.storage, this.storageKey + "-user");
@@ -55339,7 +55594,7 @@ let GoTrueClient$1 = class GoTrueClient {
         }
         return;
       }
-      const expiresWithMargin = ((_b2 = currentSession.expires_at) !== null && _b2 !== void 0 ? _b2 : Infinity) * 1e3 - Date.now() < EXPIRY_MARGIN_MS;
+      const expiresWithMargin = ((_b = currentSession.expires_at) !== null && _b !== void 0 ? _b : Infinity) * 1e3 - Date.now() < EXPIRY_MARGIN_MS;
       this._debug(debugName, `session has${expiresWithMargin ? "" : " not"} expired with margin of ${EXPIRY_MARGIN_MS}s`);
       if (expiresWithMargin) {
         if (this.autoRefreshToken && currentSession.refresh_token) {
@@ -55378,7 +55633,7 @@ let GoTrueClient$1 = class GoTrueClient {
     }
   }
   async _callRefreshToken(refreshToken) {
-    var _a3, _b2;
+    var _a2, _b;
     if (!refreshToken) {
       throw new AuthSessionMissingError$1();
     }
@@ -55406,10 +55661,10 @@ let GoTrueClient$1 = class GoTrueClient {
         if (!isAuthRetryableFetchError$1(error)) {
           await this._removeSession();
         }
-        (_a3 = this.refreshingDeferred) === null || _a3 === void 0 ? void 0 : _a3.resolve(result);
+        (_a2 = this.refreshingDeferred) === null || _a2 === void 0 ? void 0 : _a2.resolve(result);
         return result;
       }
-      (_b2 = this.refreshingDeferred) === null || _b2 === void 0 ? void 0 : _b2.reject(error);
+      (_b = this.refreshingDeferred) === null || _b === void 0 ? void 0 : _b.reject(error);
       throw error;
     } finally {
       this.refreshingDeferred = null;
@@ -55683,14 +55938,14 @@ let GoTrueClient$1 = class GoTrueClient {
   async _unenroll(params) {
     try {
       return await this._useSession(async (result) => {
-        var _a3;
+        var _a2;
         const { data: sessionData, error: sessionError } = result;
         if (sessionError) {
           return this._returnResult({ data: null, error: sessionError });
         }
         return await _request(this.fetch, "DELETE", `${this.url}/factors/${params.factorId}`, {
           headers: this.headers,
-          jwt: (_a3 = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a3 === void 0 ? void 0 : _a3.access_token
+          jwt: (_a2 = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a2 === void 0 ? void 0 : _a2.access_token
         });
       });
     } catch (error) {
@@ -55703,7 +55958,7 @@ let GoTrueClient$1 = class GoTrueClient {
   async _enroll(params) {
     try {
       return await this._useSession(async (result) => {
-        var _a3, _b2;
+        var _a2, _b;
         const { data: sessionData, error: sessionError } = result;
         if (sessionError) {
           return this._returnResult({ data: null, error: sessionError });
@@ -55712,12 +55967,12 @@ let GoTrueClient$1 = class GoTrueClient {
         const { data, error } = await _request(this.fetch, "POST", `${this.url}/factors`, {
           body,
           headers: this.headers,
-          jwt: (_a3 = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a3 === void 0 ? void 0 : _a3.access_token
+          jwt: (_a2 = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a2 === void 0 ? void 0 : _a2.access_token
         });
         if (error) {
           return this._returnResult({ data: null, error });
         }
-        if (params.factorType === "totp" && data.type === "totp" && ((_b2 = data === null || data === void 0 ? void 0 : data.totp) === null || _b2 === void 0 ? void 0 : _b2.qr_code)) {
+        if (params.factorType === "totp" && data.type === "totp" && ((_b = data === null || data === void 0 ? void 0 : data.totp) === null || _b === void 0 ? void 0 : _b.qr_code)) {
           data.totp.qr_code = `data:image/svg+xml;utf-8,${data.totp.qr_code}`;
         }
         return this._returnResult({ data, error: null });
@@ -55733,7 +55988,7 @@ let GoTrueClient$1 = class GoTrueClient {
     return this._acquireLock(-1, async () => {
       try {
         return await this._useSession(async (result) => {
-          var _a3;
+          var _a2;
           const { data: sessionData, error: sessionError } = result;
           if (sessionError) {
             return this._returnResult({ data: null, error: sessionError });
@@ -55744,7 +55999,7 @@ let GoTrueClient$1 = class GoTrueClient {
           const { data, error } = await _request(this.fetch, "POST", `${this.url}/factors/${params.factorId}/verify`, {
             body,
             headers: this.headers,
-            jwt: (_a3 = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a3 === void 0 ? void 0 : _a3.access_token
+            jwt: (_a2 = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a2 === void 0 ? void 0 : _a2.access_token
           });
           if (error) {
             return this._returnResult({ data: null, error });
@@ -55765,7 +56020,7 @@ let GoTrueClient$1 = class GoTrueClient {
     return this._acquireLock(-1, async () => {
       try {
         return await this._useSession(async (result) => {
-          var _a3;
+          var _a2;
           const { data: sessionData, error: sessionError } = result;
           if (sessionError) {
             return this._returnResult({ data: null, error: sessionError });
@@ -55773,7 +56028,7 @@ let GoTrueClient$1 = class GoTrueClient {
           const response = await _request(this.fetch, "POST", `${this.url}/factors/${params.factorId}/challenge`, {
             body: params,
             headers: this.headers,
-            jwt: (_a3 = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a3 === void 0 ? void 0 : _a3.access_token
+            jwt: (_a2 = sessionData === null || sessionData === void 0 ? void 0 : sessionData.session) === null || _a2 === void 0 ? void 0 : _a2.access_token
           });
           if (response.error) {
             return response;
@@ -55823,7 +56078,7 @@ let GoTrueClient$1 = class GoTrueClient {
    * {@see GoTrueMFAApi#listFactors}
    */
   async _listFactors() {
-    var _a3;
+    var _a2;
     const { data: { user }, error: userError } = await this.getUser();
     if (userError) {
       return { data: null, error: userError };
@@ -55834,7 +56089,7 @@ let GoTrueClient$1 = class GoTrueClient {
       totp: [],
       webauthn: []
     };
-    for (const factor of (_a3 = user === null || user === void 0 ? void 0 : user.factors) !== null && _a3 !== void 0 ? _a3 : []) {
+    for (const factor of (_a2 = user === null || user === void 0 ? void 0 : user.factors) !== null && _a2 !== void 0 ? _a2 : []) {
       data.all.push(factor);
       if (factor.status === "verified") {
         data[factor.factor_type].push(factor);
@@ -55849,7 +56104,7 @@ let GoTrueClient$1 = class GoTrueClient {
    * {@see GoTrueMFAApi#getAuthenticatorAssuranceLevel}
    */
   async _getAuthenticatorAssuranceLevel() {
-    var _a3, _b2;
+    var _a2, _b;
     const { data: { session }, error: sessionError } = await this.getSession();
     if (sessionError) {
       return this._returnResult({ data: null, error: sessionError });
@@ -55866,7 +56121,7 @@ let GoTrueClient$1 = class GoTrueClient {
       currentLevel = payload.aal;
     }
     let nextLevel = currentLevel;
-    const verifiedFactors = (_b2 = (_a3 = session.user.factors) === null || _a3 === void 0 ? void 0 : _a3.filter((factor) => factor.status === "verified")) !== null && _b2 !== void 0 ? _b2 : [];
+    const verifiedFactors = (_b = (_a2 = session.user.factors) === null || _a2 === void 0 ? void 0 : _a2.filter((factor) => factor.status === "verified")) !== null && _b !== void 0 ? _b : [];
     if (verifiedFactors.length > 0) {
       nextLevel = "aal2";
     }
@@ -56208,7 +56463,7 @@ function requireSupabaseClient() {
      * ```
      */
     constructor(supabaseUrl, supabaseKey, options) {
-      var _a3, _b2, _c;
+      var _a2, _b, _c;
       this.supabaseUrl = supabaseUrl;
       this.supabaseKey = supabaseKey;
       const baseUrl = (0, helpers_1.validateSupabaseUrl)(supabaseUrl);
@@ -56227,8 +56482,8 @@ function requireSupabaseClient() {
         global: constants_1.DEFAULT_GLOBAL_OPTIONS
       };
       const settings = (0, helpers_1.applySettingDefaults)(options !== null && options !== void 0 ? options : {}, DEFAULTS);
-      this.storageKey = (_a3 = settings.auth.storageKey) !== null && _a3 !== void 0 ? _a3 : "";
-      this.headers = (_b2 = settings.global.headers) !== null && _b2 !== void 0 ? _b2 : {};
+      this.storageKey = (_a2 = settings.auth.storageKey) !== null && _a2 !== void 0 ? _a2 : "";
+      this.headers = (_b = settings.global.headers) !== null && _b !== void 0 ? _b : {};
       if (!settings.accessToken) {
         this.auth = this._initSupabaseAuthClient((_c = settings.auth) !== null && _c !== void 0 ? _c : {}, this.headers, settings.global.fetch);
       } else {
@@ -56345,12 +56600,12 @@ function requireSupabaseClient() {
       return this.realtime.removeAllChannels();
     }
     async _getAccessToken() {
-      var _a3, _b2;
+      var _a2, _b;
       if (this.accessToken) {
         return await this.accessToken();
       }
       const { data } = await this.auth.getSession();
-      return (_b2 = (_a3 = data.session) === null || _a3 === void 0 ? void 0 : _a3.access_token) !== null && _b2 !== void 0 ? _b2 : this.supabaseKey;
+      return (_b = (_a2 = data.session) === null || _a2 === void 0 ? void 0 : _a2.access_token) !== null && _b !== void 0 ? _b : this.supabaseKey;
     }
     _initSupabaseAuthClient({ autoRefreshToken, persistSession, detectSessionInUrl, storage: storage2, userStorage, storageKey, flowType, lock, debug, throwOnError }, headers, fetch2) {
       const authHeaders = {
@@ -56532,18 +56787,35 @@ const {
   REALTIME_SUBSCRIBE_STATES,
   REALTIME_CHANNEL_STATES
 } = index || index$1;
-const SUPABASE_URL = typeof window !== "undefined" && window.SUPABASE_URL || typeof window !== "undefined" && ((_a2 = window.ENV_CONFIG) == null ? void 0 : _a2.SUPABASE_URL) || "https://boyuxgdplbpkknplxbxp.supabase.co";
-const SUPABASE_ANON_KEY = typeof window !== "undefined" && window.SUPABASE_ANON_KEY || typeof window !== "undefined" && ((_b = window.ENV_CONFIG) == null ? void 0 : _b.SUPABASE_ANON_KEY) || null;
+function getSupabaseConfig() {
+  var _a2, _b;
+  if (typeof window === "undefined") return { url: null, key: null };
+  const url = window.SUPABASE_URL || ((_a2 = window.ENV_CONFIG) == null ? void 0 : _a2.SUPABASE_URL) || "https://boyuxgdplbpkknplxbxp.supabase.co";
+  const key = window.SUPABASE_ANON_KEY || ((_b = window.ENV_CONFIG) == null ? void 0 : _b.SUPABASE_ANON_KEY);
+  if (!key && typeof document !== "undefined") {
+    const envScript = document.querySelector('script[src*="env-config"]');
+    if (envScript) {
+      console.log("📋 env-config.js script found in DOM");
+    }
+  }
+  return { url, key };
+}
+const { url: SUPABASE_URL, key: SUPABASE_ANON_KEY } = getSupabaseConfig();
 let supabaseInstance = null;
 function getSupabaseClient() {
   if (supabaseInstance) return supabaseInstance;
-  if (!SUPABASE_ANON_KEY) {
+  const config2 = getSupabaseConfig();
+  const key = config2.key || SUPABASE_ANON_KEY;
+  const url = config2.url || SUPABASE_URL;
+  if (!key) {
     console.warn("⚠️ Supabase anon key not configured. Real-time sync disabled.");
     console.warn("   Make sure env-config.js is loaded before this script.");
+    console.warn("   Current window.SUPABASE_ANON_KEY:", typeof window !== "undefined" ? window.SUPABASE_ANON_KEY : "N/A");
+    console.warn("   Current window.ENV_CONFIG:", typeof window !== "undefined" ? window.ENV_CONFIG : "N/A");
     return null;
   }
   try {
-    supabaseInstance = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    supabaseInstance = createClient(url, key, {
       realtime: {
         params: {
           eventsPerSecond: 10
@@ -56558,6 +56830,11 @@ function getSupabaseClient() {
   }
 }
 const supabase = getSupabaseClient();
+const supabase$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  getSupabaseClient,
+  supabase
+}, Symbol.toStringTag, { value: "Module" }));
 function useRealtimeSync(tableName, onDataChange, options) {
   const onDataChangeRef = reactExports.useRef(onDataChange);
   reactExports.useEffect(() => {
@@ -56690,7 +56967,7 @@ const ProgressBar = ({ current, total }) => {
   ) });
 };
 function App() {
-  var _a3, _b2, _c;
+  var _a2, _b, _c;
   reactExports.useEffect(() => {
     console.log("🚀 3p1 App v2.1.0 - Filtres/Tri & Rapports Visuels activés");
     console.log("✅ Modifications disponibles:");
@@ -56749,8 +57026,8 @@ function App() {
   const realtimeTimeoutRef = reactExports.useRef(null);
   const loadTickersFromSupabaseRef = reactExports.useRef(null);
   useRealtimeSync("tickers", (payload) => {
-    var _a4, _b3, _c2, _d, _e;
-    console.log("📡 [3p1] Realtime ticker change:", payload.eventType, ((_a4 = payload.new) == null ? void 0 : _a4.ticker) || ((_b3 = payload.old) == null ? void 0 : _b3.ticker));
+    var _a3, _b2, _c2, _d, _e;
+    console.log("📡 [3p1] Realtime ticker change:", payload.eventType, ((_a3 = payload.new) == null ? void 0 : _a3.ticker) || ((_b2 = payload.old) == null ? void 0 : _b2.ticker));
     if (realtimeTimeoutRef.current) {
       clearTimeout(realtimeTimeoutRef.current);
       realtimeTimeoutRef.current = null;
@@ -56933,7 +57210,7 @@ function App() {
   const [isReadOnly, setIsReadOnly] = reactExports.useState(false);
   reactExports.useEffect(() => {
     const loadFromStorage = async () => {
-      var _a4;
+      var _a3;
       try {
         const saved = await storage.getItem(STORAGE_KEY);
         if (saved) {
@@ -56963,7 +57240,7 @@ function App() {
           const cleaned = {};
           const removedMutualFunds = [];
           for (const [symbol, profile2] of Object.entries(parsed)) {
-            const companyName = ((_a4 = profile2 == null ? void 0 : profile2.info) == null ? void 0 : _a4.name) || "";
+            const companyName = ((_a3 = profile2 == null ? void 0 : profile2.info) == null ? void 0 : _a3.name) || "";
             if (isMutualFund(symbol, companyName)) {
               removedMutualFunds.push(symbol);
             } else {
@@ -57007,6 +57284,12 @@ function App() {
     loadFromStorage();
   }, []);
   const [isLoadingTickers, setIsLoadingTickers] = reactExports.useState(false);
+  const [supabaseProgress, setSupabaseProgress] = reactExports.useState({
+    current: 0,
+    total: 0,
+    startTime: null,
+    message: ""
+  });
   const [tickersLoadError, setTickersLoadError] = reactExports.useState(null);
   const hasLoadedTickersRef = reactExports.useRef(false);
   const activeIdRef = reactExports.useRef(activeId);
@@ -57032,6 +57315,12 @@ function App() {
       loadTickersFromSupabaseRef.current = loadTickersFromSupabase;
       setIsLoadingTickers(true);
       setTickersLoadError(null);
+      setSupabaseProgress({
+        current: 0,
+        total: 0,
+        startTime: Date.now(),
+        message: "Chargement de la liste des tickers..."
+      });
       console.log("📡 Début chargement tickers depuis Supabase...");
       try {
         const result = await loadAllTickersFromSupabase();
@@ -57061,6 +57350,13 @@ Vérifiez votre connexion et réessayez.`,
           return;
         }
         console.log(`✅ ${result.tickers.length} tickers chargés depuis Supabase`);
+        const validTickers = result.tickers.filter((t) => t.ticker && !isMutualFund(t.ticker, t.company_name));
+        setSupabaseProgress({
+          current: 0,
+          total: validTickers.length,
+          startTime: Date.now(),
+          message: `Chargement des données pour ${validTickers.length} ticker(s)...`
+        });
         hasLoadedTickersRef.current = true;
         supabaseTickersCacheRef.current = {
           data: result.tickers,
@@ -57277,7 +57573,7 @@ Vérifiez votre connexion et réessayez.`,
           return updated;
         });
         if (newTickers.length > 0) {
-          const validTickers = newTickers.filter((t) => {
+          const validTickers2 = newTickers.filter((t) => {
             const symbol = t.ticker.toUpperCase();
             if (isMutualFund(symbol, t.company_name)) {
               console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - profil NON créé (exclu automatiquement)`);
@@ -57285,13 +57581,13 @@ Vérifiez votre connexion et réessayez.`,
             }
             return true;
           });
-          if (validTickers.length === 0) {
+          if (validTickers2.length === 0) {
             console.log("✅ Aucun ticker valide après filtrage des fonds mutuels");
             setIsLoadingTickers(false);
             return;
           }
           const skeletonProfiles = {};
-          validTickers.forEach((supabaseTicker) => {
+          validTickers2.forEach((supabaseTicker) => {
             const symbol = supabaseTicker.ticker.toUpperCase();
             const isWatchlist2 = mapSourceToIsWatchlist(supabaseTicker.source);
             skeletonProfiles[symbol] = {
@@ -57346,18 +57642,25 @@ Vérifiez votre connexion et réessayez.`,
             return updated;
           });
           setIsLoadingTickers(false);
-          console.log(`✅ ${validTickers.length} profils squelettes créés - affichage immédiat`);
+          console.log(`✅ ${validTickers2.length} profils squelettes créés - affichage immédiat`);
           const loadFMPDataInBackground = async () => {
             const batchSize = 50;
             const delayBetweenBatches = 200;
-            console.log(`🚀 Démarrage du chargement optimisé pour ${validTickers.length} tickers (Batch: ${batchSize})`);
-            for (let i = 0; i < validTickers.length; i += batchSize) {
-              const batch = validTickers.slice(i, i + batchSize);
+            console.log(`🚀 Démarrage du chargement optimisé pour ${validTickers2.length} tickers (Batch: ${batchSize})`);
+            let processedCount = 0;
+            for (let i = 0; i < validTickers2.length; i += batchSize) {
+              const batch = validTickers2.slice(i, i + batchSize);
               if (i > 0) {
                 await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
               }
               const tickerSymbols = batch.map((t) => t.ticker.toUpperCase());
-              console.log(`📥 Chargement batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(validTickers.length / batchSize)}: ${tickerSymbols.length} tickers...`);
+              const batchNumber = Math.floor(i / batchSize) + 1;
+              const totalBatches = Math.ceil(validTickers2.length / batchSize);
+              console.log(`📥 Chargement batch ${batchNumber}/${totalBatches}: ${tickerSymbols.length} tickers...`);
+              setSupabaseProgress((prev) => ({
+                ...prev,
+                message: `Chargement batch ${batchNumber}/${totalBatches}...`
+              }));
               const supabaseResults = await loadProfilesBatchFromSupabase(tickerSymbols);
               await Promise.allSettled(
                 batch.map(async (supabaseTicker) => {
@@ -57367,7 +57670,7 @@ Vérifiez votre connexion et réessayez.`,
                   const markAsInvalid = (reason) => {
                     console.warn(`❌ ${symbol}: ${reason} - Marking as invalid/loaded`);
                     setLibrary((prev) => {
-                      var _a4, _b3;
+                      var _a3, _b2;
                       return {
                         ...prev,
                         [symbol]: {
@@ -57376,7 +57679,7 @@ Vérifiez votre connexion et réessayez.`,
                           data: [],
                           info: {
                             symbol,
-                            name: ((_b3 = (_a4 = prev[symbol]) == null ? void 0 : _a4.info) == null ? void 0 : _b3.name) || symbol,
+                            name: ((_b2 = (_a3 = prev[symbol]) == null ? void 0 : _a3.info) == null ? void 0 : _b2.name) || symbol,
                             sector: "",
                             financials: { currency: "USD" },
                             // minimal stub
@@ -57479,12 +57782,36 @@ Vérifiez votre connexion et réessayez.`,
                       return updated;
                     });
                     console.log(`✅ ${symbol}: Profil mis à jour depuis ${result2.source === "supabase" ? "Supabase" : "FMP"}`);
+                    processedCount++;
+                    setSupabaseProgress((prev) => ({
+                      ...prev,
+                      current: processedCount,
+                      message: `Chargement ${processedCount}/${prev.total} ticker(s)...`
+                    }));
                   } catch (error) {
                     console.error(`❌ ${symbol}: Erreur chargement données:`, error);
+                    processedCount++;
+                    setSupabaseProgress((prev) => ({
+                      ...prev,
+                      current: processedCount
+                    }));
                   }
                 })
               );
             }
+            setSupabaseProgress((prev) => ({
+              ...prev,
+              current: prev.total,
+              message: "Chargement terminé"
+            }));
+            setTimeout(() => {
+              setSupabaseProgress({
+                current: 0,
+                total: 0,
+                startTime: null,
+                message: ""
+              });
+            }, 2e3);
           };
           if (typeof requestIdleCallback !== "undefined") {
             requestIdleCallback(() => {
@@ -57497,11 +57824,23 @@ Vérifiez votre connexion et réessayez.`,
           }
         } else {
           setIsLoadingTickers(false);
+          setSupabaseProgress({
+            current: 0,
+            total: 0,
+            startTime: null,
+            message: ""
+          });
         }
       } catch (error) {
         console.error("❌ Erreur lors du chargement des tickers:", error);
         setTickersLoadError(error.message || "Erreur inconnue");
         hasLoadedTickersRef.current = false;
+        setSupabaseProgress({
+          current: 0,
+          total: 0,
+          startTime: null,
+          message: ""
+        });
       } finally {
         setIsLoadingTickers(false);
       }
@@ -57573,6 +57912,10 @@ Vérifiez votre connexion et réessayez.`,
     if (!isInitialized) return;
     if (showLanding) return;
     if (showDemo) return;
+    const hasClosedDemo = localStorage.getItem("3p1-has-closed-demo");
+    if (hasClosedDemo === "true") {
+      return;
+    }
     const currentProfile = library[activeId] || DEFAULT_PROFILE;
     const currentProfileName = currentProfile.info.name;
     if (!activeId || currentProfileName === "Chargement...") {
@@ -57665,7 +58008,7 @@ Vérifiez votre connexion et réessayez.`,
     setShowAdvancedSyncDialog(true);
   };
   const performSync = async (saveCurrentVersion, syncOptions) => {
-    var _a4, _b3, _c2, _d, _e, _f, _g;
+    var _a3, _b2, _c2, _d, _e, _f, _g;
     setIsLoading(true);
     try {
       if (saveCurrentVersion) {
@@ -57791,8 +58134,8 @@ Vérifiez votre connexion et réessayez.`,
         console.log("✅ performSync: Données mergées prêtes", {
           mergedDataLength: mergedData.length,
           mergedDataYears: mergedData.map((d) => d.year),
-          lastYearEPS: (_a4 = mergedData[mergedData.length - 1]) == null ? void 0 : _a4.earningsPerShare,
-          lastYearCF: (_b3 = mergedData[mergedData.length - 1]) == null ? void 0 : _b3.cashFlowPerShare,
+          lastYearEPS: (_a3 = mergedData[mergedData.length - 1]) == null ? void 0 : _a3.earningsPerShare,
+          lastYearCF: (_b2 = mergedData[mergedData.length - 1]) == null ? void 0 : _b2.cashFlowPerShare,
           lastYearBV: (_c2 = mergedData[mergedData.length - 1]) == null ? void 0 : _c2.bookValuePerShare,
           allMergedData: mergedData.map((d) => ({
             year: d.year,
@@ -58301,13 +58644,13 @@ Vérifiez les logs de la console pour plus de détails.`;
     return allZero;
   };
   const handleSelectTicker = async (symbol) => {
-    var _a4, _b3, _c2, _d, _e, _f, _g;
+    var _a3, _b2, _c2, _d, _e, _f, _g;
     const upperSymbol = symbol.toUpperCase();
     if (library[upperSymbol]) {
       const existingProfile = library[upperSymbol];
       const isSkeleton = existingProfile._isSkeleton === true;
       const hasNoData = !existingProfile.data || existingProfile.data.length === 0;
-      const hasNoPrice = !((_a4 = existingProfile.assumptions) == null ? void 0 : _a4.currentPrice) || existingProfile.assumptions.currentPrice === 0;
+      const hasNoPrice = !((_a3 = existingProfile.assumptions) == null ? void 0 : _a3.currentPrice) || existingProfile.assumptions.currentPrice === 0;
       const hasCorruptedDataValue = hasCorruptedData(existingProfile.data || []);
       if (isSkeleton || hasNoData || hasNoPrice || hasCorruptedDataValue) {
         if (hasCorruptedDataValue) {
@@ -58574,7 +58917,7 @@ Vérifiez les logs de la console pour plus de détails.`;
           ...(existingProfile == null ? void 0 : existingProfile.info) || {},
           symbol,
           name: result.info.name || symbol,
-          sector: result.info.sector || ((_b3 = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _b3.sector) || "",
+          sector: result.info.sector || ((_b2 = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _b2.sector) || "",
           securityRank: result.info.securityRank || ((_c2 = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _c2.securityRank) || "N/A",
           marketCap: result.info.marketCap || ((_d = existingProfile == null ? void 0 : existingProfile.info) == null ? void 0 : _d.marketCap) || "N/A",
           ...result.info
@@ -58628,8 +58971,8 @@ Vérifiez les logs de la console pour plus de détails.`;
       if (remaining.length > 0) {
         const sortedRemaining = remaining.sort(
           (a2, b) => {
-            var _a4, _b3, _c2, _d;
-            return (((_b3 = (_a4 = library[a2]) == null ? void 0 : _a4.info) == null ? void 0 : _b3.preferredSymbol) || a2).localeCompare(((_d = (_c2 = library[b]) == null ? void 0 : _c2.info) == null ? void 0 : _d.preferredSymbol) || b);
+            var _a3, _b2, _c2, _d;
+            return (((_b2 = (_a3 = library[a2]) == null ? void 0 : _a3.info) == null ? void 0 : _b2.preferredSymbol) || a2).localeCompare(((_d = (_c2 = library[b]) == null ? void 0 : _c2.info) == null ? void 0 : _d.preferredSymbol) || b);
           }
         );
         setActiveId(sortedRemaining[0]);
@@ -58771,7 +59114,7 @@ Vérifiez les logs de la console pour plus de détails.`;
     const MAX_SYNC_TIME_MS = 30 * 60 * 1e3;
     const startSyncTime = Date.now();
     const fetchCompanyDataBatch = async (tickerSymbols, includeKeyMetrics = true) => {
-      var _a4;
+      var _a3;
       const results = /* @__PURE__ */ new Map();
       try {
         const symbolString = tickerSymbols.join(",");
@@ -58789,7 +59132,7 @@ Vérifiez les logs de la console pour plus de détails.`;
         const batchData = await response.json();
         console.log(`🔍 [BATCH] Données reçues:`, {
           success: batchData.success,
-          resultsCount: ((_a4 = batchData.results) == null ? void 0 : _a4.length) || 0,
+          resultsCount: ((_a3 = batchData.results) == null ? void 0 : _a3.length) || 0,
           stats: batchData.stats
         });
         if (batchData.success && batchData.results) {
@@ -58859,7 +59202,7 @@ Vérifiez les logs de la console pour plus de détails.`;
             const TICKER_TIMEOUT_MS = 6e4;
             return Promise.race([
               (async () => {
-                var _a4, _b3, _c2;
+                var _a3, _b2, _c2;
                 let tickerResult = {
                   ticker: tickerSymbol,
                   success: false,
@@ -58938,7 +59281,7 @@ Vérifiez les logs de la console pour plus de détails.`;
                   let result;
                   if (batchResults.has(tickerSymbol)) {
                     result = batchResults.get(tickerSymbol);
-                    console.log(`📦 ${tickerSymbol}: Données récupérées du batch (data.length: ${((_a4 = result == null ? void 0 : result.data) == null ? void 0 : _a4.length) || 0})`);
+                    console.log(`📦 ${tickerSymbol}: Données récupérées du batch (data.length: ${((_a3 = result == null ? void 0 : result.data) == null ? void 0 : _a3.length) || 0})`);
                   } else {
                     console.warn(`⚠️ ${tickerSymbol}: Pas dans les résultats du batch, fallback vers appel individuel`);
                     try {
@@ -59019,7 +59362,7 @@ Vérifiez les logs de la console pour plus de détails.`;
                     }
                   }
                   tickerResult.dataRetrieved = {
-                    years: ((_b3 = result.data) == null ? void 0 : _b3.length) || 0,
+                    years: ((_b2 = result.data) == null ? void 0 : _b2.length) || 0,
                     dataPoints: ((_c2 = result.data) == null ? void 0 : _c2.length) || 0,
                     hasProfile: !!result.info,
                     hasKeyMetrics: !!(result.data && result.data.length > 0),
@@ -59341,16 +59684,16 @@ Vérifiez les logs de la console pour plus de détails.`;
       }
       const endTime = Date.now();
       const totalDataPoints = tickerResults.filter((r2) => r2.success).reduce((sum, r2) => {
-        var _a4;
-        return sum + (((_a4 = r2.dataRetrieved) == null ? void 0 : _a4.dataPoints) || 0);
+        var _a3;
+        return sum + (((_a3 = r2.dataRetrieved) == null ? void 0 : _a3.dataPoints) || 0);
       }, 0);
       const totalOutliersDetected = tickerResults.filter((r2) => r2.success).reduce((sum, r2) => {
-        var _a4, _b3;
-        return sum + (((_b3 = (_a4 = r2.outliers) == null ? void 0 : _a4.detected) == null ? void 0 : _b3.length) || 0);
+        var _a3, _b2;
+        return sum + (((_b2 = (_a3 = r2.outliers) == null ? void 0 : _a3.detected) == null ? void 0 : _b2.length) || 0);
       }, 0);
       const totalOrangeDataReplaced = tickerResults.filter((r2) => {
-        var _a4;
-        return r2.success && ((_a4 = r2.orangeData) == null ? void 0 : _a4.wasReplaced);
+        var _a3;
+        return r2.success && ((_a3 = r2.orangeData) == null ? void 0 : _a3.wasReplaced);
       }).length;
       const avgTimePerTicker = tickerResults.length > 0 ? tickerResults.reduce((sum, r2) => sum + r2.timeMs, 0) / tickerResults.length : 0;
       const reportData = {
@@ -59997,7 +60340,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
   isBulkSyncing ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "fixed bottom-4 right-4 bg-slate-800 p-4 rounded-lg shadow-xl border border-slate-700 z-[100] w-80 animate-in fade-in slide-in-from-bottom-5", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center mb-2", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-bold text-white text-sm flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: `w-4 h-4 ${!syncPausedState ? "animate-spin" : ""}` }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$P, { className: `w-4 h-4 ${!syncPausedState ? "animate-spin" : ""}` }),
         "Syncing... ",
         bulkSyncProgress.current,
         "/",
@@ -60035,7 +60378,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
           },
           className: `flex-1 flex items-center justify-center gap-1 py-1.5 rounded transition-colors ${syncPausedState ? "bg-green-600 hover:bg-green-500 text-white" : "bg-yellow-600 hover:bg-yellow-500 text-white"}`,
           children: [
-            syncPausedState ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$e, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-4 h-4" }),
+            syncPausedState ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$h, { className: "w-4 h-4" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: syncPausedState ? "Resume" : "Pause" })
           ]
         }
@@ -60161,7 +60504,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 onClick: () => setIsSidebarOpen(!isSidebarOpen),
                 className: "p-2 bg-white rounded-md shadow-sm border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors flex-shrink-0",
                 title: isSidebarOpen ? "Fermer le menu" : "Ouvrir le menu",
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$I, { className: "w-5 h-5 sm:w-6 sm:h-6" })
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: "w-5 h-5 sm:w-6 sm:h-6" })
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -60170,10 +60513,13 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 onClick: () => setIsRightSidebarOpen(!isRightSidebarOpen),
                 className: `p-2 rounded-lg transition-colors ${isRightSidebarOpen ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"}`,
                 title: "Afficher/Masquer l'historique",
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-5 h-5 sm:w-6 sm:h-6" })
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-5 h-5 sm:w-6 sm:h-6" })
               }
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-base sm:text-xl font-bold text-gray-700 truncate flex-1 sm:flex-none", children: "JLab 3p1" })
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("h1", { className: "text-base sm:text-xl md:text-2xl font-extrabold truncate flex-1 sm:flex-none bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent tracking-tight", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-block", children: "JLab" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-block ml-1.5 text-blue-500", children: "3p1" })
+            ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex bg-gray-800/50 p-1 rounded-lg border border-gray-700/50 backdrop-blur-sm", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -60183,7 +60529,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 title: "Tableau de bord principal",
                 className: `p-2 rounded-lg transition-colors duration-200 flex items-center gap-2 ${currentView === "analysis" ? "bg-blue-600 text-white shadow-md" : "text-gray-400 hover:text-white hover:bg-gray-800"}`,
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$D, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$E, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: "Analyse" })
                 ]
               }
@@ -60195,7 +60541,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 title: "Tableau de bord KPI et classement",
                 className: `p-2 rounded-lg transition-colors duration-200 flex items-center gap-2 ${currentView === "kpi" ? "bg-blue-600 text-white shadow-md" : "text-gray-400 hover:text-white hover:bg-gray-800"}`,
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$c, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$d, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: "KPIs & Classement" })
                 ]
               }
@@ -60207,14 +60553,14 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 title: "Mode d'emploi et documentation",
                 className: `p-2 rounded-lg transition-colors duration-200 flex items-center gap-2 ${currentView === "info" ? "bg-blue-600 text-white shadow-md" : "text-gray-400 hover:text-white hover:bg-gray-800"}`,
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden xs:inline", children: "Mode d'emploi" })
                 ]
               }
             )
           ] })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
+        currentView !== "kpi" && /* @__PURE__ */ jsxRuntimeExports.jsx(
           Header,
           {
             info,
@@ -60224,11 +60570,12 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
             isWatchlist,
             onUpdateInfo: handleUpdateInfo,
             onUpdateAssumption: handleUpdateAssumption,
-            onFetchData: ((_a3 = profile == null ? void 0 : profile.info) == null ? void 0 : _a3.symbol) ? handleFetchData : void 0,
+            onFetchData: ((_a2 = profile == null ? void 0 : profile.info) == null ? void 0 : _a2.symbol) ? handleFetchData : void 0,
             onRestoreData: profile && profile.data.length > 0 ? () => setShowRestoreDialog(true) : void 0,
             showSyncButton: true,
             onOpenSettings: () => setIsSettingsOpen(true),
-            onOpenReports: () => setIsReportsOpen(true)
+            onOpenReports: () => setIsReportsOpen(true),
+            activeSymbol: activeId || info.symbol || void 0
           }
         ),
         currentView === "info" ? /* @__PURE__ */ jsxRuntimeExports.jsx(InfoTab, {}) : currentView === "kpi" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ErrorBoundary, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(reactExports.Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx(LoadingFallback, {}), children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -60255,11 +60602,11 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 ] })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1 bg-white rounded-md shadow-sm border border-gray-200 p-0.5 no-print", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: undo, disabled: pastData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: "↶ Annuler la dernière modification\\n\\nAnnule la dernière modification effectuée sur les données historiques.\\n\\n📊 Fonctionnalités:\\n• Permet de revenir en arrière sur les changements\\n• Fonctionne avec toutes les modifications (EPS, CF, BV, Dividendes, Prix)\\n• Historique illimité (tant que vous ne quittez pas la page)\\n\\n⌨️ Raccourci: Ctrl+Z (Cmd+Z sur Mac)", "aria-label": "Annuler la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$L, { className: "w-4 h-4" }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: undo, disabled: pastData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: "↶ Annuler la dernière modification\\n\\nAnnule la dernière modification effectuée sur les données historiques.\\n\\n📊 Fonctionnalités:\\n• Permet de revenir en arrière sur les changements\\n• Fonctionne avec toutes les modifications (EPS, CF, BV, Dividendes, Prix)\\n• Historique illimité (tant que vous ne quittez pas la page)\\n\\n⌨️ Raccourci: Ctrl+Z (Cmd+Z sur Mac)", "aria-label": "Annuler la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-4 h-4" }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-px bg-gray-200 my-1" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: redo, disabled: futureData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: "↷ Rétablir la modification annulée\\n\\nRétablit la dernière modification que vous avez annulée.\\n\\n📊 Fonctionnalités:\\n• Permet de refaire une action annulée\\n• Fonctionne avec toutes les modifications\\n• Disponible uniquement si vous avez annulé une action\\n\\n⌨️ Raccourci: Ctrl+Shift+Z (Cmd+Shift+Z sur Mac)", "aria-label": "Rétablir la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-4 h-4" }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: redo, disabled: futureData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: "↷ Rétablir la modification annulée\\n\\nRétablit la dernière modification que vous avez annulée.\\n\\n📊 Fonctionnalités:\\n• Permet de refaire une action annulée\\n• Fonctionne avec toutes les modifications\\n• Disponible uniquement si vous avez annulé une action\\n\\n⌨️ Raccourci: Ctrl+Shift+Z (Cmd+Shift+Z sur Mac)", "aria-label": "Rétablir la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$L, { className: "w-4 h-4" }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-px bg-gray-200 my-1" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleResetData, className: "p-1.5 rounded hover:bg-red-50 text-red-600", title: "🔄 Réinitialiser les données\\n\\nRéinitialise toutes les données historiques à leurs valeurs d'origine.\\n\\n⚠️ Attention:\\n• Cette action est irréversible\\n• Toutes vos modifications manuelles seront perdues\\n• Les données seront restaurées depuis la dernière synchronisation FMP\\n• Les hypothèses ne sont PAS affectées\\n\\n💡 Utilisation:\\n• Utile si vous avez fait des erreurs de saisie\\n• Permet de repartir de zéro avec les données FMP\\n• Confirmation requise avant exécution", "aria-label": "Réinitialiser toutes les données", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$O, { className: "w-4 h-4" }) })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleResetData, className: "p-1.5 rounded hover:bg-red-50 text-red-600", title: "🔄 Réinitialiser les données\\n\\nRéinitialise toutes les données historiques à leurs valeurs d'origine.\\n\\n⚠️ Attention:\\n• Cette action est irréversible\\n• Toutes vos modifications manuelles seront perdues\\n• Les données seront restaurées depuis la dernière synchronisation FMP\\n• Les hypothèses ne sont PAS affectées\\n\\n💡 Utilisation:\\n• Utile si vous avez fait des erreurs de saisie\\n• Permet de repartir de zéro avec les données FMP\\n• Confirmation requise avant exécution", "aria-label": "Réinitialiser toutes les données", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$P, { className: "w-4 h-4" }) })
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(HistoricalTable, { data, onUpdateRow: handleUpdateRow }),
@@ -60308,7 +60655,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
               {
                 data,
                 info: profile.info,
-                sector: (_b2 = profile.info) == null ? void 0 : _b2.sector,
+                sector: (_b = profile.info) == null ? void 0 : _b.sector,
                 assumptions
               }
             ),
@@ -60335,17 +60682,20 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 formatCurrency(assumptions.currentPrice),
                 "."
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-slate-300 text-sm mb-4 leading-relaxed", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-slate-300 text-sm mb-4 leading-relaxed", children: targetPrice && targetPrice > 0 && assumptions.currentPrice > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
                 "Le titre se négocie à ",
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("strong", { className: "text-white", children: [
-                  formatPercent(Math.abs(1 - assumptions.currentPrice / targetPrice) * 100),
+                  (() => {
+                    const diff = Math.abs(1 - assumptions.currentPrice / targetPrice) * 100;
+                    return isFinite(diff) && !isNaN(diff) ? formatPercent(diff) : "N/A";
+                  })(),
                   " ",
                   assumptions.currentPrice < targetPrice ? "sous" : "au-dessus de"
                 ] }),
                 " l'objectif de prix EPS de ",
                 formatCurrency(targetPrice),
                 "."
-              ] }),
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-slate-400", children: "Données insuffisantes pour calculer la position relative au prix cible EPS." }) }),
               info.beta !== void 0 && info.beta !== null && isFinite(info.beta) && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-700/50 p-3 rounded mt-6", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-slate-400 uppercase", children: "Beta" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-bold text-blue-400", children: info.beta.toFixed(2) }),
@@ -60354,7 +60704,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 rounded-lg shadow border border-gray-200", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xs sm:text-sm font-bold text-gray-500 uppercase mb-2 sm:mb-3 flex items-center gap-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-3 h-3 sm:w-4 sm:h-4" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-3 h-3 sm:w-4 sm:h-4" }),
                 "Configuration"
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 sm:space-y-3 text-xs sm:text-sm", children: [
@@ -60545,7 +60895,10 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
     showDemo && (!activeId || profile.info.name === "Chargement...") && /* @__PURE__ */ jsxRuntimeExports.jsx(
       InteractiveDemo,
       {
-        onClose: () => setShowDemo(false),
+        onClose: () => {
+          setShowDemo(false);
+          localStorage.setItem("3p1-has-closed-demo", "true");
+        },
         onSelectTicker: () => {
           setIsSidebarOpen(true);
         },
@@ -60578,6 +60931,46 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
             });
           }
           await handleSelectTicker(upperTicker);
+          setTimeout(async () => {
+            const currentProfile = library[upperTicker];
+            if (currentProfile && (!currentProfile.data || currentProfile.data.length === 0)) {
+              console.log(`🔄 ${upperTicker}: Données toujours vides après handleSelectTicker - Forcer chargement FMP...`);
+              try {
+                const { fetchCompanyData: fetchCompanyData2 } = await __vitePreload(async () => {
+                  const { fetchCompanyData: fetchCompanyData22 } = await Promise.resolve().then(() => financeApi);
+                  return { fetchCompanyData: fetchCompanyData22 };
+                }, true ? void 0 : void 0, import.meta.url);
+                showNotification(`Chargement des données FMP pour ${upperTicker}...`, "info");
+                const result = await fetchCompanyData2(upperTicker);
+                if (result.data && result.data.length > 0 && result.currentPrice > 0) {
+                  const updatedProfile = {
+                    id: upperTicker,
+                    lastModified: Date.now(),
+                    data: result.data,
+                    assumptions: autoFillAssumptionsFromFMPData(result.data, result.currentPrice, INITIAL_ASSUMPTIONS),
+                    info: result.info,
+                    notes: "",
+                    isWatchlist: null
+                  };
+                  delete updatedProfile._isSkeleton;
+                  setLibrary((prev) => ({
+                    ...prev,
+                    [upperTicker]: updatedProfile
+                  }));
+                  if (activeId === upperTicker) {
+                    setData(updatedProfile.data);
+                    setAssumptions(updatedProfile.assumptions);
+                    setInfo(updatedProfile.info);
+                  }
+                  showNotification(`✅ ${upperTicker} chargé depuis FMP`, "success");
+                  console.log(`✅ ${upperTicker}: Données FMP chargées avec succès`);
+                }
+              } catch (error) {
+                console.error(`❌ ${upperTicker}: Erreur chargement FMP forcé:`, error);
+                showNotification(`❌ Impossible de charger ${upperTicker} depuis FMP`, "error");
+              }
+            }
+          }, 1e3);
         }
       }
     ),
@@ -60598,6 +60991,16 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
         onLoadVersion: handleLoadSnapshot,
         isOpen: isRightSidebarOpen,
         onToggle: () => setIsRightSidebarOpen(!isRightSidebarOpen)
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      SupabaseLoadingProgress,
+      {
+        isLoading: isLoadingTickers && supabaseProgress.total > 0,
+        current: supabaseProgress.current,
+        total: supabaseProgress.total,
+        startTime: supabaseProgress.startTime,
+        message: supabaseProgress.message
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -60659,8 +61062,8 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
         onRetryFailed: async () => {
           if ((syncReportData == null ? void 0 : syncReportData.options) && (syncReportData == null ? void 0 : syncReportData.tickerResults)) {
             const failedTickers = syncReportData.tickerResults.filter((r2) => {
-              var _a4;
-              return !r2.success && !((_a4 = r2.error) == null ? void 0 : _a4.includes("introuvable"));
+              var _a3;
+              return !r2.success && !((_a3 = r2.error) == null ? void 0 : _a3.includes("introuvable"));
             }).map((r2) => r2.ticker);
             if (failedTickers.length > 0) {
               setIsBulkSyncing(true);
@@ -60690,29 +61093,28 @@ export {
   EvaluationDetails as E,
   ForwardRef$1 as F,
   React as R,
-  ForwardRef$m as a,
-  ForwardRef$C as b,
+  ForwardRef$n as a,
+  ForwardRef$D as b,
   calculateRecommendation as c,
   ForwardRef$7 as d,
-  ForwardRef$n as e,
-  ForwardRef$o as f,
-  ForwardRef$O as g,
-  ForwardRef$H as h,
-  ForwardRef$l as i,
+  ForwardRef$o as e,
+  ForwardRef$p as f,
+  ForwardRef$P as g,
+  ForwardRef$I as h,
+  ForwardRef$m as i,
   jsxRuntimeExports as j,
-  ForwardRef$B as k,
-  ForwardRef$w as l,
-  ForwardRef$z as m,
-  ForwardRef$t as n,
+  ForwardRef$C as k,
+  ForwardRef$x as l,
+  ForwardRef$A as m,
+  ForwardRef$u as n,
   ForwardRef$2 as o,
   listSnapshots as p,
   ForwardRef$9 as q,
   reactExports as r,
   ForwardRef$5 as s,
-  ForwardRef$A as t,
-  ForwardRef$P as u,
-  ForwardRef$p as v,
-  ForwardRef$v as w,
-  ForwardRef$h as x,
-  ForwardRef$u as y
+  ForwardRef$B as t,
+  ForwardRef$Q as u,
+  ForwardRef$q as v,
+  ForwardRef$w as w,
+  ForwardRef$i as x
 };

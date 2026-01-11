@@ -8,6 +8,7 @@ import {
   EyeIcon,
   StarIcon,
   ArrowPathIcon,
+  CloudArrowUpIcon,
   ShieldCheckIcon,
   FunnelIcon,
   BarsArrowUpIcon,
@@ -16,7 +17,8 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   TableCellsIcon,
-  CheckIcon
+  CheckIcon,
+  ServerIcon
 } from '@heroicons/react/24/outline';
 import { AnalysisProfile, Recommendation } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
@@ -62,10 +64,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
   const [filterExchange, setFilterExchange] = useState<string>('all');
   const [filterMarketCap, setFilterMarketCap] = useState<string>('all');
   // ✅ État pour collapse/expand des filtres
-  const [isFiltersExpanded, setIsFiltersExpanded] = useState(true);
+  const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
   // ✅ État pour la sélection de tickers pour synchronisation
   const [selectedTickers, setSelectedTickers] = useState<Set<string>>(new Set());
   const [isSelectionMode, setIsSelectionMode] = useState(false);
+  // ✅ État pour l'autocomplétion
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   
   // ✅ Gestionnaire double-clic pour toggle admin (fonction cachée)
   const [logoClickCount, setLogoClickCount] = useState(0);
@@ -129,6 +135,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
     const total = profiles.length;
     return { portfolio, watchlist, normal, total };
   }, [profiles]);
+
+  // ✅ SUGGESTIONS: Calculer les suggestions basées sur searchTerm
+  const suggestions = useMemo(() => {
+    if (!searchTerm || searchTerm.trim().length < 1) {
+      return [];
+    }
+    
+    const term = searchTerm.toLowerCase().trim();
+    const matches = profiles
+      .filter(p => {
+        const symbolMatch = p.id.toLowerCase().includes(term);
+        const nameMatch = p.info.name.toLowerCase().includes(term);
+        return symbolMatch || nameMatch;
+      })
+      .slice(0, 8) // Limiter à 8 suggestions max
+      .map(p => ({
+        id: p.id,
+        symbol: p.id,
+        name: p.info.name || p.id,
+        sector: p.info.sector || '',
+        isWatchlist: p.isWatchlist
+      }));
+    
+    return matches;
+  }, [profiles, searchTerm]);
 
   // ✅ Extraire les valeurs uniques pour les filtres
   const availableCountries = useMemo(() => {
@@ -285,15 +316,92 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
       <div className="p-2 sm:p-3 md:p-4 border-b border-slate-800/50">
         <div className="flex gap-1.5 sm:gap-2 mb-2">
           <div className="relative flex-1 min-w-0">
-            <MagnifyingGlassIcon className="w-4 h-4 absolute left-2 sm:left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-slate-500 flex-shrink-0" />
+            <MagnifyingGlassIcon className="w-4 h-4 absolute left-2 sm:left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-slate-500 flex-shrink-0 z-10" />
             <input
+              ref={searchInputRef}
               type="text"
               placeholder="Filtrer..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setShowSuggestions(true);
+                setSelectedSuggestionIndex(-1);
+              }}
+              onFocus={() => {
+                if (suggestions.length > 0) {
+                  setShowSuggestions(true);
+                }
+              }}
+              onBlur={() => {
+                // Délai pour permettre le clic sur une suggestion
+                setTimeout(() => setShowSuggestions(false), 200);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  setSelectedSuggestionIndex(prev => 
+                    prev < suggestions.length - 1 ? prev + 1 : prev
+                  );
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1);
+                } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+                  e.preventDefault();
+                  const suggestion = suggestions[selectedSuggestionIndex];
+                  if (suggestion) {
+                    onSelect(suggestion.id);
+                    setSearchTerm('');
+                    setShowSuggestions(false);
+                    setSelectedSuggestionIndex(-1);
+                  }
+                } else if (e.key === 'Escape') {
+                  setShowSuggestions(false);
+                  setSelectedSuggestionIndex(-1);
+                }
+              }}
               className="w-full bg-slate-800 border border-slate-700 rounded pl-7 sm:pl-8 md:pl-9 pr-2 sm:pr-3 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-200 focus:ring-1 focus:ring-blue-500 outline-none placeholder-slate-500 transition-all focus:border-blue-500"
-              title="Rechercher un ticker\n\nTapez le symbole ou le nom de l'entreprise pour filtrer la liste.\nLa recherche est insensible à la casse et cherche dans:\n• Le symbole du ticker\n• Le nom de l'entreprise"
+              title="Rechercher un ticker\n\nTapez le symbole ou le nom de l'entreprise pour filtrer la liste.\nLa recherche est insensible à la casse et cherche dans:\n• Le symbole du ticker\n• Le nom de l'entreprise\n\n💡 Utilisez les flèches ↑↓ pour naviguer dans les suggestions et Entrée pour sélectionner."
             />
+            
+            {/* Suggestions Dropdown */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto">
+                {suggestions.map((suggestion, index) => (
+                  <button
+                    key={suggestion.id}
+                    type="button"
+                    onClick={() => {
+                      onSelect(suggestion.id);
+                      setSearchTerm('');
+                      setShowSuggestions(false);
+                      setSelectedSuggestionIndex(-1);
+                    }}
+                    onMouseEnter={() => setSelectedSuggestionIndex(index)}
+                    className={`w-full text-left px-3 py-2 text-xs sm:text-sm transition-colors flex items-center gap-2 ${
+                      index === selectedSuggestionIndex
+                        ? 'bg-blue-600 text-white'
+                        : 'text-slate-200 hover:bg-slate-700'
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-blue-400">{suggestion.symbol}</span>
+                        {suggestion.isWatchlist === false && (
+                          <StarIcon className="w-3 h-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                        )}
+                        {suggestion.isWatchlist === true && (
+                          <EyeIcon className="w-3 h-3 text-blue-500 flex-shrink-0" />
+                        )}
+                      </div>
+                      <div className="text-slate-400 truncate mt-0.5">{suggestion.name}</div>
+                      {suggestion.sector && (
+                        <div className="text-[10px] text-slate-500 mt-0.5">{suggestion.sector}</div>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <button
             onClick={onAdd}
@@ -311,7 +419,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
             className="w-full bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors mb-2"
             title="Synchroniser depuis Supabase\n\nCharge les tickers depuis la base de données Supabase.\n\nAjoute les nouveaux tickers présents dans Supabase mais absents de votre LocalStorage.\n\n⚠️ Ne modifie pas les tickers existants, seulement ajoute les nouveaux."
           >
-            <ArrowPathIcon className={`w-4 h-4 ${isLoadingTickers ? 'animate-spin' : ''}`} />
+            <ServerIcon className={`w-4 h-4 ${isLoadingTickers ? 'animate-pulse' : ''}`} />
             <span style={{ wordBreak: 'normal', overflowWrap: 'normal', whiteSpace: 'normal' }}>{isLoadingTickers ? 'Synchronisation...' : 'Synchroniser Supabase'}</span>
           </button>
         )}
@@ -348,7 +456,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
                   className="flex-1 bg-green-700 hover:bg-green-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 py-1.5 rounded text-xs font-medium transition-colors"
                   title={`Synchroniser ${selectedTickers.size} ticker(s) sélectionné(s)\n\nSynchronise uniquement les tickers que vous avez sélectionnés avec les options de synchronisation avancées.`}
                 >
-                  <ArrowPathIcon className={`w-3 h-3 inline mr-1 ${isBulkSyncing ? 'animate-spin' : ''}`} />
+                  <CloudArrowUpIcon className={`w-3 h-3 inline mr-1 ${isBulkSyncing ? 'animate-pulse' : ''}`} />
                   Sync ({selectedTickers.size})
                 </button>
               )}
@@ -360,7 +468,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
                 className="w-full bg-green-700 hover:bg-green-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors"
                 title="🔄 Options de Synchronisation Avancées\n\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options:\n\n📊 Options principales:\n• Sauvegarder avant sync\n• Remplacer données oranges\n• Forcer remplacement\n\n⚙️ Options détaillées:\n• Synchroniser données historiques\n• Synchroniser uniquement nouvelles années\n• Synchroniser uniquement métriques manquantes\n• Synchroniser assumptions\n• Préserver exclusions\n• Recalculer outliers\n• Mettre à jour prix actuel\n• Synchroniser métriques ValueLine\n\n💡 Chaque option inclut des explications détaillées, exemples concrets et informations sur les outils utilisés."
               >
-                <ArrowPathIcon className={`w-4 h-4 ${isBulkSyncing ? 'animate-spin' : ''}`} />
+                <CloudArrowUpIcon className={`w-4 h-4 ${isBulkSyncing ? 'animate-pulse' : ''}`} />
                 <span className="flex-1 text-left" style={{ wordBreak: 'normal', overflowWrap: 'normal', whiteSpace: 'normal' }}>
                   {isBulkSyncing && bulkSyncProgress
                     ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}`

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CompanyInfo, Assumptions, Recommendation } from '../types';
-import { ArrowTrendingUpIcon, BanknotesIcon, TagIcon, CalendarDaysIcon, PrinterIcon, CloudArrowDownIcon, EyeIcon, StarIcon, ArrowPathIcon, ArrowDownTrayIcon, Cog6ToothIcon, ShieldCheckIcon, DocumentChartBarIcon } from '@heroicons/react/24/outline';
+import { ArrowTrendingUpIcon, BanknotesIcon, TagIcon, CalendarDaysIcon, PrinterIcon, ServerIcon, EyeIcon, StarIcon, ArrowPathIcon, ArrowUturnLeftIcon, Cog6ToothIcon, ShieldCheckIcon, DocumentChartBarIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline';
 import { formatPercent } from '../utils/calculations';
 import { createLogoErrorHandler, createLogoLoadHandler } from '../utils/logoUtils';
 
@@ -17,6 +17,7 @@ interface HeaderProps {
   showSyncButton?: boolean; // Nouveau prop pour contrôler la visibilité du bouton
   onOpenSettings?: () => void;
   onOpenReports?: () => void;
+  activeSymbol?: string; // Symbole du ticker actuellement sélectionné
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -29,10 +30,10 @@ export const Header: React.FC<HeaderProps> = ({
   onUpdateAssumption,
   onFetchData,
   onRestoreData,
-
   showSyncButton = true, // Par défaut, afficher le bouton
   onOpenSettings,
-  onOpenReports
+  onOpenReports,
+  activeSymbol
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -120,10 +121,12 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
           <div className="flex-1 min-w-0">
-            {/* BUG #3P1-4 FIX: Afficher message d'erreur si toujours en chargement */}
+            {/* Affichage conditionnel: "Données non disponibles" seulement si aucun ticker n'est sélectionné */}
             <h1 className="text-base sm:text-xl md:text-2xl font-bold text-gray-800 uppercase truncate flex items-center gap-2 cursor-help" title={`${info.name}\n\nNom complet de l'entreprise.\n\nSource: FMP API (company-profile)\n\nSymbole: ${info.preferredSymbol || info.symbol}\nSecteur: ${info.sector || 'N/A'}\nPays: ${info.country || 'N/A'}\nBourse: ${info.exchange || 'N/A'}`}>
-              {info.name === 'Chargement...' ? (
+              {info.name === 'Chargement...' && !activeSymbol ? (
                 <span className="text-orange-600 normal-case">Données non disponibles - Veuillez sélectionner un ticker</span>
+              ) : info.name === 'Chargement...' && activeSymbol ? (
+                <span className="text-blue-600 normal-case">Chargement des données pour {activeSymbol}...</span>
               ) : (
                 info.name
               )}
@@ -186,64 +189,82 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="text-[9px] text-gray-500 block mt-0.5">ValueLine 3 déc 2025</span>
             </div>
           )}
-          <div className="flex gap-1 sm:gap-2 ml-auto md:ml-0">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 ml-auto md:ml-0">
+            {/* Bouton Sauvegarder */}
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('open-save-dialog'))}
-              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print bg-blue-600 text-white hover:bg-blue-700"
-              title="💾 Sauvegarder une version (Snapshot)\n\nCrée un snapshot complet de l'analyse actuelle incluant:\n\n📊 Données:\n• Toutes les données historiques (EPS, CF, BV, Dividendes)\n• Prix historiques (High/Low par année)\n• Données manuelles et auto-fetchées\n\n⚙️ Hypothèses:\n• Tous les taux de croissance (EPS, CF, BV, DIV)\n• Tous les ratios cibles (P/E, P/CF, P/BV, Yield)\n• Prix actuel et dividende actuel\n• Taux de rendement requis\n• Exclusions de métriques (EPS, CF, BV, DIV)\n\n📈 Métriques:\n• Toutes les métriques calculées\n• Date et heure de sauvegarde\n• Version du snapshot\n\n💡 Utilisation:\n• Les snapshots sont accessibles dans la sidebar droite (icône horloge)\n• Permet de comparer différentes versions de l'analyse\n• Utile pour suivre l'évolution de vos hypothèses dans le temps"
+              className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md active:scale-95"
+              title="💾 Sauvegarder une version (Snapshot)\n\nCrée un snapshot complet de l'analyse actuelle incluant toutes les données historiques, hypothèses et métriques calculées.\n\nLes snapshots sont accessibles dans la sidebar droite (icône horloge)."
             >
-              <CloudArrowDownIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">Sauvegarder</span>
+              <ServerIcon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+              <span className="hidden sm:inline whitespace-nowrap">Sauvegarder</span>
             </button>
 
+            {/* Bouton Synchroniser */}
             {onFetchData && showSyncButton && (
               <button
                 onClick={handleSyncClick}
                 disabled={isLoading}
-                className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
-                title="🔄 Options de Synchronisation Avancées\n\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options configurables.\n\n📊 Le dialogue vous permet de:\n• Choisir quelles données synchroniser (historiques, assumptions, infos)\n• Décider si vous voulez remplacer les données oranges\n• Configurer des options avancées (nouvelles années uniquement, métriques manquantes, etc.)\n• Voir des explications détaillées avec exemples concrets pour chaque option\n\n💡 Chaque option inclut une section d'aide avec:\n• Comportement attendu\n• Exemples concrets\n• Outils et APIs utilisés\n• Formules et algorithmes\n• Recommandations d'utilisation"
+                className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print ${
+                  isLoading 
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                    : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:shadow-md active:scale-95 border border-emerald-200'
+                }`}
+                title="🔄 Options de Synchronisation Avancées\n\nOuvre le tableau de bord de synchronisation avec toutes les options configurables pour charger/mettre à jour les données depuis FMP."
               >
-                <ArrowPathIcon className={`w-3 h-3 sm:w-4 sm:h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                <span className="hidden xs:inline">{isLoading ? 'Sync...' : '⚙️ Options Sync'}</span>
+                <CloudArrowUpIcon className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${isLoading ? 'animate-pulse' : ''}`} />
+                <span className="hidden sm:inline whitespace-nowrap">{isLoading ? 'Synchronisation...' : 'Synchroniser'}</span>
               </button>
             )}
 
+            {/* Bouton Restaurer */}
             {onRestoreData && (
               <button
                 onClick={onRestoreData}
                 disabled={isLoading}
-                className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors no-print ${isLoading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-purple-50 text-purple-600 hover:bg-purple-100'}`}
-                title="📥 Restaurer les données\n\nOuvre un dialogue de restauration avec 2 options principales:\n\n1️⃣ Charger le dernier snapshot:\n   • Restaure la dernière sauvegarde complète\n   • Inclut toutes les données historiques\n   • Inclut toutes les hypothèses\n   • Mode lecture seule (sécurisé)\n   • Permet de comparer avec la version actuelle\n\n2️⃣ Recalculer depuis FMP:\n   • Recharge les données FMP Premium (30 ans)\n   • Réapplique automatiquement les hypothèses auto-fill\n   • Préserve vos exclusions de métriques\n   • Préserve les métriques ValueLine\n   • Met à jour uniquement les données auto-fetchées\n\n💡 Utilisation:\n• Utilisez 'Charger snapshot' pour revenir à une version précédente\n• Utilisez 'Recalculer FMP' pour actualiser avec les dernières données\n• Les modifications manuelles sont toujours préservées"
+                className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print ${
+                  isLoading 
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                    : 'bg-purple-50 text-purple-700 hover:bg-purple-100 hover:shadow-md active:scale-95 border border-purple-200'
+                }`}
+                title="📥 Restaurer les données\n\nOuvre un dialogue pour charger un snapshot précédent ou recalculer depuis FMP."
               >
-                <ArrowDownTrayIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Restaurer</span>
+                <ArrowUturnLeftIcon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <span className="hidden sm:inline whitespace-nowrap">Restaurer</span>
               </button>
             )}
 
+            {/* Bouton Imprimer */}
             <button
               onClick={handlePrint}
-              className="p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors no-print"
-              title="🖨️ Imprimer la fiche d'analyse\n\nGénère une version imprimable de l'analyse complète incluant:\n\n📊 Contenu imprimé:\n• En-tête avec informations de l'entreprise\n• Tableau des données historiques\n• Graphiques de valorisation\n• Matrices de sensibilité (P/E et P/CF)\n• Évaluation détaillée (4 métriques)\n• Notes de l'analyste\n• Résumé exécutif\n\n💡 Conseils:\n• Utilisez Ctrl+P (Cmd+P sur Mac) pour ouvrir le dialogue d'impression\n• Les éléments avec la classe 'no-print' sont automatiquement masqués\n• Optimisé pour impression en format A4\n• Les couleurs sont préservées pour une meilleure lisibilité"
+              className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print bg-gray-50 text-gray-700 hover:bg-gray-100 hover:shadow-md active:scale-95 border border-gray-200"
+              title="🖨️ Imprimer la fiche d'analyse\n\nGénère une version imprimable de l'analyse complète (données, graphiques, matrices, notes)."
             >
-              <PrinterIcon className="w-4 h-4 sm:w-6 sm:h-6" />
+              <PrinterIcon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+              <span className="hidden sm:inline whitespace-nowrap">Imprimer</span>
             </button>
 
+            {/* Bouton Rapports */}
             {onOpenReports && (
               <button
                 onClick={onOpenReports}
-                className="p-1.5 sm:p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-full transition-colors no-print"
-                title="📊 Rapports Visuels et Analyse de Données\n\nOuvre le panneau de rapports visuels complets incluant:\n\n📈 Qualité des Données:\n• Visualisation des données aberrantes détectées\n• Métriques exclues et raisons d'exclusion\n• Analyse des outliers dans les données historiques\n• Graphiques des prix cibles par métrique\n• Statistiques détaillées (médiane, écart-type)\n\n✅ Rapport de Sanitisation:\n• Comparaison avant/après sanitisation\n• Détails de toutes les corrections appliquées\n• Raisons des corrections par paramètre\n• Statistiques par catégorie (croissance, ratios, prix)\n\n📊 Visualisation Complète:\n• Graphiques de toutes les données historiques\n• Évolution des prix (High/Low/Avg)\n• Ratios de valorisation (P/E, P/CF, P/BV)\n• Taux de croissance annuel\n• Corrélations et statistiques"
+                className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:shadow-md active:scale-95 border border-indigo-200"
+                title="📊 Rapports Visuels et Analyse de Données\n\nOuvre le panneau de rapports visuels complets avec visualisation des données, qualité des données et statistiques détaillées."
               >
-                <DocumentChartBarIcon className="w-4 h-4 sm:w-6 sm:h-6" />
+                <DocumentChartBarIcon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <span className="hidden sm:inline whitespace-nowrap">Rapports</span>
               </button>
             )}
+
+            {/* Bouton Paramètres */}
             {onOpenSettings && (
               <button
                 onClick={onOpenSettings}
-                className="p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors no-print"
-                title="⚙️ Configuration Complète : Guardrails, Validation, Ajustements\n\nOuvre le panneau de configuration unifié pour gérer tous les paramètres de l'application.\n\n🛡️ Guardrails (Limites d'affichage):\n• Limites de croissance (min/max)\n• Limites de ratios (P/E, P/CF, P/BV)\n• Multiplicateur maximum raisonnable\n• Contrôlent l'affichage des graphiques et tableaux\n• Stockés dans localStorage (navigateur)\n\n✅ Validation (Paramètres de sanitisation):\n• Limites de croissance par métrique\n• Limites de ratios cibles\n• Précision des calculs\n• Automatisation de la sanitisation\n• Cohérence des données\n• Stockés dans Supabase (partagés)\n\n📊 Ajustements:\n• Paramètres généraux de l'application\n• Comportement par défaut\n• Options d'affichage\n\n💡 Impact:\n• Les Guardrails affectent l'affichage uniquement\n• La Validation affecte les calculs et la sauvegarde\n• Les changements sont appliqués immédiatement"
+                className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print bg-slate-50 text-slate-700 hover:bg-slate-100 hover:shadow-md active:scale-95 border border-slate-200"
+                title="⚙️ Configuration Complète\n\nOuvre le panneau de configuration pour gérer les Guardrails (affichage), Validation (sanitisation) et Ajustements."
               >
-                <Cog6ToothIcon className="w-4 h-4 sm:w-6 sm:h-6" />
+                <Cog6ToothIcon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <span className="hidden sm:inline whitespace-nowrap">Paramètres</span>
               </button>
             )}
           </div>

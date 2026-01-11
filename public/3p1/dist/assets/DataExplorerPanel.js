@@ -1,4 +1,28 @@
-import { r as reactExports, j as jsxRuntimeExports, s as ForwardRef, t as ForwardRef$1, u as ForwardRef$2, g as ForwardRef$3, F as ForwardRef$4, v as ForwardRef$5, w as ForwardRef$6, x as ForwardRef$7, a as ForwardRef$8, l as ForwardRef$9, m as ForwardRef$a, y as ForwardRef$b } from "./index.js";
+import { r as reactExports, j as jsxRuntimeExports, s as ForwardRef$1, t as ForwardRef$2, u as ForwardRef$3, g as ForwardRef$4, F as ForwardRef$5, v as ForwardRef$6, w as ForwardRef$7, x as ForwardRef$8, a as ForwardRef$9, l as ForwardRef$a, m as ForwardRef$b } from "./index.js";
+function CloudArrowDownIcon({
+  title,
+  titleId,
+  ...props
+}, svgRef) {
+  return /* @__PURE__ */ reactExports.createElement("svg", Object.assign({
+    xmlns: "http://www.w3.org/2000/svg",
+    fill: "none",
+    viewBox: "0 0 24 24",
+    strokeWidth: 1.5,
+    stroke: "currentColor",
+    "aria-hidden": "true",
+    "data-slot": "icon",
+    ref: svgRef,
+    "aria-labelledby": titleId
+  }, props), title ? /* @__PURE__ */ reactExports.createElement("title", {
+    id: titleId
+  }, title) : null, /* @__PURE__ */ reactExports.createElement("path", {
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    d: "M12 9.75v6.75m0 0-3-3m3 3 3-3m-8.25 6a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
+  }));
+}
+const ForwardRef = /* @__PURE__ */ reactExports.forwardRef(CloudArrowDownIcon);
 const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
   const [tables, setTables] = reactExports.useState([]);
   const [selectedTable, setSelectedTable] = reactExports.useState(null);
@@ -272,7 +296,7 @@ ID: ${id}`)) return;
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-7xl h-[90vh] flex flex-col shadow-2xl", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-4 border-b border-slate-700", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-6 h-6 text-blue-400" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-6 h-6 text-blue-400" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-bold text-white", children: "Data Explorer" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-slate-400", children: "Supabase 3P1 Tables" })
@@ -289,7 +313,7 @@ ID: ${id}`)) return;
               },
               className: "flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm text-white transition-colors",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$2, { className: "w-4 h-4" }),
                 "Ajouter"
               ]
             }
@@ -300,7 +324,7 @@ ID: ${id}`)) return;
               onClick: exportToExcel,
               className: "flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-sm text-white transition-colors",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$2, { className: "w-4 h-4" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-4 h-4" }),
                 "Export Excel"
               ]
             }
@@ -311,7 +335,7 @@ ID: ${id}`)) return;
               onClick: () => setShowSyncPanel(true),
               className: "flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm text-white transition-colors",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-4 h-4" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-4 h-4" }),
                 "Sync (",
                 selectedRows.size,
                 ")"
@@ -324,7 +348,7 @@ ID: ${id}`)) return;
           {
             onClick: onClose,
             className: "p-2 hover:bg-slate-700 rounded-lg transition-colors",
-            children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-5 h-5 text-slate-400" })
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-5 h-5 text-slate-400" })
           }
         )
       ] })
@@ -340,7 +364,7 @@ ID: ${id}`)) return;
             },
             className: `w-full text-left p-3 rounded-xl mb-4 transition-all ${showSummary && !selectedTable ? "bg-emerald-600/20 border border-emerald-500/50" : "hover:bg-slate-800 border border-transparent"}`,
             children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-5 h-5 text-emerald-400" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-5 h-5 text-emerald-400" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold text-white", children: "Rapport Global" })
             ] })
           }
@@ -365,12 +389,12 @@ ID: ${id}`)) return;
                       table.count.toLocaleString(),
                       " rows"
                     ] }),
-                    table.error && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-3 h-3 text-red-400" })
+                    table.error && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$6, { className: "w-3 h-3 text-red-400" })
                   ] })
                 ] })
               ] }),
               table.lastUpdate && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 mt-2 text-xs text-slate-500", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$6, { className: "w-3 h-3" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-3 h-3" }),
                 formatLastUpdate(table.lastUpdate)
               ] })
             ]
@@ -383,7 +407,7 @@ ID: ${id}`)) return;
             onClick: loadTables,
             className: "w-full mt-4 p-2 flex items-center justify-center gap-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-4 h-4" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-4 h-4" }),
               "Actualiser"
             ]
           }
@@ -392,7 +416,7 @@ ID: ${id}`)) return;
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 flex flex-col overflow-hidden", children: selectedTable ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 p-4 border-b border-slate-700 bg-slate-800/50", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex-1 max-w-md", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$8, { className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "input",
               {
@@ -413,7 +437,7 @@ ID: ${id}`)) return;
               onClick: () => setShowFilterBar(!showFilterBar),
               className: `p-2 rounded-lg border transition-all ${showFilterBar || Object.keys(activeFilters).length > 0 ? "bg-blue-600/20 border-blue-500 text-blue-400" : "bg-slate-900 border-slate-600 text-slate-400 hover:text-white"}`,
               title: "Filtres avancés",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$8, { className: "w-5 h-5" })
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$9, { className: "w-5 h-5" })
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-slate-400", children: [
@@ -423,7 +447,7 @@ ID: ${id}`)) return;
         ] }),
         showFilterBar && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 py-3 bg-slate-800/80 border-b border-slate-700 flex flex-wrap gap-2 items-center animate-in slide-in-from-top duration-200", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs font-bold text-slate-500 uppercase flex items-center gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$8, { className: "w-3 h-3" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$9, { className: "w-3 h-3" }),
             "Filtres:"
           ] }),
           columns.slice(0, 5).map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 min-w-[150px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -464,8 +488,8 @@ ID: ${id}`)) return;
             }
           )
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-auto", children: loading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-8 h-8 text-blue-400 animate-spin" }) }) : error ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center h-full text-red-400", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-6 h-6 mr-2" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-auto", children: loading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-8 h-8 text-blue-400 animate-spin" }) }) : error ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center h-full text-red-400", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$6, { className: "w-6 h-6 mr-2" }),
           error
         ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-slate-800 sticky top-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
@@ -485,7 +509,7 @@ ID: ${id}`)) return;
                 className: "p-3 text-left text-slate-300 cursor-pointer hover:text-white transition-colors",
                 children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate max-w-[120px]", children: col.name }),
-                  sortBy === col.name && (sortAsc ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$9, { className: "w-3 h-3" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-3 h-3" }))
+                  sortBy === col.name && (sortAsc ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-3 h-3" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: "w-3 h-3" }))
                 ] })
               },
               col.name
@@ -526,7 +550,7 @@ ID: ${id}`)) return;
                       onClick: () => handleSyncFMP(row.ticker),
                       className: "p-1 hover:bg-slate-700 rounded text-green-400 transition-colors",
                       title: "Synchroniser FMP",
-                      children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-4 h-4" })
+                      children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-4 h-4" })
                     }
                   ),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -607,7 +631,7 @@ ID: ${id}`)) return;
           ) })
         ] }, t.name)) })
       ] }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 flex items-center justify-center text-slate-500", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-16 h-16 mx-auto mb-4 opacity-50" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-16 h-16 mx-auto mb-4 opacity-50" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg", children: "Sélectionnez une table" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm mt-2", children: "pour visualiser les données" })
       ] }) }) })
@@ -652,14 +676,14 @@ ID: ${id}`)) return;
       {
         className: `p-4 rounded-xl shadow-2xl flex items-center gap-3 animate-in slide-in-from-right duration-300 ${n.type === "success" ? "bg-emerald-600 text-white" : "bg-red-600 text-white"}`,
         children: [
-          n.type === "success" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-5 h-5" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-5 h-5" }),
+          n.type === "success" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$2, { className: "w-5 h-5" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$6, { className: "w-5 h-5" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: n.message }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "button",
             {
               onClick: () => setNotifications((prev) => prev.filter((x) => x.id !== n.id)),
               className: "ml-4 p-1 hover:bg-black/10 rounded",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-4 h-4" })
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-4 h-4" })
             }
           )
         ]
@@ -768,7 +792,7 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 z-[60] bg-black/60 flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col max-h-[80vh]", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 border-b border-slate-700 flex justify-between items-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold text-white", children: title }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: onClose, className: "p-2 hover:bg-slate-700 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-5 h-5" }) })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: onClose, className: "p-2 hover:bg-slate-700 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-5 h-5" }) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6 overflow-y-auto space-y-4", children: columns.map((col) => {
       if (["id", "created_at", "updated_at"].includes(col.name)) return null;
@@ -788,7 +812,7 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
                 className: `flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded transition-colors disabled:opacity-50 ${hasFmpValue ? "bg-green-600/20 text-green-400" : "bg-blue-600/20 text-blue-400 hover:bg-blue-600/30"}`,
                 title: "Récupérer depuis FMP",
                 children: [
-                  loadingField === col.name ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-3 h-3 animate-spin" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: "w-3 h-3" }),
+                  loadingField === col.name ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-3 h-3 animate-spin" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-3 h-3" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "FMP" })
                 ]
               }
@@ -877,7 +901,7 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
                     setFmpValues(newFmpValues);
                   },
                   className: "p-1 hover:bg-slate-700/50 rounded text-slate-400 hover:text-white",
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-4 h-4" })
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-4 h-4" })
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsx(

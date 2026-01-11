@@ -22,6 +22,7 @@ import { SyncProgressBar } from './components/SyncProgressBar';
 import { LandingPage } from './components/LandingPage';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { InteractiveDemo } from './components/InteractiveDemo';
+import { SupabaseLoadingProgress } from './components/SupabaseLoadingProgress';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
 import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation, autoFillAssumptionsFromFMPData, isMutualFund, calculateHistoricalGrowth } from './utils/calculations';
 import { detectOutlierMetrics } from './utils/outlierDetection';
@@ -579,6 +580,13 @@ export default function App() {
 
     // --- LOAD TICKERS FROM SUPABASE ON INITIALIZATION ---
     const [isLoadingTickers, setIsLoadingTickers] = useState(false);
+    // États pour la progression du chargement Supabase
+    const [supabaseProgress, setSupabaseProgress] = useState({
+        current: 0,
+        total: 0,
+        startTime: null as number | null,
+        message: ''
+    });
     const [tickersLoadError, setTickersLoadError] = useState<string | null>(null);
     const hasLoadedTickersRef = useRef(false); // Flag pour éviter les chargements multiples
     const activeIdRef = useRef(activeId); // Ref pour accéder à activeId sans dépendance
@@ -622,6 +630,14 @@ export default function App() {
             setIsLoadingTickers(true);
             setTickersLoadError(null);
             
+            // Initialiser la progression
+            setSupabaseProgress({
+                current: 0,
+                total: 0,
+                startTime: Date.now(),
+                message: 'Chargement de la liste des tickers...'
+            });
+            
             console.log('📡 Début chargement tickers depuis Supabase...');
 
             try {
@@ -657,6 +673,15 @@ export default function App() {
                 }
                 
                 console.log(`✅ ${result.tickers.length} tickers chargés depuis Supabase`);
+                
+                // Mettre à jour la progression pour le chargement des données
+                const validTickers = result.tickers.filter(t => t.ticker && !isMutualFund(t.ticker, t.company_name));
+                setSupabaseProgress({
+                    current: 0,
+                    total: validTickers.length,
+                    startTime: Date.now(),
+                    message: `Chargement des données pour ${validTickers.length} ticker(s)...`
+                });
                 
                 // ✅ Marquer comme chargé seulement après succès
                 hasLoadedTickersRef.current = true;
@@ -1039,6 +1064,7 @@ export default function App() {
 
                         console.log(`🚀 Démarrage du chargement optimisé pour ${validTickers.length} tickers (Batch: ${batchSize})`);
 
+                        let processedCount = 0;
                         for (let i = 0; i < validTickers.length; i += batchSize) {
                             const batch = validTickers.slice(i, i + batchSize);
                             
@@ -1049,7 +1075,15 @@ export default function App() {
 
                             // ✅ OPTIMISATION : Charger depuis Supabase en batch
                             const tickerSymbols = batch.map(t => t.ticker.toUpperCase());
-                            console.log(`📥 Chargement batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(validTickers.length/batchSize)}: ${tickerSymbols.length} tickers...`);
+                            const batchNumber = Math.floor(i/batchSize) + 1;
+                            const totalBatches = Math.ceil(validTickers.length/batchSize);
+                            console.log(`📥 Chargement batch ${batchNumber}/${totalBatches}: ${tickerSymbols.length} tickers...`);
+                            
+                            // Mettre à jour la progression
+                            setSupabaseProgress(prev => ({
+                                ...prev,
+                                message: `Chargement batch ${batchNumber}/${totalBatches}...`
+                            }));
                             
                             const supabaseResults = await loadProfilesBatchFromSupabase(tickerSymbols);
 
@@ -1205,12 +1239,44 @@ export default function App() {
                                     });
                                     
                                     console.log(`✅ ${symbol}: Profil mis à jour depuis ${result.source === 'supabase' ? 'Supabase' : 'FMP'}`);
+                                    
+                                    // Mettre à jour la progression
+                                    processedCount++;
+                                    setSupabaseProgress(prev => ({
+                                        ...prev,
+                                        current: processedCount,
+                                        message: `Chargement ${processedCount}/${prev.total} ticker(s)...`
+                                    }));
                                 } catch (error) {
                                     console.error(`❌ ${symbol}: Erreur chargement données:`, error);
+                                    
+                                    // Mettre à jour la progression même en cas d'erreur
+                                    processedCount++;
+                                    setSupabaseProgress(prev => ({
+                                        ...prev,
+                                        current: processedCount
+                                    }));
                                 }
                             })
                         );
                         }
+                        
+                        // Finaliser la progression
+                        setSupabaseProgress(prev => ({
+                            ...prev,
+                            current: prev.total,
+                            message: 'Chargement terminé'
+                        }));
+                        
+                        // Masquer la progression après 2 secondes
+                        setTimeout(() => {
+                            setSupabaseProgress({
+                                current: 0,
+                                total: 0,
+                                startTime: null,
+                                message: ''
+                            });
+                        }, 2000);
                     };
 
                     // Démarrer le chargement en arrière-plan (non-bloquant)
@@ -1226,12 +1292,24 @@ export default function App() {
                 } else {
                     // Aucun nouveau ticker - libérer le loading
                     setIsLoadingTickers(false);
+                    setSupabaseProgress({
+                        current: 0,
+                        total: 0,
+                        startTime: null,
+                        message: ''
+                    });
                 }
 
             } catch (error: any) {
                 console.error('❌ Erreur lors du chargement des tickers:', error);
                 setTickersLoadError(error.message || 'Erreur inconnue');
                 hasLoadedTickersRef.current = false; // Réessayer au prochain render
+                setSupabaseProgress({
+                    current: 0,
+                    total: 0,
+                    startTime: null,
+                    message: ''
+                });
             } finally {
                 setIsLoadingTickers(false);
             }
@@ -1341,6 +1419,12 @@ export default function App() {
         if (!isInitialized) return; // Skip si pas encore initialisé
         if (showLanding) return; // Skip si on est sur la landing page
         if (showDemo) return; // Skip si le démo est déjà affiché
+        
+        // ✅ Vérifier si l'utilisateur a déjà fermé le démo manuellement
+        const hasClosedDemo = localStorage.getItem('3p1-has-closed-demo');
+        if (hasClosedDemo === 'true') {
+            return; // Ne pas réafficher si l'utilisateur l'a fermé
+        }
         
         const currentProfile = library[activeId] || DEFAULT_PROFILE;
         const currentProfileName = currentProfile.info.name;
@@ -4661,7 +4745,10 @@ export default function App() {
                                 >
                                     <ClockIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </button>
-                                <h1 className="text-base sm:text-xl font-bold text-gray-700 truncate flex-1 sm:flex-none">JLab 3p1</h1>
+                                <h1 className="text-base sm:text-xl md:text-2xl font-extrabold truncate flex-1 sm:flex-none bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent tracking-tight">
+                                  <span className="inline-block">JLab</span>
+                                  <span className="inline-block ml-1.5 text-blue-500">3p1</span>
+                                </h1>
                             </div>
 
                             {/* VIEW TABS */}
@@ -4705,20 +4792,24 @@ export default function App() {
                             </div>
                         </div>
 
-                                <Header
-                                    info={info}
-                                    assumptions={assumptions}
-                                    availableYears={availableYears}
-                                    recommendation={recommendation}
-                                    isWatchlist={isWatchlist}
-                                    onUpdateInfo={handleUpdateInfo}
-                                    onUpdateAssumption={handleUpdateAssumption}
-                                    onFetchData={profile?.info?.symbol ? handleFetchData : undefined}
-                                    onRestoreData={profile && profile.data.length > 0 ? () => setShowRestoreDialog(true) : undefined}
-                                    showSyncButton={true}
-                                    onOpenSettings={() => setIsSettingsOpen(true)}
-                                    onOpenReports={() => setIsReportsOpen(true)}
-                                />
+                        {/* Header - Affiché seulement pour les vues Analysis et Info, pas pour KPI */}
+                        {currentView !== 'kpi' && (
+                            <Header
+                                info={info}
+                                assumptions={assumptions}
+                                availableYears={availableYears}
+                                recommendation={recommendation}
+                                isWatchlist={isWatchlist}
+                                onUpdateInfo={handleUpdateInfo}
+                                onUpdateAssumption={handleUpdateAssumption}
+                                onFetchData={profile?.info?.symbol ? handleFetchData : undefined}
+                                onRestoreData={profile && profile.data.length > 0 ? () => setShowRestoreDialog(true) : undefined}
+                                showSyncButton={true}
+                                onOpenSettings={() => setIsSettingsOpen(true)}
+                                onOpenReports={() => setIsReportsOpen(true)}
+                                activeSymbol={activeId || info.symbol || undefined}
+                            />
+                        )}
 
                         {/* CONDITIONAL RENDER: ANALYSIS VS INFO VS KPI */}
                         {currentView === 'info' ? (
@@ -4839,7 +4930,18 @@ export default function App() {
                                             L'analyse de {info.name} suggère une position <strong className="text-white uppercase">{recommendation}</strong> au prix actuel de {formatCurrency(assumptions.currentPrice)}.
                                         </p>
                                         <p className="text-slate-300 text-sm mb-4 leading-relaxed">
-                                            Le titre se négocie à <strong className="text-white">{formatPercent(Math.abs(1 - (assumptions.currentPrice / targetPrice)) * 100)} {assumptions.currentPrice < targetPrice ? 'sous' : 'au-dessus de'}</strong> l'objectif de prix EPS de {formatCurrency(targetPrice)}.
+                                            {targetPrice && targetPrice > 0 && assumptions.currentPrice > 0 ? (
+                                                <>
+                                                    Le titre se négocie à <strong className="text-white">
+                                                        {(() => {
+                                                            const diff = Math.abs(1 - (assumptions.currentPrice / targetPrice)) * 100;
+                                                            return isFinite(diff) && !isNaN(diff) ? formatPercent(diff) : 'N/A';
+                                                        })()} {assumptions.currentPrice < targetPrice ? 'sous' : 'au-dessus de'}
+                                                    </strong> l'objectif de prix EPS de {formatCurrency(targetPrice)}.
+                                                </>
+                                            ) : (
+                                                <span className="text-slate-400">Données insuffisantes pour calculer la position relative au prix cible EPS.</span>
+                                            )}
                                         </p>
 
                                         {/* Note: Les métriques ValueLine sont affichées dans le Header (barre supérieure) et dans la section Configuration ci-dessous */}
@@ -5028,7 +5130,11 @@ export default function App() {
             {/* Interactive Demo */}
             {showDemo && (!activeId || profile.info.name === 'Chargement...') && (
                 <InteractiveDemo
-                    onClose={() => setShowDemo(false)}
+                    onClose={() => {
+                        setShowDemo(false);
+                        // ✅ Mémoriser que l'utilisateur a fermé le démo pour ne pas le réafficher
+                        localStorage.setItem('3p1-has-closed-demo', 'true');
+                    }}
                     onSelectTicker={() => {
                         setIsSidebarOpen(true);
                     }}
@@ -5069,8 +5175,55 @@ export default function App() {
                             });
                         }
                         
-                        // Sélectionner ACN (handleSelectTicker chargera les données)
+                        // Sélectionner ACN (handleSelectTicker chargera les données depuis Supabase puis FMP)
+                        // ✅ FORCER le chargement même si le profil existe déjà mais est vide
                         await handleSelectTicker(upperTicker);
+                        
+                        // ✅ DOUBLE VÉRIFICATION : Si après handleSelectTicker les données sont toujours vides, forcer le chargement FMP
+                        setTimeout(async () => {
+                            const currentProfile = library[upperTicker];
+                            if (currentProfile && (!currentProfile.data || currentProfile.data.length === 0)) {
+                                console.log(`🔄 ${upperTicker}: Données toujours vides après handleSelectTicker - Forcer chargement FMP...`);
+                                try {
+                                    const { fetchCompanyData } = await import('./services/financeApi');
+                                    showNotification(`Chargement des données FMP pour ${upperTicker}...`, 'info');
+                                    const result = await fetchCompanyData(upperTicker);
+                                    
+                                    if (result.data && result.data.length > 0 && result.currentPrice > 0) {
+                                        const updatedProfile: AnalysisProfile = {
+                                            id: upperTicker,
+                                            lastModified: Date.now(),
+                                            data: result.data,
+                                            assumptions: autoFillAssumptionsFromFMPData(result.data, result.currentPrice, INITIAL_ASSUMPTIONS) as Assumptions,
+                                            info: result.info,
+                                            notes: '',
+                                            isWatchlist: null
+                                        };
+                                        
+                                        // Retirer le flag squelette
+                                        delete (updatedProfile as any)._isSkeleton;
+                                        
+                                        setLibrary(prev => ({
+                                            ...prev,
+                                            [upperTicker]: updatedProfile
+                                        }));
+                                        
+                                        // Mettre à jour les states si c'est toujours le ticker actif
+                                        if (activeId === upperTicker) {
+                                            setData(updatedProfile.data);
+                                            setAssumptions(updatedProfile.assumptions);
+                                            setInfo(updatedProfile.info);
+                                        }
+                                        
+                                        showNotification(`✅ ${upperTicker} chargé depuis FMP`, 'success');
+                                        console.log(`✅ ${upperTicker}: Données FMP chargées avec succès`);
+                                    }
+                                } catch (error) {
+                                    console.error(`❌ ${upperTicker}: Erreur chargement FMP forcé:`, error);
+                                    showNotification(`❌ Impossible de charger ${upperTicker} depuis FMP`, 'error');
+                                }
+                            }
+                        }, 1000); // Attendre 1 seconde pour laisser handleSelectTicker terminer
                     }}
                 />
             )}
@@ -5093,6 +5246,15 @@ export default function App() {
             />
 
             {/* NOTIFICATIONS */}
+            {/* Indicateur de progression Supabase */}
+            <SupabaseLoadingProgress
+                isLoading={isLoadingTickers && supabaseProgress.total > 0}
+                current={supabaseProgress.current}
+                total={supabaseProgress.total}
+                startTime={supabaseProgress.startTime}
+                message={supabaseProgress.message}
+            />
+
             <NotificationManager
                 notifications={notifications}
                 onRemove={(id) => setNotifications(prev => prev.filter(n => n.id !== id))}

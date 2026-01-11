@@ -43,6 +43,13 @@ export interface LoadTickersResult {
  */
 export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> => {
   try {
+    // ✅ DÉTECTION LOCALHOST: Si on est en localhost et que les APIs échouent, utiliser Supabase directement
+    const isLocalhost = typeof window !== 'undefined' && (
+      window.location.hostname === 'localhost' || 
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === '0.0.0.0'
+    );
+
     // ✅ ESSAI 1: Charger TOUS les team tickers explicitement (sans limite de priority)
     // Cela garantit que les 25 team tickers sont toujours chargés, même avec priority basse
     let teamTickersResponse = await fetch('/api/admin/tickers?is_active=true&source=team&limit=1000&order_by=ticker&order_direction=asc');
@@ -203,6 +210,46 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
             tickers: allTickers
           };
         }
+      }
+    }
+
+    // ✅ ESSAI 4: Si on est en localhost et que toutes les APIs ont échoué, essayer Supabase directement
+    if (isLocalhost) {
+      console.log('🔄 Localhost détecté - Tentative chargement direct depuis Supabase...');
+      try {
+        const { getSupabaseClient } = await import('./supabase');
+        const supabase = getSupabaseClient();
+        
+        if (supabase) {
+          const { data: tickers, error: supabaseError } = await supabase
+            .from('tickers')
+            .select('ticker, company_name, sector, source, is_active, security_rank, earnings_predictability, price_growth_persistence, price_stability, beta')
+            .eq('is_active', true)
+            .limit(1000);
+          
+          if (!supabaseError && tickers && tickers.length > 0) {
+            const normalizedTickers = tickers.map((t: any) => ({
+              ticker: t.ticker,
+              company_name: t.company_name,
+              sector: t.sector,
+              source: t.source || 'manual',
+              is_active: t.is_active,
+              security_rank: t.security_rank,
+              earnings_predictability: t.earnings_predictability,
+              price_growth_persistence: t.price_growth_persistence,
+              price_stability: t.price_stability,
+              beta: t.beta
+            }));
+            
+            console.log(`✅ ${normalizedTickers.length} tickers chargés directement depuis Supabase (localhost)`);
+            return {
+              success: true,
+              tickers: normalizedTickers
+            };
+          }
+        }
+      } catch (supabaseDirectError) {
+        console.warn('⚠️ Erreur chargement direct Supabase:', supabaseDirectError);
       }
     }
 

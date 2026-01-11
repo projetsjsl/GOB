@@ -105,8 +105,13 @@ export const formatCurrency = (val: number | undefined | null) => {
   return new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(val);
 };
 
-export const formatPercent = (val: number) => 
-  new Intl.NumberFormat('fr-CA', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 2 }).format(val / 100);
+export const formatPercent = (val: number) => {
+  // ✅ Validation pour éviter NaN
+  if (val == null || !isFinite(val) || isNaN(val)) {
+    return 'N/A';
+  }
+  return new Intl.NumberFormat('fr-CA', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 2 }).format(val / 100);
+};
 
 /**
  * Détecte si un ticker est probablement un fonds mutuel

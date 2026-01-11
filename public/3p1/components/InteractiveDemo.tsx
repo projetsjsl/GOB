@@ -104,6 +104,8 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSel
       if (onLoadDefaultTicker) {
         onLoadDefaultTicker();
       }
+      // ✅ Mémoriser que l'utilisateur a terminé le démo
+      localStorage.setItem('3p1-has-closed-demo', 'true');
       onClose();
     }
   };
@@ -119,6 +121,8 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSel
     if (onLoadDefaultTicker) {
       onLoadDefaultTicker();
     }
+    // ✅ Mémoriser que l'utilisateur a fermé le démo
+    localStorage.setItem('3p1-has-closed-demo', 'true');
     onClose();
   };
 

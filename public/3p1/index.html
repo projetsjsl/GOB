@@ -8,7 +8,23 @@
     <style>
     </style>
   <!-- Environment Configuration - Must be loaded FIRST -->
-  <script src="/js/env-config.js"></script>
+  <script src="/js/env-config.js" defer></script>
+  <script>
+    // Ensure env-config.js is loaded before React modules
+    if (typeof window !== 'undefined' && !window.SUPABASE_ANON_KEY && !window.ENV_CONFIG) {
+      console.warn('⏳ Waiting for env-config.js to load...');
+      // Fallback: set default values if env-config.js fails
+      window.SUPABASE_URL = window.SUPABASE_URL || 'https://boyuxgdplbpkknplxbxp.supabase.co';
+      window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJveXV4Z2RwbGJwa2tucGx4YnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzMzU5MTQsImV4cCI6MjA3NTkxMTkxNH0.-M-QdpBFlDtg1CeA00VepQCNzGzvU-tISyVA0yCLBdw';
+      if (!window.ENV_CONFIG) {
+        window.ENV_CONFIG = {
+          SUPABASE_URL: window.SUPABASE_URL,
+          SUPABASE_ANON_KEY: window.SUPABASE_ANON_KEY
+        };
+      }
+      console.log('✅ Fallback env config set for localhost');
+    }
+  </script>
   <script type="importmap">
 {
   "imports": {
