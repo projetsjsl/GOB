@@ -41178,7 +41178,7 @@ class ErrorBoundary extends reactExports.Component {
     return this.props.children;
   }
 }
-const InteractiveDemo = ({ onClose, onSelectTicker }) => {
+const InteractiveDemo = ({ onClose, onSelectTicker, onLoadDefaultTicker }) => {
   const [currentStep, setCurrentStep] = reactExports.useState(1);
   const [highlightRect, setHighlightRect] = reactExports.useState(null);
   const overlayRef = reactExports.useRef(null);
@@ -41242,6 +41242,9 @@ const InteractiveDemo = ({ onClose, onSelectTicker }) => {
     if (currentStep < 3) {
       setCurrentStep((prev) => prev + 1);
     } else {
+      if (onLoadDefaultTicker) {
+        onLoadDefaultTicker();
+      }
       onClose();
     }
   };
@@ -41251,6 +41254,9 @@ const InteractiveDemo = ({ onClose, onSelectTicker }) => {
     }
   };
   const handleSkip = () => {
+    if (onLoadDefaultTicker) {
+      onLoadDefaultTicker();
+    }
     onClose();
   };
   const handleSelectTicker = () => {
@@ -60534,6 +60540,36 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
         onClose: () => setShowDemo(false),
         onSelectTicker: () => {
           setIsSidebarOpen(true);
+        },
+        onLoadDefaultTicker: async () => {
+          const defaultTicker = "ACN";
+          const upperTicker = defaultTicker.toUpperCase();
+          if (!library[upperTicker]) {
+            console.log(`📝 Création profil squelette pour ${upperTicker}...`);
+            const skeletonProfile = {
+              id: upperTicker,
+              lastModified: Date.now(),
+              data: [],
+              assumptions: INITIAL_ASSUMPTIONS,
+              info: {
+                ...INITIAL_INFO,
+                symbol: upperTicker,
+                name: "Chargement..."
+              },
+              notes: "",
+              isWatchlist: null
+            };
+            skeletonProfile._isSkeleton = true;
+            setLibrary((prev) => {
+              const updated = {
+                ...prev,
+                [upperTicker]: skeletonProfile
+              };
+              saveToCache(updated).catch((e) => console.warn("Erreur sauvegarde cache:", e));
+              return updated;
+            });
+          }
+          await handleSelectTicker(upperTicker);
         }
       }
     ),

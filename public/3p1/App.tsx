@@ -5019,6 +5019,46 @@ export default function App() {
                     onSelectTicker={() => {
                         setIsSidebarOpen(true);
                     }}
+                    onLoadDefaultTicker={async () => {
+                        // Charger ACN par défaut quand le démo se ferme
+                        const defaultTicker = 'ACN';
+                        const upperTicker = defaultTicker.toUpperCase();
+                        
+                        // Si ACN n'existe pas dans la library, créer un profil squelette
+                        if (!library[upperTicker]) {
+                            console.log(`📝 Création profil squelette pour ${upperTicker}...`);
+                            const skeletonProfile: AnalysisProfile = {
+                                id: upperTicker,
+                                lastModified: Date.now(),
+                                data: [],
+                                assumptions: INITIAL_ASSUMPTIONS,
+                                info: {
+                                    ...INITIAL_INFO,
+                                    symbol: upperTicker,
+                                    name: 'Chargement...'
+                                },
+                                notes: '',
+                                isWatchlist: null
+                            };
+                            
+                            // Marquer comme squelette
+                            (skeletonProfile as any)._isSkeleton = true;
+                            
+                            // Ajouter à la library
+                            setLibrary(prev => {
+                                const updated = {
+                                    ...prev,
+                                    [upperTicker]: skeletonProfile
+                                };
+                                // Sauvegarder dans le cache
+                                saveToCache(updated).catch(e => console.warn('Erreur sauvegarde cache:', e));
+                                return updated;
+                            });
+                        }
+                        
+                        // Sélectionner ACN (handleSelectTicker chargera les données)
+                        await handleSelectTicker(upperTicker);
+                    }}
                 />
             )}
 

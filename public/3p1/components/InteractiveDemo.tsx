@@ -11,6 +11,7 @@ import {
 interface InteractiveDemoProps {
   onClose: () => void;
   onSelectTicker?: () => void; // Callback pour guider vers la sélection d'un ticker
+  onLoadDefaultTicker?: () => void; // Callback pour charger ACN par défaut
 }
 
 type DemoStep = 1 | 2 | 3;
@@ -22,7 +23,7 @@ interface HighlightRect {
   height: number;
 }
 
-export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSelectTicker }) => {
+export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSelectTicker, onLoadDefaultTicker }) => {
   const [currentStep, setCurrentStep] = useState<DemoStep>(1);
   const [highlightRect, setHighlightRect] = useState<HighlightRect | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -99,6 +100,10 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSel
     if (currentStep < 3) {
       setCurrentStep((prev) => (prev + 1) as DemoStep);
     } else {
+      // À la fin du démo, charger ACN par défaut
+      if (onLoadDefaultTicker) {
+        onLoadDefaultTicker();
+      }
       onClose();
     }
   };
@@ -110,6 +115,10 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSel
   };
 
   const handleSkip = () => {
+    // Même si on skip, charger ACN par défaut
+    if (onLoadDefaultTicker) {
+      onLoadDefaultTicker();
+    }
     onClose();
   };
 
