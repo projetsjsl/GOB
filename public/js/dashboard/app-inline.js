@@ -26756,10 +26756,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             const availableWidth = navWidth - padding * 2 - plusButtonWidth - gap;
 
             // LISTE DE PRIORITÉ STRICTE demandée par l'utilisateur
-            // Admin, Marchés, Titres, JLab, Emma IA
+            // Admin, Marchés, Nouvelles, Titres, JLab, Emma IA
             const PRIORITY_IDS = [
                 'admin-jsla',
                 'markets-economy',
+                'nouvelles',
                 'advanced-analysis',
                 'jlab',
                 'ask-emma'
