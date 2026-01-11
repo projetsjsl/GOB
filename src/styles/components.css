@@ -32,6 +32,8 @@
 .widget-content-scroll {
     overflow-y: auto;
     height: 100%;
+    /* Firefox scrollbar styling (not supported in Safari/Chrome < 121) */
+    /* Safari/Chrome use ::-webkit-scrollbar styles defined above */
     scrollbar-width: thin;
     scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
 }
@@ -46,7 +48,7 @@
 /* Glassmorphism effect */
 .glass-effect {
     background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     border: 1px solid var(--gob-border-subtle);
 }
