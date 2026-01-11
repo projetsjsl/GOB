@@ -13,10 +13,12 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS - Compiled CSS file (production-ready, replaces CDN) -->
+    <link rel="stylesheet" href="/css/tailwind.css">
     <script>
-        tailwind.config = {
+        // Tailwind config preserved for compatibility (if needed by inline styles)
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {

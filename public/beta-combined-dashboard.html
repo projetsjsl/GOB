@@ -191,6 +191,9 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <!-- Note: Babel Standalone utilisé intentionnellement pour ce fichier standalone -->
+    <!-- PRODUCTION NOTE: Babel Standalone is intentionally used for this standalone file -->
+    <!-- The console warning "You are using the in-browser Babel transformer" is expected and can be ignored -->
+    <!-- For production optimization, consider precompiling with: npm run build:babel -->
     <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
 
     <!-- Fix for "exports is not defined" error when Babel transpiles modules -->
@@ -561,31 +564,7 @@
 
     <!-- TradingView Lightweight Charts - Bibliothèque officielle pour graphiques personnalisés -->
     <!-- <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script> -->
-    <!-- Note: CDN Tailwind utilisé intentionnellement pour ce fichier standalone -->
-    <!-- Tailwind CSS CDN avec JIT pour support complet des classes -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'Plus Jakarta Sans', 'sans-serif'],
-                        display: ['Outfit', 'sans-serif'],
-                    },
-                    colors: {
-                        gold: {
-                            50: '#fbf7eb', 100: '#f5ecd0', 200: '#ebdcb6',
-                            300: '#dfbc6e', 400: '#d9a843', 500: '#d08f23',
-                            600: '#b46f19', 700: '#905316', 800: '#754316', 900: '#613816',
-                        },
-                        dark: { 900: '#050505', 800: '#0a0a0a', 700: '#121212', 600: '#1a1a1a' }
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Tailwind CSS compilé (backup) -->
+    <!-- Tailwind CSS - Compiled CSS file (production-ready, replaces CDN) -->
     <link rel="stylesheet" href="/css/tailwind.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Recharts - Bundled locally (prop-types included in bundle) -->
@@ -823,8 +802,11 @@
             console.log('Iconoir disponible:', document.querySelectorAll('[class*="iconoir-"]').length > 0);
 
             // Message informatif sur les avertissements de production
-            console.log('ℹ️ Note: Les avertissements Tailwind/Babel sont normaux pour ce fichier standalone');
-            console.log('ℹ️ Ce fichier utilise intentionnellement des CDN pour la portabilité');
+            // Note: Babel Standalone is used intentionally for this standalone file
+            // For production optimization, consider precompiling with: npm run build:babel
+            if (process.env.NODE_ENV === 'production') {
+                console.log('ℹ️ Production mode: Consider using precompiled scripts for better performance');
+            }
         });
 
         // ============================================
@@ -2006,7 +1988,9 @@
         console.log('✅ All component scripts loaded, components-ready event dispatched');
     </script>
 
-    <!-- Inline bundle - Using Babel (confirmed working) -->
+    <!-- Inline bundle - Using Babel Standalone (intentional for standalone file) -->
+    <!-- PRODUCTION NOTE: This file is >500KB and compiled by Babel in-browser -->
+    <!-- The warning about file size is expected. For optimization, use precompiled version -->
     <script type="text/babel" data-presets="react" src="/js/dashboard/app-inline.js?v=3.2"></script>
 
     <!-- Global Real-time Sync (must load after app-inline to dispatch events) -->
