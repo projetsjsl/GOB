@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
+import Icon from '../shared/Icon';
 
             const EmmaSmsPanel = () => {
                 const [loading, setLoading] = useState(true);

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import type { TabProps } from '../../types';
+import Icon from '../shared/Icon';
 
 declare const Chart: any;
 declare const Recharts: any;
