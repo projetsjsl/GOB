@@ -35046,29 +35046,27 @@ Synchronise uniquement les tickers que vous avez sélectionnés avec les options
 ⚠️ IMPORTANT:
 • ⭐ Étoile = Portefeuille (team tickers DÉTENUS)
 • 👁️ Œil = Watchlist (titres SURVEILLÉS)
-• Pas d'icône = Tickers normaux (hors team/watchlist)
+• 📋 = Tickers normaux (hors team/watchlist)
 • Point coloré = Recommandation (ACHAT/CONSERVER/VENTE)
 
-Utilisez la barre de recherche pour filtrer par symbole ou nom.`, children: "Portefeuille" }),
+Utilisez les filtres ci-dessous pour filtrer par type.`, children: filterBy === "all" ? "Tous les tickers" : filterBy === "portfolio" ? "⭐ Portefeuille" : filterBy === "watchlist" ? "👁️ Watchlist" : "📋 Normaux" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
-          filterBy === "all" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[9px] bg-yellow-900/50 px-1.5 py-0.5 rounded text-yellow-400", title: `Portefeuille (team tickers): ${tickerStats.portfolio} tickers`, children: [
-              "⭐ ",
-              tickerStats.portfolio
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[9px] bg-blue-900/50 px-1.5 py-0.5 rounded text-blue-400", title: `Watchlist: ${tickerStats.watchlist} tickers`, children: [
-              "👁️ ",
-              tickerStats.watchlist
-            ] }),
-            tickerStats.normal > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[9px] bg-slate-700/50 px-1.5 py-0.5 rounded text-slate-400", title: `Tickers normaux (hors team/watchlist): ${tickerStats.normal} tickers`, children: [
-              "📋 ",
-              tickerStats.normal
-            ] })
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: `text-[9px] px-1.5 py-0.5 rounded transition-colors ${filterBy === "portfolio" ? "bg-yellow-600 text-white" : "bg-yellow-900/50 text-yellow-400"}`, title: `Portefeuille (team tickers): ${tickerStats.portfolio} tickers`, children: [
+            "⭐ ",
+            tickerStats.portfolio
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: `text-[9px] px-1.5 py-0.5 rounded transition-colors ${filterBy === "watchlist" ? "bg-blue-600 text-white" : "bg-blue-900/50 text-blue-400"}`, title: `Watchlist: ${tickerStats.watchlist} tickers`, children: [
+            "👁️ ",
+            tickerStats.watchlist
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: `text-[9px] px-1.5 py-0.5 rounded transition-colors ${filterBy === "normal" ? "bg-slate-600 text-white" : "bg-slate-700/50 text-slate-400"}`, title: `Tickers normaux: ${tickerStats.normal} tickers`, children: [
+            "📋 ",
+            tickerStats.normal
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] bg-slate-800 px-1.5 py-0.5 rounded-full text-slate-400 cursor-help", title: `Nombre de tickers affichés: ${filteredAndSortedProfiles.length} / ${profiles.length}
 
 ${searchTerm ? `(Filtrés sur "${searchTerm}")` : ""}
-${filterBy !== "all" ? `(Filtre: ${filterBy === "portfolio" ? "Portefeuille" : "Watchlist"})` : ""}`, children: filteredAndSortedProfiles.length })
+${filterBy !== "all" ? `(Filtre actif: ${filterBy === "portfolio" ? "Portefeuille" : filterBy === "watchlist" ? "Watchlist" : "Normaux"})` : ""}`, children: filteredAndSortedProfiles.length })
         ] })
       ] }),
       filteredAndSortedProfiles.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center text-slate-600 text-sm py-8 px-4", children: searchTerm ? "Aucun résultat" : "Commencez par ajouter un ticker" }) : filteredAndSortedProfiles.map((profile) => {
@@ -41001,7 +40999,7 @@ const LandingPage = ({ onGetStarted }) => {
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-center mb-8", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "inline-flex items-center space-x-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-2xl shadow-2xl", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$8, { className: "w-8 h-8" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-3xl font-bold", children: "3P1" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-3xl font-bold", children: "JLab 3p1" })
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h1", { className: "text-5xl md:text-6xl font-extrabold text-white mb-6 leading-tight", style: { wordBreak: "normal", overflowWrap: "normal" }, children: [
         "Analyse Financière",
@@ -41058,7 +41056,7 @@ const LandingPage = ({ onGetStarted }) => {
         }
       )
     ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-slate-800", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-center text-slate-500 text-sm", children: "© 2025 3P1 - Plateforme d'analyse financière professionnelle" }) })
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-slate-800", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-center text-slate-500 text-sm", children: "© 2025 JLab 3p1 - Plateforme d'analyse financière professionnelle" }) })
   ] });
 };
 class ErrorBoundary extends reactExports.Component {
@@ -59807,7 +59805,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-5 h-5 sm:w-6 sm:h-6" })
               }
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-base sm:text-xl font-bold text-gray-700 truncate flex-1 sm:flex-none", children: "Analyse Financière Pro" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-base sm:text-xl font-bold text-gray-700 truncate flex-1 sm:flex-none", children: "JLab 3p1" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex bg-gray-800/50 p-1 rounded-lg border border-gray-700/50 backdrop-blur-sm", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs(

@@ -4626,7 +4626,7 @@ export default function App() {
                                 >
                                     <ClockIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </button>
-                                <h1 className="text-base sm:text-xl font-bold text-gray-700 truncate flex-1 sm:flex-none">Analyse Financière Pro</h1>
+                                <h1 className="text-base sm:text-xl font-bold text-gray-700 truncate flex-1 sm:flex-none">JLab 3p1</h1>
                             </div>
 
                             {/* VIEW TABS */}

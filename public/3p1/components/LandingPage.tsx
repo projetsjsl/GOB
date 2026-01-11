@@ -18,7 +18,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           <div className="flex justify-center mb-8">
             <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-2xl shadow-2xl">
               <SparklesIcon className="w-8 h-8" />
-              <span className="text-3xl font-bold">3P1</span>
+              <span className="text-3xl font-bold">JLab 3p1</span>
             </div>
           </div>
 
@@ -123,7 +123,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       {/* Footer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-slate-800">
         <p className="text-center text-slate-500 text-sm">
-          © 2025 3P1 - Plateforme d'analyse financière professionnelle
+          © 2025 JLab 3p1 - Plateforme d'analyse financière professionnelle
         </p>
       </div>
     </div>
