@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect, memo, useRef } from 'react';
+import React, { useState, useEffect, memo, useRef, useMemo } from 'react';
 import type { TabProps } from '../../types';
 
 // Ground News Expandable Section Component
@@ -136,6 +136,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
     const [isLoadingNews, setIsLoadingNews] = useState(false);
 
     // ✅ FIX: Charger les news automatiquement si vides au montage ou quand newsData change
+    // Use newsData.length instead of newsData to prevent infinite loops
     useEffect(() => {
         if ((!newsData || newsData.length === 0) && fetchNews && !loading && !isLoadingNews) {
             console.log('📰 NouvellesTab: newsData vide, chargement automatique...');
@@ -147,7 +148,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                 setIsLoadingNews(false);
             });
         }
-    }, [newsData, fetchNews, loading, isLoadingNews]); // Se déclenche quand newsData change ou au montage
+    }, [newsData.length, fetchNews, loading, isLoadingNews]); // Use length to prevent infinite loops
     
     // BUG #1 FIX: Pagination et lazy loading pour éviter freeze
     const [displayedCount, setDisplayedCount] = useState(20); // Limiter à 20 articles initialement
@@ -250,19 +251,11 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
         }
     };
 
-    // Filtrer les nouvelles
-    useEffect(() => {
+    // Filtrer les nouvelles - Optimisé avec useMemo pour éviter les re-renders inutiles et freezes
+    const filteredNewsResult = useMemo(() => {
         // ✅ FIX: Vérifier que newsData existe et est un tableau non vide
         if (!newsData || !Array.isArray(newsData) || newsData.length === 0) {
-            setLocalFilteredNews([]);
-            setIsApproximateMatch(false);
-            // Si pas de données et fetchNews disponible, essayer de charger
-            if (fetchNews && newsData.length === 0) {
-                fetchNews('general', 100).catch(err => {
-                    console.error('Erreur chargement nouvelles:', err);
-                });
-            }
-            return;
+            return { filtered: [], isApproximate: false };
         }
 
         let filtered = newsData;
@@ -355,11 +348,16 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
             hasExactMatches = false;
         }
 
-        setIsApproximateMatch(!hasExactMatches);
-        setLocalFilteredNews(filtered);
+        return { filtered, isApproximate: !hasExactMatches };
+    }, [newsData, localFrenchOnly, selectedSource, selectedMarket, selectedTheme, isFrenchArticle, matchesSource]);
+
+    // Mettre à jour les states depuis le résultat mémorisé
+    useEffect(() => {
+        setLocalFilteredNews(filteredNewsResult.filtered);
+        setIsApproximateMatch(filteredNewsResult.isApproximate);
         // BUG #1 FIX: Réinitialiser le compteur d'affichage quand les filtres changent
         setDisplayedCount(ARTICLES_PER_PAGE);
-    }, [newsData, localFrenchOnly, selectedSource, selectedMarket, selectedTheme]);
+    }, [filteredNewsResult]);
 
     // BUG #1 FIX: Intersection Observer pour lazy loading automatique
     useEffect(() => {
