@@ -124,6 +124,9 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
         <span className={className}>{name}</span>
     ));
 
+    // Sub-tabs state
+    const [activeSubTab, setActiveSubTab] = useState<'all' | 'french' | 'by-source' | 'by-market' | 'ground'>('all');
+    
     const [localFrenchOnly, setLocalFrenchOnly] = useState(false);
     const [selectedSource, setSelectedSource] = useState('all');
     const [selectedMarket, setSelectedMarket] = useState('all');
@@ -361,6 +364,44 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
     const displayedNews = localFilteredNews.slice(0, displayedCount);
     const hasMore = displayedCount < localFilteredNews.length;
 
+    // Sub-tabs configuration
+    const subTabs = [
+        { id: 'all' as const, label: 'Toutes', icon: 'Newspaper' },
+        { id: 'french' as const, label: 'Français', icon: 'Languages' },
+        { id: 'by-source' as const, label: 'Par Source', icon: 'Building2' },
+        { id: 'by-market' as const, label: 'Par Marché', icon: 'Globe' },
+        { id: 'ground' as const, label: 'Ground News', icon: 'Globe' }
+    ];
+
+    // Sync sub-tab changes with filters
+    useEffect(() => {
+        switch (activeSubTab) {
+            case 'french':
+                setLocalFrenchOnly(true);
+                setSelectedSource('all');
+                setSelectedMarket('all');
+                setSelectedTheme('all');
+                break;
+            case 'by-source':
+                setLocalFrenchOnly(false);
+                setSelectedMarket('all');
+                setSelectedTheme('all');
+                break;
+            case 'by-market':
+                setLocalFrenchOnly(false);
+                setSelectedSource('all');
+                setSelectedTheme('all');
+                break;
+            case 'all':
+            default:
+                setLocalFrenchOnly(false);
+                setSelectedSource('all');
+                setSelectedMarket('all');
+                setSelectedTheme('all');
+                break;
+        }
+    }, [activeSubTab]);
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -402,6 +443,43 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                 </p>
             )}
 
+            {/* Secondary Navigation Bar - Sub-tabs */}
+            <div className={`mb-6 p-2 rounded-2xl flex items-center gap-3 overflow-x-auto custom-scrollbar ${
+                isDarkMode 
+                    ? 'bg-gradient-to-r from-slate-900/80 to-slate-800/80 border border-white/10' 
+                    : 'bg-gradient-to-r from-white/80 to-gray-50/80 border border-gray-200'
+            }`}>
+                {subTabs.map((subTab) => {
+                    const isActive = activeSubTab === subTab.id;
+                    return (
+                        <button
+                            key={subTab.id}
+                            data-subtab={subTab.id}
+                            onClick={() => setActiveSubTab(subTab.id)}
+                            className={`group relative px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 border overflow-hidden ${
+                                isActive
+                                    ? (isDarkMode 
+                                        ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20 scale-105' 
+                                        : 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20 scale-105')
+                                    : (isDarkMode 
+                                        ? 'bg-white/5 border-white/5 text-gray-300 hover:bg-white/10 hover:border-white/20 hover:text-white hover:scale-105' 
+                                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-blue-200 hover:text-blue-600 hover:scale-105')
+                            }`}
+                        >
+                            {/* Glow effect for active/hover */}
+                            {isActive && (
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 animate-shimmer" />
+                            )}
+                            
+                            <span className={`relative z-10 transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
+                                <LucideIcon name={subTab.icon} className="w-4 h-4" />
+                            </span>
+                            <span className="relative z-10 whitespace-nowrap">{subTab.label}</span>
+                        </button>
+                    );
+                })}
+            </div>
+
             {/* Statistiques */}
             <div className={`p-4 rounded-xl transition-colors duration-300 ${
                 isDarkMode
@@ -421,7 +499,8 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                 </div>
             </div>
 
-            {/* Filtres */}
+            {/* Filtres - Only show when relevant sub-tab is active */}
+            {(activeSubTab === 'by-source' || activeSubTab === 'by-market' || activeSubTab === 'all') && (
             <div className={`p-6 rounded-xl transition-colors duration-300 ${
                 isDarkMode
                     ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
@@ -546,11 +625,15 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                     </div>
                 )}
             </div>
+            )}
 
-            {/* Ground News Section - Expandable */}
-            <GroundNewsSection isDarkMode={isDarkMode} LucideIcon={LucideIcon} />
+            {/* Ground News Section - Only show when ground sub-tab is active */}
+            {activeSubTab === 'ground' && (
+                <GroundNewsSection isDarkMode={isDarkMode} LucideIcon={LucideIcon} />
+            )}
 
-            {/* Liste des nouvelles avec pagination lazy */}
+            {/* Liste des nouvelles avec pagination lazy - Hide when ground sub-tab is active */}
+            {activeSubTab !== 'ground' && (
             <div className="space-y-4">
                 {localFilteredNews.length === 0 ? (
                     <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -707,6 +790,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                     </>
                 )}
             </div>
+            )}
         </div>
     );
 });

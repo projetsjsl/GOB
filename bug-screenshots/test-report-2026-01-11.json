@@ -1,0 +1,237 @@
+{
+  "testDate": "2026-01-11T14:34:53.432Z",
+  "appStatus": "WORKING",
+  "totalBugs": 11,
+  "consoleErrors": [
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:38.427Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:38.431Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:38.741Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:38.741Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:38.741Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:38.741Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:38.742Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:44.414Z"
+    },
+    {
+      "text": "Error fetching all snapshots: Error: HTTP 500\n    at http://localhost:5173/src/components/tabs/FinanceProTab.tsx:107:31",
+      "timestamp": "2026-01-11T14:34:44.415Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:44.417Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:44.418Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:44.419Z"
+    },
+    {
+      "text": "Error fetching all snapshots: Error: HTTP 500\n    at http://localhost:5173/src/components/tabs/FinanceProTab.tsx:107:31",
+      "timestamp": "2026-01-11T14:34:44.419Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:44.419Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:44.420Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:44.421Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:44.424Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:44.424Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:44.425Z"
+    },
+    {
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2026-01-11T14:34:44.426Z"
+    }
+  ],
+  "networkErrors": [
+    {
+      "url": "https://cdn.jsdelivr.net/npm/recharts@2.10.3/dist/Recharts.js",
+      "failure": "net::ERR_BLOCKED_BY_ORB"
+    },
+    {
+      "url": "https://unpkg.com/recharts@2.10.3/dist/Recharts.js",
+      "failure": "net::ERR_BLOCKED_BY_ORB"
+    },
+    {
+      "url": "http://localhost:5173/api/supabase-watchlist",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5173/api/supabase-watchlist",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://widget-sheriff.tradingview-widget.com/sheriff/api/v1/rules/search?origin=http%3A%2F%2Flocalhost%3A5173",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://widget-sheriff.tradingview-widget.com/sheriff/api/v1/rules/search?origin=http%3A%2F%2Flocalhost%3A5173",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5173/api/finance-snapshots?all=true&current=true",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5173/api/finance-snapshots?ticker=AAPL&current=true",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5173/api/fmp-company-data?symbol=AAPL",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5173/api/finance-snapshots?all=true&current=true",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5173/api/finance-snapshots?ticker=AAPL&current=true",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5173/api/fmp-company-data?symbol=AAPL",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5173/api/fmp-company-data?symbol=GOOGL",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5173/api/fmp-company-data?symbol=MSFT",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5173/api/fmp-company-data?symbol=GOOGL",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5173/api/fmp-company-data?symbol=TSLA",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5173/api/fmp-company-data?symbol=MSFT",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5173/api/fmp-company-data?symbol=NVDA",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5173/api/fmp-company-data?symbol=TSLA",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5173/api/fmp-company-data?symbol=NVDA",
+      "failure": "net::ERR_ABORTED"
+    }
+  ],
+  "bugs": [
+    {
+      "type": "JavaScript Error",
+      "severity": "High",
+      "message": "emmaPopulateJLab is not defined",
+      "stack": "ReferenceError: emmaPopulateJLab is not defined\n    at IntelliStocksTab (http://localhost:5173/src/components/tabs/IntelliStocksTab.tsx:2048:24)\n    at Object.react_stack_bottom_frame (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=abe59498:18507:20)\n    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=abe59498:5652:24)\n    at updateFunctionComponent (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=abe59498:7473:21)\n"
+    },
+    {
+      "type": "Navigation",
+      "severity": "Medium",
+      "location": "Navigation",
+      "message": "Tab button not found: 📧 Briefings"
+    },
+    {
+      "type": "Navigation",
+      "severity": "Medium",
+      "location": "Navigation",
+      "message": "Tab button not found: ⭐ Watchlist"
+    },
+    {
+      "type": "Navigation",
+      "severity": "Medium",
+      "location": "Navigation",
+      "message": "Tab button not found: 📅 Calendar"
+    },
+    {
+      "type": "Navigation",
+      "severity": "Medium",
+      "location": "Navigation",
+      "message": "Tab button not found: 📈 Yield Curve"
+    },
+    {
+      "type": "Navigation",
+      "severity": "Medium",
+      "location": "Navigation",
+      "message": "Tab button not found: 🔬 Analyse Pro"
+    },
+    {
+      "type": "Navigation",
+      "severity": "Medium",
+      "location": "Navigation",
+      "message": "Tab button not found: 🤖 Emma IA™"
+    },
+    {
+      "type": "Navigation",
+      "severity": "Medium",
+      "location": "Navigation",
+      "message": "Tab button not found: 🛠️ Emma Config"
+    },
+    {
+      "type": "Navigation",
+      "severity": "Medium",
+      "location": "Navigation",
+      "message": "Tab button not found: 🧪 Test Only"
+    },
+    {
+      "type": "Navigation",
+      "severity": "Medium",
+      "location": "Navigation",
+      "message": "Tab button not found: ⚙️ Admin"
+    },
+    {
+      "type": "Navigation",
+      "severity": "Medium",
+      "location": "Navigation",
+      "message": "Tab button not found: ➕ Plus"
+    }
+  ]
+}
