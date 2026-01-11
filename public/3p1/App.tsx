@@ -150,7 +150,11 @@ export default function App() {
     }, []);
 
     // --- GLOBAL STATE & PERSISTENCE ---
-    const [showLanding, setShowLanding] = useState(true); // Show landing page by default
+    // Vérifier si l'utilisateur a déjà vu la landing page
+    const [showLanding, setShowLanding] = useState(() => {
+        const hasSeenLanding = localStorage.getItem('3p1-has-seen-landing');
+        return hasSeenLanding !== 'true';
+    });
     const [showDemo, setShowDemo] = useState(false); // Show interactive demo
     const [library, setLibrary] = useState<Record<string, AnalysisProfile>>({});
     const [activeId, setActiveId] = useState<string>('');
@@ -4493,6 +4497,7 @@ export default function App() {
     if (showLanding) {
         return <LandingPage onGetStarted={() => {
             setShowLanding(false);
+            localStorage.setItem('3p1-has-seen-landing', 'true');
             // Afficher le démo après la landing page si aucun ticker n'est sélectionné
             setTimeout(() => {
                 if (!activeId || Object.keys(library).length === 0) {

@@ -56698,7 +56698,10 @@ function App() {
     console.log("   - Bouton 📊 Rapports dans Header");
     console.log("   - Bouton ⚙️ Settings fonctionnel");
   }, []);
-  const [showLanding, setShowLanding] = reactExports.useState(true);
+  const [showLanding, setShowLanding] = reactExports.useState(() => {
+    const hasSeenLanding = localStorage.getItem("3p1-has-seen-landing");
+    return hasSeenLanding !== "true";
+  });
   const [showDemo, setShowDemo] = reactExports.useState(false);
   const [library, setLibrary] = reactExports.useState({});
   const [activeId, setActiveId] = reactExports.useState("");
@@ -60041,6 +60044,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
   if (showLanding) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx(LandingPage, { onGetStarted: () => {
       setShowLanding(false);
+      localStorage.setItem("3p1-has-seen-landing", "true");
       setTimeout(() => {
         if (!activeId || Object.keys(library).length === 0) {
           setShowDemo(true);
