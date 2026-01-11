@@ -56706,7 +56706,7 @@ function App() {
   const [library, setLibrary] = reactExports.useState({});
   const [activeId, setActiveId] = reactExports.useState("");
   const [isInitialized, setIsInitialized] = reactExports.useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = reactExports.useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = reactExports.useState(true);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = reactExports.useState(false);
   const [currentView, setCurrentView] = reactExports.useState("analysis");
   const [isSearchOpen, setIsSearchOpen] = reactExports.useState(false);

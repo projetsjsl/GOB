@@ -159,7 +159,7 @@ export default function App() {
     const [library, setLibrary] = useState<Record<string, AnalysisProfile>>({});
     const [activeId, setActiveId] = useState<string>('');
     const [isInitialized, setIsInitialized] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Open by default
     const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
     const [currentView, setCurrentView] = useState<'analysis' | 'info' | 'kpi'>('analysis');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
