@@ -696,6 +696,16 @@ function _applyThemeInternal(themeId) {
 function getCurrentTheme() {
     try {
         const saved = localStorage.getItem('gob-dashboard-theme');
+        // ✅ FIX: Ignorer 'lightglass' et le remplacer par 'darkmode'
+        if (saved === 'lightglass') {
+            // Supprimer 'lightglass' du localStorage et utiliser 'darkmode'
+            try {
+                localStorage.setItem('gob-dashboard-theme', 'darkmode');
+            } catch (e) {
+                console.warn('Impossible de mettre à jour le thème:', e);
+            }
+            return 'darkmode';
+        }
         // Vérifier dans tous les thèmes (par défaut + personnalisés)
         if (saved && typeof saved === 'string' && allThemes[saved]) {
             return saved;
@@ -733,6 +743,17 @@ function getTheme(themeId = null) {
     return allThemes[id] || allThemes.darkmode;
 }
 
+// Fonction pour réinitialiser le thème (supprimer du localStorage et appliquer le défaut)
+function resetTheme() {
+    try {
+        localStorage.removeItem('gob-dashboard-theme');
+        return applyTheme('darkmode');
+    } catch (error) {
+        console.warn('Erreur lors de la réinitialisation du thème:', error);
+        return applyTheme('darkmode');
+    }
+}
+
 // Exposer globalement AVANT l'initialisation
 window.GOBThemes = {
     themes: allThemes,
@@ -742,6 +763,7 @@ window.GOBThemes = {
     getCurrentTheme,
     getTheme,
     initTheme,
+    resetTheme, // ✅ Nouvelle fonction pour réinitialiser le thème
     // New helpers to replace isDarkMode
     isLightTheme,
     getTradingViewTheme,

@@ -263,7 +263,7 @@ const ThemeSelector = () => {
     const themeCategories = {
         'Mode': ['light', 'darkmode', 'ia', 'terminal'],
         'Professionnel': ['marketq', 'marketq-dark', 'bloomberg-terminal', 'seeking-alpha'],
-        'Spécial': ['lightglass', 'bloomberg-mobile', 'bloomberg-nostalgie', 'desjardins', 'default']
+        'Spécial': ['bloomberg-mobile', 'bloomberg-nostalgie', 'desjardins', 'default'] // ✅ lightglass retiré car désactivé
     };
 
     return (
