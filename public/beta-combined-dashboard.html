@@ -562,10 +562,30 @@
     <!-- TradingView Lightweight Charts - Bibliothèque officielle pour graphiques personnalisés -->
     <!-- <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script> -->
     <!-- Note: CDN Tailwind utilisé intentionnellement pour ce fichier standalone -->
+    <!-- Tailwind CSS CDN avec JIT pour support complet des classes -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Suppress Tailwind CDN warnings in production
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        gold: {
+                            50: '#fbf7eb', 100: '#f5ecd0', 200: '#ebdcb6',
+                            300: '#dfbc6e', 400: '#d9a843', 500: '#d08f23',
+                            600: '#b46f19', 700: '#905316', 800: '#754316', 900: '#613816',
+                        },
+                        dark: { 900: '#050505', 800: '#0a0a0a', 700: '#121212', 600: '#1a1a1a' }
+                    }
+                }
+            }
+        }
     </script>
-    <!-- Tailwind CSS compilé (remplace le CDN pour production) -->
+    <!-- Tailwind CSS compilé (backup) -->
     <link rel="stylesheet" href="/css/tailwind.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Recharts - Bundled locally (prop-types included in bundle) -->
