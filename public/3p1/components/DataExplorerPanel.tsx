@@ -23,6 +23,7 @@ import {
   FunnelIcon,
   CloudArrowDownIcon
 } from '@heroicons/react/24/outline';
+import { logger } from '../utils/logger';
 
 interface TableInfo {
   name: string;
@@ -267,7 +268,7 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
     // Fallback: check standard keys if pk value is missing in row
     const id = row[pk] || row.id || row.ticker;
 
-    console.log(`[DataExplorer] Deleting from ${selectedTable}, PK=${pk}, ID=${id}`, row);
+    logger.debug(`Deleting from ${selectedTable}, PK=${pk}, ID=${id}`, row);
 
     if (!id) {
        addNotification('error', `Impossible de trouver l'ID (clé primaire: ${pk}) pour cet enregistrement`);
@@ -294,12 +295,12 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
         setTableData(prev => prev.filter(r => (r[pk] || r.id || r.ticker) !== id));
         loadTables(); // Refresh counts in background
       } else {
-        console.error('Delete failed:', result);
+        logger.error('Delete failed:', result);
         addNotification('error', result.error || 'Erreur de suppression');
         setError(result.error);
       }
     } catch (e: any) {
-      console.error('Delete exception:', e);
+      logger.error('Delete exception:', e);
       addNotification('error', e.message);
       setError(e.message);
     } finally {
@@ -869,7 +870,7 @@ const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onCl
         setShowTickerResults(true);
       }
     } catch (e) {
-      console.error(e);
+      logger.error('Error:', e);
     }
   };
 
@@ -907,7 +908,7 @@ const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onCl
         alert("Donnée non trouvée chez FMP pour ce champ.");
       }
     } catch (e) {
-      console.error(e);
+      logger.error('Error:', e);
       alert("Erreur lors de la récupération FMP");
     } finally {
       setLoadingField(null);
