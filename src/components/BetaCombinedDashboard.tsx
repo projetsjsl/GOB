@@ -459,26 +459,23 @@ export const BetaCombinedDashboard: React.FC = () => {
 
     // Memoized active tab component for better performance
     const activeTabContent = useMemo(() => {
-        const TabComponent = (() => {
-            switch (activeTab) {
-                case 'stocks-news': return StocksNewsTab;
-                case 'nouvelles': return NouvellesTab;
-                case 'intellistocks': return IntelliStocksTab;
-                case 'admin-jslai': return AdminJSLaiTab;
-                case 'ask-emma': return AskEmmaTab;
-                case 'emma-config': return EmmaConfigTab;
-                case 'testonly': return TestOnlyTab;
-                case 'email-briefings': return EmailBriefingsTab;
-                case 'plus': return PlusTab;
-                case 'watchlist': return DansWatchlistTab;
-                case 'economic-calendar': return EconomicCalendarTab;
-                case 'yield-curve': return YieldCurveTab;
-                case 'advanced-analysis': return AdvancedAnalysisTab;
-                case 'finance-pro': return FinanceProTab;
-                default: return StocksNewsTab;
-            }
-        })();
-        return <TabComponent {...tabProps} />;
+        switch (activeTab) {
+            case 'stocks-news': return <StocksNewsTab {...tabProps} />;
+            case 'nouvelles': return <NouvellesTab {...tabProps} />;
+            case 'intellistocks': return <IntelliStocksTab {...tabProps} />;
+            case 'admin-jslai': return <AdminJSLaiTab {...tabProps} />;
+            case 'ask-emma': return <AskEmmaTab {...tabProps} />;
+            case 'emma-config': return <EmmaConfigTab {...tabProps} />;
+            case 'testonly': return <TestOnlyTab {...tabProps} />;
+            case 'email-briefings': return <EmailBriefingsTab {...tabProps} />;
+            case 'plus': return <PlusTab {...tabProps} />;
+            case 'watchlist': return <DansWatchlistTab {...tabProps} />;
+            case 'economic-calendar': return <EconomicCalendarTab {...tabProps} />;
+            case 'yield-curve': return <YieldCurveTab {...tabProps} />;
+            case 'advanced-analysis': return <AdvancedAnalysisTab {...tabProps} />;
+            case 'finance-pro': return <FinanceProTab {...tabProps} />;
+            default: return <StocksNewsTab {...tabProps} />;
+        }
     }, [activeTab, tabProps]);
 
     return (
