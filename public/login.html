@@ -15,49 +15,20 @@
     
     <!-- Tailwind CSS -->
     <link rel="stylesheet" href="css/tailwind.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        display: ['"Outfit"', 'sans-serif'],
-                    },
-                    colors: {
-                        gold: {
-                            50: '#fbf7eb',
-                            100: '#f5ecd0',
-                            200: '#ebdcb6',
-                            300: '#dfbc6e',
-                            400: '#d9a843',
-                            500: '#d08f23',
-                            600: '#b46f19',
-                            700: '#905316',
-                            800: '#754316',
-                            900: '#613816',
-                        },
-                        dark: {
-                            900: '#050505',
-                            800: '#0a0a0a',
-                            700: '#121212',
-                            600: '#1a1a1a',
-                        }
-                    },
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        }
-                    }
-                }
-            }
+    <!-- Note: tailwind.config supprimé car le CSS compilé contient déjà les styles personnalisés -->
+    <style>
+        /* Custom styles pour login.html - les classes Tailwind sont déjà dans tailwind.css */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
-    </script>
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        .animate-pulse-slow {
+            animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
 
     <!-- 💾 SAFE STORAGE WRAPPER (Critical for Login) -->
     <script>

@@ -5,59 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emma Config - Gestion Prompts & Variables</title>
     <!-- 🔇 INTERCEPTION CONSOLE ERRORS (extensions, etc.) -->
-    <script>
-        (function() {
-            'use strict';
-            const originalWarn = console.warn;
-            const originalError = console.error;
-            console.warn = function(...args) {
-                const message = args.join(' ');
-                if (message.includes('cdn.tailwindcss.com') || message.includes('should not be used in production')) return;
-                originalWarn.apply(console, args);
-            };
-            console.error = function(...args) {
-                const message = args.join(' ');
-                if (message.includes('share-modal') || message.includes('chrome-extension') || message.includes('extension://')) return;
-                originalError.apply(console, args);
-            };
-            window.onerror = function(message, source) {
-                if (!source) return true;
-                if (String(source).includes('extension://')) return true;
-                return false;
-            };
-        })();
-    </script>
-
-    <!-- 💾 SAFE STORAGE WRAPPER -->
-    <script>
-        (function() {
-            'use strict';
-            const storageAvailable = (type) => {
-                try {
-                    const storage = window[type];
-                    const test = '__test__';
-                    storage.setItem(test, test);
-                    storage.removeItem(test);
-                    return true;
-                } catch (e) { return false; }
-            };
-            const localAvail = storageAvailable('localStorage');
-            const mem = {};
-            const safeLocal = {
-                getItem: (k) => { try { return localAvail ? localStorage.getItem(k) : (mem['l_'+k]||null); } catch(e) { return mem['l_'+k]||null; }},
-                setItem: (k,v) => { try { localAvail ? localStorage.setItem(k,v) : (mem['l_'+k]=String(v)); } catch(e) { mem['l_'+k]=String(v); }},
-                removeItem: (k) => { try { localAvail ? localStorage.removeItem(k) : delete mem['l_'+k]; } catch(e) { delete mem['l_'+k]; }}
-            };
-            if (!localAvail) { try { Object.defineProperty(window, 'localStorage', {value: safeLocal, writable: false}); } catch(e) { window.safeLocalStorage = safeLocal; }}
-        })();
-    </script>
-
-    <link rel="stylesheet" href="css/tailwind.css">
-    <script>
-        tailwind.config = {
-            plugins: []
-        }
-    </script>
+    
     <style>
         /* Preview formatting (remplace prose) */
         .preview-content { font-size: 0.9rem; line-height: 1.6; }

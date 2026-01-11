@@ -5,38 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FinVox - Assistant Financier</title>
     <link rel="stylesheet" href="css/tailwind.css">
+    <style>
+        /* Custom animations - migrées depuis tailwind.config */
+        .animate-pulse-slow { animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-            },
-            colors: {
-              slate: {
-                850: '#1e293b',
-                900: '#0f172a',
-                950: '#020617',
-              },
-              emerald: {
-                450: '#10b981', // Custom bright emerald
-              }
-            },
-            animation: {
-              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-              'wave': 'wave 1.2s ease-in-out infinite',
-            },
-            keyframes: {
-              wave: {
-                '0%, 100%': { height: '10%' },
-                '50%': { height: '60%' },
-              }
-            }
-          }
-        }
-      }
-    </script>
+    
     <style>
       body {
         background-color: #0f172a;
