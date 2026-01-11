@@ -57571,6 +57571,19 @@ Vérifiez votre connexion et réessayez.`,
   }, [activeId, isInitialized, library]);
   reactExports.useEffect(() => {
     if (!isInitialized) return;
+    if (showLanding) return;
+    if (showDemo) return;
+    const currentProfile = library[activeId] || DEFAULT_PROFILE;
+    const currentProfileName = currentProfile.info.name;
+    if (!activeId || currentProfileName === "Chargement...") {
+      const timer = setTimeout(() => {
+        setShowDemo(true);
+      }, 1e3);
+      return () => clearTimeout(timer);
+    }
+  }, [isInitialized, showLanding, activeId, showDemo, library]);
+  reactExports.useEffect(() => {
+    if (!isInitialized) return;
     if (isLoadingProfileRef.current) {
       return;
     }
@@ -60042,19 +60055,6 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
   ] }) : null;
   if (!isInitialized) return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-screen text-slate-500", children: "Chargement..." });
   const profile = library[activeId] || DEFAULT_PROFILE;
-  profile.info.name;
-  reactExports.useEffect(() => {
-    if (!showLanding && !showDemo) {
-      const currentProfile = library[activeId] || DEFAULT_PROFILE;
-      const currentProfileName = currentProfile.info.name;
-      if (!activeId || currentProfileName === "Chargement...") {
-        const timer = setTimeout(() => {
-          setShowDemo(true);
-        }, 1e3);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [showLanding, activeId, showDemo, library]);
   if (showLanding) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx(LandingPage, { onGetStarted: () => {
       setShowLanding(false);

@@ -1335,6 +1335,24 @@ export default function App() {
         }
     }, [activeId, isInitialized, library]);
 
+    // Afficher le démo si aucun ticker n'est sélectionné ou si les données ne sont pas chargées
+    // ⚠️ IMPORTANT: Ce useEffect doit être AVANT TOUS les early returns pour respecter les Rules of Hooks
+    useEffect(() => {
+        if (!isInitialized) return; // Skip si pas encore initialisé
+        if (showLanding) return; // Skip si on est sur la landing page
+        if (showDemo) return; // Skip si le démo est déjà affiché
+        
+        const currentProfile = library[activeId] || DEFAULT_PROFILE;
+        const currentProfileName = currentProfile.info.name;
+        if (!activeId || currentProfileName === 'Chargement...') {
+            // Attendre un peu pour que l'interface se charge
+            const timer = setTimeout(() => {
+                setShowDemo(true);
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [isInitialized, showLanding, activeId, showDemo, library]);
+
     // Save to Library when Active State Changes (optimisé avec requestIdleCallback)
     useEffect(() => {
         if (!isInitialized) return;
@@ -4493,25 +4511,8 @@ export default function App() {
 
     if (!isInitialized) return <div className="flex items-center justify-center h-screen text-slate-500">Chargement...</div>;
 
-    // Get profile before early returns (for useEffect)
+    // Get profile before early returns
     const profile = library[activeId] || DEFAULT_PROFILE;
-    const profileInfoName = profile.info.name;
-    
-    // Afficher le démo si aucun ticker n'est sélectionné ou si les données ne sont pas chargées
-    // ⚠️ IMPORTANT: Ce useEffect doit être AVANT les early returns pour respecter les Rules of Hooks
-    useEffect(() => {
-        if (!showLanding && !showDemo) {
-            const currentProfile = library[activeId] || DEFAULT_PROFILE;
-            const currentProfileName = currentProfile.info.name;
-            if (!activeId || currentProfileName === 'Chargement...') {
-                // Attendre un peu pour que l'interface se charge
-                const timer = setTimeout(() => {
-                    setShowDemo(true);
-                }, 1000);
-                return () => clearTimeout(timer);
-            }
-        }
-    }, [showLanding, activeId, showDemo, library]);
 
     // Show landing page on first visit
     if (showLanding) {
