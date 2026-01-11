@@ -4493,6 +4493,26 @@ export default function App() {
 
     if (!isInitialized) return <div className="flex items-center justify-center h-screen text-slate-500">Chargement...</div>;
 
+    // Get profile before early returns (for useEffect)
+    const profile = library[activeId] || DEFAULT_PROFILE;
+    const profileInfoName = profile.info.name;
+    
+    // Afficher le démo si aucun ticker n'est sélectionné ou si les données ne sont pas chargées
+    // ⚠️ IMPORTANT: Ce useEffect doit être AVANT les early returns pour respecter les Rules of Hooks
+    useEffect(() => {
+        if (!showLanding && !showDemo) {
+            const currentProfile = library[activeId] || DEFAULT_PROFILE;
+            const currentProfileName = currentProfile.info.name;
+            if (!activeId || currentProfileName === 'Chargement...') {
+                // Attendre un peu pour que l'interface se charge
+                const timer = setTimeout(() => {
+                    setShowDemo(true);
+                }, 1000);
+                return () => clearTimeout(timer);
+            }
+        }
+    }, [showLanding, activeId, showDemo, library]);
+
     // Show landing page on first visit
     if (showLanding) {
         return <LandingPage onGetStarted={() => {
@@ -4527,19 +4547,6 @@ export default function App() {
         );
     }
 
-    const profile = library[activeId] || DEFAULT_PROFILE; // Ensure profile is always available
-    const profileInfoName = profile.info.name; // Extraire pour éviter les références instables
-    
-    // Afficher le démo si aucun ticker n'est sélectionné ou si les données ne sont pas chargées
-    useEffect(() => {
-        if (!showLanding && !showDemo && (!activeId || profileInfoName === 'Chargement...')) {
-            // Attendre un peu pour que l'interface se charge
-            const timer = setTimeout(() => {
-                setShowDemo(true);
-            }, 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [showLanding, activeId, profileInfoName, showDemo]);
 
     // Handler générique pour mettre à jour un profil complet (utilisé par KPIDashboard)
     const handleUpdateProfile = (id: string, updates: Partial<AnalysisProfile>) => {
